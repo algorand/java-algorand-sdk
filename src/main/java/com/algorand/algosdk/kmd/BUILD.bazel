@@ -1,0 +1,16 @@
+
+java_library(
+    name = "kmd",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    exports = [
+        "//src/main/java/com/algorand/algosdk/kmd/model:model",
+    ],
+    deps = [
+        "//src/main/java/com/algorand/algosdk/kmd/model:model",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:com_squareup_retrofit2_converter_gson",
+        "@maven//:com_squareup_okhttp3_okhttp",
+    ],
+)
+

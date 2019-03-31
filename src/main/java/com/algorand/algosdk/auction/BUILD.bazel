@@ -1,0 +1,8 @@
+
+java_library(
+    name = "auction",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)

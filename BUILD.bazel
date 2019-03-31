@@ -1,0 +1,10 @@
+
+java_library(
+    name = "algosdk",
+    exports = [
+        "//src/main/java/com/algorand/algosdk/algod:algod",
+        "//src/main/java/com/algorand/algosdk/kmd:kmd",
+        "//src/main/java/com/algorand/algosdk/transaction:transaction",
+    ],
+    visibility = ["//visibility:public"],
+)

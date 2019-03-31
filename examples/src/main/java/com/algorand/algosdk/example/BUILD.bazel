@@ -1,0 +1,10 @@
+
+java_binary(
+    name = "example",
+    srcs = ["Main.java"],
+    main_class = "com.algorand.algosdk.example.Main",
+    deps = [
+        "//:algosdk",
+        "@maven//:com_squareup_retrofit2_retrofit",
+    ],
+)

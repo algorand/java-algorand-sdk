@@ -1,0 +1,8 @@
+
+java_library(
+    name = "mnemonic",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)

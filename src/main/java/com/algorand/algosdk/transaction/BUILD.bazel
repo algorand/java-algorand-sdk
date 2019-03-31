@@ -1,0 +1,8 @@
+
+java_library(
+    name = "transaction",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)

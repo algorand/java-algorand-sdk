@@ -1,0 +1,12 @@
+
+java_library(
+    name = "model",
+    srcs = glob(["*.java"]),
+    visibility = [
+        "//visibility:public",
+    ],
+    deps = [
+        "@maven//:com_google_code_gson_gson",
+        "@maven//:org_apache_commons_commons_lang3"
+    ],
+)
