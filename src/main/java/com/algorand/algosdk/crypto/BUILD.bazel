@@ -1,9 +1,9 @@
 
 java_library(
-    name = "transaction",
+    name = "crypto",
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "//src/main/java/com/algorand/algosdk/crypto:crypto",
+        "@maven//:commons_codec_commons_codec",
     ],
 )

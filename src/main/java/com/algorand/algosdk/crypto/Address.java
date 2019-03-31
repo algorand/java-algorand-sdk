@@ -1,4 +1,4 @@
-package com.algorand.algosdk.account;
+package com.algorand.algosdk.crypto;
 
 
 import org.apache.commons.codec.binary.Base32;
@@ -9,17 +9,18 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Address represents a 32-byte length Algorand address. TODO test and figure out how to encode
+ * Address represents a serializable 32-byte length Algorand address. TODO test and figure out how to encode
  */
 public class Address {
+    /**
+     * The length of an address. Equal to the size of a SHA256 checksum.
+     */
+    public static final int LEN_BYTES = 32;
+
     // the underlying bytes
     private final byte[] bytes;
-
-    // ADDR_LEN_BYTES is equal to the size of a SHA256 checksum.
-    private static final int ADDR_LEN_BYTES  = 32;
     // the length of checksum to append
     private static final int CHECKSUM_LEN_BYTES = 4;
-
     // Used to select checksum alg from provider
     private static final String SHA256_ALG = "SHA-512/256";
 
@@ -29,10 +30,10 @@ public class Address {
      */
     public Address(final byte[] bytes) {
         Objects.requireNonNull(bytes, "bytes must not be null");
-        if (bytes.length != ADDR_LEN_BYTES) {
-            throw new IllegalArgumentException(String.format("Given address length is not %s", ADDR_LEN_BYTES));
+        if (bytes.length != LEN_BYTES) {
+            throw new IllegalArgumentException(String.format("Given address length is not %s", LEN_BYTES));
         }
-        this.bytes = Arrays.copyOf(bytes, bytes.length);
+        this.bytes = Arrays.copyOf(bytes, LEN_BYTES);
     }
 
     /**
@@ -53,18 +54,18 @@ public class Address {
         Base32 codec = new Base32();
         final byte[] checksumAddr = codec.decode(encodedAddr); // may expect padding
         // sanity check length
-        if (checksumAddr.length != ADDR_LEN_BYTES + CHECKSUM_LEN_BYTES) {
+        if (checksumAddr.length != LEN_BYTES + CHECKSUM_LEN_BYTES) {
             throw new IllegalArgumentException("Input string is an invalid address. Wrong length");
         }
         // split into checksum
-        final byte[] checksum = Arrays.copyOfRange(checksumAddr, ADDR_LEN_BYTES, checksumAddr.length);
-        final byte[] addr = Arrays.copyOf(checksumAddr, ADDR_LEN_BYTES); // truncates
+        final byte[] checksum = Arrays.copyOfRange(checksumAddr, LEN_BYTES, checksumAddr.length);
+        final byte[] addr = Arrays.copyOf(checksumAddr, LEN_BYTES); // truncates
 
         // compute expected checksum
         MessageDigest digest = MessageDigest.getInstance(SHA256_ALG);
-        digest.update(Arrays.copyOf(addr, ADDR_LEN_BYTES));
+        digest.update(Arrays.copyOf(addr, LEN_BYTES));
         final byte[] hashedAddr = digest.digest();
-        final byte[] expectedChecksum = Arrays.copyOfRange(hashedAddr, ADDR_LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);
+        final byte[] expectedChecksum = Arrays.copyOfRange(hashedAddr, LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);
 
         // compare
         if (Arrays.equals(checksum, expectedChecksum)) {
@@ -83,11 +84,11 @@ public class Address {
     public String EncodeAsString() throws NoSuchAlgorithmException {
         // compute sha512/256 checksum
         MessageDigest digest = MessageDigest.getInstance(SHA256_ALG);
-        digest.update(Arrays.copyOf(this.bytes, ADDR_LEN_BYTES));
+        digest.update(Arrays.copyOf(this.bytes, LEN_BYTES));
         final byte[] hashedAddr = digest.digest();
 
         // take the last 4 bytes, and append to addr
-        final byte[] checksum = Arrays.copyOfRange(hashedAddr, ADDR_LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);
+        final byte[] checksum = Arrays.copyOfRange(hashedAddr, LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);
         byte[] checksumAddr = Arrays.copyOf(this.bytes, this.bytes.length + CHECKSUM_LEN_BYTES);
         System.arraycopy(checksum, 0, checksumAddr, bytes.length, CHECKSUM_LEN_BYTES);
 

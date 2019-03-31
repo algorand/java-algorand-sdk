@@ -1,6 +1,8 @@
 package com.algorand.algosdk.account;
 
 
+import com.algorand.algosdk.crypto.Address;
+
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;

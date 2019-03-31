@@ -1,6 +1,10 @@
 package com.algorand.algosdk.transaction;
 
 
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.ParticipationPublicKey;
+import com.algorand.algosdk.crypto.VRFPublicKey;
+
 import java.util.Objects;
 
 /**
@@ -9,17 +13,13 @@ import java.util.Objects;
  * TODO msgpack codec tags
  */
 public class Transaction {
-    private static final int TX_ADDR_LEN = 32;
-
     public final Type type;
     public final Header header;
 
     public Transaction(Type type, Header header) {
         // we could do this with annotations but let's avoid pulling in dependencies
-        Objects.requireNonNull(type, "txtype must not be null");
-        Objects.requireNonNull(header, "header must not be null");
-        this.type = type;
-        this.header = header;
+        this.type = Objects.requireNonNull(type, "txtype must not be null");
+        this.header = Objects.requireNonNull(header, "header must not be null");
     }
 
     /**
@@ -45,7 +45,7 @@ public class Transaction {
     }
 
     static public class Header {
-        public final byte[] sender = new byte[TX_ADDR_LEN];
+        public final Address sender;
         public final long fee;
         public final long firstValid;
         public final long lastValid;
@@ -61,55 +61,40 @@ public class Transaction {
          * @param note
          * @param genesisID
          */
-        public Header(byte[] sender, long fee, long firstValid, long lastValid, byte[] note, String genesisID) {
-            Objects.requireNonNull(sender, "sender must not be null");
-            Objects.requireNonNull(genesisID, "genesis ID must not be null");
-
-            if (sender.length != TX_ADDR_LEN) {
-                throw new IllegalArgumentException("sender address wrong length");
-            }
-            System.arraycopy(sender, 0, this.sender, 0, TX_ADDR_LEN);
+        public Header(Address sender, long fee, long firstValid, long lastValid, byte[] note, String genesisID) {
+            this.sender = Objects.requireNonNull(sender, "sender must not be null");
+            this.genesisID = Objects.requireNonNull(genesisID, "genesis ID must not be null");
             this.fee = fee;
             this.firstValid = firstValid;
             this.lastValid = lastValid;
             this.note = note;
-            this.genesisID = genesisID;
         }
     }
 
     static public class KeyregTxnFields {
-        private static final int VOTE_PK_LEN = 32;
-        private static final int VRF_PK_LEN = 32;
-
         // VotePK is the participation public key used in key registration transactions
-        public final byte[] votePK = new byte[VOTE_PK_LEN];
+        public final ParticipationPublicKey votePK;
         // selectionPK is the VRF public key used in key registration transactions
-        public final byte[] selectionPK= new byte[VRF_PK_LEN];
+        public final VRFPublicKey selectionPK;
 
         /**
-         *
-         * @param votePK
-         * @param vrfPK
+         * Create new key registration transaction metadata.
+         * @param votePK a participation public key
+         * @param vrfPK a selection public key
          */
-        public KeyregTxnFields(byte[] votePK, byte[] vrfPK) {
-            Objects.requireNonNull(votePK, "participation key must not be null");
-            Objects.requireNonNull(vrfPK, "selection key must not be null");
-
-            if (votePK.length != VOTE_PK_LEN) {
-                throw new IllegalArgumentException("participation key wrong length");
-            }
-            if (vrfPK.length != VRF_PK_LEN) {
-                throw new IllegalArgumentException("vrf key wrong length");
-            }
-            System.arraycopy(votePK, 0, this.votePK, 0, VOTE_PK_LEN);
-            System.arraycopy(vrfPK, 0, this.selectionPK, 0, VRF_PK_LEN);
+        public KeyregTxnFields(ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
+            this.votePK = Objects.requireNonNull(votePK, "participation key must not be null");
+            this.selectionPK = Objects.requireNonNull(vrfPK, "selection key must not be null");
         }
     }
 
+    /**
+     * TODO
+     */
     static public class PaymentTxnFields {
-        public final byte[] receiver = new byte[TX_ADDR_LEN];
+        public final Address receiver;
         public final long amount;
-        public final byte[] closeRemainderTo; // can be null, optional
+        public final Address closeRemainderTo; // can be null, optional
 
         /**
          *
@@ -117,22 +102,20 @@ public class Transaction {
          * @param amount
          * @param closeRemainderTo
          */
-        public PaymentTxnFields(byte[] receiver, long amount, byte[] closeRemainderTo) {
-            Objects.requireNonNull(receiver, "receiver must not be null");
-            if (receiver.length != TX_ADDR_LEN) {
-                throw new IllegalArgumentException("receiver address wrong length");
-            }
-            System.arraycopy(receiver, 0, this.receiver, 0, TX_ADDR_LEN);
-            if (closeRemainderTo == null) {
-                this.closeRemainderTo = null;
-            } else {
-                if (closeRemainderTo.length != TX_ADDR_LEN) {
-                    throw new IllegalArgumentException("close remainder address wrong length");
-                }
-                this.closeRemainderTo = new byte[TX_ADDR_LEN];
-                System.arraycopy(closeRemainderTo, 0, this.closeRemainderTo, 0, TX_ADDR_LEN);
-            }
+        public PaymentTxnFields(Address receiver, long amount, Address closeRemainderTo) {
+            this.receiver = Objects.requireNonNull(receiver, "receiver must not be null");
+            this.closeRemainderTo = Objects.requireNonNull(closeRemainderTo, "close remainder address must not be null");
             this.amount = amount;
+        }
+
+        /**
+         *
+         * @param receiver
+         * @param amount
+         */
+        public PaymentTxnFields(Address receiver, long amount) {
+            // close out to the zero address
+            this(receiver, amount, new Address(new byte[Address.LEN_BYTES]));
         }
     }
 }
