@@ -1,10 +1,11 @@
 package com.algorand.algosdk.crypto;
 
 
+import com.algorand.algosdk.util.Digest;
+import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.codec.binary.Base32;
 
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -22,8 +23,8 @@ public class Address {
     private final byte[] bytes;
     // the length of checksum to append
     private static final int CHECKSUM_LEN_BYTES = 4;
-    // Used to select checksum alg from provider
-    private static final String SHA256_ALG = "SHA-512/256";
+    // expected length of base32-encoded checksum-appended addresses
+    private static final int EXPECTED_STR_ENCODED_LEN = 58;
 
     /**
      * Create a new address from a byte array.
@@ -64,9 +65,7 @@ public class Address {
         final byte[] addr = Arrays.copyOf(checksumAddr, LEN_BYTES); // truncates
 
         // compute expected checksum
-        MessageDigest digest = MessageDigest.getInstance(SHA256_ALG);
-        digest.update(Arrays.copyOf(addr, LEN_BYTES));
-        final byte[] hashedAddr = digest.digest();
+        final byte[] hashedAddr = Digest.digest(Arrays.copyOf(addr, LEN_BYTES));
         final byte[] expectedChecksum = Arrays.copyOfRange(hashedAddr, LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);
 
         // compare
@@ -85,18 +84,19 @@ public class Address {
      */
     public String EncodeAsString() throws NoSuchAlgorithmException {
         // compute sha512/256 checksum
-        MessageDigest digest = MessageDigest.getInstance(SHA256_ALG);
-        digest.update(Arrays.copyOf(this.bytes, LEN_BYTES));
-        final byte[] hashedAddr = digest.digest();
+        final byte[] hashedAddr = Digest.digest(Arrays.copyOf(bytes, LEN_BYTES));
 
         // take the last 4 bytes, and append to addr
         final byte[] checksum = Arrays.copyOfRange(hashedAddr, LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);
         byte[] checksumAddr = Arrays.copyOf(this.bytes, this.bytes.length + CHECKSUM_LEN_BYTES);
         System.arraycopy(checksum, 0, checksumAddr, bytes.length, CHECKSUM_LEN_BYTES);
 
-        // encode addr+checksum as base32 and return. May pad output.
-        Base32 codec = new Base32();
-        return codec.encodeToString(checksumAddr);
+        // encodeToMsgPack addr+checksum as base32 and return. Strip padding.
+        String res = Encoder.encodeToBase32StripPad(checksumAddr);
+        if (res.length() != EXPECTED_STR_ENCODED_LEN) {
+            throw new RuntimeException("unexpected address length " + res.length());
+        }
+        return res;
     }
 
     @Override

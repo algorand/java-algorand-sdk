@@ -87,14 +87,14 @@ public class Mnemonic {
         }
         byte[] bCopy = Arrays.copyOf(b, KEY_LEN_BYTES);
         String chkWord = checksum(bCopy);
-        if (chkWord != mnemonic[MNEM_LEN_WORDS - CHECKSUM_LEN_WORDS]) {
+        if (!chkWord.equals(mnemonic[MNEM_LEN_WORDS - CHECKSUM_LEN_WORDS])) {
             throw new GeneralSecurityException("checksum failed to validate");
         }
         return Arrays.copyOf(b, KEY_LEN_BYTES);
     }
 
     // returns a word corresponding to the 11 bit checksum of the data
-    private static String checksum(byte[] data) {
+    protected static String checksum(byte[] data) {
         try {
             MessageDigest digest = MessageDigest.getInstance(CHECKSUM_ALG);
             digest.update(Arrays.copyOf(data, data.length));
@@ -118,6 +118,7 @@ public class Mnemonic {
         for (int i = 0; i < arr.length; i++) {
             // numBits is how many bits in arr[i] we've processed
             int v = arr[i];
+            if (v < 0) v += 256; // deal with java signed types
             buffer |= (v << numBits);
             numBits += 8;
             if (numBits >= BITS_PER_WORD) {
@@ -136,6 +137,7 @@ public class Mnemonic {
     }
 
     // reverses toUintNArray, might result in an extra byte
+    // be careful since int is a signed type. But 11 < 32/2 so should be ok.
     private static byte[] toByteArray(int[] arr) {
         int buffer = 0;
         int numBits = 0;
@@ -145,7 +147,7 @@ public class Mnemonic {
         for (int i = 0; i < arr.length; i++) {
             buffer |= (arr[i] << numBits);
             numBits += BITS_PER_WORD;
-            if (numBits >= 8) {
+            while (numBits >= 8) {
                 out[j] = (byte)(buffer&0xff);
                 j++;
                 buffer = buffer >> 8;
