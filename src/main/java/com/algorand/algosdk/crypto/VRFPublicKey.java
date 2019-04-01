@@ -1,5 +1,7 @@
 package com.algorand.algosdk.crypto;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Objects;
 
 /**
@@ -10,7 +12,7 @@ public class VRFPublicKey {
     /**
      * The raw bytes.
      */
-    public final byte[] bytes = new byte[KEY_LEN_BYTES];
+    private final byte[] bytes = new byte[KEY_LEN_BYTES];
 
     /**
      * Create a new VRF key.
@@ -22,5 +24,10 @@ public class VRFPublicKey {
             throw new IllegalArgumentException("vrf key wrong length");
         }
         System.arraycopy(bytes, 0, this.bytes, 0, KEY_LEN_BYTES);
+    }
+
+    @JsonValue
+    public byte[] getBytes() {
+        return this.bytes;
     }
 }

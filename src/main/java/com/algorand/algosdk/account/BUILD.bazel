@@ -4,7 +4,9 @@ java_library(
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//src/main/java/com/algorand/algosdk/auction:auction",
         "//src/main/java/com/algorand/algosdk/crypto:crypto",
         "//src/main/java/com/algorand/algosdk/transaction:transaction",
+        "//src/main/java/com/algorand/algosdk/util:util",
     ],
 )

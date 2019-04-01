@@ -17,6 +17,11 @@ maven_install(
         # Crypto
         "org.bouncycastle:bcprov-jdk15on:1.61",
         # Encoding
+        "com.fasterxml.jackson.core:jackson-core:2.7.9", # 2.7 for android
+        "com.fasterxml.jackson.core:jackson-annotations:2.7.0",
+        "com.fasterxml.jackson.core:jackson-databind:2.7.9",
+        "org.msgpack:msgpack-core:0.8.16",
+        "org.msgpack:jackson-dataformat-msgpack:0.8.16",
         "commons-codec:commons-codec:1.12",
         # Client API
         "com.squareup.retrofit2:retrofit:2.5.0",
@@ -24,6 +29,8 @@ maven_install(
         "org.apache.commons:commons-lang3:3.8.1",
         "com.squareup.okhttp3:okhttp:3.14.0",
         "com.squareup.retrofit2:converter-gson:2.5.0",
+        # Tests
+        "junit:junit:4.12",
     ],
     repositories = [
         "https://repo1.maven.org/maven2",

@@ -1,0 +1,19 @@
+
+java_library(
+    name = "tests",
+    testonly = 1,
+    srcs = glob(["*.java"]),
+    deps = [
+        "//:algosdk",
+        "@maven//:junit_junit",
+        "@maven//:org_bouncycastle_bcprov_jdk15on",
+    ],
+)
+
+java_test(
+    name = "TestAccount",
+    size = "small",
+    runtime_deps = [
+        ":tests",
+    ],
+)

@@ -1,5 +1,7 @@
 package com.algorand.algosdk.crypto;
 
+import com.fasterxml.jackson.annotation.JsonValue;
+
 import java.util.Objects;
 
 /**
@@ -7,10 +9,7 @@ import java.util.Objects;
  */
 public class ParticipationPublicKey {
     private static final int KEY_LEN_BYTES  = 32;
-    /**
-     * The raw bytes.
-     */
-    public final byte[] bytes = new byte[KEY_LEN_BYTES];
+    private final byte[] bytes = new byte[KEY_LEN_BYTES];
 
     /**
      * Create a new participation key.
@@ -22,5 +21,10 @@ public class ParticipationPublicKey {
             throw new IllegalArgumentException("participation key wrong length");
         }
         System.arraycopy(bytes, 0, this.bytes, 0, KEY_LEN_BYTES);
+    }
+
+    @JsonValue
+    public byte[] getBytes() {
+        return this.bytes;
     }
 }

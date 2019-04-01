@@ -1,6 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.codec.binary.Base32;
 
 import java.security.MessageDigest;
@@ -9,7 +10,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Address represents a serializable 32-byte length Algorand address. TODO test and figure out how to encode
+ * Address represents a serializable 32-byte length Algorand address.
  */
 public class Address {
     /**
@@ -40,6 +41,7 @@ public class Address {
      * Get the underlying bytes wrapped by this Address.
      * @return 32 byte array
      */
+    @JsonValue
     public byte[] getBytes() {
         return Arrays.copyOf(bytes, bytes.length);
     }

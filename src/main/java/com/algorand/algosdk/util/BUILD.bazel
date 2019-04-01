@@ -1,0 +1,12 @@
+
+java_library(
+    name = "util",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:com_fasterxml_jackson_core_jackson_core",
+        "@maven//:com_fasterxml_jackson_core_jackson_databind",
+        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@maven//:org_msgpack_jackson_dataformat_msgpack",
+    ],
+)
