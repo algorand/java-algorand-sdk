@@ -5,10 +5,15 @@ import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Signature;
+import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Digest;
 import com.algorand.algosdk.util.Encoder;
+
+import org.bouncycastle.asn1.ASN1Encodable;
+import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -42,7 +47,7 @@ public class Account {
 
     /**
      * Create a new account from an existing PKCS8 encoded keypair and Algorand address.
-     * @param secretKey existing private key. Must be 32 bytes. TODO what format? ASN.1??
+     * @param secretKey existing private key. Must be 32 bytes. Corresponds to seed.
      * @param publicKey existing public key. Must be 32 bytes.
      * @param address existing address. Must be same size as public key.
      * @throws NoSuchAlgorithmException if cryptographic provider not configured
@@ -75,6 +80,10 @@ public class Account {
         this(new FixedSecureRandom(seed));
     }
 
+    public Account(String mnemonic) throws GeneralSecurityException {
+        this(Mnemonic.toKey(mnemonic));
+    }
+
     // randomSrc can be null, in which case system default is used
     private Account(SecureRandom randomSrc) throws NoSuchAlgorithmException {
         KeyPairGenerator gen = KeyPairGenerator.getInstance(KEY_ALGO);
@@ -102,15 +111,6 @@ public class Account {
     }
 
     /**
-     * Convenience method for getting underlying private key for raw operations.
-     * @return the private key as length 32 byte array.
-     */
-    public byte[] getClearTextPrivateKey() {
-        // TODO: unclear what format this is in
-        return this.privateKeyPair.getPrivate().getEncoded();
-    }
-
-    /**
      * Convenience method for getting underlying address.
      * @return account address
      */
@@ -124,7 +124,16 @@ public class Account {
      * @return string a 25 word mnemonic
      */
     public String toMnemonic() {
-        return "";
+        // this is the only place we use a bouncy castle compile-time dependency
+        byte[] X509enc = this.privateKeyPair.getPrivate().getEncoded();
+        PrivateKeyInfo pkinfo = PrivateKeyInfo.getInstance(X509enc);
+        try {
+            ASN1Encodable keyOcts = pkinfo.parsePrivateKey();
+            byte[] res = ASN1OctetString.getInstance(keyOcts).getOctets();
+            return Mnemonic.fromKey(res);
+        } catch (IOException e) {
+            throw new RuntimeException("unexpected behavior", e);
+        }
     }
 
     /**

@@ -1,0 +1,18 @@
+
+java_library(
+    name = "client",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    exports = [
+    ],
+    deps = [
+        "//src/main/java/com/algorand/algosdk/algod/client/auth:auth",
+        "//src/main/java/com/algorand/algosdk/algod/client/lib:lib",
+        "@mavenforswagger//:com_google_code_gson_gson",
+        "@mavenforswagger//:com_squareup_okhttp_okhttp",
+        "@mavenforswagger//:com_squareup_okio_okio",
+        "@mavenforswagger//:org_threeten_threetenbp",
+        "@mavenforswagger//:com_squareup_okhttp_logging_interceptor",
+        "@mavenforswagger//:io_gsonfire_gson_fire",
+    ],
+)

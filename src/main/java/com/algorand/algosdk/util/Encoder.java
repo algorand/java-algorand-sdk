@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.commons.codec.binary.Base32;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
@@ -66,5 +67,15 @@ public class Encoder {
             }
         }
         return paddedStr.substring(0, i);
+    }
+
+    /**
+     * Encode to base64 string. Does not strip padding.
+     * @param bytes input
+     * @return base64 string with appropriate padding
+     */
+    public static String encodeToBase64(byte[] bytes) {
+        Base64 codec = new Base64();
+        return codec.encodeToString(bytes);
     }
 }

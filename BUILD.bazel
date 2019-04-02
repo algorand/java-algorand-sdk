@@ -2,13 +2,27 @@
 java_library(
     name = "algosdk",
     exports = [
-        "//src/main/java/com/algorand/algosdk/algod:algod",
-        "//src/main/java/com/algorand/algosdk/kmd:kmd",
         "//src/main/java/com/algorand/algosdk/account:account",
         "//src/main/java/com/algorand/algosdk/crypto:crypto",
         "//src/main/java/com/algorand/algosdk/mnemonic:mnemonic",
         "//src/main/java/com/algorand/algosdk/transaction:transaction",
         "//src/main/java/com/algorand/algosdk/util:util",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+
+java_library(
+    name = "algosdk-rest-api",
+    exports = [
+        "//src/main/java/com/algorand/algosdk/algod/client:client",
+        "//src/main/java/com/algorand/algosdk/algod/client/api:api",
+        "//src/main/java/com/algorand/algosdk/algod/client/auth:auth",
+        "//src/main/java/com/algorand/algosdk/algod/client/model:model",
+        "//src/main/java/com/algorand/algosdk/kmd/client:client",
+        "//src/main/java/com/algorand/algosdk/kmd/client/api:api",
+        "//src/main/java/com/algorand/algosdk/kmd/client/auth:auth",
+        "//src/main/java/com/algorand/algosdk/kmd/client/model:model",
     ],
     visibility = ["//visibility:public"],
 )

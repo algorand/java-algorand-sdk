@@ -1,0 +1,15 @@
+
+java_library(
+    name = "api",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    exports = [
+    ],
+    deps = [
+        "//src/main/java/com/algorand/algosdk/kmd/client/model:model",
+        "//src/main/java/com/algorand/algosdk/kmd/client/lib:lib",
+        "//src/main/java/com/algorand/algosdk/kmd/client:client",
+        "@mavenforswagger//:com_squareup_okhttp_okhttp",
+        "@mavenforswagger//:com_google_code_gson_gson",
+    ],
+)

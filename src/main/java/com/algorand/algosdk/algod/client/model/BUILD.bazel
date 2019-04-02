@@ -1,0 +1,13 @@
+
+java_library(
+    name = "model",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    exports = [
+    ],
+    deps = [
+        "@mavenforswagger//:io_swagger_swagger_annotations",
+        "@mavenforswagger//:org_apache_commons_commons_lang3",
+        "@mavenforswagger//:com_google_code_gson_gson",
+    ],
+)

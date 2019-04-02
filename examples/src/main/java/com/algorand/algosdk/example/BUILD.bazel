@@ -5,6 +5,7 @@ java_binary(
     main_class = "com.algorand.algosdk.example.Main",
     deps = [
         "//:algosdk",
-        "@maven//:com_squareup_retrofit2_retrofit",
+        "//:algosdk-rest-api",
+        "@maven//:org_bouncycastle_bcprov_jdk15on",
     ],
 )

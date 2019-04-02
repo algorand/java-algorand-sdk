@@ -1,0 +1,12 @@
+
+java_library(
+    name = "auth",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    exports = [
+    ],
+    deps = [
+        "//src/main/java/com/algorand/algosdk/kmd/client/lib:lib",
+        "@mavenforswagger//:com_squareup_okhttp_okhttp",
+    ],
+)
