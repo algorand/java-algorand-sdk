@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,36 +19,57 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTWalletInitRequest is the request for &#x60;POST /v1/wallet/init&#x60;
+ * APIV1POSTWalletRenameRequest is the request for &#x60;POST /v1/wallet/rename&#x60;
  */
-@ApiModel(description = "APIV1POSTWalletInitRequest is the request for `POST /v1/wallet/init`")
+@ApiModel(description = "APIV1POSTWalletRenameRequest is the request for `POST /v1/wallet/rename`")
 
-public class APIV1POSTWalletInitRequest {
-  @SerializedName("WalletID")
-  private String walletID = null;
+public class RenameWalletRequest {
+  @SerializedName("wallet_id")
+  private String walletId = null;
 
-  @SerializedName("WalletPassword")
+  @SerializedName("wallet_name")
+  private String walletName = null;
+
+  @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public APIV1POSTWalletInitRequest walletID(String walletID) {
-    this.walletID = walletID;
+  public RenameWalletRequest walletId(String walletId) {
+    this.walletId = walletId;
     return this;
   }
 
    /**
-   * Get walletID
-   * @return walletID
+   * Get walletId
+   * @return walletId
   **/
   @ApiModelProperty(value = "")
-  public String getWalletID() {
-    return walletID;
+  public String getWalletId() {
+    return walletId;
   }
 
-  public void setWalletID(String walletID) {
-    this.walletID = walletID;
+  public void setWalletId(String walletId) {
+    this.walletId = walletId;
   }
 
-  public APIV1POSTWalletInitRequest walletPassword(String walletPassword) {
+  public RenameWalletRequest walletName(String walletName) {
+    this.walletName = walletName;
+    return this;
+  }
+
+   /**
+   * Get walletName
+   * @return walletName
+  **/
+  @ApiModelProperty(value = "")
+  public String getWalletName() {
+    return walletName;
+  }
+
+  public void setWalletName(String walletName) {
+    this.walletName = walletName;
+  }
+
+  public RenameWalletRequest walletPassword(String walletPassword) {
     this.walletPassword = walletPassword;
     return this;
   }
@@ -75,23 +96,25 @@ public class APIV1POSTWalletInitRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTWalletInitRequest apIV1POSTWalletInitRequest = (APIV1POSTWalletInitRequest) o;
-    return ObjectUtils.equals(this.walletID, apIV1POSTWalletInitRequest.walletID) &&
-    ObjectUtils.equals(this.walletPassword, apIV1POSTWalletInitRequest.walletPassword);
+    RenameWalletRequest renameWalletRequest = (RenameWalletRequest) o;
+    return ObjectUtils.equals(this.walletId, renameWalletRequest.walletId) &&
+    ObjectUtils.equals(this.walletName, renameWalletRequest.walletName) &&
+    ObjectUtils.equals(this.walletPassword, renameWalletRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(walletID, walletPassword);
+    return ObjectUtils.hashCodeMulti(walletId, walletName, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTWalletInitRequest {\n");
+    sb.append("class RenameWalletRequest {\n");
     
-    sb.append("    walletID: ").append(toIndentedString(walletID)).append("\n");
+    sb.append("    walletId: ").append(toIndentedString(walletId)).append("\n");
+    sb.append("    walletName: ").append(toIndentedString(walletName)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");
     return sb.toString();

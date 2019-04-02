@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,57 +19,57 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTWalletRenameRequest is the request for &#x60;POST /v1/wallet/rename&#x60;
+ * APIV1DELETEKeyRequest is the request for &#x60;DELETE /v1/key&#x60;
  */
-@ApiModel(description = "APIV1POSTWalletRenameRequest is the request for `POST /v1/wallet/rename`")
+@ApiModel(description = "APIV1DELETEKeyRequest is the request for `DELETE /v1/key`")
 
-public class APIV1POSTWalletRenameRequest {
-  @SerializedName("NewWalletName")
-  private String newWalletName = null;
+public class DeleteKeyRequest {
+  @SerializedName("address")
+  private String address = null;
 
-  @SerializedName("WalletID")
-  private String walletID = null;
+  @SerializedName("wallet_handle_token")
+  private String walletHandleToken = null;
 
-  @SerializedName("WalletPassword")
+  @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public APIV1POSTWalletRenameRequest newWalletName(String newWalletName) {
-    this.newWalletName = newWalletName;
+  public DeleteKeyRequest address(String address) {
+    this.address = address;
     return this;
   }
 
    /**
-   * Get newWalletName
-   * @return newWalletName
+   * Get address
+   * @return address
   **/
   @ApiModelProperty(value = "")
-  public String getNewWalletName() {
-    return newWalletName;
+  public String getAddress() {
+    return address;
   }
 
-  public void setNewWalletName(String newWalletName) {
-    this.newWalletName = newWalletName;
+  public void setAddress(String address) {
+    this.address = address;
   }
 
-  public APIV1POSTWalletRenameRequest walletID(String walletID) {
-    this.walletID = walletID;
+  public DeleteKeyRequest walletHandleToken(String walletHandleToken) {
+    this.walletHandleToken = walletHandleToken;
     return this;
   }
 
    /**
-   * Get walletID
-   * @return walletID
+   * Get walletHandleToken
+   * @return walletHandleToken
   **/
   @ApiModelProperty(value = "")
-  public String getWalletID() {
-    return walletID;
+  public String getWalletHandleToken() {
+    return walletHandleToken;
   }
 
-  public void setWalletID(String walletID) {
-    this.walletID = walletID;
+  public void setWalletHandleToken(String walletHandleToken) {
+    this.walletHandleToken = walletHandleToken;
   }
 
-  public APIV1POSTWalletRenameRequest walletPassword(String walletPassword) {
+  public DeleteKeyRequest walletPassword(String walletPassword) {
     this.walletPassword = walletPassword;
     return this;
   }
@@ -96,25 +96,25 @@ public class APIV1POSTWalletRenameRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTWalletRenameRequest apIV1POSTWalletRenameRequest = (APIV1POSTWalletRenameRequest) o;
-    return ObjectUtils.equals(this.newWalletName, apIV1POSTWalletRenameRequest.newWalletName) &&
-    ObjectUtils.equals(this.walletID, apIV1POSTWalletRenameRequest.walletID) &&
-    ObjectUtils.equals(this.walletPassword, apIV1POSTWalletRenameRequest.walletPassword);
+    DeleteKeyRequest deleteKeyRequest = (DeleteKeyRequest) o;
+    return ObjectUtils.equals(this.address, deleteKeyRequest.address) &&
+    ObjectUtils.equals(this.walletHandleToken, deleteKeyRequest.walletHandleToken) &&
+    ObjectUtils.equals(this.walletPassword, deleteKeyRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(newWalletName, walletID, walletPassword);
+    return ObjectUtils.hashCodeMulti(address, walletHandleToken, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTWalletRenameRequest {\n");
+    sb.append("class DeleteKeyRequest {\n");
     
-    sb.append("    newWalletName: ").append(toIndentedString(newWalletName)).append("\n");
-    sb.append("    walletID: ").append(toIndentedString(walletID)).append("\n");
+    sb.append("    address: ").append(toIndentedString(address)).append("\n");
+    sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");
     return sb.toString();

@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -27,23 +27,23 @@ import java.util.List;
 @ApiModel(description = "APIV1Wallet is the API's representation of a wallet")
 
 public class APIV1Wallet {
-  @SerializedName("DriverName")
+  @SerializedName("driver_name")
   private String driverName = null;
 
-  @SerializedName("DriverVersion")
+  @SerializedName("driver_version")
   private Integer driverVersion = null;
 
-  @SerializedName("ID")
-  private String ID = null;
+  @SerializedName("id")
+  private String id = null;
 
-  @SerializedName("Name")
+  @SerializedName("mnemonic_ux")
+  private Boolean mnemonicUx = null;
+
+  @SerializedName("name")
   private String name = null;
 
-  @SerializedName("SupportedTransactions")
-  private List<String> supportedTransactions = null;
-
-  @SerializedName("SupportsMnemonicUX")
-  private Boolean supportsMnemonicUX = null;
+  @SerializedName("supported_txs")
+  private List<String> supportedTxs = null;
 
   public APIV1Wallet driverName(String driverName) {
     this.driverName = driverName;
@@ -81,22 +81,40 @@ public class APIV1Wallet {
     this.driverVersion = driverVersion;
   }
 
-  public APIV1Wallet ID(String ID) {
-    this.ID = ID;
+  public APIV1Wallet id(String id) {
+    this.id = id;
     return this;
   }
 
    /**
-   * Get ID
-   * @return ID
+   * Get id
+   * @return id
   **/
   @ApiModelProperty(value = "")
-  public String getID() {
-    return ID;
+  public String getId() {
+    return id;
   }
 
-  public void setID(String ID) {
-    this.ID = ID;
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public APIV1Wallet mnemonicUx(Boolean mnemonicUx) {
+    this.mnemonicUx = mnemonicUx;
+    return this;
+  }
+
+   /**
+   * Get mnemonicUx
+   * @return mnemonicUx
+  **/
+  @ApiModelProperty(value = "")
+  public Boolean isMnemonicUx() {
+    return mnemonicUx;
+  }
+
+  public void setMnemonicUx(Boolean mnemonicUx) {
+    this.mnemonicUx = mnemonicUx;
   }
 
   public APIV1Wallet name(String name) {
@@ -117,48 +135,30 @@ public class APIV1Wallet {
     this.name = name;
   }
 
-  public APIV1Wallet supportedTransactions(List<String> supportedTransactions) {
-    this.supportedTransactions = supportedTransactions;
+  public APIV1Wallet supportedTxs(List<String> supportedTxs) {
+    this.supportedTxs = supportedTxs;
     return this;
   }
 
-  public APIV1Wallet addSupportedTransactionsItem(String supportedTransactionsItem) {
-    if (this.supportedTransactions == null) {
-      this.supportedTransactions = new ArrayList<String>();
+  public APIV1Wallet addSupportedTxsItem(String supportedTxsItem) {
+    if (this.supportedTxs == null) {
+      this.supportedTxs = new ArrayList<String>();
     }
-    this.supportedTransactions.add(supportedTransactionsItem);
+    this.supportedTxs.add(supportedTxsItem);
     return this;
   }
 
    /**
-   * Get supportedTransactions
-   * @return supportedTransactions
+   * Get supportedTxs
+   * @return supportedTxs
   **/
   @ApiModelProperty(value = "")
-  public List<String> getSupportedTransactions() {
-    return supportedTransactions;
+  public List<String> getSupportedTxs() {
+    return supportedTxs;
   }
 
-  public void setSupportedTransactions(List<String> supportedTransactions) {
-    this.supportedTransactions = supportedTransactions;
-  }
-
-  public APIV1Wallet supportsMnemonicUX(Boolean supportsMnemonicUX) {
-    this.supportsMnemonicUX = supportsMnemonicUX;
-    return this;
-  }
-
-   /**
-   * Get supportsMnemonicUX
-   * @return supportsMnemonicUX
-  **/
-  @ApiModelProperty(value = "")
-  public Boolean isSupportsMnemonicUX() {
-    return supportsMnemonicUX;
-  }
-
-  public void setSupportsMnemonicUX(Boolean supportsMnemonicUX) {
-    this.supportsMnemonicUX = supportsMnemonicUX;
+  public void setSupportedTxs(List<String> supportedTxs) {
+    this.supportedTxs = supportedTxs;
   }
 
 
@@ -173,15 +173,15 @@ public class APIV1Wallet {
     APIV1Wallet apIV1Wallet = (APIV1Wallet) o;
     return ObjectUtils.equals(this.driverName, apIV1Wallet.driverName) &&
     ObjectUtils.equals(this.driverVersion, apIV1Wallet.driverVersion) &&
-    ObjectUtils.equals(this.ID, apIV1Wallet.ID) &&
+    ObjectUtils.equals(this.id, apIV1Wallet.id) &&
+    ObjectUtils.equals(this.mnemonicUx, apIV1Wallet.mnemonicUx) &&
     ObjectUtils.equals(this.name, apIV1Wallet.name) &&
-    ObjectUtils.equals(this.supportedTransactions, apIV1Wallet.supportedTransactions) &&
-    ObjectUtils.equals(this.supportsMnemonicUX, apIV1Wallet.supportsMnemonicUX);
+    ObjectUtils.equals(this.supportedTxs, apIV1Wallet.supportedTxs);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(driverName, driverVersion, ID, name, supportedTransactions, supportsMnemonicUX);
+    return ObjectUtils.hashCodeMulti(driverName, driverVersion, id, mnemonicUx, name, supportedTxs);
   }
 
 
@@ -192,10 +192,10 @@ public class APIV1Wallet {
     
     sb.append("    driverName: ").append(toIndentedString(driverName)).append("\n");
     sb.append("    driverVersion: ").append(toIndentedString(driverVersion)).append("\n");
-    sb.append("    ID: ").append(toIndentedString(ID)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    mnemonicUx: ").append(toIndentedString(mnemonicUx)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
-    sb.append("    supportedTransactions: ").append(toIndentedString(supportedTransactions)).append("\n");
-    sb.append("    supportsMnemonicUX: ").append(toIndentedString(supportsMnemonicUX)).append("\n");
+    sb.append("    supportedTxs: ").append(toIndentedString(supportedTxs)).append("\n");
     sb.append("}");
     return sb.toString();
   }

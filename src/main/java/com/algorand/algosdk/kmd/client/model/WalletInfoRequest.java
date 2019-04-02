@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,15 +19,15 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTKeysListRequest is the request for &#x60;POST /v1/keys/list&#x60;
+ * APIV1POSTWalletInfoRequest is the request for &#x60;POST /v1/wallet/info&#x60;
  */
-@ApiModel(description = "APIV1POSTKeysListRequest is the request for `POST /v1/keys/list`")
+@ApiModel(description = "APIV1POSTWalletInfoRequest is the request for `POST /v1/wallet/info`")
 
-public class APIV1POSTKeysListRequest {
-  @SerializedName("WalletHandleToken")
+public class WalletInfoRequest {
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public APIV1POSTKeysListRequest walletHandleToken(String walletHandleToken) {
+  public WalletInfoRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -54,8 +54,8 @@ public class APIV1POSTKeysListRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTKeysListRequest apIV1POSTKeysListRequest = (APIV1POSTKeysListRequest) o;
-    return ObjectUtils.equals(this.walletHandleToken, apIV1POSTKeysListRequest.walletHandleToken);
+    WalletInfoRequest walletInfoRequest = (WalletInfoRequest) o;
+    return ObjectUtils.equals(this.walletHandleToken, walletInfoRequest.walletHandleToken);
   }
 
   @Override
@@ -67,7 +67,7 @@ public class APIV1POSTKeysListRequest {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTKeysListRequest {\n");
+    sb.append("class WalletInfoRequest {\n");
     
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("}");

@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -30,7 +30,10 @@ public class MasterDerivationKey extends ArrayList<Integer> {
   if (this == o) {
     return true;
   }
-      return o != null && getClass() == o.getClass();
+  if (o == null || getClass() != o.getClass()) {
+    return false;
+  }
+    return true;
   }
 
   @Override

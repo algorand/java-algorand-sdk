@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -23,17 +23,14 @@ import org.apache.commons.lang3.ObjectUtils;
  */
 @ApiModel(description = "APIV1POSTMultisigExportRequest is the request for `POST /v1/multisig/export`")
 
-public class APIV1POSTMultisigExportRequest {
-  @SerializedName("Address")
-  private Address address = null;
+public class ExportMultisigRequest {
+  @SerializedName("address")
+  private String address = null;
 
-  @SerializedName("WalletHandleToken")
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  @SerializedName("WalletPassword")
-  private String walletPassword = null;
-
-  public APIV1POSTMultisigExportRequest address(Address address) {
+  public ExportMultisigRequest address(String address) {
     this.address = address;
     return this;
   }
@@ -43,15 +40,15 @@ public class APIV1POSTMultisigExportRequest {
    * @return address
   **/
   @ApiModelProperty(value = "")
-  public Address getAddress() {
+  public String getAddress() {
     return address;
   }
 
-  public void setAddress(Address address) {
+  public void setAddress(String address) {
     this.address = address;
   }
 
-  public APIV1POSTMultisigExportRequest walletHandleToken(String walletHandleToken) {
+  public ExportMultisigRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -69,24 +66,6 @@ public class APIV1POSTMultisigExportRequest {
     this.walletHandleToken = walletHandleToken;
   }
 
-  public APIV1POSTMultisigExportRequest walletPassword(String walletPassword) {
-    this.walletPassword = walletPassword;
-    return this;
-  }
-
-   /**
-   * Get walletPassword
-   * @return walletPassword
-  **/
-  @ApiModelProperty(value = "")
-  public String getWalletPassword() {
-    return walletPassword;
-  }
-
-  public void setWalletPassword(String walletPassword) {
-    this.walletPassword = walletPassword;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -96,26 +75,24 @@ public class APIV1POSTMultisigExportRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTMultisigExportRequest apIV1POSTMultisigExportRequest = (APIV1POSTMultisigExportRequest) o;
-    return ObjectUtils.equals(this.address, apIV1POSTMultisigExportRequest.address) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1POSTMultisigExportRequest.walletHandleToken) &&
-    ObjectUtils.equals(this.walletPassword, apIV1POSTMultisigExportRequest.walletPassword);
+    ExportMultisigRequest exportMultisigRequest = (ExportMultisigRequest) o;
+    return ObjectUtils.equals(this.address, exportMultisigRequest.address) &&
+    ObjectUtils.equals(this.walletHandleToken, exportMultisigRequest.walletHandleToken);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(address, walletHandleToken, walletPassword);
+    return ObjectUtils.hashCodeMulti(address, walletHandleToken);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTMultisigExportRequest {\n");
+    sb.append("class ExportMultisigRequest {\n");
     
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
-    sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");
     return sb.toString();
   }

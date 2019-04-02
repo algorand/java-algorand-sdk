@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,18 +19,15 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTMasterKeyExportRequest is the request for &#x60;POST /v1/master_key/export&#x60;
+ * APIV1POSTWalletReleaseRequest is the request for &#x60;POST /v1/wallet/release&#x60;
  */
-@ApiModel(description = "APIV1POSTMasterKeyExportRequest is the request for `POST /v1/master_key/export`")
+@ApiModel(description = "APIV1POSTWalletReleaseRequest is the request for `POST /v1/wallet/release`")
 
-public class APIV1POSTMasterKeyExportRequest {
-  @SerializedName("WalletHandleToken")
+public class ReleaseWalletHandleTokenRequest {
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  @SerializedName("WalletPassword")
-  private String walletPassword = null;
-
-  public APIV1POSTMasterKeyExportRequest walletHandleToken(String walletHandleToken) {
+  public ReleaseWalletHandleTokenRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -48,24 +45,6 @@ public class APIV1POSTMasterKeyExportRequest {
     this.walletHandleToken = walletHandleToken;
   }
 
-  public APIV1POSTMasterKeyExportRequest walletPassword(String walletPassword) {
-    this.walletPassword = walletPassword;
-    return this;
-  }
-
-   /**
-   * Get walletPassword
-   * @return walletPassword
-  **/
-  @ApiModelProperty(value = "")
-  public String getWalletPassword() {
-    return walletPassword;
-  }
-
-  public void setWalletPassword(String walletPassword) {
-    this.walletPassword = walletPassword;
-  }
-
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -75,24 +54,22 @@ public class APIV1POSTMasterKeyExportRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTMasterKeyExportRequest apIV1POSTMasterKeyExportRequest = (APIV1POSTMasterKeyExportRequest) o;
-    return ObjectUtils.equals(this.walletHandleToken, apIV1POSTMasterKeyExportRequest.walletHandleToken) &&
-    ObjectUtils.equals(this.walletPassword, apIV1POSTMasterKeyExportRequest.walletPassword);
+    ReleaseWalletHandleTokenRequest releaseWalletHandleTokenRequest = (ReleaseWalletHandleTokenRequest) o;
+    return ObjectUtils.equals(this.walletHandleToken, releaseWalletHandleTokenRequest.walletHandleToken);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(walletHandleToken, walletPassword);
+    return ObjectUtils.hashCodeMulti(walletHandleToken);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTMasterKeyExportRequest {\n");
+    sb.append("class ReleaseWalletHandleTokenRequest {\n");
     
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
-    sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");
     return sb.toString();
   }

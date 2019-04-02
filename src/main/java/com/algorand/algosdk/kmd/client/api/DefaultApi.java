@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -14,9 +14,7 @@
 package com.algorand.algosdk.kmd.client.api;
 
 import com.algorand.algosdk.kmd.client.*;
-import com.algorand.algosdk.kmd.client.lib.Pair;
-import com.algorand.algosdk.kmd.client.model.APIV1Wallet;
-import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
+import com.algorand.algosdk.kmd.client.model.*;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
@@ -47,14 +45,14 @@ public class DefaultApi {
 
     /**
      * Build call for createWallet
-     * @param walletInfo wallet info (required)
+     * @param createWalletRequest  (required)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call createWalletCall(CreateWalletRequest walletInfo, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        Object localVarPostBody = walletInfo;
+    public com.squareup.okhttp.Call createWalletCall(CreateWalletRequest createWalletRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = createWalletRequest;
 
         // create path and map variables
         String localVarPath = "/v1/wallet";
@@ -95,53 +93,53 @@ public class DefaultApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call createWalletValidateBeforeCall(CreateWalletRequest walletInfo, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call createWalletValidateBeforeCall(CreateWalletRequest createWalletRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
-        // verify the required parameter 'walletInfo' is set
-        if (walletInfo == null) {
-            throw new ApiException("Missing the required parameter 'walletInfo' when calling createWallet(Async)");
+        // verify the required parameter 'createWalletRequest' is set
+        if (createWalletRequest == null) {
+            throw new ApiException("Missing the required parameter 'createWalletRequest' when calling createWallet(Async)");
         }
         
 
-        com.squareup.okhttp.Call call = createWalletCall(walletInfo, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = createWalletCall(createWalletRequest, progressListener, progressRequestListener);
         return call;
 
     }
 
     /**
-     * Creates a wallet.
-     * 
-     * @param walletInfo wallet info (required)
-     * @return APIV1Wallet
+     * Create a wallet
+     * Create a new wallet (collection of keys) with the given parameters.
+     * @param createWalletRequest  (required)
+     * @return APIV1POSTWalletResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public APIV1Wallet createWallet(CreateWalletRequest walletInfo) throws ApiException {
-        ApiResponse<APIV1Wallet> resp = createWalletWithHttpInfo(walletInfo);
+    public APIV1POSTWalletResponse createWallet(CreateWalletRequest createWalletRequest) throws ApiException {
+        ApiResponse<APIV1POSTWalletResponse> resp = createWalletWithHttpInfo(createWalletRequest);
         return resp.getData();
     }
 
     /**
-     * Creates a wallet.
-     * 
-     * @param walletInfo wallet info (required)
-     * @return ApiResponse&lt;APIV1Wallet&gt;
+     * Create a wallet
+     * Create a new wallet (collection of keys) with the given parameters.
+     * @param createWalletRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTWalletResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<APIV1Wallet> createWalletWithHttpInfo(CreateWalletRequest walletInfo) throws ApiException {
-        com.squareup.okhttp.Call call = createWalletValidateBeforeCall(walletInfo, null, null);
-        Type localVarReturnType = new TypeToken<APIV1Wallet>(){}.getType();
+    public ApiResponse<APIV1POSTWalletResponse> createWalletWithHttpInfo(CreateWalletRequest createWalletRequest) throws ApiException {
+        com.squareup.okhttp.Call call = createWalletValidateBeforeCall(createWalletRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletResponse>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
 
     /**
-     * Creates a wallet. (asynchronously)
-     * 
-     * @param walletInfo wallet info (required)
+     * Create a wallet (asynchronously)
+     * Create a new wallet (collection of keys) with the given parameters.
+     * @param createWalletRequest  (required)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call createWalletAsync(CreateWalletRequest walletInfo, final ApiCallback<APIV1Wallet> callback) throws ApiException {
+    public com.squareup.okhttp.Call createWalletAsync(CreateWalletRequest createWalletRequest, final ApiCallback<APIV1POSTWalletResponse> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -162,8 +160,2421 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = createWalletValidateBeforeCall(walletInfo, progressListener, progressRequestListener);
-        Type localVarReturnType = new TypeToken<APIV1Wallet>(){}.getType();
+        com.squareup.okhttp.Call call = createWalletValidateBeforeCall(createWalletRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for deleteKey
+     * @param deleteKeyRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call deleteKeyCall(DeleteKeyRequest deleteKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = deleteKeyRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/key";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call deleteKeyValidateBeforeCall(DeleteKeyRequest deleteKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'deleteKeyRequest' is set
+        if (deleteKeyRequest == null) {
+            throw new ApiException("Missing the required parameter 'deleteKeyRequest' when calling deleteKey(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = deleteKeyCall(deleteKeyRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Delete a key
+     * Deletes the key with the passed public key from the wallet.
+     * @param deleteKeyRequest  (required)
+     * @return APIV1DELETEKeyResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1DELETEKeyResponse deleteKey(DeleteKeyRequest deleteKeyRequest) throws ApiException {
+        ApiResponse<APIV1DELETEKeyResponse> resp = deleteKeyWithHttpInfo(deleteKeyRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Delete a key
+     * Deletes the key with the passed public key from the wallet.
+     * @param deleteKeyRequest  (required)
+     * @return ApiResponse&lt;APIV1DELETEKeyResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1DELETEKeyResponse> deleteKeyWithHttpInfo(DeleteKeyRequest deleteKeyRequest) throws ApiException {
+        com.squareup.okhttp.Call call = deleteKeyValidateBeforeCall(deleteKeyRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1DELETEKeyResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Delete a key (asynchronously)
+     * Deletes the key with the passed public key from the wallet.
+     * @param deleteKeyRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call deleteKeyAsync(DeleteKeyRequest deleteKeyRequest, final ApiCallback<APIV1DELETEKeyResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = deleteKeyValidateBeforeCall(deleteKeyRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1DELETEKeyResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for deleteMultisig
+     * @param deleteMultisigRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call deleteMultisigCall(DeleteMultisigRequest deleteMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = deleteMultisigRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/multisig";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "DELETE", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call deleteMultisigValidateBeforeCall(DeleteMultisigRequest deleteMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'deleteMultisigRequest' is set
+        if (deleteMultisigRequest == null) {
+            throw new ApiException("Missing the required parameter 'deleteMultisigRequest' when calling deleteMultisig(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = deleteMultisigCall(deleteMultisigRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Delete a multisig
+     * Deletes multisig preimage information for the passed address from the wallet. 
+     * @param deleteMultisigRequest  (required)
+     * @return APIV1DELETEMultisigResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1DELETEMultisigResponse deleteMultisig(DeleteMultisigRequest deleteMultisigRequest) throws ApiException {
+        ApiResponse<APIV1DELETEMultisigResponse> resp = deleteMultisigWithHttpInfo(deleteMultisigRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Delete a multisig
+     * Deletes multisig preimage information for the passed address from the wallet. 
+     * @param deleteMultisigRequest  (required)
+     * @return ApiResponse&lt;APIV1DELETEMultisigResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1DELETEMultisigResponse> deleteMultisigWithHttpInfo(DeleteMultisigRequest deleteMultisigRequest) throws ApiException {
+        com.squareup.okhttp.Call call = deleteMultisigValidateBeforeCall(deleteMultisigRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1DELETEMultisigResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Delete a multisig (asynchronously)
+     * Deletes multisig preimage information for the passed address from the wallet. 
+     * @param deleteMultisigRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call deleteMultisigAsync(DeleteMultisigRequest deleteMultisigRequest, final ApiCallback<APIV1DELETEMultisigResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = deleteMultisigValidateBeforeCall(deleteMultisigRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1DELETEMultisigResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for exportKey
+     * @param exportKeyRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call exportKeyCall(ExportKeyRequest exportKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = exportKeyRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/key/export";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call exportKeyValidateBeforeCall(ExportKeyRequest exportKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'exportKeyRequest' is set
+        if (exportKeyRequest == null) {
+            throw new ApiException("Missing the required parameter 'exportKeyRequest' when calling exportKey(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = exportKeyCall(exportKeyRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Export a key
+     * Export the secret key associated with the passed public key.
+     * @param exportKeyRequest  (required)
+     * @return APIV1POSTKeyExportResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTKeyExportResponse exportKey(ExportKeyRequest exportKeyRequest) throws ApiException {
+        ApiResponse<APIV1POSTKeyExportResponse> resp = exportKeyWithHttpInfo(exportKeyRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Export a key
+     * Export the secret key associated with the passed public key.
+     * @param exportKeyRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTKeyExportResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTKeyExportResponse> exportKeyWithHttpInfo(ExportKeyRequest exportKeyRequest) throws ApiException {
+        com.squareup.okhttp.Call call = exportKeyValidateBeforeCall(exportKeyRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyExportResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Export a key (asynchronously)
+     * Export the secret key associated with the passed public key.
+     * @param exportKeyRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call exportKeyAsync(ExportKeyRequest exportKeyRequest, final ApiCallback<APIV1POSTKeyExportResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = exportKeyValidateBeforeCall(exportKeyRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyExportResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for exportMasterKey
+     * @param exportMasterKeyRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call exportMasterKeyCall(ExportMasterKeyRequest exportMasterKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = exportMasterKeyRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/master-key/export";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call exportMasterKeyValidateBeforeCall(ExportMasterKeyRequest exportMasterKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'exportMasterKeyRequest' is set
+        if (exportMasterKeyRequest == null) {
+            throw new ApiException("Missing the required parameter 'exportMasterKeyRequest' when calling exportMasterKey(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = exportMasterKeyCall(exportMasterKeyRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Export the master derivation key from a wallet
+     * Export the master derivation key from the wallet. This key is a master \&quot;backup\&quot; key for the underlying wallet. With it, you can regenerate all of the wallets that have been generated with this wallet&#39;s &#x60;POST /v1/key&#x60; endpoint. This key will not allow you to recover keys imported from other wallets, however. 
+     * @param exportMasterKeyRequest  (required)
+     * @return APIV1POSTMasterKeyExportResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTMasterKeyExportResponse exportMasterKey(ExportMasterKeyRequest exportMasterKeyRequest) throws ApiException {
+        ApiResponse<APIV1POSTMasterKeyExportResponse> resp = exportMasterKeyWithHttpInfo(exportMasterKeyRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Export the master derivation key from a wallet
+     * Export the master derivation key from the wallet. This key is a master \&quot;backup\&quot; key for the underlying wallet. With it, you can regenerate all of the wallets that have been generated with this wallet&#39;s &#x60;POST /v1/key&#x60; endpoint. This key will not allow you to recover keys imported from other wallets, however. 
+     * @param exportMasterKeyRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTMasterKeyExportResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTMasterKeyExportResponse> exportMasterKeyWithHttpInfo(ExportMasterKeyRequest exportMasterKeyRequest) throws ApiException {
+        com.squareup.okhttp.Call call = exportMasterKeyValidateBeforeCall(exportMasterKeyRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTMasterKeyExportResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Export the master derivation key from a wallet (asynchronously)
+     * Export the master derivation key from the wallet. This key is a master \&quot;backup\&quot; key for the underlying wallet. With it, you can regenerate all of the wallets that have been generated with this wallet&#39;s &#x60;POST /v1/key&#x60; endpoint. This key will not allow you to recover keys imported from other wallets, however. 
+     * @param exportMasterKeyRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call exportMasterKeyAsync(ExportMasterKeyRequest exportMasterKeyRequest, final ApiCallback<APIV1POSTMasterKeyExportResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = exportMasterKeyValidateBeforeCall(exportMasterKeyRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTMasterKeyExportResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for exportMultisig
+     * @param exportMultisigRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call exportMultisigCall(ExportMultisigRequest exportMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = exportMultisigRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/multisig/export";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call exportMultisigValidateBeforeCall(ExportMultisigRequest exportMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'exportMultisigRequest' is set
+        if (exportMultisigRequest == null) {
+            throw new ApiException("Missing the required parameter 'exportMultisigRequest' when calling exportMultisig(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = exportMultisigCall(exportMultisigRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Export multisig address metadata
+     * Given a multisig address whose preimage this wallet stores, returns the information used to generate the address, including public keys, threshold, and multisig version. 
+     * @param exportMultisigRequest  (required)
+     * @return APIV1POSTMultisigExportResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTMultisigExportResponse exportMultisig(ExportMultisigRequest exportMultisigRequest) throws ApiException {
+        ApiResponse<APIV1POSTMultisigExportResponse> resp = exportMultisigWithHttpInfo(exportMultisigRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Export multisig address metadata
+     * Given a multisig address whose preimage this wallet stores, returns the information used to generate the address, including public keys, threshold, and multisig version. 
+     * @param exportMultisigRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTMultisigExportResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTMultisigExportResponse> exportMultisigWithHttpInfo(ExportMultisigRequest exportMultisigRequest) throws ApiException {
+        com.squareup.okhttp.Call call = exportMultisigValidateBeforeCall(exportMultisigRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigExportResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Export multisig address metadata (asynchronously)
+     * Given a multisig address whose preimage this wallet stores, returns the information used to generate the address, including public keys, threshold, and multisig version. 
+     * @param exportMultisigRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call exportMultisigAsync(ExportMultisigRequest exportMultisigRequest, final ApiCallback<APIV1POSTMultisigExportResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = exportMultisigValidateBeforeCall(exportMultisigRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigExportResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for generateKey
+     * @param generateKeyRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call generateKeyCall(GenerateKeyRequest generateKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = generateKeyRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/key";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call generateKeyValidateBeforeCall(GenerateKeyRequest generateKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'generateKeyRequest' is set
+        if (generateKeyRequest == null) {
+            throw new ApiException("Missing the required parameter 'generateKeyRequest' when calling generateKey(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = generateKeyCall(generateKeyRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Generate a key
+     * Generates the next key in the deterministic key sequence (as determined by the master derivation key) and adds it to the wallet, returning the public key. 
+     * @param generateKeyRequest  (required)
+     * @return APIV1POSTKeyResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTKeyResponse generateKey(GenerateKeyRequest generateKeyRequest) throws ApiException {
+        ApiResponse<APIV1POSTKeyResponse> resp = generateKeyWithHttpInfo(generateKeyRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Generate a key
+     * Generates the next key in the deterministic key sequence (as determined by the master derivation key) and adds it to the wallet, returning the public key. 
+     * @param generateKeyRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTKeyResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTKeyResponse> generateKeyWithHttpInfo(GenerateKeyRequest generateKeyRequest) throws ApiException {
+        com.squareup.okhttp.Call call = generateKeyValidateBeforeCall(generateKeyRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Generate a key (asynchronously)
+     * Generates the next key in the deterministic key sequence (as determined by the master derivation key) and adds it to the wallet, returning the public key. 
+     * @param generateKeyRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call generateKeyAsync(GenerateKeyRequest generateKeyRequest, final ApiCallback<APIV1POSTKeyResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = generateKeyValidateBeforeCall(generateKeyRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for getVersion
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call getVersionCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/versions";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call getVersionValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+
+        com.squareup.okhttp.Call call = getVersionCall(progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * 
+     * Retrieves the current version
+     * @return VersionsResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public VersionsResponse getVersion() throws ApiException {
+        ApiResponse<VersionsResponse> resp = getVersionWithHttpInfo();
+        return resp.getData();
+    }
+
+    /**
+     * 
+     * Retrieves the current version
+     * @return ApiResponse&lt;VersionsResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<VersionsResponse> getVersionWithHttpInfo() throws ApiException {
+        com.squareup.okhttp.Call call = getVersionValidateBeforeCall(null, null);
+        Type localVarReturnType = new TypeToken<VersionsResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     *  (asynchronously)
+     * Retrieves the current version
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call getVersionAsync(final ApiCallback<VersionsResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = getVersionValidateBeforeCall(progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<VersionsResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for getWalletInfo
+     * @param getWalletInfoRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call getWalletInfoCall(WalletInfoRequest getWalletInfoRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = getWalletInfoRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/wallet/info";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call getWalletInfoValidateBeforeCall(WalletInfoRequest getWalletInfoRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'getWalletInfoRequest' is set
+        if (getWalletInfoRequest == null) {
+            throw new ApiException("Missing the required parameter 'getWalletInfoRequest' when calling getWalletInfo(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = getWalletInfoCall(getWalletInfoRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Get wallet info
+     * Returns information about the wallet associated with the passed wallet handle token. Additionally returns expiration information about the token itself. 
+     * @param getWalletInfoRequest  (required)
+     * @return APIV1POSTWalletInfoResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTWalletInfoResponse getWalletInfo(WalletInfoRequest getWalletInfoRequest) throws ApiException {
+        ApiResponse<APIV1POSTWalletInfoResponse> resp = getWalletInfoWithHttpInfo(getWalletInfoRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Get wallet info
+     * Returns information about the wallet associated with the passed wallet handle token. Additionally returns expiration information about the token itself. 
+     * @param getWalletInfoRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTWalletInfoResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTWalletInfoResponse> getWalletInfoWithHttpInfo(WalletInfoRequest getWalletInfoRequest) throws ApiException {
+        com.squareup.okhttp.Call call = getWalletInfoValidateBeforeCall(getWalletInfoRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletInfoResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Get wallet info (asynchronously)
+     * Returns information about the wallet associated with the passed wallet handle token. Additionally returns expiration information about the token itself. 
+     * @param getWalletInfoRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call getWalletInfoAsync(WalletInfoRequest getWalletInfoRequest, final ApiCallback<APIV1POSTWalletInfoResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = getWalletInfoValidateBeforeCall(getWalletInfoRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletInfoResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for importKey
+     * @param importKeyRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call importKeyCall(ImportKeyRequest importKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = importKeyRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/key/import";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call importKeyValidateBeforeCall(ImportKeyRequest importKeyRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'importKeyRequest' is set
+        if (importKeyRequest == null) {
+            throw new ApiException("Missing the required parameter 'importKeyRequest' when calling importKey(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = importKeyCall(importKeyRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Import a key
+     * Import an externally generated key into the wallet. Note that if you wish to back up the imported key, you must do so by backing up the entire wallet database, because imported keys were not derived from the wallet&#39;s master derivation key. 
+     * @param importKeyRequest  (required)
+     * @return APIV1POSTKeyImportResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTKeyImportResponse importKey(ImportKeyRequest importKeyRequest) throws ApiException {
+        ApiResponse<APIV1POSTKeyImportResponse> resp = importKeyWithHttpInfo(importKeyRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Import a key
+     * Import an externally generated key into the wallet. Note that if you wish to back up the imported key, you must do so by backing up the entire wallet database, because imported keys were not derived from the wallet&#39;s master derivation key. 
+     * @param importKeyRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTKeyImportResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTKeyImportResponse> importKeyWithHttpInfo(ImportKeyRequest importKeyRequest) throws ApiException {
+        com.squareup.okhttp.Call call = importKeyValidateBeforeCall(importKeyRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyImportResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Import a key (asynchronously)
+     * Import an externally generated key into the wallet. Note that if you wish to back up the imported key, you must do so by backing up the entire wallet database, because imported keys were not derived from the wallet&#39;s master derivation key. 
+     * @param importKeyRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call importKeyAsync(ImportKeyRequest importKeyRequest, final ApiCallback<APIV1POSTKeyImportResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = importKeyValidateBeforeCall(importKeyRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyImportResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for importMultisig
+     * @param importMultisigRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call importMultisigCall(ImportMultisigRequest importMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = importMultisigRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/multisig/import";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call importMultisigValidateBeforeCall(ImportMultisigRequest importMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'importMultisigRequest' is set
+        if (importMultisigRequest == null) {
+            throw new ApiException("Missing the required parameter 'importMultisigRequest' when calling importMultisig(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = importMultisigCall(importMultisigRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Import a multisig account
+     * Generates a multisig account from the passed public keys array and multisig metadata, and stores all of this in the wallet. 
+     * @param importMultisigRequest  (required)
+     * @return APIV1POSTMultisigImportResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTMultisigImportResponse importMultisig(ImportMultisigRequest importMultisigRequest) throws ApiException {
+        ApiResponse<APIV1POSTMultisigImportResponse> resp = importMultisigWithHttpInfo(importMultisigRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Import a multisig account
+     * Generates a multisig account from the passed public keys array and multisig metadata, and stores all of this in the wallet. 
+     * @param importMultisigRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTMultisigImportResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTMultisigImportResponse> importMultisigWithHttpInfo(ImportMultisigRequest importMultisigRequest) throws ApiException {
+        com.squareup.okhttp.Call call = importMultisigValidateBeforeCall(importMultisigRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigImportResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Import a multisig account (asynchronously)
+     * Generates a multisig account from the passed public keys array and multisig metadata, and stores all of this in the wallet. 
+     * @param importMultisigRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call importMultisigAsync(ImportMultisigRequest importMultisigRequest, final ApiCallback<APIV1POSTMultisigImportResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = importMultisigValidateBeforeCall(importMultisigRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigImportResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for initWalletHandleToken
+     * @param initializeWalletHandleTokenRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call initWalletHandleTokenCall(InitWalletHandleTokenRequest initializeWalletHandleTokenRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = initializeWalletHandleTokenRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/wallet/init";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call initWalletHandleTokenValidateBeforeCall(InitWalletHandleTokenRequest initializeWalletHandleTokenRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'initializeWalletHandleTokenRequest' is set
+        if (initializeWalletHandleTokenRequest == null) {
+            throw new ApiException("Missing the required parameter 'initializeWalletHandleTokenRequest' when calling initWalletHandleToken(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = initWalletHandleTokenCall(initializeWalletHandleTokenRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Initialize a wallet handle token
+     * Unlock the wallet and return a wallet handle token that can be used for subsequent operations. These tokens expire periodically and must be renewed. You can &#x60;POST&#x60; the token to &#x60;/v1/wallet/info&#x60; to see how much time remains until expiration, and renew it with &#x60;/v1/wallet/renew&#x60;. When you&#39;re done, you can invalidate the token with &#x60;/v1/wallet/release&#x60;. 
+     * @param initializeWalletHandleTokenRequest  (required)
+     * @return APIV1POSTWalletInitResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTWalletInitResponse initWalletHandleToken(InitWalletHandleTokenRequest initializeWalletHandleTokenRequest) throws ApiException {
+        ApiResponse<APIV1POSTWalletInitResponse> resp = initWalletHandleTokenWithHttpInfo(initializeWalletHandleTokenRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Initialize a wallet handle token
+     * Unlock the wallet and return a wallet handle token that can be used for subsequent operations. These tokens expire periodically and must be renewed. You can &#x60;POST&#x60; the token to &#x60;/v1/wallet/info&#x60; to see how much time remains until expiration, and renew it with &#x60;/v1/wallet/renew&#x60;. When you&#39;re done, you can invalidate the token with &#x60;/v1/wallet/release&#x60;. 
+     * @param initializeWalletHandleTokenRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTWalletInitResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTWalletInitResponse> initWalletHandleTokenWithHttpInfo(InitWalletHandleTokenRequest initializeWalletHandleTokenRequest) throws ApiException {
+        com.squareup.okhttp.Call call = initWalletHandleTokenValidateBeforeCall(initializeWalletHandleTokenRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletInitResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Initialize a wallet handle token (asynchronously)
+     * Unlock the wallet and return a wallet handle token that can be used for subsequent operations. These tokens expire periodically and must be renewed. You can &#x60;POST&#x60; the token to &#x60;/v1/wallet/info&#x60; to see how much time remains until expiration, and renew it with &#x60;/v1/wallet/renew&#x60;. When you&#39;re done, you can invalidate the token with &#x60;/v1/wallet/release&#x60;. 
+     * @param initializeWalletHandleTokenRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call initWalletHandleTokenAsync(InitWalletHandleTokenRequest initializeWalletHandleTokenRequest, final ApiCallback<APIV1POSTWalletInitResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = initWalletHandleTokenValidateBeforeCall(initializeWalletHandleTokenRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletInitResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for listKeysInWallet
+     * @param listKeysRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call listKeysInWalletCall(ListKeysRequest listKeysRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = listKeysRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/key/list";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call listKeysInWalletValidateBeforeCall(ListKeysRequest listKeysRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'listKeysRequest' is set
+        if (listKeysRequest == null) {
+            throw new ApiException("Missing the required parameter 'listKeysRequest' when calling listKeysInWallet(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = listKeysInWalletCall(listKeysRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * List keys in wallet
+     * Lists all of the public keys in this wallet. All of them have a stored private key.
+     * @param listKeysRequest  (required)
+     * @return APIV1POSTKeyListResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTKeyListResponse listKeysInWallet(ListKeysRequest listKeysRequest) throws ApiException {
+        ApiResponse<APIV1POSTKeyListResponse> resp = listKeysInWalletWithHttpInfo(listKeysRequest);
+        return resp.getData();
+    }
+
+    /**
+     * List keys in wallet
+     * Lists all of the public keys in this wallet. All of them have a stored private key.
+     * @param listKeysRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTKeyListResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTKeyListResponse> listKeysInWalletWithHttpInfo(ListKeysRequest listKeysRequest) throws ApiException {
+        com.squareup.okhttp.Call call = listKeysInWalletValidateBeforeCall(listKeysRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyListResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * List keys in wallet (asynchronously)
+     * Lists all of the public keys in this wallet. All of them have a stored private key.
+     * @param listKeysRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call listKeysInWalletAsync(ListKeysRequest listKeysRequest, final ApiCallback<APIV1POSTKeyListResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = listKeysInWalletValidateBeforeCall(listKeysRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTKeyListResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for listMultisg
+     * @param listMultisigRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call listMultisgCall(ListMultisigRequest listMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = listMultisigRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/multisig/list";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call listMultisgValidateBeforeCall(ListMultisigRequest listMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'listMultisigRequest' is set
+        if (listMultisigRequest == null) {
+            throw new ApiException("Missing the required parameter 'listMultisigRequest' when calling listMultisg(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = listMultisgCall(listMultisigRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * List multisig accounts
+     * Lists all of the multisig accounts whose preimages this wallet stores
+     * @param listMultisigRequest  (required)
+     * @return APIV1POSTMultisigListResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTMultisigListResponse listMultisg(ListMultisigRequest listMultisigRequest) throws ApiException {
+        ApiResponse<APIV1POSTMultisigListResponse> resp = listMultisgWithHttpInfo(listMultisigRequest);
+        return resp.getData();
+    }
+
+    /**
+     * List multisig accounts
+     * Lists all of the multisig accounts whose preimages this wallet stores
+     * @param listMultisigRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTMultisigListResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTMultisigListResponse> listMultisgWithHttpInfo(ListMultisigRequest listMultisigRequest) throws ApiException {
+        com.squareup.okhttp.Call call = listMultisgValidateBeforeCall(listMultisigRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigListResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * List multisig accounts (asynchronously)
+     * Lists all of the multisig accounts whose preimages this wallet stores
+     * @param listMultisigRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call listMultisgAsync(ListMultisigRequest listMultisigRequest, final ApiCallback<APIV1POSTMultisigListResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = listMultisgValidateBeforeCall(listMultisigRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigListResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for listWallets
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call listWalletsCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/wallets";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call listWalletsValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+
+        com.squareup.okhttp.Call call = listWalletsCall(progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * List wallets
+     * Lists all of the wallets that kmd is aware of.
+     * @return APIV1GETWalletsResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1GETWalletsResponse listWallets() throws ApiException {
+        ApiResponse<APIV1GETWalletsResponse> resp = listWalletsWithHttpInfo();
+        return resp.getData();
+    }
+
+    /**
+     * List wallets
+     * Lists all of the wallets that kmd is aware of.
+     * @return ApiResponse&lt;APIV1GETWalletsResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1GETWalletsResponse> listWalletsWithHttpInfo() throws ApiException {
+        com.squareup.okhttp.Call call = listWalletsValidateBeforeCall(null, null);
+        Type localVarReturnType = new TypeToken<APIV1GETWalletsResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * List wallets (asynchronously)
+     * Lists all of the wallets that kmd is aware of.
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call listWalletsAsync(final ApiCallback<APIV1GETWalletsResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = listWalletsValidateBeforeCall(progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1GETWalletsResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for releaseWalletHandleToken
+     * @param releaseWalletHandleTokenRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call releaseWalletHandleTokenCall(ReleaseWalletHandleTokenRequest releaseWalletHandleTokenRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = releaseWalletHandleTokenRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/wallet/release";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call releaseWalletHandleTokenValidateBeforeCall(ReleaseWalletHandleTokenRequest releaseWalletHandleTokenRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'releaseWalletHandleTokenRequest' is set
+        if (releaseWalletHandleTokenRequest == null) {
+            throw new ApiException("Missing the required parameter 'releaseWalletHandleTokenRequest' when calling releaseWalletHandleToken(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = releaseWalletHandleTokenCall(releaseWalletHandleTokenRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Release a wallet handle token
+     * Invalidate the passed wallet handle token, making it invalid for use in subsequent requests.
+     * @param releaseWalletHandleTokenRequest  (required)
+     * @return APIV1POSTWalletReleaseResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTWalletReleaseResponse releaseWalletHandleToken(ReleaseWalletHandleTokenRequest releaseWalletHandleTokenRequest) throws ApiException {
+        ApiResponse<APIV1POSTWalletReleaseResponse> resp = releaseWalletHandleTokenWithHttpInfo(releaseWalletHandleTokenRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Release a wallet handle token
+     * Invalidate the passed wallet handle token, making it invalid for use in subsequent requests.
+     * @param releaseWalletHandleTokenRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTWalletReleaseResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTWalletReleaseResponse> releaseWalletHandleTokenWithHttpInfo(ReleaseWalletHandleTokenRequest releaseWalletHandleTokenRequest) throws ApiException {
+        com.squareup.okhttp.Call call = releaseWalletHandleTokenValidateBeforeCall(releaseWalletHandleTokenRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletReleaseResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Release a wallet handle token (asynchronously)
+     * Invalidate the passed wallet handle token, making it invalid for use in subsequent requests.
+     * @param releaseWalletHandleTokenRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call releaseWalletHandleTokenAsync(ReleaseWalletHandleTokenRequest releaseWalletHandleTokenRequest, final ApiCallback<APIV1POSTWalletReleaseResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = releaseWalletHandleTokenValidateBeforeCall(releaseWalletHandleTokenRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletReleaseResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for renameWallet
+     * @param renameWalletRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call renameWalletCall(RenameWalletRequest renameWalletRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = renameWalletRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/wallet/rename";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call renameWalletValidateBeforeCall(RenameWalletRequest renameWalletRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'renameWalletRequest' is set
+        if (renameWalletRequest == null) {
+            throw new ApiException("Missing the required parameter 'renameWalletRequest' when calling renameWallet(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = renameWalletCall(renameWalletRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Rename a wallet
+     * Rename the underlying wallet to something else
+     * @param renameWalletRequest  (required)
+     * @return APIV1POSTWalletRenameResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTWalletRenameResponse renameWallet(RenameWalletRequest renameWalletRequest) throws ApiException {
+        ApiResponse<APIV1POSTWalletRenameResponse> resp = renameWalletWithHttpInfo(renameWalletRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Rename a wallet
+     * Rename the underlying wallet to something else
+     * @param renameWalletRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTWalletRenameResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTWalletRenameResponse> renameWalletWithHttpInfo(RenameWalletRequest renameWalletRequest) throws ApiException {
+        com.squareup.okhttp.Call call = renameWalletValidateBeforeCall(renameWalletRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletRenameResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Rename a wallet (asynchronously)
+     * Rename the underlying wallet to something else
+     * @param renameWalletRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call renameWalletAsync(RenameWalletRequest renameWalletRequest, final ApiCallback<APIV1POSTWalletRenameResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = renameWalletValidateBeforeCall(renameWalletRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletRenameResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for renewWalletHandleToken
+     * @param renewWalletHandleTokenRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call renewWalletHandleTokenCall(RenewWalletHandleTokenRequest renewWalletHandleTokenRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = renewWalletHandleTokenRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/wallet/renew";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call renewWalletHandleTokenValidateBeforeCall(RenewWalletHandleTokenRequest renewWalletHandleTokenRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'renewWalletHandleTokenRequest' is set
+        if (renewWalletHandleTokenRequest == null) {
+            throw new ApiException("Missing the required parameter 'renewWalletHandleTokenRequest' when calling renewWalletHandleToken(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = renewWalletHandleTokenCall(renewWalletHandleTokenRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Renew a wallet handle token
+     * Renew a wallet handle token, increasing its expiration duration to its initial value
+     * @param renewWalletHandleTokenRequest  (required)
+     * @return APIV1POSTWalletRenewResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTWalletRenewResponse renewWalletHandleToken(RenewWalletHandleTokenRequest renewWalletHandleTokenRequest) throws ApiException {
+        ApiResponse<APIV1POSTWalletRenewResponse> resp = renewWalletHandleTokenWithHttpInfo(renewWalletHandleTokenRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Renew a wallet handle token
+     * Renew a wallet handle token, increasing its expiration duration to its initial value
+     * @param renewWalletHandleTokenRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTWalletRenewResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTWalletRenewResponse> renewWalletHandleTokenWithHttpInfo(RenewWalletHandleTokenRequest renewWalletHandleTokenRequest) throws ApiException {
+        com.squareup.okhttp.Call call = renewWalletHandleTokenValidateBeforeCall(renewWalletHandleTokenRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletRenewResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Renew a wallet handle token (asynchronously)
+     * Renew a wallet handle token, increasing its expiration duration to its initial value
+     * @param renewWalletHandleTokenRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call renewWalletHandleTokenAsync(RenewWalletHandleTokenRequest renewWalletHandleTokenRequest, final ApiCallback<APIV1POSTWalletRenewResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = renewWalletHandleTokenValidateBeforeCall(renewWalletHandleTokenRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTWalletRenewResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for signMultisigTransaction
+     * @param signMultisigTransactionRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call signMultisigTransactionCall(SignMultisigRequest signMultisigTransactionRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = signMultisigTransactionRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/multisig/sign";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call signMultisigTransactionValidateBeforeCall(SignMultisigRequest signMultisigTransactionRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'signMultisigTransactionRequest' is set
+        if (signMultisigTransactionRequest == null) {
+            throw new ApiException("Missing the required parameter 'signMultisigTransactionRequest' when calling signMultisigTransaction(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = signMultisigTransactionCall(signMultisigTransactionRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Sign a multisig transaction
+     * Start a multisig signature, or add a signature to a partially completed multisig signature object. 
+     * @param signMultisigTransactionRequest  (required)
+     * @return APIV1POSTMultisigTransactionSignResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTMultisigTransactionSignResponse signMultisigTransaction(SignMultisigRequest signMultisigTransactionRequest) throws ApiException {
+        ApiResponse<APIV1POSTMultisigTransactionSignResponse> resp = signMultisigTransactionWithHttpInfo(signMultisigTransactionRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Sign a multisig transaction
+     * Start a multisig signature, or add a signature to a partially completed multisig signature object. 
+     * @param signMultisigTransactionRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTMultisigTransactionSignResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTMultisigTransactionSignResponse> signMultisigTransactionWithHttpInfo(SignMultisigRequest signMultisigTransactionRequest) throws ApiException {
+        com.squareup.okhttp.Call call = signMultisigTransactionValidateBeforeCall(signMultisigTransactionRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigTransactionSignResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Sign a multisig transaction (asynchronously)
+     * Start a multisig signature, or add a signature to a partially completed multisig signature object. 
+     * @param signMultisigTransactionRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call signMultisigTransactionAsync(SignMultisigRequest signMultisigTransactionRequest, final ApiCallback<APIV1POSTMultisigTransactionSignResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = signMultisigTransactionValidateBeforeCall(signMultisigTransactionRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTMultisigTransactionSignResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for signTransaction
+     * @param signTransactionRequest  (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call signTransactionCall(SignTransactionRequest signTransactionRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = signTransactionRequest;
+
+        // create path and map variables
+        String localVarPath = "/v1/transaction/sign";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "POST", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call signTransactionValidateBeforeCall(SignTransactionRequest signTransactionRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'signTransactionRequest' is set
+        if (signTransactionRequest == null) {
+            throw new ApiException("Missing the required parameter 'signTransactionRequest' when calling signTransaction(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = signTransactionCall(signTransactionRequest, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Sign a transaction
+     * Signs the passed transaction with a key from the wallet, determined by the sender encoded in the transaction. 
+     * @param signTransactionRequest  (required)
+     * @return APIV1POSTTransactionSignResponse
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public APIV1POSTTransactionSignResponse signTransaction(SignTransactionRequest signTransactionRequest) throws ApiException {
+        ApiResponse<APIV1POSTTransactionSignResponse> resp = signTransactionWithHttpInfo(signTransactionRequest);
+        return resp.getData();
+    }
+
+    /**
+     * Sign a transaction
+     * Signs the passed transaction with a key from the wallet, determined by the sender encoded in the transaction. 
+     * @param signTransactionRequest  (required)
+     * @return ApiResponse&lt;APIV1POSTTransactionSignResponse&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<APIV1POSTTransactionSignResponse> signTransactionWithHttpInfo(SignTransactionRequest signTransactionRequest) throws ApiException {
+        com.squareup.okhttp.Call call = signTransactionValidateBeforeCall(signTransactionRequest, null, null);
+        Type localVarReturnType = new TypeToken<APIV1POSTTransactionSignResponse>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Sign a transaction (asynchronously)
+     * Signs the passed transaction with a key from the wallet, determined by the sender encoded in the transaction. 
+     * @param signTransactionRequest  (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call signTransactionAsync(SignTransactionRequest signTransactionRequest, final ApiCallback<APIV1POSTTransactionSignResponse> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = signTransactionValidateBeforeCall(signTransactionRequest, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<APIV1POSTTransactionSignResponse>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
+     * Build call for swaggerHandler
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call swaggerHandlerCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/swagger.json";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call swaggerHandlerValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+
+        com.squareup.okhttp.Call call = swaggerHandlerCall(progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Gets the current swagger spec.
+     * Returns the entire swagger spec in json.
+     * @return String
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public String swaggerHandler() throws ApiException {
+        ApiResponse<String> resp = swaggerHandlerWithHttpInfo();
+        return resp.getData();
+    }
+
+    /**
+     * Gets the current swagger spec.
+     * Returns the entire swagger spec in json.
+     * @return ApiResponse&lt;String&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<String> swaggerHandlerWithHttpInfo() throws ApiException {
+        com.squareup.okhttp.Call call = swaggerHandlerValidateBeforeCall(null, null);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Gets the current swagger spec. (asynchronously)
+     * Returns the entire swagger spec in json.
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call swaggerHandlerAsync(final ApiCallback<String> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = swaggerHandlerValidateBeforeCall(progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<String>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
     }

@@ -19,57 +19,36 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTWalletRequest is the request for &#x60;POST /v1/wallet&#x60;
+ * APIV1POSTWalletInitRequest is the request for &#x60;POST /v1/wallet/init&#x60;
  */
-@ApiModel(description = "APIV1POSTWalletRequest is the request for `POST /v1/wallet`")
+@ApiModel(description = "APIV1POSTWalletInitRequest is the request for `POST /v1/wallet/init`")
 
-public class CreateWalletRequest {
-  @SerializedName("wallet_driver_name")
-  private String walletDriverName = null;
-
-  @SerializedName("wallet_name")
-  private String walletName = null;
+public class InitWalletHandleTokenRequest {
+  @SerializedName("wallet_id")
+  private String walletId = null;
 
   @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public CreateWalletRequest walletDriverName(String walletDriverName) {
-    this.walletDriverName = walletDriverName;
+  public InitWalletHandleTokenRequest walletId(String walletId) {
+    this.walletId = walletId;
     return this;
   }
 
    /**
-   * Get walletDriverName
-   * @return walletDriverName
+   * Get walletId
+   * @return walletId
   **/
   @ApiModelProperty(value = "")
-  public String getWalletDriverName() {
-    return walletDriverName;
+  public String getWalletId() {
+    return walletId;
   }
 
-  public void setWalletDriverName(String walletDriverName) {
-    this.walletDriverName = walletDriverName;
+  public void setWalletId(String walletId) {
+    this.walletId = walletId;
   }
 
-  public CreateWalletRequest walletName(String walletName) {
-    this.walletName = walletName;
-    return this;
-  }
-
-   /**
-   * Get walletName
-   * @return walletName
-  **/
-  @ApiModelProperty(value = "")
-  public String getWalletName() {
-    return walletName;
-  }
-
-  public void setWalletName(String walletName) {
-    this.walletName = walletName;
-  }
-
-  public CreateWalletRequest walletPassword(String walletPassword) {
+  public InitWalletHandleTokenRequest walletPassword(String walletPassword) {
     this.walletPassword = walletPassword;
     return this;
   }
@@ -96,25 +75,23 @@ public class CreateWalletRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    CreateWalletRequest createWalletRequest = (CreateWalletRequest) o;
-    return ObjectUtils.equals(this.walletDriverName, createWalletRequest.walletDriverName) &&
-    ObjectUtils.equals(this.walletName, createWalletRequest.walletName) &&
-    ObjectUtils.equals(this.walletPassword, createWalletRequest.walletPassword);
+    InitWalletHandleTokenRequest initWalletHandleTokenRequest = (InitWalletHandleTokenRequest) o;
+    return ObjectUtils.equals(this.walletId, initWalletHandleTokenRequest.walletId) &&
+    ObjectUtils.equals(this.walletPassword, initWalletHandleTokenRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(walletDriverName, walletName, walletPassword);
+    return ObjectUtils.hashCodeMulti(walletId, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateWalletRequest {\n");
+    sb.append("class InitWalletHandleTokenRequest {\n");
     
-    sb.append("    walletDriverName: ").append(toIndentedString(walletDriverName)).append("\n");
-    sb.append("    walletName: ").append(toIndentedString(walletName)).append("\n");
+    sb.append("    walletId: ").append(toIndentedString(walletId)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");
     return sb.toString();

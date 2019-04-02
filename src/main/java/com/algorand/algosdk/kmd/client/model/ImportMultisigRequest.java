@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -26,25 +26,43 @@ import java.util.List;
  */
 @ApiModel(description = "APIV1POSTMultisigImportRequest is the request for `POST /v1/multisig/import`")
 
-public class APIV1POSTMultisigImportRequest {
-  @SerializedName("PKs")
+public class ImportMultisigRequest {
+  @SerializedName("multisig_version")
+  private Integer multisigVersion = null;
+
+  @SerializedName("pks")
   private List<PublicKey> pks = null;
 
-  @SerializedName("Threshold")
+  @SerializedName("threshold")
   private Integer threshold = null;
 
-  @SerializedName("Version")
-  private Integer version = null;
-
-  @SerializedName("WalletHandleToken")
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public APIV1POSTMultisigImportRequest pks(List<PublicKey> pks) {
+  public ImportMultisigRequest multisigVersion(Integer multisigVersion) {
+    this.multisigVersion = multisigVersion;
+    return this;
+  }
+
+   /**
+   * Get multisigVersion
+   * @return multisigVersion
+  **/
+  @ApiModelProperty(value = "")
+  public Integer getMultisigVersion() {
+    return multisigVersion;
+  }
+
+  public void setMultisigVersion(Integer multisigVersion) {
+    this.multisigVersion = multisigVersion;
+  }
+
+  public ImportMultisigRequest pks(List<PublicKey> pks) {
     this.pks = pks;
     return this;
   }
 
-  public APIV1POSTMultisigImportRequest addPksItem(PublicKey pksItem) {
+  public ImportMultisigRequest addPksItem(PublicKey pksItem) {
     if (this.pks == null) {
       this.pks = new ArrayList<PublicKey>();
     }
@@ -65,7 +83,7 @@ public class APIV1POSTMultisigImportRequest {
     this.pks = pks;
   }
 
-  public APIV1POSTMultisigImportRequest threshold(Integer threshold) {
+  public ImportMultisigRequest threshold(Integer threshold) {
     this.threshold = threshold;
     return this;
   }
@@ -83,25 +101,7 @@ public class APIV1POSTMultisigImportRequest {
     this.threshold = threshold;
   }
 
-  public APIV1POSTMultisigImportRequest version(Integer version) {
-    this.version = version;
-    return this;
-  }
-
-   /**
-   * Get version
-   * @return version
-  **/
-  @ApiModelProperty(value = "")
-  public Integer getVersion() {
-    return version;
-  }
-
-  public void setVersion(Integer version) {
-    this.version = version;
-  }
-
-  public APIV1POSTMultisigImportRequest walletHandleToken(String walletHandleToken) {
+  public ImportMultisigRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -128,27 +128,27 @@ public class APIV1POSTMultisigImportRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTMultisigImportRequest apIV1POSTMultisigImportRequest = (APIV1POSTMultisigImportRequest) o;
-    return ObjectUtils.equals(this.pks, apIV1POSTMultisigImportRequest.pks) &&
-    ObjectUtils.equals(this.threshold, apIV1POSTMultisigImportRequest.threshold) &&
-    ObjectUtils.equals(this.version, apIV1POSTMultisigImportRequest.version) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1POSTMultisigImportRequest.walletHandleToken);
+    ImportMultisigRequest importMultisigRequest = (ImportMultisigRequest) o;
+    return ObjectUtils.equals(this.multisigVersion, importMultisigRequest.multisigVersion) &&
+    ObjectUtils.equals(this.pks, importMultisigRequest.pks) &&
+    ObjectUtils.equals(this.threshold, importMultisigRequest.threshold) &&
+    ObjectUtils.equals(this.walletHandleToken, importMultisigRequest.walletHandleToken);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(pks, threshold, version, walletHandleToken);
+    return ObjectUtils.hashCodeMulti(multisigVersion, pks, threshold, walletHandleToken);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTMultisigImportRequest {\n");
+    sb.append("class ImportMultisigRequest {\n");
     
+    sb.append("    multisigVersion: ").append(toIndentedString(multisigVersion)).append("\n");
     sb.append("    pks: ").append(toIndentedString(pks)).append("\n");
     sb.append("    threshold: ").append(toIndentedString(threshold)).append("\n");
-    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("}");
     return sb.toString();

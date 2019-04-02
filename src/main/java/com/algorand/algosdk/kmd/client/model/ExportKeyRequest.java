@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,36 +19,39 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTKeyImportRequest is the request for &#x60;POST /v1/key/import&#x60;
+ * APIV1POSTKeyExportRequest is the request for &#x60;POST /v1/key/export&#x60;
  */
-@ApiModel(description = "APIV1POSTKeyImportRequest is the request for `POST /v1/key/import`")
+@ApiModel(description = "APIV1POSTKeyExportRequest is the request for `POST /v1/key/export`")
 
-public class APIV1POSTKeyImportRequest {
-  @SerializedName("PrivateKey")
-  private PrivateKey privateKey = null;
+public class ExportKeyRequest {
+  @SerializedName("address")
+  private String address = null;
 
-  @SerializedName("WalletHandleToken")
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public APIV1POSTKeyImportRequest privateKey(PrivateKey privateKey) {
-    this.privateKey = privateKey;
+  @SerializedName("wallet_password")
+  private String walletPassword = null;
+
+  public ExportKeyRequest address(String address) {
+    this.address = address;
     return this;
   }
 
    /**
-   * Get privateKey
-   * @return privateKey
+   * Get address
+   * @return address
   **/
   @ApiModelProperty(value = "")
-  public PrivateKey getPrivateKey() {
-    return privateKey;
+  public String getAddress() {
+    return address;
   }
 
-  public void setPrivateKey(PrivateKey privateKey) {
-    this.privateKey = privateKey;
+  public void setAddress(String address) {
+    this.address = address;
   }
 
-  public APIV1POSTKeyImportRequest walletHandleToken(String walletHandleToken) {
+  public ExportKeyRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -66,6 +69,24 @@ public class APIV1POSTKeyImportRequest {
     this.walletHandleToken = walletHandleToken;
   }
 
+  public ExportKeyRequest walletPassword(String walletPassword) {
+    this.walletPassword = walletPassword;
+    return this;
+  }
+
+   /**
+   * Get walletPassword
+   * @return walletPassword
+  **/
+  @ApiModelProperty(value = "")
+  public String getWalletPassword() {
+    return walletPassword;
+  }
+
+  public void setWalletPassword(String walletPassword) {
+    this.walletPassword = walletPassword;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -75,24 +96,26 @@ public class APIV1POSTKeyImportRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTKeyImportRequest apIV1POSTKeyImportRequest = (APIV1POSTKeyImportRequest) o;
-    return ObjectUtils.equals(this.privateKey, apIV1POSTKeyImportRequest.privateKey) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1POSTKeyImportRequest.walletHandleToken);
+    ExportKeyRequest exportKeyRequest = (ExportKeyRequest) o;
+    return ObjectUtils.equals(this.address, exportKeyRequest.address) &&
+    ObjectUtils.equals(this.walletHandleToken, exportKeyRequest.walletHandleToken) &&
+    ObjectUtils.equals(this.walletPassword, exportKeyRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(privateKey, walletHandleToken);
+    return ObjectUtils.hashCodeMulti(address, walletHandleToken, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTKeyImportRequest {\n");
+    sb.append("class ExportKeyRequest {\n");
     
-    sb.append("    privateKey: ").append(toIndentedString(privateKey)).append("\n");
+    sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
+    sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");
     return sb.toString();
   }

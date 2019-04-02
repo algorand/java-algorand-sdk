@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -11,7 +11,7 @@
  */
 
 
-package com.algorand.algosdk.kmd.client.lib;
+package com.algorand.algosdk.kmd.client;
 
 
 public class Pair {

@@ -1,6 +1,6 @@
 package com.algorand.algosdk.example;
 
-import com.algorand.algosdk.kmd.client.model.APIV1Wallet;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletResponse;
 import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
 
 
@@ -78,13 +78,13 @@ public class Main {
         api_key.setApiKey(KMD_API_TOKEN);
         com.algorand.algosdk.kmd.client.api.DefaultApi kmdApiInstance = new com.algorand.algosdk.kmd.client.api.DefaultApi(client);
 
-        APIV1Wallet wallet;
+        APIV1POSTWalletResponse wallet;
         try {
             CreateWalletRequest req = new CreateWalletRequest()
-                    .walletName("arbitrary-wallet-name")
+                    .walletName("arbitrary-wallet-name-2")
                     .walletDriverName("sqlite");
             wallet = kmdApiInstance.createWallet(req);
-            System.out.println("Created wallet id: " + wallet.getID());
+            System.out.println("Created wallet id: " + wallet.getWallet().getId());
         } catch (com.algorand.algosdk.kmd.client.ApiException e) {
             System.out.println("Failed to create wallet: " + e.getResponseBody());
             e.printStackTrace();

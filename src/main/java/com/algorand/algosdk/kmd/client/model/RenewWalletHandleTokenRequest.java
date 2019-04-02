@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,36 +19,15 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTKeyRequest is the request for &#x60;POST /v1/key&#x60;
+ * APIV1POSTWalletRenewRequest is the request for &#x60;POST /v1/wallet/renew&#x60;
  */
-@ApiModel(description = "APIV1POSTKeyRequest is the request for `POST /v1/key`")
+@ApiModel(description = "APIV1POSTWalletRenewRequest is the request for `POST /v1/wallet/renew`")
 
-public class APIV1POSTKeyRequest {
-  @SerializedName("DisplayMnemonic")
-  private Boolean displayMnemonic = null;
-
-  @SerializedName("WalletHandleToken")
+public class RenewWalletHandleTokenRequest {
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public APIV1POSTKeyRequest displayMnemonic(Boolean displayMnemonic) {
-    this.displayMnemonic = displayMnemonic;
-    return this;
-  }
-
-   /**
-   * Get displayMnemonic
-   * @return displayMnemonic
-  **/
-  @ApiModelProperty(value = "")
-  public Boolean isDisplayMnemonic() {
-    return displayMnemonic;
-  }
-
-  public void setDisplayMnemonic(Boolean displayMnemonic) {
-    this.displayMnemonic = displayMnemonic;
-  }
-
-  public APIV1POSTKeyRequest walletHandleToken(String walletHandleToken) {
+  public RenewWalletHandleTokenRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -75,23 +54,21 @@ public class APIV1POSTKeyRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTKeyRequest apIV1POSTKeyRequest = (APIV1POSTKeyRequest) o;
-    return ObjectUtils.equals(this.displayMnemonic, apIV1POSTKeyRequest.displayMnemonic) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1POSTKeyRequest.walletHandleToken);
+    RenewWalletHandleTokenRequest renewWalletHandleTokenRequest = (RenewWalletHandleTokenRequest) o;
+    return ObjectUtils.equals(this.walletHandleToken, renewWalletHandleTokenRequest.walletHandleToken);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(displayMnemonic, walletHandleToken);
+    return ObjectUtils.hashCodeMulti(walletHandleToken);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTKeyRequest {\n");
+    sb.append("class RenewWalletHandleTokenRequest {\n");
     
-    sb.append("    displayMnemonic: ").append(toIndentedString(displayMnemonic)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("}");
     return sb.toString();

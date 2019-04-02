@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,39 +19,39 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTKeyExportRequest is the request for &#x60;POST /v1/key/export&#x60;
+ * APIV1DELETEMultisigRequest is the request for &#x60;DELETE /v1/multisig&#x60;
  */
-@ApiModel(description = "APIV1POSTKeyExportRequest is the request for `POST /v1/key/export`")
+@ApiModel(description = "APIV1DELETEMultisigRequest is the request for `DELETE /v1/multisig`")
 
-public class APIV1POSTKeyExportRequest {
-  @SerializedName("PublicKey")
-  private PublicKey publicKey = null;
+public class DeleteMultisigRequest {
+  @SerializedName("address")
+  private String address = null;
 
-  @SerializedName("WalletHandleToken")
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  @SerializedName("WalletPassword")
+  @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public APIV1POSTKeyExportRequest publicKey(PublicKey publicKey) {
-    this.publicKey = publicKey;
+  public DeleteMultisigRequest address(String address) {
+    this.address = address;
     return this;
   }
 
    /**
-   * Get publicKey
-   * @return publicKey
+   * Get address
+   * @return address
   **/
   @ApiModelProperty(value = "")
-  public PublicKey getPublicKey() {
-    return publicKey;
+  public String getAddress() {
+    return address;
   }
 
-  public void setPublicKey(PublicKey publicKey) {
-    this.publicKey = publicKey;
+  public void setAddress(String address) {
+    this.address = address;
   }
 
-  public APIV1POSTKeyExportRequest walletHandleToken(String walletHandleToken) {
+  public DeleteMultisigRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -69,7 +69,7 @@ public class APIV1POSTKeyExportRequest {
     this.walletHandleToken = walletHandleToken;
   }
 
-  public APIV1POSTKeyExportRequest walletPassword(String walletPassword) {
+  public DeleteMultisigRequest walletPassword(String walletPassword) {
     this.walletPassword = walletPassword;
     return this;
   }
@@ -96,24 +96,24 @@ public class APIV1POSTKeyExportRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTKeyExportRequest apIV1POSTKeyExportRequest = (APIV1POSTKeyExportRequest) o;
-    return ObjectUtils.equals(this.publicKey, apIV1POSTKeyExportRequest.publicKey) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1POSTKeyExportRequest.walletHandleToken) &&
-    ObjectUtils.equals(this.walletPassword, apIV1POSTKeyExportRequest.walletPassword);
+    DeleteMultisigRequest deleteMultisigRequest = (DeleteMultisigRequest) o;
+    return ObjectUtils.equals(this.address, deleteMultisigRequest.address) &&
+    ObjectUtils.equals(this.walletHandleToken, deleteMultisigRequest.walletHandleToken) &&
+    ObjectUtils.equals(this.walletPassword, deleteMultisigRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(publicKey, walletHandleToken, walletPassword);
+    return ObjectUtils.hashCodeMulti(address, walletHandleToken, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTKeyExportRequest {\n");
+    sb.append("class DeleteMultisigRequest {\n");
     
-    sb.append("    publicKey: ").append(toIndentedString(publicKey)).append("\n");
+    sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");

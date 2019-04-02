@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,15 +19,36 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTWalletRenewRequest is the request for &#x60;POST /v1/wallet/renew&#x60;
+ * APIV1POSTKeyImportRequest is the request for &#x60;POST /v1/key/import&#x60;
  */
-@ApiModel(description = "APIV1POSTWalletRenewRequest is the request for `POST /v1/wallet/renew`")
+@ApiModel(description = "APIV1POSTKeyImportRequest is the request for `POST /v1/key/import`")
 
-public class APIV1POSTWalletRenewRequest {
-  @SerializedName("WalletHandleToken")
+public class ImportKeyRequest {
+  @SerializedName("private_key")
+  private PrivateKey privateKey = null;
+
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public APIV1POSTWalletRenewRequest walletHandleToken(String walletHandleToken) {
+  public ImportKeyRequest privateKey(PrivateKey privateKey) {
+    this.privateKey = privateKey;
+    return this;
+  }
+
+   /**
+   * Get privateKey
+   * @return privateKey
+  **/
+  @ApiModelProperty(value = "")
+  public PrivateKey getPrivateKey() {
+    return privateKey;
+  }
+
+  public void setPrivateKey(PrivateKey privateKey) {
+    this.privateKey = privateKey;
+  }
+
+  public ImportKeyRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -54,21 +75,23 @@ public class APIV1POSTWalletRenewRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTWalletRenewRequest apIV1POSTWalletRenewRequest = (APIV1POSTWalletRenewRequest) o;
-    return ObjectUtils.equals(this.walletHandleToken, apIV1POSTWalletRenewRequest.walletHandleToken);
+    ImportKeyRequest importKeyRequest = (ImportKeyRequest) o;
+    return ObjectUtils.equals(this.privateKey, importKeyRequest.privateKey) &&
+    ObjectUtils.equals(this.walletHandleToken, importKeyRequest.walletHandleToken);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(walletHandleToken);
+    return ObjectUtils.hashCodeMulti(privateKey, walletHandleToken);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTWalletRenewRequest {\n");
+    sb.append("class ImportKeyRequest {\n");
     
+    sb.append("    privateKey: ").append(toIndentedString(privateKey)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("}");
     return sb.toString();

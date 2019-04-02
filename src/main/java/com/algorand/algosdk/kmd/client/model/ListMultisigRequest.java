@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -23,11 +23,11 @@ import org.apache.commons.lang3.ObjectUtils;
  */
 @ApiModel(description = "APIV1POSTMultisigListRequest is the request for `POST /v1/multisig/list`")
 
-public class APIV1POSTMultisigListRequest {
-  @SerializedName("WalletHandleToken")
+public class ListMultisigRequest {
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public APIV1POSTMultisigListRequest walletHandleToken(String walletHandleToken) {
+  public ListMultisigRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -54,8 +54,8 @@ public class APIV1POSTMultisigListRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTMultisigListRequest apIV1POSTMultisigListRequest = (APIV1POSTMultisigListRequest) o;
-    return ObjectUtils.equals(this.walletHandleToken, apIV1POSTMultisigListRequest.walletHandleToken);
+    ListMultisigRequest listMultisigRequest = (ListMultisigRequest) o;
+    return ObjectUtils.equals(this.walletHandleToken, listMultisigRequest.walletHandleToken);
   }
 
   @Override
@@ -67,7 +67,7 @@ public class APIV1POSTMultisigListRequest {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTMultisigListRequest {\n");
+    sb.append("class ListMultisigRequest {\n");
     
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("}");

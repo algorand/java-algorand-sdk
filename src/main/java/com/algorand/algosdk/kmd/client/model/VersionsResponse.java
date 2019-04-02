@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -18,31 +18,42 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * APIV1POSTWalletInfoRequest is the request for &#x60;POST /v1/wallet/info&#x60;
+ * VersionsResponse is the response to &#x60;GET /versions&#x60; friendly:VersionsResponse
  */
-@ApiModel(description = "APIV1POSTWalletInfoRequest is the request for `POST /v1/wallet/info`")
+@ApiModel(description = "VersionsResponse is the response to `GET /versions` friendly:VersionsResponse")
 
-public class APIV1POSTWalletInfoRequest {
-  @SerializedName("WalletHandleToken")
-  private String walletHandleToken = null;
+public class VersionsResponse {
+  @SerializedName("versions")
+  private List<String> versions = null;
 
-  public APIV1POSTWalletInfoRequest walletHandleToken(String walletHandleToken) {
-    this.walletHandleToken = walletHandleToken;
+  public VersionsResponse versions(List<String> versions) {
+    this.versions = versions;
+    return this;
+  }
+
+  public VersionsResponse addVersionsItem(String versionsItem) {
+    if (this.versions == null) {
+      this.versions = new ArrayList<String>();
+    }
+    this.versions.add(versionsItem);
     return this;
   }
 
    /**
-   * Get walletHandleToken
-   * @return walletHandleToken
+   * Get versions
+   * @return versions
   **/
   @ApiModelProperty(value = "")
-  public String getWalletHandleToken() {
-    return walletHandleToken;
+  public List<String> getVersions() {
+    return versions;
   }
 
-  public void setWalletHandleToken(String walletHandleToken) {
-    this.walletHandleToken = walletHandleToken;
+  public void setVersions(List<String> versions) {
+    this.versions = versions;
   }
 
 
@@ -54,22 +65,22 @@ public class APIV1POSTWalletInfoRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTWalletInfoRequest apIV1POSTWalletInfoRequest = (APIV1POSTWalletInfoRequest) o;
-    return ObjectUtils.equals(this.walletHandleToken, apIV1POSTWalletInfoRequest.walletHandleToken);
+    VersionsResponse versionsResponse = (VersionsResponse) o;
+    return ObjectUtils.equals(this.versions, versionsResponse.versions);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(walletHandleToken);
+    return ObjectUtils.hashCodeMulti(versions);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTWalletInfoRequest {\n");
+    sb.append("class VersionsResponse {\n");
     
-    sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
+    sb.append("    versions: ").append(toIndentedString(versions)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,39 +19,18 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1DELETEKeyRequest is the request for &#x60;DELETE /v1/key&#x60;
+ * APIV1POSTMasterKeyExportRequest is the request for &#x60;POST /v1/master-key/export&#x60;
  */
-@ApiModel(description = "APIV1DELETEKeyRequest is the request for `DELETE /v1/key`")
+@ApiModel(description = "APIV1POSTMasterKeyExportRequest is the request for `POST /v1/master-key/export`")
 
-public class APIV1DELETEKeyRequest {
-  @SerializedName("PublicKey")
-  private PublicKey publicKey = null;
-
-  @SerializedName("WalletHandleToken")
+public class ExportMasterKeyRequest {
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  @SerializedName("WalletPassword")
+  @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public APIV1DELETEKeyRequest publicKey(PublicKey publicKey) {
-    this.publicKey = publicKey;
-    return this;
-  }
-
-   /**
-   * Get publicKey
-   * @return publicKey
-  **/
-  @ApiModelProperty(value = "")
-  public PublicKey getPublicKey() {
-    return publicKey;
-  }
-
-  public void setPublicKey(PublicKey publicKey) {
-    this.publicKey = publicKey;
-  }
-
-  public APIV1DELETEKeyRequest walletHandleToken(String walletHandleToken) {
+  public ExportMasterKeyRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -69,7 +48,7 @@ public class APIV1DELETEKeyRequest {
     this.walletHandleToken = walletHandleToken;
   }
 
-  public APIV1DELETEKeyRequest walletPassword(String walletPassword) {
+  public ExportMasterKeyRequest walletPassword(String walletPassword) {
     this.walletPassword = walletPassword;
     return this;
   }
@@ -96,24 +75,22 @@ public class APIV1DELETEKeyRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1DELETEKeyRequest apIV1DELETEKeyRequest = (APIV1DELETEKeyRequest) o;
-    return ObjectUtils.equals(this.publicKey, apIV1DELETEKeyRequest.publicKey) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1DELETEKeyRequest.walletHandleToken) &&
-    ObjectUtils.equals(this.walletPassword, apIV1DELETEKeyRequest.walletPassword);
+    ExportMasterKeyRequest exportMasterKeyRequest = (ExportMasterKeyRequest) o;
+    return ObjectUtils.equals(this.walletHandleToken, exportMasterKeyRequest.walletHandleToken) &&
+    ObjectUtils.equals(this.walletPassword, exportMasterKeyRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(publicKey, walletHandleToken, walletPassword);
+    return ObjectUtils.hashCodeMulti(walletHandleToken, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1DELETEKeyRequest {\n");
+    sb.append("class ExportMasterKeyRequest {\n");
     
-    sb.append("    publicKey: ").append(toIndentedString(publicKey)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");

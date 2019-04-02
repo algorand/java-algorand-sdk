@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -18,40 +18,51 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * APIV1POSTMultisigDeleteRequest is the request for &#x60;POST /v1/multisig/delete&#x60;
+ * APIV1POSTTransactionSignRequest is the request for &#x60;POST /v1/transaction/sign&#x60;
  */
-@ApiModel(description = "APIV1POSTMultisigDeleteRequest is the request for `POST /v1/multisig/delete`")
+@ApiModel(description = "APIV1POSTTransactionSignRequest is the request for `POST /v1/transaction/sign`")
 
-public class APIV1POSTMultisigDeleteRequest {
-  @SerializedName("Address")
-  private Address address = null;
+public class SignTransactionRequest {
+  @SerializedName("transaction")
+  private List<Integer> transaction = null;
 
-  @SerializedName("WalletHandleToken")
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  @SerializedName("WalletPassword")
+  @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public APIV1POSTMultisigDeleteRequest address(Address address) {
-    this.address = address;
+  public SignTransactionRequest transaction(List<Integer> transaction) {
+    this.transaction = transaction;
+    return this;
+  }
+
+  public SignTransactionRequest addTransactionItem(Integer transactionItem) {
+    if (this.transaction == null) {
+      this.transaction = new ArrayList<Integer>();
+    }
+    this.transaction.add(transactionItem);
     return this;
   }
 
    /**
-   * Get address
-   * @return address
+   * Get transaction
+   * @return transaction
   **/
   @ApiModelProperty(value = "")
-  public Address getAddress() {
-    return address;
+  public List<Integer> getTransaction() {
+    return transaction;
   }
 
-  public void setAddress(Address address) {
-    this.address = address;
+  public void setTransaction(List<Integer> transaction) {
+    this.transaction = transaction;
   }
 
-  public APIV1POSTMultisigDeleteRequest walletHandleToken(String walletHandleToken) {
+  public SignTransactionRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -69,7 +80,7 @@ public class APIV1POSTMultisigDeleteRequest {
     this.walletHandleToken = walletHandleToken;
   }
 
-  public APIV1POSTMultisigDeleteRequest walletPassword(String walletPassword) {
+  public SignTransactionRequest walletPassword(String walletPassword) {
     this.walletPassword = walletPassword;
     return this;
   }
@@ -96,24 +107,24 @@ public class APIV1POSTMultisigDeleteRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTMultisigDeleteRequest apIV1POSTMultisigDeleteRequest = (APIV1POSTMultisigDeleteRequest) o;
-    return ObjectUtils.equals(this.address, apIV1POSTMultisigDeleteRequest.address) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1POSTMultisigDeleteRequest.walletHandleToken) &&
-    ObjectUtils.equals(this.walletPassword, apIV1POSTMultisigDeleteRequest.walletPassword);
+    SignTransactionRequest signTransactionRequest = (SignTransactionRequest) o;
+    return ObjectUtils.equals(this.transaction, signTransactionRequest.transaction) &&
+    ObjectUtils.equals(this.walletHandleToken, signTransactionRequest.walletHandleToken) &&
+    ObjectUtils.equals(this.walletPassword, signTransactionRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(address, walletHandleToken, walletPassword);
+    return ObjectUtils.hashCodeMulti(transaction, walletHandleToken, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTMultisigDeleteRequest {\n");
+    sb.append("class SignTransactionRequest {\n");
     
-    sb.append("    address: ").append(toIndentedString(address)).append("\n");
+    sb.append("    transaction: ").append(toIndentedString(transaction)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");

@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -13,35 +13,38 @@
 
 package com.algorand.algosdk.kmd.client.model;
 
+import io.swagger.annotations.ApiModel;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.ArrayList;
-
 /**
- * Digest
+ * APIV1GETWalletsRequest is the request for &#x60;GET /v1/wallets&#x60;
  */
+@ApiModel(description = "APIV1GETWalletsRequest is the request for `GET /v1/wallets`")
 
-public class Digest extends ArrayList<Integer> {
+public class ListWalletsRequest {
 
   @Override
   public boolean equals(java.lang.Object o) {
   if (this == o) {
     return true;
   }
-      return o != null && getClass() == o.getClass();
+  if (o == null || getClass() != o.getClass()) {
+    return false;
+  }
+    return true;
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(super.hashCode());
+    return ObjectUtils.hashCodeMulti();
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Digest {\n");
-    sb.append("    ").append(toIndentedString(super.toString())).append("\n");
+    sb.append("class ListWalletsRequest {\n");
+    
     sb.append("}");
     return sb.toString();
   }

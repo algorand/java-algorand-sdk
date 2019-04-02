@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -13,7 +13,7 @@
 
 package com.algorand.algosdk.kmd.client.auth;
 
-import com.algorand.algosdk.kmd.client.lib.Pair;
+import com.algorand.algosdk.kmd.client.Pair;
 import com.squareup.okhttp.Credentials;
 
 import java.util.List;

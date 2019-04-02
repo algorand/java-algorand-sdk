@@ -19,51 +19,30 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * MultisigSubsig is a struct that holds a pair of public key and signatures signatures may be empty
+ * APIV1POSTKeyListRequest is the request for &#x60;POST /v1/key/list&#x60;
  */
-@ApiModel(description = "MultisigSubsig is a struct that holds a pair of public key and signatures signatures may be empty")
+@ApiModel(description = "APIV1POSTKeyListRequest is the request for `POST /v1/key/list`")
 
-public class MultisigSubsig {
-  @SerializedName("Key")
-  private PublicKey key = null;
+public class ListKeysRequest {
+  @SerializedName("wallet_handle_token")
+  private String walletHandleToken = null;
 
-  @SerializedName("Sig")
-  private Signature sig = null;
-
-  public MultisigSubsig key(PublicKey key) {
-    this.key = key;
+  public ListKeysRequest walletHandleToken(String walletHandleToken) {
+    this.walletHandleToken = walletHandleToken;
     return this;
   }
 
    /**
-   * Get key
-   * @return key
+   * Get walletHandleToken
+   * @return walletHandleToken
   **/
   @ApiModelProperty(value = "")
-  public PublicKey getKey() {
-    return key;
+  public String getWalletHandleToken() {
+    return walletHandleToken;
   }
 
-  public void setKey(PublicKey key) {
-    this.key = key;
-  }
-
-  public MultisigSubsig sig(Signature sig) {
-    this.sig = sig;
-    return this;
-  }
-
-   /**
-   * Get sig
-   * @return sig
-  **/
-  @ApiModelProperty(value = "")
-  public Signature getSig() {
-    return sig;
-  }
-
-  public void setSig(Signature sig) {
-    this.sig = sig;
+  public void setWalletHandleToken(String walletHandleToken) {
+    this.walletHandleToken = walletHandleToken;
   }
 
 
@@ -75,24 +54,22 @@ public class MultisigSubsig {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    MultisigSubsig multisigSubsig = (MultisigSubsig) o;
-    return ObjectUtils.equals(this.key, multisigSubsig.key) &&
-    ObjectUtils.equals(this.sig, multisigSubsig.sig);
+    ListKeysRequest listKeysRequest = (ListKeysRequest) o;
+    return ObjectUtils.equals(this.walletHandleToken, listKeysRequest.walletHandleToken);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(key, sig);
+    return ObjectUtils.hashCodeMulti(walletHandleToken);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class MultisigSubsig {\n");
+    sb.append("class ListKeysRequest {\n");
     
-    sb.append("    key: ").append(toIndentedString(key)).append("\n");
-    sb.append("    sig: ").append(toIndentedString(sig)).append("\n");
+    sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -26,44 +26,41 @@ import java.util.List;
  */
 @ApiModel(description = "APIV1POSTMultisigTransactionSignRequest is the request for `POST /v1/multisig/sign`")
 
-public class APIV1POSTMultisigTransactionSignRequest {
-  @SerializedName("PartialMsig")
-  private MultisigSig partialMsig = null;
+public class SignMultisigRequest {
+  @SerializedName("partial_multisig")
+  private MultisigSig partialMultisig = null;
 
-  @SerializedName("PublicKey")
+  @SerializedName("public_key")
   private PublicKey publicKey = null;
 
-  @SerializedName("Transaction")
+  @SerializedName("transaction")
   private List<Integer> transaction = null;
 
-  @SerializedName("TransactionType")
-  private String transactionType = null;
-
-  @SerializedName("WalletHandleToken")
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  @SerializedName("WalletPassword")
+  @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public APIV1POSTMultisigTransactionSignRequest partialMsig(MultisigSig partialMsig) {
-    this.partialMsig = partialMsig;
+  public SignMultisigRequest partialMultisig(MultisigSig partialMultisig) {
+    this.partialMultisig = partialMultisig;
     return this;
   }
 
    /**
-   * Get partialMsig
-   * @return partialMsig
+   * Get partialMultisig
+   * @return partialMultisig
   **/
   @ApiModelProperty(value = "")
-  public MultisigSig getPartialMsig() {
-    return partialMsig;
+  public MultisigSig getPartialMultisig() {
+    return partialMultisig;
   }
 
-  public void setPartialMsig(MultisigSig partialMsig) {
-    this.partialMsig = partialMsig;
+  public void setPartialMultisig(MultisigSig partialMultisig) {
+    this.partialMultisig = partialMultisig;
   }
 
-  public APIV1POSTMultisigTransactionSignRequest publicKey(PublicKey publicKey) {
+  public SignMultisigRequest publicKey(PublicKey publicKey) {
     this.publicKey = publicKey;
     return this;
   }
@@ -81,12 +78,12 @@ public class APIV1POSTMultisigTransactionSignRequest {
     this.publicKey = publicKey;
   }
 
-  public APIV1POSTMultisigTransactionSignRequest transaction(List<Integer> transaction) {
+  public SignMultisigRequest transaction(List<Integer> transaction) {
     this.transaction = transaction;
     return this;
   }
 
-  public APIV1POSTMultisigTransactionSignRequest addTransactionItem(Integer transactionItem) {
+  public SignMultisigRequest addTransactionItem(Integer transactionItem) {
     if (this.transaction == null) {
       this.transaction = new ArrayList<Integer>();
     }
@@ -107,25 +104,7 @@ public class APIV1POSTMultisigTransactionSignRequest {
     this.transaction = transaction;
   }
 
-  public APIV1POSTMultisigTransactionSignRequest transactionType(String transactionType) {
-    this.transactionType = transactionType;
-    return this;
-  }
-
-   /**
-   * Get transactionType
-   * @return transactionType
-  **/
-  @ApiModelProperty(value = "")
-  public String getTransactionType() {
-    return transactionType;
-  }
-
-  public void setTransactionType(String transactionType) {
-    this.transactionType = transactionType;
-  }
-
-  public APIV1POSTMultisigTransactionSignRequest walletHandleToken(String walletHandleToken) {
+  public SignMultisigRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -143,7 +122,7 @@ public class APIV1POSTMultisigTransactionSignRequest {
     this.walletHandleToken = walletHandleToken;
   }
 
-  public APIV1POSTMultisigTransactionSignRequest walletPassword(String walletPassword) {
+  public SignMultisigRequest walletPassword(String walletPassword) {
     this.walletPassword = walletPassword;
     return this;
   }
@@ -170,30 +149,28 @@ public class APIV1POSTMultisigTransactionSignRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTMultisigTransactionSignRequest apIV1POSTMultisigTransactionSignRequest = (APIV1POSTMultisigTransactionSignRequest) o;
-    return ObjectUtils.equals(this.partialMsig, apIV1POSTMultisigTransactionSignRequest.partialMsig) &&
-    ObjectUtils.equals(this.publicKey, apIV1POSTMultisigTransactionSignRequest.publicKey) &&
-    ObjectUtils.equals(this.transaction, apIV1POSTMultisigTransactionSignRequest.transaction) &&
-    ObjectUtils.equals(this.transactionType, apIV1POSTMultisigTransactionSignRequest.transactionType) &&
-    ObjectUtils.equals(this.walletHandleToken, apIV1POSTMultisigTransactionSignRequest.walletHandleToken) &&
-    ObjectUtils.equals(this.walletPassword, apIV1POSTMultisigTransactionSignRequest.walletPassword);
+    SignMultisigRequest signMultisigRequest = (SignMultisigRequest) o;
+    return ObjectUtils.equals(this.partialMultisig, signMultisigRequest.partialMultisig) &&
+    ObjectUtils.equals(this.publicKey, signMultisigRequest.publicKey) &&
+    ObjectUtils.equals(this.transaction, signMultisigRequest.transaction) &&
+    ObjectUtils.equals(this.walletHandleToken, signMultisigRequest.walletHandleToken) &&
+    ObjectUtils.equals(this.walletPassword, signMultisigRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(partialMsig, publicKey, transaction, transactionType, walletHandleToken, walletPassword);
+    return ObjectUtils.hashCodeMulti(partialMultisig, publicKey, transaction, walletHandleToken, walletPassword);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTMultisigTransactionSignRequest {\n");
+    sb.append("class SignMultisigRequest {\n");
     
-    sb.append("    partialMsig: ").append(toIndentedString(partialMsig)).append("\n");
+    sb.append("    partialMultisig: ").append(toIndentedString(partialMultisig)).append("\n");
     sb.append("    publicKey: ").append(toIndentedString(publicKey)).append("\n");
     sb.append("    transaction: ").append(toIndentedString(transaction)).append("\n");
-    sb.append("    transactionType: ").append(toIndentedString(transactionType)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");
     sb.append("}");

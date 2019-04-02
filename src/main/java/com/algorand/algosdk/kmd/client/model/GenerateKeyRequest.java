@@ -1,5 +1,5 @@
 /*
- * KMD HTTP API
+ * for KMD HTTP API
  * API for KMD (Key Management Daemon)
  *
  * OpenAPI spec version: 0.0.1
@@ -19,15 +19,36 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTWalletReleaseRequest is the request for &#x60;POST /v1/wallet/release&#x60;
+ * APIV1POSTKeyRequest is the request for &#x60;POST /v1/key&#x60;
  */
-@ApiModel(description = "APIV1POSTWalletReleaseRequest is the request for `POST /v1/wallet/release`")
+@ApiModel(description = "APIV1POSTKeyRequest is the request for `POST /v1/key`")
 
-public class APIV1POSTWalletReleaseRequest {
-  @SerializedName("WalletHandleToken")
+public class GenerateKeyRequest {
+  @SerializedName("display_mnemonic")
+  private Boolean displayMnemonic = null;
+
+  @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public APIV1POSTWalletReleaseRequest walletHandleToken(String walletHandleToken) {
+  public GenerateKeyRequest displayMnemonic(Boolean displayMnemonic) {
+    this.displayMnemonic = displayMnemonic;
+    return this;
+  }
+
+   /**
+   * Get displayMnemonic
+   * @return displayMnemonic
+  **/
+  @ApiModelProperty(value = "")
+  public Boolean isDisplayMnemonic() {
+    return displayMnemonic;
+  }
+
+  public void setDisplayMnemonic(Boolean displayMnemonic) {
+    this.displayMnemonic = displayMnemonic;
+  }
+
+  public GenerateKeyRequest walletHandleToken(String walletHandleToken) {
     this.walletHandleToken = walletHandleToken;
     return this;
   }
@@ -54,21 +75,23 @@ public class APIV1POSTWalletReleaseRequest {
   if (o == null || getClass() != o.getClass()) {
     return false;
   }
-    APIV1POSTWalletReleaseRequest apIV1POSTWalletReleaseRequest = (APIV1POSTWalletReleaseRequest) o;
-    return ObjectUtils.equals(this.walletHandleToken, apIV1POSTWalletReleaseRequest.walletHandleToken);
+    GenerateKeyRequest generateKeyRequest = (GenerateKeyRequest) o;
+    return ObjectUtils.equals(this.displayMnemonic, generateKeyRequest.displayMnemonic) &&
+    ObjectUtils.equals(this.walletHandleToken, generateKeyRequest.walletHandleToken);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(walletHandleToken);
+    return ObjectUtils.hashCodeMulti(displayMnemonic, walletHandleToken);
   }
 
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class APIV1POSTWalletReleaseRequest {\n");
+    sb.append("class GenerateKeyRequest {\n");
     
+    sb.append("    displayMnemonic: ").append(toIndentedString(displayMnemonic)).append("\n");
     sb.append("    walletHandleToken: ").append(toIndentedString(walletHandleToken)).append("\n");
     sb.append("}");
     return sb.toString();
