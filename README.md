@@ -122,7 +122,9 @@ try {
 
 # Cryptography
 
-To use the library, users will need to add their own provider for `Ed25519` signatures and `SHA-512/256` checksums. For instance:
+To use the library, the SDK requires you specify a JCA provider for `Ed25519` signatures and `SHA-512/256` checksums. This SDK
+is tested with `BouncyCastle 1.61` (bouncycastle.org). This SDK also bundles Bouncy Castle for your convenience. In your applications,
+setup the SDK, like the following example code:
 
 ```java
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
