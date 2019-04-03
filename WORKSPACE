@@ -23,7 +23,6 @@ maven_install(
         "com.fasterxml.jackson.core:jackson-core:2.7.9", # 2.7 for android
         "com.fasterxml.jackson.core:jackson-annotations:2.7.0",
         "com.fasterxml.jackson.core:jackson-databind:2.7.9",
-        "org.msgpack:msgpack-core:0.8.16",
         "org.msgpack:jackson-dataformat-msgpack:0.8.16",
         "commons-codec:commons-codec:1.12",
         # Tests
@@ -54,4 +53,20 @@ maven_install(
         "https://maven.google.com",
     ],
     fetch_sources = False,
+)
+
+# for pom_file, maven integration
+http_archive(
+    name = "bazel_common",
+    strip_prefix = "bazel-common-f1115e0f777f08c3cdb115526c4e663005bec69b",
+    sha256 = "1e05a4791cc3470d3ecf7edb556f796b1d340359f1c4d293f175d4d0946cf84c",
+    url = "https://github.com/google/bazel-common/archive/f1115e0f777f08c3cdb115526c4e663005bec69b.zip",
+)
+BAZEL_SKYLIB_TAG = "0.6.0"
+http_archive(
+    name = "bazel_skylib",
+    strip_prefix = "bazel-skylib-%s" % BAZEL_SKYLIB_TAG,
+    sha256 = "eb5c57e4c12e68c0c20bc774bfbc60a568e800d025557bc4ea022c6479acc867",
+    url = "https://github.com/bazelbuild/bazel-skylib/archive/%s.tar.gz" %
+          BAZEL_SKYLIB_TAG,
 )

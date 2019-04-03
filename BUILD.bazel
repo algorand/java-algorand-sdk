@@ -12,7 +12,7 @@ java_library(
 )
 
 java_library(
-    name = "algosdk-rest-api",
+    name = "algosdk_rest_api",
     exports = [
         "//src/main/java/com/algorand/algosdk/algod/client:client",
         "//src/main/java/com/algorand/algosdk/algod/client/api:api",
@@ -24,5 +24,32 @@ java_library(
         "//src/main/java/com/algorand/algosdk/kmd/client/model:model",
     ],
     visibility = ["//visibility:public"],
+)
+
+# Generate a POM file for Maven integration
+load("@bazel_common//tools/maven:pom_file.bzl", "pom_file")
+
+pom_file(
+    name = "algosdk_pom",
+    targets = [
+        "//:algosdk",
+    ],
+    template_file = "pom_template.xml",
+    substitutions = {
+        '{group_id}': 'com.algorand',
+        '{artifact_id}': 'algosdk',
+    },
+)
+
+pom_file(
+    name = "algosdk_rest_api_pom",
+    targets = [
+        "//:algosdk_rest_api",
+    ],
+    template_file = "pom_template.xml",
+    substitutions = {
+        '{group_id}': 'com.algorand',
+        '{artifact_id}': 'algosdk-rest-api',
+    },
 )
 

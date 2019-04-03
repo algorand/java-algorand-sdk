@@ -12,4 +12,8 @@ java_library(
         "@mavenforswagger//:com_squareup_okhttp_okhttp",
         "@mavenforswagger//:com_google_code_gson_gson",
     ],
+    tags = [
+        "maven_coordinates=com.squareup.okhttp:okhttp:2.7.5",
+        "maven_coordinates=com.google.code.gson:gson:2.8.1",
+    ],
 )

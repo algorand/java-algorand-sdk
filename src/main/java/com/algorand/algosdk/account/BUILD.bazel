@@ -11,4 +11,7 @@ java_library(
         "//src/main/java/com/algorand/algosdk/util:util",
         "@maven//:org_bouncycastle_bcprov_jdk15on", # unfortunate dep for parsing X.509 formats
     ],
+    tags = [
+        "maven_coordinates=org.bouncycastle:bcprov-jdk15on:1.61",
+    ],
 )

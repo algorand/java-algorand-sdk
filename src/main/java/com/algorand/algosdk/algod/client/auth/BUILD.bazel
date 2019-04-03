@@ -9,4 +9,7 @@ java_library(
         "//src/main/java/com/algorand/algosdk/algod/client/lib:lib",
         "@mavenforswagger//:com_squareup_okhttp_okhttp",
     ],
+    tags = [
+        "maven_coordinates=com.squareup.okhttp:okhttp:2.7.5",
+    ],
 )

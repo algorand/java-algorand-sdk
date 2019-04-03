@@ -7,6 +7,20 @@ This SDK supports Java 7 and can be made compatible with Android `minSdkVersion`
 
 # Installation
 
+Maven (coming soon).
+
+Download the jars (coming soon).
+
+To build from source:
+```
+bazel build //:algosdk
+bazel build //:algosdk_rest_api
+```
+
+# Documentation
+
+Javadoc (coming soon).
+
 # Quickstart
 
 Take a look at `com.algorand.algodsdk.example`. For instance:
@@ -94,9 +108,12 @@ To build the main library:
 `bazel build //:algosdk`
 
 To build the REST client libraries:
-`bazel build //:algosdk-rest-api`
+`bazel build //:algosdk_rest_api`
 
-To build specific libraries (pick and choose)
+To test:
+`bazel test //...`
+
+To build specific libraries (pick and choose, e.g. for account library)
 `bazel build //src/main/java/com/algorand/algosdk/account:account`
 
 ## Updating the `algod` and `kmd` REST clients
@@ -140,4 +157,31 @@ default crypto provider on Android does not provide `ed25519` signatures, so you
 
 # Maven Support
 
-We also maintain a `pom.xml` file for Maven support.
+We also maintain a `pom.xml` file for Maven support. Make sure to update the maven coordinates tags
+appropriately, in synch with the actual dependencies. We should monitor the status of `maven_install` development
+because tags may no longer be needed in the future. An example `BUILD.bazel` file might look like:
+```
+java_library(
+    name = "model",
+    srcs = glob(["*.java"]),
+    visibility = ["//visibility:public"],
+    exports = [
+    ],
+    deps = [
+        "@mavenforswagger//:io_swagger_swagger_annotations",
+        "@mavenforswagger//:org_apache_commons_commons_lang3",
+        "@mavenforswagger//:com_google_code_gson_gson",
+    ],
+    tags = [
+        "maven_coordinates=io.swagger:swagger-annotations:1.5.18",
+        "maven_coordinates=org.apache.commons:commons-lang3:3.6",
+        "maven_coordinates=com.google.code.gson:gson:2.8.1",
+    ]
+)
+```
+
+To build the `pom.xml` file with `bazel` (with dependencies on `bazel-common` and `skylib`)
+```
+bazel build //:algosdk_pom
+bazel build //:algosdk_rest_api_pom
+```

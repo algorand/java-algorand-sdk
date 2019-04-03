@@ -15,4 +15,12 @@ java_library(
         "@mavenforswagger//:com_squareup_okhttp_logging_interceptor",
         "@mavenforswagger//:io_gsonfire_gson_fire",
     ],
+    tags = [
+        "maven_coordinates=com.google.code.gson:gson:2.8.1",
+        "maven_coordinates=com.squareup.okhttp:okhttp:2.7.5",
+        "maven_coordinates=com.squareup.okio:okio:1.6.0",
+        "maven_coordinates=org.threeten:threetenbp:1.3.5",
+        "maven_coordinates=com.squareup.okhttp:logging-interceptor:2.7.5",
+        "maven_coordinates=io.gsonfire:gson-fire:1.8.0",
+    ]
 )

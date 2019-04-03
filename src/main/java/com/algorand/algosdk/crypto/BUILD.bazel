@@ -8,4 +8,8 @@ java_library(
         "@maven//:commons_codec_commons_codec",
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
     ],
+    tags = [
+        "maven_coordinates=commons-codec:commons-codec:1.12",
+        "maven_coordinates=com.fasterxml.jackson.core:jackson-annotations:2.7.0",
+    ],
 )
