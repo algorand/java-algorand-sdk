@@ -1,18 +1,28 @@
 package com.algorand.algosdk.auction;
 
+import com.algorand.algosdk.crypto.Address;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
 import java.util.Objects;
 
 /**
  * A raw serializable Bid class.
  */
+@JsonPropertyOrder(alphabetic=true)
 public class Bid {
-    private static final int BID_ADDR_LEN = 32;
-
-    public final byte[] bidderKey = new byte[BID_ADDR_LEN];
-    public final byte[] auctionKey = new byte[BID_ADDR_LEN];
+    @JsonProperty("bidder")
+    public final Address bidderKey; // cannot be null
+    @JsonProperty("auc")
+    public final Address auctionKey; // cannot be null
+    @JsonProperty("cur")
     public final long bidCurrency;
+    @JsonProperty("price")
     public final long maxPrice;
+    @JsonProperty("id")
     public final long bidID;
+    @JsonProperty("aid")
     public final long auctionID;
 
     /**
@@ -24,17 +34,9 @@ public class Bid {
      * @param bidID
      * @param auctionID
      */
-    public Bid(byte[] bidderKey, byte[] auctionKey, long bidCurrency, long maxPrice, long bidID, long auctionID) {
-        Objects.requireNonNull(bidderKey, "bidder key must not be null");
-        Objects.requireNonNull(auctionKey, "auction key must not be null");
-        if (bidderKey.length != BID_ADDR_LEN) {
-            throw new IllegalArgumentException("bidder key wrong length");
-        }
-        if (auctionKey.length != BID_ADDR_LEN) {
-            throw new IllegalArgumentException("auction key wrong length");
-        }
-        System.arraycopy(bidderKey, 0, this.bidderKey, 0, BID_ADDR_LEN);
-        System.arraycopy(auctionKey, 0, this.auctionKey, 0, BID_ADDR_LEN);
+    public Bid(Address bidderKey, Address auctionKey, long bidCurrency, long maxPrice, long bidID, long auctionID) {
+        this.bidderKey = Objects.requireNonNull(bidderKey, "bidder key must not be null");
+        this.auctionKey = Objects.requireNonNull(auctionKey, "auction key must not be null");
         this.bidCurrency = bidCurrency;
         this.maxPrice = maxPrice;
         this.bidID = bidID;
