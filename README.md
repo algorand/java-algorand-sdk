@@ -199,12 +199,8 @@ To resolve this, we do the following manual pass on generated code:
 - Find-and-replace `Integer` with `Long` in `com.algorand.algosdk.algod` and subpackages;
 - Run an `Optimize Imports` operation on generated code, to minimize dependencies.
 
-# Android Support
 
-Significant work has been taken to ensure Android compatibility (in particular for `minSdkVersion` 16). Note that the
-default crypto provider on Android does not provide `ed25519` signatures, so you will need to provide your own (e.g. `BouncyCastle`).
-
-# Maven Support
+## Maven Support
 
 We also maintain a `pom.xml` file for Maven support. Make sure to update the maven coordinates tags
 appropriately, in synch with the actual dependencies. We should monitor the status of `maven_install` development
@@ -234,3 +230,9 @@ To build the `pom.xml` file with `bazel` (with dependencies on `bazel-common` an
 bazel build //:algosdk_pom
 bazel build //:algosdk_rest_api_pom
 ```
+
+
+# Android Support
+
+Significant work has been taken to ensure Android compatibility (in particular for `minSdkVersion` 16). Note that the
+default crypto provider on Android does not provide `ed25519` signatures, so you will need to provide your own (e.g. `BouncyCastle`).
