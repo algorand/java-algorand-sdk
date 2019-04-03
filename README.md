@@ -14,7 +14,6 @@ Download the jars (coming soon).
 To build from source:
 ```
 bazel build //:algosdk
-bazel build //:algosdk_rest_api
 ```
 
 # Documentation
@@ -152,10 +151,11 @@ To run the example project:
 bazel run //examples/src/main/java/com/algorand/algosdk/example:example
 ```
 
-To build the main library:
+To build the whole library:
 `bazel build //:algosdk`
 
-To build the REST client libraries:
+To build individual pieces:
+`bazel build //:algosdk_core`
 `bazel build //:algosdk_rest_api`
 
 To test:
@@ -227,7 +227,6 @@ java_library(
 To build the `pom.xml` file with `bazel` (with dependencies on `bazel-common` and `skylib`)
 ```
 bazel build //:algosdk_pom
-bazel build //:algosdk_rest_api_pom
 ```
 
 
