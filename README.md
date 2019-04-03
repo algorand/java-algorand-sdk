@@ -23,9 +23,56 @@ Javadoc (coming soon).
 
 # Quickstart
 
+```java
+package com.algorand.algosdk.example;
+
+import com.algorand.algosdk.algod.client.ApiClient;
+import com.algorand.algosdk.algod.client.ApiException;
+import com.algorand.algosdk.algod.client.api.DefaultApi;
+import com.algorand.algosdk.algod.client.auth.ApiKeyAuth;
+import com.algorand.algosdk.algod.client.model.NodeStatus;
+
+
+public class Main {
+
+    public static void main(String args[]) throws Exception {
+        final String ALGOD_API_ADDR = "http://localhost:8080";
+        final String ALGOD_API_TOKEN = "d6f33a522f465ff12f0d263f2c3b707ac2f560bacad4d859914ada7e827902b3";
+
+        ApiClient client = new ApiClient().setBasePath(ALGOD_API_ADDR);
+        ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
+        api_key.setApiKey(ALGOD_API_TOKEN);
+
+        DefaultApi algodApiInstance = new DefaultApi(client);
+        try {
+            NodeStatus status = algodApiInstance.getStatus();
+            System.out.println("Algorand network status: " + status);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling algod#getStatus");
+            e.printStackTrace();
+        }
+    }
+
+}
+```
+This prints:
+```
+Algorand network status: class NodeStatus {
+    catchupTime: 0
+    lastConsensusVersion: v4
+    lastRound: 260318
+    nextConsensusVersion: v4
+    nextConsensusVersionRound: 260319
+    nextConsensusVersionSupported: true
+    timeSinceLastRound: 3620331759
+}
+```
+
+# Longer Example
+
 Take a look at `com.algorand.algodsdk.example`. For instance:
 
-```
+```java
 final String ALGOD_API_ADDR = "http://localhost:8080";
 final String ALGOD_API_TOKEN = "d6f33a522f465ff12f0d263f2c3b707ac2f560bacad4d859914ada7e827902b3";
 final String SRC_ACCOUNT = "viable grain female caution grant mind cry mention pudding oppose orchard people forget similar social gossip marble fish guitar art morning ring west above concert";
@@ -77,7 +124,7 @@ try {
 
 To use the library, users will need to add their own provider for `Ed25519` signatures and `SHA-512/256` checksums. For instance:
 
-```
+```java
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import java.security.Security;
 ...
@@ -127,7 +174,7 @@ swagger-codegen generate -i http://path-of-algod-or-kmd-api/swagger.json -l java
 ```
 
 `config.json` looks like:
-```
+```json
 {
   "library": "okhttp-gson",
   "java8": false,
@@ -160,7 +207,7 @@ default crypto provider on Android does not provide `ed25519` signatures, so you
 We also maintain a `pom.xml` file for Maven support. Make sure to update the maven coordinates tags
 appropriately, in synch with the actual dependencies. We should monitor the status of `maven_install` development
 because tags may no longer be needed in the future. An example `BUILD.bazel` file might look like:
-```
+```bazel
 java_library(
     name = "model",
     srcs = glob(["*.java"]),
