@@ -20,8 +20,8 @@ maven_install(
         # Crypto (for tests and a util function. Clients should provide their own provider).
         "org.bouncycastle:bcprov-jdk15on:1.61",
         # Encoding
-        "com.fasterxml.jackson.core:jackson-core:2.7.9", # 2.7 for android
-        "com.fasterxml.jackson.core:jackson-annotations:2.7.0",
+        "com.fasterxml.jackson.core:jackson-core:2.7.9", # 2.7 for android min16
+        "com.fasterxml.jackson.core:jackson-annotations:2.7.9",
         "com.fasterxml.jackson.core:jackson-databind:2.7.9",
         "org.msgpack:jackson-dataformat-msgpack:0.8.16",
         "commons-codec:commons-codec:1.12",

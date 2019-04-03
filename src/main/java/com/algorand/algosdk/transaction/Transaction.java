@@ -15,12 +15,14 @@ import java.util.Objects;
 @JsonPropertyOrder(alphabetic=true)
 public class Transaction {
     @JsonProperty("type")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Type type;
 
     // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields. This circumvents our encoders'
     // inability to sort child fields.
     /* header fields */
     @JsonProperty("snd")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Address sender; // not null (should never serialize tx without sender)
     @JsonProperty("fee")
     public final long fee;
@@ -29,24 +31,30 @@ public class Transaction {
     @JsonProperty("lv")
     public final long lastValid;
     @JsonProperty("note")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final byte[] note; // can be null (optional)
     @JsonProperty("gen")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final String genesisID;
 
     /* payment fields */
     @JsonProperty("amt")
     public final long amount;
     @JsonProperty("rcv")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Address receiver;
     @JsonProperty("close")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Address closeRemainderTo; // can be null, optional
 
     /* keyreg fields */
     // VotePK is the participation public key used in key registration transactions
     @JsonProperty("votekey")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final ParticipationPublicKey votePK;
     // selectionPK is the VRF public key used in key registration transactions
     @JsonProperty("selkey")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final VRFPublicKey selectionPK;
 
     /**

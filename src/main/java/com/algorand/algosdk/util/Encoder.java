@@ -23,6 +23,9 @@ public class Encoder {
         // It is important to sort fields alphabetically to match the Algorand canonical encoding
         objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        // There's some odd bug in Jackson < 2.8.? where null values are not excluded. See:
+        // https://github.com/FasterXML/jackson-databind/issues/1351. So we will
+        // also annotate all fields manually
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
         return objectMapper.writeValueAsBytes(o);
     }
@@ -35,6 +38,7 @@ public class Encoder {
      */
     public static String encodeToJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
+        System.out.println(ObjectMapper.class.getPackage().getSpecificationVersion());
         // It is important to sort fields alphabetically to match the Algorand canonical encoding
         objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);

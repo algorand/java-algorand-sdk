@@ -60,7 +60,12 @@ public class TestMnemonic {
             r.nextBytes(randKey);
             String mn = Mnemonic.fromKey(Arrays.copyOf(randKey, randKey.length));
             String[] words = mn.split(" ");
-            words[words.length - 1] = Wordlist.RAW[r.nextInt(2^11)];
+            String oldWord = words[words.length - 1];
+            String newWord = oldWord;
+            while (oldWord.equals(newWord)) {
+                newWord = Wordlist.RAW[r.nextInt(2^11)];
+            }
+            words[words.length - 1] = newWord;
 
             StringBuilder s = new StringBuilder();
             for (int j = 0; j < words.length; j++) {

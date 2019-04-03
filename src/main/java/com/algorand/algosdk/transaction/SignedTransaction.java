@@ -3,6 +3,7 @@ package com.algorand.algosdk.transaction;
 import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.Signature;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -14,10 +15,13 @@ import java.util.Objects;
 @JsonPropertyOrder(alphabetic=true)
 public class SignedTransaction {
     @JsonProperty("txn")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Transaction tx;
     @JsonProperty("sig")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Signature sig; // can be null
     @JsonProperty("msig")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final MultisigSignature mSig;
 
     @JsonIgnore

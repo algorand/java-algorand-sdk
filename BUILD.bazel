@@ -35,6 +35,7 @@ java_library(
     visibility = ["//visibility:public"],
 )
 
+
 # Generate a POM file for Maven integration
 load("@bazel_common//tools/maven:pom_file.bzl", "pom_file")
 

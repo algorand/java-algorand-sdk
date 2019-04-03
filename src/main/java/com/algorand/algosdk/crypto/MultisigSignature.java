@@ -1,5 +1,6 @@
 package com.algorand.algosdk.crypto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -17,6 +18,7 @@ public class MultisigSignature {
     @JsonProperty("thr")
     public final int threshold;
     @JsonProperty("subsig")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final List<MultisigSubsig> subsigs;
 
     /**

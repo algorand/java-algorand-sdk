@@ -58,6 +58,41 @@ public class TestAccount {
     }
 
     @Test
+    public void testSignsTransactionZeroValE2E() throws Exception {
+        final String REF_SIG_TXN = "82a3736967c440dfca36ff10b07b0b354f5593ef8ba9a2d10ff0256b1a8f3c17e7951c1e4d745e5c48d5d11ced0c2a3b91e622f5dbfdb72b5fbe4e2ea1b18b23bb34cf946dbe09a374786e86a3616d74cd04d2a366656501a26c76ce0001a437a3726376c4207d3f99e53d34ae49eb2f458761cf538408ffdaee35c70d8234166de7abe3e517a3736e64c4201bd63dc672b0bb29d42fcafa3422a4d385c0c8169bb01595babf8855cf596979a474797065a3706179";
+        final String REF_TX_ID = "Y5RLONMU6BDW5WFVLWMYY52PMXCUNWG4LMT3JBA2OV4E6W6RRLXQ";
+        final String FROM_ADDR = "DPLD3RTSWC5STVBPZL5DIIVE2OC4BSAWTOYBLFN2X6EFLT2ZNF4SMX64UA";
+        final String FROM_SK = "actress tongue harbor tray suspect odor load topple vocal avoid ignore apple lunch unknown tissue museum once switch captain place lemon sail outdoor absent creek";
+        final String TO_ADDR = "PU7ZTZJ5GSXET2ZPIWDWDT2TQQEP7WXOGXDQ3ARUCZW6PK7D4ULSE6NYCE";
+
+        // build unsigned transaction
+        Transaction tx = new Transaction(
+                new Address(FROM_ADDR),
+                new Address(TO_ADDR),
+                1,
+                1234,
+                0,
+                107575
+        );
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+        // make sure public key generated from mnemonic is correct
+        Assert.assertEquals(FROM_ADDR, new Address(account.getClearTextPublicKey()).toString());
+        // make sure address was also correctly computed
+        Assert.assertEquals(FROM_ADDR, account.getAddress().toString());
+
+        // sign the transaction
+        SignedTransaction signedTx = account.signTransaction(tx);
+        byte[] signedTxBytes = Encoder.encodeToMsgPack(signedTx);
+        String signedTxHex = Encoder.encodeToHexStr(signedTxBytes);
+        Assert.assertEquals(REF_SIG_TXN, signedTxHex);
+
+        // verify transaction ID
+        String txID = signedTx.transactionID;
+        Assert.assertEquals(REF_TX_ID, txID);
+    }
+
+    @Test
     public void testKeygen() throws Exception {
         for (int i = 0; i < 100; i++) {
             Account account = new Account();
