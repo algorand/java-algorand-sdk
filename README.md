@@ -7,9 +7,29 @@ This SDK supports Java 7 and can be made compatible with Android `minSdkVersion`
 
 # Installation
 
-Maven (coming soon).
+Maven:
 
-Download the jars (coming soon).
+```xml
+<dependency>
+    <groupId>com.algorand</groupId>
+    <artifactId>algosdk</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+To fetch it straight from the algorand repository, on github, also add in your `pom.xml`:
+```xml
+<repositories>
+    <repository>
+        <id>algosdk-mvn-repo</id>
+        <url>https://raw.github.com/algorand/java-algorand-sdk/mvn-repo/</url>
+        <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
+    </repository>
+</repositories>
+```
+
 
 To build from source:
 ```
