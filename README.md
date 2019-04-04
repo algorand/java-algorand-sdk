@@ -3,7 +3,9 @@
 AlgoSDK is a Java library for communicating and interacting with the Algorand network. It contains a REST client for accessing `algod` instances over the web,
 and also exposes functionality for generating keypairs, mnemonics, creating transactions, signing transactions, and serializing data across the network.
 
-This SDK supports Java 7 and can be made compatible with Android `minSdkVersion` 16.
+# Prerequisites
+
+Java 7+ and Android `minSdkVersion` 16+
 
 # Installation
 
@@ -89,55 +91,7 @@ Algorand network status: class NodeStatus {
 
 # Longer Example
 
-Take a look at `com.algorand.algodsdk.example`. For instance:
-
-```java
-final String ALGOD_API_ADDR = "http://localhost:8080";
-final String ALGOD_API_TOKEN = "d6f33a522f465ff12f0d263f2c3b707ac2f560bacad4d859914ada7e827902b3";
-final String SRC_ACCOUNT = "viable grain female caution grant mind cry mention pudding oppose orchard people forget similar social gossip marble fish guitar art morning ring west above concert";
-final String DEST_ADDR = "KV2XGKMXGYJ6PWYQA5374BYIQBL3ONRMSIARPCFCJEAMAHQEVYPB7PL3KU";
-
-ApiClient client = new ApiClient();
-client.setBasePath(ALGOD_API_ADDR);
-ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
-api_key.setApiKey(ALGOD_API_TOKEN);
-DefaultApi algodApiInstance = new DefaultApi(client);
-
-// set up crypto, in order to sign transactions
-if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-    Security.addProvider(new BouncyCastleProvider());
-}
-
-// get suggested fee for transaction
-long fee = 1;
-try {
-    TransactionParams params = algodApiInstance.transactionParams();
-    fee = params.getFee();
-    System.out.println("Suggested Fee: " + fee);
-} catch (ApiException e) {
-    System.err.println("Exception when calling algod#transactionParams");
-    e.printStackTrace();
-}
-
-// Generate a new transaction using specified account
-Account src = new Account(SRC_ACCOUNT);
-long amount = 100;
-long firstRound = 300;
-long lastRound = 400;
-Transaction tx = new Transaction(src.getAddress(), new Address(DEST_ADDR), fee, amount, firstRound, lastRound);
-SignedTransaction signedTx = src.signTransaction(tx);
-System.out.println("Signed transaction with txid: " + signedTx.transactionID);
-
-// send the transaction to the network. This will be rejected since the source account has no money.
-try {
-    byte[] encodedTxBytes = Encoder.encodeToMsgPack(signedTx);
-    TransactionID id = algodApiInstance.rawTransaction(encodedTxBytes);
-    System.out.println("Successfully sent tx with id: " + id);
-} catch (ApiException e) {
-    // This is generally expected, but should give us an informative error message.
-    System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
-}
-```
+Take a look at the example located in the examples/ directory.
 
 # Cryptography
 

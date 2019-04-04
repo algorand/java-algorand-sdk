@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.algorand.sdk</groupId>
-  <artifactId>java-sdk-example</artifactId>
-  <version>0.1</version>
+  <groupId>com.algorand</groupId>
+  <artifactId>algosdk-example</artifactId>
+  <version>1.0.0</version>
   <packaging>jar</packaging>
 
   <name>${project.groupId}:${project.artifactId}</name>
@@ -27,7 +27,7 @@
 
   <developers>
     <developer>
-      <name>Ben Chan</name>
+      <name>Benjamin Chan</name>
       <email>ben.chan@algorand.com</email>
     </developer>
   </developers>
@@ -40,17 +40,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.algorand.sdk</groupId>
-      <artifactId>java-sdk</artifactId>
-      <version>0.1</version>
-    </dependency>
-
-    <!-- test deps -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
+      <groupId>com.algorand</groupId>
+      <artifactId>algosdk</artifactId>
+      <version>1.0.0</version>
     </dependency>
   </dependencies>
 
@@ -71,4 +63,14 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>algosdk-mvn-repo</id>
+      <url>https://raw.github.com/algorand/java-algorand-sdk/mvn-repo/</url>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>

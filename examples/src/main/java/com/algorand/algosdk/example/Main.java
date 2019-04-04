@@ -5,6 +5,7 @@ import com.algorand.algosdk.algod.client.ApiClient;
 import com.algorand.algosdk.algod.client.ApiException;
 import com.algorand.algosdk.algod.client.api.DefaultApi;
 import com.algorand.algosdk.algod.client.auth.ApiKeyAuth;
+import com.algorand.algosdk.algod.client.model.NodeStatus;
 import com.algorand.algosdk.algod.client.model.Supply;
 import com.algorand.algosdk.algod.client.model.TransactionID;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
@@ -44,10 +45,14 @@ public class Main {
         }
 
         long fee = 1;
+        long firstRound = 301;
         try {
             TransactionParams params = algodApiInstance.transactionParams();
             fee = params.getFee();
             System.out.println("Suggested Fee: " + fee);
+            NodeStatus s = algodApiInstance.getStatus();
+            firstRound = s.getLastRound();
+            System.out.println("Current Round: " + firstRound);
         } catch (ApiException e) {
             System.err.println("Exception when calling algod#transactionParams");
             e.printStackTrace();
@@ -61,8 +66,7 @@ public class Main {
         // Generate a new transaction using randomly generated accounts (this is invalid, since src has no money...)
         Account src = new Account(SRC_ACCOUNT);
         long amount = 100;
-        long firstRound = 300;
-        long lastRound = 400;
+        long lastRound = firstRound + 1000; // 1000 is the max tx window
         Transaction tx = new Transaction(src.getAddress(), new Address(DEST_ADDR), fee, amount, firstRound, lastRound);
         SignedTransaction signedTx = src.signTransaction(tx);
         System.out.println("Signed transaction with txid: " + signedTx.transactionID);
