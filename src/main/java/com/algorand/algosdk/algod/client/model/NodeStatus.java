@@ -13,15 +13,10 @@
 
 package com.algorand.algosdk.algod.client.model;
 
-import org.apache.commons.lang3.ObjectUtils;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.IOException;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * NodeStatus contains the information about a node status
@@ -30,27 +25,27 @@ import java.io.IOException;
 
 public class NodeStatus {
   @SerializedName("catchupTime")
-  private Long catchupTime = null;
+  private java.math.BigInteger catchupTime = null;
 
   @SerializedName("lastConsensusVersion")
   private String lastConsensusVersion = null;
 
   @SerializedName("lastRound")
-  private Long lastRound = null;
+  private java.math.BigInteger lastRound = null;
 
   @SerializedName("nextConsensusVersion")
   private String nextConsensusVersion = null;
 
   @SerializedName("nextConsensusVersionRound")
-  private Long nextConsensusVersionRound = null;
+  private java.math.BigInteger nextConsensusVersionRound = null;
 
   @SerializedName("nextConsensusVersionSupported")
   private Boolean nextConsensusVersionSupported = null;
 
   @SerializedName("timeSinceLastRound")
-  private Long timeSinceLastRound = null;
+  private java.math.BigInteger timeSinceLastRound = null;
 
-  public NodeStatus catchupTime(Long catchupTime) {
+  public NodeStatus catchupTime(java.math.BigInteger catchupTime) {
     this.catchupTime = catchupTime;
     return this;
   }
@@ -60,11 +55,11 @@ public class NodeStatus {
    * @return catchupTime
   **/
   @ApiModelProperty(required = true, value = "CatchupTime in nanoseconds")
-  public Long getCatchupTime() {
+  public java.math.BigInteger getCatchupTime() {
     return catchupTime;
   }
 
-  public void setCatchupTime(Long catchupTime) {
+  public void setCatchupTime(java.math.BigInteger catchupTime) {
     this.catchupTime = catchupTime;
   }
 
@@ -86,7 +81,7 @@ public class NodeStatus {
     this.lastConsensusVersion = lastConsensusVersion;
   }
 
-  public NodeStatus lastRound(Long lastRound) {
+  public NodeStatus lastRound(java.math.BigInteger lastRound) {
     this.lastRound = lastRound;
     return this;
   }
@@ -96,11 +91,11 @@ public class NodeStatus {
    * @return lastRound
   **/
   @ApiModelProperty(required = true, value = "LastRound indicates the last round seen")
-  public Long getLastRound() {
+  public java.math.BigInteger getLastRound() {
     return lastRound;
   }
 
-  public void setLastRound(Long lastRound) {
+  public void setLastRound(java.math.BigInteger lastRound) {
     this.lastRound = lastRound;
   }
 
@@ -122,7 +117,7 @@ public class NodeStatus {
     this.nextConsensusVersion = nextConsensusVersion;
   }
 
-  public NodeStatus nextConsensusVersionRound(Long nextConsensusVersionRound) {
+  public NodeStatus nextConsensusVersionRound(java.math.BigInteger nextConsensusVersionRound) {
     this.nextConsensusVersionRound = nextConsensusVersionRound;
     return this;
   }
@@ -132,11 +127,11 @@ public class NodeStatus {
    * @return nextConsensusVersionRound
   **/
   @ApiModelProperty(required = true, value = "NextVersionRound is the round at which the next consensus version will apply")
-  public Long getNextConsensusVersionRound() {
+  public java.math.BigInteger getNextConsensusVersionRound() {
     return nextConsensusVersionRound;
   }
 
-  public void setNextConsensusVersionRound(Long nextConsensusVersionRound) {
+  public void setNextConsensusVersionRound(java.math.BigInteger nextConsensusVersionRound) {
     this.nextConsensusVersionRound = nextConsensusVersionRound;
   }
 
@@ -158,7 +153,7 @@ public class NodeStatus {
     this.nextConsensusVersionSupported = nextConsensusVersionSupported;
   }
 
-  public NodeStatus timeSinceLastRound(Long timeSinceLastRound) {
+  public NodeStatus timeSinceLastRound(java.math.BigInteger timeSinceLastRound) {
     this.timeSinceLastRound = timeSinceLastRound;
     return this;
   }
@@ -168,11 +163,11 @@ public class NodeStatus {
    * @return timeSinceLastRound
   **/
   @ApiModelProperty(required = true, value = "TimeSinceLastRound in nanoseconds")
-  public Long getTimeSinceLastRound() {
+  public java.math.BigInteger getTimeSinceLastRound() {
     return timeSinceLastRound;
   }
 
-  public void setTimeSinceLastRound(Long timeSinceLastRound) {
+  public void setTimeSinceLastRound(java.math.BigInteger timeSinceLastRound) {
     this.timeSinceLastRound = timeSinceLastRound;
   }
 

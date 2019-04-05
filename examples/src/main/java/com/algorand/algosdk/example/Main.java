@@ -48,10 +48,10 @@ public class Main {
         long firstRound = 301;
         try {
             TransactionParams params = algodApiInstance.transactionParams();
-            fee = params.getFee();
+            fee = params.getFee().longValue(); // work with longs for convenience - though under the hood we support uint64 BigInteger
             System.out.println("Suggested Fee: " + fee);
             NodeStatus s = algodApiInstance.getStatus();
-            firstRound = s.getLastRound();
+            firstRound = s.getLastRound().longValue();
             System.out.println("Current Round: " + firstRound);
         } catch (ApiException e) {
             System.err.println("Exception when calling algod#transactionParams");
@@ -100,7 +100,7 @@ public class Main {
         APIV1POSTWalletResponse wallet;
         try {
             CreateWalletRequest req = new CreateWalletRequest()
-                    .walletName("arbitrary-wallet-name-2")
+                    .walletName("arbitrary-wallet-name-3")
                     .walletDriverName("sqlite");
             wallet = kmdApiInstance.createWallet(req);
             System.out.println("Created wallet id: " + wallet.getWallet().getId());

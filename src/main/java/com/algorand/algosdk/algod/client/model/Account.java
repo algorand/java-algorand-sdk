@@ -28,10 +28,10 @@ public class Account {
   private String address = null;
 
   @SerializedName("amount")
-  private Long amount = null;
+  private java.math.BigInteger amount = null;
 
   @SerializedName("earnings")
-  private Long earnings = null;
+  private java.math.BigInteger earnings = null;
 
   @SerializedName("status")
   private String status = null;
@@ -54,7 +54,7 @@ public class Account {
     this.address = address;
   }
 
-  public Account amount(Long amount) {
+  public Account amount(java.math.BigInteger amount) {
     this.amount = amount;
     return this;
   }
@@ -64,15 +64,15 @@ public class Account {
    * @return amount
   **/
   @ApiModelProperty(required = true, value = "Amount indicates the total number of Algos in the account")
-  public Long getAmount() {
+  public java.math.BigInteger getAmount() {
     return amount;
   }
 
-  public void setAmount(Long amount) {
+  public void setAmount(java.math.BigInteger amount) {
     this.amount = amount;
   }
 
-  public Account earnings(Long earnings) {
+  public Account earnings(java.math.BigInteger earnings) {
     this.earnings = earnings;
     return this;
   }
@@ -82,11 +82,11 @@ public class Account {
    * @return earnings
   **/
   @ApiModelProperty(required = true, value = "Earnings indicates the total earnings of Algos the account has recieved")
-  public Long getEarnings() {
+  public java.math.BigInteger getEarnings() {
     return earnings;
   }
 
-  public void setEarnings(Long earnings) {
+  public void setEarnings(java.math.BigInteger earnings) {
     this.earnings = earnings;
   }
 

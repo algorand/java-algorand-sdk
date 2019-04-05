@@ -25,12 +25,12 @@ import org.apache.commons.lang3.ObjectUtils;
 
 public class PendingTransactions {
   @SerializedName("totalTxns")
-  private Long totalTxns = null;
+  private java.math.BigInteger totalTxns = null;
 
   @SerializedName("truncatedTxns")
   private TransactionList truncatedTxns = null;
 
-  public PendingTransactions totalTxns(Long totalTxns) {
+  public PendingTransactions totalTxns(java.math.BigInteger totalTxns) {
     this.totalTxns = totalTxns;
     return this;
   }
@@ -40,11 +40,11 @@ public class PendingTransactions {
    * @return totalTxns
   **/
   @ApiModelProperty(required = true, value = "TotalTxns")
-  public Long getTotalTxns() {
+  public java.math.BigInteger getTotalTxns() {
     return totalTxns;
   }
 
-  public void setTotalTxns(Long totalTxns) {
+  public void setTotalTxns(java.math.BigInteger totalTxns) {
     this.totalTxns = totalTxns;
   }
 

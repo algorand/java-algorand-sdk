@@ -24,6 +24,9 @@ import org.apache.commons.lang3.ObjectUtils;
 @ApiModel(description = "APIV1POSTWalletRequest is the request for `POST /v1/wallet`")
 
 public class CreateWalletRequest {
+  @SerializedName("master_derivation_key")
+  private MasterDerivationKey masterDerivationKey = null;
+
   @SerializedName("wallet_driver_name")
   private String walletDriverName = null;
 
@@ -32,6 +35,24 @@ public class CreateWalletRequest {
 
   @SerializedName("wallet_password")
   private String walletPassword = null;
+
+  public CreateWalletRequest masterDerivationKey(MasterDerivationKey masterDerivationKey) {
+    this.masterDerivationKey = masterDerivationKey;
+    return this;
+  }
+
+   /**
+   * Get masterDerivationKey
+   * @return masterDerivationKey
+  **/
+  @ApiModelProperty(value = "")
+  public MasterDerivationKey getMasterDerivationKey() {
+    return masterDerivationKey;
+  }
+
+  public void setMasterDerivationKey(MasterDerivationKey masterDerivationKey) {
+    this.masterDerivationKey = masterDerivationKey;
+  }
 
   public CreateWalletRequest walletDriverName(String walletDriverName) {
     this.walletDriverName = walletDriverName;
@@ -97,14 +118,15 @@ public class CreateWalletRequest {
     return false;
   }
     CreateWalletRequest createWalletRequest = (CreateWalletRequest) o;
-    return ObjectUtils.equals(this.walletDriverName, createWalletRequest.walletDriverName) &&
+    return ObjectUtils.equals(this.masterDerivationKey, createWalletRequest.masterDerivationKey) &&
+    ObjectUtils.equals(this.walletDriverName, createWalletRequest.walletDriverName) &&
     ObjectUtils.equals(this.walletName, createWalletRequest.walletName) &&
     ObjectUtils.equals(this.walletPassword, createWalletRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(walletDriverName, walletName, walletPassword);
+    return ObjectUtils.hashCodeMulti(masterDerivationKey, walletDriverName, walletName, walletPassword);
   }
 
 
@@ -113,6 +135,7 @@ public class CreateWalletRequest {
     StringBuilder sb = new StringBuilder();
     sb.append("class CreateWalletRequest {\n");
     
+    sb.append("    masterDerivationKey: ").append(toIndentedString(masterDerivationKey)).append("\n");
     sb.append("    walletDriverName: ").append(toIndentedString(walletDriverName)).append("\n");
     sb.append("    walletName: ").append(toIndentedString(walletName)).append("\n");
     sb.append("    walletPassword: ").append(toIndentedString(walletPassword)).append("\n");

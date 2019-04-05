@@ -13,15 +13,10 @@
 
 package com.algorand.algosdk.algod.client.model;
 
-import org.apache.commons.lang3.ObjectUtils;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.IOException;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * PaymentTransactionType contains the additional fields for a payment Transaction
@@ -30,7 +25,7 @@ import java.io.IOException;
 
 public class PaymentTransactionType {
   @SerializedName("amount")
-  private Long amount = null;
+  private java.math.BigInteger amount = null;
 
   @SerializedName("close")
   private String close = null;
@@ -38,7 +33,7 @@ public class PaymentTransactionType {
   @SerializedName("to")
   private String to = null;
 
-  public PaymentTransactionType amount(Long amount) {
+  public PaymentTransactionType amount(java.math.BigInteger amount) {
     this.amount = amount;
     return this;
   }
@@ -48,11 +43,11 @@ public class PaymentTransactionType {
    * @return amount
   **/
   @ApiModelProperty(required = true, value = "Amount is the amount of Algos intended to be transferred")
-  public Long getAmount() {
+  public java.math.BigInteger getAmount() {
     return amount;
   }
 
-  public void setAmount(Long amount) {
+  public void setAmount(java.math.BigInteger amount) {
     this.amount = amount;
   }
 

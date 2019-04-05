@@ -18,9 +18,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * APIV1POSTTransactionSignResponse is the repsonse to &#x60;POST /v1/transaction/sign&#x60; friendly:SignTransactionResponse
  */
@@ -34,7 +31,7 @@ public class APIV1POSTTransactionSignResponse {
   private String message = null;
 
   @SerializedName("signed_transaction")
-  private List<Integer> signedTransaction = null;
+  private byte[] signedTransaction = null;
 
   public APIV1POSTTransactionSignResponse error(Boolean error) {
     this.error = error;
@@ -72,16 +69,8 @@ public class APIV1POSTTransactionSignResponse {
     this.message = message;
   }
 
-  public APIV1POSTTransactionSignResponse signedTransaction(List<Integer> signedTransaction) {
+  public APIV1POSTTransactionSignResponse signedTransaction(byte[] signedTransaction) {
     this.signedTransaction = signedTransaction;
-    return this;
-  }
-
-  public APIV1POSTTransactionSignResponse addSignedTransactionItem(Integer signedTransactionItem) {
-    if (this.signedTransaction == null) {
-      this.signedTransaction = new ArrayList<Integer>();
-    }
-    this.signedTransaction.add(signedTransactionItem);
     return this;
   }
 
@@ -90,11 +79,11 @@ public class APIV1POSTTransactionSignResponse {
    * @return signedTransaction
   **/
   @ApiModelProperty(value = "")
-  public List<Integer> getSignedTransaction() {
+  public byte[] getSignedTransaction() {
     return signedTransaction;
   }
 
-  public void setSignedTransaction(List<Integer> signedTransaction) {
+  public void setSignedTransaction(byte[] signedTransaction) {
     this.signedTransaction = signedTransaction;
   }
 

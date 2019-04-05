@@ -18,9 +18,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * APIV1POSTTransactionSignRequest is the request for &#x60;POST /v1/transaction/sign&#x60;
  */
@@ -28,7 +25,7 @@ import java.util.List;
 
 public class SignTransactionRequest {
   @SerializedName("transaction")
-  private List<Integer> transaction = null;
+  private byte[] transaction = null;
 
   @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
@@ -36,16 +33,8 @@ public class SignTransactionRequest {
   @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public SignTransactionRequest transaction(List<Integer> transaction) {
+  public SignTransactionRequest transaction(byte[] transaction) {
     this.transaction = transaction;
-    return this;
-  }
-
-  public SignTransactionRequest addTransactionItem(Integer transactionItem) {
-    if (this.transaction == null) {
-      this.transaction = new ArrayList<Integer>();
-    }
-    this.transaction.add(transactionItem);
     return this;
   }
 
@@ -54,11 +43,11 @@ public class SignTransactionRequest {
    * @return transaction
   **/
   @ApiModelProperty(value = "")
-  public List<Integer> getTransaction() {
+  public byte[] getTransaction() {
     return transaction;
   }
 
-  public void setTransaction(List<Integer> transaction) {
+  public void setTransaction(byte[] transaction) {
     this.transaction = transaction;
   }
 

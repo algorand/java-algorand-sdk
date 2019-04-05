@@ -13,15 +13,10 @@
 
 package com.algorand.algosdk.algod.client.model;
 
-import org.apache.commons.lang3.ObjectUtils;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.IOException;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * TransactionParams contains the parameters that help a client construct a new transaction.
@@ -33,13 +28,16 @@ public class TransactionParams {
   private String consensusVersion = null;
 
   @SerializedName("fee")
-  private Long fee = null;
+  private java.math.BigInteger fee = null;
 
   @SerializedName("genesisID")
   private String genesisID = null;
 
+  @SerializedName("genesishashb64")
+  private byte[] genesishashb64 = null;
+
   @SerializedName("lastRound")
-  private Long lastRound = null;
+  private java.math.BigInteger lastRound = null;
 
   public TransactionParams consensusVersion(String consensusVersion) {
     this.consensusVersion = consensusVersion;
@@ -59,7 +57,7 @@ public class TransactionParams {
     this.consensusVersion = consensusVersion;
   }
 
-  public TransactionParams fee(Long fee) {
+  public TransactionParams fee(java.math.BigInteger fee) {
     this.fee = fee;
     return this;
   }
@@ -69,11 +67,11 @@ public class TransactionParams {
    * @return fee
   **/
   @ApiModelProperty(required = true, value = "Fee is the suggested transaction fee")
-  public Long getFee() {
+  public java.math.BigInteger getFee() {
     return fee;
   }
 
-  public void setFee(Long fee) {
+  public void setFee(java.math.BigInteger fee) {
     this.fee = fee;
   }
 
@@ -95,7 +93,25 @@ public class TransactionParams {
     this.genesisID = genesisID;
   }
 
-  public TransactionParams lastRound(Long lastRound) {
+  public TransactionParams genesishashb64(byte[] genesishashb64) {
+    this.genesishashb64 = genesishashb64;
+    return this;
+  }
+
+   /**
+   * Genesis hash
+   * @return genesishashb64
+  **/
+  @ApiModelProperty(required = true, value = "Genesis hash")
+  public byte[] getGenesishashb64() {
+    return genesishashb64;
+  }
+
+  public void setGenesishashb64(byte[] genesishashb64) {
+    this.genesishashb64 = genesishashb64;
+  }
+
+  public TransactionParams lastRound(java.math.BigInteger lastRound) {
     this.lastRound = lastRound;
     return this;
   }
@@ -105,11 +121,11 @@ public class TransactionParams {
    * @return lastRound
   **/
   @ApiModelProperty(required = true, value = "LastRound indicates the last round seen")
-  public Long getLastRound() {
+  public java.math.BigInteger getLastRound() {
     return lastRound;
   }
 
-  public void setLastRound(Long lastRound) {
+  public void setLastRound(java.math.BigInteger lastRound) {
     this.lastRound = lastRound;
   }
 
@@ -126,12 +142,13 @@ public class TransactionParams {
     return ObjectUtils.equals(this.consensusVersion, transactionParams.consensusVersion) &&
     ObjectUtils.equals(this.fee, transactionParams.fee) &&
     ObjectUtils.equals(this.genesisID, transactionParams.genesisID) &&
+    ObjectUtils.equals(this.genesishashb64, transactionParams.genesishashb64) &&
     ObjectUtils.equals(this.lastRound, transactionParams.lastRound);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(consensusVersion, fee, genesisID, lastRound);
+    return ObjectUtils.hashCodeMulti(consensusVersion, fee, genesisID, genesishashb64, lastRound);
   }
 
 
@@ -143,6 +160,7 @@ public class TransactionParams {
     sb.append("    consensusVersion: ").append(toIndentedString(consensusVersion)).append("\n");
     sb.append("    fee: ").append(toIndentedString(fee)).append("\n");
     sb.append("    genesisID: ").append(toIndentedString(genesisID)).append("\n");
+    sb.append("    genesishashb64: ").append(toIndentedString(genesishashb64)).append("\n");
     sb.append("    lastRound: ").append(toIndentedString(lastRound)).append("\n");
     sb.append("}");
     return sb.toString();

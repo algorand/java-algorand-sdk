@@ -18,9 +18,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Transaction contains all fields common to all transactions and serves as an envelope to all transactions type
  */
@@ -28,19 +25,25 @@ import java.util.List;
 
 public class Transaction {
   @SerializedName("fee")
-  private Long fee = null;
+  private java.math.BigInteger fee = null;
 
   @SerializedName("first-round")
-  private Long firstRound = null;
+  private java.math.BigInteger firstRound = null;
 
   @SerializedName("from")
   private String from = null;
 
+  @SerializedName("genesisID")
+  private String genesisID = null;
+
+  @SerializedName("genesishashb64")
+  private byte[] genesishashb64 = null;
+
   @SerializedName("last-round")
-  private Long lastRound = null;
+  private java.math.BigInteger lastRound = null;
 
   @SerializedName("noteb64")
-  private List<Long> noteb64 = null;
+  private byte[] noteb64 = null;
 
   @SerializedName("payment")
   private PaymentTransactionType payment = null;
@@ -49,7 +52,7 @@ public class Transaction {
   private String poolerror = null;
 
   @SerializedName("round")
-  private Long round = null;
+  private java.math.BigInteger round = null;
 
   @SerializedName("tx")
   private String tx = null;
@@ -57,7 +60,7 @@ public class Transaction {
   @SerializedName("type")
   private String type = null;
 
-  public Transaction fee(Long fee) {
+  public Transaction fee(java.math.BigInteger fee) {
     this.fee = fee;
     return this;
   }
@@ -67,15 +70,15 @@ public class Transaction {
    * @return fee
   **/
   @ApiModelProperty(required = true, value = "Fee is the transaction fee")
-  public Long getFee() {
+  public java.math.BigInteger getFee() {
     return fee;
   }
 
-  public void setFee(Long fee) {
+  public void setFee(java.math.BigInteger fee) {
     this.fee = fee;
   }
 
-  public Transaction firstRound(Long firstRound) {
+  public Transaction firstRound(java.math.BigInteger firstRound) {
     this.firstRound = firstRound;
     return this;
   }
@@ -85,11 +88,11 @@ public class Transaction {
    * @return firstRound
   **/
   @ApiModelProperty(required = true, value = "FirstRound indicates the first valid round for this transaction")
-  public Long getFirstRound() {
+  public java.math.BigInteger getFirstRound() {
     return firstRound;
   }
 
-  public void setFirstRound(Long firstRound) {
+  public void setFirstRound(java.math.BigInteger firstRound) {
     this.firstRound = firstRound;
   }
 
@@ -111,7 +114,43 @@ public class Transaction {
     this.from = from;
   }
 
-  public Transaction lastRound(Long lastRound) {
+  public Transaction genesisID(String genesisID) {
+    this.genesisID = genesisID;
+    return this;
+  }
+
+   /**
+   * Genesis ID
+   * @return genesisID
+  **/
+  @ApiModelProperty(required = true, value = "Genesis ID")
+  public String getGenesisID() {
+    return genesisID;
+  }
+
+  public void setGenesisID(String genesisID) {
+    this.genesisID = genesisID;
+  }
+
+  public Transaction genesishashb64(byte[] genesishashb64) {
+    this.genesishashb64 = genesishashb64;
+    return this;
+  }
+
+   /**
+   * Genesis hash
+   * @return genesishashb64
+  **/
+  @ApiModelProperty(required = true, value = "Genesis hash")
+  public byte[] getGenesishashb64() {
+    return genesishashb64;
+  }
+
+  public void setGenesishashb64(byte[] genesishashb64) {
+    this.genesishashb64 = genesishashb64;
+  }
+
+  public Transaction lastRound(java.math.BigInteger lastRound) {
     this.lastRound = lastRound;
     return this;
   }
@@ -121,24 +160,16 @@ public class Transaction {
    * @return lastRound
   **/
   @ApiModelProperty(required = true, value = "LastRound indicates the last valid round for this transaction")
-  public Long getLastRound() {
+  public java.math.BigInteger getLastRound() {
     return lastRound;
   }
 
-  public void setLastRound(Long lastRound) {
+  public void setLastRound(java.math.BigInteger lastRound) {
     this.lastRound = lastRound;
   }
 
-  public Transaction noteb64(List<Long> noteb64) {
+  public Transaction noteb64(byte[] noteb64) {
     this.noteb64 = noteb64;
-    return this;
-  }
-
-  public Transaction addNoteb64Item(Long noteb64Item) {
-    if (this.noteb64 == null) {
-      this.noteb64 = new ArrayList<Long>();
-    }
-    this.noteb64.add(noteb64Item);
     return this;
   }
 
@@ -147,11 +178,11 @@ public class Transaction {
    * @return noteb64
   **/
   @ApiModelProperty(value = "Note is a free form data")
-  public List<Long> getNoteb64() {
+  public byte[] getNoteb64() {
     return noteb64;
   }
 
-  public void setNoteb64(List<Long> noteb64) {
+  public void setNoteb64(byte[] noteb64) {
     this.noteb64 = noteb64;
   }
 
@@ -191,7 +222,7 @@ public class Transaction {
     this.poolerror = poolerror;
   }
 
-  public Transaction round(Long round) {
+  public Transaction round(java.math.BigInteger round) {
     this.round = round;
     return this;
   }
@@ -201,11 +232,11 @@ public class Transaction {
    * @return round
   **/
   @ApiModelProperty(value = "ConfirmedRound indicates the block number this transaction appeared in")
-  public Long getRound() {
+  public java.math.BigInteger getRound() {
     return round;
   }
 
-  public void setRound(Long round) {
+  public void setRound(java.math.BigInteger round) {
     this.round = round;
   }
 
@@ -258,6 +289,8 @@ public class Transaction {
     return ObjectUtils.equals(this.fee, transaction.fee) &&
     ObjectUtils.equals(this.firstRound, transaction.firstRound) &&
     ObjectUtils.equals(this.from, transaction.from) &&
+    ObjectUtils.equals(this.genesisID, transaction.genesisID) &&
+    ObjectUtils.equals(this.genesishashb64, transaction.genesishashb64) &&
     ObjectUtils.equals(this.lastRound, transaction.lastRound) &&
     ObjectUtils.equals(this.noteb64, transaction.noteb64) &&
     ObjectUtils.equals(this.payment, transaction.payment) &&
@@ -269,7 +302,7 @@ public class Transaction {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(fee, firstRound, from, lastRound, noteb64, payment, poolerror, round, tx, type);
+    return ObjectUtils.hashCodeMulti(fee, firstRound, from, genesisID, genesishashb64, lastRound, noteb64, payment, poolerror, round, tx, type);
   }
 
 
@@ -281,6 +314,8 @@ public class Transaction {
     sb.append("    fee: ").append(toIndentedString(fee)).append("\n");
     sb.append("    firstRound: ").append(toIndentedString(firstRound)).append("\n");
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
+    sb.append("    genesisID: ").append(toIndentedString(genesisID)).append("\n");
+    sb.append("    genesishashb64: ").append(toIndentedString(genesishashb64)).append("\n");
     sb.append("    lastRound: ").append(toIndentedString(lastRound)).append("\n");
     sb.append("    noteb64: ").append(toIndentedString(noteb64)).append("\n");
     sb.append("    payment: ").append(toIndentedString(payment)).append("\n");

@@ -4,8 +4,12 @@ package com.algorand.algosdk.transaction;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 /**
@@ -25,11 +29,14 @@ public class Transaction {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Address sender; // not null (should never serialize tx without sender)
     @JsonProperty("fee")
-    public final long fee;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public final BigInteger fee;
     @JsonProperty("fv")
-    public final long firstValid;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public final BigInteger firstValid;
     @JsonProperty("lv")
-    public final long lastValid;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public final BigInteger lastValid;
     @JsonProperty("note")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public final byte[] note; // can be null (optional)
@@ -39,7 +46,8 @@ public class Transaction {
 
     /* payment fields */
     @JsonProperty("amt")
-    public final long amount;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public final BigInteger amount;
     @JsonProperty("rcv")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Address receiver;
@@ -66,18 +74,24 @@ public class Transaction {
      * @param firstRound first valid round
      * @param lastRound last valid round
      */
-    public Transaction(Address fromAddr, Address toAddr, long fee, long amount, long firstRound,
-                       long lastRound) {
+    public Transaction(Address fromAddr, Address toAddr, BigInteger fee, BigInteger amount, BigInteger firstRound,
+                       BigInteger lastRound) {
         this(fromAddr, fee, firstRound, lastRound, null, amount, toAddr);
     }
 
-    public Transaction(Address sender, long fee, long firstValid, long lastValid, byte[] note,
-                       long amount, Address receiver) {
+    // Helper with long types
+    public Transaction(Address fromAddr, Address toAddr, long fee, long amount, long firstRound,
+                       long lastRound) {
+        this(fromAddr, BigInteger.valueOf(fee), BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr);
+    }
+
+    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+                       BigInteger amount, Address receiver) {
         this(sender, fee, firstValid, lastValid, note, null, amount, receiver, null);
     }
 
-    public Transaction(Address sender, long fee, long firstValid, long lastValid, byte[] note, String genesisID,
-                       long amount, Address receiver, Address closeRemainderTo) {
+    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID,
+                       BigInteger amount, Address receiver, Address closeRemainderTo) {
         this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, amount, receiver, closeRemainderTo, null, null);
         Objects.requireNonNull(receiver, "receiver must not be null");
     }
@@ -92,16 +106,16 @@ public class Transaction {
      * @param votePK the new participation key to register
      * @param vrfPK the sortition key to register
      */
-    public Transaction(Address sender, long fee, long firstValid, long lastValid, byte[] note,
+    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
-        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, null, 0, null, null, votePK, vrfPK);
+        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, null, null, null, null, votePK, vrfPK);
         Objects.requireNonNull(votePK, "participation key must not be null");
         Objects.requireNonNull(vrfPK, "selection key must not be null");
     }
 
     private Transaction(Type type,
-                       Address sender, long fee, long firstValid, long lastValid, byte[] note, String genesisID,
-                       long amount, Address receiver, Address closeRemainderTo, ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
+                       Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID,
+                       BigInteger amount, Address receiver, Address closeRemainderTo, ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
         this.type = Objects.requireNonNull(type, "txtype must not be null");
         // header fields
         this.sender = Objects.requireNonNull(sender, "sender must not be null");

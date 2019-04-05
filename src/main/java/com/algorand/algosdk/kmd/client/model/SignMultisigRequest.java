@@ -18,9 +18,6 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * APIV1POSTMultisigTransactionSignRequest is the request for &#x60;POST /v1/multisig/sign&#x60;
  */
@@ -34,7 +31,7 @@ public class SignMultisigRequest {
   private PublicKey publicKey = null;
 
   @SerializedName("transaction")
-  private List<Integer> transaction = null;
+  private byte[] transaction = null;
 
   @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
@@ -78,16 +75,8 @@ public class SignMultisigRequest {
     this.publicKey = publicKey;
   }
 
-  public SignMultisigRequest transaction(List<Integer> transaction) {
+  public SignMultisigRequest transaction(byte[] transaction) {
     this.transaction = transaction;
-    return this;
-  }
-
-  public SignMultisigRequest addTransactionItem(Integer transactionItem) {
-    if (this.transaction == null) {
-      this.transaction = new ArrayList<Integer>();
-    }
-    this.transaction.add(transactionItem);
     return this;
   }
 
@@ -96,11 +85,11 @@ public class SignMultisigRequest {
    * @return transaction
   **/
   @ApiModelProperty(value = "")
-  public List<Integer> getTransaction() {
+  public byte[] getTransaction() {
     return transaction;
   }
 
-  public void setTransaction(List<Integer> transaction) {
+  public void setTransaction(byte[] transaction) {
     this.transaction = transaction;
   }
 

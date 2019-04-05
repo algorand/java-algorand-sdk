@@ -13,15 +13,11 @@
 
 package com.algorand.algosdk.algod.client.model;
 
-import org.apache.commons.lang3.ObjectUtils;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.IOException;
+import org.apache.commons.lang3.ObjectUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +27,37 @@ import java.util.List;
 @ApiModel(description = "Note that we annotate this as a model so that legacy clients can directly import a swagger generated Version model.")
 
 public class Version {
+  @SerializedName("genesis_hash_b64")
+  private List<Integer> genesisHashB64 = new ArrayList<Integer>();
+
   @SerializedName("genesis_id")
   private String genesisId = null;
 
   @SerializedName("versions")
   private List<String> versions = new ArrayList<String>();
+
+  public Version genesisHashB64(List<Integer> genesisHashB64) {
+    this.genesisHashB64 = genesisHashB64;
+    return this;
+  }
+
+  public Version addGenesisHashB64Item(Integer genesisHashB64Item) {
+    this.genesisHashB64.add(genesisHashB64Item);
+    return this;
+  }
+
+   /**
+   * Get genesisHashB64
+   * @return genesisHashB64
+  **/
+  @ApiModelProperty(required = true, value = "")
+  public List<Integer> getGenesisHashB64() {
+    return genesisHashB64;
+  }
+
+  public void setGenesisHashB64(List<Integer> genesisHashB64) {
+    this.genesisHashB64 = genesisHashB64;
+  }
 
   public Version genesisId(String genesisId) {
     this.genesisId = genesisId;
@@ -88,13 +110,14 @@ public class Version {
     return false;
   }
     Version version = (Version) o;
-    return ObjectUtils.equals(this.genesisId, version.genesisId) &&
+    return ObjectUtils.equals(this.genesisHashB64, version.genesisHashB64) &&
+    ObjectUtils.equals(this.genesisId, version.genesisId) &&
     ObjectUtils.equals(this.versions, version.versions);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(genesisId, versions);
+    return ObjectUtils.hashCodeMulti(genesisHashB64, genesisId, versions);
   }
 
 
@@ -103,6 +126,7 @@ public class Version {
     StringBuilder sb = new StringBuilder();
     sb.append("class Version {\n");
     
+    sb.append("    genesisHashB64: ").append(toIndentedString(genesisHashB64)).append("\n");
     sb.append("    genesisId: ").append(toIndentedString(genesisId)).append("\n");
     sb.append("    versions: ").append(toIndentedString(versions)).append("\n");
     sb.append("}");

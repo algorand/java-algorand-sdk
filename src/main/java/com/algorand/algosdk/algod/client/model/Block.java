@@ -13,15 +13,10 @@
 
 package com.algorand.algosdk.algod.client.model;
 
-import org.apache.commons.lang3.ObjectUtils;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.IOException;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * Block contains a block information
@@ -36,10 +31,10 @@ public class Block {
   private String currentProtocol = null;
 
   @SerializedName("earn")
-  private Long earn = null;
+  private java.math.BigInteger earn = null;
 
   @SerializedName("frac")
-  private Long frac = null;
+  private java.math.BigInteger frac = null;
 
   @SerializedName("hash")
   private String hash = null;
@@ -48,16 +43,16 @@ public class Block {
   private String nextProtocol = null;
 
   @SerializedName("nextProtocolApprovals")
-  private Long nextProtocolApprovals = null;
+  private java.math.BigInteger nextProtocolApprovals = null;
 
   @SerializedName("nextProtocolSwitchOn")
-  private Long nextProtocolSwitchOn = null;
+  private java.math.BigInteger nextProtocolSwitchOn = null;
 
   @SerializedName("nextProtocolVoteBefore")
-  private Long nextProtocolVoteBefore = null;
+  private java.math.BigInteger nextProtocolVoteBefore = null;
 
   @SerializedName("period")
-  private Long period = null;
+  private java.math.BigInteger period = null;
 
   @SerializedName("previousBlockHash")
   private String previousBlockHash = null;
@@ -66,16 +61,16 @@ public class Block {
   private String proposer = null;
 
   @SerializedName("rate")
-  private Long rate = null;
+  private java.math.BigInteger rate = null;
 
   @SerializedName("round")
-  private Long round = null;
+  private java.math.BigInteger round = null;
 
   @SerializedName("seed")
   private String seed = null;
 
   @SerializedName("timestamp")
-  private Long timestamp = null;
+  private java.math.BigInteger timestamp = null;
 
   @SerializedName("txnRoot")
   private String txnRoot = null;
@@ -125,7 +120,7 @@ public class Block {
     this.currentProtocol = currentProtocol;
   }
 
-  public Block earn(Long earn) {
+  public Block earn(java.math.BigInteger earn) {
     this.earn = earn;
     return this;
   }
@@ -135,15 +130,15 @@ public class Block {
    * @return earn
   **/
   @ApiModelProperty(value = "EarningsLevel specifies how many earnings, in Algos, have been distributed to each config.Protocol.EarningUnit of Algos since genesis.")
-  public Long getEarn() {
+  public java.math.BigInteger getEarn() {
     return earn;
   }
 
-  public void setEarn(Long earn) {
+  public void setEarn(java.math.BigInteger earn) {
     this.earn = earn;
   }
 
-  public Block frac(Long frac) {
+  public Block frac(java.math.BigInteger frac) {
     this.frac = frac;
     return this;
   }
@@ -153,11 +148,11 @@ public class Block {
    * @return frac
   **/
   @ApiModelProperty(value = "The number of leftover Algos after the distribution of EarningsRate/earningUnits Algos for every earning unit in the next round.")
-  public Long getFrac() {
+  public java.math.BigInteger getFrac() {
     return frac;
   }
 
-  public void setFrac(Long frac) {
+  public void setFrac(java.math.BigInteger frac) {
     this.frac = frac;
   }
 
@@ -197,7 +192,7 @@ public class Block {
     this.nextProtocol = nextProtocol;
   }
 
-  public Block nextProtocolApprovals(Long nextProtocolApprovals) {
+  public Block nextProtocolApprovals(java.math.BigInteger nextProtocolApprovals) {
     this.nextProtocolApprovals = nextProtocolApprovals;
     return this;
   }
@@ -207,15 +202,15 @@ public class Block {
    * @return nextProtocolApprovals
   **/
   @ApiModelProperty(required = true, value = "NextProtocolApprovals is the number of blocks which approved the protocol upgrade")
-  public Long getNextProtocolApprovals() {
+  public java.math.BigInteger getNextProtocolApprovals() {
     return nextProtocolApprovals;
   }
 
-  public void setNextProtocolApprovals(Long nextProtocolApprovals) {
+  public void setNextProtocolApprovals(java.math.BigInteger nextProtocolApprovals) {
     this.nextProtocolApprovals = nextProtocolApprovals;
   }
 
-  public Block nextProtocolSwitchOn(Long nextProtocolSwitchOn) {
+  public Block nextProtocolSwitchOn(java.math.BigInteger nextProtocolSwitchOn) {
     this.nextProtocolSwitchOn = nextProtocolSwitchOn;
     return this;
   }
@@ -225,15 +220,15 @@ public class Block {
    * @return nextProtocolSwitchOn
   **/
   @ApiModelProperty(required = true, value = "NextProtocolSwitchOn is the round on which the protocol upgrade will take effect")
-  public Long getNextProtocolSwitchOn() {
+  public java.math.BigInteger getNextProtocolSwitchOn() {
     return nextProtocolSwitchOn;
   }
 
-  public void setNextProtocolSwitchOn(Long nextProtocolSwitchOn) {
+  public void setNextProtocolSwitchOn(java.math.BigInteger nextProtocolSwitchOn) {
     this.nextProtocolSwitchOn = nextProtocolSwitchOn;
   }
 
-  public Block nextProtocolVoteBefore(Long nextProtocolVoteBefore) {
+  public Block nextProtocolVoteBefore(java.math.BigInteger nextProtocolVoteBefore) {
     this.nextProtocolVoteBefore = nextProtocolVoteBefore;
     return this;
   }
@@ -243,15 +238,15 @@ public class Block {
    * @return nextProtocolVoteBefore
   **/
   @ApiModelProperty(required = true, value = "NextProtocolVoteBefore is the deadline round for this protocol upgrade (No votes will be consider after this round)")
-  public Long getNextProtocolVoteBefore() {
+  public java.math.BigInteger getNextProtocolVoteBefore() {
     return nextProtocolVoteBefore;
   }
 
-  public void setNextProtocolVoteBefore(Long nextProtocolVoteBefore) {
+  public void setNextProtocolVoteBefore(java.math.BigInteger nextProtocolVoteBefore) {
     this.nextProtocolVoteBefore = nextProtocolVoteBefore;
   }
 
-  public Block period(Long period) {
+  public Block period(java.math.BigInteger period) {
     this.period = period;
     return this;
   }
@@ -261,11 +256,11 @@ public class Block {
    * @return period
   **/
   @ApiModelProperty(required = true, value = "Period is the period on which the block was confirmed")
-  public Long getPeriod() {
+  public java.math.BigInteger getPeriod() {
     return period;
   }
 
-  public void setPeriod(Long period) {
+  public void setPeriod(java.math.BigInteger period) {
     this.period = period;
   }
 
@@ -305,7 +300,7 @@ public class Block {
     this.proposer = proposer;
   }
 
-  public Block rate(Long rate) {
+  public Block rate(java.math.BigInteger rate) {
     this.rate = rate;
     return this;
   }
@@ -315,15 +310,15 @@ public class Block {
    * @return rate
   **/
   @ApiModelProperty(value = "The number of new Algos added to the participation stake from earnings at the next round.")
-  public Long getRate() {
+  public java.math.BigInteger getRate() {
     return rate;
   }
 
-  public void setRate(Long rate) {
+  public void setRate(java.math.BigInteger rate) {
     this.rate = rate;
   }
 
-  public Block round(Long round) {
+  public Block round(java.math.BigInteger round) {
     this.round = round;
     return this;
   }
@@ -333,11 +328,11 @@ public class Block {
    * @return round
   **/
   @ApiModelProperty(required = true, value = "Round is the current round on which this block was appended to the chain")
-  public Long getRound() {
+  public java.math.BigInteger getRound() {
     return round;
   }
 
-  public void setRound(Long round) {
+  public void setRound(java.math.BigInteger round) {
     this.round = round;
   }
 
@@ -359,7 +354,7 @@ public class Block {
     this.seed = seed;
   }
 
-  public Block timestamp(Long timestamp) {
+  public Block timestamp(java.math.BigInteger timestamp) {
     this.timestamp = timestamp;
     return this;
   }
@@ -369,11 +364,11 @@ public class Block {
    * @return timestamp
   **/
   @ApiModelProperty(required = true, value = "TimeStamp in seconds since epoch")
-  public Long getTimestamp() {
+  public java.math.BigInteger getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(Long timestamp) {
+  public void setTimestamp(java.math.BigInteger timestamp) {
     this.timestamp = timestamp;
   }
 

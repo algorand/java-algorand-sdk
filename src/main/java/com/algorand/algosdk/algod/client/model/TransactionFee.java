@@ -13,15 +13,10 @@
 
 package com.algorand.algosdk.algod.client.model;
 
-import org.apache.commons.lang3.ObjectUtils;
-import com.google.gson.TypeAdapter;
-import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.io.IOException;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * TransactionFee contains the suggested fee
@@ -30,9 +25,9 @@ import java.io.IOException;
 
 public class TransactionFee {
   @SerializedName("fee")
-  private Long fee = null;
+  private java.math.BigInteger fee = null;
 
-  public TransactionFee fee(Long fee) {
+  public TransactionFee fee(java.math.BigInteger fee) {
     this.fee = fee;
     return this;
   }
@@ -42,11 +37,11 @@ public class TransactionFee {
    * @return fee
   **/
   @ApiModelProperty(required = true, value = "Fee is transaction fee")
-  public Long getFee() {
+  public java.math.BigInteger getFee() {
     return fee;
   }
 
-  public void setFee(Long fee) {
+  public void setFee(java.math.BigInteger fee) {
     this.fee = fee;
   }
 

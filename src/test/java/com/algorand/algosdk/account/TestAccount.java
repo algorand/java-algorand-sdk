@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.math.BigInteger;
 import java.security.Security;
 
 public class TestAccount {
@@ -34,10 +35,10 @@ public class TestAccount {
         Transaction tx = new Transaction(
                 new Address(FROM_ADDR),
                 new Address(TO_ADDR),
-                1,
-                1234,
-                106575,
-                107575
+                BigInteger.valueOf(1),
+                BigInteger.valueOf(1234),
+                BigInteger.valueOf(106575),
+                BigInteger.valueOf(107575)
         );
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
@@ -69,10 +70,10 @@ public class TestAccount {
         Transaction tx = new Transaction(
                 new Address(FROM_ADDR),
                 new Address(TO_ADDR),
-                1,
-                1234,
-                0,
-                107575
+                BigInteger.valueOf(1),
+                BigInteger.valueOf(1234),
+                BigInteger.valueOf(0),
+                BigInteger.valueOf(107575)
         );
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);

@@ -25,15 +25,15 @@ import org.apache.commons.lang3.ObjectUtils;
 
 public class Supply {
   @SerializedName("onlineMoney")
-  private Long onlineMoney = null;
+  private java.math.BigInteger onlineMoney = null;
 
   @SerializedName("round")
-  private Long round = null;
+  private java.math.BigInteger round = null;
 
   @SerializedName("totalMoney")
-  private Long totalMoney = null;
+  private java.math.BigInteger totalMoney = null;
 
-  public Supply onlineMoney(Long onlineMoney) {
+  public Supply onlineMoney(java.math.BigInteger onlineMoney) {
     this.onlineMoney = onlineMoney;
     return this;
   }
@@ -43,15 +43,15 @@ public class Supply {
    * @return onlineMoney
   **/
   @ApiModelProperty(required = true, value = "OnlineMoney")
-  public Long getOnlineMoney() {
+  public java.math.BigInteger getOnlineMoney() {
     return onlineMoney;
   }
 
-  public void setOnlineMoney(Long onlineMoney) {
+  public void setOnlineMoney(java.math.BigInteger onlineMoney) {
     this.onlineMoney = onlineMoney;
   }
 
-  public Supply round(Long round) {
+  public Supply round(java.math.BigInteger round) {
     this.round = round;
     return this;
   }
@@ -61,15 +61,15 @@ public class Supply {
    * @return round
   **/
   @ApiModelProperty(required = true, value = "Round")
-  public Long getRound() {
+  public java.math.BigInteger getRound() {
     return round;
   }
 
-  public void setRound(Long round) {
+  public void setRound(java.math.BigInteger round) {
     this.round = round;
   }
 
-  public Supply totalMoney(Long totalMoney) {
+  public Supply totalMoney(java.math.BigInteger totalMoney) {
     this.totalMoney = totalMoney;
     return this;
   }
@@ -79,11 +79,11 @@ public class Supply {
    * @return totalMoney
   **/
   @ApiModelProperty(required = true, value = "TotalMoney")
-  public Long getTotalMoney() {
+  public java.math.BigInteger getTotalMoney() {
     return totalMoney;
   }
 
-  public void setTotalMoney(Long totalMoney) {
+  public void setTotalMoney(java.math.BigInteger totalMoney) {
     this.totalMoney = totalMoney;
   }
 
