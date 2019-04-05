@@ -6,9 +6,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * A serializable representation of a VRF public key.
+ * a serializable Ed25519PublicKey
  */
-public class VRFPublicKey {
+public class Ed25519PublicKey {
     private static final int KEY_LEN_BYTES  = 32;
     /**
      * The raw bytes.
@@ -19,7 +19,7 @@ public class VRFPublicKey {
      * Create a new VRF key.
      * @param bytes a length 32 byte array.
      */
-    public VRFPublicKey(byte[] bytes) {
+    public Ed25519PublicKey(byte[] bytes) {
         Objects.requireNonNull(bytes, "vrf key must not be null");
         if (bytes.length != KEY_LEN_BYTES) {
             throw new IllegalArgumentException("vrf key wrong length");
@@ -28,7 +28,7 @@ public class VRFPublicKey {
     }
 
     // default values for serializer to ignore
-    public VRFPublicKey() {
+    public Ed25519PublicKey() {
     }
 
     @JsonValue
@@ -38,7 +38,7 @@ public class VRFPublicKey {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof VRFPublicKey && Arrays.equals(this.bytes, ((VRFPublicKey)obj).bytes)) {
+        if (obj instanceof Ed25519PublicKey && Arrays.equals(this.bytes, ((Ed25519PublicKey)obj).bytes)) {
             return true;
         } else {
             return false;

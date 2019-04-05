@@ -75,6 +75,7 @@ public class TestAccount {
                 BigInteger.valueOf(0),
                 BigInteger.valueOf(107575)
         );
+        System.out.println(Encoder.encodeToJson(tx));
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct

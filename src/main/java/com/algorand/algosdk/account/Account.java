@@ -4,11 +4,12 @@ package com.algorand.algosdk.account;
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
 import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.util.Digest;
+import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -110,6 +111,10 @@ public class Account {
         return raw;
     }
 
+    public Ed25519PublicKey getEd25519PublicKey() {
+        return new Ed25519PublicKey(this.getClearTextPublicKey());
+    }
+
     /**
      * Convenience method for getting underlying address.
      * @return account address
@@ -150,7 +155,7 @@ public class Account {
             System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
             // sign
             Signature txSig = signBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
-            String txID = Encoder.encodeToBase32StripPad(Digest.digest(prefixEncodedTx));
+            String txID = Encoder.encodeToBase32StripPad(Digester.digest(prefixEncodedTx));
             return new SignedTransaction(tx, txSig, txID);
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);

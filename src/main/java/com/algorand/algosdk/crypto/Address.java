@@ -1,7 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 
-import com.algorand.algosdk.util.Digest;
+import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.codec.binary.Base32;
@@ -20,7 +20,7 @@ public class Address {
     public static final int LEN_BYTES = 32;
 
     // the underlying bytes
-    private final byte[] bytes;
+    private final byte[] bytes = new byte[LEN_BYTES];
     // the length of checksum to append
     private static final int CHECKSUM_LEN_BYTES = 4;
     // expected length of base32-encoded checksum-appended addresses
@@ -35,7 +35,11 @@ public class Address {
         if (bytes.length != LEN_BYTES) {
             throw new IllegalArgumentException(String.format("Given address length is not %s", LEN_BYTES));
         }
-        this.bytes = Arrays.copyOf(bytes, LEN_BYTES);
+        System.arraycopy(bytes, 0, this.bytes, 0, LEN_BYTES);
+    }
+
+    // default values for serializer to ignore
+    public Address() {
     }
 
     /**
@@ -65,12 +69,12 @@ public class Address {
         final byte[] addr = Arrays.copyOf(checksumAddr, LEN_BYTES); // truncates
 
         // compute expected checksum
-        final byte[] hashedAddr = Digest.digest(Arrays.copyOf(addr, LEN_BYTES));
+        final byte[] hashedAddr = Digester.digest(Arrays.copyOf(addr, LEN_BYTES));
         final byte[] expectedChecksum = Arrays.copyOfRange(hashedAddr, LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);
 
         // compare
         if (Arrays.equals(checksum, expectedChecksum)) {
-            this.bytes = addr;
+            System.arraycopy(addr, 0, this.bytes, 0, LEN_BYTES);
         } else {
             throw new IllegalArgumentException("Input checksum did not validate");
         }
@@ -84,7 +88,7 @@ public class Address {
      */
     public String encodeAsString() throws NoSuchAlgorithmException {
         // compute sha512/256 checksum
-        final byte[] hashedAddr = Digest.digest(Arrays.copyOf(bytes, LEN_BYTES));
+        final byte[] hashedAddr = Digester.digest(Arrays.copyOf(bytes, LEN_BYTES));
 
         // take the last 4 bytes, and append to addr
         final byte[] checksum = Arrays.copyOfRange(hashedAddr, LEN_BYTES - CHECKSUM_LEN_BYTES, hashedAddr.length);

@@ -1,10 +1,9 @@
 package com.algorand.algosdk.crypto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -18,7 +17,6 @@ public class MultisigSignature {
     @JsonProperty("thr")
     public final int threshold;
     @JsonProperty("subsig")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final List<MultisigSubsig> subsigs;
 
     /**
@@ -30,7 +28,18 @@ public class MultisigSignature {
     public MultisigSignature(int version, int threshold, List<MultisigSubsig> subsigs) {
         this.version = version;
         this.threshold = threshold;
-        this.subsigs = subsigs;
+        this.subsigs = Objects.requireNonNull(subsigs, "subsigs must not be null");
+    }
+
+    public MultisigSignature(int version, int threshold) {
+        this(version, threshold, new ArrayList<MultisigSubsig>());
+    }
+
+    // default values for serializer to ignore
+    public MultisigSignature() {
+        this.version = 0;
+        this.threshold = 0;
+        this.subsigs = new ArrayList<>();
     }
 
     /**
@@ -39,17 +48,41 @@ public class MultisigSignature {
     @JsonPropertyOrder(alphabetic=true)
     public static class MultisigSubsig {
         @JsonProperty("pk")
-        public final PublicKey key;
+        public final Ed25519PublicKey key;
         @JsonProperty("s")
         public final Signature sig; // optional
 
-        public MultisigSubsig(PublicKey key, Signature sig) {
+        public MultisigSubsig(Ed25519PublicKey key, Signature sig) {
             this.key = Objects.requireNonNull(key, "public key cannot be null");
             this.sig = sig;
         }
 
-        public MultisigSubsig(PublicKey key) {
-            this(key, null);
+        public MultisigSubsig(Ed25519PublicKey key) {
+            this(key, new Signature());
+        }
+
+        public MultisigSubsig() { this(new Ed25519PublicKey(), new Signature()); }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof MultisigSubsig) {
+                MultisigSubsig actual = (MultisigSubsig) obj;
+                return key.equals(actual.key) && sig.equals(actual.sig);
+            } else {
+                return false;
+            }
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof MultisigSignature) {
+            MultisigSignature actual = (MultisigSignature) obj;
+            if (this.version != actual.version) return false;
+            if (this.threshold != actual.threshold) return false;
+            return this.subsigs.equals(actual.subsigs);
+        } else {
+            return false;
         }
     }
 

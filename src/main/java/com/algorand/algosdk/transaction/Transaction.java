@@ -2,9 +2,9 @@ package com.algorand.algosdk.transaction;
 
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -19,50 +19,40 @@ import java.util.Objects;
 @JsonPropertyOrder(alphabetic=true)
 public class Transaction {
     @JsonProperty("type")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Type type;
 
     // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields. This circumvents our encoders'
     // inability to sort child fields.
     /* header fields */
     @JsonProperty("snd")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public final Address sender; // not null (should never serialize tx without sender)
+    public final Address sender;
     @JsonProperty("fee")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final BigInteger fee;
     @JsonProperty("fv")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final BigInteger firstValid;
     @JsonProperty("lv")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final BigInteger lastValid;
     @JsonProperty("note")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    public final byte[] note; // can be null (optional)
+    public final byte[] note;
     @JsonProperty("gen")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final String genesisID;
+    @JsonProperty("gh")
+    public final Digest genesisHash;
 
     /* payment fields */
     @JsonProperty("amt")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final BigInteger amount;
     @JsonProperty("rcv")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Address receiver;
     @JsonProperty("close")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final Address closeRemainderTo; // can be null, optional
 
     /* keyreg fields */
     // VotePK is the participation public key used in key registration transactions
     @JsonProperty("votekey")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final ParticipationPublicKey votePK;
     // selectionPK is the VRF public key used in key registration transactions
     @JsonProperty("selkey")
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     public final VRFPublicKey selectionPK;
 
     /**
@@ -87,17 +77,17 @@ public class Transaction {
 
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        BigInteger amount, Address receiver) {
-        this(sender, fee, firstValid, lastValid, note, null, amount, receiver, null);
+        this(sender, fee, firstValid, lastValid, note, "", amount, receiver, new Address());
     }
 
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID,
                        BigInteger amount, Address receiver, Address closeRemainderTo) {
-        this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, amount, receiver, closeRemainderTo, null, null);
-        Objects.requireNonNull(receiver, "receiver must not be null");
+        this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, new Digest(), amount, receiver, closeRemainderTo,
+                new ParticipationPublicKey(), new VRFPublicKey());
     }
 
     /**
-     * Create a key registration transaction
+     * Create a key registration transaction. No field can be null except the note field.
      * @param sender source address
      * @param fee transaction fee
      * @param firstValid first valid round
@@ -108,35 +98,54 @@ public class Transaction {
      */
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
-        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, null, null, null, null, votePK, vrfPK);
-        Objects.requireNonNull(votePK, "participation key must not be null");
-        Objects.requireNonNull(vrfPK, "selection key must not be null");
+        // populate with default values which will be ignored...
+        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, "", new Digest(),
+                BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK);
     }
 
     private Transaction(Type type,
-                       Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID,
+                       Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID, Digest genesisHash,
                        BigInteger amount, Address receiver, Address closeRemainderTo, ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
         this.type = Objects.requireNonNull(type, "txtype must not be null");
         // header fields
         this.sender = Objects.requireNonNull(sender, "sender must not be null");
-        this.genesisID = genesisID;
-        this.fee = fee;
-        this.firstValid = firstValid;
-        this.lastValid = lastValid;
-        this.note = note;
+        this.genesisID = Objects.requireNonNull(genesisID, "genesisID must not be null");
+        this.fee = Objects.requireNonNull(fee, "fee must not be null");
+        this.firstValid = Objects.requireNonNull(firstValid, "firstValid must not be null");
+        this.lastValid = Objects.requireNonNull(lastValid, "lastValid must not be null");
+        this.genesisHash = Objects.requireNonNull(genesisHash, "genesisHash must not be null");
         // payment fields
-        this.amount = amount;
-        this.receiver = receiver;
-        this.closeRemainderTo = closeRemainderTo;
+        this.amount = Objects.requireNonNull(amount, "amount must not be null");
+        this.receiver = Objects.requireNonNull(receiver, "receiver must not be null");
+        this.closeRemainderTo = Objects.requireNonNull(closeRemainderTo, "closeRemainderTo must not be null");
+        this.note = note; // can be null, since it matches golang's default value
         // keyreg fields
-        this.votePK = votePK;
-        this.selectionPK = vrfPK;
+        this.votePK = Objects.requireNonNull(votePK, "votePK must not be null");
+        this.selectionPK = Objects.requireNonNull(vrfPK, "selectionPK must not be null");
+    }
+
+    // default values for serializer to ignore
+    public Transaction() {
+        this.type = Type.Default;
+        this.sender = new Address();
+        this.genesisID = "";
+        this.genesisHash = new Digest();
+        this.fee = BigInteger.valueOf(0);
+        this.firstValid = BigInteger.valueOf(0);
+        this.lastValid = BigInteger.valueOf(0);
+        this.note = null;
+        this.amount = BigInteger.valueOf(0);
+        this.receiver = new Address();
+        this.closeRemainderTo = new Address();
+        this.votePK = new ParticipationPublicKey();
+        this.selectionPK = new VRFPublicKey();
     }
 
     /**
      * TxType represents a transaction type.
      */
     public enum Type {
+        Default(""),
         Payment("pay"),
         KeyRegistration("keyreg");
 
@@ -154,7 +163,6 @@ public class Transaction {
             return this.value;
         }
     }
-
 
 
 }
