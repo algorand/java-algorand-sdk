@@ -869,7 +869,7 @@ public class DefaultApi {
         Object localVarPostBody = null;
 
         // create path and map variables
-        String localVarPath = "/v1/transaction/pending/{txid}"
+        String localVarPath = "/v1/transactions/pending/{txid}"
             .replaceAll("\\{" + "txid" + "\\}", apiClient.escapeString(txid.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
