@@ -5,6 +5,7 @@ import com.algorand.algosdk.crypto.Address;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.math.BigInteger;
 import java.util.Objects;
 
 /**
@@ -17,13 +18,13 @@ public class Bid {
     @JsonProperty("auc")
     public final Address auctionKey; // cannot be null
     @JsonProperty("cur")
-    public final long bidCurrency;
+    public final BigInteger bidCurrency;
     @JsonProperty("price")
-    public final long maxPrice;
+    public final BigInteger maxPrice;
     @JsonProperty("id")
-    public final long bidID;
+    public final BigInteger bidID;
     @JsonProperty("aid")
-    public final long auctionID;
+    public final BigInteger auctionID;
 
     /**
      * Create a new bid
@@ -34,12 +35,35 @@ public class Bid {
      * @param bidID
      * @param auctionID
      */
-    public Bid(Address bidderKey, Address auctionKey, long bidCurrency, long maxPrice, long bidID, long auctionID) {
+    public Bid(Address bidderKey, Address auctionKey, BigInteger bidCurrency, BigInteger maxPrice, BigInteger bidID, BigInteger auctionID) {
         this.bidderKey = Objects.requireNonNull(bidderKey, "bidder key must not be null");
         this.auctionKey = Objects.requireNonNull(auctionKey, "auction key must not be null");
-        this.bidCurrency = bidCurrency;
-        this.maxPrice = maxPrice;
-        this.bidID = bidID;
-        this.auctionID = auctionID;
+        this.bidCurrency = Objects.requireNonNull(bidCurrency, "bidCurrency must not be null");
+        this.maxPrice = Objects.requireNonNull(maxPrice, "maxPrice must not be null");
+        this.bidID = Objects.requireNonNull(bidID, "bidID must not be null");
+        this.auctionID = Objects.requireNonNull(auctionID, "auctionID must not be null");
     }
+
+    public Bid() {
+        this.bidderKey = new Address();
+        this.auctionKey = new Address();
+        this.bidCurrency = BigInteger.valueOf(0);
+        this.maxPrice = BigInteger.valueOf(0);
+        this.bidID = BigInteger.valueOf(0);
+        this.auctionID = BigInteger.valueOf(0);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Bid bid = (Bid) o;
+        return bidderKey.equals(bid.bidderKey) &&
+                auctionKey.equals(bid.auctionKey) &&
+                bidCurrency.equals(bid.bidCurrency) &&
+                maxPrice.equals(bid.maxPrice) &&
+                bidID.equals(bid.bidID) &&
+                auctionID.equals(bid.auctionID);
+    }
+
 }

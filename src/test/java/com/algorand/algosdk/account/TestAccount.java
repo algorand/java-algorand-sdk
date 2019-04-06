@@ -41,6 +41,7 @@ public class TestAccount {
                 BigInteger.valueOf(107575)
         );
         byte[] seed = Mnemonic.toKey(FROM_SK);
+        System.out.println(Encoder.encodeToJson(tx));
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct
         Assert.assertEquals(FROM_ADDR, new Address(account.getClearTextPublicKey()).toString());
@@ -49,6 +50,8 @@ public class TestAccount {
 
         // sign the transaction
         SignedTransaction signedTx = account.signTransaction(tx);
+        System.out.println(Encoder.encodeToJson(signedTx));
+
         byte[] signedTxBytes = Encoder.encodeToMsgPack(signedTx);
         String signedTxHex = Encoder.encodeToHexStr(signedTxBytes);
         Assert.assertEquals(REF_SIG_TXN, signedTxHex);

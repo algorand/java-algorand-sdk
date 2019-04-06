@@ -4,9 +4,9 @@ java_library(
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
-        "@maven//:com_fasterxml_jackson_core_jackson_core",
-        "@maven//:com_fasterxml_jackson_core_jackson_databind",
-        "@maven//:com_fasterxml_jackson_core_jackson_annotations",
+        "@mavenjackson//:com_fasterxml_jackson_core_jackson_core",
+        "@mavenjackson//:com_fasterxml_jackson_core_jackson_databind",
+        "@mavenjackson//:com_fasterxml_jackson_core_jackson_annotations",
         "@maven//:commons_codec_commons_codec",
         "@maven//:org_msgpack_jackson_dataformat_msgpack",
     ],

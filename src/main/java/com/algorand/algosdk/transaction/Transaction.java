@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -164,5 +165,24 @@ public class Transaction {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Transaction that = (Transaction) o;
+        return type == that.type &&
+                sender.equals(that.sender) &&
+                fee.equals(that.fee) &&
+                firstValid.equals(that.firstValid) &&
+                lastValid.equals(that.lastValid) &&
+                Arrays.equals(note, that.note) &&
+                genesisID.equals(that.genesisID) &&
+                genesisHash.equals(that.genesisHash) &&
+                amount.equals(that.amount) &&
+                receiver.equals(that.receiver) &&
+                closeRemainderTo.equals(that.closeRemainderTo) &&
+                votePK.equals(that.votePK) &&
+                selectionPK.equals(that.selectionPK);
+    }
 
 }
