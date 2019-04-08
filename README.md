@@ -1,7 +1,10 @@
 # java-algorand-sdk
 
+[![Build Status](https://travis-ci.com/algorand/java-algorand-sdk.svg?branch=master)](https://travis-ci.com/algorand/java-algorand-sdk)
+
 AlgoSDK is a Java library for communicating and interacting with the Algorand network. It contains a REST client for accessing `algod` instances over the web,
 and also exposes functionality for generating keypairs, mnemonics, creating transactions, signing transactions, and serializing data across the network.
+
 
 # Prerequisites
 
@@ -32,15 +35,6 @@ To fetch it straight from the algorand repository, on github, also add in your `
 </repositories>
 ```
 
-
-To build from source:
-```
-mvn clean install
-```
-
-# Documentation
-
-Javadoc (coming soon).
 
 # Quickstart
 
@@ -89,15 +83,15 @@ Algorand network status: class NodeStatus {
 }
 ```
 
-# Longer Example
+# Documentation
 
-Take a look at the example located in the examples/ directory.
+Javadoc can be found at (https://algorand.github.io/java-algorand-sdk/). Additional resources are located at (https://developer.algorand.org).
 
 # Cryptography
 
 To use the library, the SDK requires you specify a JCA provider for `Ed25519` signatures and `SHA-512/256` checksums. This SDK
-is tested with `BouncyCastle 1.61` (bouncycastle.org). This SDK relies on BouncyCastle transitively; make sure to add it as a dependency (optionally).
-In your applications, setup the SDK, like the following example code:
+is tested with `BouncyCastle 1.61` (bouncycastle.org).
+In your applications, setup the SDK, for instance:
 
 ```java
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -111,7 +105,12 @@ if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
 ```
 
 In addition, AlgoSDK depends on `org.bouncycastle:bcprov-jdk15on:1.61` for deserializing `X.509`-encoded `Ed25519` private keys. This is the only
-dependency on an external crypto library - all other references are abstracted through the JCA.
+dependency on an external crypto library - all other references are abstracted through the JCA. As a result, Bouncy Castle 1.61 is pulled in as a transitive dependency.
+We recommend that you explicitly add Bouncy Castle (or some other provider) as a project dependency.
+
+# Longer Example
+
+Take a look at the example located in the `examples/` directory.
 
 
 # Contributing to this Project
@@ -153,6 +152,7 @@ The generated pom file provides maven compatibility and deploy capabilities.
 ```
 mvn clean install
 mvn clean deploy -P github
+mvn clean site -P github  # for javadoc
 mvn clean deploy -P release
 ```
 Please update the appropriate bazel files if you use maven and contribute to the project.
