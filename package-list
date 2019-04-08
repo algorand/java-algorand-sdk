@@ -1,0 +1,15 @@
+com.algorand.algosdk.account
+com.algorand.algosdk.algod.client
+com.algorand.algosdk.algod.client.api
+com.algorand.algosdk.algod.client.auth
+com.algorand.algosdk.algod.client.lib
+com.algorand.algosdk.algod.client.model
+com.algorand.algosdk.auction
+com.algorand.algosdk.crypto
+com.algorand.algosdk.kmd.client
+com.algorand.algosdk.kmd.client.api
+com.algorand.algosdk.kmd.client.auth
+com.algorand.algosdk.kmd.client.model
+com.algorand.algosdk.mnemonic
+com.algorand.algosdk.transaction
+com.algorand.algosdk.util
