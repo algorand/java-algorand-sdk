@@ -1,6 +1,6 @@
 # java-algorand-sdk
 
-[![Build Status](https://travis-ci.com/algorand/java-algorand-sdk.svg?branch=master)](https://travis-ci.com/algorand/java-algorand-sdk)
+[![Build Status](https://travis-ci.com/algorand/java-algorand-sdk.svg?branch=master)](https://travis-ci.com/algorand/java-algorand-sdk?branch=master)
 
 AlgoSDK is a Java library for communicating and interacting with the Algorand network. It contains a REST client for accessing `algod` instances over the web,
 and also exposes functionality for generating keypairs, mnemonics, creating transactions, signing transactions, and serializing data across the network.
