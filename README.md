@@ -41,9 +41,9 @@ To fetch it straight from the algorand repository, on github, also add in your `
 ```java
 package com.algorand.algosdk.example;
 
-import com.algorand.algosdk.algod.client.ApiClient;
+import com.algorand.algosdk.algod.client.AlgodClient;
 import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.algod.client.api.DefaultApi;
+import com.algorand.algosdk.algod.client.api.AlgodApi;
 import com.algorand.algosdk.algod.client.auth.ApiKeyAuth;
 import com.algorand.algosdk.algod.client.model.NodeStatus;
 
@@ -54,11 +54,11 @@ public class Main {
         final String ALGOD_API_ADDR = "http://localhost:8080";
         final String ALGOD_API_TOKEN = "d6f33a522f465ff12f0d263f2c3b707ac2f560bacad4d859914ada7e827902b3";
 
-        ApiClient client = new ApiClient().setBasePath(ALGOD_API_ADDR);
+        AlgodClient client = new AlgodClient().setBasePath(ALGOD_API_ADDR);
         ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
         api_key.setApiKey(ALGOD_API_TOKEN);
 
-        DefaultApi algodApiInstance = new DefaultApi(client);
+        AlgodApi algodApiInstance = new AlgodApi(client);
         try {
             NodeStatus status = algodApiInstance.getStatus();
             System.out.println("Algorand network status: " + status);
