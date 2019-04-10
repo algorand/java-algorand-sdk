@@ -9,6 +9,7 @@ import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 
@@ -50,22 +51,19 @@ public class Account {
      * Create a new account from an existing PKCS8 encoded keypair and Algorand address.
      * @param secretKey existing private key. Must be 32 bytes. Corresponds to seed.
      * @param publicKey existing public key. Must be 32 bytes.
-     * @param address existing address. Must be same size as public key.
      * @throws NoSuchAlgorithmException if cryptographic provider not configured
      */
-    public Account(byte[] secretKey, byte[] publicKey, Address address) throws NoSuchAlgorithmException {
+    public Account(byte[] secretKey, byte[] publicKey) throws NoSuchAlgorithmException {
         Objects.requireNonNull(secretKey, "secret key must not be null");
         Objects.requireNonNull(publicKey, "public key must not be null");
-        this.address = Objects.requireNonNull(address, "address must not be null");
-
         if (publicKey.length != PK_SIZE || secretKey.length != SK_SIZE) {
             throw new IllegalArgumentException("Input keys are the wrong size");
         }
         PKCS8EncodedKeySpec pkS = new PKCS8EncodedKeySpec(publicKey);
         PKCS8EncodedKeySpec skS = new PKCS8EncodedKeySpec(secretKey);
-
         // JCA keypair
         try {
+            CryptoProvider.setupIfNeeded();
             KeyFactory kf = KeyFactory.getInstance(KEY_ALGO);
             PublicKey pk = kf.generatePublic(pkS);
             PrivateKey sk = kf.generatePrivate(skS);
@@ -73,6 +71,9 @@ public class Account {
         } catch (InvalidKeySpecException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
+        // now, convert public key to an address
+        byte[] raw = this.getClearTextPublicKey();
+        this.address = new Address(Arrays.copyOf(raw, raw.length));
     }
 
     public Account(byte[] seed) throws NoSuchAlgorithmException {
@@ -87,6 +88,7 @@ public class Account {
 
     // randomSrc can be null, in which case system default is used
     private Account(SecureRandom randomSrc) throws NoSuchAlgorithmException {
+        CryptoProvider.setupIfNeeded();
         KeyPairGenerator gen = KeyPairGenerator.getInstance(KEY_ALGO);
         if (randomSrc != null) {
             gen.initialize(SK_SIZE_BITS, randomSrc);
@@ -190,6 +192,7 @@ public class Account {
      */
     private Signature signBytes(byte[] bytes)  throws NoSuchAlgorithmException {
         try {
+            CryptoProvider.setupIfNeeded();
             java.security.Signature signer = java.security.Signature.getInstance(SIGN_ALGO);
             signer.initSign(this.privateKeyPair.getPrivate());
             signer.update(bytes);

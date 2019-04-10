@@ -15,7 +15,6 @@ import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 import java.security.Security;
 
@@ -56,11 +55,6 @@ public class Main {
         } catch (ApiException e) {
             System.err.println("Exception when calling algod#transactionParams");
             e.printStackTrace();
-        }
-
-        // set up crypto, in order to sign transactions
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
         }
 
         // Generate a new transaction using randomly generated accounts (this is invalid, since src has no money...)

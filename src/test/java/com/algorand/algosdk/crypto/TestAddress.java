@@ -1,21 +1,11 @@
 package com.algorand.algosdk.crypto;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.security.Security;
 import java.util.Random;
 
 public class TestAddress {
-    @BeforeClass
-    public static void setup() {
-        // add bouncy castle provider for crypto
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
 
     @Test
     public void testEncodeDecodeStr() throws Exception {

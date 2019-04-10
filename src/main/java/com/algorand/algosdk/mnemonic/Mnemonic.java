@@ -1,5 +1,7 @@
 package com.algorand.algosdk.mnemonic;
 
+import com.algorand.algosdk.util.CryptoProvider;
+
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -96,6 +98,7 @@ public class Mnemonic {
     // returns a word corresponding to the 11 bit checksum of the data
     protected static String checksum(byte[] data) {
         try {
+            CryptoProvider.setupIfNeeded();
             MessageDigest digest = MessageDigest.getInstance(CHECKSUM_ALG);
             digest.update(Arrays.copyOf(data, data.length));
             byte[] d = digest.digest();

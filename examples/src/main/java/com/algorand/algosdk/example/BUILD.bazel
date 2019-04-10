@@ -5,6 +5,5 @@ java_binary(
     main_class = "com.algorand.algosdk.example.Main",
     deps = [
         "//:algosdk",
-        "@maven//:org_bouncycastle_bcprov_jdk15on",
     ],
 )

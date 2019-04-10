@@ -5,23 +5,12 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigInteger;
-import java.security.Security;
 
 public class TestAccount {
-
-    @BeforeClass
-    public static void setup() {
-        // add bouncy castle provider for crypto
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
 
     @Test
     public void testSignsTransactionE2E() throws Exception {
@@ -105,5 +94,13 @@ public class TestAccount {
             Assert.assertNotNull(account.getAddress());
             Assert.assertArrayEquals(account.getClearTextPublicKey(), account.getAddress().getBytes());
         }
+    }
+
+    @Test
+    public void testToMnemonic() throws Exception {
+        final String FROM_SK = "actress tongue harbor tray suspect odor load topple vocal avoid ignore apple lunch unknown tissue museum once switch captain place lemon sail outdoor absent creek";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+        Assert.assertEquals(FROM_SK, account.toMnemonic());
     }
 }

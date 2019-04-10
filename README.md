@@ -89,24 +89,8 @@ Javadoc can be found at (https://algorand.github.io/java-algorand-sdk/). Additio
 
 # Cryptography
 
-To use the library, the SDK requires you specify a JCA provider for `Ed25519` signatures and `SHA-512/256` checksums. This SDK
-is tested with `BouncyCastle 1.61` (bouncycastle.org).
-In your applications, setup the SDK, for instance:
-
-```java
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import java.security.Security;
-...
-// set up crypto, in order to sign transactions
-if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-    Security.addProvider(new BouncyCastleProvider());
-}
-// now, do work
-```
-
-In addition, AlgoSDK depends on `org.bouncycastle:bcprov-jdk15on:1.61` for deserializing `X.509`-encoded `Ed25519` private keys. This is the only
-dependency on an external crypto library - all other references are abstracted through the JCA. As a result, Bouncy Castle 1.61 is pulled in as a transitive dependency.
-We recommend that you explicitly add Bouncy Castle (or some other provider) as a project dependency.
+AlgoSDK depends on `org.bouncycastle:bcprov-jdk15on:1.61` for `Ed25519` signatures, `sha512/256` digests, and deserializing `X.509`-encoded `Ed25519` private keys.
+The latter is the only explicit dependency on an external crypto library - all other references are abstracted through the JCA.
 
 # Longer Example
 

@@ -1,23 +1,13 @@
 package com.algorand.algosdk.mnemonic;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.security.GeneralSecurityException;
-import java.security.Security;
 import java.util.Arrays;
 import java.util.Random;
 
 public class TestMnemonic {
-    @BeforeClass
-    public static void setup() {
-        // add bouncy castle provider for crypto
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
 
     @Test
     public void testZeroVector() throws Exception {

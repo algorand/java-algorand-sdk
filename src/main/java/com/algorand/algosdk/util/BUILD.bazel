@@ -9,6 +9,7 @@ java_library(
         "@mavenjackson//:com_fasterxml_jackson_core_jackson_annotations",
         "@maven//:commons_codec_commons_codec",
         "@maven//:org_msgpack_jackson_dataformat_msgpack",
+        "@maven//:org_bouncycastle_bcprov_jdk15on",
     ],
     tags = [
         "maven_coordinates=com.fasterxml.jackson.core:jackson-core:2.7.9",
