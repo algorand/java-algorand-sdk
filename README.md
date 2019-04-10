@@ -96,6 +96,14 @@ The latter is the only explicit dependency on an external crypto library - all o
 
 Take a look at the example located in the `examples/` directory.
 
+# Java 9+
+
+When using cryptographic functionality, and Java9+, you may run into the following warning:
+```
+WARNING: Illegal reflective access by org.bouncycastle.jcajce.provider.drbg.DRBG
+```
+This is known behavior, caused by more restrictive language features in Java 9+, that Bouncy Castle has yet to support. This warning can be suppressed safely. We will monitor
+cryptographic packages for updates or alternative implementations.
 
 # Contributing to this Project
 

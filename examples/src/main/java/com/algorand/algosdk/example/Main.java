@@ -1,15 +1,17 @@
 package com.algorand.algosdk.example;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.ApiClient;
+import com.algorand.algosdk.algod.client.AlgodClient;
+import com.algorand.algosdk.algod.client.api.AlgodApi;
 import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.algod.client.api.DefaultApi;
 import com.algorand.algosdk.algod.client.auth.ApiKeyAuth;
 import com.algorand.algosdk.algod.client.model.NodeStatus;
 import com.algorand.algosdk.algod.client.model.Supply;
 import com.algorand.algosdk.algod.client.model.TransactionID;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.kmd.client.KmdClient;
+import com.algorand.algosdk.kmd.client.api.KmdApi;
 import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletResponse;
 import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -27,13 +29,13 @@ public class Main {
         final String SRC_ACCOUNT = "viable grain female caution grant mind cry mention pudding oppose orchard people forget similar social gossip marble fish guitar art morning ring west above concert";
         final String DEST_ADDR = "KV2XGKMXGYJ6PWYQA5374BYIQBL3ONRMSIARPCFCJEAMAHQEVYPB7PL3KU";
 
-        ApiClient client = new ApiClient();
+        AlgodClient client = new AlgodClient();
         client.setBasePath(ALGOD_API_ADDR);
         // Configure API key authorization: api_key
         ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
         api_key.setApiKey(ALGOD_API_TOKEN);
 
-        DefaultApi algodApiInstance = new DefaultApi(client);
+        AlgodApi algodApiInstance = new AlgodApi(client);
         try {
             Supply supply = algodApiInstance.getSupply();
             System.out.println("Total Algorand Supply: " + supply.getTotalMoney());
@@ -84,12 +86,12 @@ public class Main {
         final String KMD_API_TOKEN = "1bce699faef65c80da8da6201bd0639b3ea4205c4fa05d24f94469efa2418f2d";
 
         // Create a wallet with kmd rest api
-        com.algorand.algosdk.kmd.client.ApiClient client = new com.algorand.algosdk.kmd.client.ApiClient();
+        KmdClient client = new KmdClient();
         client.setBasePath(KMD_API_ADDR);
         // Configure API key authorization: api_key
         com.algorand.algosdk.kmd.client.auth.ApiKeyAuth api_key = (com.algorand.algosdk.kmd.client.auth.ApiKeyAuth) client.getAuthentication("api_key");
         api_key.setApiKey(KMD_API_TOKEN);
-        com.algorand.algosdk.kmd.client.api.DefaultApi kmdApiInstance = new com.algorand.algosdk.kmd.client.api.DefaultApi(client);
+        KmdApi kmdApiInstance = new KmdApi(client);
 
         APIV1POSTWalletResponse wallet;
         try {
