@@ -25,12 +25,12 @@ import org.apache.commons.lang3.ObjectUtils;
 
 public class APIV1WalletHandle {
   @SerializedName("expires_seconds")
-  private java.math.BigInteger expiresSeconds = null;
+  private Long expiresSeconds = null;
 
   @SerializedName("wallet")
   private APIV1Wallet wallet = null;
 
-  public APIV1WalletHandle expiresSeconds(java.math.BigInteger expiresSeconds) {
+  public APIV1WalletHandle expiresSeconds(Long expiresSeconds) {
     this.expiresSeconds = expiresSeconds;
     return this;
   }
@@ -40,11 +40,11 @@ public class APIV1WalletHandle {
    * @return expiresSeconds
   **/
   @ApiModelProperty(value = "")
-  public java.math.BigInteger getExpiresSeconds() {
+  public Long getExpiresSeconds() {
     return expiresSeconds;
   }
 
-  public void setExpiresSeconds(java.math.BigInteger expiresSeconds) {
+  public void setExpiresSeconds(Long expiresSeconds) {
     this.expiresSeconds = expiresSeconds;
   }
 

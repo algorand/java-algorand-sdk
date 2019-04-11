@@ -19,9 +19,9 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * APIV1POSTMultisigTransactionSignResponse is the repsonse to &#x60;POST /v1/multisig/sign&#x60; friendly:SignMultisigResponse
+ * APIV1POSTMultisigTransactionSignResponse is the response to &#x60;POST /v1/multisig/sign&#x60; friendly:SignMultisigResponse
  */
-@ApiModel(description = "APIV1POSTMultisigTransactionSignResponse is the repsonse to `POST /v1/multisig/sign` friendly:SignMultisigResponse")
+@ApiModel(description = "APIV1POSTMultisigTransactionSignResponse is the response to `POST /v1/multisig/sign` friendly:SignMultisigResponse")
 
 public class APIV1POSTMultisigTransactionSignResponse {
   @SerializedName("error")
@@ -31,7 +31,7 @@ public class APIV1POSTMultisigTransactionSignResponse {
   private String message = null;
 
   @SerializedName("multisig")
-  private MultisigSig multisig = null;
+  private byte[] multisig = null;
 
   public APIV1POSTMultisigTransactionSignResponse error(Boolean error) {
     this.error = error;
@@ -69,7 +69,7 @@ public class APIV1POSTMultisigTransactionSignResponse {
     this.message = message;
   }
 
-  public APIV1POSTMultisigTransactionSignResponse multisig(MultisigSig multisig) {
+  public APIV1POSTMultisigTransactionSignResponse multisig(byte[] multisig) {
     this.multisig = multisig;
     return this;
   }
@@ -79,11 +79,11 @@ public class APIV1POSTMultisigTransactionSignResponse {
    * @return multisig
   **/
   @ApiModelProperty(value = "")
-  public MultisigSig getMultisig() {
+  public byte[] getMultisig() {
     return multisig;
   }
 
-  public void setMultisig(MultisigSig multisig) {
+  public void setMultisig(byte[] multisig) {
     this.multisig = multisig;
   }
 

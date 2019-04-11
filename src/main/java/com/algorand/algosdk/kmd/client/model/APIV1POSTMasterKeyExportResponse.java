@@ -28,7 +28,7 @@ public class APIV1POSTMasterKeyExportResponse {
   private Boolean error = null;
 
   @SerializedName("master_derivation_key")
-  private MasterDerivationKey masterDerivationKey = null;
+  private byte[] masterDerivationKey = null;
 
   @SerializedName("message")
   private String message = null;
@@ -51,7 +51,7 @@ public class APIV1POSTMasterKeyExportResponse {
     this.error = error;
   }
 
-  public APIV1POSTMasterKeyExportResponse masterDerivationKey(MasterDerivationKey masterDerivationKey) {
+  public APIV1POSTMasterKeyExportResponse masterDerivationKey(byte[] masterDerivationKey) {
     this.masterDerivationKey = masterDerivationKey;
     return this;
   }
@@ -61,11 +61,11 @@ public class APIV1POSTMasterKeyExportResponse {
    * @return masterDerivationKey
   **/
   @ApiModelProperty(value = "")
-  public MasterDerivationKey getMasterDerivationKey() {
+  public byte[] getMasterDerivationKey() {
     return masterDerivationKey;
   }
 
-  public void setMasterDerivationKey(MasterDerivationKey masterDerivationKey) {
+  public void setMasterDerivationKey(byte[] masterDerivationKey) {
     this.masterDerivationKey = masterDerivationKey;
   }
 

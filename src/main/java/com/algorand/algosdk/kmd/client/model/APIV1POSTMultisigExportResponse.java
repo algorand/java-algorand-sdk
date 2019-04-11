@@ -37,7 +37,7 @@ public class APIV1POSTMultisigExportResponse {
   private Integer multisigVersion = null;
 
   @SerializedName("pks")
-  private List<PublicKey> pks = null;
+  private List<byte[]> pks = null;
 
   @SerializedName("threshold")
   private Integer threshold = null;
@@ -96,14 +96,14 @@ public class APIV1POSTMultisigExportResponse {
     this.multisigVersion = multisigVersion;
   }
 
-  public APIV1POSTMultisigExportResponse pks(List<PublicKey> pks) {
+  public APIV1POSTMultisigExportResponse pks(List<byte[]> pks) {
     this.pks = pks;
     return this;
   }
 
-  public APIV1POSTMultisigExportResponse addPksItem(PublicKey pksItem) {
+  public APIV1POSTMultisigExportResponse addPksItem(byte[] pksItem) {
     if (this.pks == null) {
-      this.pks = new ArrayList<PublicKey>();
+      this.pks = new ArrayList<byte[]>();
     }
     this.pks.add(pksItem);
     return this;
@@ -114,11 +114,11 @@ public class APIV1POSTMultisigExportResponse {
    * @return pks
   **/
   @ApiModelProperty(value = "")
-  public List<PublicKey> getPks() {
+  public List<byte[]> getPks() {
     return pks;
   }
 
-  public void setPks(List<PublicKey> pks) {
+  public void setPks(List<byte[]> pks) {
     this.pks = pks;
   }
 

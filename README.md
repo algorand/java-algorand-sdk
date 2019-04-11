@@ -161,6 +161,12 @@ curl http://localhost:8080/swagger.json | sed -e 's/uint64/int64/g' > temp.json
 swagger-codegen generate -i temp.json -l java -c config.json --type-mappings Long=java.math.BigInteger
 ```
 
+For kmd:
+```
+curl http://localhost:8080/swagger.json | sed -e 's/uint32/int64/g' > temp.json
+swagger-codegen generate -i temp.json -l java -c config.json
+```
+
 `config.json` looks like:
 ```json
 {

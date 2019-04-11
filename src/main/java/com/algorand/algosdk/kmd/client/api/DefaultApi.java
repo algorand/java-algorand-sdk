@@ -13,11 +13,59 @@
 
 package com.algorand.algosdk.kmd.client.api;
 
-import com.algorand.algosdk.kmd.client.*;
-import com.algorand.algosdk.kmd.client.model.*;
+import com.algorand.algosdk.kmd.client.ApiCallback;
+import com.algorand.algosdk.kmd.client.ApiClient;
+import com.algorand.algosdk.kmd.client.ApiException;
+import com.algorand.algosdk.kmd.client.ApiResponse;
+import com.algorand.algosdk.kmd.client.Configuration;
+import com.algorand.algosdk.kmd.client.lib.Pair;
+import com.algorand.algosdk.kmd.client.ProgressRequestBody;
+import com.algorand.algosdk.kmd.client.ProgressResponseBody;
+
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+
+
+import com.algorand.algosdk.kmd.client.model.APIV1DELETEKeyResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1DELETEMultisigResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1GETWalletsResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTKeyExportResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTKeyImportResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTKeyListResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTKeyResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTMasterKeyExportResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTMultisigExportResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTMultisigImportResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTMultisigListResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTMultisigTransactionSignResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTTransactionSignResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletInfoResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletInitResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletReleaseResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletRenameResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletRenewResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletResponse;
+import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
+import com.algorand.algosdk.kmd.client.model.DeleteKeyRequest;
+import com.algorand.algosdk.kmd.client.model.DeleteMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.ExportKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ExportMasterKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ExportMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.GenerateKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ImportKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ImportMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.InitWalletHandleTokenRequest;
+import com.algorand.algosdk.kmd.client.model.ListKeysRequest;
+import com.algorand.algosdk.kmd.client.model.ListMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.ReleaseWalletHandleTokenRequest;
+import com.algorand.algosdk.kmd.client.model.RenameWalletRequest;
+import com.algorand.algosdk.kmd.client.model.RenewWalletHandleTokenRequest;
+import com.algorand.algosdk.kmd.client.model.SignMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.SignTransactionRequest;
+import com.algorand.algosdk.kmd.client.model.VersionsResponse;
+import com.algorand.algosdk.kmd.client.model.WalletInfoRequest;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;

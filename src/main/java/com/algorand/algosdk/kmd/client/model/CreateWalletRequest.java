@@ -25,7 +25,7 @@ import org.apache.commons.lang3.ObjectUtils;
 
 public class CreateWalletRequest {
   @SerializedName("master_derivation_key")
-  private MasterDerivationKey masterDerivationKey = null;
+  private byte[] masterDerivationKey = null;
 
   @SerializedName("wallet_driver_name")
   private String walletDriverName = null;
@@ -36,7 +36,7 @@ public class CreateWalletRequest {
   @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public CreateWalletRequest masterDerivationKey(MasterDerivationKey masterDerivationKey) {
+  public CreateWalletRequest masterDerivationKey(byte[] masterDerivationKey) {
     this.masterDerivationKey = masterDerivationKey;
     return this;
   }
@@ -46,11 +46,11 @@ public class CreateWalletRequest {
    * @return masterDerivationKey
   **/
   @ApiModelProperty(value = "")
-  public MasterDerivationKey getMasterDerivationKey() {
+  public byte[] getMasterDerivationKey() {
     return masterDerivationKey;
   }
 
-  public void setMasterDerivationKey(MasterDerivationKey masterDerivationKey) {
+  public void setMasterDerivationKey(byte[] masterDerivationKey) {
     this.masterDerivationKey = masterDerivationKey;
   }
 

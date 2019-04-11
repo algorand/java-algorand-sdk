@@ -13,7 +13,7 @@
 
 package com.algorand.algosdk.kmd.client.auth;
 
-import com.algorand.algosdk.kmd.client.Pair;
+import com.algorand.algosdk.kmd.client.lib.Pair;
 import com.squareup.okhttp.Credentials;
 
 import java.util.List;

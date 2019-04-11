@@ -31,7 +31,7 @@ public class APIV1Wallet {
   private String driverName = null;
 
   @SerializedName("driver_version")
-  private Integer driverVersion = null;
+  private Long driverVersion = null;
 
   @SerializedName("id")
   private String id = null;
@@ -63,7 +63,7 @@ public class APIV1Wallet {
     this.driverName = driverName;
   }
 
-  public APIV1Wallet driverVersion(Integer driverVersion) {
+  public APIV1Wallet driverVersion(Long driverVersion) {
     this.driverVersion = driverVersion;
     return this;
   }
@@ -73,11 +73,11 @@ public class APIV1Wallet {
    * @return driverVersion
   **/
   @ApiModelProperty(value = "")
-  public Integer getDriverVersion() {
+  public Long getDriverVersion() {
     return driverVersion;
   }
 
-  public void setDriverVersion(Integer driverVersion) {
+  public void setDriverVersion(Long driverVersion) {
     this.driverVersion = driverVersion;
   }
 

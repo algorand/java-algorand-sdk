@@ -11,7 +11,7 @@
  */
 
 
-package com.algorand.algosdk.kmd.client;
+package com.algorand.algosdk.kmd.client.lib;
 
 
 public class Pair {

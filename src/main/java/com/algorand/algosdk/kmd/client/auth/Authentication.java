@@ -13,7 +13,7 @@
 
 package com.algorand.algosdk.kmd.client.auth;
 
-import com.algorand.algosdk.kmd.client.Pair;
+import com.algorand.algosdk.kmd.client.lib.Pair;
 
 import java.util.List;
 import java.util.Map;

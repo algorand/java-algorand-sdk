@@ -31,7 +31,7 @@ public class APIV1POSTKeyExportResponse {
   private String message = null;
 
   @SerializedName("private_key")
-  private PrivateKey privateKey = null;
+  private byte[] privateKey = null;
 
   public APIV1POSTKeyExportResponse error(Boolean error) {
     this.error = error;
@@ -69,7 +69,7 @@ public class APIV1POSTKeyExportResponse {
     this.message = message;
   }
 
-  public APIV1POSTKeyExportResponse privateKey(PrivateKey privateKey) {
+  public APIV1POSTKeyExportResponse privateKey(byte[] privateKey) {
     this.privateKey = privateKey;
     return this;
   }
@@ -79,11 +79,11 @@ public class APIV1POSTKeyExportResponse {
    * @return privateKey
   **/
   @ApiModelProperty(value = "")
-  public PrivateKey getPrivateKey() {
+  public byte[] getPrivateKey() {
     return privateKey;
   }
 
-  public void setPrivateKey(PrivateKey privateKey) {
+  public void setPrivateKey(byte[] privateKey) {
     this.privateKey = privateKey;
   }
 

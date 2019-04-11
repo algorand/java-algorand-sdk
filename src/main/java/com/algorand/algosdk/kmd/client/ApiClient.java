@@ -17,6 +17,7 @@ import com.algorand.algosdk.kmd.client.auth.ApiKeyAuth;
 import com.algorand.algosdk.kmd.client.auth.Authentication;
 import com.algorand.algosdk.kmd.client.auth.HttpBasicAuth;
 import com.algorand.algosdk.kmd.client.auth.OAuth;
+import com.algorand.algosdk.kmd.client.lib.Pair;
 import com.squareup.okhttp.*;
 import com.squareup.okhttp.internal.http.HttpMethod;
 import com.squareup.okhttp.logging.HttpLoggingInterceptor;
