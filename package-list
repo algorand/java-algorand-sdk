@@ -9,6 +9,7 @@ com.algorand.algosdk.crypto
 com.algorand.algosdk.kmd.client
 com.algorand.algosdk.kmd.client.api
 com.algorand.algosdk.kmd.client.auth
+com.algorand.algosdk.kmd.client.lib
 com.algorand.algosdk.kmd.client.model
 com.algorand.algosdk.mnemonic
 com.algorand.algosdk.transaction
