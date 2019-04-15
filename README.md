@@ -54,7 +54,8 @@ public class Main {
         final String ALGOD_API_ADDR = "http://localhost:8080";
         final String ALGOD_API_TOKEN = "d6f33a522f465ff12f0d263f2c3b707ac2f560bacad4d859914ada7e827902b3";
 
-        AlgodClient client = new AlgodClient().setBasePath(ALGOD_API_ADDR);
+        AlgodClient client = new AlgodClient();
+        client.setBasePath(ALGOD_API_ADDR);
         ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
         api_key.setApiKey(ALGOD_API_TOKEN);
 
