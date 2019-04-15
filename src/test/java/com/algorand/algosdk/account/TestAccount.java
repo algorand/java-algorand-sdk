@@ -1,6 +1,7 @@
 package com.algorand.algosdk.account;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -27,7 +28,9 @@ public class TestAccount {
                 BigInteger.valueOf(1),
                 BigInteger.valueOf(1234),
                 BigInteger.valueOf(106575),
-                BigInteger.valueOf(107575)
+                BigInteger.valueOf(107575),
+                "",
+                new Digest()
         );
         byte[] seed = Mnemonic.toKey(FROM_SK);
         System.out.println(Encoder.encodeToJson(tx));
@@ -65,7 +68,9 @@ public class TestAccount {
                 BigInteger.valueOf(1),
                 BigInteger.valueOf(1234),
                 BigInteger.valueOf(0),
-                BigInteger.valueOf(107575)
+                BigInteger.valueOf(107575),
+                "",
+                new Digest()
         );
         System.out.println(Encoder.encodeToJson(tx));
         byte[] seed = Mnemonic.toKey(FROM_SK);

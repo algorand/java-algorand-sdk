@@ -10,6 +10,7 @@ import com.algorand.algosdk.algod.client.model.Supply;
 import com.algorand.algosdk.algod.client.model.TransactionID;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
 import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletResponse;
@@ -19,6 +20,7 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
 import java.security.Security;
+import java.math.BigInteger;
 
 
 public class Main {
@@ -45,26 +47,31 @@ public class Main {
             e.printStackTrace();
         }
 
-        long fee = 1;
+        Account src = new Account(SRC_ACCOUNT);
+
+        BigInteger feePerByte;
+        String genesisID;
+        Digest genesisHash;
         long firstRound = 301;
         try {
             TransactionParams params = algodApiInstance.transactionParams();
-            fee = params.getFee().longValue(); // work with longs for convenience - though under the hood we support uint64 BigInteger
-            System.out.println("Suggested Fee: " + fee);
+            feePerByte = params.getFee();
+            genesisHash = new Digest(params.getGenesishashb64());
+            genesisID = params.getGenesisID();
+            System.out.println("Suggested Fee: " + feePerByte);
             NodeStatus s = algodApiInstance.getStatus();
             firstRound = s.getLastRound().longValue();
             System.out.println("Current Round: " + firstRound);
         } catch (ApiException e) {
-            System.err.println("Exception when calling algod#transactionParams");
-            e.printStackTrace();
+            throw new RuntimeException("Could not get params", e);
         }
 
         // Generate a new transaction using randomly generated accounts (this is invalid, since src has no money...)
-        Account src = new Account(SRC_ACCOUNT);
         long amount = 100;
         long lastRound = firstRound + 1000; // 1000 is the max tx window
-        Transaction tx = new Transaction(src.getAddress(), new Address(DEST_ADDR), fee, amount, firstRound, lastRound);
-        SignedTransaction signedTx = src.signTransaction(tx);
+        Transaction baseTx = new Transaction(src.getAddress(), new Address(DEST_ADDR), 0, amount, firstRound, lastRound, genesisID, genesisHash);
+        Transaction realTx = src.transactionWithSuggestedFeePerByte(baseTx, feePerByte);
+        SignedTransaction signedTx = src.signTransaction(realTx);
         System.out.println("Signed transaction with txid: " + signedTx.transactionID);
 
         // send the transaction to the network

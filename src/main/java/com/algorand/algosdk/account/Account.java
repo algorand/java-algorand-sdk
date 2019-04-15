@@ -18,6 +18,7 @@ import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
@@ -184,6 +185,42 @@ public class Account {
         }
     }
 
+    /**
+     * Creates a version of the given transaction with fee populated according to suggestedFeePerByte * estimateTxSize.
+     * @param copyTx transaction to populate fee field
+     * @param suggestedFeePerByte suggestedFee given by network
+     * @return transaction with proper fee set
+     * @throws NoSuchAlgorithmException could not estimate tx encoded size.
+     */
+    public Transaction transactionWithSuggestedFeePerByte(Transaction copyTx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
+        BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(copyTx));
+        switch (copyTx.type) {
+            case Payment:
+                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
+                        copyTx.amount, copyTx.receiver, copyTx.closeRemainderTo);
+            case KeyRegistration:
+                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
+                        copyTx.votePK, copyTx.selectionPK);
+            case Default:
+                throw new IllegalArgumentException("tx cannot have no type");
+            default:
+                throw new RuntimeException("cannot reach");
+        }
+    }
+
+    /**
+     * EstimateEncodedSize returns the estimated encoded size of the transaction including the signature.
+     * This function is useful for calculating the fee from suggested fee per byte.
+     * @return an estimated byte size for the transaction.
+     */
+    public static BigInteger estimatedEncodedSize(Transaction tx) throws NoSuchAlgorithmException {
+        Account acc = new Account();
+        try {
+            return BigInteger.valueOf(Encoder.encodeToMsgPack(acc.signTransaction(tx)).length);
+        } catch (IOException e) {
+            throw new RuntimeException("unexpected behavior", e);
+        }
+    }
 
     /**
      * Sign the given bytes, and wrap in Signature.

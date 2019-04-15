@@ -67,23 +67,29 @@ public class Transaction {
      */
     public Transaction(Address fromAddr, Address toAddr, BigInteger fee, BigInteger amount, BigInteger firstRound,
                        BigInteger lastRound) {
-        this(fromAddr, fee, firstRound, lastRound, null, amount, toAddr);
+        this(fromAddr, fee, firstRound, lastRound, null, amount, toAddr, "", new Digest());
+    }
+
+    public Transaction(Address fromAddr, Address toAddr, BigInteger fee, BigInteger amount, BigInteger firstRound,
+                       BigInteger lastRound,
+                       String genesisID, Digest genesisHash) {
+        this(fromAddr, fee, firstRound, lastRound, null, amount, toAddr, genesisID, genesisHash);
     }
 
     // Helper with long types
-    public Transaction(Address fromAddr, Address toAddr, long fee, long amount, long firstRound,
-                       long lastRound) {
-        this(fromAddr, BigInteger.valueOf(fee), BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr);
+    public Transaction(Address fromAddr, Address toAddr, long fee, long amount, long firstRound, long lastRound,
+                       String genesisID, Digest genesisHash) {
+        this(fromAddr, BigInteger.valueOf(fee), BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr, genesisID, genesisHash);
     }
 
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       BigInteger amount, Address receiver) {
-        this(sender, fee, firstValid, lastValid, note, "", amount, receiver, new Address());
+                       BigInteger amount, Address receiver, String genesisID, Digest genesisHash) {
+        this(sender, fee, firstValid, lastValid, note, genesisID, genesisHash, amount, receiver, new Address());
     }
 
-    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID,
+    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID, Digest genesisHash,
                        BigInteger amount, Address receiver, Address closeRemainderTo) {
-        this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, new Digest(), amount, receiver, closeRemainderTo,
+        this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, genesisHash, amount, receiver, closeRemainderTo,
                 new ParticipationPublicKey(), new VRFPublicKey());
     }
 
@@ -98,9 +104,10 @@ public class Transaction {
      * @param vrfPK the sortition key to register
      */
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+                       String genesisID, Digest genesisHash,
                        ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
         // populate with default values which will be ignored...
-        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, "", new Digest(),
+        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK);
     }
 
