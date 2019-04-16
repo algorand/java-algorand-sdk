@@ -166,6 +166,18 @@ public class Account {
     }
 
     /**
+     * Sign a transaction with this account, replacing the fee with the given feePerByte.
+     * @param tx transaction to sign
+     * @param feePerByte fee per byte, often returned as a suggested fee
+     * @return a signed transaction
+     * @throws NoSuchAlgorithmException crypto provider not found
+     */
+    public SignedTransaction signTransactionWithFeePerByte(Transaction tx, BigInteger feePerByte) throws NoSuchAlgorithmException {
+        Transaction feeTx = transactionWithSuggestedFeePerByte(tx, feePerByte);
+        return this.signTransaction(feeTx);
+    }
+
+    /**
      * Sign a bid with this account
      * @param bid the bid to sign
      * @return a signed bid
@@ -192,7 +204,7 @@ public class Account {
      * @return transaction with proper fee set
      * @throws NoSuchAlgorithmException could not estimate tx encoded size.
      */
-    public Transaction transactionWithSuggestedFeePerByte(Transaction copyTx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
+    static public Transaction transactionWithSuggestedFeePerByte(Transaction copyTx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
         BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(copyTx));
         switch (copyTx.type) {
             case Payment:
