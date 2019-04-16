@@ -18,7 +18,7 @@ Maven:
 <dependency>
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
 </dependency>
 ```
 To fetch it straight from the algorand repository, on github, also add in your `pom.xml`:

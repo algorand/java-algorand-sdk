@@ -76,10 +76,19 @@ public class Transaction {
         this(fromAddr, fee, firstRound, lastRound, null, amount, toAddr, genesisID, genesisHash);
     }
 
-    // Helper with long types
-    public Transaction(Address fromAddr, Address toAddr, long fee, long amount, long firstRound, long lastRound,
+    /**
+     * Create a payment transaction. Make sure to sign with a suggested fee.
+     * @param fromAddr source address
+     * @param toAddr destination address
+     * @param amount amount to send
+     * @param firstRound first valid round
+     * @param lastRound last valid round
+     * @param genesisID genesis id
+     * @param genesisHash genesis hash
+     */
+    public Transaction(Address fromAddr, Address toAddr, long amount, long firstRound, long lastRound,
                        String genesisID, Digest genesisHash) {
-        this(fromAddr, BigInteger.valueOf(fee), BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr, genesisID, genesisHash);
+        this(fromAddr, BigInteger.valueOf(0), BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr, genesisID, genesisHash);
     }
 
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,

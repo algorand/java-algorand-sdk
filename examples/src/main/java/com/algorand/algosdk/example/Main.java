@@ -69,7 +69,7 @@ public class Main {
         // Generate a new transaction using randomly generated accounts (this is invalid, since src has no money...)
         long amount = 100;
         long lastRound = firstRound + 1000; // 1000 is the max tx window
-        Transaction tx = new Transaction(src.getAddress(), new Address(DEST_ADDR), 0, amount, firstRound, lastRound, genesisID, genesisHash);
+        Transaction tx = new Transaction(src.getAddress(), new Address(DEST_ADDR), amount, firstRound, lastRound, genesisID, genesisHash);
         SignedTransaction signedTx = src.signTransactionWithFeePerByte(tx, feePerByte);
         System.out.println("Signed transaction with txid: " + signedTx.transactionID);
 
