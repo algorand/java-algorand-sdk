@@ -1,8 +1,10 @@
 package com.algorand.algosdk.crypto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,13 +13,13 @@ import java.util.Objects;
  * Serializable raw multisig class.
  */
 @JsonPropertyOrder(alphabetic=true)
-public class MultisigSignature {
+public class MultisigSignature implements Serializable {
     @JsonProperty("v")
-    public final int version;
+    public int version;
     @JsonProperty("thr")
-    public final int threshold;
+    public int threshold;
     @JsonProperty("subsig")
-    public final List<MultisigSubsig> subsigs;
+    public List<MultisigSubsig> subsigs = new ArrayList<>();
 
     /**
      * create a multisig signature.
@@ -25,7 +27,12 @@ public class MultisigSignature {
      * @param threshold required
      * @param subsigs can be empty, or null
      */
-    public MultisigSignature(int version, int threshold, List<MultisigSubsig> subsigs) {
+    @JsonCreator
+    public MultisigSignature(
+            @JsonProperty("v") int version,
+            @JsonProperty("thr") int threshold,
+            @JsonProperty("subsig") List<MultisigSubsig> subsigs
+    ) {
         this.version = version;
         this.threshold = threshold;
         this.subsigs = Objects.requireNonNull(subsigs, "subsigs must not be null");
@@ -35,11 +42,7 @@ public class MultisigSignature {
         this(version, threshold, new ArrayList<MultisigSubsig>());
     }
 
-    // default values for serializer to ignore
     public MultisigSignature() {
-        this.version = 0;
-        this.threshold = 0;
-        this.subsigs = new ArrayList<>();
     }
 
     /**
@@ -48,9 +51,19 @@ public class MultisigSignature {
     @JsonPropertyOrder(alphabetic=true)
     public static class MultisigSubsig {
         @JsonProperty("pk")
-        public final Ed25519PublicKey key;
+        public Ed25519PublicKey key = new Ed25519PublicKey();
         @JsonProperty("s")
-        public final Signature sig; // optional
+        public Signature sig = new Signature(); // optional
+
+        // workaround wrapped json values
+        @JsonCreator
+        public MultisigSubsig(
+                @JsonProperty("pk") byte[] key,
+                @JsonProperty("s") byte[] sig
+        ) {
+            if (key != null) this.key = new Ed25519PublicKey(key);
+            if (sig != null) this.sig = new Signature(sig);
+        }
 
         public MultisigSubsig(Ed25519PublicKey key, Signature sig) {
             this.key = Objects.requireNonNull(key, "public key cannot be null");
@@ -61,7 +74,7 @@ public class MultisigSignature {
             this(key, new Signature());
         }
 
-        public MultisigSubsig() { this(new Ed25519PublicKey(), new Signature()); }
+        public MultisigSubsig() {}
 
         @Override
         public boolean equals(Object obj) {

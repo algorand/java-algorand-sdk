@@ -1,14 +1,16 @@
 package com.algorand.algosdk.crypto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * A serializable representation of a VRF public key.
  */
-public class VRFPublicKey {
+public class VRFPublicKey implements Serializable {
     private static final int KEY_LEN_BYTES  = 32;
     /**
      * The raw bytes.
@@ -19,8 +21,11 @@ public class VRFPublicKey {
      * Create a new VRF key.
      * @param bytes a length 32 byte array.
      */
+    @JsonCreator
     public VRFPublicKey(byte[] bytes) {
-        Objects.requireNonNull(bytes, "vrf key must not be null");
+        if (bytes == null) {
+            return;
+        }
         if (bytes.length != KEY_LEN_BYTES) {
             throw new IllegalArgumentException("vrf key wrong length");
         }

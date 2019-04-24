@@ -10,6 +10,8 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
+import java.io.IOException;
+
 public class Encoder {
     private static final char BASE32_PAD_CHAR = '=';
     /**
@@ -27,6 +29,23 @@ public class Encoder {
         // also annotate all fields manually
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
         return objectMapper.writeValueAsBytes(o);
+    }
+
+    /**
+     * Convenience method for deserializing arbitrary objects encoded with canonical msg-pack
+     * @param input byte array representing canonical msg-pack encoding
+     * @param tClass class of type of object to deserialize as
+     * @param <T> object type
+     * @return deserialized object
+     * @throws IOException if decoding failed
+     */
+    public static <T> T decodeFromMsgPack(byte[] input, Class<T> tClass) throws IOException {
+        // See encodedToMsgPack for explanation of settings, and how this makes msgpack canonical
+        ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());
+        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+        return objectMapper.readValue(input, tClass);
     }
 
     /**

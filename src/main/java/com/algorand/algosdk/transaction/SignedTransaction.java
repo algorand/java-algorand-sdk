@@ -2,26 +2,28 @@ package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.Signature;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * A serializable convenience type for packaging transactions with their signatures.
  */
 @JsonPropertyOrder(alphabetic=true)
-public class SignedTransaction {
+public class SignedTransaction implements Serializable {
     @JsonProperty("txn")
-    public final Transaction tx;
+    public Transaction tx = new Transaction();
     @JsonProperty("sig")
-    public final Signature sig; // can be null
+    public Signature sig = new Signature(); // can be null
     @JsonProperty("msig")
-    public final MultisigSignature mSig;
+    public MultisigSignature mSig = new MultisigSignature();
 
     @JsonIgnore
-    public final String transactionID;
+    public String transactionID = "";
 
     public SignedTransaction(Transaction tx, Signature sig, MultisigSignature mSig, String transactionID) {
         this.tx = Objects.requireNonNull(tx, "tx must not be null");
@@ -38,12 +40,18 @@ public class SignedTransaction {
         this(tx, new Signature(), mSig, txId);
     }
 
-    // default constructor for default values to ignore (mirroring msgpack go)
     public SignedTransaction() {
-        this.tx = new Transaction();
-        this.mSig = new MultisigSignature();
-        this.sig = new Signature();
-        this.transactionID = "";
+    }
+
+    @JsonCreator
+    public SignedTransaction(
+            @JsonProperty("txn") Transaction tx,
+            @JsonProperty("sig") byte[] sig,
+            @JsonProperty("msig") MultisigSignature mSig) {
+        if (tx != null) this.tx = tx;
+        if (sig != null) this.sig = new Signature(sig);
+        if (mSig != null) this.mSig = mSig;
+        // don't recover the txid yet
     }
 
     @Override

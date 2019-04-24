@@ -3,9 +3,11 @@ package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.codec.binary.Base32;
 
+import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Objects;
@@ -13,7 +15,7 @@ import java.util.Objects;
 /**
  * Address represents a serializable 32-byte length Algorand address.
  */
-public class Address {
+public class Address implements Serializable {
     /**
      * The length of an address. Equal to the size of a SHA256 checksum.
      */
@@ -30,8 +32,11 @@ public class Address {
      * Create a new address from a byte array.
      * @param bytes array of 32 bytes
      */
+    @JsonCreator
     public Address(final byte[] bytes) {
-        Objects.requireNonNull(bytes, "bytes must not be null");
+        if (bytes == null) {
+            return;
+        }
         if (bytes.length != LEN_BYTES) {
             throw new IllegalArgumentException(String.format("Given address length is not %s", LEN_BYTES));
         }

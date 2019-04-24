@@ -2,6 +2,7 @@ package com.algorand.algosdk.auction;
 
 import com.algorand.algosdk.crypto.Address;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -14,17 +15,17 @@ import java.util.Objects;
 @JsonPropertyOrder(alphabetic=true)
 public class Bid {
     @JsonProperty("bidder")
-    public final Address bidderKey; // cannot be null
+    public Address bidderKey = new Address(); // cannot be null
     @JsonProperty("auc")
-    public final Address auctionKey; // cannot be null
+    public Address auctionKey = new Address(); // cannot be null
     @JsonProperty("cur")
-    public final BigInteger bidCurrency;
+    public BigInteger bidCurrency = BigInteger.valueOf(0);
     @JsonProperty("price")
-    public final BigInteger maxPrice;
+    public BigInteger maxPrice = BigInteger.valueOf(0);
     @JsonProperty("id")
-    public final BigInteger bidID;
+    public BigInteger bidID = BigInteger.valueOf(0);
     @JsonProperty("aid")
-    public final BigInteger auctionID;
+    public BigInteger auctionID = BigInteger.valueOf(0);
 
     /**
      * Create a new bid
@@ -36,21 +37,31 @@ public class Bid {
      * @param auctionID
      */
     public Bid(Address bidderKey, Address auctionKey, BigInteger bidCurrency, BigInteger maxPrice, BigInteger bidID, BigInteger auctionID) {
-        this.bidderKey = Objects.requireNonNull(bidderKey, "bidder key must not be null");
-        this.auctionKey = Objects.requireNonNull(auctionKey, "auction key must not be null");
-        this.bidCurrency = Objects.requireNonNull(bidCurrency, "bidCurrency must not be null");
-        this.maxPrice = Objects.requireNonNull(maxPrice, "maxPrice must not be null");
-        this.bidID = Objects.requireNonNull(bidID, "bidID must not be null");
-        this.auctionID = Objects.requireNonNull(auctionID, "auctionID must not be null");
+        if (bidderKey != null) this.bidderKey = bidderKey;
+        if (auctionKey != null) this.auctionKey = auctionKey;
+        if (bidCurrency != null) this.bidCurrency = bidCurrency;
+        if (maxPrice != null) this.maxPrice = maxPrice;
+        if (bidID != null) this.bidID = bidID;
+        if (auctionID != null) this.auctionID = auctionID;
+    }
+
+    @JsonCreator
+    public Bid(
+            @JsonProperty("bidder") byte[] bidderKey,
+            @JsonProperty("auc") byte[] auctionKey,
+            @JsonProperty("cur") BigInteger bidCurrency,
+            @JsonProperty("price") BigInteger maxPrice,
+            @JsonProperty("id") BigInteger bidID,
+            @JsonProperty("aid") BigInteger auctionID) {
+        if (bidderKey != null) this.bidderKey = new Address(bidderKey);
+        if (auctionKey != null) this.auctionKey = new Address(auctionKey);
+        if (bidCurrency != null) this.bidCurrency = bidCurrency;
+        if (maxPrice != null) this.maxPrice = maxPrice;
+        if (bidID != null) this.bidID = bidID;
+        if (auctionID != null) this.auctionID = auctionID;
     }
 
     public Bid() {
-        this.bidderKey = new Address();
-        this.auctionKey = new Address();
-        this.bidCurrency = BigInteger.valueOf(0);
-        this.maxPrice = BigInteger.valueOf(0);
-        this.bidID = BigInteger.valueOf(0);
-        this.auctionID = BigInteger.valueOf(0);
     }
 
     @Override

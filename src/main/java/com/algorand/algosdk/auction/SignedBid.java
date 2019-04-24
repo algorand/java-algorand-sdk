@@ -2,20 +2,23 @@ package com.algorand.algosdk.auction;
 
 import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.Signature;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.Objects;
 
 /**
  * A serializable raw signed bid class.
  */
+@JsonPropertyOrder(alphabetic=true)
 public class SignedBid {
     @JsonProperty("bid")
-    public final Bid bid;
+    public Bid bid = new Bid();
     @JsonProperty("sig")
-    public final Signature sig;
+    public Signature sig = new Signature();
     @JsonProperty("msig")
-    public final MultisigSignature mSig;
+    public MultisigSignature mSig = new MultisigSignature();
 
     public SignedBid(Bid bid, Signature sig, MultisigSignature mSig) {
         this.bid = Objects.requireNonNull(bid, "tx must not be null");
@@ -31,11 +34,19 @@ public class SignedBid {
         this(bid, new Signature(), mSig);
     }
 
-    // default constructor for encoding analysis
     public SignedBid() {
-        this.bid = new Bid();
-        this.sig = new Signature();
-        this.mSig = new MultisigSignature();
+    }
+
+    @JsonCreator
+    public SignedBid(
+            @JsonProperty("bid") Bid bid,
+            @JsonProperty("sig") byte[] sig,
+            @JsonProperty("msig") MultisigSignature mSig
+    )
+    {
+        if (bid != null) this.bid = bid;
+        if (sig != null) this.sig = new Signature(sig);
+        if (mSig != null) this.mSig = mSig;
     }
 
     @Override

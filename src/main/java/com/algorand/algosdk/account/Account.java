@@ -148,6 +148,7 @@ public class Account {
      * Sign a transaction with this account
      * @param tx the transaction to sign
      * @return a signed transaction
+     * @throws NoSuchAlgorithmException if signing algorithm could not be found
      */
     public SignedTransaction signTransaction(Transaction tx) throws NoSuchAlgorithmException {
         try {
@@ -162,6 +163,21 @@ public class Account {
             return new SignedTransaction(tx, txSig, txID);
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
+        }
+    }
+
+    /**
+     * Sign a canonical msg-pack encoded Transaction
+     * @param bytes a canonical msg-pack encoded transaction
+     * @return a signed transaction
+     * @throws NoSuchAlgorithmException if ed25519 not found on this system
+     */
+    public SignedTransaction signTransactionBytes(byte[] bytes) throws NoSuchAlgorithmException, IOException {
+        try {
+            Transaction tx = Encoder.decodeFromMsgPack(bytes, Transaction.class);
+            return this.signTransaction(tx);
+        } catch (IOException e) {
+            throw new IOException("could not decode transaction", e);
         }
     }
 
@@ -239,7 +255,7 @@ public class Account {
      * @param bytes the data to sign
      * @return a signature
      */
-    private Signature signBytes(byte[] bytes)  throws NoSuchAlgorithmException {
+    public Signature signBytes(byte[] bytes)  throws NoSuchAlgorithmException {
         try {
             CryptoProvider.setupIfNeeded();
             java.security.Signature signer = java.security.Signature.getInstance(SIGN_ALGO);

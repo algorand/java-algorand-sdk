@@ -5,10 +5,12 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
@@ -18,43 +20,43 @@ import java.util.Objects;
  * This is distinct from algod.model.Transaction, which is only returned for GET requests to algod.
  */
 @JsonPropertyOrder(alphabetic=true)
-public class Transaction {
+public class Transaction implements Serializable {
     @JsonProperty("type")
-    public final Type type;
+    public Type type = Type.Default;
 
     // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields. This circumvents our encoders'
     // inability to sort child fields.
     /* header fields */
     @JsonProperty("snd")
-    public final Address sender;
+    public Address sender = new Address();
     @JsonProperty("fee")
-    public final BigInteger fee;
+    public BigInteger fee = BigInteger.valueOf(0);
     @JsonProperty("fv")
-    public final BigInteger firstValid;
+    public BigInteger firstValid = BigInteger.valueOf(0);
     @JsonProperty("lv")
-    public final BigInteger lastValid;
+    public BigInteger lastValid = BigInteger.valueOf(0);
     @JsonProperty("note")
-    public final byte[] note;
+    public byte[] note;
     @JsonProperty("gen")
-    public final String genesisID;
+    public String genesisID = "";
     @JsonProperty("gh")
-    public final Digest genesisHash;
+    public Digest genesisHash = new Digest();
 
     /* payment fields */
     @JsonProperty("amt")
-    public final BigInteger amount;
+    public BigInteger amount = BigInteger.valueOf(0);
     @JsonProperty("rcv")
-    public final Address receiver;
+    public Address receiver = new Address();
     @JsonProperty("close")
-    public final Address closeRemainderTo; // can be null, optional
+    public Address closeRemainderTo = new Address(); // can be null, optional
 
     /* keyreg fields */
     // VotePK is the participation public key used in key registration transactions
     @JsonProperty("votekey")
-    public final ParticipationPublicKey votePK;
+    public ParticipationPublicKey votePK = new ParticipationPublicKey();
     // selectionPK is the VRF public key used in key registration transactions
     @JsonProperty("selkey")
-    public final VRFPublicKey selectionPK;
+    public VRFPublicKey selectionPK = new VRFPublicKey();
 
     /**
      * Create a payment transaction
@@ -120,42 +122,54 @@ public class Transaction {
                 BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK);
     }
 
-    private Transaction(Type type,
-                       Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID, Digest genesisHash,
-                       BigInteger amount, Address receiver, Address closeRemainderTo, ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
-        this.type = Objects.requireNonNull(type, "txtype must not be null");
-        // header fields
-        this.sender = Objects.requireNonNull(sender, "sender must not be null");
-        this.genesisID = Objects.requireNonNull(genesisID, "genesisID must not be null");
-        this.fee = Objects.requireNonNull(fee, "fee must not be null");
-        this.firstValid = Objects.requireNonNull(firstValid, "firstValid must not be null");
-        this.lastValid = Objects.requireNonNull(lastValid, "lastValid must not be null");
-        this.genesisHash = Objects.requireNonNull(genesisHash, "genesisHash must not be null");
-        // payment fields
-        this.amount = Objects.requireNonNull(amount, "amount must not be null");
-        this.receiver = Objects.requireNonNull(receiver, "receiver must not be null");
-        this.closeRemainderTo = Objects.requireNonNull(closeRemainderTo, "closeRemainderTo must not be null");
-        this.note = note; // can be null, since it matches golang's default value
-        // keyreg fields
-        this.votePK = Objects.requireNonNull(votePK, "votePK must not be null");
-        this.selectionPK = Objects.requireNonNull(vrfPK, "selectionPK must not be null");
+    // workaround for nested JsonValue classes
+    @JsonCreator
+    private Transaction(@JsonProperty("type") Type type,
+                        @JsonProperty("snd") byte[] sender,
+                        @JsonProperty("fee") BigInteger fee,
+                        @JsonProperty("fv") BigInteger firstValid,
+                        @JsonProperty("lv") BigInteger lastValid,
+                        @JsonProperty("note") byte[] note,
+                        @JsonProperty("gen") String genesisID,
+                        @JsonProperty("gh") byte[] genesisHash,
+                        @JsonProperty("amt") BigInteger amount,
+                        @JsonProperty("rcv") byte[] receiver,
+                        @JsonProperty("close") byte[] closeRemainderTo,
+                        @JsonProperty("votekey") byte[] votePK,
+                        @JsonProperty("selkey") byte[] vrfPK) {
+        this(type, new Address(sender), fee, firstValid, lastValid, note, genesisID, new Digest(genesisHash), amount,
+                new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK));
     }
 
-    // default values for serializer to ignore
+    private Transaction(Type type,
+                        Address sender,
+                        BigInteger fee,
+                        BigInteger firstValid,
+                        BigInteger lastValid,
+                        byte[] note,
+                        String genesisID,
+                        Digest genesisHash,
+                        BigInteger amount,
+                        Address receiver,
+                        Address closeRemainderTo,
+                        ParticipationPublicKey votePK,
+                        VRFPublicKey vrfPK) {
+        if (type != null) this.type = type;
+        if (sender != null) this.sender = sender;
+        if (fee != null) this.fee = fee;
+        if (firstValid != null) this.firstValid = firstValid;
+        if (lastValid != null) this.lastValid = lastValid;
+        if (note != null) this.note = note;
+        if (genesisID != null) this.genesisID = genesisID;
+        if (genesisHash != null) this.genesisHash = genesisHash;
+        if (amount != null) this.amount = amount;
+        if (receiver != null) this.receiver = receiver;
+        if (closeRemainderTo != null) this.closeRemainderTo = closeRemainderTo;
+        if (votePK != null) this.votePK = votePK;
+        if (vrfPK != null) this.selectionPK = vrfPK;
+    }
+
     public Transaction() {
-        this.type = Type.Default;
-        this.sender = new Address();
-        this.genesisID = "";
-        this.genesisHash = new Digest();
-        this.fee = BigInteger.valueOf(0);
-        this.firstValid = BigInteger.valueOf(0);
-        this.lastValid = BigInteger.valueOf(0);
-        this.note = null;
-        this.amount = BigInteger.valueOf(0);
-        this.receiver = new Address();
-        this.closeRemainderTo = new Address();
-        this.votePK = new ParticipationPublicKey();
-        this.selectionPK = new VRFPublicKey();
     }
 
     /**
