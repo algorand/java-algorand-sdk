@@ -17,6 +17,7 @@ import com.algorand.algosdk.algod.client.*;
 import com.algorand.algosdk.algod.client.lib.Pair;
 import com.algorand.algosdk.algod.client.model.*;
 import com.google.gson.reflect.TypeToken;
+import org.threeten.bp.LocalDate;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -175,7 +176,7 @@ public class DefaultApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getBlockCall(java.math.BigInteger round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call getBlockCall(Long round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
 
         // create path and map variables
@@ -218,7 +219,7 @@ public class DefaultApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call getBlockValidateBeforeCall(java.math.BigInteger round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call getBlockValidateBeforeCall(Long round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'round' is set
         if (round == null) {
@@ -238,7 +239,7 @@ public class DefaultApi {
      * @return Block
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public Block getBlock(java.math.BigInteger round) throws ApiException {
+    public Block getBlock(Long round) throws ApiException {
         ApiResponse<Block> resp = getBlockWithHttpInfo(round);
         return resp.getData();
     }
@@ -250,7 +251,7 @@ public class DefaultApi {
      * @return ApiResponse&lt;Block&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<Block> getBlockWithHttpInfo(java.math.BigInteger round) throws ApiException {
+    public ApiResponse<Block> getBlockWithHttpInfo(Long round) throws ApiException {
         com.squareup.okhttp.Call call = getBlockValidateBeforeCall(round, null, null);
         Type localVarReturnType = new TypeToken<Block>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -264,7 +265,7 @@ public class DefaultApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getBlockAsync(java.math.BigInteger round, final ApiCallback<Block> callback) throws ApiException {
+    public com.squareup.okhttp.Call getBlockAsync(Long round, final ApiCallback<Block> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -298,7 +299,7 @@ public class DefaultApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call getPendingTransactionsCall(java.math.BigInteger max, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call getPendingTransactionsCall(Long max, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
 
         // create path and map variables
@@ -342,7 +343,7 @@ public class DefaultApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call getPendingTransactionsValidateBeforeCall(java.math.BigInteger max, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call getPendingTransactionsValidateBeforeCall(Long max, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
 
         com.squareup.okhttp.Call call = getPendingTransactionsCall(max, progressListener, progressRequestListener);
@@ -357,7 +358,7 @@ public class DefaultApi {
      * @return PendingTransactions
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public PendingTransactions getPendingTransactions(java.math.BigInteger max) throws ApiException {
+    public PendingTransactions getPendingTransactions(Long max) throws ApiException {
         ApiResponse<PendingTransactions> resp = getPendingTransactionsWithHttpInfo(max);
         return resp.getData();
     }
@@ -369,7 +370,7 @@ public class DefaultApi {
      * @return ApiResponse&lt;PendingTransactions&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<PendingTransactions> getPendingTransactionsWithHttpInfo(java.math.BigInteger max) throws ApiException {
+    public ApiResponse<PendingTransactions> getPendingTransactionsWithHttpInfo(Long max) throws ApiException {
         com.squareup.okhttp.Call call = getPendingTransactionsValidateBeforeCall(max, null, null);
         Type localVarReturnType = new TypeToken<PendingTransactions>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -383,7 +384,7 @@ public class DefaultApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call getPendingTransactionsAsync(java.math.BigInteger max, final ApiCallback<PendingTransactions> callback) throws ApiException {
+    public com.squareup.okhttp.Call getPendingTransactionsAsync(Long max, final ApiCallback<PendingTransactions> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -1329,6 +1330,129 @@ public class DefaultApi {
         return call;
     }
     /**
+     * Build call for transaction
+     * @param txid A transaction id (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call transactionCall(String txid, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/indexer/transactions/{txid}"
+            .replaceAll("\\{" + "txid" + "\\}", apiClient.escapeString(txid.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call transactionValidateBeforeCall(String txid, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'txid' is set
+        if (txid == null) {
+            throw new ApiException("Missing the required parameter 'txid' when calling transaction(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = transactionCall(txid, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Get an information of a single transaction.
+     * Returns the transaction information of the given txid. Works only if the indexer is enabled.
+     * @param txid A transaction id (required)
+     * @return Transaction
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public Transaction transaction(String txid) throws ApiException {
+        ApiResponse<Transaction> resp = transactionWithHttpInfo(txid);
+        return resp.getData();
+    }
+
+    /**
+     * Get an information of a single transaction.
+     * Returns the transaction information of the given txid. Works only if the indexer is enabled.
+     * @param txid A transaction id (required)
+     * @return ApiResponse&lt;Transaction&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<Transaction> transactionWithHttpInfo(String txid) throws ApiException {
+        com.squareup.okhttp.Call call = transactionValidateBeforeCall(txid, null, null);
+        Type localVarReturnType = new TypeToken<Transaction>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Get an information of a single transaction. (asynchronously)
+     * Returns the transaction information of the given txid. Works only if the indexer is enabled.
+     * @param txid A transaction id (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call transactionAsync(String txid, final ApiCallback<Transaction> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = transactionValidateBeforeCall(txid, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<Transaction>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
      * Build call for transactionInformation
      * @param address An account public key (required)
      * @param txid A transaction id (required)
@@ -1584,7 +1708,7 @@ public class DefaultApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call transactionsCall(String address, java.math.BigInteger firstRound, java.math.BigInteger lastRound, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call transactionsCall(String address, Long firstRound, Long lastRound, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
 
         // create path and map variables
@@ -1631,7 +1755,7 @@ public class DefaultApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call transactionsValidateBeforeCall(String address, java.math.BigInteger firstRound, java.math.BigInteger lastRound, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call transactionsValidateBeforeCall(String address, Long firstRound, Long lastRound, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'address' is set
         if (address == null) {
@@ -1663,7 +1787,7 @@ public class DefaultApi {
      * @return TransactionList
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public TransactionList transactions(String address, java.math.BigInteger firstRound, java.math.BigInteger lastRound) throws ApiException {
+    public TransactionList transactions(String address, Long firstRound, Long lastRound) throws ApiException {
         ApiResponse<TransactionList> resp = transactionsWithHttpInfo(address, firstRound, lastRound);
         return resp.getData();
     }
@@ -1677,7 +1801,7 @@ public class DefaultApi {
      * @return ApiResponse&lt;TransactionList&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<TransactionList> transactionsWithHttpInfo(String address, java.math.BigInteger firstRound, java.math.BigInteger lastRound) throws ApiException {
+    public ApiResponse<TransactionList> transactionsWithHttpInfo(String address, Long firstRound, Long lastRound) throws ApiException {
         com.squareup.okhttp.Call call = transactionsValidateBeforeCall(address, firstRound, lastRound, null, null);
         Type localVarReturnType = new TypeToken<TransactionList>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -1693,7 +1817,7 @@ public class DefaultApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call transactionsAsync(String address, java.math.BigInteger firstRound, java.math.BigInteger lastRound, final ApiCallback<TransactionList> callback) throws ApiException {
+    public com.squareup.okhttp.Call transactionsAsync(String address, Long firstRound, Long lastRound, final ApiCallback<TransactionList> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -1720,6 +1844,162 @@ public class DefaultApi {
         return call;
     }
     /**
+     * Build call for transactionsIndexer
+     * @param address An account public key (required)
+     * @param from Do not fetch any transactions before this date. (required)
+     * @param to Do not fetch any transactions after this date. (required)
+     * @param max maximum transactions to show (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call transactionsIndexerCall(String address, LocalDate from, LocalDate to, Long max, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/indexer/account/{address}/transactions"
+            .replaceAll("\\{" + "address" + "\\}", apiClient.escapeString(address.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+        if (from != null)
+        localVarQueryParams.addAll(apiClient.parameterToPair("from", from));
+        if (to != null)
+        localVarQueryParams.addAll(apiClient.parameterToPair("to", to));
+        if (max != null)
+        localVarQueryParams.addAll(apiClient.parameterToPair("max", max));
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call transactionsIndexerValidateBeforeCall(String address, LocalDate from, LocalDate to, Long max, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'address' is set
+        if (address == null) {
+            throw new ApiException("Missing the required parameter 'address' when calling transactionsIndexer(Async)");
+        }
+        
+        // verify the required parameter 'from' is set
+        if (from == null) {
+            throw new ApiException("Missing the required parameter 'from' when calling transactionsIndexer(Async)");
+        }
+        
+        // verify the required parameter 'to' is set
+        if (to == null) {
+            throw new ApiException("Missing the required parameter 'to' when calling transactionsIndexer(Async)");
+        }
+        
+        // verify the required parameter 'max' is set
+        if (max == null) {
+            throw new ApiException("Missing the required parameter 'max' when calling transactionsIndexer(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = transactionsIndexerCall(address, from, to, max, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Get a list of confirmed transactions.
+     * Returns the list of confirmed transactions between within a date range. This call is available only when the indexer is running.
+     * @param address An account public key (required)
+     * @param from Do not fetch any transactions before this date. (required)
+     * @param to Do not fetch any transactions after this date. (required)
+     * @param max maximum transactions to show (required)
+     * @return TransactionList
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public TransactionList transactionsIndexer(String address, LocalDate from, LocalDate to, Long max) throws ApiException {
+        ApiResponse<TransactionList> resp = transactionsIndexerWithHttpInfo(address, from, to, max);
+        return resp.getData();
+    }
+
+    /**
+     * Get a list of confirmed transactions.
+     * Returns the list of confirmed transactions between within a date range. This call is available only when the indexer is running.
+     * @param address An account public key (required)
+     * @param from Do not fetch any transactions before this date. (required)
+     * @param to Do not fetch any transactions after this date. (required)
+     * @param max maximum transactions to show (required)
+     * @return ApiResponse&lt;TransactionList&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<TransactionList> transactionsIndexerWithHttpInfo(String address, LocalDate from, LocalDate to, Long max) throws ApiException {
+        com.squareup.okhttp.Call call = transactionsIndexerValidateBeforeCall(address, from, to, max, null, null);
+        Type localVarReturnType = new TypeToken<TransactionList>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Get a list of confirmed transactions. (asynchronously)
+     * Returns the list of confirmed transactions between within a date range. This call is available only when the indexer is running.
+     * @param address An account public key (required)
+     * @param from Do not fetch any transactions before this date. (required)
+     * @param to Do not fetch any transactions after this date. (required)
+     * @param max maximum transactions to show (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call transactionsIndexerAsync(String address, LocalDate from, LocalDate to, Long max, final ApiCallback<TransactionList> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = transactionsIndexerValidateBeforeCall(address, from, to, max, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<TransactionList>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
      * Build call for waitForBlock
      * @param round The round to wait until returning status (required)
      * @param progressListener Progress listener
@@ -1727,7 +2007,7 @@ public class DefaultApi {
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call waitForBlockCall(java.math.BigInteger round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call waitForBlockCall(Long round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
 
         // create path and map variables
@@ -1770,7 +2050,7 @@ public class DefaultApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call waitForBlockValidateBeforeCall(java.math.BigInteger round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call waitForBlockValidateBeforeCall(Long round, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'round' is set
         if (round == null) {
@@ -1790,7 +2070,7 @@ public class DefaultApi {
      * @return NodeStatus
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public NodeStatus waitForBlock(java.math.BigInteger round) throws ApiException {
+    public NodeStatus waitForBlock(Long round) throws ApiException {
         ApiResponse<NodeStatus> resp = waitForBlockWithHttpInfo(round);
         return resp.getData();
     }
@@ -1802,7 +2082,7 @@ public class DefaultApi {
      * @return ApiResponse&lt;NodeStatus&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<NodeStatus> waitForBlockWithHttpInfo(java.math.BigInteger round) throws ApiException {
+    public ApiResponse<NodeStatus> waitForBlockWithHttpInfo(Long round) throws ApiException {
         com.squareup.okhttp.Call call = waitForBlockValidateBeforeCall(round, null, null);
         Type localVarReturnType = new TypeToken<NodeStatus>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
@@ -1816,7 +2096,7 @@ public class DefaultApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call waitForBlockAsync(java.math.BigInteger round, final ApiCallback<NodeStatus> callback) throws ApiException {
+    public com.squareup.okhttp.Call waitForBlockAsync(Long round, final ApiCallback<NodeStatus> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;

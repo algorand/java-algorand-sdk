@@ -28,7 +28,7 @@ import java.util.List;
 
 public class Version {
   @SerializedName("genesis_hash_b64")
-  private List<Integer> genesisHashB64 = new ArrayList<Integer>();
+  private byte[] genesisHashB64 = null;
 
   @SerializedName("genesis_id")
   private String genesisId = null;
@@ -36,13 +36,8 @@ public class Version {
   @SerializedName("versions")
   private List<String> versions = new ArrayList<String>();
 
-  public Version genesisHashB64(List<Integer> genesisHashB64) {
+  public Version genesisHashB64(byte[] genesisHashB64) {
     this.genesisHashB64 = genesisHashB64;
-    return this;
-  }
-
-  public Version addGenesisHashB64Item(Integer genesisHashB64Item) {
-    this.genesisHashB64.add(genesisHashB64Item);
     return this;
   }
 
@@ -51,11 +46,11 @@ public class Version {
    * @return genesisHashB64
   **/
   @ApiModelProperty(required = true, value = "")
-  public List<Integer> getGenesisHashB64() {
+  public byte[] getGenesisHashB64() {
     return genesisHashB64;
   }
 
-  public void setGenesisHashB64(List<Integer> genesisHashB64) {
+  public void setGenesisHashB64(byte[] genesisHashB64) {
     this.genesisHashB64 = genesisHashB64;
   }
 
