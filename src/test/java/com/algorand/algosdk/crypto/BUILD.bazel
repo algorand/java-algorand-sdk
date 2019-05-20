@@ -16,3 +16,11 @@ java_test(
         ":tests",
     ],
 )
+
+java_test(
+    name = "TestMultisigAddress",
+    size = "small",
+    runtime_deps = [
+        ":tests",
+    ],
+)

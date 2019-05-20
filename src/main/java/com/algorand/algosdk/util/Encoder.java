@@ -56,7 +56,6 @@ public class Encoder {
      */
     public static String encodeToJson(Object o) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(ObjectMapper.class.getPackage().getSpecificationVersion());
         // It is important to sort fields alphabetically to match the Algorand canonical encoding
         objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
@@ -99,5 +98,15 @@ public class Encoder {
     public static String encodeToBase64(byte[] bytes) {
         Base64 codec = new Base64();
         return codec.encodeToString(bytes);
+    }
+
+    /**
+     * Decode from base64 string.
+     * @param str input
+     * @return decoded bytes
+     */
+    public static byte[] decodeFromBase64(String str) {
+        Base64 codec = new Base64();
+        return codec.decode(str);
     }
 }

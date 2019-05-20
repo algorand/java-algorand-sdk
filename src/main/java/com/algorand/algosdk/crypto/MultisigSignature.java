@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -80,7 +81,8 @@ public class MultisigSignature implements Serializable {
         public boolean equals(Object obj) {
             if (obj instanceof MultisigSubsig) {
                 MultisigSubsig actual = (MultisigSubsig) obj;
-                return key.equals(actual.key) && sig.equals(actual.sig);
+                return Arrays.equals(key.getBytes(), actual.key.getBytes())
+                        && sig.equals(actual.sig);
             } else {
                 return false;
             }

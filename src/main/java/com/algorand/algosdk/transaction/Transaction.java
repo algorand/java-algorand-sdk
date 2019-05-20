@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.databind.node.BigIntegerNode;
 
 import java.io.Serializable;
 import java.math.BigInteger;
@@ -57,6 +58,15 @@ public class Transaction implements Serializable {
     // selectionPK is the VRF public key used in key registration transactions
     @JsonProperty("selkey")
     public VRFPublicKey selectionPK = new VRFPublicKey();
+    // voteFirst is the first round this keyreg tx is valid for
+    @JsonProperty("votefst")
+    public BigInteger voteFirst = BigInteger.valueOf(0);
+    // voteLast is the last round this keyreg tx is valid for
+    @JsonProperty("votelst")
+    public BigInteger voteLast = BigInteger.valueOf(0);
+    // voteKeyDilution
+    @JsonProperty("votekd")
+    public BigInteger voteKeyDilution = BigInteger.valueOf(0);
 
     /**
      * Create a payment transaction
@@ -101,7 +111,7 @@ public class Transaction implements Serializable {
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID, Digest genesisHash,
                        BigInteger amount, Address receiver, Address closeRemainderTo) {
         this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, genesisHash, amount, receiver, closeRemainderTo,
-                new ParticipationPublicKey(), new VRFPublicKey());
+                new ParticipationPublicKey(), new VRFPublicKey(), BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0));
     }
 
     /**
@@ -113,13 +123,17 @@ public class Transaction implements Serializable {
      * @param note optional notes field (can be null)
      * @param votePK the new participation key to register
      * @param vrfPK the sortition key to register
+     * @param voteFirst key reg valid first round
+     * @param voteLast key reg valid last round
+     * @param voteKeyDilution key reg dilution
      */
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash,
-                       ParticipationPublicKey votePK, VRFPublicKey vrfPK) {
+                       ParticipationPublicKey votePK, VRFPublicKey vrfPK,
+                       BigInteger voteFirst, BigInteger voteLast, BigInteger voteKeyDilution) {
         // populate with default values which will be ignored...
         this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
-                BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK);
+                BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK, voteFirst, voteLast, voteKeyDilution);
     }
 
     // workaround for nested JsonValue classes
@@ -136,9 +150,13 @@ public class Transaction implements Serializable {
                         @JsonProperty("rcv") byte[] receiver,
                         @JsonProperty("close") byte[] closeRemainderTo,
                         @JsonProperty("votekey") byte[] votePK,
-                        @JsonProperty("selkey") byte[] vrfPK) {
+                        @JsonProperty("selkey") byte[] vrfPK,
+                        @JsonProperty("votefst") BigInteger voteFirst,
+                        @JsonProperty("votelst") BigInteger voteLast,
+                        @JsonProperty("votekd") BigInteger voteKeyDilution) {
         this(type, new Address(sender), fee, firstValid, lastValid, note, genesisID, new Digest(genesisHash), amount,
-                new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK));
+                new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK),
+                voteFirst, voteLast, voteKeyDilution);
     }
 
     private Transaction(Type type,
@@ -153,7 +171,10 @@ public class Transaction implements Serializable {
                         Address receiver,
                         Address closeRemainderTo,
                         ParticipationPublicKey votePK,
-                        VRFPublicKey vrfPK) {
+                        VRFPublicKey vrfPK,
+                        BigInteger voteFirst,
+                        BigInteger voteLast,
+                        BigInteger voteKeyDilution) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
         if (fee != null) this.fee = fee;
@@ -167,6 +188,9 @@ public class Transaction implements Serializable {
         if (closeRemainderTo != null) this.closeRemainderTo = closeRemainderTo;
         if (votePK != null) this.votePK = votePK;
         if (vrfPK != null) this.selectionPK = vrfPK;
+        if (voteFirst != null) this.voteFirst = voteFirst;
+        if (voteLast != null) this.voteLast = voteLast;
+        if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
     }
 
     public Transaction() {
@@ -212,7 +236,10 @@ public class Transaction implements Serializable {
                 receiver.equals(that.receiver) &&
                 closeRemainderTo.equals(that.closeRemainderTo) &&
                 votePK.equals(that.votePK) &&
-                selectionPK.equals(that.selectionPK);
+                selectionPK.equals(that.selectionPK) &&
+                voteFirst.equals(that.voteFirst) &&
+                voteLast.equals(that.voteLast) &&
+                voteKeyDilution.equals(that.voteKeyDilution);
     }
 
 }
