@@ -30,9 +30,6 @@ public class Block {
   @SerializedName("currentProtocol")
   private String currentProtocol = null;
 
-  @SerializedName("earn")
-  private java.math.BigInteger earn = null;
-
   @SerializedName("frac")
   private java.math.BigInteger frac = null;
 
@@ -62,6 +59,9 @@ public class Block {
 
   @SerializedName("rate")
   private java.math.BigInteger rate = null;
+
+  @SerializedName("reward")
+  private java.math.BigInteger reward = null;
 
   @SerializedName("round")
   private java.math.BigInteger round = null;
@@ -120,34 +120,16 @@ public class Block {
     this.currentProtocol = currentProtocol;
   }
 
-  public Block earn(java.math.BigInteger earn) {
-    this.earn = earn;
-    return this;
-  }
-
-   /**
-   * EarningsLevel specifies how many earnings, in Algos, have been distributed to each config.Protocol.EarningUnit of Algos since genesis.
-   * @return earn
-  **/
-  @ApiModelProperty(value = "EarningsLevel specifies how many earnings, in Algos, have been distributed to each config.Protocol.EarningUnit of Algos since genesis.")
-  public java.math.BigInteger getEarn() {
-    return earn;
-  }
-
-  public void setEarn(java.math.BigInteger earn) {
-    this.earn = earn;
-  }
-
   public Block frac(java.math.BigInteger frac) {
     this.frac = frac;
     return this;
   }
 
    /**
-   * The number of leftover Algos after the distribution of EarningsRate/earningUnits Algos for every earning unit in the next round.
+   * The number of leftover MicroAlgos after the distribution of RewardsRate/rewardUnits MicroAlgos for every reward unit in the next round.
    * @return frac
   **/
-  @ApiModelProperty(value = "The number of leftover Algos after the distribution of EarningsRate/earningUnits Algos for every earning unit in the next round.")
+  @ApiModelProperty(value = "The number of leftover MicroAlgos after the distribution of RewardsRate/rewardUnits MicroAlgos for every reward unit in the next round.")
   public java.math.BigInteger getFrac() {
     return frac;
   }
@@ -306,16 +288,34 @@ public class Block {
   }
 
    /**
-   * The number of new Algos added to the participation stake from earnings at the next round.
+   * The number of new MicroAlgos added to the participation stake from rewards at the next round.
    * @return rate
   **/
-  @ApiModelProperty(value = "The number of new Algos added to the participation stake from earnings at the next round.")
+  @ApiModelProperty(value = "The number of new MicroAlgos added to the participation stake from rewards at the next round.")
   public java.math.BigInteger getRate() {
     return rate;
   }
 
   public void setRate(java.math.BigInteger rate) {
     this.rate = rate;
+  }
+
+  public Block reward(java.math.BigInteger reward) {
+    this.reward = reward;
+    return this;
+  }
+
+   /**
+   * RewardsLevel specifies how many rewards, in MicroAlgos, have been distributed to each config.Protocol.RewardUnit of MicroAlgos since genesis.
+   * @return reward
+  **/
+  @ApiModelProperty(value = "RewardsLevel specifies how many rewards, in MicroAlgos, have been distributed to each config.Protocol.RewardUnit of MicroAlgos since genesis.")
+  public java.math.BigInteger getReward() {
+    return reward;
+  }
+
+  public void setReward(java.math.BigInteger reward) {
+    this.reward = reward;
   }
 
   public Block round(java.math.BigInteger round) {
@@ -456,7 +456,6 @@ public class Block {
     Block block = (Block) o;
     return ObjectUtils.equals(this.balRoot, block.balRoot) &&
     ObjectUtils.equals(this.currentProtocol, block.currentProtocol) &&
-    ObjectUtils.equals(this.earn, block.earn) &&
     ObjectUtils.equals(this.frac, block.frac) &&
     ObjectUtils.equals(this.hash, block.hash) &&
     ObjectUtils.equals(this.nextProtocol, block.nextProtocol) &&
@@ -467,6 +466,7 @@ public class Block {
     ObjectUtils.equals(this.previousBlockHash, block.previousBlockHash) &&
     ObjectUtils.equals(this.proposer, block.proposer) &&
     ObjectUtils.equals(this.rate, block.rate) &&
+    ObjectUtils.equals(this.reward, block.reward) &&
     ObjectUtils.equals(this.round, block.round) &&
     ObjectUtils.equals(this.seed, block.seed) &&
     ObjectUtils.equals(this.timestamp, block.timestamp) &&
@@ -478,7 +478,7 @@ public class Block {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(balRoot, currentProtocol, earn, frac, hash, nextProtocol, nextProtocolApprovals, nextProtocolSwitchOn, nextProtocolVoteBefore, period, previousBlockHash, proposer, rate, round, seed, timestamp, txnRoot, txns, upgradeApprove, upgradePropose);
+    return ObjectUtils.hashCodeMulti(balRoot, currentProtocol, frac, hash, nextProtocol, nextProtocolApprovals, nextProtocolSwitchOn, nextProtocolVoteBefore, period, previousBlockHash, proposer, rate, reward, round, seed, timestamp, txnRoot, txns, upgradeApprove, upgradePropose);
   }
 
 
@@ -489,7 +489,6 @@ public class Block {
     
     sb.append("    balRoot: ").append(toIndentedString(balRoot)).append("\n");
     sb.append("    currentProtocol: ").append(toIndentedString(currentProtocol)).append("\n");
-    sb.append("    earn: ").append(toIndentedString(earn)).append("\n");
     sb.append("    frac: ").append(toIndentedString(frac)).append("\n");
     sb.append("    hash: ").append(toIndentedString(hash)).append("\n");
     sb.append("    nextProtocol: ").append(toIndentedString(nextProtocol)).append("\n");
@@ -500,6 +499,7 @@ public class Block {
     sb.append("    previousBlockHash: ").append(toIndentedString(previousBlockHash)).append("\n");
     sb.append("    proposer: ").append(toIndentedString(proposer)).append("\n");
     sb.append("    rate: ").append(toIndentedString(rate)).append("\n");
+    sb.append("    reward: ").append(toIndentedString(reward)).append("\n");
     sb.append("    round: ").append(toIndentedString(round)).append("\n");
     sb.append("    seed: ").append(toIndentedString(seed)).append("\n");
     sb.append("    timestamp: ").append(toIndentedString(timestamp)).append("\n");

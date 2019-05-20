@@ -39,10 +39,10 @@ public class PaymentTransactionType {
   }
 
    /**
-   * Amount is the amount of Algos intended to be transferred
+   * Amount is the amount of MicroAlgos intended to be transferred
    * @return amount
   **/
-  @ApiModelProperty(required = true, value = "Amount is the amount of Algos intended to be transferred")
+  @ApiModelProperty(required = true, value = "Amount is the amount of MicroAlgos intended to be transferred")
   public java.math.BigInteger getAmount() {
     return amount;
   }

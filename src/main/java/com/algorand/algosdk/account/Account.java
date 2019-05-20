@@ -3,9 +3,9 @@ package com.algorand.algosdk.account;
 
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.crypto.Signature;
+import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -228,7 +228,7 @@ public class Account {
                         copyTx.amount, copyTx.receiver, copyTx.closeRemainderTo);
             case KeyRegistration:
                 return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.votePK, copyTx.selectionPK);
+                        copyTx.votePK, copyTx.selectionPK, copyTx.voteFirst, copyTx.voteLast, copyTx.voteKeyDilution);
             case Default:
                 throw new IllegalArgumentException("tx cannot have no type");
             default:
@@ -255,17 +255,149 @@ public class Account {
      * @param bytes the data to sign
      * @return a signature
      */
-    public Signature signBytes(byte[] bytes)  throws NoSuchAlgorithmException {
+    public Signature signBytes(byte[] bytes) throws NoSuchAlgorithmException {
         try {
             CryptoProvider.setupIfNeeded();
             java.security.Signature signer = java.security.Signature.getInstance(SIGN_ALGO);
             signer.initSign(this.privateKeyPair.getPrivate());
             signer.update(bytes);
             byte[] sigRaw = signer.sign();
-            Signature sig = new Signature(sigRaw);
-            return sig;
+            return new Signature(sigRaw);
         } catch (InvalidKeyException|SignatureException e) {
             throw new RuntimeException("unexpected behavior", e);
+        }
+    }
+
+    /* Multisignature support */
+
+    /**
+     * signMultisigTransaction creates a multisig transaction from the input and the multisig identity.
+     * @param from sign as this multisignature identity
+     * @param tx the transaction to sign
+     * @return SignedTransaction a partially signed multisig transaction
+     * @throws NoSuchAlgorithmException if could not sign tx
+     */
+    public SignedTransaction signMultisigTransaction(MultisigAddress from, Transaction tx) throws NoSuchAlgorithmException {
+        // check that from addr of tx matches multisig preimage
+        if (!tx.sender.toString().equals(from.toString())) {
+            throw new IllegalArgumentException("Transaction sender does not match multisig identity");
+        }
+        // check that account secret key is in multisig pk list
+        Ed25519PublicKey myPK = this.getEd25519PublicKey();
+        int myI = from.publicKeys.indexOf(myPK);
+        if (myI == -1) {
+            throw new IllegalArgumentException("Multisig identity does not contain this secret key");
+        }
+        // now, create the multisignature
+        SignedTransaction txSig = this.signTransaction(tx);
+        MultisigSignature mSig = new MultisigSignature(from.version, from.threshold);
+        for (int i = 0; i < from.publicKeys.size(); i++) {
+            if (i == myI) {
+                mSig.subsigs.add(new MultisigSubsig(myPK, txSig.sig));
+            } else {
+                mSig.subsigs.add(new MultisigSubsig(from.publicKeys.get(i)));
+            }
+        }
+        return new SignedTransaction(tx, mSig, txSig.transactionID);
+    }
+
+    /**
+     * mergeMultisigTransactions merges the given (partially) signed multisig transactions.
+     * @param txs partially signed multisig transactions to merge. Underlying transactions may be mutated.
+     * @return a merged multisig transaction
+     */
+    public static SignedTransaction mergeMultisigTransactions(SignedTransaction... txs) {
+        if (txs.length < 2) {
+            throw new IllegalArgumentException("cannot merge a single transaction");
+        }
+        SignedTransaction merged = txs[0];
+        for (int i = 0; i < txs.length; i++) {
+            // check that multisig parameters match
+            SignedTransaction tx = txs[i];
+            if (tx.mSig.version != merged.mSig.version ||
+                    tx.mSig.threshold != merged.mSig.threshold) {
+                throw new IllegalArgumentException("transaction msig parameters do not match");
+            }
+            for (int j = 0; j < tx.mSig.subsigs.size(); j++) {
+                MultisigSubsig myMsig = merged.mSig.subsigs.get(j);
+                MultisigSubsig theirMsig = tx.mSig.subsigs.get(j);
+                if (!theirMsig.key.equals(myMsig.key)) {
+                    throw new IllegalArgumentException("transaction msig public keys do not match");
+                }
+                if (myMsig.sig.equals(new Signature())) {
+                    myMsig.sig = theirMsig.sig;
+                } else if (!myMsig.sig.equals(theirMsig.sig) &&
+                        !theirMsig.sig.equals(new Signature())) {
+                    throw new IllegalArgumentException("transaction msig has mismatched signatures");
+                }
+                merged.mSig.subsigs.set(j, myMsig);
+            }
+        }
+        return merged;
+    }
+
+    /**
+     * appendMultisigTransaction appends our signature to the given multisig transaction.
+     * @param from the multisig public identity we are signing for
+     * @param signedTx the partially signed msig tx to which to append signature
+     * @return a merged multisig transaction
+     * @throws NoSuchAlgorithmException unknown signature algorithm
+     */
+    public SignedTransaction appendMultisigTransaction(MultisigAddress from, SignedTransaction signedTx) throws NoSuchAlgorithmException {
+        SignedTransaction sTx = this.signMultisigTransaction(from, signedTx.tx);
+        return this.mergeMultisigTransactions(sTx, signedTx);
+    }
+
+
+    /**
+     * mergeMultisigTransactionBytes is a convenience method for working directly with raw transaction files.
+     * @param txsBytes list of multisig transactions to merge
+     * @return an encoded, merged multisignature transaction
+     * @throws NoSuchAlgorithmException if could not compute signature
+     */
+    public static byte[] mergeMultisigTransactionBytes(byte[]... txsBytes) throws NoSuchAlgorithmException, IOException {
+        try {
+            SignedTransaction[] sTxs = new SignedTransaction[txsBytes.length];
+            for (int i = 0; i < txsBytes.length; i++) {
+                sTxs[i] = Encoder.decodeFromMsgPack(txsBytes[i], SignedTransaction.class);
+            }
+            SignedTransaction merged = Account.mergeMultisigTransactions(sTxs);
+            return Encoder.encodeToMsgPack(merged);
+        } catch (IOException e) {
+            throw new IOException("could not decode transactions", e);
+        }
+    }
+
+    /**
+     * appendMultisigTransactionBytes is a convenience method for directly appending our signature to a raw tx file.
+     * @param from the public identity we are signing as.
+     * @param txBytes the multisig transaction to append signature to
+     * @return merged multisignature transaction inclukding our signature
+     * @throws NoSuchAlgorithmException on failure to compute signature
+     */
+    public byte[] appendMultisigTransactionBytes(MultisigAddress from, byte[] txBytes) throws NoSuchAlgorithmException, IOException {
+        try {
+            SignedTransaction inTx = Encoder.decodeFromMsgPack(txBytes, SignedTransaction.class);
+            SignedTransaction appended = this.appendMultisigTransaction(from, inTx);
+            return Encoder.encodeToMsgPack(appended);
+        } catch (IOException e) {
+            throw new IOException("could not decode transactions", e);
+        }
+    }
+
+    /**
+     * signMultisigTransactionBytes is a convenience method for signing a multistransaction into bytes
+     * @param from the public identity we are signing as.
+     * @param tx the multisig transaction to append signature to
+     * @return merged multisignature transaction inclukding our signature
+     * @throws NoSuchAlgorithmException on failure to compute signature
+     */
+    public byte[] signMultisigTransactionBytes(MultisigAddress from, Transaction tx) throws NoSuchAlgorithmException, IOException {
+        try {
+            SignedTransaction signed = this.signMultisigTransaction(from, tx);
+            return Encoder.encodeToMsgPack(signed);
+        } catch (IOException e) {
+            throw new IOException("could not encode transactions", e);
         }
     }
 

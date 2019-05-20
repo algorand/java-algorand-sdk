@@ -30,8 +30,11 @@ public class Account {
   @SerializedName("amount")
   private java.math.BigInteger amount = null;
 
-  @SerializedName("earnings")
-  private java.math.BigInteger earnings = null;
+  @SerializedName("rewards")
+  private java.math.BigInteger rewards = null;
+
+  @SerializedName("round")
+  private java.math.BigInteger round = null;
 
   @SerializedName("status")
   private String status = null;
@@ -60,10 +63,10 @@ public class Account {
   }
 
    /**
-   * Amount indicates the total number of Algos in the account
+   * Amount indicates the total number of MicroAlgos in the account
    * @return amount
   **/
-  @ApiModelProperty(required = true, value = "Amount indicates the total number of Algos in the account")
+  @ApiModelProperty(required = true, value = "Amount indicates the total number of MicroAlgos in the account")
   public java.math.BigInteger getAmount() {
     return amount;
   }
@@ -72,22 +75,40 @@ public class Account {
     this.amount = amount;
   }
 
-  public Account earnings(java.math.BigInteger earnings) {
-    this.earnings = earnings;
+  public Account rewards(java.math.BigInteger rewards) {
+    this.rewards = rewards;
     return this;
   }
 
    /**
-   * Earnings indicates the total earnings of Algos the account has recieved
-   * @return earnings
+   * Rewards indicates the total rewards of MicroAlgos the account has recieved
+   * @return rewards
   **/
-  @ApiModelProperty(required = true, value = "Earnings indicates the total earnings of Algos the account has recieved")
-  public java.math.BigInteger getEarnings() {
-    return earnings;
+  @ApiModelProperty(required = true, value = "Rewards indicates the total rewards of MicroAlgos the account has recieved")
+  public java.math.BigInteger getRewards() {
+    return rewards;
   }
 
-  public void setEarnings(java.math.BigInteger earnings) {
-    this.earnings = earnings;
+  public void setRewards(java.math.BigInteger rewards) {
+    this.rewards = rewards;
+  }
+
+  public Account round(java.math.BigInteger round) {
+    this.round = round;
+    return this;
+  }
+
+   /**
+   * Round indicates the round for which this information is relevant
+   * @return round
+  **/
+  @ApiModelProperty(required = true, value = "Round indicates the round for which this information is relevant")
+  public java.math.BigInteger getRound() {
+    return round;
+  }
+
+  public void setRound(java.math.BigInteger round) {
+    this.round = round;
   }
 
   public Account status(String status) {
@@ -96,10 +117,10 @@ public class Account {
   }
 
    /**
-   * Status indicates the delegation status of the account&#39;s Algos Offline - indicates that the associated account is delegated. Online  - indicates that the associated account used as part of the delegation pool. NotParticipating - indicates that the associated account is neither a delegator nor a delegate.
+   * Status indicates the delegation status of the account&#39;s MicroAlgos Offline - indicates that the associated account is delegated. Online  - indicates that the associated account used as part of the delegation pool. NotParticipating - indicates that the associated account is neither a delegator nor a delegate.
    * @return status
   **/
-  @ApiModelProperty(required = true, value = "Status indicates the delegation status of the account's Algos Offline - indicates that the associated account is delegated. Online  - indicates that the associated account used as part of the delegation pool. NotParticipating - indicates that the associated account is neither a delegator nor a delegate.")
+  @ApiModelProperty(required = true, value = "Status indicates the delegation status of the account's MicroAlgos Offline - indicates that the associated account is delegated. Online  - indicates that the associated account used as part of the delegation pool. NotParticipating - indicates that the associated account is neither a delegator nor a delegate.")
   public String getStatus() {
     return status;
   }
@@ -120,13 +141,14 @@ public class Account {
     Account account = (Account) o;
     return ObjectUtils.equals(this.address, account.address) &&
     ObjectUtils.equals(this.amount, account.amount) &&
-    ObjectUtils.equals(this.earnings, account.earnings) &&
+    ObjectUtils.equals(this.rewards, account.rewards) &&
+    ObjectUtils.equals(this.round, account.round) &&
     ObjectUtils.equals(this.status, account.status);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(address, amount, earnings, status);
+    return ObjectUtils.hashCodeMulti(address, amount, rewards, round, status);
   }
 
 
@@ -137,7 +159,8 @@ public class Account {
     
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
-    sb.append("    earnings: ").append(toIndentedString(earnings)).append("\n");
+    sb.append("    rewards: ").append(toIndentedString(rewards)).append("\n");
+    sb.append("    round: ").append(toIndentedString(round)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("}");
     return sb.toString();

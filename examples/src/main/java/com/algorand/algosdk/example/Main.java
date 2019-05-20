@@ -27,7 +27,7 @@ public class Main {
 
     public static void main(String args[]) throws Exception {
         final String ALGOD_API_ADDR = "http://localhost:8080";
-        final String ALGOD_API_TOKEN = "d6f33a522f465ff12f0d263f2c3b707ac2f560bacad4d859914ada7e827902b3";
+        final String ALGOD_API_TOKEN = "a45707ed0756631574a4babf10663d75a6e39a494adac6e6441e49c5e45ebf52";
         final String SRC_ACCOUNT = "viable grain female caution grant mind cry mention pudding oppose orchard people forget similar social gossip marble fish guitar art morning ring west above concert";
         final String DEST_ADDR = "KV2XGKMXGYJ6PWYQA5374BYIQBL3ONRMSIARPCFCJEAMAHQEVYPB7PL3KU";
 

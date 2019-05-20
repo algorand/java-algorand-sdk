@@ -11,7 +11,7 @@ import java.util.Objects;
  * a serializable Ed25519PublicKey
  */
 public class Ed25519PublicKey implements Serializable {
-    private static final int KEY_LEN_BYTES  = 32;
+    public static final int KEY_LEN_BYTES  = 32;
     /**
      * The raw bytes.
      */
@@ -27,7 +27,7 @@ public class Ed25519PublicKey implements Serializable {
             return;
         }
         if (bytes.length != KEY_LEN_BYTES) {
-            throw new IllegalArgumentException("vrf key wrong length");
+            throw new IllegalArgumentException("ed25519 public key wrong length");
         }
         System.arraycopy(bytes, 0, this.bytes, 0, KEY_LEN_BYTES);
     }

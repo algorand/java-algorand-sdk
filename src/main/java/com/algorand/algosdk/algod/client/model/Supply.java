@@ -19,9 +19,9 @@ import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
- * Supply represents the current supply of Algos in the system
+ * Supply represents the current supply of MicroAlgos in the system
  */
-@ApiModel(description = "Supply represents the current supply of Algos in the system")
+@ApiModel(description = "Supply represents the current supply of MicroAlgos in the system")
 
 public class Supply {
   @SerializedName("onlineMoney")
