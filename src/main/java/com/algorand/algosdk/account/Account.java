@@ -13,6 +13,7 @@ import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 
+import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -40,6 +41,7 @@ public class Account {
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
+    private static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
 
     /**
      * Account creates a new, random account.
@@ -222,6 +224,9 @@ public class Account {
      */
     static public Transaction transactionWithSuggestedFeePerByte(Transaction copyTx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
         BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(copyTx));
+        if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
+            newFee = MIN_TX_FEE_UALGOS;
+        }
         switch (copyTx.type) {
             case Payment:
                 return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
