@@ -33,6 +33,9 @@ public class Transaction {
   @SerializedName("from")
   private String from = null;
 
+  @SerializedName("fromrewards")
+  private java.math.BigInteger fromrewards = null;
+
   @SerializedName("genesisID")
   private String genesisID = null;
 
@@ -112,6 +115,24 @@ public class Transaction {
 
   public void setFrom(String from) {
     this.from = from;
+  }
+
+  public Transaction fromrewards(java.math.BigInteger fromrewards) {
+    this.fromrewards = fromrewards;
+    return this;
+  }
+
+   /**
+   * FromRewards is the amount of pending rewards applied to the From account as part of this transaction.
+   * @return fromrewards
+  **/
+  @ApiModelProperty(value = "FromRewards is the amount of pending rewards applied to the From account as part of this transaction.")
+  public java.math.BigInteger getFromrewards() {
+    return fromrewards;
+  }
+
+  public void setFromrewards(java.math.BigInteger fromrewards) {
+    this.fromrewards = fromrewards;
   }
 
   public Transaction genesisID(String genesisID) {
@@ -289,6 +310,7 @@ public class Transaction {
     return ObjectUtils.equals(this.fee, transaction.fee) &&
     ObjectUtils.equals(this.firstRound, transaction.firstRound) &&
     ObjectUtils.equals(this.from, transaction.from) &&
+    ObjectUtils.equals(this.fromrewards, transaction.fromrewards) &&
     ObjectUtils.equals(this.genesisID, transaction.genesisID) &&
     ObjectUtils.equals(this.genesishashb64, transaction.genesishashb64) &&
     ObjectUtils.equals(this.lastRound, transaction.lastRound) &&
@@ -302,7 +324,7 @@ public class Transaction {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(fee, firstRound, from, genesisID, genesishashb64, lastRound, noteb64, payment, poolerror, round, tx, type);
+    return ObjectUtils.hashCodeMulti(fee, firstRound, from, fromrewards, genesisID, genesishashb64, lastRound, noteb64, payment, poolerror, round, tx, type);
   }
 
 
@@ -314,6 +336,7 @@ public class Transaction {
     sb.append("    fee: ").append(toIndentedString(fee)).append("\n");
     sb.append("    firstRound: ").append(toIndentedString(firstRound)).append("\n");
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
+    sb.append("    fromrewards: ").append(toIndentedString(fromrewards)).append("\n");
     sb.append("    genesisID: ").append(toIndentedString(genesisID)).append("\n");
     sb.append("    genesishashb64: ").append(toIndentedString(genesishashb64)).append("\n");
     sb.append("    lastRound: ").append(toIndentedString(lastRound)).append("\n");

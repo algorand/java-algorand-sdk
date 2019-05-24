@@ -30,8 +30,17 @@ public class PaymentTransactionType {
   @SerializedName("close")
   private String close = null;
 
+  @SerializedName("closeamount")
+  private java.math.BigInteger closeamount = null;
+
+  @SerializedName("closerewards")
+  private java.math.BigInteger closerewards = null;
+
   @SerializedName("to")
   private String to = null;
+
+  @SerializedName("torewards")
+  private java.math.BigInteger torewards = null;
 
   public PaymentTransactionType amount(java.math.BigInteger amount) {
     this.amount = amount;
@@ -69,6 +78,42 @@ public class PaymentTransactionType {
     this.close = close;
   }
 
+  public PaymentTransactionType closeamount(java.math.BigInteger closeamount) {
+    this.closeamount = closeamount;
+    return this;
+  }
+
+   /**
+   * CloseAmount is the amount sent to CloseRemainderTo, for committed transaction
+   * @return closeamount
+  **/
+  @ApiModelProperty(value = "CloseAmount is the amount sent to CloseRemainderTo, for committed transaction")
+  public java.math.BigInteger getCloseamount() {
+    return closeamount;
+  }
+
+  public void setCloseamount(java.math.BigInteger closeamount) {
+    this.closeamount = closeamount;
+  }
+
+  public PaymentTransactionType closerewards(java.math.BigInteger closerewards) {
+    this.closerewards = closerewards;
+    return this;
+  }
+
+   /**
+   * CloseRewards is the amount of pending rewards applied to the CloseRemainderTo account as part of this transaction.
+   * @return closerewards
+  **/
+  @ApiModelProperty(value = "CloseRewards is the amount of pending rewards applied to the CloseRemainderTo account as part of this transaction.")
+  public java.math.BigInteger getCloserewards() {
+    return closerewards;
+  }
+
+  public void setCloserewards(java.math.BigInteger closerewards) {
+    this.closerewards = closerewards;
+  }
+
   public PaymentTransactionType to(String to) {
     this.to = to;
     return this;
@@ -87,6 +132,24 @@ public class PaymentTransactionType {
     this.to = to;
   }
 
+  public PaymentTransactionType torewards(java.math.BigInteger torewards) {
+    this.torewards = torewards;
+    return this;
+  }
+
+   /**
+   * ToRewards is the amount of pending rewards applied to the To account as part of this transaction.
+   * @return torewards
+  **/
+  @ApiModelProperty(value = "ToRewards is the amount of pending rewards applied to the To account as part of this transaction.")
+  public java.math.BigInteger getTorewards() {
+    return torewards;
+  }
+
+  public void setTorewards(java.math.BigInteger torewards) {
+    this.torewards = torewards;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -99,12 +162,15 @@ public class PaymentTransactionType {
     PaymentTransactionType paymentTransactionType = (PaymentTransactionType) o;
     return ObjectUtils.equals(this.amount, paymentTransactionType.amount) &&
     ObjectUtils.equals(this.close, paymentTransactionType.close) &&
-    ObjectUtils.equals(this.to, paymentTransactionType.to);
+    ObjectUtils.equals(this.closeamount, paymentTransactionType.closeamount) &&
+    ObjectUtils.equals(this.closerewards, paymentTransactionType.closerewards) &&
+    ObjectUtils.equals(this.to, paymentTransactionType.to) &&
+    ObjectUtils.equals(this.torewards, paymentTransactionType.torewards);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(amount, close, to);
+    return ObjectUtils.hashCodeMulti(amount, close, closeamount, closerewards, to, torewards);
   }
 
 
@@ -115,7 +181,10 @@ public class PaymentTransactionType {
     
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("    close: ").append(toIndentedString(close)).append("\n");
+    sb.append("    closeamount: ").append(toIndentedString(closeamount)).append("\n");
+    sb.append("    closerewards: ").append(toIndentedString(closerewards)).append("\n");
     sb.append("    to: ").append(toIndentedString(to)).append("\n");
+    sb.append("    torewards: ").append(toIndentedString(torewards)).append("\n");
     sb.append("}");
     return sb.toString();
   }

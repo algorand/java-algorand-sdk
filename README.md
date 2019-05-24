@@ -191,7 +191,7 @@ in OpenAPI 2.0; however, we need to send large integers to the `algod` API (`kmd
 To resolve this, we do the following manual pass on generated code:
 
 - Move `Pair.java` into the `client.lib` package (with appropriate `BUILD.bazel` file and renaming);
-- Find-and-replace `Integer` with `BigInteger` (for uint64), `Long` (for uint32), etc. in `com.algorand.algosdk.algod` and subpackages;
+- Find-and-replace `Integer` with `BigInteger` (for uint64), `Long` (for uint32), etc. in `com.algorand.algosdk.algod` and subpackages (unnecessary for algod);
 - Run an `Optimize Imports` operation on generated code, to minimize dependencies.
 
 Note that msgpack-java is good at using the minimal representation.

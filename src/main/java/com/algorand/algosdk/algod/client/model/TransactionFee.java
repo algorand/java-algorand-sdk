@@ -33,10 +33,10 @@ public class TransactionFee {
   }
 
    /**
-   * Fee is transaction fee
+   * Fee is transaction fee Fee is in units of micro-Algos per byte. Fee may fall to zero but transactions must still have a fee of at least MinTxnFee for the current network protocol.
    * @return fee
   **/
-  @ApiModelProperty(required = true, value = "Fee is transaction fee")
+  @ApiModelProperty(required = true, value = "Fee is transaction fee Fee is in units of micro-Algos per byte. Fee may fall to zero but transactions must still have a fee of at least MinTxnFee for the current network protocol.")
   public java.math.BigInteger getFee() {
     return fee;
   }
