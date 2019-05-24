@@ -24,9 +24,6 @@ import org.apache.commons.lang3.ObjectUtils;
 @ApiModel(description = "Block contains a block information")
 
 public class Block {
-  @SerializedName("balRoot")
-  private String balRoot = null;
-
   @SerializedName("currentProtocol")
   private String currentProtocol = null;
 
@@ -83,24 +80,6 @@ public class Block {
 
   @SerializedName("upgradePropose")
   private String upgradePropose = null;
-
-  public Block balRoot(String balRoot) {
-    this.balRoot = balRoot;
-    return this;
-  }
-
-   /**
-   * BalanceRoot is the root of the merkle tree after committing this block
-   * @return balRoot
-  **/
-  @ApiModelProperty(required = true, value = "BalanceRoot is the root of the merkle tree after committing this block")
-  public String getBalRoot() {
-    return balRoot;
-  }
-
-  public void setBalRoot(String balRoot) {
-    this.balRoot = balRoot;
-  }
 
   public Block currentProtocol(String currentProtocol) {
     this.currentProtocol = currentProtocol;
@@ -454,8 +433,7 @@ public class Block {
     return false;
   }
     Block block = (Block) o;
-    return ObjectUtils.equals(this.balRoot, block.balRoot) &&
-    ObjectUtils.equals(this.currentProtocol, block.currentProtocol) &&
+    return ObjectUtils.equals(this.currentProtocol, block.currentProtocol) &&
     ObjectUtils.equals(this.frac, block.frac) &&
     ObjectUtils.equals(this.hash, block.hash) &&
     ObjectUtils.equals(this.nextProtocol, block.nextProtocol) &&
@@ -478,7 +456,7 @@ public class Block {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(balRoot, currentProtocol, frac, hash, nextProtocol, nextProtocolApprovals, nextProtocolSwitchOn, nextProtocolVoteBefore, period, previousBlockHash, proposer, rate, reward, round, seed, timestamp, txnRoot, txns, upgradeApprove, upgradePropose);
+    return ObjectUtils.hashCodeMulti(currentProtocol, frac, hash, nextProtocol, nextProtocolApprovals, nextProtocolSwitchOn, nextProtocolVoteBefore, period, previousBlockHash, proposer, rate, reward, round, seed, timestamp, txnRoot, txns, upgradeApprove, upgradePropose);
   }
 
 
@@ -487,7 +465,6 @@ public class Block {
     StringBuilder sb = new StringBuilder();
     sb.append("class Block {\n");
     
-    sb.append("    balRoot: ").append(toIndentedString(balRoot)).append("\n");
     sb.append("    currentProtocol: ").append(toIndentedString(currentProtocol)).append("\n");
     sb.append("    frac: ").append(toIndentedString(frac)).append("\n");
     sb.append("    hash: ").append(toIndentedString(hash)).append("\n");

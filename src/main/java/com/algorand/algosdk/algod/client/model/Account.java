@@ -30,6 +30,12 @@ public class Account {
   @SerializedName("amount")
   private java.math.BigInteger amount = null;
 
+  @SerializedName("amountwithoutpendingrewards")
+  private java.math.BigInteger amountwithoutpendingrewards = null;
+
+  @SerializedName("pendingrewards")
+  private java.math.BigInteger pendingrewards = null;
+
   @SerializedName("rewards")
   private java.math.BigInteger rewards = null;
 
@@ -73,6 +79,42 @@ public class Account {
 
   public void setAmount(java.math.BigInteger amount) {
     this.amount = amount;
+  }
+
+  public Account amountwithoutpendingrewards(java.math.BigInteger amountwithoutpendingrewards) {
+    this.amountwithoutpendingrewards = amountwithoutpendingrewards;
+    return this;
+  }
+
+   /**
+   * AmountWithoutPendingRewards specifies the amount of MicroAlgos in the account, without the pending rewards.
+   * @return amountwithoutpendingrewards
+  **/
+  @ApiModelProperty(required = true, value = "AmountWithoutPendingRewards specifies the amount of MicroAlgos in the account, without the pending rewards.")
+  public java.math.BigInteger getAmountwithoutpendingrewards() {
+    return amountwithoutpendingrewards;
+  }
+
+  public void setAmountwithoutpendingrewards(java.math.BigInteger amountwithoutpendingrewards) {
+    this.amountwithoutpendingrewards = amountwithoutpendingrewards;
+  }
+
+  public Account pendingrewards(java.math.BigInteger pendingrewards) {
+    this.pendingrewards = pendingrewards;
+    return this;
+  }
+
+   /**
+   * PendingRewards specifies the amount of MicroAlgos of pending rewards in this account.
+   * @return pendingrewards
+  **/
+  @ApiModelProperty(required = true, value = "PendingRewards specifies the amount of MicroAlgos of pending rewards in this account.")
+  public java.math.BigInteger getPendingrewards() {
+    return pendingrewards;
+  }
+
+  public void setPendingrewards(java.math.BigInteger pendingrewards) {
+    this.pendingrewards = pendingrewards;
   }
 
   public Account rewards(java.math.BigInteger rewards) {
@@ -141,6 +183,8 @@ public class Account {
     Account account = (Account) o;
     return ObjectUtils.equals(this.address, account.address) &&
     ObjectUtils.equals(this.amount, account.amount) &&
+    ObjectUtils.equals(this.amountwithoutpendingrewards, account.amountwithoutpendingrewards) &&
+    ObjectUtils.equals(this.pendingrewards, account.pendingrewards) &&
     ObjectUtils.equals(this.rewards, account.rewards) &&
     ObjectUtils.equals(this.round, account.round) &&
     ObjectUtils.equals(this.status, account.status);
@@ -148,7 +192,7 @@ public class Account {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(address, amount, rewards, round, status);
+    return ObjectUtils.hashCodeMulti(address, amount, amountwithoutpendingrewards, pendingrewards, rewards, round, status);
   }
 
 
@@ -159,6 +203,8 @@ public class Account {
     
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
+    sb.append("    amountwithoutpendingrewards: ").append(toIndentedString(amountwithoutpendingrewards)).append("\n");
+    sb.append("    pendingrewards: ").append(toIndentedString(pendingrewards)).append("\n");
     sb.append("    rewards: ").append(toIndentedString(rewards)).append("\n");
     sb.append("    round: ").append(toIndentedString(round)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
