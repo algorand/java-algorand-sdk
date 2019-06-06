@@ -18,23 +18,9 @@ Maven:
 <dependency>
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.3</version>
 </dependency>
 ```
-To fetch it straight from the algorand repository, on github, also add in your `pom.xml`:
-```xml
-<repositories>
-    <repository>
-        <id>algosdk-mvn-repo</id>
-        <url>https://raw.github.com/algorand/java-algorand-sdk/mvn-repo/</url>
-        <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
-    </repository>
-</repositories>
-```
-
 
 # Quickstart
 

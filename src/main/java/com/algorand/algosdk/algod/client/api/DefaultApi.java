@@ -859,6 +859,115 @@ public class DefaultApi {
         return call;
     }
     /**
+     * Build call for metrics
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call metricsCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/metrics";
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "text/plain"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call metricsValidateBeforeCall(final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+
+        com.squareup.okhttp.Call call = metricsCall(progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Return metrics about algod functioning.
+     * 
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public void metrics() throws ApiException {
+        metricsWithHttpInfo();
+    }
+
+    /**
+     * Return metrics about algod functioning.
+     * 
+     * @return ApiResponse&lt;Void&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<Void> metricsWithHttpInfo() throws ApiException {
+        com.squareup.okhttp.Call call = metricsValidateBeforeCall(null, null);
+        return apiClient.execute(call);
+    }
+
+    /**
+     * Return metrics about algod functioning. (asynchronously)
+     * 
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call metricsAsync(final ApiCallback<Void> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = metricsValidateBeforeCall(progressListener, progressRequestListener);
+        apiClient.executeAsync(call, callback);
+        return call;
+    }
+    /**
      * Build call for pendingTransactionInformation
      * @param txid A transaction id (required)
      * @param progressListener Progress listener
@@ -1330,6 +1439,129 @@ public class DefaultApi {
         return call;
     }
     /**
+     * Build call for transaction
+     * @param txid A transaction id (required)
+     * @param progressListener Progress listener
+     * @param progressRequestListener Progress request listener
+     * @return Call to execute
+     * @throws ApiException If fail to serialize the request body object
+     */
+    public com.squareup.okhttp.Call transactionCall(String txid, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        Object localVarPostBody = null;
+
+        // create path and map variables
+        String localVarPath = "/v1/transaction/{txid}"
+            .replaceAll("\\{" + "txid" + "\\}", apiClient.escapeString(txid.toString()));
+
+        List<Pair> localVarQueryParams = new ArrayList<Pair>();
+        List<Pair> localVarCollectionQueryParams = new ArrayList<Pair>();
+
+        Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+
+        Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+        final String[] localVarAccepts = {
+            "application/json"
+        };
+        final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+        if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
+
+        final String[] localVarContentTypes = {
+            "application/json"
+        };
+        final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+        localVarHeaderParams.put("Content-Type", localVarContentType);
+
+        if(progressListener != null) {
+            apiClient.getHttpClient().networkInterceptors().add(new com.squareup.okhttp.Interceptor() {
+                @Override
+                public com.squareup.okhttp.Response intercept(com.squareup.okhttp.Interceptor.Chain chain) throws IOException {
+                    com.squareup.okhttp.Response originalResponse = chain.proceed(chain.request());
+                    return originalResponse.newBuilder()
+                    .body(new ProgressResponseBody(originalResponse.body(), progressListener))
+                    .build();
+                }
+            });
+        }
+
+        String[] localVarAuthNames = new String[] { "api_key" };
+        return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private com.squareup.okhttp.Call transactionValidateBeforeCall(String txid, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
+        // verify the required parameter 'txid' is set
+        if (txid == null) {
+            throw new ApiException("Missing the required parameter 'txid' when calling transaction(Async)");
+        }
+        
+
+        com.squareup.okhttp.Call call = transactionCall(txid, progressListener, progressRequestListener);
+        return call;
+
+    }
+
+    /**
+     * Get an information of a single transaction.
+     * Returns the transaction information of the given txid. Works only if the indexer is enabled.
+     * @param txid A transaction id (required)
+     * @return Transaction
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public Transaction transaction(String txid) throws ApiException {
+        ApiResponse<Transaction> resp = transactionWithHttpInfo(txid);
+        return resp.getData();
+    }
+
+    /**
+     * Get an information of a single transaction.
+     * Returns the transaction information of the given txid. Works only if the indexer is enabled.
+     * @param txid A transaction id (required)
+     * @return ApiResponse&lt;Transaction&gt;
+     * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
+     */
+    public ApiResponse<Transaction> transactionWithHttpInfo(String txid) throws ApiException {
+        com.squareup.okhttp.Call call = transactionValidateBeforeCall(txid, null, null);
+        Type localVarReturnType = new TypeToken<Transaction>(){}.getType();
+        return apiClient.execute(call, localVarReturnType);
+    }
+
+    /**
+     * Get an information of a single transaction. (asynchronously)
+     * Returns the transaction information of the given txid. Works only if the indexer is enabled.
+     * @param txid A transaction id (required)
+     * @param callback The callback to be executed when the API call finishes
+     * @return The request call
+     * @throws ApiException If fail to process the API call, e.g. serializing the request body object
+     */
+    public com.squareup.okhttp.Call transactionAsync(String txid, final ApiCallback<Transaction> callback) throws ApiException {
+
+        ProgressResponseBody.ProgressListener progressListener = null;
+        ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
+
+        if (callback != null) {
+            progressListener = new ProgressResponseBody.ProgressListener() {
+                @Override
+                public void update(long bytesRead, long contentLength, boolean done) {
+                    callback.onDownloadProgress(bytesRead, contentLength, done);
+                }
+            };
+
+            progressRequestListener = new ProgressRequestBody.ProgressRequestListener() {
+                @Override
+                public void onRequestProgress(long bytesWritten, long contentLength, boolean done) {
+                    callback.onUploadProgress(bytesWritten, contentLength, done);
+                }
+            };
+        }
+
+        com.squareup.okhttp.Call call = transactionValidateBeforeCall(txid, progressListener, progressRequestListener);
+        Type localVarReturnType = new TypeToken<Transaction>(){}.getType();
+        apiClient.executeAsync(call, localVarReturnType, callback);
+        return call;
+    }
+    /**
      * Build call for transactionInformation
      * @param address An account public key (required)
      * @param txid A transaction id (required)
@@ -1578,11 +1810,11 @@ public class DefaultApi {
     /**
      * Build call for transactions
      * @param address An account public key (required)
-     * @param firstRound Do not fetch any transactions before this round. (required)
-     * @param lastRound Do not fetch any transactions after this round. (required)
-     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (required)
-     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (required)
-     * @param max maximum transactions to show (default to 100) (required)
+     * @param firstRound Do not fetch any transactions before this round. (optional)
+     * @param lastRound Do not fetch any transactions after this round. (optional)
+     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (optional)
+     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (optional)
+     * @param max maximum transactions to show (default to 100) (optional)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
@@ -1648,31 +1880,6 @@ public class DefaultApi {
             throw new ApiException("Missing the required parameter 'address' when calling transactions(Async)");
         }
         
-        // verify the required parameter 'firstRound' is set
-        if (firstRound == null) {
-            throw new ApiException("Missing the required parameter 'firstRound' when calling transactions(Async)");
-        }
-        
-        // verify the required parameter 'lastRound' is set
-        if (lastRound == null) {
-            throw new ApiException("Missing the required parameter 'lastRound' when calling transactions(Async)");
-        }
-        
-        // verify the required parameter 'fromDate' is set
-        if (fromDate == null) {
-            throw new ApiException("Missing the required parameter 'fromDate' when calling transactions(Async)");
-        }
-        
-        // verify the required parameter 'toDate' is set
-        if (toDate == null) {
-            throw new ApiException("Missing the required parameter 'toDate' when calling transactions(Async)");
-        }
-        
-        // verify the required parameter 'max' is set
-        if (max == null) {
-            throw new ApiException("Missing the required parameter 'max' when calling transactions(Async)");
-        }
-        
 
         com.squareup.okhttp.Call call = transactionsCall(address, firstRound, lastRound, fromDate, toDate, max, progressListener, progressRequestListener);
         return call;
@@ -1683,11 +1890,11 @@ public class DefaultApi {
      * Get a list of confirmed transactions.
      * Returns the list of confirmed transactions between within a date range. This call is available only when the indexer is running.
      * @param address An account public key (required)
-     * @param firstRound Do not fetch any transactions before this round. (required)
-     * @param lastRound Do not fetch any transactions after this round. (required)
-     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (required)
-     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (required)
-     * @param max maximum transactions to show (default to 100) (required)
+     * @param firstRound Do not fetch any transactions before this round. (optional)
+     * @param lastRound Do not fetch any transactions after this round. (optional)
+     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (optional)
+     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (optional)
+     * @param max maximum transactions to show (default to 100) (optional)
      * @return TransactionList
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
@@ -1700,11 +1907,11 @@ public class DefaultApi {
      * Get a list of confirmed transactions.
      * Returns the list of confirmed transactions between within a date range. This call is available only when the indexer is running.
      * @param address An account public key (required)
-     * @param firstRound Do not fetch any transactions before this round. (required)
-     * @param lastRound Do not fetch any transactions after this round. (required)
-     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (required)
-     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (required)
-     * @param max maximum transactions to show (default to 100) (required)
+     * @param firstRound Do not fetch any transactions before this round. (optional)
+     * @param lastRound Do not fetch any transactions after this round. (optional)
+     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (optional)
+     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (optional)
+     * @param max maximum transactions to show (default to 100) (optional)
      * @return ApiResponse&lt;TransactionList&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
@@ -1718,11 +1925,11 @@ public class DefaultApi {
      * Get a list of confirmed transactions. (asynchronously)
      * Returns the list of confirmed transactions between within a date range. This call is available only when the indexer is running.
      * @param address An account public key (required)
-     * @param firstRound Do not fetch any transactions before this round. (required)
-     * @param lastRound Do not fetch any transactions after this round. (required)
-     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (required)
-     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (required)
-     * @param max maximum transactions to show (default to 100) (required)
+     * @param firstRound Do not fetch any transactions before this round. (optional)
+     * @param lastRound Do not fetch any transactions after this round. (optional)
+     * @param fromDate Do not fetch any transactions before this date. (enabled only with indexer) (optional)
+     * @param toDate Do not fetch any transactions after this date. (enabled only with indexer) (optional)
+     * @param max maximum transactions to show (default to 100) (optional)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
