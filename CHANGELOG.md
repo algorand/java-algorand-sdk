@@ -1,4 +1,4 @@
 
 # 1.1.4
-## Added
+## Fixed
 - Compatibility with 2.9 Jackson
