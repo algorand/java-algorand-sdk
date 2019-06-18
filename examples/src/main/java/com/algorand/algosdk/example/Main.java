@@ -27,7 +27,7 @@ public class Main {
 
     public static void main(String args[]) throws Exception {
         final String ALGOD_API_ADDR = "http://localhost:8080";
-        final String ALGOD_API_TOKEN = "a45707ed0756631574a4babf10663d75a6e39a494adac6e6441e49c5e45ebf52";
+        final String ALGOD_API_TOKEN = "b3ff7b3765bf33c7557a2cd334238eca07578e3ce266cb03fad93d12aab0622e";
         final String SRC_ACCOUNT = "viable grain female caution grant mind cry mention pudding oppose orchard people forget similar social gossip marble fish guitar art morning ring west above concert";
         final String DEST_ADDR = "KV2XGKMXGYJ6PWYQA5374BYIQBL3ONRMSIARPCFCJEAMAHQEVYPB7PL3KU";
 
@@ -48,6 +48,7 @@ public class Main {
         }
 
         Account src = new Account(SRC_ACCOUNT);
+        System.out.println("My Address: " + src.getAddress());
 
         BigInteger feePerByte;
         String genesisID;
@@ -67,7 +68,7 @@ public class Main {
         }
 
         // Generate a new transaction using randomly generated accounts (this is invalid, since src has no money...)
-        long amount = 100;
+        long amount = 100000;
         long lastRound = firstRound + 1000; // 1000 is the max tx window
         Transaction tx = new Transaction(src.getAddress(), new Address(DEST_ADDR), amount, firstRound, lastRound, genesisID, genesisHash);
         SignedTransaction signedTx = src.signTransactionWithFeePerByte(tx, feePerByte);

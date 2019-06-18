@@ -2,10 +2,7 @@ package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.Signature;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -14,6 +11,7 @@ import java.util.Objects;
  * A serializable convenience type for packaging transactions with their signatures.
  */
 @JsonPropertyOrder(alphabetic=true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class SignedTransaction implements Serializable {
     @JsonProperty("txn")
     public Transaction tx = new Transaction();

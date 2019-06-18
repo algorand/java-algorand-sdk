@@ -1,6 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.Digester;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -11,6 +12,7 @@ import java.util.List;
 /**
  * MultisigAddress is a convenience class for handling multisignature public identities.
  */
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MultisigAddress implements Serializable {
     public final int version;
     public final int threshold;

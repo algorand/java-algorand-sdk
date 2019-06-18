@@ -1,6 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.Objects;
 /**
  * A raw serializable signature class.
  */
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Signature implements Serializable {
     private static final int ED25519_SIG_SIZE = 64;
     private final byte[] bytes = new byte[ED25519_SIG_SIZE];

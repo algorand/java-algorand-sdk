@@ -5,10 +5,7 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.node.BigIntegerNode;
 
 import java.io.Serializable;
@@ -21,6 +18,7 @@ import java.util.Objects;
  * This is distinct from algod.model.Transaction, which is only returned for GET requests to algod.
  */
 @JsonPropertyOrder(alphabetic=true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Transaction implements Serializable {
     @JsonProperty("type")
     public Type type = Type.Default;

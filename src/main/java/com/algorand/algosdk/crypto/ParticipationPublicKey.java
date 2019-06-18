@@ -1,6 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.io.Serializable;
@@ -10,6 +11,7 @@ import java.util.Objects;
 /**
  * A serializable class representing a participation key.
  */
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ParticipationPublicKey implements Serializable {
     private static final int KEY_LEN_BYTES  = 32;
     private final byte[] bytes = new byte[KEY_LEN_BYTES];

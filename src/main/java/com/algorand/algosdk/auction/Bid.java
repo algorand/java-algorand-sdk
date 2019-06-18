@@ -3,6 +3,7 @@ package com.algorand.algosdk.auction;
 import com.algorand.algosdk.crypto.Address;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -13,6 +14,7 @@ import java.util.Objects;
  * A raw serializable Bid class.
  */
 @JsonPropertyOrder(alphabetic=true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Bid {
     @JsonProperty("bidder")
     public Address bidderKey = new Address(); // cannot be null

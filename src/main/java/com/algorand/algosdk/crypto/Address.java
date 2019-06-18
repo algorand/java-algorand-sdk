@@ -4,6 +4,7 @@ package com.algorand.algosdk.crypto;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
 import org.apache.commons.codec.binary.Base32;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
 /**
  * Address represents a serializable 32-byte length Algorand address.
  */
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Address implements Serializable {
     /**
      * The length of an address. Equal to the size of a SHA256 checksum.

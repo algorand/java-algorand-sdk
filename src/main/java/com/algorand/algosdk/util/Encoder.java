@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
@@ -70,6 +71,16 @@ public class Encoder {
      */
     public static String encodeToHexStr(byte[] bytes) {
         return Hex.encodeHexString(bytes);
+    }
+
+    /**
+     * Convenience method for decoding bytes from hex.
+     * @param hexStr hex string to decode
+     * @return byte array
+     * @throws DecoderException
+     */
+    public static byte[] decodeFromHexStr(String hexStr) throws DecoderException {
+        return Hex.decodeHex(hexStr);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -14,6 +15,7 @@ import java.util.Objects;
  * Serializable raw multisig class.
  */
 @JsonPropertyOrder(alphabetic=true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MultisigSignature implements Serializable {
     @JsonProperty("v")
     public int version;
