@@ -8,6 +8,6 @@ install:
   - chmod +x ~/sdkupdate.sh
 
 script:
-  - mvn test -B
+  - mvn test -q
   - ~/sdkupdate.sh --java
 
