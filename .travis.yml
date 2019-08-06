@@ -1,6 +1,7 @@
 language: java
 
 before_install:
+  - pyenv versions
   - pyenv global 3.7
 
 install:
