@@ -7,4 +7,3 @@ install:
 script:
   - mvn test -q
   - ~/sdkupdate.sh --java
-
