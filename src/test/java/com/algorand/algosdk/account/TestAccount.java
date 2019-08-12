@@ -219,4 +219,16 @@ public class TestAccount {
         b[0] = (byte) firstByte;
         Assert.assertFalse(account.getAddress().verifyBytes(b, signature));
     }
+
+    @Test
+    public void testVerifyBytes() throws Exception {
+        byte[] message = Encoder.decodeFromBase64("rTs7+dUj");
+        Signature signature = new Signature(Encoder.decodeFromBase64("COEBmoD+ysVECoyVOAsvMAjFxvKeQVkYld+RSHMnEiHsypqrfj2EdYqhrm4t7dK3ZOeSQh3aXiZK/zqQDTPBBw=="));
+        Address address = new Address("DPLD3RTSWC5STVBPZL5DIIVE2OC4BSAWTOYBLFN2X6EFLT2ZNF4SMX64UA");
+        Assert.assertTrue(address.verifyBytes(message, signature));
+        int firstByte = (int) message[0];
+        firstByte = (firstByte+1) % 256;
+        message[0] = (byte) firstByte;
+        Assert.assertFalse(address.verifyBytes(message, signature));
+    }
 }
