@@ -75,7 +75,7 @@ public class Account {
             pkS = new X509EncodedKeySpec(publicKeyInfo.getEncoded());
             PrivateKeyInfo privateKeyInfo = new PrivateKeyInfo(new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(secretKey));
             skS = new PKCS8EncodedKeySpec(privateKeyInfo.getEncoded());
-        }catch (IOException e) {
+        } catch (IOException e) {
             throw new RuntimeException("could not parse raw key bytes", e);
         }
 
