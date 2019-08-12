@@ -13,7 +13,6 @@ import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 
-import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -22,10 +21,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.
@@ -48,35 +44,6 @@ public class Account {
      */
     public Account() throws NoSuchAlgorithmException {
         this((SecureRandom)null);
-    }
-
-    /**
-     * Create a new account from an existing PKCS8 encoded keypair and Algorand address.
-     * @param secretKey existing private key. Must be 32 bytes. Corresponds to seed.
-     * @param publicKey existing public key. Must be 32 bytes.
-     * @throws NoSuchAlgorithmException if cryptographic provider not configured
-     */
-    public Account(byte[] secretKey, byte[] publicKey) throws NoSuchAlgorithmException {
-        Objects.requireNonNull(secretKey, "secret key must not be null");
-        Objects.requireNonNull(publicKey, "public key must not be null");
-        if (publicKey.length != PK_SIZE || secretKey.length != SK_SIZE) {
-            throw new IllegalArgumentException("Input keys are the wrong size");
-        }
-        PKCS8EncodedKeySpec pkS = new PKCS8EncodedKeySpec(publicKey);
-        PKCS8EncodedKeySpec skS = new PKCS8EncodedKeySpec(secretKey);
-        // JCA keypair
-        try {
-            CryptoProvider.setupIfNeeded();
-            KeyFactory kf = KeyFactory.getInstance(KEY_ALGO);
-            PublicKey pk = kf.generatePublic(pkS);
-            PrivateKey sk = kf.generatePrivate(skS);
-            this.privateKeyPair = new KeyPair(pk, sk);
-        } catch (InvalidKeySpecException e) {
-            throw new RuntimeException("unexpected behavior", e);
-        }
-        // now, convert public key to an address
-        byte[] raw = this.getClearTextPublicKey();
-        this.address = new Address(Arrays.copyOf(raw, raw.length));
     }
 
     public Account(byte[] seed) throws NoSuchAlgorithmException {
