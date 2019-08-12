@@ -8,6 +8,7 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.crypto.Signature;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -211,7 +212,7 @@ public class TestAccount {
         byte[] b = new byte[15];
         new Random().nextBytes(b);
         Account account = new Account();
-        byte[] signature = account.signBytes(b);
+        Signature signature = account.signBytes(b);
         Assert.assertTrue(account.getAddress().verifyBytes(b, signature));
         int firstByte = (int) b[0];
         firstByte = (firstByte+1) % 256;

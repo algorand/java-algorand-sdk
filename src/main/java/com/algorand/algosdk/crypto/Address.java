@@ -129,16 +129,16 @@ public class Address implements Serializable {
     }
 
     /**
-     * verifyBytes verifies that the signature for the message is valid for the public key
+     * verifyBytes verifies that the signature for the message is valid for the public key. The message should have been prepended with "MX" when signing.
      * @param message the message that was signed
      * @param signature
      * @return boolean; true if the signature is valid
      */
-    public boolean verifyBytes(byte[] message, byte[] signature) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+    public boolean verifyBytes(byte[] message, Signature signature) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
         CryptoProvider.setupIfNeeded();
         X509EncodedKeySpec pkS;
         try {
-            // Wrap both keys in ASN.1 format.
+            // Wrap the public key in ASN.1 format.
             SubjectPublicKeyInfo publicKeyInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), this.bytes);
             pkS = new X509EncodedKeySpec(publicKeyInfo.getEncoded());
         } catch (IOException e) {
@@ -157,7 +157,7 @@ public class Address implements Serializable {
         java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGO);
         sig.initVerify(pk);
         sig.update(prefixBytes);
-        return sig.verify(signature);
+        return sig.verify(signature.getBytes());
     }
 
     @Override

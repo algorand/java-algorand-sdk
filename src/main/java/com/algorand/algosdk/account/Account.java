@@ -275,26 +275,17 @@ public class Account {
     }
 
     /**
-     * Sign the given bytes, and wrap in Signature.
+     * Sign the given bytes, and wrap in signature. The message is prepended with "MX" for domain separation.
      * @param bytes the data to sign
      * @return a signature
      */
-    public byte[] signBytes(byte[] bytes) throws NoSuchAlgorithmException {
-        try {
-            CryptoProvider.setupIfNeeded();
-            java.security.Signature signer = java.security.Signature.getInstance(SIGN_ALGO);
-            signer.initSign(this.privateKeyPair.getPrivate());
-            // prepend hashable prefix
-            byte[] prefixBytes = new byte[bytes.length + BYTES_SIGN_PREFIX.length];
-            System.arraycopy(BYTES_SIGN_PREFIX, 0, prefixBytes, 0, BYTES_SIGN_PREFIX.length);
-            System.arraycopy(bytes, 0, prefixBytes, BYTES_SIGN_PREFIX.length, bytes.length);
-            // sign
-            signer.update(prefixBytes);
-            byte[] sigRaw = signer.sign();
-            return sigRaw;
-        } catch (InvalidKeyException|SignatureException e) {
-            throw new RuntimeException("unexpected behavior", e);
-        }
+    public Signature signBytes(byte[] bytes) throws NoSuchAlgorithmException {
+        // prepend hashable prefix
+        byte[] prefixBytes = new byte[bytes.length + BYTES_SIGN_PREFIX.length];
+        System.arraycopy(BYTES_SIGN_PREFIX, 0, prefixBytes, 0, BYTES_SIGN_PREFIX.length);
+        System.arraycopy(bytes, 0, prefixBytes, BYTES_SIGN_PREFIX.length, bytes.length);
+        // sign
+        return rawSignBytes(prefixBytes);
     }
 
     /* Multisignature support */
