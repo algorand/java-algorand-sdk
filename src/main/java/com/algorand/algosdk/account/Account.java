@@ -55,8 +55,8 @@ public class Account {
     }
 
     /**
-     * Create a new account from an existing PKCS8 encoded keypair and Algorand address.
-     * @param secretKey existing private key. Must be 32 bytes. Corresponds to seed.
+     * Create a new account from an existing raw ed25519 keypair and Algorand address.
+     * @param secretKey existing private key. Must be 32 bytes. Corresponds to ed25519 seed.
      * @param publicKey existing public key. Must be 32 bytes.
      * @throws NoSuchAlgorithmException if cryptographic provider not configured
      */
