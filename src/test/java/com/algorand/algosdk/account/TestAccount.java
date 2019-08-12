@@ -14,6 +14,7 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Random;
 
 public class TestAccount {
 
@@ -203,5 +204,18 @@ public class TestAccount {
         byte[] b = Account.mergeMultisigTransactionBytes(secondAndThird, firstAndThird);
         Assert.assertArrayEquals(a, b);
         Assert.assertArrayEquals(expected, a);
+    }
+
+    @Test
+    public void testSignBytes() throws Exception {
+        byte[] b = new byte[15];
+        new Random().nextBytes(b);
+        Account account = new Account();
+        byte[] signature = account.signBytes(b);
+        Assert.assertTrue(account.getAddress().verifyBytes(b, signature));
+        int firstByte = (int) b[0];
+        firstByte = (firstByte+1) % 256;
+        b[0] = (byte) firstByte;
+        Assert.assertFalse(account.getAddress().verifyBytes(b, signature));
     }
 }

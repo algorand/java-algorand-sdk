@@ -41,7 +41,7 @@ public class Account {
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
-    private static final byte[] BYTES_SIGN_PREFIX = ("Ab").getBytes(StandardCharsets.UTF_8);
+    private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
     private static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
 
     /**
@@ -279,7 +279,7 @@ public class Account {
      * @param bytes the data to sign
      * @return a signature
      */
-    public Signature signBytes(byte[] bytes) throws NoSuchAlgorithmException {
+    public byte[] signBytes(byte[] bytes) throws NoSuchAlgorithmException {
         try {
             CryptoProvider.setupIfNeeded();
             java.security.Signature signer = java.security.Signature.getInstance(SIGN_ALGO);
@@ -291,7 +291,7 @@ public class Account {
             // sign
             signer.update(prefixBytes);
             byte[] sigRaw = signer.sign();
-            return new Signature(sigRaw);
+            return sigRaw;
         } catch (InvalidKeyException|SignatureException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
