@@ -1,9 +1,6 @@
 package com.algorand.algosdk.account;
 
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
-import com.algorand.algosdk.crypto.MultisigAddress;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -203,5 +200,18 @@ public class TestAccount {
         byte[] b = Account.mergeMultisigTransactionBytes(secondAndThird, firstAndThird);
         Assert.assertArrayEquals(a, b);
         Assert.assertArrayEquals(expected, a);
+    }
+
+    @Test
+    public void testCreateAccountFromRawKeyPair() throws Exception {
+        byte[] text = Encoder.decodeFromBase64("ZXlKaGJHY2lPaUpGWkVSVFFTSjkuUlhoaGJYQnNaU0J2WmlCRlpESTFOVEU1SUhOcFoyNXBibWM=");
+        byte[] expectedSig = Encoder.decodeFromBase64("hgyY0il_MGCjP0JzlnLWG1PPOt7-09PGcvMg3AIbQR6dWbhijcNR4ki4iylGjg5BhVsPt9g7sVvpAr_MuM0KAg");
+        byte[] secretKey = Encoder.decodeFromBase64("nWGxne_9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A");
+        byte[] publicKey = Encoder.decodeFromBase64("11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo");
+        Account acc = new Account(secretKey, publicKey);
+        Signature out = acc.signBytes(text);
+        Assert.assertArrayEquals(expectedSig, out.getBytes());
+        Assert.assertEquals("Different addresses", (new Address(publicKey)).toString(), acc.getAddress().toString());
+        Assert.assertEquals("Different address strings", "25NJQAMCWEFLPVKL73J4SZAHHIHOC4XT3KTCGJNPAINGR5YHKENMEF5QTE", acc.getAddress().toString());
     }
 }

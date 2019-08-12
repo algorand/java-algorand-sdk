@@ -13,10 +13,13 @@ import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 
-import com.fasterxml.jackson.databind.node.BigIntegerNode;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
+import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -24,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -62,9 +66,20 @@ public class Account {
         if (publicKey.length != PK_SIZE || secretKey.length != SK_SIZE) {
             throw new IllegalArgumentException("Input keys are the wrong size");
         }
-        PKCS8EncodedKeySpec pkS = new PKCS8EncodedKeySpec(publicKey);
-        PKCS8EncodedKeySpec skS = new PKCS8EncodedKeySpec(secretKey);
-        // JCA keypair
+
+        X509EncodedKeySpec pkS;
+        PKCS8EncodedKeySpec skS;
+        try {
+            // Wrap both keys in ASN.1 format.
+            SubjectPublicKeyInfo publicKeyInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), publicKey);
+            pkS = new X509EncodedKeySpec(publicKeyInfo.getEncoded());
+            PrivateKeyInfo privateKeyInfo = new PrivateKeyInfo(new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), new DEROctetString(secretKey));
+            skS = new PKCS8EncodedKeySpec(privateKeyInfo.getEncoded());
+        }catch (IOException e) {
+            throw new RuntimeException("could not parse raw key bytes", e);
+        }
+
+        // use JCA to generate keypair
         try {
             CryptoProvider.setupIfNeeded();
             KeyFactory kf = KeyFactory.getInstance(KEY_ALGO);
