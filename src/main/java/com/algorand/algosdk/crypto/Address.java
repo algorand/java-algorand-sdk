@@ -1,8 +1,10 @@
 package com.algorand.algosdk.crypto;
 
 
+import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+import java.security.KeyFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -10,8 +12,18 @@ import org.apache.commons.codec.binary.Base32;
 
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.security.*;
+import java.nio.charset.StandardCharsets;
+import java.security.spec.X509EncodedKeySpec;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import java.io.IOException;
+
+
 
 /**
  * Address represents a serializable 32-byte length Algorand address.
@@ -29,6 +41,12 @@ public class Address implements Serializable {
     private static final int CHECKSUM_LEN_BYTES = 4;
     // expected length of base32-encoded checksum-appended addresses
     private static final int EXPECTED_STR_ENCODED_LEN = 58;
+    // signature algorithm for verifying signature
+    private static final String SIGN_ALGO = "EdDSA";
+    private static final String KEY_ALGO = "Ed25519";
+    // prefix for signing bytes
+    private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
+
 
     /**
      * Create a new address from a byte array.
@@ -108,6 +126,38 @@ public class Address implements Serializable {
             throw new RuntimeException("unexpected address length " + res.length());
         }
         return res;
+    }
+
+    /**
+     * verifyBytes verifies that the signature for the message is valid for the public key. The message should have been prepended with "MX" when signing.
+     * @param message the message that was signed
+     * @param signature
+     * @return boolean; true if the signature is valid
+     */
+    public boolean verifyBytes(byte[] message, Signature signature) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+        CryptoProvider.setupIfNeeded();
+        X509EncodedKeySpec pkS;
+        try {
+            // Wrap the public key in ASN.1 format.
+            SubjectPublicKeyInfo publicKeyInfo = new SubjectPublicKeyInfo(new AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), this.bytes);
+            pkS = new X509EncodedKeySpec(publicKeyInfo.getEncoded());
+        } catch (IOException e) {
+            throw new RuntimeException("could not parse raw key bytes", e);
+        }
+        // prepend the message prefix
+        byte[] prefixBytes = new byte[message.length + BYTES_SIGN_PREFIX.length];
+        System.arraycopy(BYTES_SIGN_PREFIX, 0, prefixBytes, 0, BYTES_SIGN_PREFIX.length);
+        System.arraycopy(message, 0, prefixBytes, BYTES_SIGN_PREFIX.length, message.length);
+        
+        // create public key
+        KeyFactory kf = KeyFactory.getInstance(KEY_ALGO);
+        PublicKey pk = kf.generatePublic(pkS);
+        
+        // verify signature
+        java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGO);
+        sig.initVerify(pk);
+        sig.update(prefixBytes);
+        return sig.verify(signature.getBytes());
     }
 
     @Override

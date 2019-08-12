@@ -37,6 +37,7 @@ public class Account {
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
+    private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
     private static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
 
     /**
@@ -127,7 +128,7 @@ public class Account {
             System.arraycopy(TX_SIGN_PREFIX, 0, prefixEncodedTx, 0, TX_SIGN_PREFIX.length);
             System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
             // sign
-            Signature txSig = signBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
+            Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
             String txID = Encoder.encodeToBase32StripPad(Digester.digest(prefixEncodedTx));
             return new SignedTransaction(tx, txSig, txID);
         } catch (IOException e) {
@@ -175,7 +176,7 @@ public class Account {
             System.arraycopy(BID_SIGN_PREFIX, 0, prefixEncodedBid, 0, BID_SIGN_PREFIX.length);
             System.arraycopy(encodedBid, 0, prefixEncodedBid, BID_SIGN_PREFIX.length, encodedBid.length);
             // sign
-            Signature bidSig = signBytes(prefixEncodedBid);
+            Signature bidSig = rawSignBytes(prefixEncodedBid);
             return new SignedBid(bid, bidSig);
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
@@ -227,7 +228,7 @@ public class Account {
      * @param bytes the data to sign
      * @return a signature
      */
-    public Signature signBytes(byte[] bytes) throws NoSuchAlgorithmException {
+    private Signature rawSignBytes(byte[] bytes) throws NoSuchAlgorithmException {
         try {
             CryptoProvider.setupIfNeeded();
             java.security.Signature signer = java.security.Signature.getInstance(SIGN_ALGO);
@@ -238,6 +239,20 @@ public class Account {
         } catch (InvalidKeyException|SignatureException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
+    }
+
+    /**
+     * Sign the given bytes, and wrap in signature. The message is prepended with "MX" for domain separation.
+     * @param bytes the data to sign
+     * @return a signature
+     */
+    public Signature signBytes(byte[] bytes) throws NoSuchAlgorithmException {
+        // prepend hashable prefix
+        byte[] prefixBytes = new byte[bytes.length + BYTES_SIGN_PREFIX.length];
+        System.arraycopy(BYTES_SIGN_PREFIX, 0, prefixBytes, 0, BYTES_SIGN_PREFIX.length);
+        System.arraycopy(bytes, 0, prefixBytes, BYTES_SIGN_PREFIX.length, bytes.length);
+        // sign
+        return rawSignBytes(prefixBytes);
     }
 
     /* Multisignature support */

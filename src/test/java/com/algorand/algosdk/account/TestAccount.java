@@ -8,12 +8,14 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.crypto.Signature;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Random;
 
 public class TestAccount {
 
@@ -203,5 +205,30 @@ public class TestAccount {
         byte[] b = Account.mergeMultisigTransactionBytes(secondAndThird, firstAndThird);
         Assert.assertArrayEquals(a, b);
         Assert.assertArrayEquals(expected, a);
+    }
+
+    @Test
+    public void testSignBytes() throws Exception {
+        byte[] b = new byte[15];
+        new Random().nextBytes(b);
+        Account account = new Account();
+        Signature signature = account.signBytes(b);
+        Assert.assertTrue(account.getAddress().verifyBytes(b, signature));
+        int firstByte = (int) b[0];
+        firstByte = (firstByte+1) % 256;
+        b[0] = (byte) firstByte;
+        Assert.assertFalse(account.getAddress().verifyBytes(b, signature));
+    }
+
+    @Test
+    public void testVerifyBytes() throws Exception {
+        byte[] message = Encoder.decodeFromBase64("rTs7+dUj");
+        Signature signature = new Signature(Encoder.decodeFromBase64("COEBmoD+ysVECoyVOAsvMAjFxvKeQVkYld+RSHMnEiHsypqrfj2EdYqhrm4t7dK3ZOeSQh3aXiZK/zqQDTPBBw=="));
+        Address address = new Address("DPLD3RTSWC5STVBPZL5DIIVE2OC4BSAWTOYBLFN2X6EFLT2ZNF4SMX64UA");
+        Assert.assertTrue(address.verifyBytes(message, signature));
+        int firstByte = (int) message[0];
+        firstByte = (firstByte+1) % 256;
+        message[0] = (byte) firstByte;
+        Assert.assertFalse(address.verifyBytes(message, signature));
     }
 }
