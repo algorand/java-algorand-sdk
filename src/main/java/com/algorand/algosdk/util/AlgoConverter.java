@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 public class AlgoConverter {
 
-    private static BigDecimal ALGOS_TO_MICROALGOS_RATIO = BigDecimal.valueOf(1000000L);
+    private final static BigDecimal ALGOS_TO_MICROALGOS_RATIO = BigDecimal.valueOf(1000000L);
 
     /**
      * Convert microalgos to algos.
