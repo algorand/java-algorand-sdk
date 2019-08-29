@@ -332,7 +332,7 @@ public class Account {
      */
     public SignedTransaction appendMultisigTransaction(MultisigAddress from, SignedTransaction signedTx) throws NoSuchAlgorithmException {
         SignedTransaction sTx = this.signMultisigTransaction(from, signedTx.tx);
-        return this.mergeMultisigTransactions(sTx, signedTx);
+        return mergeMultisigTransactions(sTx, signedTx);
     }
 
 

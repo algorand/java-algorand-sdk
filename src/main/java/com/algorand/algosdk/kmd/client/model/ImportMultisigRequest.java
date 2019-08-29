@@ -17,6 +17,7 @@ import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,7 @@ public class ImportMultisigRequest {
   private Integer multisigVersion = null;
 
   @SerializedName("pks")
-  private List<PublicKey> pks = null;
+  private List<byte[]> pks = null; 
 
   @SerializedName("threshold")
   private Integer threshold = null;
@@ -57,16 +58,21 @@ public class ImportMultisigRequest {
     this.multisigVersion = multisigVersion;
   }
 
-  public ImportMultisigRequest pks(List<PublicKey> pks) {
-    this.pks = pks;
+  public ImportMultisigRequest pks(List<Ed25519PublicKey> pks) {
+    if (this.pks == null) {
+      this.pks = new ArrayList<byte[]>();
+    }
+    for (Ed25519PublicKey pk : pks) {
+      this.pks.add(pk.getBytes());
+    }
     return this;
   }
 
-  public ImportMultisigRequest addPksItem(PublicKey pksItem) {
+  public ImportMultisigRequest addPksItem(Ed25519PublicKey pksItem) {
     if (this.pks == null) {
-      this.pks = new ArrayList<PublicKey>();
+      this.pks = new ArrayList<byte[]>();
     }
-    this.pks.add(pksItem);
+    this.pks.add(pksItem.getBytes());
     return this;
   }
 
@@ -75,12 +81,21 @@ public class ImportMultisigRequest {
    * @return pks
   **/
   @ApiModelProperty(value = "")
-  public List<PublicKey> getPks() {
-    return pks;
+  public List<Ed25519PublicKey> getPks() {
+    List<Ed25519PublicKey> pkObjs = new ArrayList<Ed25519PublicKey>();
+    for (byte[] pk : this.pks) {
+      pkObjs.add(new Ed25519PublicKey(pk));
+    }
+    return pkObjs;
   }
 
-  public void setPks(List<PublicKey> pks) {
-    this.pks = pks;
+  public void setPks(List<Ed25519PublicKey> pks) {
+    if (this.pks == null) {
+      this.pks = new ArrayList<byte[]>();
+    }
+    for (Ed25519PublicKey pk : pks) {
+      this.pks.add(pk.getBytes());
+    }
   }
 
   public ImportMultisigRequest threshold(Integer threshold) {
