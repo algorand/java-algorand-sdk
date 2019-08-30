@@ -13,6 +13,7 @@
 
 package com.algorand.algosdk.kmd.client.model;
 
+import com.algorand.algosdk.crypto.MultisigSignature;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,10 +26,10 @@ import org.apache.commons.lang3.ObjectUtils;
 
 public class SignMultisigRequest {
   @SerializedName("partial_multisig")
-  private MultisigSig partialMultisig = null;
+  private MultisigSignature partialMultisig = null;
 
   @SerializedName("public_key")
-  private PublicKey publicKey = null;
+  private byte[] publicKey = null;
 
   @SerializedName("transaction")
   private byte[] transaction = null;
@@ -39,7 +40,7 @@ public class SignMultisigRequest {
   @SerializedName("wallet_password")
   private String walletPassword = null;
 
-  public SignMultisigRequest partialMultisig(MultisigSig partialMultisig) {
+  public SignMultisigRequest partialMultisig(MultisigSignature partialMultisig) {
     this.partialMultisig = partialMultisig;
     return this;
   }
@@ -49,15 +50,15 @@ public class SignMultisigRequest {
    * @return partialMultisig
   **/
   @ApiModelProperty(value = "")
-  public MultisigSig getPartialMultisig() {
+  public MultisigSignature getPartialMultisig() {
     return partialMultisig;
   }
 
-  public void setPartialMultisig(MultisigSig partialMultisig) {
+  public void setPartialMultisig(MultisigSignature partialMultisig) {
     this.partialMultisig = partialMultisig;
   }
 
-  public SignMultisigRequest publicKey(PublicKey publicKey) {
+  public SignMultisigRequest publicKey(byte[] publicKey) {
     this.publicKey = publicKey;
     return this;
   }
@@ -67,11 +68,11 @@ public class SignMultisigRequest {
    * @return publicKey
   **/
   @ApiModelProperty(value = "")
-  public PublicKey getPublicKey() {
+  public byte[] getPublicKey() {
     return publicKey;
   }
 
-  public void setPublicKey(PublicKey publicKey) {
+  public void setPublicKey(byte[] publicKey) {
     this.publicKey = publicKey;
   }
 

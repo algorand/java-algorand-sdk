@@ -25,12 +25,12 @@ import org.apache.commons.lang3.ObjectUtils;
 
 public class ImportKeyRequest {
   @SerializedName("private_key")
-  private PrivateKey privateKey = null;
+  private byte[] privateKey = null;
 
   @SerializedName("wallet_handle_token")
   private String walletHandleToken = null;
 
-  public ImportKeyRequest privateKey(PrivateKey privateKey) {
+  public ImportKeyRequest privateKey(byte[] privateKey) {
     this.privateKey = privateKey;
     return this;
   }
@@ -40,11 +40,11 @@ public class ImportKeyRequest {
    * @return privateKey
   **/
   @ApiModelProperty(value = "")
-  public PrivateKey getPrivateKey() {
+  public byte[] getPrivateKey() {
     return privateKey;
   }
 
-  public void setPrivateKey(PrivateKey privateKey) {
+  public void setPrivateKey(byte[] privateKey) {
     this.privateKey = privateKey;
   }
 

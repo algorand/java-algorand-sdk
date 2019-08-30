@@ -1669,14 +1669,14 @@ public class DefaultApi {
         return call;
     }
     /**
-     * Build call for listMultisg
+     * Build call for listMultisig
      * @param listMultisigRequest  (required)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call listMultisgCall(ListMultisigRequest listMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call listMultisigCall(ListMultisigRequest listMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = listMultisigRequest;
 
         // create path and map variables
@@ -1718,15 +1718,15 @@ public class DefaultApi {
     }
 
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call listMultisgValidateBeforeCall(ListMultisigRequest listMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    private com.squareup.okhttp.Call listMultisigValidateBeforeCall(ListMultisigRequest listMultisigRequest, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         
         // verify the required parameter 'listMultisigRequest' is set
         if (listMultisigRequest == null) {
-            throw new ApiException("Missing the required parameter 'listMultisigRequest' when calling listMultisg(Async)");
+            throw new ApiException("Missing the required parameter 'listMultisigRequest' when calling listMultisig(Async)");
         }
         
 
-        com.squareup.okhttp.Call call = listMultisgCall(listMultisigRequest, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = listMultisigCall(listMultisigRequest, progressListener, progressRequestListener);
         return call;
 
     }
@@ -1738,8 +1738,8 @@ public class DefaultApi {
      * @return APIV1POSTMultisigListResponse
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public APIV1POSTMultisigListResponse listMultisg(ListMultisigRequest listMultisigRequest) throws ApiException {
-        ApiResponse<APIV1POSTMultisigListResponse> resp = listMultisgWithHttpInfo(listMultisigRequest);
+    public APIV1POSTMultisigListResponse listMultisig(ListMultisigRequest listMultisigRequest) throws ApiException {
+        ApiResponse<APIV1POSTMultisigListResponse> resp = listMultisigWithHttpInfo(listMultisigRequest);
         return resp.getData();
     }
 
@@ -1750,8 +1750,8 @@ public class DefaultApi {
      * @return ApiResponse&lt;APIV1POSTMultisigListResponse&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<APIV1POSTMultisigListResponse> listMultisgWithHttpInfo(ListMultisigRequest listMultisigRequest) throws ApiException {
-        com.squareup.okhttp.Call call = listMultisgValidateBeforeCall(listMultisigRequest, null, null);
+    public ApiResponse<APIV1POSTMultisigListResponse> listMultisigWithHttpInfo(ListMultisigRequest listMultisigRequest) throws ApiException {
+        com.squareup.okhttp.Call call = listMultisigValidateBeforeCall(listMultisigRequest, null, null);
         Type localVarReturnType = new TypeToken<APIV1POSTMultisigListResponse>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
@@ -1764,7 +1764,7 @@ public class DefaultApi {
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call listMultisgAsync(ListMultisigRequest listMultisigRequest, final ApiCallback<APIV1POSTMultisigListResponse> callback) throws ApiException {
+    public com.squareup.okhttp.Call listMultisigAsync(ListMultisigRequest listMultisigRequest, final ApiCallback<APIV1POSTMultisigListResponse> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -1785,7 +1785,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = listMultisgValidateBeforeCall(listMultisigRequest, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = listMultisigValidateBeforeCall(listMultisigRequest, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<APIV1POSTMultisigListResponse>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;
