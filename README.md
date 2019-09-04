@@ -42,7 +42,7 @@ public class Main {
 
         AlgodClient client = new AlgodClient();
         client.setBasePath(ALGOD_API_ADDR);
-        ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
+        ApiKeyAuth api_key = client.getAuthentication("api_key");
         api_key.setApiKey(ALGOD_API_TOKEN);
 
         AlgodApi algodApiInstance = new AlgodApi(client);

@@ -261,8 +261,8 @@ public class ApiClient {
      * @param authName The authentication name
      * @return The authentication, null if not found
      */
-    public Authentication getAuthentication(String authName) {
-        return authentications.get(authName);
+    public <T extends Authentication> T getAuthentication(String authName) {
+        return (T) authentications.get(authName);
     }
 
     /**

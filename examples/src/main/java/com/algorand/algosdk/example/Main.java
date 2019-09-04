@@ -34,7 +34,7 @@ public class Main {
         AlgodClient client = new AlgodClient();
         client.setBasePath(ALGOD_API_ADDR);
         // Configure API key authorization: api_key
-        ApiKeyAuth api_key = (ApiKeyAuth) client.getAuthentication("api_key");
+        ApiKeyAuth api_key = client.getAuthentication("api_key");
         api_key.setApiKey(ALGOD_API_TOKEN);
 
         AlgodApi algodApiInstance = new AlgodApi(client);
@@ -96,7 +96,7 @@ public class Main {
         KmdClient client = new KmdClient();
         client.setBasePath(KMD_API_ADDR);
         // Configure API key authorization: api_key
-        com.algorand.algosdk.kmd.client.auth.ApiKeyAuth api_key = (com.algorand.algosdk.kmd.client.auth.ApiKeyAuth) client.getAuthentication("api_key");
+        com.algorand.algosdk.kmd.client.auth.ApiKeyAuth api_key = client.getAuthentication("api_key");
         api_key.setApiKey(KMD_API_TOKEN);
         KmdApi kmdApiInstance = new KmdApi(client);
 
