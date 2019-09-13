@@ -65,6 +65,31 @@ public class Transaction implements Serializable {
     // voteKeyDilution
     @JsonProperty("votekd")
     public BigInteger voteKeyDilution = BigInteger.valueOf(0);
+    /* asset creation fields */
+    // total asset issuance
+    @JsonProperty("t")
+    public BigInteger assetTotal = BigInteger.valueOf(0);
+    // whether each account has their asset slot frozen for this asset by default
+    @JsonProperty("df")
+    public boolean assetDefaultFrozen = false;
+    // a hint to the unit name of the asset
+    @JsonProperty("un")
+    public String assetUnitName = "";
+    // the name of the asset
+    @JsonProperty("an")
+    public String assetName = "";
+    // the address which has the ability to reconfigure the asset
+    @JsonProperty("m")
+    public Address assetManager = new Address();
+    // the asset reserve: assets owned by this address do not count against circulation
+    @JsonProperty("r")
+    public Address assetReserve = new Address();
+    // the address which has the ability to freeze/unfreeze accounts holding this asset
+    @JsonProperty("f")
+    public Address assetFreeze = new Address();
+    // the address which has the ability to issue clawbacks against asset-holding accounts
+    @JsonProperty("c")
+    public Address assetClawback = new Address();
 
     /**
      * Create a payment transaction
@@ -134,6 +159,34 @@ public class Transaction implements Serializable {
                 BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK, voteFirst, voteLast, voteKeyDilution);
     }
 
+    /**
+     * Create an asset creation transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
+     * @param sender source address
+     * @param fee transaction fee
+     * @param firstValid first valid round
+     * @param lastValid last valid round
+     * @param note optional note field (can be null)
+     * @param genesisID
+     * @param genesisHash
+     * @param assetTotal total asset issuance
+     * @param defaultFrozen whether accounts have this asset frozen by default
+     * @param assetUnitName name of unit of the asset
+     * @param assetName name of the asset
+     * @param manager account which can reconfigure the asset
+     * @param reserve account whose asset holdings count as non-minted
+     * @param freeze account which can freeze or unfreeze holder accounts
+     * @param clawback account which can issue clawbacks against holder accounts
+     */
+    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+                       String genesisID, Digest genesisHash,
+                       BigInteger assetTotal, boolean defaultFrozen,
+                       String assetUnitName, String assetName, Address manager, Address reserve, Address freeze, Address clawback) {
+        // populate ignored values with default or null values
+        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
+                BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0),
+                assetTotal, assetDefaultFrozen, assetUnitName, assetName, assetManager, assetReserve, assetFreeze, assetClawback);
+    }
+
     // workaround for nested JsonValue classes
     @JsonCreator
     private Transaction(@JsonProperty("type") Type type,
@@ -151,10 +204,19 @@ public class Transaction implements Serializable {
                         @JsonProperty("selkey") byte[] vrfPK,
                         @JsonProperty("votefst") BigInteger voteFirst,
                         @JsonProperty("votelst") BigInteger voteLast,
-                        @JsonProperty("votekd") BigInteger voteKeyDilution) {
+                        @JsonProperty("votekd") BigInteger voteKeyDilution,
+                        @JsonProperty("t") BigInteger assetTotal,
+                        @JsonProperty("df") boolean assetDefaultFrozen,
+                        @JsonProperty("un") String assetUnitName,
+                        @JsonProperty("an") String assetName,
+                        @JsonProperty("m") Address assetManager,
+                        @JsonProperty("r") Address assetReserve,
+                        @JsonProperty("f") Address assetFreeze,
+                        @JsonProperty("c") Address assetClawback) {
         this(type, new Address(sender), fee, firstValid, lastValid, note, genesisID, new Digest(genesisHash), amount,
                 new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK),
-                voteFirst, voteLast, voteKeyDilution);
+                voteFirst, voteLast, voteKeyDilution, assetTotal, assetDefaultFrozen, assetUnitName, assetName,
+                new Address(assetManager), new Address(assetReserve), new Address(assetFreeze), new Address(assetClawback));
     }
 
     private Transaction(Type type,
@@ -172,7 +234,15 @@ public class Transaction implements Serializable {
                         VRFPublicKey vrfPK,
                         BigInteger voteFirst,
                         BigInteger voteLast,
-                        BigInteger voteKeyDilution) {
+                        BigInteger voteKeyDilution,
+                        BigInteger assetTotal,
+                        boolean assetDefaultFrozen,
+                        String assetUnitName,
+                        String assetName,
+                        Address assetManager,
+                        Address assetReserve,
+                        Address assetFreeze,
+                        Address assetClawback) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
         if (fee != null) this.fee = fee;
@@ -189,6 +259,14 @@ public class Transaction implements Serializable {
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
+        if (assetTotal != null) this.assetTotal = assetTotal;
+        if (assetDefaultFrozen != null) this.assetDefaultFrozen = assetDefaultFrozen;
+        if (assetUnitName != null) this.assetUnitName = assetUnitName;
+        if (assetName != null) this.assetName = assetName;
+        if (assetManager != null) this.assetManager = assetManager;
+        if (assetReserve != null) this.assetReserve = assetReserve;
+        if (assetFreeze != null) this.assetFreeze = assetFreeze;
+        if (assetClawback != null) this.assetClawback = assetClawback;
     }
 
     public Transaction() {
@@ -201,6 +279,7 @@ public class Transaction implements Serializable {
         Default(""),
         Payment("pay"),
         KeyRegistration("keyreg");
+        AssetCreation("acfg");
 
         private final String value;
         private Type(String value) {
@@ -237,7 +316,14 @@ public class Transaction implements Serializable {
                 selectionPK.equals(that.selectionPK) &&
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
-                voteKeyDilution.equals(that.voteKeyDilution);
+                voteKeyDilution.equals(that.voteKeyDilution) &&
+                assetTotal.equals(that.assetTotal) &&
+                assetDefaultFrozen.equals(that.assetDefaultFrozen) &&
+                assetName.equals(that.assetName) &&
+                assetUnitName.equals(that.assetUnitName) &&
+                assetManager.equals(that.assetManager) &&
+                assetReserve.equals(that.assetReserve) &&
+                assetFreeze.equals(that.assetFreeze) &&
+                assetClawback.equals(that.assetClawback);
     }
-
 }
