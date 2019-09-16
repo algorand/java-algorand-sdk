@@ -134,7 +134,8 @@ public class Transaction implements Serializable {
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID, Digest genesisHash,
                        BigInteger amount, Address receiver, Address closeRemainderTo) {
         this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, genesisHash, amount, receiver, closeRemainderTo,
-                new ParticipationPublicKey(), new VRFPublicKey(), BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0));
+                new ParticipationPublicKey(), new VRFPublicKey(), BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0),
+                BigInteger.valueOf(0), false, new String(), new String(), new Address(), new Address(), new Address(), new Address());
     }
 
     /**
@@ -156,7 +157,8 @@ public class Transaction implements Serializable {
                        BigInteger voteFirst, BigInteger voteLast, BigInteger voteKeyDilution) {
         // populate with default values which will be ignored...
         this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
-                BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK, voteFirst, voteLast, voteKeyDilution);
+                BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK, voteFirst, voteLast, voteKeyDilution,
+                BigInteger.valueOf(0), false, new String(), new String(), new Address(), new Address(), new Address(), new Address());
     }
 
     /**
@@ -184,7 +186,7 @@ public class Transaction implements Serializable {
         // populate ignored values with default or null values
         this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0),
-                assetTotal, assetDefaultFrozen, assetUnitName, assetName, assetManager, assetReserve, assetFreeze, assetClawback);
+                assetTotal, defaultFrozen, assetUnitName, assetName, manager, reserve, freeze, clawback);
     }
 
     // workaround for nested JsonValue classes
@@ -209,10 +211,10 @@ public class Transaction implements Serializable {
                         @JsonProperty("df") boolean assetDefaultFrozen,
                         @JsonProperty("un") String assetUnitName,
                         @JsonProperty("an") String assetName,
-                        @JsonProperty("m") Address assetManager,
-                        @JsonProperty("r") Address assetReserve,
-                        @JsonProperty("f") Address assetFreeze,
-                        @JsonProperty("c") Address assetClawback) {
+                        @JsonProperty("m") byte[] assetManager,
+                        @JsonProperty("r") byte[] assetReserve,
+                        @JsonProperty("f") byte[] assetFreeze,
+                        @JsonProperty("c") byte[] assetClawback) {
         this(type, new Address(sender), fee, firstValid, lastValid, note, genesisID, new Digest(genesisHash), amount,
                 new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK),
                 voteFirst, voteLast, voteKeyDilution, assetTotal, assetDefaultFrozen, assetUnitName, assetName,
@@ -260,7 +262,7 @@ public class Transaction implements Serializable {
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
         if (assetTotal != null) this.assetTotal = assetTotal;
-        if (assetDefaultFrozen != null) this.assetDefaultFrozen = assetDefaultFrozen;
+        this.assetDefaultFrozen = assetDefaultFrozen;
         if (assetUnitName != null) this.assetUnitName = assetUnitName;
         if (assetName != null) this.assetName = assetName;
         if (assetManager != null) this.assetManager = assetManager;
@@ -278,7 +280,7 @@ public class Transaction implements Serializable {
     public enum Type {
         Default(""),
         Payment("pay"),
-        KeyRegistration("keyreg");
+        KeyRegistration("keyreg"),
         AssetCreation("acfg");
 
         private final String value;
@@ -318,7 +320,7 @@ public class Transaction implements Serializable {
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
                 assetTotal.equals(that.assetTotal) &&
-                assetDefaultFrozen.equals(that.assetDefaultFrozen) &&
+                (assetDefaultFrozen == that.assetDefaultFrozen) &&
                 assetName.equals(that.assetName) &&
                 assetUnitName.equals(that.assetUnitName) &&
                 assetManager.equals(that.assetManager) &&
