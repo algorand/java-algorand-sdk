@@ -184,7 +184,7 @@ public class Transaction implements Serializable {
                        BigInteger assetTotal, boolean defaultFrozen,
                        String assetUnitName, String assetName, Address manager, Address reserve, Address freeze, Address clawback) {
         // populate ignored values with default or null values
-        this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
+        this(Type.AssetCreation, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0),
                 assetTotal, defaultFrozen, assetUnitName, assetName, manager, reserve, freeze, clawback);
     }
