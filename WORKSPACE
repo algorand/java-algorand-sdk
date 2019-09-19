@@ -1,8 +1,8 @@
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-RULES_JVM_EXTERNAL_TAG = "1.2"
-RULES_JVM_EXTERNAL_SHA = "e5c68b87f750309a79f59c2b69ead5c3221ffa54ff9496306937bfa1c9c8c86b"
+RULES_JVM_EXTERNAL_TAG = "2.8"
+RULES_JVM_EXTERNAL_SHA = "79c9850690d7614ecdb72d68394f994fef7534b292c4867ce5e7dec0aa7bdfad"
 
 http_archive(
     name = "rules_jvm_external",
