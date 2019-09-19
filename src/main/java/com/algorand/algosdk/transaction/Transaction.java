@@ -160,7 +160,7 @@ public class Transaction implements Serializable {
                        String genesisID, Digest genesisHash, BigInteger assetTotal, boolean defaultFrozen,
                        String assetUnitName, String assetName, Address manager, Address reserve, Address freeze, Address clawback) {
         // populate ignored values with default or null values
-        this(Type.AssetCreation, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
+        this(Type.AssetConfig, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), new AssetID(), 
                 new AssetParams(assetTotal, defaultFrozen, assetUnitName, assetName, manager, reserve, freeze, clawback));
     }
@@ -187,9 +187,16 @@ public class Transaction implements Serializable {
                        String genesisID, Digest genesisHash, Address creator, BigInteger index,
                     Address manager, Address reserve, Address freeze, Address clawback) {
         // populate ignored values with default or null values
-        this(Type.AssetCreation, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
+        this(Type.AssetConfig, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), new AssetID(creator, index), 
                 new AssetParams(BigInteger.valueOf(0), false, "", "", manager, reserve, freeze, clawback));
+    }
+
+    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+                       String genesisID, Digest genesisHash, AssetID assetID, AssetParams assetParams) {
+        // populate ignored values with default or null values
+        this(Type.AssetConfig, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
+                BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), assetID, assetParams);
     }
 
     // workaround for nested JsonValue classes
@@ -265,7 +272,7 @@ public class Transaction implements Serializable {
         Default(""),
         Payment("pay"),
         KeyRegistration("keyreg"),
-        AssetCreation("acfg");
+        AssetConfig("acfg");
 
         private final String value;
         private Type(String value) {
@@ -335,7 +342,7 @@ public class Transaction implements Serializable {
         @JsonProperty("c")
         public Address assetClawback = new Address();
         
-        private AssetParams(BigInteger assetTotal, boolean defaultFrozen, String assetUnitName, String assetName, Address manager, Address reserve, Address freeze, Address clawback) {
+        public AssetParams(BigInteger assetTotal, boolean defaultFrozen, String assetUnitName, String assetName, Address manager, Address reserve, Address freeze, Address clawback) {
             if(assetTotal != null) this.assetTotal = assetTotal;
             this.assetDefaultFrozen = defaultFrozen;
             if(assetUnitName != null) this.assetUnitName = assetUnitName;
@@ -389,7 +396,7 @@ public class Transaction implements Serializable {
         @JsonProperty("i")
         public BigInteger index = BigInteger.valueOf(0);
 
-        private AssetID(Address creator, BigInteger index) {
+        public AssetID(Address creator, BigInteger index) {
             if(creator != null) this.creator = creator;
             if(index != null) this.index = index;
         }
