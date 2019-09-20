@@ -45,6 +45,8 @@ public class Transaction implements Serializable {
     public String genesisID = "";
     @JsonProperty("gh")
     public Digest genesisHash = new Digest();
+    @JsonProperty("grp")
+    public Digest group = new Digest();
 
     /* payment fields */
     @JsonProperty("amt")
@@ -246,6 +248,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("note") byte[] note,
                         @JsonProperty("gen") String genesisID,
                         @JsonProperty("gh") byte[] genesisHash,
+                        @JsonProperty("grp") byte[] group,
                         @JsonProperty("amt") BigInteger amount,
                         @JsonProperty("rcv") byte[] receiver,
                         @JsonProperty("close") byte[] closeRemainderTo,
@@ -262,6 +265,7 @@ public class Transaction implements Serializable {
         this(type, new Address(sender), fee, firstValid, lastValid, note, genesisID, new Digest(genesisHash), amount,
                 new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK),
                 voteFirst, voteLast, voteKeyDilution, assetID, assetParams, new Address(freezeTarget), assetFreezeID, freezeState);
+        if (group != null) this.group = new Digest(group);
     }
 
     private Transaction(Type type,
@@ -382,6 +386,10 @@ public class Transaction implements Serializable {
         return Encoder.encodeToBase32StripPad(this.rawTxID().getBytes());
     }
 
+    public void assignGroupID(Digest gid) {
+        this.group = gid;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -395,6 +403,7 @@ public class Transaction implements Serializable {
                 Arrays.equals(note, that.note) &&
                 genesisID.equals(that.genesisID) &&
                 genesisHash.equals(that.genesisHash) &&
+                group.equals(that.group) &&
                 amount.equals(that.amount) &&
                 receiver.equals(that.receiver) &&
                 closeRemainderTo.equals(that.closeRemainderTo) &&
