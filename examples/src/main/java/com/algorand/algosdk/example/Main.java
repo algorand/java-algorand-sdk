@@ -17,9 +17,11 @@ import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletResponse;
 import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxGroup;
 import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 
 
@@ -98,6 +100,21 @@ public class Main {
             // This is generally expected, but should give us an informative error message.
             System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
         }
+        // let's create a transaction group
+        Digest gid = TxGroup.computeGroupID(new Transaction[]{tx ,tx});
+        tx.assignGroupID(gid);
+        signedTx = src.signTransactionWithFeePerByte(tx, feePerByte);
+        try {
+            byte[] encodedTxBytes = Encoder.encodeToMsgPack(signedTx);
+            byte[] concat = Arrays.copyOf(encodedTxBytes, encodedTxBytes.length + encodedTxBytes.length);
+            System.arraycopy(encodedTxBytes, 0, concat, encodedTxBytes.length, encodedTxBytes.length);
+            TransactionID id = algodApiInstance.rawTransaction(concat);
+            System.out.println("Successfully sent tx group with first tx id: " + id);
+        } catch (ApiException e) {
+            // This is generally expected, but should give us an informative error message.
+            System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
+        }
+
     }
 
     public static void kmdApi() {
