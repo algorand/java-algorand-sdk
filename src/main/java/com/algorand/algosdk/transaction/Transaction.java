@@ -5,10 +5,15 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
+import com.algorand.algosdk.util.Digester;
+import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.*;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
@@ -18,6 +23,8 @@ import java.util.Arrays;
 @JsonPropertyOrder(alphabetic=true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Transaction implements Serializable {
+    private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
+
     @JsonProperty("type")
     public Type type = Type.Default;
 
@@ -326,6 +333,53 @@ public class Transaction implements Serializable {
         public String getValue() {
             return this.value;
         }
+    }
+
+    /**
+     * Return encoded representation of the transaction
+     */
+    public byte[] bytes() throws IOException {
+        try {
+            return Encoder.encodeToMsgPack(this);
+        } catch (IOException e) {
+            throw new RuntimeException("serialization failed", e);
+        }
+    }
+
+    /**
+     * Return encoded representation of the transaction with a prefix
+     * suitable for signing
+     */
+    public byte[] bytesToSign() throws IOException {
+        try {
+            byte[] encodedTx = Encoder.encodeToMsgPack(this);
+            byte[] prefixEncodedTx = new byte[encodedTx.length + TX_SIGN_PREFIX.length];
+            System.arraycopy(TX_SIGN_PREFIX, 0, prefixEncodedTx, 0, TX_SIGN_PREFIX.length);
+            System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
+            return prefixEncodedTx;
+        } catch (IOException e) {
+            throw new RuntimeException("serialization failed", e);
+        }
+    }
+
+    /**
+     * Return transaction ID as Digest
+     */
+    public Digest rawTxID() throws IOException {
+        try {
+         return new Digest(Digester.digest(this.bytesToSign()));
+        } catch (IOException e) {
+            throw new RuntimeException("tx computation failed", e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("tx computation failed", e);
+        }
+    }
+
+    /**
+     * Return transaction ID as string
+     */
+    public String txID() throws IOException, NoSuchAlgorithmException {
+        return Encoder.encodeToBase32StripPad(this.rawTxID().getBytes());
     }
 
     @Override
