@@ -10,7 +10,6 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.CryptoProvider;
-import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -35,7 +34,6 @@ public class Account {
     private static final int PK_X509_PREFIX_LENGTH = 12; // Ed25519 specific
     private static final int SK_SIZE = 32;
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
-    private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
     private static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
@@ -122,15 +120,9 @@ public class Account {
      */
     public SignedTransaction signTransaction(Transaction tx) throws NoSuchAlgorithmException {
         try {
-            byte[] encodedTx = Encoder.encodeToMsgPack(tx);
-            // prepend hashable prefix
-            byte[] prefixEncodedTx = new byte[encodedTx.length + TX_SIGN_PREFIX.length];
-            System.arraycopy(TX_SIGN_PREFIX, 0, prefixEncodedTx, 0, TX_SIGN_PREFIX.length);
-            System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
-            // sign
+            byte[] prefixEncodedTx = tx.bytesToSign();
             Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
-            String txID = Encoder.encodeToBase32StripPad(Digester.digest(prefixEncodedTx));
-            return new SignedTransaction(tx, txSig, txID);
+            return new SignedTransaction(tx, txSig, tx.txID());
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
