@@ -59,7 +59,14 @@ public class TestTransaction {
     public void testSerializationAssetConfig() throws Exception {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
-        Transaction tx = new Transaction(addr, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), addr, BigInteger.valueOf(1234), addr, addr, addr, addr);
+        Address sender = addr;
+        Address creator = addr;
+        Address manager = addr;
+        Address reserve = addr;
+        Address freeze = addr;
+        Address clawback = addr;
+
+        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), creator, BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
         tx = Account.transactionWithSuggestedFeePerByte(tx, BigInteger.valueOf(10));
 
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
