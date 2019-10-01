@@ -8,12 +8,18 @@
    command with the address from the file.
 
 2. Find the X-Algo-API-Token from algod.token file within the data
-   directory of your algod install. Replace <X-Algo-API-Token> in the
+   directory of your algod install. Replace ***X-Algo-API-Token*** in the
    mvn command with the token from the file.
 
+To run the example using bazel:
+```
+bazel run //examples/src/main/java/com/algorand/algosdk/example:example  -- 127.0.0.1:8080 ***X-Algo-API-Token***
+```
+
+To run the example using maven:
 ```
 cd examples
-mvn clean install -Dexec.cleanupDaemonThreads=false exec:java -Dexec.mainClass="com.algorand.algosdk.example.Main" -Dexec.args="127.0.0.1:8080 <X-Algo-API-Token>"
+mvn clean install -Dexec.cleanupDaemonThreads=false exec:java -Dexec.mainClass="com.algorand.algosdk.example.Main" -Dexec.args="127.0.0.1:8080 ***X-Algo-API-Token***"
 ```
 Output (for instance):
 ```

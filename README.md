@@ -102,9 +102,11 @@ More information can be found at https://blog.bazel.build/2019/03/31/rules-jvm-e
 
 We should monitor the progress of features such as artifact checksumming.
 
-To run the example project:
+To run the example project, run the following command with the algod
+network address and the API token parameters (see examples/README
+for more information):
 ```
-bazel run //examples/src/main/java/com/algorand/algosdk/example:example
+bazel run //examples/src/main/java/com/algorand/algosdk/example:example -- 127.0.0.1:8080 ***X-Algo-API-Token***
 ```
 
 To build the whole library:

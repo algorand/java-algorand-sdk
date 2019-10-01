@@ -19,8 +19,6 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
-import com.squareup.okhttp.HttpUrl;
-
 import java.math.BigInteger;
 
 
@@ -36,7 +34,7 @@ public class Main {
 
         // If the protocol is not specified in the address, http is added.
         String algodApiAddrTmp = args[0];
-        if (HttpUrl.parse(algodApiAddrTmp) == null) {
+        if (algodApiAddrTmp.indexOf("//") == -1) {
             algodApiAddrTmp = "http://" + algodApiAddrTmp;
         }
 
