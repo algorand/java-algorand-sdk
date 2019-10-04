@@ -69,6 +69,15 @@ public class Transaction implements Serializable {
     public AssetParams assetParams = new AssetParams();
     @JsonProperty("caid")
     public AssetID assetID = new AssetID();
+
+    /* asset freeze fields */
+    @JsonProperty("faid")
+    public AssetID assetFreezeID = new AssetID();
+    @JsonProperty("fadd")
+    public Address freezeTarget = new Address();
+    @JsonProperty("afrz")
+    public boolean freezeState = false;
+
     /**
      * Create a payment transaction
      * @param fromAddr source address
@@ -199,6 +208,27 @@ public class Transaction implements Serializable {
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), assetID, assetParams);
     }
 
+    /**
+     * Create an asset freeze/un-freeze transaction.
+     * @param sender source address (must be the freeze manager for said asset)
+     * @param fee transaction fee
+     * @param firstValid first round transaction is valid
+     * @param lastValid last round transaction is valid
+     * @param note optional note field (can be null)
+     * @param genesisID
+     * @param genesisHash
+     * @param assetFreezeID asset creator and index
+     * @param freezeTarget account to be un-frozen or frozen
+     * @param freezeState new frozen state for target account (true==frozen==cannot transact)
+     */
+    public Transaction (Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+                        String genesisID, Digest genesisHash, AssetID assetFreezeID, Address freezeTarget, boolean freezeState) {
+        // populate ignored values with default or null values
+        this(type.AssetFreeze, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
+                BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), null, null,
+                freezeTarget, assetFreezeID, freezeState);
+    }
+
     // workaround for nested JsonValue classes
     @JsonCreator
     private Transaction(@JsonProperty("type") Type type,
@@ -218,10 +248,13 @@ public class Transaction implements Serializable {
                         @JsonProperty("votelst") BigInteger voteLast,
                         @JsonProperty("votekd") BigInteger voteKeyDilution,
                         @JsonProperty("caid") AssetID assetID,
-                        @JsonProperty("apar") AssetParams assetParams) {
+                        @JsonProperty("apar") AssetParams assetParams,
+                        @JsonProperty("fadd") Address freezeTarget,
+                        @JsonProperty("faid") AssetID assetFreezeID,
+                        @JsonProperty("afrz") boolean freezeState) {
         this(type, new Address(sender), fee, firstValid, lastValid, note, genesisID, new Digest(genesisHash), amount,
                 new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK),
-                voteFirst, voteLast, voteKeyDilution, assetID, assetParams);
+                voteFirst, voteLast, voteKeyDilution, assetID, assetParams, freezeTarget, assetFreezeID, freezeState);
     }
 
     private Transaction(Type type,
@@ -241,7 +274,10 @@ public class Transaction implements Serializable {
                         BigInteger voteLast,
                         BigInteger voteKeyDilution,
                         AssetID assetID,
-                        AssetParams assetParams) {
+                        AssetParams assetParams,
+                        Address freezeTarget,
+                        AssetID assetFreezeID,
+                        boolean freezeState) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
         if (fee != null) this.fee = fee;
@@ -258,12 +294,14 @@ public class Transaction implements Serializable {
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
-        if (assetParams != null) this.assetParams = assetParams;
         if (assetID != null) this.assetID = assetID;
+        if (assetParams != null) this.assetParams = assetParams;
+        if (freezeTarget != null) this.freezeTarget = freezeTarget;
+        if (assetFreezeID != null) this.assetFreezeID = assetFreezeID;
+        if (freezeState != null) this.freezeState = freezeState;
     }
 
-    public Transaction() {
-    }
+    public Transaction() {}
 
     /**
      * TxType represents a transaction type.
@@ -272,7 +310,8 @@ public class Transaction implements Serializable {
         Default(""),
         Payment("pay"),
         KeyRegistration("keyreg"),
-        AssetConfig("acfg");
+        AssetConfig("acfg"),
+        AssetFreeze("afrz");
 
         private final String value;
         private Type(String value) {
@@ -311,7 +350,10 @@ public class Transaction implements Serializable {
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
                 assetParams.equals(that.assetParams) &&
-                assetID.equals(that.assetID);
+                assetID.equals(that.assetID) &&
+                freezeTarget.equals(that.freezeTarget) &&
+                assetFreezeID.equals(that.assetFreezeID) &&
+                freezeState.equals(that.freezeState);
     }
 
     @JsonPropertyOrder(alphabetic=true)

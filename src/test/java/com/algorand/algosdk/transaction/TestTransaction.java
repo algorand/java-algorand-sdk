@@ -77,4 +77,10 @@ public class TestTransaction {
         Assert.assertEquals(tx, o);
     }
 
+    @Test
+    public void testSerializationAssetFreeze() throws Exception {
+        // TODO evan fail for now
+        Assert.assertEquals(true, false);
+    }
+
 }
