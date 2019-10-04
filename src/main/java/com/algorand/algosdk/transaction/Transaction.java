@@ -121,7 +121,7 @@ public class Transaction implements Serializable {
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID, Digest genesisHash,
                        BigInteger amount, Address receiver, Address closeRemainderTo) {
         this(Type.Payment, sender, fee, firstValid, lastValid, note, genesisID, genesisHash, amount, receiver, closeRemainderTo,
-                new ParticipationPublicKey(), new VRFPublicKey(), BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), new AssetID(), new AssetParams());
+                new ParticipationPublicKey(), new VRFPublicKey(), BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), new AssetID(), new AssetParams(), new Address(), new AssetID(), false);
     }
 
     /**
@@ -144,7 +144,7 @@ public class Transaction implements Serializable {
         // populate with default values which will be ignored...
         this(Type.KeyRegistration, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), votePK, vrfPK, voteFirst, voteLast, 
-                voteKeyDilution, new AssetID(), new AssetParams());
+                voteKeyDilution, new AssetID(), new AssetParams(), new Address(), new AssetID(), false);
     }
 
     /**
@@ -171,7 +171,7 @@ public class Transaction implements Serializable {
         // populate ignored values with default or null values
         this(Type.AssetConfig, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), new AssetID(), 
-                new AssetParams(assetTotal, defaultFrozen, assetUnitName, assetName, manager, reserve, freeze, clawback));
+                new AssetParams(assetTotal, defaultFrozen, assetUnitName, assetName, manager, reserve, freeze, clawback, new Address(), new AssetID(), false));
     }
 
     /**
@@ -198,14 +198,14 @@ public class Transaction implements Serializable {
         // populate ignored values with default or null values
         this(Type.AssetConfig, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), new AssetID(creator, index), 
-                new AssetParams(BigInteger.valueOf(0), false, "", "", manager, reserve, freeze, clawback));
+                new AssetParams(BigInteger.valueOf(0), false, "", "", manager, reserve, freeze, clawback, new Address(), new AssetID(), false));
     }
 
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash, AssetID assetID, AssetParams assetParams) {
         // populate ignored values with default or null values
         this(Type.AssetConfig, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
-                BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), assetID, assetParams);
+                BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), assetID, assetParams, new Address(), new AssetID(), false);
     }
 
     /**
