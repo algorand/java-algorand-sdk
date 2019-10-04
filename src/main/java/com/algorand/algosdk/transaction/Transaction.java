@@ -224,7 +224,7 @@ public class Transaction implements Serializable {
     public Transaction (Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                         String genesisID, Digest genesisHash, AssetID assetFreezeID, Address freezeTarget, boolean freezeState) {
         // populate ignored values with default or null values
-        this(type.AssetFreeze, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
+        this(Type.AssetFreeze, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), null, null,
                 freezeTarget, assetFreezeID, freezeState);
     }
@@ -353,7 +353,7 @@ public class Transaction implements Serializable {
                 assetID.equals(that.assetID) &&
                 freezeTarget.equals(that.freezeTarget) &&
                 assetFreezeID.equals(that.assetFreezeID) &&
-                freezeState.equals(that.freezeState);
+                freezeState != that.freezeState;
     }
 
     @JsonPropertyOrder(alphabetic=true)
