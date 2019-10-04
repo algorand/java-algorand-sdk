@@ -298,7 +298,7 @@ public class Transaction implements Serializable {
         if (assetParams != null) this.assetParams = assetParams;
         if (freezeTarget != null) this.freezeTarget = freezeTarget;
         if (assetFreezeID != null) this.assetFreezeID = assetFreezeID;
-        if (freezeState != null) this.freezeState = freezeState;
+        this.freezeState = freezeState;
     }
 
     public Transaction() {}
