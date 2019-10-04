@@ -79,8 +79,23 @@ public class TestTransaction {
 
     @Test
     public void testSerializationAssetFreeze() throws Exception {
-        // TODO evan fail for now
-        Assert.assertEquals(true, false);
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address creator = addr;
+        Address target = addr;
+        BigInteger index = BigInteger.valueOf(1);
+        AssetID assetFreezeID = new AssetID(creator, assetIndex);
+        boolean freezeState = true;
+        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), assetFreezeID, target, freezeState);
+        tx = Account.transactionWithSuggestedFeePerByte(tx, BigInteger.valueOf(10));
+
+        byte[] outBytes = Encoder.encodeToMsgPack(tx);
+        byte[] golden = Encoder.decodeFromBase64("this will fail until the golden is known");
+        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+
+        Assert.assertArrayEquals(outBytes, golden);
+        Assert.assertEquals(tx, o);
     }
 
 }
