@@ -85,7 +85,7 @@ public class TestTransaction {
         Address creator = addr;
         Address target = addr;
         BigInteger index = BigInteger.valueOf(1);
-        AssetID assetFreezeID = new AssetID(creator, assetIndex);
+        Transaction.AssetID assetFreezeID = new Transaction.AssetID(creator, assetIndex);
         boolean freezeState = true;
         Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), assetFreezeID, target, freezeState);
         tx = Account.transactionWithSuggestedFeePerByte(tx, BigInteger.valueOf(10));
