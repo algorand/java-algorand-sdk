@@ -198,7 +198,7 @@ public class Transaction implements Serializable {
         // populate ignored values with default or null values
         this(Type.AssetConfig, sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
                 BigInteger.valueOf(0), new Address(), new Address(), null, null, BigInteger.valueOf(0), BigInteger.valueOf(0), BigInteger.valueOf(0), new AssetID(creator, index), 
-                new AssetParams(BigInteger.valueOf(0), false, "", "", manager, reserve, freeze, clawback, new Address(), new AssetID(), false));
+                new AssetParams(BigInteger.valueOf(0), false, "", "", manager, reserve, freeze, clawback), new Address(), new AssetID(), false);
     }
 
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
