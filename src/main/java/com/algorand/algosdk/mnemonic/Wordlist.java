@@ -1574,7 +1574,7 @@ public class Wordlist {
             "service",
             "session",
             "settle",
-            "setupIfNeeded",
+            "setup",
             "seven",
             "shadow",
             "shaft",
