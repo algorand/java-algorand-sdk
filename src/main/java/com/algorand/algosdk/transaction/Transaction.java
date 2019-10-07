@@ -353,7 +353,7 @@ public class Transaction implements Serializable {
                 assetID.equals(that.assetID) &&
                 freezeTarget.equals(that.freezeTarget) &&
                 assetFreezeID.equals(that.assetFreezeID) &&
-                freezeState != that.freezeState;
+                freezeState == that.freezeState;
     }
 
     @JsonPropertyOrder(alphabetic=true)
