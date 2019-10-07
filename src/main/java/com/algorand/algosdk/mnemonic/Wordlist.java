@@ -1,6 +1,9 @@
 package com.algorand.algosdk.mnemonic;
 
+import java.util.Arrays;
+
 public class Wordlist {
+    private static final String RAW_CHECKSUM = "cancel";
     public static final String[] RAW = new String[]{
             "abandon",
             "ability",
@@ -2051,4 +2054,11 @@ public class Wordlist {
             "zone",
             "zoo",
     };
+
+    // check that the words we'rent modified
+    static {
+        if (!Mnemonic.checksum(Arrays.toString(RAW).getBytes()).equals(RAW_CHECKSUM)) {
+            throw new RuntimeException("cannot initialize passphrase library: wordlist corrupted");
+        }
+    }
 }
