@@ -87,15 +87,16 @@ public class TestTransaction {
         BigInteger index = BigInteger.valueOf(1);
         Transaction.AssetID assetFreezeID = new Transaction.AssetID(creator, index);
         boolean freezeState = true;
-        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), assetFreezeID, target, freezeState);
+        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null,
+                "", new Digest(gh), assetFreezeID, target, freezeState);
         tx = Account.transactionWithSuggestedFeePerByte(tx, BigInteger.valueOf(10));
-
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
-        byte[] golden = Encoder.decodeFromBase64("this will fail until the golden is known");
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+        byte[] golden = Encoder.decodeFromBase64("iaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkgqFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFpAaNmZWXNCqCiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
 
         Assert.assertArrayEquals(outBytes, golden);
         Assert.assertEquals(tx, o);
+        return;
     }
 
 }
