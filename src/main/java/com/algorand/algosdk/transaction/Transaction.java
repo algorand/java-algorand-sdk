@@ -71,10 +71,10 @@ public class Transaction implements Serializable {
     public AssetID assetID = new AssetID();
 
     /* asset freeze fields */
-    @JsonProperty("faid")
-    public AssetID assetFreezeID = new AssetID();
     @JsonProperty("fadd")
     public Address freezeTarget = new Address();
+    @JsonProperty("faid")
+    public AssetID assetFreezeID = new AssetID();
     @JsonProperty("afrz")
     public boolean freezeState = false;
 
@@ -249,12 +249,12 @@ public class Transaction implements Serializable {
                         @JsonProperty("votekd") BigInteger voteKeyDilution,
                         @JsonProperty("caid") AssetID assetID,
                         @JsonProperty("apar") AssetParams assetParams,
-                        @JsonProperty("fadd") Address freezeTarget,
+                        @JsonProperty("fadd") byte[] freezeTarget,
                         @JsonProperty("faid") AssetID assetFreezeID,
                         @JsonProperty("afrz") boolean freezeState) {
         this(type, new Address(sender), fee, firstValid, lastValid, note, genesisID, new Digest(genesisHash), amount,
                 new Address(receiver), new Address(closeRemainderTo), new ParticipationPublicKey(votePK), new VRFPublicKey(vrfPK),
-                voteFirst, voteLast, voteKeyDilution, assetID, assetParams, freezeTarget, assetFreezeID, freezeState);
+                voteFirst, voteLast, voteKeyDilution, assetID, assetParams, new Address(freezeTarget), assetFreezeID, freezeState);
     }
 
     private Transaction(Type type,
