@@ -77,4 +77,26 @@ public class TestTransaction {
         Assert.assertEquals(tx, o);
     }
 
+    @Test
+    public void testSerializationAssetFreeze() throws Exception {
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address creator = addr;
+        Address target = addr;
+        BigInteger index = BigInteger.valueOf(1);
+        Transaction.AssetID assetFreezeID = new Transaction.AssetID(creator, index);
+        boolean freezeState = true;
+        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null,
+                "", new Digest(gh), assetFreezeID, target, freezeState);
+        tx = Account.transactionWithSuggestedFeePerByte(tx, BigInteger.valueOf(10));
+        byte[] outBytes = Encoder.encodeToMsgPack(tx);
+        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+        byte[] golden = Encoder.decodeFromBase64("iaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkgqFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFpAaNmZWXNCqCiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
+
+        Assert.assertArrayEquals(outBytes, golden);
+        Assert.assertEquals(tx, o);
+        return;
+    }
+
 }
