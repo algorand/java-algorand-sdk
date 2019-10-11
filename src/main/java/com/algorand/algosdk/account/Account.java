@@ -10,8 +10,8 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.CryptoProvider;
-import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.SignatureUtils;
 
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -29,16 +29,10 @@ import java.util.Arrays;
 public class Account {
     private final KeyPair privateKeyPair;
     private final Address address;
-    private static final String KEY_ALGO = "Ed25519";
-    private static final String SIGN_ALGO = "EdDSA";
     private static final int PK_SIZE = 32;
     private static final int PK_X509_PREFIX_LENGTH = 12; // Ed25519 specific
-    private static final int SK_SIZE = 32;
-    private static final int SK_SIZE_BITS = SK_SIZE * 8;
-    private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
-    private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
-    private static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
+    private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);    
 
     /**
      * Account creates a new, random account.
@@ -59,12 +53,7 @@ public class Account {
 
     // randomSrc can be null, in which case system default is used
     private Account(SecureRandom randomSrc) throws NoSuchAlgorithmException {
-        CryptoProvider.setupIfNeeded();
-        KeyPairGenerator gen = KeyPairGenerator.getInstance(KEY_ALGO);
-        if (randomSrc != null) {
-            gen.initialize(SK_SIZE_BITS, randomSrc);
-        }
-        this.privateKeyPair = gen.generateKeyPair();
+ 	this.privateKeyPair = SignatureUtils.generateKeyPair(randomSrc);
         // now, convert public key to an address
         byte[] raw = this.getClearTextPublicKey();
         this.address = new Address(Arrays.copyOf(raw, raw.length));
@@ -121,19 +110,7 @@ public class Account {
      * @throws NoSuchAlgorithmException if signing algorithm could not be found
      */
     public SignedTransaction signTransaction(Transaction tx) throws NoSuchAlgorithmException {
-        try {
-            byte[] encodedTx = Encoder.encodeToMsgPack(tx);
-            // prepend hashable prefix
-            byte[] prefixEncodedTx = new byte[encodedTx.length + TX_SIGN_PREFIX.length];
-            System.arraycopy(TX_SIGN_PREFIX, 0, prefixEncodedTx, 0, TX_SIGN_PREFIX.length);
-            System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
-            // sign
-            Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
-            String txID = Encoder.encodeToBase32StripPad(Digester.digest(prefixEncodedTx));
-            return new SignedTransaction(tx, txSig, txID);
-        } catch (IOException e) {
-            throw new RuntimeException("unexpected behavior", e);
-        }
+        return (tx.signTransaction(this.privateKeyPair.getPrivate()));
     }
 
     /**
@@ -145,7 +122,7 @@ public class Account {
     public SignedTransaction signTransactionBytes(byte[] bytes) throws NoSuchAlgorithmException, IOException {
         try {
             Transaction tx = Encoder.decodeFromMsgPack(bytes, Transaction.class);
-            return this.signTransaction(tx);
+            return tx.signTransaction(this.privateKeyPair.getPrivate());
         } catch (IOException e) {
             throw new IOException("could not decode transaction", e);
         }
@@ -159,8 +136,8 @@ public class Account {
      * @throws NoSuchAlgorithmException crypto provider not found
      */
     public SignedTransaction signTransactionWithFeePerByte(Transaction tx, BigInteger feePerByte) throws NoSuchAlgorithmException {
-        Transaction feeTx = transactionWithSuggestedFeePerByte(tx, feePerByte);
-        return this.signTransaction(feeTx);
+        tx.setFeeWithSuggestedFeePerByte(feePerByte);
+        return this.signTransaction(tx);
     }
 
     /**
@@ -182,36 +159,6 @@ public class Account {
             throw new RuntimeException("unexpected behavior", e);
         }
     }
-
-    /**
-     * Creates a version of the given transaction with fee populated according to suggestedFeePerByte * estimateTxSize.
-     * @param copyTx transaction to populate fee field
-     * @param suggestedFeePerByte suggestedFee given by network
-     * @return transaction with proper fee set
-     * @throws NoSuchAlgorithmException could not estimate tx encoded size.
-     */
-    static public Transaction transactionWithSuggestedFeePerByte(Transaction copyTx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
-        BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(copyTx));
-        if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
-            newFee = MIN_TX_FEE_UALGOS;
-        }
-        switch (copyTx.type) {
-            case Payment:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.amount, copyTx.receiver, copyTx.closeRemainderTo);
-            case KeyRegistration:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.votePK, copyTx.selectionPK, copyTx.voteFirst, copyTx.voteLast, copyTx.voteKeyDilution);
-            case AssetConfig:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.assetID, copyTx.assetParams);
-            case Default:
-                throw new IllegalArgumentException("tx cannot have no type");
-            default:
-                throw new RuntimeException("cannot reach");
-        }
-    }
-
     /**
      * EstimateEncodedSize returns the estimated encoded size of the transaction including the signature.
      * This function is useful for calculating the fee from suggested fee per byte.
@@ -232,16 +179,7 @@ public class Account {
      * @return a signature
      */
     private Signature rawSignBytes(byte[] bytes) throws NoSuchAlgorithmException {
-        try {
-            CryptoProvider.setupIfNeeded();
-            java.security.Signature signer = java.security.Signature.getInstance(SIGN_ALGO);
-            signer.initSign(this.privateKeyPair.getPrivate());
-            signer.update(bytes);
-            byte[] sigRaw = signer.sign();
-            return new Signature(sigRaw);
-        } catch (InvalidKeyException|SignatureException e) {
-            throw new RuntimeException("unexpected behavior", e);
-        }
+        return new Signature(SignatureUtils.rawSignBytes(bytes, this.privateKeyPair.getPrivate()));
     }
 
     /**
