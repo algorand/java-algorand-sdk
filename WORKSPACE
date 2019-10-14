@@ -70,9 +70,9 @@ maven_install(
 # for pom_file, maven integration
 http_archive(
     name = "bazel_common",
-    strip_prefix = "bazel-common-f1115e0f777f08c3cdb115526c4e663005bec69b",
-    sha256 = "1e05a4791cc3470d3ecf7edb556f796b1d340359f1c4d293f175d4d0946cf84c",
-    url = "https://github.com/google/bazel-common/archive/f1115e0f777f08c3cdb115526c4e663005bec69b.zip",
+    strip_prefix = "bazel-common-413b433b91f26dbe39cdbc20f742ad6555dd1e27",
+    sha256 = "d8c9586b24ce4a5513d972668f94b62eb7d705b92405d4bc102131f294751f1d",
+    url = "https://github.com/google/bazel-common/archive/413b433b91f26dbe39cdbc20f742ad6555dd1e27.zip",
 )
 BAZEL_SKYLIB_TAG = "0.6.0"
 http_archive(
