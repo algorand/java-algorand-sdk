@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.io.Serializable;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,8 @@ import java.util.Objects;
 @JsonPropertyOrder(alphabetic=true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MultisigSignature implements Serializable {
+    private static final String SIGN_ALGO = "EdDSA";
+
     @JsonProperty("v")
     public int version;
     @JsonProperty("thr")
@@ -89,6 +92,43 @@ public class MultisigSignature implements Serializable {
                 return false;
             }
         }
+    }
+
+    /**
+     * Performs signature verification
+     * @param message raw message to verify
+     * @return boolean
+     */
+    public boolean verify(byte[] message) {
+        if (this.version != 1 || this.threshold <= 0 || this.subsigs.size() == 0) {
+            return false;
+        }
+        if (this.threshold > this.subsigs.size()) {
+            return false;
+        }
+
+        int verifiedCount = 0;
+        Signature emptySig = new Signature();
+        for (int i = 0; i < this.subsigs.size(); i++) {
+            MultisigSubsig subsig = this.subsigs.get(i);
+            if (!subsig.sig.equals(emptySig)) {
+                try {
+                    PublicKey pk = new Address(subsig.key.getBytes()).toVerifyKey();
+                    java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGO);
+                    sig.initVerify(pk);
+                    sig.update(message);
+                    boolean verified = sig.verify(subsig.sig.getBytes());
+                    if (verified) {
+                        verifiedCount += 1;
+                    }
+                } catch (Exception ex) {
+                }
+            }
+        }
+        if (verifiedCount < this.threshold) {
+            return false;
+        }
+        return true;
     }
 
     @Override

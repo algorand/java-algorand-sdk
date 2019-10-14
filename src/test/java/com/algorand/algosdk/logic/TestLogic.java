@@ -65,8 +65,11 @@ public class TestLogic {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
         };
+        boolean valid = Logic.checkProgram(program, null);
+        Assert.assertTrue(valid);
+
         ArrayList<byte[]> args = new ArrayList<byte[]>();
-        boolean valid = Logic.checkProgram(program, args);
+        valid = Logic.checkProgram(program, args);
         Assert.assertTrue(valid);
 
         byte[] arg = new byte[10];
