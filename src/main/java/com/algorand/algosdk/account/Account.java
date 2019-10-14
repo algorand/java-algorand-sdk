@@ -368,6 +368,54 @@ public class Account {
         }
     }
 
+    public LogicsigSignature signLogicsig(LogicsigSignature lsig) throws NoSuchAlgorithmException {
+        byte[] bytesToSign = lsig.bytesToSign();
+        lsig.sig = this.rawSignBytes(bytesToSign);
+        return lsig;
+    }
+
+    public LogicsigSignature signLogicsig(LogicsigSignature lsig, MultisigAddress ma) throws NoSuchAlgorithmException {
+        Ed25519PublicKey myPK = this.getEd25519PublicKey();
+        int myI = ma.publicKeys.indexOf(myPK);
+        if (myI == -1) {
+            throw new IllegalArgumentException("Multisig identity does not contain this secret key");
+        }
+        // now, create the multisignature
+        byte[] bytesToSign = lsig.bytesToSign();
+        Signature sig = this.rawSignBytes(bytesToSign);
+        MultisigSignature mSig = new MultisigSignature(ma.version, ma.threshold);
+        for (int i = 0; i < ma.publicKeys.size(); i++) {
+            if (i == myI) {
+                mSig.subsigs.add(new MultisigSubsig(myPK, sig));
+            } else {
+                mSig.subsigs.add(new MultisigSubsig(ma.publicKeys.get(i)));
+            }
+        }
+        lsig.msig = mSig;
+        return lsig;
+    }
+
+    public LogicsigSignature appendToLogicsig(LogicsigSignature lsig) throws IllegalStateException, NoSuchAlgorithmException {
+        Ed25519PublicKey myPK = this.getEd25519PublicKey();
+        int myI = -1;
+        for (int i = 0; i < lsig.msig.subsigs.size(); i++ ) {
+            MultisigSubsig subsig = lsig.msig.subsigs.get(i);
+            if (subsig.key.equals(myPK)) {
+                myI = i;
+            }
+        }
+        if (myI == -1) {
+            throw new IllegalArgumentException("Multisig identity does not contain this secret key");
+        }
+
+        // now, create the multisignature
+        byte[] bytesToSign = lsig.bytesToSign();
+        Signature sig = this.rawSignBytes(bytesToSign);
+        lsig.msig.subsigs.set(myI, new MultisigSubsig(myPK, sig));
+        return lsig;
+
+    }
+
     // Return a pre-set seed in response to nextBytes or generateSeed
     private static class FixedSecureRandom extends SecureRandom {
         private final byte[] fixedValue;

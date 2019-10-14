@@ -40,6 +40,13 @@ public class Logic {
     private static LangSpec langSpec;
     private static Operation[] opcodes;
 
+    /**
+     * Performs basic program validation: instruction count and program cost
+     * @param program Program to validate
+     * @param args Program arguments to validate
+     * @return boolean
+     * @throws IOException
+     */
     public static boolean checkProgram(byte[] program, ArrayList<byte[]> args) throws IOException {
         if (langSpec == null) {
             Reader reader;
@@ -67,6 +74,10 @@ public class Logic {
         int version = result.value;
         if (version > langSpec.EvalMaxVersion) {
             throw new IllegalArgumentException("unsupported version");
+        }
+
+        if (args == null) {
+            args = new ArrayList<byte[]>();
         }
 
         int cost = 0;
@@ -119,7 +130,7 @@ public class Logic {
         return true;
     }
 
-    public static int checkIntConstBlock(byte[] program, int pc) {
+    static int checkIntConstBlock(byte[] program, int pc) {
         int size = 1;
         VariantResult result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
         if (result.length <= 0) {
@@ -144,7 +155,7 @@ public class Logic {
         return size;
     }
 
-    public static int checkByteConstBlock(byte[] program, int pc) {
+    static int checkByteConstBlock(byte[] program, int pc) {
         int size = 1;
         VariantResult result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
         if (result.length <= 0) {

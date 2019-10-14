@@ -135,6 +135,30 @@ public class Address implements Serializable {
      * @return boolean; true if the signature is valid
      */
     public boolean verifyBytes(byte[] message, Signature signature) throws NoSuchAlgorithmException, InvalidKeySpecException, InvalidKeyException, SignatureException {
+        PublicKey pk = this.toVerifyKey();
+
+        // prepend the message prefix
+        byte[] prefixBytes = new byte[message.length + BYTES_SIGN_PREFIX.length];
+        System.arraycopy(BYTES_SIGN_PREFIX, 0, prefixBytes, 0, BYTES_SIGN_PREFIX.length);
+        System.arraycopy(message, 0, prefixBytes, BYTES_SIGN_PREFIX.length, message.length);
+
+        // verify signature
+        java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGO);
+        sig.initVerify(pk);
+        sig.update(prefixBytes);
+        return sig.verify(signature.getBytes());
+    }
+
+    /**
+     * toVerifyKey returns address' public key in a form suitable for
+     * java.security.Signature.initVerify
+     *
+     * @return PublicKey
+     * @throws InvalidKeySpecException
+     * @throws NoSuchAlgorithmException
+     */
+
+    public PublicKey toVerifyKey() throws InvalidKeySpecException, NoSuchAlgorithmException {
         CryptoProvider.setupIfNeeded();
         X509EncodedKeySpec pkS;
         try {
@@ -144,20 +168,12 @@ public class Address implements Serializable {
         } catch (IOException e) {
             throw new RuntimeException("could not parse raw key bytes", e);
         }
-        // prepend the message prefix
-        byte[] prefixBytes = new byte[message.length + BYTES_SIGN_PREFIX.length];
-        System.arraycopy(BYTES_SIGN_PREFIX, 0, prefixBytes, 0, BYTES_SIGN_PREFIX.length);
-        System.arraycopy(message, 0, prefixBytes, BYTES_SIGN_PREFIX.length, message.length);
-        
+
         // create public key
         KeyFactory kf = KeyFactory.getInstance(KEY_ALGO);
         PublicKey pk = kf.generatePublic(pkS);
-        
-        // verify signature
-        java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGO);
-        sig.initVerify(pk);
-        sig.update(prefixBytes);
-        return sig.verify(signature.getBytes());
+
+        return pk;
     }
 
     @Override

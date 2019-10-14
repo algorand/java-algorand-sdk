@@ -4,6 +4,7 @@ java_library(
     srcs = glob(["*.java"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//src/main/java/com/algorand/algosdk/logic:logic",
         "//src/main/java/com/algorand/algosdk/util:util",
         "@maven//:commons_codec_commons_codec",
         "@maven//:com_fasterxml_jackson_core_jackson_annotations",
