@@ -10,9 +10,13 @@ java_library(
 
 java_library(
     name = "algosdk_core",
+    resources = [
+        "//src/main/resources:langspec"
+    ],
     exports = [
         "//src/main/java/com/algorand/algosdk/account:account",
         "//src/main/java/com/algorand/algosdk/crypto:crypto",
+        "//src/main/java/com/algorand/algosdk/logic:logic",
         "//src/main/java/com/algorand/algosdk/mnemonic:mnemonic",
         "//src/main/java/com/algorand/algosdk/transaction:transaction",
         "//src/main/java/com/algorand/algosdk/util:util",
