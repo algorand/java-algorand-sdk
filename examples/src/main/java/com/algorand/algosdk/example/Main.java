@@ -19,15 +19,27 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
-import java.security.Security;
 import java.math.BigInteger;
+
 
 
 public class Main {
 
     public static void main(String args[]) throws Exception {
-        final String ALGOD_API_ADDR = "http://localhost:8080";
-        final String ALGOD_API_TOKEN = "b3ff7b3765bf33c7557a2cd334238eca07578e3ce266cb03fad93d12aab0622e";
+        if (args.length != 2) {
+            System.err.println("Required parameters: ALGOD_API_ADDR ALGOD_API_TOKEN");
+            System.err.println("The parameter values can be found in algod.net and algod.token files within the data directory of your algod install.");
+            System.exit(1);
+        }
+
+        // If the protocol is not specified in the address, http is added.
+        String algodApiAddrTmp = args[0];
+        if (algodApiAddrTmp.indexOf("//") == -1) {
+            algodApiAddrTmp = "http://" + algodApiAddrTmp;
+        }
+
+        final String ALGOD_API_ADDR = algodApiAddrTmp;
+        final String ALGOD_API_TOKEN = args[1];
         final String SRC_ACCOUNT = "viable grain female caution grant mind cry mention pudding oppose orchard people forget similar social gossip marble fish guitar art morning ring west above concert";
         final String DEST_ADDR = "KV2XGKMXGYJ6PWYQA5374BYIQBL3ONRMSIARPCFCJEAMAHQEVYPB7PL3KU";
 
@@ -68,6 +80,9 @@ public class Main {
         }
 
         // Generate a new transaction using randomly generated accounts (this is invalid, since src has no money...)
+        System.out.println("Attempting an invalid transaction: overspending using randomly generated accounts.");
+        System.out.println("Expecting overspend exception.");
+
         long amount = 100000;
         long lastRound = firstRound + 1000; // 1000 is the max tx window
         Transaction tx = new Transaction(src.getAddress(), new Address(DEST_ADDR), amount, firstRound, lastRound, genesisID, genesisHash);
@@ -83,9 +98,6 @@ public class Main {
             // This is generally expected, but should give us an informative error message.
             System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
         }
-
-        // now, demo kmd api
-//        kmdApi();
     }
 
     public static void kmdApi() {
