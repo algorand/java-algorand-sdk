@@ -3,6 +3,7 @@ package com.algorand.algosdk.account;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -13,6 +14,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -229,5 +231,43 @@ public class TestAccount {
         firstByte = (firstByte+1) % 256;
         message[0] = (byte) firstByte;
         Assert.assertFalse(address.verifyBytes(message, signature));
+    }
+
+    @Test
+    public void testLogicsigTransaction() throws Exception {
+        Address from = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+        Address to = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
+        String mn = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
+        Account account = new Account(mn);
+
+        BigInteger fee = BigInteger.valueOf(1000);
+        BigInteger amount = BigInteger.valueOf(2000);
+        String genesisID = "devnet-v1.0";
+        Digest genesisHash = new Digest(Encoder.decodeFromBase64("sC3P7e2SdbqKJK0tbiCdK9tdSpbe6XeCGKdoNzmlj0E"));
+        BigInteger firstRound = BigInteger.valueOf(2063137);
+        byte[] note = Encoder.decodeFromBase64("8xMCTuLQ810=");
+
+        Transaction tx = new Transaction(
+            from, fee, firstRound, firstRound.add(BigInteger.valueOf(1000)),
+            note, genesisID, genesisHash, amount, to, null
+        );
+
+        String goldenTx = "gqRsc2lng6NhcmeSxAMxMjPEAzQ1NqFsxAUBIAEBIqNzaWfEQE6HXaI5K0lcq50o/y3bWOYsyw9TLi/oorZB4xaNdn1Z14351u2f6JTON478fl+JhIP4HNRRAIh/I8EWXBPpJQ2jdHhuiqNhbXTNB9CjZmVlzQPoomZ2zgAfeyGjZ2Vuq2Rldm5ldC12MS4womdoxCCwLc/t7ZJ1uookrS1uIJ0r211Klt7pd4IYp2g3OaWPQaJsds4AH38JpG5vdGXECPMTAk7i0PNdo3JjdsQge2ziT+tbrMCxZOKcIixX9fY9w4fUOQSCWEEcX+EPfAKjc25kxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaR0eXBlo3BheQ==";
+
+        byte[] program = {
+            0x01, 0x20, 0x01, 0x01, 0x22  // int 1
+        };
+
+        ArrayList<byte[]> args = new ArrayList<byte[]>();
+        byte[] arg1 = {49, 50, 51};
+        byte[] arg2 = {52, 53, 54};
+        args.add(arg1);
+        args.add(arg2);
+
+        LogicsigSignature lsig = new LogicsigSignature(program, args);
+        account.signLogicsig(lsig);
+        SignedTransaction stx = Account.signLogicsigTransaction(lsig, tx);
+
+        Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx), Encoder.decodeFromBase64(goldenTx)));
     }
 }

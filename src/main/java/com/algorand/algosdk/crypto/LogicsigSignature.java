@@ -65,9 +65,10 @@ public class LogicsigSignature {
         this(logic, args, null, null);
     }
 
-    // public LogicsigSignature() {
-    //     this(new byte[0], null);
-    // }
+    public LogicsigSignature() {
+        this.logic = null;
+        this.args = null;
+    }
 
     /**
      * Calculate escrow address from logic sig program
@@ -96,6 +97,10 @@ public class LogicsigSignature {
      * @return boolean
      */
     public boolean verify(Address address) {
+        if (this.logic == null) {
+            return false;
+        }
+
         if (this.sig != null && this.msig != null) {
             return false;
         }
@@ -146,7 +151,10 @@ public class LogicsigSignature {
     public boolean equals(Object obj) {
         if (obj instanceof LogicsigSignature) {
             LogicsigSignature actual = (LogicsigSignature) obj;
+
+            if (!LogicsigSignature.nullCheck(this.logic, actual.logic)) return false;
             if (!Arrays.equals(this.logic, actual.logic)) return false;
+
             if (!LogicsigSignature.nullCheck(this.args, actual.args)) return false;
             if (this.args != null) {
                 if (this.args.size() != actual.args.size()) return false;
@@ -154,10 +162,13 @@ public class LogicsigSignature {
                     if (!Arrays.equals(this.args.get(i), actual.args.get(i))) return false;
                 }
             }
+
             if (!LogicsigSignature.nullCheck(this.sig, actual.sig)) return false;
             if (this.sig != null && !this.sig.equals(actual.sig)) return false;
+
             if (!LogicsigSignature.nullCheck(this.msig, actual.msig)) return false;
             if (this.msig != null && !this.msig.equals(actual.msig)) return false;
+
             return true;
         } else {
             return false;
