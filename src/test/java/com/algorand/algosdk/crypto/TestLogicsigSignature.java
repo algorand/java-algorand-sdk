@@ -94,7 +94,6 @@ public class TestLogicsigSignature {
 
         // check serialization
         byte[] outBytes = Encoder.encodeToMsgPack(lsig);
-        System.out.println(new String(outBytes));
         LogicsigSignature lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
         Assert.assertTrue(lsig.equals(lsig1));
     }

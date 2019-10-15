@@ -368,21 +368,46 @@ public class Account {
         }
     }
 
-    public LogicsigSignature signLogicsig(LogicsigSignature lsig) throws NoSuchAlgorithmException {
-        byte[] bytesToSign = lsig.bytesToSign();
-        lsig.sig = this.rawSignBytes(bytesToSign);
+    /**
+     * Sign LogicSig with account's secret key
+     * @param lsig LogicsigSignature to sign
+     * @return LogicsigSignature with updated signature
+     * @throws IOException
+     */
+    public LogicsigSignature signLogicsig(LogicsigSignature lsig) throws IOException {
+        Signature sig;
+        try {
+            byte[] bytesToSign = lsig.bytesToSign();
+            sig = this.rawSignBytes(bytesToSign);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("could not sign transaction", ex);
+        }
+        lsig.sig = sig;
         return lsig;
     }
 
-    public LogicsigSignature signLogicsig(LogicsigSignature lsig, MultisigAddress ma) throws NoSuchAlgorithmException {
+    /**
+     * Sign LogicSig as multisig
+     * @param lsig LogicsigSignature to sign
+     * @param ma MultisigAddress to format multi signature from
+     * @return LogicsigSignature
+     * @throws IOException
+     */
+    public LogicsigSignature signLogicsig(LogicsigSignature lsig, MultisigAddress ma) throws IOException {
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myI = ma.publicKeys.indexOf(myPK);
         if (myI == -1) {
             throw new IllegalArgumentException("Multisig identity does not contain this secret key");
         }
         // now, create the multisignature
-        byte[] bytesToSign = lsig.bytesToSign();
-        Signature sig = this.rawSignBytes(bytesToSign);
+        Signature sig;
+        try {
+            byte[] bytesToSign = lsig.bytesToSign();
+            sig = this.rawSignBytes(bytesToSign);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("could not sign transaction", ex);
+        }
+
         MultisigSignature mSig = new MultisigSignature(ma.version, ma.threshold);
         for (int i = 0; i < ma.publicKeys.size(); i++) {
             if (i == myI) {
@@ -395,7 +420,14 @@ public class Account {
         return lsig;
     }
 
-    public LogicsigSignature appendToLogicsig(LogicsigSignature lsig) throws IllegalStateException, NoSuchAlgorithmException {
+    /**
+     * Appends a signature to multisig logic signed transaction
+     * @param lsig LogicsigSignature append to
+     * @return LogicsigSignature
+     * @throws IllegalArgumentException
+     * @throws NoSuchAlgorithmException
+     */
+    public LogicsigSignature appendToLogicsig(LogicsigSignature lsig) throws IllegalArgumentException, IOException {
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myI = -1;
         for (int i = 0; i < lsig.msig.subsigs.size(); i++ ) {
@@ -408,12 +440,36 @@ public class Account {
             throw new IllegalArgumentException("Multisig identity does not contain this secret key");
         }
 
-        // now, create the multisignature
-        byte[] bytesToSign = lsig.bytesToSign();
-        Signature sig = this.rawSignBytes(bytesToSign);
-        lsig.msig.subsigs.set(myI, new MultisigSubsig(myPK, sig));
-        return lsig;
+        try {
+            // now, create the multisignature
+            byte[] bytesToSign = lsig.bytesToSign();
+            Signature sig = this.rawSignBytes(bytesToSign);
+            lsig.msig.subsigs.set(myI, new MultisigSubsig(myPK, sig));
+            return lsig;
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("could not sign transaction", ex);
+        }
 
+    }
+
+    /**
+     * Creates SignedTransaction from LogicsigSignature and Transaction.
+     * LogicsigSignature must be valid and verifiable against transaction sender field.
+     * @param lsig LogicsigSignature
+     * @param tx Transaction
+     * @return SignedTransaction
+     */
+
+    public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
+        if (!lsig.verify(tx.sender)) {
+            throw new IllegalArgumentException("verification failed");
+        }
+
+        try {
+            return new SignedTransaction(tx, lsig, tx.txID());
+        } catch (Exception ex) {
+            throw new IOException("could not encode transactions", ex);
+        }
     }
 
     // Return a pre-set seed in response to nextBytes or generateSeed
