@@ -11,6 +11,7 @@ import com.algorand.algosdk.algod.client.model.TransactionID;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
 import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletResponse;
@@ -20,9 +21,10 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxGroup;
 import com.algorand.algosdk.util.Encoder;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-
 
 
 public class Main {
@@ -115,6 +117,29 @@ public class Main {
             System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
         }
 
+        // format and send logic sig
+        byte[] program = {
+            0x01, 0x20, 0x01, 0x00, 0x22  // int 0
+        };
+
+        LogicsigSignature lsig = new LogicsigSignature(program, null);
+        System.out.println("Escrow address: " + lsig.toAddress().toString());
+
+        tx = new Transaction(lsig.toAddress(), new Address(DEST_ADDR), amount, firstRound, lastRound, genesisID, genesisHash);
+        if (!lsig.verify(tx.sender)) {
+            String msg = "Verification failed";
+            System.err.println(msg);
+        } else {
+            try {
+                SignedTransaction stx = Account.signLogicsigTransaction(lsig, tx);
+                byte[] encodedTxBytes = Encoder.encodeToMsgPack(signedTx);
+                TransactionID id = algodApiInstance.rawTransaction(encodedTxBytes);
+                System.out.println("Successfully sent tx logic sig tx id: " + id);
+            } catch (ApiException e) {
+                // This is generally expected, but should give us an informative error message.
+                System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
+            }
+        }
     }
 
     public static void kmdApi() {
@@ -140,6 +165,5 @@ public class Main {
             System.out.println("Failed to create wallet: " + e.getResponseBody());
             e.printStackTrace();
         }
-
     }
 }
