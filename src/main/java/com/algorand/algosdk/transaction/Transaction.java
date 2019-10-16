@@ -301,7 +301,6 @@ public class Transaction implements Serializable {
         tx.assetCloseTo = assetCloseTo; // aclose
         tx.assetAmount = assetAmount; // aamt
         tx.sender = assetSender; // snd
-
         return tx;
     }
 
