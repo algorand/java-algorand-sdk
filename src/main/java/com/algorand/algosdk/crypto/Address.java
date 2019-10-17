@@ -157,7 +157,6 @@ public class Address implements Serializable {
      * @throws InvalidKeySpecException
      * @throws NoSuchAlgorithmException
      */
-
     public PublicKey toVerifyKey() throws InvalidKeySpecException, NoSuchAlgorithmException {
         CryptoProvider.setupIfNeeded();
         X509EncodedKeySpec pkS;

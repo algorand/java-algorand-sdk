@@ -1,15 +1,19 @@
 package com.algorand.algosdk.logic;
 
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-import java.io.IOException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+/**
+ * Logic class provides static checkProgram function
+ * that can be used for client-side program validation for size and execution cost.
+ */
 public class Logic {
 
     private static final int MAX_COST = 20000;
@@ -142,7 +146,7 @@ public class Logic {
         int numInts = result.value;
         for (int i = 0; i < numInts; i++) {
             if (pc + size >= program.length) {
-                throw new IllegalArgumentException("intcblock ran past end of program");
+                throw new IllegalArgumentException("int const block exceeds program length");
             }
             result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
             if (result.length <= 0) {
@@ -167,7 +171,7 @@ public class Logic {
         int numInts = result.value;
         for (int i = 0; i < numInts; i++) {
             if (pc + size >= program.length) {
-                throw new IllegalArgumentException("bytecblock ran past end of program");
+                throw new IllegalArgumentException("byte[] const block exceeds program length");
             }
             result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
             if (result.length <= 0) {
@@ -177,7 +181,7 @@ public class Logic {
             }
             size += result.length;
             if (pc + size >= program.length) {
-                throw new IllegalArgumentException("bytecblock ran past end of program");
+                throw new IllegalArgumentException("byte[] const block exceeds program length");
             }
             size += result.value;
         }

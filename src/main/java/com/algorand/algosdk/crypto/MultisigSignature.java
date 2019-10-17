@@ -19,6 +19,7 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class MultisigSignature implements Serializable {
     private static final String SIGN_ALGO = "EdDSA";
+    private static final int MULTISIG_VERSION = 1;
 
     @JsonProperty("v")
     public int version;
@@ -98,9 +99,10 @@ public class MultisigSignature implements Serializable {
      * Performs signature verification
      * @param message raw message to verify
      * @return boolean
+     * @throws IllegalStateException on verification error
      */
     public boolean verify(byte[] message) {
-        if (this.version != 1 || this.threshold <= 0 || this.subsigs.size() == 0) {
+        if (this.version != MULTISIG_VERSION || this.threshold <= 0 || this.subsigs.size() == 0) {
             return false;
         }
         if (this.threshold > this.subsigs.size()) {
@@ -122,6 +124,7 @@ public class MultisigSignature implements Serializable {
                         verifiedCount += 1;
                     }
                 } catch (Exception ex) {
+                    throw new IllegalStateException("verification of subsig " + i + "failed", ex);
                 }
             }
         }
