@@ -1,6 +1,5 @@
 package com.algorand.algosdk.crypto;
 
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
 import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.util.Digester;
 
@@ -8,7 +7,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
@@ -21,6 +19,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 /**
  * Serializable logicsig class.
+ * LogicsigSignature is constructed from a program and optional arguments.
+ * Signature sig and MultisigSignature msig property are available for modification by it's clients.
  */
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -52,10 +52,10 @@ public class LogicsigSignature {
         try {
             verified = Logic.checkProgram(this.logic, this.args);
         } catch (IOException ex) {
+            throw new IllegalArgumentException("invalid program", ex);
         }
-        if (!verified) {
-            throw new IllegalArgumentException("invalid program");
-        }
+
+        assert verified == true;
 
         if (sig != null) this.sig = new Signature(sig);
         this.msig = msig;

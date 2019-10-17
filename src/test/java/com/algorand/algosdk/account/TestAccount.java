@@ -252,6 +252,30 @@ public class TestAccount {
             note, genesisID, genesisHash, amount, to, null
         );
 
+        /*
+        {
+        "lsig": {
+            "arg": [
+            "MTIz",
+            "NDU2"
+            ],
+            "l": "// version 1\nintcblock 1\nintc_0\n",
+            "sig": "ToddojkrSVyrnSj/LdtY5izLD1MuL+iitkHjFo12fVnXjfnW7Z/olM43jvx+X4mEg/gc1FEAiH8jwRZcE+klDQ=="
+        },
+        "txn": {
+            "amt": 2000,
+            "fee": 1000,
+            "fv": 2063137,
+            "gen": "devnet-v1.0",
+            "gh": "sC3P7e2SdbqKJK0tbiCdK9tdSpbe6XeCGKdoNzmlj0E=",
+            "lv": 2064137,
+            "note": "8xMCTuLQ810=",
+            "rcv": "PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI",
+            "snd": "47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU",
+            "type": "pay"
+            }
+        }
+        */
         String goldenTx = "gqRsc2lng6NhcmeSxAMxMjPEAzQ1NqFsxAUBIAEBIqNzaWfEQE6HXaI5K0lcq50o/y3bWOYsyw9TLi/oorZB4xaNdn1Z14351u2f6JTON478fl+JhIP4HNRRAIh/I8EWXBPpJQ2jdHhuiqNhbXTNB9CjZmVlzQPoomZ2zgAfeyGjZ2Vuq2Rldm5ldC12MS4womdoxCCwLc/t7ZJ1uookrS1uIJ0r211Klt7pd4IYp2g3OaWPQaJsds4AH38JpG5vdGXECPMTAk7i0PNdo3JjdsQge2ziT+tbrMCxZOKcIixX9fY9w4fUOQSCWEEcX+EPfAKjc25kxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaR0eXBlo3BheQ==";
 
         byte[] program = {

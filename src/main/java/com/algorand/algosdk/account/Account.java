@@ -1,11 +1,27 @@
 package com.algorand.algosdk.account;
 
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.SignatureException;
+import java.util.Arrays;
+
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
-import com.algorand.algosdk.crypto.*;
-import com.algorand.algosdk.crypto.Signature;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.LogicsigSignature;
+import com.algorand.algosdk.crypto.MultisigAddress;
+import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
+import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -15,12 +31,6 @@ import com.algorand.algosdk.util.Encoder;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.util.Arrays;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.
@@ -238,8 +248,8 @@ public class Account {
     /* Multisignature support */
 
     /**
-     * signMultisigTransaction creates a multisig transaction from the input and the multisig identity.
-     * @param from sign as this multisignature identity
+     * signMultisigTransaction creates a multisig transaction from the input and the multisig account.
+     * @param from sign as this multisignature account
      * @param tx the transaction to sign
      * @return SignedTransaction a partially signed multisig transaction
      * @throws NoSuchAlgorithmException if could not sign tx
@@ -247,13 +257,13 @@ public class Account {
     public SignedTransaction signMultisigTransaction(MultisigAddress from, Transaction tx) throws NoSuchAlgorithmException {
         // check that from addr of tx matches multisig preimage
         if (!tx.sender.toString().equals(from.toString())) {
-            throw new IllegalArgumentException("Transaction sender does not match multisig identity");
+            throw new IllegalArgumentException("Transaction sender does not match multisig account");
         }
         // check that account secret key is in multisig pk list
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myI = from.publicKeys.indexOf(myPK);
         if (myI == -1) {
-            throw new IllegalArgumentException("Multisig identity does not contain this secret key");
+            throw new IllegalArgumentException("Multisig account does not contain this secret key");
         }
         // now, create the multisignature
         SignedTransaction txSig = this.signTransaction(tx);
@@ -395,9 +405,9 @@ public class Account {
      */
     public LogicsigSignature signLogicsig(LogicsigSignature lsig, MultisigAddress ma) throws IOException {
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
-        int myI = ma.publicKeys.indexOf(myPK);
-        if (myI == -1) {
-            throw new IllegalArgumentException("Multisig identity does not contain this secret key");
+        int myIndex = ma.publicKeys.indexOf(myPK);
+        if (myIndex == -1) {
+            throw new IllegalArgumentException("Multisig account does not contain this secret key");
         }
         // now, create the multisignature
         Signature sig;
@@ -410,7 +420,7 @@ public class Account {
 
         MultisigSignature mSig = new MultisigSignature(ma.version, ma.threshold);
         for (int i = 0; i < ma.publicKeys.size(); i++) {
-            if (i == myI) {
+            if (i == myIndex) {
                 mSig.subsigs.add(new MultisigSubsig(myPK, sig));
             } else {
                 mSig.subsigs.add(new MultisigSubsig(ma.publicKeys.get(i)));
@@ -429,22 +439,22 @@ public class Account {
      */
     public LogicsigSignature appendToLogicsig(LogicsigSignature lsig) throws IllegalArgumentException, IOException {
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
-        int myI = -1;
+        int myIndex = -1;
         for (int i = 0; i < lsig.msig.subsigs.size(); i++ ) {
             MultisigSubsig subsig = lsig.msig.subsigs.get(i);
             if (subsig.key.equals(myPK)) {
-                myI = i;
+                myIndex = i;
             }
         }
-        if (myI == -1) {
-            throw new IllegalArgumentException("Multisig identity does not contain this secret key");
+        if (myIndex == -1) {
+            throw new IllegalArgumentException("Multisig account does not contain this secret key");
         }
 
         try {
             // now, create the multisignature
             byte[] bytesToSign = lsig.bytesToSign();
             Signature sig = this.rawSignBytes(bytesToSign);
-            lsig.msig.subsigs.set(myI, new MultisigSubsig(myPK, sig));
+            lsig.msig.subsigs.set(myIndex, new MultisigSubsig(myPK, sig));
             return lsig;
         } catch (NoSuchAlgorithmException ex) {
             throw new IOException("could not sign transaction", ex);
@@ -459,7 +469,6 @@ public class Account {
      * @param tx Transaction
      * @return SignedTransaction
      */
-
     public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
         if (!lsig.verify(tx.sender)) {
             throw new IllegalArgumentException("verification failed");
