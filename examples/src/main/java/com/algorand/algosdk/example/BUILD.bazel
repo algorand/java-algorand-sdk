@@ -1,9 +1,0 @@
-
-java_binary(
-    name = "example",
-    srcs = ["Main.java"],
-    main_class = "com.algorand.algosdk.example.Main",
-    deps = [
-        "//:algosdk",
-    ],
-)
