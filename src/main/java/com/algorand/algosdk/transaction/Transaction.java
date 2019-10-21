@@ -114,18 +114,6 @@ public class Transaction implements Serializable {
     public AssetID assetFreezeID = new AssetID();
     @JsonProperty("afrz")
     public boolean freezeState = false;
-
-
-    /**
-     * Set the transaction fee value.
-     * @param newFee the fee suggested for the transaction. If the
-     * newFee is less than the minimum transaction fee, it is replaced
-     * by the minimum fee. 
-     **/
-    public void setFee(BigInteger newFee) {
-        fee = newFee;
-    }    
-    
     
     /**
      * Create a payment transaction

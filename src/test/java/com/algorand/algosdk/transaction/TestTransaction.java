@@ -72,7 +72,7 @@ public class TestTransaction {
         Address clawback = addr;
 
         Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), creator, BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
-        Account.transactionWithSuggestedFeePerByte(tx, BigInteger.valueOf(10));
+        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
 
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         byte[] golden = Encoder.decodeFromBase64("iKRhcGFyhKFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRjYWlkgqFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFpzQTSo2ZlZc0OzqJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
@@ -94,7 +94,7 @@ public class TestTransaction {
         boolean freezeState = true;
         Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null,
                 "", new Digest(gh), assetFreezeID, target, freezeState);
-        Account.transactionWithSuggestedFeePerByte(tx, BigInteger.valueOf(10));
+        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
         byte[] golden = Encoder.decodeFromBase64("iaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkgqFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFpAaNmZWXNCqCiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
@@ -212,7 +212,7 @@ public class TestTransaction {
                 creator,
                 assetIndex);
 
-        Account.transactionWithSuggestedFeePerByte(tx, tx.fee);
+        Account.setFeeByFeePerByte(tx, tx.fee);
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
         Assert.assertEquals(o,  tx);
@@ -278,7 +278,7 @@ public class TestTransaction {
                 creator,
                 assetIndex);
 
-        Account.transactionWithSuggestedFeePerByte(tx, tx.fee);
+        Account.setFeeByFeePerByte(tx, tx.fee);
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
         Assert.assertEquals(o,  tx);

@@ -151,7 +151,7 @@ public class Account {
      * @throws NoSuchAlgorithmException crypto provider not found
      */
     public SignedTransaction signTransactionWithFeePerByte(Transaction tx, BigInteger feePerByte) throws NoSuchAlgorithmException {
-        transactionWithSuggestedFeePerByte(tx, feePerByte);
+        setFeeByFeePerByte(tx, feePerByte);
         return this.signTransaction(tx);
     }
 
@@ -181,12 +181,12 @@ public class Account {
      * @param suggestedFeePerByte suggestedFee given by network
      * @throws NoSuchAlgorithmException could not estimate tx encoded size.
      */
-    static public void transactionWithSuggestedFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
+    static public void setFeeByFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
         BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(tx));
         if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
             newFee = MIN_TX_FEE_UALGOS;
         }
-        tx.setFee(newFee);
+        tx.fee = newFee;
     }
 
     /**
