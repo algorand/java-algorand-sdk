@@ -16,7 +16,7 @@ package com.algorand.algosdk.kmd.client.model;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.ObjectUtils;
+import java.util.Objects;
 
 /**
  * APIV1POSTWalletRequest is the request for &#x60;POST /v1/wallet&#x60;
@@ -118,15 +118,15 @@ public class CreateWalletRequest {
     return false;
   }
     CreateWalletRequest createWalletRequest = (CreateWalletRequest) o;
-    return ObjectUtils.equals(this.masterDerivationKey, createWalletRequest.masterDerivationKey) &&
-    ObjectUtils.equals(this.walletDriverName, createWalletRequest.walletDriverName) &&
-    ObjectUtils.equals(this.walletName, createWalletRequest.walletName) &&
-    ObjectUtils.equals(this.walletPassword, createWalletRequest.walletPassword);
+    return Objects.equals(this.masterDerivationKey, createWalletRequest.masterDerivationKey) &&
+            Objects.equals(this.walletDriverName, createWalletRequest.walletDriverName) &&
+            Objects.equals(this.walletName, createWalletRequest.walletName) &&
+            Objects.equals(this.walletPassword, createWalletRequest.walletPassword);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(masterDerivationKey, walletDriverName, walletName, walletPassword);
+    return Objects.hash(masterDerivationKey, walletDriverName, walletName, walletPassword);
   }
 
 

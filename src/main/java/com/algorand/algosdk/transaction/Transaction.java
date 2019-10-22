@@ -15,6 +15,8 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A raw serializable transaction class, used to generate transactions to broadcast to the network.
@@ -194,8 +196,6 @@ public class Transaction implements Serializable {
      * @param genesisHash
      * @param creator asset creator
      * @param index asset index
-     * @param assetUnitName name of unit of the asset
-     * @param assetName name of the asset
      * @param manager account which can reconfigure the asset
      * @param reserve account whose asset holdings count as non-minted
      * @param freeze account which can freeze or unfreeze holder accounts
@@ -324,18 +324,33 @@ public class Transaction implements Serializable {
         AssetConfig("acfg"),
         AssetFreeze("afrz");
 
+        private static Map<String, Type> namesMap = new HashMap<String, Type>(5);
+
+        static {
+            namesMap.put(Default.value, Default);
+            namesMap.put(Payment.value, Payment);
+            namesMap.put(KeyRegistration.value, KeyRegistration);
+            namesMap.put(AssetConfig.value, AssetConfig);
+            namesMap.put(AssetFreeze.value, AssetFreeze);
+        }
+
         private final String value;
-        private Type(String value) {
+        Type(String value) {
             this.value = value;
         }
 
-        /**
-         * Get underlying string value
-         * @return String the string repr of this txtype
-         */
+        @JsonCreator
+        public static Type forValue(String value) {
+            return namesMap.get(value.toLowerCase());
+        }
+
         @JsonValue
-        public String getValue() {
-            return this.value;
+        public String toValue() {
+            for (Map.Entry<String, Type> entry : namesMap.entrySet()) {
+                if (entry.getValue() == this)
+                    return entry.getKey();
+            }
+            return null;
         }
     }
 
