@@ -584,13 +584,6 @@ public class Transaction implements Serializable {
         return tx;
     }
 
-
-
-
-
-
-
-    
     /**
      * TxType represents a transaction type.
      */
@@ -602,13 +595,14 @@ public class Transaction implements Serializable {
         AssetTransfer("axfer"),
         AssetFreeze("afrz");
 
-        private static Map<String, Type> namesMap = new HashMap<String, Type>(5);
+        private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
 
         static {
             namesMap.put(Default.value, Default);
             namesMap.put(Payment.value, Payment);
             namesMap.put(KeyRegistration.value, KeyRegistration);
             namesMap.put(AssetConfig.value, AssetConfig);
+            namesMap.put(AssetTransfer.value, AssetTransfer);
             namesMap.put(AssetFreeze.value, AssetFreeze);
         }
 
@@ -617,11 +611,20 @@ public class Transaction implements Serializable {
             this.value = value;
         }
 
+        /**
+         * Return the enumeration for the given string value. Required for JSON serialization.
+         * @param value string representation
+         * @return enumeration type
+         */
         @JsonCreator
         public static Type forValue(String value) {
-            return namesMap.get(value.toLowerCase());
+            return namesMap.get(value);
         }
 
+        /**
+         * Return the string value for this enumeration. Required for JSON serialization.
+         * @return string value
+         */
         @JsonValue
         public String toValue() {
             for (Map.Entry<String, Type> entry : namesMap.entrySet()) {
