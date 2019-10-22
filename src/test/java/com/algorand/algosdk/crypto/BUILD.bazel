@@ -24,3 +24,11 @@ java_test(
         ":tests",
     ],
 )
+
+java_test(
+    name = "TestLogicsigSignature",
+    size = "small",
+    runtime_deps = [
+        ":tests",
+    ],
+)
