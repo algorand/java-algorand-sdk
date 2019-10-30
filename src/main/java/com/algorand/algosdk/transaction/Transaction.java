@@ -7,6 +7,7 @@ import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.algod.client.model.AssetParams;
 import com.fasterxml.jackson.annotation.*;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -653,6 +655,7 @@ public class Transaction implements Serializable {
     public byte[] bytesToSign() throws IOException {
         try {
             byte[] encodedTx = Encoder.encodeToMsgPack(this);
+            String xxx = Encoder.encodeToJson(this);
             byte[] prefixEncodedTx = new byte[encodedTx.length + TX_SIGN_PREFIX.length];
             System.arraycopy(TX_SIGN_PREFIX, 0, prefixEncodedTx, 0, TX_SIGN_PREFIX.length);
             System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
@@ -763,6 +766,20 @@ public class Transaction implements Serializable {
 
         }
 
+        public com.algorand.algosdk.algod.client.model.AssetParams extractModelAssetParams() throws InvalidKeySpecException, NoSuchAlgorithmException {
+            com.algorand.algosdk.algod.client.model.AssetParams aParams = 
+                    new com.algorand.algosdk.algod.client.model.AssetParams();
+            
+            aParams.setTotal(this.assetTotal.intValue());
+            aParams.setDefaultfrozen(this.assetDefaultFrozen);
+            aParams.setUnitname(this.assetUnitName);
+            aParams.setAssetname(this.assetName);
+            aParams.setManagerkey(this.assetManager.toVerifyKey().toString());
+            aParams.setReserveaddr(this.assetReserve.toString());
+            aParams.setFreezeaddr(this.assetFreeze.toString());
+            aParams.setClawbackaddr(this.assetClawback.toString());
+            return aParams;
+        }
 
         @Override
         public boolean equals(Object o) {
