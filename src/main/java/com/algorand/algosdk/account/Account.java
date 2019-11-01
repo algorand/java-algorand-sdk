@@ -207,12 +207,6 @@ public class Account {
             case KeyRegistration:
                 return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
                         copyTx.votePK, copyTx.selectionPK, copyTx.voteFirst, copyTx.voteLast, copyTx.voteKeyDilution);
-            case AssetConfig:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.assetID, copyTx.assetParams);
-            case AssetFreeze:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.assetFreezeID, copyTx.freezeTarget, copyTx.freezeState);
             case Default:
                 throw new IllegalArgumentException("tx cannot have no type");
             default:
