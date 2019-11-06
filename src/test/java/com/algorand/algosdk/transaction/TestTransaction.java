@@ -8,7 +8,6 @@ import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Assert;
@@ -382,9 +381,7 @@ public class TestTransaction {
             ObjectMapper om = new ObjectMapper();
             SignedTransaction decodedTx = om.readerFor(tx.getClass()).readValue(encoded.getBytes());
             encoded2 = Encoder.encodeToJson(decodedTx);
-        } catch (JsonProcessingException e) {
-            return false;
-        } catch (IOException e) {
+        } catch (Exception e) {
             return false;
         }
         return encoded.contentEquals(encoded2);
