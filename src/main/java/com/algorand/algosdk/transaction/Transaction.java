@@ -261,7 +261,7 @@ public class Transaction implements Serializable {
      * @param freeze account which can freeze or unfreeze holder accounts
      * @param clawback account which can issue clawbacks against holder accounts
      */
-    public static Transaction AssetCreateTransaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+    public static Transaction createAssetCreateTransaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash, BigInteger assetTotal, boolean defaultFrozen,
                        String assetUnitName, String assetName, String url, byte[] metadataHash, 
                        Address manager, Address reserve, Address freeze, Address clawback) {
@@ -318,7 +318,7 @@ public class Transaction implements Serializable {
      * @param freeze account which can freeze or unfreeze holder accounts
      * @param clawback account which can issue clawbacks against holder accounts
      */
-    public static Transaction assetConfigurationTransaction(
+    public static Transaction createAssetConfigureTransaction(
             Address sender, 
             BigInteger fee, 
             BigInteger firstValid, 
@@ -526,7 +526,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset index
      **/
-    public static Transaction assetAcceptanceTransaction( //AssetTransaction
+    public static Transaction createAssetAcceptTransaction( //AssetTransaction
             Address acceptingAccount, 
             BigInteger flatFee,
             BigInteger firstRound,
@@ -536,7 +536,7 @@ public class Transaction implements Serializable {
             Digest genesisHash,
             BigInteger assetIndex) {
 
-        Transaction tx = assetTransferTransaction(
+        Transaction tx = createAssetTransferTransaction(
                 acceptingAccount,
                 acceptingAccount,
                 new Address(),
@@ -564,7 +564,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset ID to destroy
      **/
-    public static Transaction assetDestroyTransaction(
+    public static Transaction createAssetDestroyTransaction(
             Address senderAccount, 
             BigInteger flatFee,
             BigInteger firstValid,
@@ -597,7 +597,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset ID to destroy
      **/
-    public static Transaction assetFreezeTransaction(
+    public static Transaction createAssetFreezeTransaction(
             Address senderAccount, 
             Address accountToFreeze,
             boolean freezeState,
@@ -641,7 +641,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset index
      **/
-    public static Transaction assetRevokeTransaction(// AssetTransaction
+    public static Transaction createAssetRevokeTransaction(// AssetTransaction
             Address transactionSender,
             Address assetRevokedFrom,
             Address assetReceiver,
@@ -694,7 +694,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset index
      **/
-    public static Transaction assetTransferTransaction(// AssetTransaction
+    public static Transaction createAssetTransferTransaction(// AssetTransaction
             Address assetSender,
             Address assetReceiver,
             Address assetCloseTo,
