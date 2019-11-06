@@ -79,7 +79,7 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
 
-        Transaction tx = Transaction.assetConfigurationTransaction(
+        Transaction tx = Transaction.createAssetConfigureTransaction(
                 sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = account.signTransaction(tx);
@@ -108,7 +108,7 @@ public class TestTransaction {
         Address target = addr;
         BigInteger assetFreezeID = BigInteger.valueOf(1);
         boolean freezeState = true;
-        Transaction tx = Transaction.assetFreezeTransaction(                
+        Transaction tx = Transaction.createAssetFreezeTransaction(                
                 sender, target, freezeState, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323576), null,
                 new Digest(gh), assetFreezeID);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
@@ -223,7 +223,7 @@ public class TestTransaction {
         BigInteger firstValidRound = BigInteger.valueOf(322575);
         BigInteger lastValidRound = BigInteger.valueOf(323575);
 
-        Transaction tx = Transaction.assetAcceptanceTransaction(
+        Transaction tx = Transaction.createAssetAcceptTransaction(
                 recipient,
                 BigInteger.valueOf(10),
                 firstValidRound,
@@ -282,7 +282,7 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323576);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.assetTransferTransaction(
+        Transaction tx = Transaction.createAssetTransferTransaction(
                 sender,
                 recipient,
                 closeAssetsTo,
@@ -346,7 +346,7 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323575);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.assetRevokeTransaction(
+        Transaction tx = Transaction.createAssetRevokeTransaction(
                 revoker,
                 revokeFrom,
                 receiver,
