@@ -6,7 +6,6 @@ java_library(
     deps = [
         "//:algosdk",
         "@maven//:junit_junit",
-	"@mavenjackson//:com_fasterxml_jackson_core_jackson_databind",
     ],
 )
 
