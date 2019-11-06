@@ -8,6 +8,9 @@ import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -88,6 +91,8 @@ public class TestTransaction {
 
         Assert.assertArrayEquals(outBytes, golden);
         Assert.assertEquals(stx,  o);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+
     }
 
     @Test
@@ -114,6 +119,8 @@ public class TestTransaction {
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
         Assert.assertArrayEquals(outBytes, golden);
         Assert.assertEquals(stx, o);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+
         return;
     }
 
@@ -154,7 +161,10 @@ public class TestTransaction {
 
         Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx1), Encoder.decodeFromBase64(goldenTx1)));
         Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx2), Encoder.decodeFromBase64(goldenTx2)));
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx1));
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx2));
 
+        
         Digest gid = TxGroup.computeGroupID(new Transaction[]{tx1, tx2});
         tx1.assignGroupID(gid);
         tx2.assignGroupID(gid);
@@ -250,6 +260,7 @@ public class TestTransaction {
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
         Assert.assertEquals(stx, stxDecoded);
         Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
     }
 
 
@@ -314,6 +325,7 @@ public class TestTransaction {
 
         Assert.assertEquals(stx, stxDecoded);
         Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
     }
 
     @Test
@@ -359,6 +371,22 @@ public class TestTransaction {
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
 
         Assert.assertEquals(stx, stxDecoded);
-        Assert.assertArrayEquals(signedOutBytes, golden);
-    }    
+        Assert.assertArrayEquals(signedOutBytes, golden);    
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+    }
+    
+    private static boolean jsonSerializeDeserializeCheck(SignedTransaction tx) {
+        String encoded, encoded2;
+        try {
+            encoded = Encoder.encodeToJson(tx);
+            ObjectMapper om = new ObjectMapper();
+            SignedTransaction decodedTx = om.readerFor(tx.getClass()).readValue(encoded.getBytes());
+            encoded2 = Encoder.encodeToJson(decodedTx);
+        } catch (JsonProcessingException e) {
+            return false;
+        } catch (IOException e) {
+            return false;
+        }
+        return encoded.contentEquals(encoded2);
+    }
 }
