@@ -71,13 +71,13 @@ public class TestTransaction {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
-        Address creator = addr;
         Address manager = addr;
         Address reserve = addr;
         Address freeze = addr;
         Address clawback = addr;
 
-        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), creator, BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
+        Transaction tx = Transaction.assetConfigurationTransaction(
+                sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = account.signTransaction(tx);
         
@@ -103,12 +103,14 @@ public class TestTransaction {
         Address target = addr;
         BigInteger assetFreezeID = BigInteger.valueOf(1);
         boolean freezeState = true;
-        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323576), null,
-                "", new Digest(gh), assetFreezeID, target, freezeState);
+        Transaction tx = Transaction.assetFreezeTransaction(                
+                sender, target, freezeState, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323576), null,
+                new Digest(gh), assetFreezeID);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = account.signTransaction(tx);
         byte[] outBytes = Encoder.encodeToMsgPack(stx);
         SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
+        String sss = Encoder.encodeToJson(stx);
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
         Assert.assertArrayEquals(outBytes, golden);
         Assert.assertEquals(stx, o);
@@ -211,7 +213,7 @@ public class TestTransaction {
         BigInteger firstValidRound = BigInteger.valueOf(322575);
         BigInteger lastValidRound = BigInteger.valueOf(323575);
 
-        Transaction tx = Transaction.createAcceptAssetTransaction(
+        Transaction tx = Transaction.assetAcceptanceTransaction(
                 recipient,
                 BigInteger.valueOf(10),
                 firstValidRound,
@@ -269,7 +271,7 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323576);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.createTransferAssetTransaction(
+        Transaction tx = Transaction.assetTransferTransaction(
                 sender,
                 recipient,
                 closeAssetsTo,
@@ -313,4 +315,50 @@ public class TestTransaction {
         Assert.assertEquals(stx, stxDecoded);
         Assert.assertArrayEquals(signedOutBytes, golden);
     }
+
+    @Test
+    public void testMakeAssetRevocationTransaction() throws Exception {
+
+        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address revoker = addr;
+        Address revokeFrom = addr;
+        Address receiver = addr;
+
+        BigInteger assetIndex = BigInteger.valueOf(1);
+        BigInteger firstValidRound = BigInteger.valueOf(322575);
+        BigInteger lastValidRound = BigInteger.valueOf(323575);
+        BigInteger amountToSend = BigInteger.valueOf(1);
+
+        Transaction tx = Transaction.assetRevokeTransaction(
+                revoker,
+                revokeFrom,
+                receiver,
+                amountToSend,
+                BigInteger.valueOf(10),
+                firstValidRound,
+                lastValidRound,
+                null,
+                "",
+                new Digest(gh),
+                assetIndex);
+
+        Account.setFeeByFeePerByte(tx, tx.fee);
+        byte[] outBytes = Encoder.encodeToMsgPack(tx);
+        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+        Assert.assertEquals(o,  tx);
+
+        SignedTransaction stx = account.signTransaction(tx);
+        String sss = Encoder.encodeToJson(stx);
+        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQHsgfEAmEHUxLLLR9s+Y/yq5WeoGo/jAArCbany+7ZYwExMySzAhmV7M7S8+LBtJalB4EhzEUMKmt3kNKk6+vAWjdHhuiqRhYW10AaRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRhc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCqqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=");
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
+
+        Assert.assertEquals(stx, stxDecoded);
+        Assert.assertArrayEquals(signedOutBytes, golden);
+    }    
 }
