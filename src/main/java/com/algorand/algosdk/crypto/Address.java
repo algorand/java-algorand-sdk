@@ -193,4 +193,12 @@ public class Address implements Serializable {
             return false;
         }
     }
+    
+    // Compare to an address, with default address considered as empty string
+    public boolean compareTo(String address) {
+        if (this.equals(new Address())) {
+            return address.isEmpty();
+        }
+        return this.toString().equals(address);
+    }
 }

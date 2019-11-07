@@ -81,11 +81,11 @@ public class Transaction implements Serializable {
     @JsonProperty("apar")
     public AssetParams assetParams = new AssetParams();
     @JsonProperty("caid")
-    public AssetID assetID = new AssetID();
+    public BigInteger assetIndex = BigInteger.valueOf(0);
 
     /* asset transfer fields ***************************************************/
     @JsonProperty("xaid")
-    public AssetID xferAsset = new AssetID();
+    public BigInteger xferAsset = BigInteger.valueOf(0);
 
     // The amount of asset to transfer. A zero amount transferred to self
     // allocates that asset in the account's Assets map.
@@ -113,7 +113,7 @@ public class Transaction implements Serializable {
     @JsonProperty("fadd")
     public Address freezeTarget = new Address();
     @JsonProperty("faid")
-    public AssetID assetFreezeID = new AssetID();
+    public BigInteger assetFreezeID = BigInteger.valueOf(0);
     @JsonProperty("afrz")
     public boolean freezeState = false;
     
@@ -218,14 +218,17 @@ public class Transaction implements Serializable {
      * @param defaultFrozen whether accounts have this asset frozen by default
      * @param assetUnitName name of unit of the asset
      * @param assetName name of the asset
+     * @param url where more information about the asset can be retrieved
+     * @param metadataHash specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application
      * @param manager account which can reconfigure the asset
      * @param reserve account whose asset holdings count as non-minted
      * @param freeze account which can freeze or unfreeze holder accounts
      * @param clawback account which can issue clawbacks against holder accounts
      */
-    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+    private Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash, BigInteger assetTotal, boolean defaultFrozen,
-                       String assetUnitName, String assetName, Address manager, Address reserve, Address freeze, Address clawback) {
+                       String assetUnitName, String assetName, String url, byte[] metadataHash, 
+                       Address manager, Address reserve, Address freeze, Address clawback) {
         this.type = Type.AssetConfig;
         if (sender != null) this.sender = sender;
         if (fee != null) this.fee = fee;
@@ -235,9 +238,40 @@ public class Transaction implements Serializable {
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
  
-        this.assetParams = new AssetParams(assetTotal, defaultFrozen, assetUnitName, assetName, manager, reserve, freeze, clawback);        
+        this.assetParams = new AssetParams(assetTotal, defaultFrozen, assetUnitName, assetName, url, metadataHash, manager, reserve, freeze, clawback);        
     }
 
+    /**
+     * Create an asset creation transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
+     * @param sender source address
+     * @param fee transaction fee
+     * @param firstValid first valid round
+     * @param lastValid last valid round
+     * @param note optional note field (can be null)
+     * @param genesisID
+     * @param genesisHash
+     * @param assetTotal total asset issuance
+     * @param defaultFrozen whether accounts have this asset frozen by default
+     * @param assetUnitName name of unit of the asset
+     * @param assetName name of the asset
+     * @param url where more information about the asset can be retrieved
+     * @param metadataHash specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application
+     * @param manager account which can reconfigure the asset
+     * @param reserve account whose asset holdings count as non-minted
+     * @param freeze account which can freeze or unfreeze holder accounts
+     * @param clawback account which can issue clawbacks against holder accounts
+     */
+    public static Transaction createAssetCreateTransaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+                       String genesisID, Digest genesisHash, BigInteger assetTotal, boolean defaultFrozen,
+                       String assetUnitName, String assetName, String url, byte[] metadataHash, 
+                       Address manager, Address reserve, Address freeze, Address clawback) {
+        return new Transaction(
+                sender, fee, firstValid, lastValid, note,
+                genesisID, genesisHash, assetTotal, defaultFrozen,
+                assetUnitName, assetName, url, metadataHash, 
+                manager, reserve, freeze, clawback);
+    }
+    
     /**
      * Create an asset configuration transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
      * @param sender source address
@@ -247,15 +281,14 @@ public class Transaction implements Serializable {
      * @param note optional note field (can be null)
      * @param genesisID
      * @param genesisHash
-     * @param creator asset creator
      * @param index asset index
      * @param manager account which can reconfigure the asset
      * @param reserve account whose asset holdings count as non-minted
      * @param freeze account which can freeze or unfreeze holder accounts
      * @param clawback account which can issue clawbacks against holder accounts
      */
-    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       String genesisID, Digest genesisHash, Address creator, BigInteger index,
+    private Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
+                       String genesisID, Digest genesisHash, BigInteger index,
                     Address manager, Address reserve, Address freeze, Address clawback) {
  
         this.type = Type.AssetConfig;
@@ -266,52 +299,53 @@ public class Transaction implements Serializable {
         if (note != null) this.note = note;
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
-        this.assetParams = new AssetParams(BigInteger.valueOf(0), false, "", "", manager, reserve, freeze, clawback);
-        assetID = new AssetID(creator, index);
+        this.assetParams = new AssetParams(BigInteger.valueOf(0), false, "", "", "", null, manager, reserve, freeze, clawback);
+        assetIndex = index;
     }        
 
-    public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       String genesisID, Digest genesisHash, AssetID assetID, AssetParams assetParams) {
-        this.type = Type.AssetConfig;
-        if (sender != null) this.sender = sender;
-        if (fee != null) this.fee = fee;
-        if (firstValid != null) this.firstValid = firstValid;
-        if (lastValid != null) this.lastValid = lastValid;
-        if (note != null) this.note = note;
-        if (genesisID != null) this.genesisID = genesisID;
-        if (genesisHash != null) this.genesisHash = genesisHash;
-        if (assetParams != null) this.assetParams = assetParams;
-        if (assetID != null) this.assetID = assetID;
-    }
-
     /**
-     * Create an asset freeze/un-freeze transaction.
-     * @param sender source address (must be the freeze manager for said asset)
+     * Create an asset configuration transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
+     * @param sender source address
      * @param fee transaction fee
-     * @param firstValid first round transaction is valid
-     * @param lastValid last round transaction is valid
+     * @param firstValid first valid round
+     * @param lastValid last valid round
      * @param note optional note field (can be null)
      * @param genesisID
      * @param genesisHash
-     * @param assetFreezeID asset creator and index
-     * @param freezeTarget account to be un-frozen or frozen
-     * @param freezeState new frozen state for target account (true==frozen==cannot transact)
+     * @param index asset index
+     * @param manager account which can reconfigure the asset
+     * @param reserve account whose asset holdings count as non-minted
+     * @param freeze account which can freeze or unfreeze holder accounts
+     * @param clawback account which can issue clawbacks against holder accounts
      */
-    public Transaction (Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                        String genesisID, Digest genesisHash, AssetID assetFreezeID, Address freezeTarget, boolean freezeState) {
-        this.type = Type.AssetFreeze;
-        if (sender != null) this.sender = sender;
-        if (fee != null) this.fee = fee;
-        if (firstValid != null) this.firstValid = firstValid;
-        if (lastValid != null) this.lastValid = lastValid;
-        if (note != null) this.note = note;
-        if (genesisID != null) this.genesisID = genesisID;
-        if (genesisHash != null) this.genesisHash = genesisHash;
-        if (freezeTarget != null) this.freezeTarget = freezeTarget;
-        if (assetFreezeID != null) this.assetFreezeID = assetFreezeID;
-        this.freezeState = freezeState;
+    public static Transaction createAssetConfigureTransaction(
+            Address sender, 
+            BigInteger fee, 
+            BigInteger firstValid, 
+            BigInteger lastValid, 
+            byte[] note,
+            String genesisID, 
+            Digest genesisHash,
+            BigInteger index,
+            Address manager, 
+            Address reserve, 
+            Address freeze, 
+            Address clawback) {
+        return new Transaction(
+                sender, 
+                fee, 
+                firstValid, 
+                lastValid, 
+                note,
+                genesisID, 
+                genesisHash, 
+                index,
+                manager, 
+                reserve, 
+                freeze, 
+                clawback);
     }
-    
+   
     // workaround for nested JsonValue classes
     @JsonCreator
     private Transaction(@JsonProperty("type") Type type,
@@ -336,16 +370,16 @@ public class Transaction implements Serializable {
                         @JsonProperty("votekd") BigInteger voteKeyDilution,
                         // asset creation and configuration
                         @JsonProperty("apar") AssetParams assetParams,
-                        @JsonProperty("caid") AssetID assetID,
+                        @JsonProperty("caid") BigInteger assetIndex,
                         // Asset xfer transaction fields
-                        @JsonProperty("xaid") AssetID xferAsset,
+                        @JsonProperty("xaid") BigInteger xferAsset,
                         @JsonProperty("aamt") BigInteger assetAmount,
                         @JsonProperty("asnd") byte[] assetSender,
                         @JsonProperty("arcv") byte[] assetReceiver,
                         @JsonProperty("aclose") byte[] assetCloseTo,
                         // asset freeze fields
                         @JsonProperty("fadd") byte[] freezeTarget,
-                        @JsonProperty("faid") AssetID assetFreezeID,
+                        @JsonProperty("faid") BigInteger assetFreezeID,
                         @JsonProperty("afrz") boolean freezeState) {
         this(
 	     type,
@@ -370,7 +404,7 @@ public class Transaction implements Serializable {
 	     voteKeyDilution,
 	     // asset creation and configuration
 	     assetParams,
-	     assetID,
+	     assetIndex,
 	     // asset transfer fields
 	     xferAsset,
 	     assetAmount,
@@ -409,15 +443,15 @@ public class Transaction implements Serializable {
                         BigInteger voteKeyDilution,
                         // asset creation and configuration
                         AssetParams assetParams,
-                        AssetID assetID,
+                        BigInteger assetIndex,
                         // asset transfer fields
-                        AssetID xferAsset,
+                        BigInteger xferAsset,
                         BigInteger assetAmount,
                         Address assetSender,
                         Address assetReceiver,
                         Address assetCloseTo,
                         Address freezeTarget,
-                        AssetID assetFreezeID,
+                        BigInteger assetFreezeID,
                         boolean freezeState) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
@@ -437,7 +471,7 @@ public class Transaction implements Serializable {
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
         if (assetParams != null) this.assetParams = assetParams;
-        if (assetID != null) this.assetID = assetID;
+        if (assetIndex != null) this.assetIndex = assetIndex;
         if (xferAsset != null) this.xferAsset = xferAsset;
         if (assetAmount != null) this.assetAmount = assetAmount;
         if (assetSender != null) this.assetSender = assetSender;
@@ -450,9 +484,8 @@ public class Transaction implements Serializable {
 
     public Transaction() {}
 
-
     /**
-     * Base constructor with flat fee for asset xfer transactions.
+     * Base constructor with flat fee for asset xfer/freeze/destroy transactions.
      * @param flatFee is the transaction flat fee
      * @param firstRound is the first round this txn is valid (txn semantics
      * unrelated to asset management)
@@ -461,29 +494,22 @@ public class Transaction implements Serializable {
      * @param genesisID corresponds to the id of the network
      * @param genesisHash corresponds to the base64-encoded hash of the genesis
      * of the network
-     * @param assetCreator is the address of the asset creator
      * @param assetIndex is the asset index
      **/
-    private Transaction(// Asset xfer transaction
+    private Transaction(
+            Type type,
             BigInteger flatFee,
             BigInteger firstRound,
             BigInteger lastRound,
             byte [] note,
-            String genesisID,
-            Digest genesisHash,
-            Address assetCreator,
-            BigInteger assetIndex) {
+            Digest genesisHash) {
 
-        this.type = Type.AssetTransfer;
+        this.type = type;
         if (flatFee != null) this.fee = flatFee;
         if (firstRound != null) this.firstValid = firstRound;
         if (lastRound != null) this.lastValid = lastRound;
         if (note != null) this.note = note;
-        if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
-        if (assetCreator != null) this.xferAsset = new AssetID(assetCreator,
-                assetIndex);
-
     }
 
     /**
@@ -498,10 +524,9 @@ public class Transaction implements Serializable {
      * @param genesisID corresponds to the id of the network
      * @param genesisHash corresponds to the base64-encoded hash of the genesis
      * of the network
-     * @param assetCreator is the address of the asset creator
      * @param assetIndex is the asset index
      **/
-    public static Transaction createAcceptAssetTransaction( //AssetTransaction
+    public static Transaction createAssetAcceptTransaction( //AssetTransaction
             Address acceptingAccount, 
             BigInteger flatFee,
             BigInteger firstRound,
@@ -509,10 +534,9 @@ public class Transaction implements Serializable {
             byte [] note,
             String genesisID,
             Digest genesisHash,
-            Address assetCreator,
             BigInteger assetIndex) {
 
-        Transaction tx = createTransferAssetTransaction(
+        Transaction tx = createAssetTransferTransaction(
                 acceptingAccount,
                 acceptingAccount,
                 new Address(),
@@ -523,12 +547,130 @@ public class Transaction implements Serializable {
                 note,
                 genesisID,
                 genesisHash,
-                assetCreator,
                 assetIndex);
 
         return tx;
     }
 
+    /**
+     * Creates a tx to destroy the asset
+     * @param senderAccount is a checksummed, human-readable address of the sender 
+     * @param flatFee is the transaction flat fee
+     * @param firstValid is the first round this txn is valid (txn semantics
+     * unrelated to asset management)
+     * @param lastValid is the last round this txn is valid
+     * @param note
+     * @param genesisHash corresponds to the base64-encoded hash of the genesis
+     * of the network
+     * @param assetIndex is the asset ID to destroy
+     **/
+    public static Transaction createAssetDestroyTransaction(
+            Address senderAccount, 
+            BigInteger flatFee,
+            BigInteger firstValid,
+            BigInteger lastValid,
+            byte [] note,
+            Digest genesisHash,
+            BigInteger assetIndex) {
+        Transaction tx = new Transaction(
+                Type.AssetConfig,
+                flatFee,
+                firstValid,
+                lastValid,
+                note,
+                genesisHash);
+        
+        if (assetIndex != null) tx.assetIndex = assetIndex;
+        if (senderAccount != null) tx.sender = senderAccount;
+        return tx;
+    }
+
+    /**
+     * Creates a tx to freeze/unfreeze assets
+     * @param senderAccount is a checksummed, human-readable address of the sender 
+     * @param flatFee is the transaction flat fee
+     * @param firstValid is the first round this txn is valid (txn semantics
+     * unrelated to asset management)
+     * @param lastValid is the last round this txn is valid
+     * @param note
+     * @param genesisHash corresponds to the base64-encoded hash of the genesis
+     * of the network
+     * @param assetIndex is the asset ID to destroy
+     **/
+    public static Transaction createAssetFreezeTransaction(
+            Address senderAccount, 
+            Address accountToFreeze,
+            boolean freezeState,
+            BigInteger flatFee,
+            BigInteger firstValid,
+            BigInteger lastValid,
+            byte [] note,
+            Digest genesisHash,
+            BigInteger assetIndex) {
+        Transaction tx = new Transaction(
+                Type.AssetFreeze,
+                flatFee,
+                firstValid,
+                lastValid,
+                note,
+                genesisHash);
+        
+        if (senderAccount != null) tx.sender = senderAccount;
+        if (accountToFreeze != null) tx.freezeTarget = accountToFreeze;
+        if (assetIndex != null) tx.assetFreezeID = assetIndex;
+        tx.freezeState = freezeState;
+        return tx;
+    }    
+    
+    /**
+     * Creates a tx for revoking an asset from an account and sending it to another
+     * @param transactionSender is a checksummed, human-readable address that will
+     * send the transaction
+     * @param assetRevokedFrom is a checksummed, human-readable address that will
+     * have assets taken from
+     * @param assetReceiver is a checksummed, human-readable address what will
+     * receive the assets
+     * @param assetAmount is the number of assets to send
+     * @param flatFee is the transaction flat fee
+     * @param firstRound is the first round this txn is valid (txn semantics
+     * unrelated to asset management)
+     * @param lastRound is the last round this txn is valid
+     * @param note
+     * @param genesisID corresponds to the id of the network
+     * @param genesisHash corresponds to the base64-encoded hash of the genesis
+     * of the network
+     * @param assetIndex is the asset index
+     **/
+    public static Transaction createAssetRevokeTransaction(// AssetTransaction
+            Address transactionSender,
+            Address assetRevokedFrom,
+            Address assetReceiver,
+            BigInteger assetAmount,
+            BigInteger flatFee,
+            BigInteger firstRound,
+            BigInteger lastRound,
+            byte [] note,
+            String genesisID,
+            Digest genesisHash,
+            BigInteger assetIndex) {
+
+        Transaction tx = new Transaction(
+                Type.AssetTransfer,
+                flatFee,    // fee
+                firstRound, // fv
+                lastRound, // lv
+                note, //note
+                genesisHash); // gh
+
+        tx.assetReceiver = assetReceiver; //arcv
+        tx.assetSender = assetRevokedFrom; //asnd        
+        tx.assetAmount = assetAmount; // aamt
+        tx.sender = transactionSender; // snd
+        if (assetIndex != null) tx.xferAsset = assetIndex;
+        return tx;
+    }
+
+    
     /**
      * Creates a tx for sending some asset from an asset holder to another user.
      *  The asset receiver must have marked itself as willing to accept the
@@ -550,10 +692,9 @@ public class Transaction implements Serializable {
      * @param genesisID corresponds to the id of the network
      * @param genesisHash corresponds to the base64-encoded hash of the genesis
      * of the network
-     * @param assetCreator is the address of the asset creator
      * @param assetIndex is the asset index
      **/
-    public static Transaction createTransferAssetTransaction(// AssetTransaction
+    public static Transaction createAssetTransferTransaction(// AssetTransaction
             Address assetSender,
             Address assetReceiver,
             Address assetCloseTo,
@@ -564,23 +705,21 @@ public class Transaction implements Serializable {
             byte [] note,
             String genesisID,
             Digest genesisHash,
-            Address assetCreator,
             BigInteger assetIndex) {
 
         Transaction tx = new Transaction(
+                Type.AssetTransfer,
                 flatFee,    // fee
                 firstRound, // fv
                 lastRound, // lv
                 note, //note
-                genesisID, // gen
-                genesisHash, // gh
-                assetCreator, // c
-                assetIndex); // i
+                genesisHash); // gh
 
         tx.assetReceiver = assetReceiver; //arcv
         tx.assetCloseTo = assetCloseTo; // aclose
         tx.assetAmount = assetAmount; // aamt
         tx.sender = assetSender; // snd
+        if (assetIndex != null) tx.xferAsset = assetIndex;
         return tx;
     }
 
@@ -709,12 +848,12 @@ public class Transaction implements Serializable {
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
                 assetParams.equals(that.assetParams) &&
-                assetID.equals(that.assetID) &&
-	        xferAsset.equals(that.xferAsset) &&
-       	        assetAmount.equals(that.assetAmount) &&
-	        assetSender.equals(that.assetSender) &&
-	        assetReceiver.equals(that.assetReceiver) &&
-	        assetCloseTo.equals(that.assetCloseTo) &&
+                assetIndex.equals(that.assetIndex) &&
+                xferAsset.equals(that.xferAsset) &&
+                assetAmount.equals(that.assetAmount) &&
+                assetSender.equals(that.assetSender) &&
+                assetReceiver.equals(that.assetReceiver) &&
+                assetCloseTo.equals(that.assetCloseTo) &&
                 freezeTarget.equals(that.freezeTarget) &&
                 assetFreezeID.equals(that.assetFreezeID) &&
                 freezeState == that.freezeState;
@@ -726,33 +865,61 @@ public class Transaction implements Serializable {
         // total asset issuance
         @JsonProperty("t")
         public BigInteger assetTotal = BigInteger.valueOf(0);
+
         // whether each account has their asset slot frozen for this asset by default
         @JsonProperty("df")
         public boolean assetDefaultFrozen = false;
+
         // a hint to the unit name of the asset
         @JsonProperty("un")
         public String assetUnitName = "";
+
         // the name of the asset
         @JsonProperty("an")
         public String assetName = "";
+
+        // URL where more information about the asset can be retrieved
+        @JsonProperty("au")
+        public String url = "";
+
+        // MetadataHash specifies a commitment to some unspecified asset
+        // metadata. The format of this metadata is up to the application.
+        @JsonProperty("am")
+        public byte [] metadataHash;
+	
         // the address which has the ability to reconfigure the asset
         @JsonProperty("m")
         public Address assetManager = new Address();
+
         // the asset reserve: assets owned by this address do not count against circulation
         @JsonProperty("r")
         public Address assetReserve = new Address();
+
         // the address which has the ability to freeze/unfreeze accounts holding this asset
         @JsonProperty("f")
         public Address assetFreeze = new Address();
+
         // the address which has the ability to issue clawbacks against asset-holding accounts
         @JsonProperty("c")
         public Address assetClawback = new Address();
         
-        public AssetParams(BigInteger assetTotal, boolean defaultFrozen, String assetUnitName, String assetName, Address manager, Address reserve, Address freeze, Address clawback) {
+        public AssetParams(
+			   BigInteger assetTotal,
+			   boolean defaultFrozen,
+			   String assetUnitName,
+			   String assetName,
+			   String url,
+			   byte [] metadataHash,
+			   Address manager,
+			   Address reserve,
+			   Address freeze,
+			   Address clawback) {
             if(assetTotal != null) this.assetTotal = assetTotal;
             this.assetDefaultFrozen = defaultFrozen;
             if(assetUnitName != null) this.assetUnitName = assetUnitName;
             if(assetName != null) this.assetName = assetName;
+            if(url != null) this.url = url;
+            if(metadataHash != null) this.metadataHash = metadataHash;
             if(manager != null) this.assetManager = manager;
             if(reserve != null) this.assetReserve = reserve;
             if(freeze != null) this.assetFreeze = freeze;
@@ -773,6 +940,8 @@ public class Transaction implements Serializable {
                 (assetDefaultFrozen == that.assetDefaultFrozen) &&
                 assetName.equals(that.assetName) &&
                 assetUnitName.equals(that.assetUnitName) &&
+                url.equals(that.url) &&
+                Arrays.equals(metadataHash, that.metadataHash) &&
                 assetManager.equals(that.assetManager) &&
                 assetReserve.equals(that.assetReserve) &&
                 assetFreeze.equals(that.assetFreeze) &&
@@ -784,47 +953,24 @@ public class Transaction implements Serializable {
             @JsonProperty("df") boolean assetDefaultFrozen,
             @JsonProperty("un") String assetUnitName,
             @JsonProperty("an") String assetName,
+            @JsonProperty("au") String url,
+            @JsonProperty("am") byte[] metadataHash,
             @JsonProperty("m") byte[] assetManager,
             @JsonProperty("r") byte[] assetReserve,
             @JsonProperty("f") byte[] assetFreeze,
             @JsonProperty("c") byte[] assetClawback) {
-            this(assetTotal, assetDefaultFrozen, assetUnitName, assetName, new Address(assetManager), new Address(assetReserve), new Address(assetFreeze), new Address(assetClawback));
+            this(assetTotal, assetDefaultFrozen, assetUnitName, assetName, url, metadataHash, new Address(assetManager), new Address(assetReserve), new Address(assetFreeze), new Address(assetClawback));
+        }
+        
+        /**
+         * Convert the given object to string with each line indented by 4 spaces
+         * (except the first line).
+         */
+        private String toIndentedString(java.lang.Object o) {
+          if (o == null) {
+            return "null";
+          }
+          return o.toString().replace("\n", "\n    ");
         }
     }
-
-    @JsonPropertyOrder(alphabetic=true)
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    public static class AssetID implements Serializable {
-        // asset creator
-        @JsonProperty("c")
-        public Address creator = new Address();
-        // asset index
-        @JsonProperty("i")
-        public BigInteger index = BigInteger.valueOf(0);
-
-        public AssetID(Address creator, BigInteger index) {
-            if(creator != null) this.creator = creator;
-            if(index != null) this.index = index;
-        }
-
-        public AssetID() {
-
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            AssetID that = (AssetID) o;
-            return creator.equals(that.creator) &&
-                index.equals(that.index);
-        }
-
-        @JsonCreator
-        private AssetID(@JsonProperty("c") byte[] creator,
-            @JsonProperty("i") BigInteger index) {
-                this(new Address(creator), index);
-        }
-    }
-
 }

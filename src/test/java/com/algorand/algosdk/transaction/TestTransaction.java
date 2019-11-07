@@ -8,6 +8,8 @@ import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -63,45 +65,61 @@ public class TestTransaction {
 
     @Test
     public void testSerializationAssetConfig() throws Exception {
+
+        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
-        Address creator = addr;
         Address manager = addr;
         Address reserve = addr;
         Address freeze = addr;
         Address clawback = addr;
 
-        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), creator, BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
+        Transaction tx = Transaction.createAssetConfigureTransaction(
+                sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
+        SignedTransaction stx = account.signTransaction(tx);
+        
+        byte[] outBytes = Encoder.encodeToMsgPack(stx);
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQBBkfw5n6UevuIMDo2lHyU4dS80JCCQ/vTRUcTx5m0ivX68zTKyuVRrHaTbxbRRc3YpJ4zeVEnC9Fiw3Wf4REwejdHhuiKRhcGFyhKFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRjYWlkzQTSo2ZlZc0NSKJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
 
-        byte[] outBytes = Encoder.encodeToMsgPack(tx);
-        byte[] golden = Encoder.decodeFromBase64("iKRhcGFyhKFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRjYWlkgqFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFpzQTSo2ZlZc0OzqJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
-        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+        SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
 
         Assert.assertArrayEquals(outBytes, golden);
-        Assert.assertEquals(tx, o);
+        Assert.assertEquals(stx,  o);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+
     }
 
     @Test
     public void testSerializationAssetFreeze() throws Exception {
+
+        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
-        Address creator = addr;
         Address target = addr;
-        BigInteger index = BigInteger.valueOf(1);
-        Transaction.AssetID assetFreezeID = new Transaction.AssetID(creator, index);
+        BigInteger assetFreezeID = BigInteger.valueOf(1);
         boolean freezeState = true;
-        Transaction tx = new Transaction(sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null,
-                "", new Digest(gh), assetFreezeID, target, freezeState);
+        Transaction tx = Transaction.createAssetFreezeTransaction(                
+                sender, target, freezeState, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323576), null,
+                new Digest(gh), assetFreezeID);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
-        byte[] outBytes = Encoder.encodeToMsgPack(tx);
-        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
-        byte[] golden = Encoder.decodeFromBase64("iaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkgqFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFpAaNmZWXNCqCiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
-
+        SignedTransaction stx = account.signTransaction(tx);
+        byte[] outBytes = Encoder.encodeToMsgPack(stx);
+        SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
+        String sss = Encoder.encodeToJson(stx);
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
         Assert.assertArrayEquals(outBytes, golden);
-        Assert.assertEquals(tx, o);
+        Assert.assertEquals(stx, o);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+
         return;
     }
 
@@ -142,7 +160,10 @@ public class TestTransaction {
 
         Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx1), Encoder.decodeFromBase64(goldenTx1)));
         Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx2), Encoder.decodeFromBase64(goldenTx2)));
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx1));
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx2));
 
+        
         Digest gid = TxGroup.computeGroupID(new Transaction[]{tx1, tx2});
         tx1.assignGroupID(gid);
         tx2.assignGroupID(gid);
@@ -196,13 +217,12 @@ public class TestTransaction {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address recipient = addr;
-        Address creator = addr;
 
         BigInteger assetIndex = BigInteger.valueOf(1);
         BigInteger firstValidRound = BigInteger.valueOf(322575);
         BigInteger lastValidRound = BigInteger.valueOf(323575);
 
-        Transaction tx = Transaction.createAcceptAssetTransaction(
+        Transaction tx = Transaction.createAssetAcceptTransaction(
                 recipient,
                 BigInteger.valueOf(10),
                 firstValidRound,
@@ -210,7 +230,6 @@ public class TestTransaction {
                 null,
                 "",
                 new Digest(gh),
-                creator,
                 assetIndex);
 
         Account.setFeeByFeePerByte(tx, tx.fee);
@@ -219,30 +238,28 @@ public class TestTransaction {
         Assert.assertEquals(o,  tx);
 
         /*  Example from: go-algorand-sdk/transaction/transaction_test.go
-         *  {
-         *     "sig:b64": "0u7LDECdsm6RA0vqlX3w09zsDTNih1eYrwuIbISB64HMi4opQXdEZnWwJfbu31CWfkyTR+cGJ1aR7T7e4oHKDw==",
-         *     "txn": {
-         *       "arcv:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
-         *       "fee": 2670,
-         *       "fv": 322575,
-         *       "gh:b64": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
-         *       "lv": 323575,
-         *       "snd:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
-         *       "type": "axfer",
-         *       "xaid": {
-         *         "c:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
-         *         "i": 1
-         *       }
-         *     }
-         *   }
-         */
+        {
+            "sig:b64": "nuras5PxJv/AHQXzuV37XMymvFWViptRt76jPRYzrcVy0iL4r15gVKpPbpcFnhGvf5VMmkET4ksqzydy2X2GCA==",
+            "txn": {
+              "arcv:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
+              "fee": 2280,
+              "fv": 322575,
+              "gh:b64": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+              "lv": 323575,
+              "snd:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
+              "type": "axfer",
+              "xaid": 1
+            }
+          }
+         */  
         SignedTransaction stx = account.signTransaction(tx);
         byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQNLuywxAnbJukQNL6pV98NPc7A0zYodXmK8LiGyEgeuBzIuKKUF3RGZ1sCX27t9Qln5Mk0fnBidWke0+3uKByg+jdHhuiKRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCm6iZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZIKhY8QgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2haQE=");
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQJ7q2rOT8Sb/wB0F87ld+1zMprxVlYqbUbe+oz0WM63FctIi+K9eYFSqT26XBZ4Rr3+VTJpBE+JLKs8nctl9hgijdHhuiKRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCOiiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=");
 
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
         Assert.assertEquals(stx, stxDecoded);
         Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
     }
 
 
@@ -257,7 +274,6 @@ public class TestTransaction {
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
         Address recipient = addr;
-        Address creator = addr;
         Address closeAssetsTo = addr;
 
         BigInteger assetIndex = BigInteger.valueOf(1);
@@ -265,7 +281,7 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323576);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.createTransferAssetTransaction(
+        Transaction tx = Transaction.createAssetTransferTransaction(
                 sender,
                 recipient,
                 closeAssetsTo,
@@ -276,7 +292,6 @@ public class TestTransaction {
                 null,
                 "",
                 new Digest(gh),
-                creator,
                 assetIndex);
 
         Account.setFeeByFeePerByte(tx, tx.fee);
@@ -286,40 +301,89 @@ public class TestTransaction {
 
         /*
          * Golden from: go-algorand-sdk/transaction/transaction_test.go
-         *{
-         *  "sig:b64": "aST0K284qefidTn3GY8ahm9i/7pMK7kH3k+DBD9jK3AT12vX316ESoCdJLQLZJo7hiEQECT4lU6LBmJGr/DWCA==",
-         *  "txn": {
-         *    "aamt": 1,
-         *    "aclose:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
-         *    "arcv:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
-         *    "fee": 3140,
-         *    "fv": 322575,
-         *    "gh:b64": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
-         *    "lv": 323576,
-         *    "snd:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
-         *    "type": "axfer",
-         *    "xaid": {
-         *      "c:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
-         *      "i": 1
-         *    }
-         *  }
-         *}
-         *
-         * goal command:
-         * goal asset send  -a 1
-         * --from     BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4
-         * --to       BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4
-         * --creator  BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4
-         * --close-to BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4
-         * --assetid 1 -s
+            {
+              "sig:b64": "2QSzdZ18WrohAol0XWfT+FtX3Bouy+iPL2kzVPh+/B8w12MZAPL4t56y5BR9BVOd4kPhV8w/vMrHg5SUi1uvBA==",
+              "txn": {
+                "aamt": 1,
+                "aclose:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
+                "arcv:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
+                "fee": 2750,
+                "fv": 322575,
+                "gh:b64": "SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=",
+                "lv": 323576,
+                "snd:b64": "CfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f0=",
+                "type": "axfer",
+                "xaid": 1
+              }
+            }
          */
-
         SignedTransaction stx = account.signTransaction(tx);
         byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQGkk9CtvOKnn4nU59xmPGoZvYv+6TCu5B95PgwQ/YytwE9dr199ehEqAnSS0C2SaO4YhEBAk+JVOiwZiRq/w1gijdHhuiqRhYW10AaZhY2xvc2XEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pGFyY3bEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9o2ZlZc0MRKJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/4o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaVheGZlcqR4YWlkgqFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFpAQ==");
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQNkEs3WdfFq6IQKJdF1n0/hbV9waLsvojy9pM1T4fvwfMNdjGQDy+LeesuQUfQVTneJD4VfMP7zKx4OUlItbrwSjdHhuiqRhYW10AaZhY2xvc2XEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pGFyY3bEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9o2ZlZc0KvqJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/4o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaVheGZlcqR4YWlkAQ==");
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
 
         Assert.assertEquals(stx, stxDecoded);
         Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+    }
+
+    @Test
+    public void testMakeAssetRevocationTransaction() throws Exception {
+
+        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address revoker = addr;
+        Address revokeFrom = addr;
+        Address receiver = addr;
+
+        BigInteger assetIndex = BigInteger.valueOf(1);
+        BigInteger firstValidRound = BigInteger.valueOf(322575);
+        BigInteger lastValidRound = BigInteger.valueOf(323575);
+        BigInteger amountToSend = BigInteger.valueOf(1);
+
+        Transaction tx = Transaction.createAssetRevokeTransaction(
+                revoker,
+                revokeFrom,
+                receiver,
+                amountToSend,
+                BigInteger.valueOf(10),
+                firstValidRound,
+                lastValidRound,
+                null,
+                "",
+                new Digest(gh),
+                assetIndex);
+
+        Account.setFeeByFeePerByte(tx, tx.fee);
+        byte[] outBytes = Encoder.encodeToMsgPack(tx);
+        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+        Assert.assertEquals(o,  tx);
+
+        SignedTransaction stx = account.signTransaction(tx);
+        String sss = Encoder.encodeToJson(stx);
+        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQHsgfEAmEHUxLLLR9s+Y/yq5WeoGo/jAArCbany+7ZYwExMySzAhmV7M7S8+LBtJalB4EhzEUMKmt3kNKk6+vAWjdHhuiqRhYW10AaRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRhc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCqqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=");
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
+
+        Assert.assertEquals(stx, stxDecoded);
+        Assert.assertArrayEquals(signedOutBytes, golden);    
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+    }
+    
+    private static boolean jsonSerializeDeserializeCheck(SignedTransaction tx) {
+        String encoded, encoded2;
+        try {
+            encoded = Encoder.encodeToJson(tx);
+            ObjectMapper om = new ObjectMapper();
+            SignedTransaction decodedTx = om.readerFor(tx.getClass()).readValue(encoded.getBytes());
+            encoded2 = Encoder.encodeToJson(decodedTx);
+        } catch (Exception e) {
+            return false;
+        }
+        return encoded.contentEquals(encoded2);
     }
 }
