@@ -124,6 +124,51 @@ public class TestTransaction {
     }
 
     @Test
+    public void testPaymentTransaction() throws Exception {
+        final String FROM_SK = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+
+        Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+        Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
+        Address closeTo = new Address("IDUTJEUIEVSMXTU4LGTJWZ2UE2E6TIODUKU6UW3FU3UKIQQ77RLUBBBFLA");
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQPhUAZ3xkDDcc8FvOVo6UinzmKBCqs0woYSfodlmBMfQvGbeUx3Srxy3dyJDzv7rLm26BRv9FnL2/AuT7NYfiAWjdHhui6NhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0EmKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqRub3RlxAjqABVHQ2y/lqNyY3bEIHts4k/rW6zAsWTinCIsV/X2PcOH1DkEglhBHF/hD3wCo3NuZMQg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGkdHlwZaNwYXk=");
+
+        String mn = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
+        byte[] gh = Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=");
+        BigInteger firstValidRound = BigInteger.valueOf(12466);
+        BigInteger lastValidRound = BigInteger.valueOf(13466);
+        BigInteger amountToSend = BigInteger.valueOf(1000);
+        byte[] note = Encoder.decodeFromBase64("6gAVR0Nsv5Y=");
+        String genesisID = "devnet-v33.0";
+        Digest genesisHash = new Digest(Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="));
+
+        Transaction tx = new Transaction(fromAddr,
+                BigInteger.valueOf(4),
+                firstValidRound,
+                lastValidRound,
+                note,
+                genesisID,
+                genesisHash,
+                amountToSend,
+                toAddr,
+                closeTo);
+
+        Account.setFeeByFeePerByte(tx, tx.fee);
+        byte[] outBytes = Encoder.encodeToMsgPack(tx);
+        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+        Assert.assertEquals(o,  tx);
+
+        SignedTransaction stx = account.signTransaction(tx);
+        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
+
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
+        Assert.assertEquals(stx, stxDecoded);
+        Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+    }
+
+    @Test
     public void testTransactionGroup() throws Exception {
         Address from = new Address("UPYAFLHSIPMJOHVXU2MPLQ46GXJKSDCEMZ6RLCQ7GWB5PRDKJUWKKXECXI");
         Address to = new Address("UPYAFLHSIPMJOHVXU2MPLQ46GXJKSDCEMZ6RLCQ7GWB5PRDKJUWKKXECXI");
@@ -373,7 +418,55 @@ public class TestTransaction {
         Assert.assertArrayEquals(signedOutBytes, golden);    
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
     }
-    
+
+    @Test
+    public void testTransactionWithLease() throws Exception {
+
+        final String FROM_SK = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+
+        Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+        Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
+        Address closeTo = new Address("IDUTJEUIEVSMXTU4LGTJWZ2UE2E6TIODUKU6UW3FU3UKIQQ77RLUBBBFLA");
+        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQOMmFSIKsZvpW0txwzhmbgQjxv6IyN7BbV5sZ2aNgFbVcrWUnqPpQQxfPhV/wdu9jzEPUU1jAujYtcNCxJ7ONgejdHhujKNhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0FLKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqJseMQgAQIDBAECAwQBAgMEAQIDBAECAwQBAgMEAQIDBAECAwSkbm90ZcQI6gAVR0Nsv5ajcmN2xCB7bOJP61uswLFk4pwiLFf19j3Dh9Q5BIJYQRxf4Q98AqNzbmTEIOfw+E0GgR358xyNh4sRVfRnHVGhhcIAkIZn9ElYcGihpHR5cGWjcGF5=");
+
+        String mn = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
+        byte[] gh = Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=");
+        BigInteger firstValidRound = BigInteger.valueOf(12466);
+        BigInteger lastValidRound = BigInteger.valueOf(13466);
+        BigInteger amountToSend = BigInteger.valueOf(1000);
+        byte[] note = Encoder.decodeFromBase64("6gAVR0Nsv5Y=");
+        String genesisID = "devnet-v33.0";
+        Digest genesisHash = new Digest(Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="));
+
+        Transaction tx = new Transaction(fromAddr,
+                BigInteger.valueOf(4),
+                firstValidRound,
+                lastValidRound,
+                note,
+                genesisID,
+                genesisHash,
+                amountToSend,
+                toAddr,
+                closeTo);
+        byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
+        tx.setLease(lease);
+        Account.setFeeByFeePerByte(tx, tx.fee);
+        byte[] outBytes = Encoder.encodeToMsgPack(tx);
+        Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
+        Assert.assertEquals(o,  tx);
+
+        SignedTransaction stx = account.signTransaction(tx);
+        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
+
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
+        Assert.assertEquals(stx, stxDecoded);
+                
+        Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+    }
+
     private static boolean jsonSerializeDeserializeCheck(SignedTransaction tx) {
         String encoded, encoded2;
         try {
