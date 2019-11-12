@@ -49,6 +49,8 @@ public class Transaction implements Serializable {
     public Digest genesisHash = new Digest();
     @JsonProperty("grp")
     public Digest group = new Digest();
+    @JsonProperty("lx")
+    public byte[] lease; 
 
     /* payment fields  *********************************************************/
     @JsonProperty("amt")
@@ -357,6 +359,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("note") byte[] note,
                         @JsonProperty("gen") String genesisID,
                         @JsonProperty("gh") byte[] genesisHash,
+			@JsonProperty("lx") byte[] lease,
                         @JsonProperty("grp") byte[] group,			
                         // payment fields
                         @JsonProperty("amt") BigInteger amount,
@@ -391,6 +394,7 @@ public class Transaction implements Serializable {
 	     note,
 	     genesisID,
 	     new Digest(genesisHash),
+	     lease,
 	     new Digest(group),
 	     // payment fields
 	     amount,
@@ -429,6 +433,7 @@ public class Transaction implements Serializable {
                         byte[] note,
                         String genesisID,
                         Digest genesisHash,
+			byte[] lease,
                         Digest group,
                         // payment fields
                         BigInteger amount,
@@ -461,6 +466,7 @@ public class Transaction implements Serializable {
         if (note != null) this.note = note;
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
+	if (lease != null) this.lease = lease;
         if (group != null) this.group = group;	
         if (amount != null) this.amount = amount;
         if (receiver != null) this.receiver = receiver;
@@ -723,6 +729,22 @@ public class Transaction implements Serializable {
         return tx;
     }
 
+    /** Lease enforces mutual exclusion of transactions.  If this field
+     * is nonzero, then once the transaction is confirmed, it acquires
+     * the lease identified by the (Sender, Lease) pair of the
+     * transaction until the LastValid round passes.  While this
+     * transaction possesses the lease, no other transaction
+     * specifying this lease can be confirmed. 
+     * The Size is fixed at 32 bytes. 
+     * @param lease 32 byte lease
+     **/
+    public void setLease(byte[] lease) {
+        if (lease.length != 32 && lease.length != 0) {
+            throw new RuntimeException("The lease should be an empty array or a 32 byte array.");
+        }
+        this.lease = lease;
+    }
+
     /**
      * TxType represents a transaction type.
      */
@@ -838,6 +860,7 @@ public class Transaction implements Serializable {
                 Arrays.equals(note, that.note) &&
                 genesisID.equals(that.genesisID) &&
                 genesisHash.equals(that.genesisHash) &&
+	        Arrays.equals(lease, that.lease) &&
                 group.equals(that.group) &&
                 amount.equals(that.amount) &&
                 receiver.equals(that.receiver) &&
