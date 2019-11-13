@@ -26,7 +26,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Transaction implements Serializable {
     private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
-
+    private static final int LEASE_LENGTH = 32;
     @JsonProperty("type")
     public Type type = Type.Default;
 
@@ -739,7 +739,7 @@ public class Transaction implements Serializable {
      * @param lease 32 byte lease
      **/
     public void setLease(byte[] lease) {
-        if (lease.length != 32 && lease.length != 0) {
+        if (lease.length != LEASE_LENGTH && lease.length != 0) {
             throw new RuntimeException("The lease should be an empty array or a 32 byte array.");
         }
         this.lease = lease;
