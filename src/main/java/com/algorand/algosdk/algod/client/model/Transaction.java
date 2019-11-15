@@ -13,6 +13,8 @@
 
 package com.algorand.algosdk.algod.client.model;
 
+import com.algorand.algosdk.algod.client.model.TransactionResults;
+
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -59,6 +61,9 @@ public class Transaction {
 
   @SerializedName("tx")
   private String tx = null;
+
+  @SerializedName("txresults")
+  private TransactionResults txresults = null;
 
   @SerializedName("type")
   private String type = null;
@@ -279,6 +284,24 @@ public class Transaction {
     this.tx = tx;
   }
 
+  public Transaction txresults(TransactionResults txresults) {
+    this.txresults = txresults;
+    return this;
+  }
+
+   /**
+   * Get txresults
+   * @return txresults
+  **/
+  @ApiModelProperty(value = "")
+  public TransactionResults getTxresults() {
+    return txresults;
+  }
+
+  public void setTxresults(TransactionResults txresults) {
+    this.txresults = txresults;
+  }
+
   public Transaction type(String type) {
     this.type = type;
     return this;
@@ -319,12 +342,13 @@ public class Transaction {
     ObjectUtils.equals(this.poolerror, transaction.poolerror) &&
     ObjectUtils.equals(this.round, transaction.round) &&
     ObjectUtils.equals(this.tx, transaction.tx) &&
+    ObjectUtils.equals(this.txresults, transaction.txresults) &&
     ObjectUtils.equals(this.type, transaction.type);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(fee, firstRound, from, fromrewards, genesisID, genesishashb64, lastRound, noteb64, payment, poolerror, round, tx, type);
+    return ObjectUtils.hashCodeMulti(fee, firstRound, from, fromrewards, genesisID, genesishashb64, lastRound, noteb64, payment, poolerror, round, tx, txresults, type);
   }
 
 
@@ -345,6 +369,7 @@ public class Transaction {
     sb.append("    poolerror: ").append(toIndentedString(poolerror)).append("\n");
     sb.append("    round: ").append(toIndentedString(round)).append("\n");
     sb.append("    tx: ").append(toIndentedString(tx)).append("\n");
+    sb.append("    txresults: ").append(toIndentedString(txresults)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
