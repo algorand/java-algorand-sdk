@@ -26,15 +26,6 @@ import org.apache.commons.lang3.ObjectUtils;
 @ApiModel(description = "Transaction contains all fields common to all transactions and serves as an envelope to all transactions type")
 
 public class Transaction {
-  @SerializedName("curcfg")
-  private AssetConfigTransactionType curcfg = null;
-
-  @SerializedName("curfrz")
-  private AssetFreezeTransactionType curfrz = null;
-
-  @SerializedName("curxfer")
-  private AssetTransferTransactionType curxfer = null;
-
   @SerializedName("fee")
   private java.math.BigInteger fee = null;
 
@@ -52,12 +43,6 @@ public class Transaction {
 
   @SerializedName("genesishashb64")
   private byte[] genesishashb64 = null;
-
-  @SerializedName("group")
-  private byte[] group = null;
-
-  @SerializedName("keyreg")
-  private KeyregTransactionType keyreg = null;
 
   @SerializedName("last-round")
   private java.math.BigInteger lastRound = null;
@@ -82,60 +67,6 @@ public class Transaction {
 
   @SerializedName("type")
   private String type = null;
-
-  public Transaction curcfg(AssetConfigTransactionType curcfg) {
-    this.curcfg = curcfg;
-    return this;
-  }
-
-   /**
-   * Get curcfg
-   * @return curcfg
-  **/
-  @ApiModelProperty(value = "")
-  public AssetConfigTransactionType getCurcfg() {
-    return curcfg;
-  }
-
-  public void setCurcfg(AssetConfigTransactionType curcfg) {
-    this.curcfg = curcfg;
-  }
-
-  public Transaction curfrz(AssetFreezeTransactionType curfrz) {
-    this.curfrz = curfrz;
-    return this;
-  }
-
-   /**
-   * Get curfrz
-   * @return curfrz
-  **/
-  @ApiModelProperty(value = "")
-  public AssetFreezeTransactionType getCurfrz() {
-    return curfrz;
-  }
-
-  public void setCurfrz(AssetFreezeTransactionType curfrz) {
-    this.curfrz = curfrz;
-  }
-
-  public Transaction curxfer(AssetTransferTransactionType curxfer) {
-    this.curxfer = curxfer;
-    return this;
-  }
-
-   /**
-   * Get curxfer
-   * @return curxfer
-  **/
-  @ApiModelProperty(value = "")
-  public AssetTransferTransactionType getCurxfer() {
-    return curxfer;
-  }
-
-  public void setCurxfer(AssetTransferTransactionType curxfer) {
-    this.curxfer = curxfer;
-  }
 
   public Transaction fee(java.math.BigInteger fee) {
     this.fee = fee;
@@ -243,42 +174,6 @@ public class Transaction {
 
   public void setGenesishashb64(byte[] genesishashb64) {
     this.genesishashb64 = genesishashb64;
-  }
-
-  public Transaction group(byte[] group) {
-    this.group = group;
-    return this;
-  }
-
-   /**
-   * Group
-   * @return group
-  **/
-  @ApiModelProperty(value = "Group")
-  public byte[] getGroup() {
-    return group;
-  }
-
-  public void setGroup(byte[] group) {
-    this.group = group;
-  }
-
-  public Transaction keyreg(KeyregTransactionType keyreg) {
-    this.keyreg = keyreg;
-    return this;
-  }
-
-   /**
-   * Get keyreg
-   * @return keyreg
-  **/
-  @ApiModelProperty(value = "")
-  public KeyregTransactionType getKeyreg() {
-    return keyreg;
-  }
-
-  public void setKeyreg(KeyregTransactionType keyreg) {
-    this.keyreg = keyreg;
   }
 
   public Transaction lastRound(java.math.BigInteger lastRound) {
@@ -413,10 +308,10 @@ public class Transaction {
   }
 
    /**
-   * Type is the transaction type
+   * Get type
    * @return type
   **/
-  @ApiModelProperty(required = true, value = "Type is the transaction type")
+  @ApiModelProperty(required = true, value = "")
   public String getType() {
     return type;
   }
@@ -435,17 +330,12 @@ public class Transaction {
     return false;
   }
     Transaction transaction = (Transaction) o;
-    return ObjectUtils.equals(this.curcfg, transaction.curcfg) &&
-    ObjectUtils.equals(this.curfrz, transaction.curfrz) &&
-    ObjectUtils.equals(this.curxfer, transaction.curxfer) &&
-    ObjectUtils.equals(this.fee, transaction.fee) &&
+    return ObjectUtils.equals(this.fee, transaction.fee) &&
     ObjectUtils.equals(this.firstRound, transaction.firstRound) &&
     ObjectUtils.equals(this.from, transaction.from) &&
     ObjectUtils.equals(this.fromrewards, transaction.fromrewards) &&
     ObjectUtils.equals(this.genesisID, transaction.genesisID) &&
     ObjectUtils.equals(this.genesishashb64, transaction.genesishashb64) &&
-    ObjectUtils.equals(this.group, transaction.group) &&
-    ObjectUtils.equals(this.keyreg, transaction.keyreg) &&
     ObjectUtils.equals(this.lastRound, transaction.lastRound) &&
     ObjectUtils.equals(this.noteb64, transaction.noteb64) &&
     ObjectUtils.equals(this.payment, transaction.payment) &&
@@ -467,17 +357,12 @@ public class Transaction {
     StringBuilder sb = new StringBuilder();
     sb.append("class Transaction {\n");
     
-    sb.append("    curcfg: ").append(toIndentedString(curcfg)).append("\n");
-    sb.append("    curfrz: ").append(toIndentedString(curfrz)).append("\n");
-    sb.append("    curxfer: ").append(toIndentedString(curxfer)).append("\n");
     sb.append("    fee: ").append(toIndentedString(fee)).append("\n");
     sb.append("    firstRound: ").append(toIndentedString(firstRound)).append("\n");
     sb.append("    from: ").append(toIndentedString(from)).append("\n");
     sb.append("    fromrewards: ").append(toIndentedString(fromrewards)).append("\n");
     sb.append("    genesisID: ").append(toIndentedString(genesisID)).append("\n");
     sb.append("    genesishashb64: ").append(toIndentedString(genesishashb64)).append("\n");
-    sb.append("    group: ").append(toIndentedString(group)).append("\n");
-    sb.append("    keyreg: ").append(toIndentedString(keyreg)).append("\n");
     sb.append("    lastRound: ").append(toIndentedString(lastRound)).append("\n");
     sb.append("    noteb64: ").append(toIndentedString(noteb64)).append("\n");
     sb.append("    payment: ").append(toIndentedString(payment)).append("\n");
