@@ -1,17 +1,15 @@
 package com.algorand.algosdk.templates;
 
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 
 import com.algorand.algosdk.templates.ContractTemplate.DataType;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
-
 import com.algorand.algosdk.util.Encoder;
 
 public class HTLC {
 
 	private static String referenceProgram = "ASAEBQEABiYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITAQYg5pqWHm8tX3rIZgeSZVK+mCNe0zNjyoiRi7nJOKkVtvkxASIOMRAjEhAxBzIDEhAxCCQSEDEJKBItASkSEDEJKhIxAiUNEBEQ";
-	private static int [] referenceOffsets = {3, 6, 10, 42, 44, 101};
+	private static int [] referenceOffsets = {3, 6, 10, 42, 45, 102};
 	/**
 	 * 
 	 * @param owner an address that can receive the asset after the expiry round
@@ -32,7 +30,6 @@ public class HTLC {
 			int maxFee) throws NoSuchAlgorithmException {
 
 		int hashInject = 0;
-		String programToUse;
 		if (hashFunction.equals("sha256")) {
 			hashInject = 1;
 		} else if (hashFunction.equals("keccak256")) {
