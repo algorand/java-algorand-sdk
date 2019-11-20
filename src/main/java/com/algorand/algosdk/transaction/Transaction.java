@@ -317,33 +317,45 @@ public class Transaction implements Serializable {
      * @param reserve account whose asset holdings count as non-minted
      * @param freeze account which can freeze or unfreeze holder accounts
      * @param clawback account which can issue clawbacks against holder accounts
+     * @param strictEmptyAddressChecking if true, disallow empty admin accounts from being set (preventing accidental disable of admin features)
      */
     public static Transaction createAssetConfigureTransaction(
-            Address sender, 
-            BigInteger fee, 
-            BigInteger firstValid, 
-            BigInteger lastValid, 
-            byte[] note,
-            String genesisID, 
-            Digest genesisHash,
-            BigInteger index,
-            Address manager, 
-            Address reserve, 
-            Address freeze, 
-            Address clawback) {
-        return new Transaction(
-                sender, 
-                fee, 
-                firstValid, 
-                lastValid, 
-                note,
-                genesisID, 
-                genesisHash, 
-                index,
-                manager, 
-                reserve, 
-                freeze, 
-                clawback);
+    		Address sender, 
+    		BigInteger fee, 
+    		BigInteger firstValid, 
+    		BigInteger lastValid, 
+    		byte[] note,
+    		String genesisID, 
+    		Digest genesisHash,
+    		BigInteger index,
+    		Address manager, 
+    		Address reserve, 
+    		Address freeze, 
+    		Address clawback,
+    		boolean strictEmptyAddressChecking) {
+    	Address defaultAddr = new Address();
+    	if (strictEmptyAddressChecking && ( 
+    			(manager == null || manager.equals(defaultAddr)) ||
+    			(reserve == null || reserve.equals(defaultAddr)) ||	
+    			(freeze == null || freeze.equals(defaultAddr)) ||
+    			(clawback == null || clawback.equals(defaultAddr))
+    			)) {
+    		throw new RuntimeException("strict empty address checking requested but "
+    				+ "empty or default address supplied to one or more manager addresses");
+    	}
+    	return new Transaction(
+    			sender, 
+    			fee, 
+    			firstValid, 
+    			lastValid, 
+    			note,
+    			genesisID, 
+    			genesisHash, 
+    			index,
+    			manager, 
+    			reserve, 
+    			freeze, 
+    			clawback);
     }
    
     // workaround for nested JsonValue classes

@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.io.*;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 
@@ -79,7 +80,19 @@ public class TestTransaction {
         Address clawback = addr;
 
         Transaction tx = Transaction.createAssetConfigureTransaction(
-                sender, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323575), null, "", new Digest(gh), BigInteger.valueOf(1234), manager, reserve, freeze, clawback);
+                sender, 
+                BigInteger.valueOf(10), 
+                BigInteger.valueOf(322575), 
+                BigInteger.valueOf(323575), 
+                null, 
+                "", 
+                new Digest(gh), 
+                BigInteger.valueOf(1234), 
+                manager, 
+                reserve, 
+                freeze, 
+                clawback,
+                true);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = account.signTransaction(tx);
         
@@ -92,6 +105,65 @@ public class TestTransaction {
         Assert.assertEquals(stx,  o);
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
 
+    }
+    
+    @Test
+    public void testAssetConfigStrictEmptyAddressChecking() throws NoSuchAlgorithmException  {
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address manager = addr;
+        Address reserve = addr;
+        Address freeze = addr;
+        Address clawback = addr;
+
+        boolean exceptionCaughtNull = false;
+        try {
+        	Transaction.createAssetConfigureTransaction(
+                sender, 
+                BigInteger.valueOf(10), 
+                BigInteger.valueOf(322575), 
+                BigInteger.valueOf(323575), 
+                null, 
+                "", 
+                new Digest(gh), 
+                BigInteger.valueOf(1234), 
+                manager, 
+                reserve, 
+                new Address(), 
+                clawback,
+                true);
+        } catch (RuntimeException e) {
+        	Assert.assertEquals("strict empty address checking "
+        			+ "requested but empty or default address supplied "
+        			+ "to one or more manager addresses",  e.getMessage());
+        	exceptionCaughtNull = true;
+        }
+        Assert.assertTrue(exceptionCaughtNull);
+        
+        boolean exceptionCaughtDefault = false;
+        try {
+        	Transaction.createAssetConfigureTransaction(
+                sender, 
+                BigInteger.valueOf(10), 
+                BigInteger.valueOf(322575), 
+                BigInteger.valueOf(323575), 
+                null, 
+                "", 
+                new Digest(gh), 
+                BigInteger.valueOf(1234), 
+                manager, 
+                reserve, 
+                freeze,
+                null,
+                true);
+        } catch (RuntimeException e) {
+        	Assert.assertEquals("strict empty address checking "
+        			+ "requested but empty or default address supplied "
+        			+ "to one or more manager addresses",  e.getMessage());
+        	exceptionCaughtDefault = true;
+        }
+        Assert.assertTrue(exceptionCaughtDefault);
     }
 
     @Test
