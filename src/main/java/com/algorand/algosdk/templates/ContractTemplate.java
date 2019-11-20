@@ -7,8 +7,6 @@ package com.algorand.algosdk.templates;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.LogicsigSignature;
@@ -24,10 +22,10 @@ public class ContractTemplate {
 		private DataType type;
 		private byte[] byteValue;
 		private int intValue;
-		
+
 		public ParameterValue(DataType dataType, String value) throws NoSuchAlgorithmException {
 			type = dataType;
-			
+
 			if (type == DataType.ADDRESS) {
 				Address addr = new Address(value);
 				byteValue = addr.getBytes();
@@ -35,7 +33,7 @@ public class ContractTemplate {
 				byteValue = value.getBytes();
 			}
 		}
-		
+
 		public ParameterValue(DataType dataType, int value) {
 			type = dataType;
 			intValue = value;
@@ -43,15 +41,15 @@ public class ContractTemplate {
 				throw new RuntimeException("Expecting int type with int value for parameter value.");
 			}
 		}
-		
+
 		public DataType getType() {
 			return type;
 		}
-		
+
 		public int getIntValue() {
 			return intValue;
 		}
-		
+
 		public byte[] getByteValue() {
 			return byteValue;
 		}
@@ -90,7 +88,7 @@ public class ContractTemplate {
 		}
 		return out;
 	}
-	
+
 	/**
 	 * Given a varint, get the integer value
 	 * @param buffer serialized varint
@@ -114,7 +112,7 @@ public class ContractTemplate {
 		return new int[] {0,0};
 	}
 
-	 
+
 	/**
 	 * 
 	 * @param program is compiled TEAL program
@@ -124,15 +122,15 @@ public class ContractTemplate {
 	 * @throws NoSuchAlgorithmException
 	 */
 	protected static ContractTemplate inject(String program, int [] offsets, ParameterValue[] values) throws NoSuchAlgorithmException {
-		
+
 		int paramIdx = 0;
 		if (offsets.length != values.length) {
 			throw new RuntimeException("offsets and values should have the same number of elements");
 		}
 		byte[] progBytes = Encoder.decodeFromBase64(program);
-		
+
 		ArrayList<Byte> updatedProgram = new ArrayList<Byte>();
-		
+
 		for (int progIdx = 0; progIdx < progBytes.length; ++progIdx) {
 			if (paramIdx < offsets.length && offsets[paramIdx] == progIdx) {
 				ParameterValue value = values[paramIdx];
@@ -147,24 +145,24 @@ public class ContractTemplate {
 					for (byte b : byteValueString) {
 						updatedProgram.add(b);	
 					}
-					progIdx += 2; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
 					break;
-					
+
 				case ADDRESS:
 					for (byte b : value.getByteValue()) {
 						updatedProgram.add(b);
 					}
-					progIdx += 32; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 31; // skip the parameter placeholder bytes in program bytecode
 					break;
-					
+
 				case INT:
 					byte[] byteValue = putVarint(value.getIntValue());
 					for (byte b : byteValue) {
 						updatedProgram.add(b);	
 					}
-					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 0; // skip the parameter placeholder bytes in program bytecode
 					break;
-					
+
 				default:
 					throw new RuntimeException("Unrecognized program parameter datatype!");
 				}
