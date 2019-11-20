@@ -69,7 +69,7 @@ public class Logic {
             reader.close();
         }
 
-        VariantResult result = Uvariant.parse(program);
+        VarintResult result = Uvarint.parse(program);
         int vlen = result.length;
         if (vlen <= 0) {
             throw new IllegalArgumentException("version parsing error");
@@ -136,7 +136,7 @@ public class Logic {
 
     static int checkIntConstBlock(byte[] program, int pc) {
         int size = 1;
-        VariantResult result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
+        VarintResult result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
         if (result.length <= 0) {
             throw new IllegalArgumentException(
                 String.format("could not decode int const block at pc=%d", pc)
@@ -148,7 +148,7 @@ public class Logic {
             if (pc + size >= program.length) {
                 throw new IllegalArgumentException("int const block exceeds program length");
             }
-            result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
+            result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
             if (result.length <= 0) {
                 throw new IllegalArgumentException(
                     String.format("could not decode int const[%d] block at pc=%d", i, pc + size)
@@ -161,7 +161,7 @@ public class Logic {
 
     static int checkByteConstBlock(byte[] program, int pc) {
         int size = 1;
-        VariantResult result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
+        VarintResult result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
         if (result.length <= 0) {
             throw new IllegalArgumentException(
                 String.format("could not decode byte[] const block at pc=%d", pc)
@@ -173,7 +173,7 @@ public class Logic {
             if (pc + size >= program.length) {
                 throw new IllegalArgumentException("byte[] const block exceeds program length");
             }
-            result = Uvariant.parse(Arrays.copyOfRange(program, pc + size, program.length));
+            result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
             if (result.length <= 0) {
                 throw new IllegalArgumentException(
                     String.format("could not decode byte[] const[%d] block at pc=%d", i, pc + size)
@@ -189,35 +189,35 @@ public class Logic {
     }
 }
 
-class Uvariant {
-    public static VariantResult parse(byte[] data) {
+class Uvarint {
+    public static VarintResult parse(byte[] data) {
         int x = 0;
         int s = 0;
         for (int i = 0; i < data.length; i++) {
             int b = data[i] & 0xff;
             if (b < 0x80) {
                 if (i > 9 || i == 9 && b > 1) {
-                    return new VariantResult(0, -(i + 1));
+                    return new VarintResult(0, -(i + 1));
                 }
-                return new VariantResult(x | (b & 0xff) << s, i + 1);
+                return new VarintResult(x | (b & 0xff) << s, i + 1);
             }
             x |= ((b & 0x7f) & 0xff) << s;
             s += 7;
         }
-        return new VariantResult();
+        return new VarintResult();
     }
 }
 
-class VariantResult {
+class VarintResult {
     public int value;
     public int length;
 
-    public VariantResult(int value, int length) {
+    public VarintResult(int value, int length) {
         this.value = value;
         this.length = length;
     }
 
-    public VariantResult() {
+    public VarintResult() {
         this.value = 0;
         this.length = 0;
     }

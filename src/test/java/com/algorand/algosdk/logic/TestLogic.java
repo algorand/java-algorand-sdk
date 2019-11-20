@@ -11,33 +11,33 @@ import java.util.Random;
 public class TestLogic {
 
     @Test
-    public void testParseUvariant1() throws Exception {
+    public void testParseUvarint1() throws Exception {
         byte[] data = {0x01};
-        VariantResult result = Uvariant.parse(data);
+        VarintResult result = Uvarint.parse(data);
         Assert.assertEquals(1, result.length);
         Assert.assertEquals(1, result.value);
     }
 
     @Test
-    public void testParseUvariant2() throws Exception {
+    public void testParseUvarint2() throws Exception {
         byte[] data = {0x02};
-        VariantResult result = Uvariant.parse(data);
+        VarintResult result = Uvarint.parse(data);
         Assert.assertEquals(1, result.length);
         Assert.assertEquals(2, result.value);
     }
 
     @Test
-    public void testParseUvariant3() throws Exception {
+    public void testParseUvarint3() throws Exception {
         byte[] data = {0x7b};
-        VariantResult result = Uvariant.parse(data);
+        VarintResult result = Uvarint.parse(data);
         Assert.assertEquals(1, result.length);
         Assert.assertEquals(123, result.value);
     }
 
     @Test
-    public void testParseUvariant4() throws Exception {
+    public void testParseUvarint4() throws Exception {
         byte[] data = {(byte)0xc8, 0x03};
-        VariantResult result = Uvariant.parse(data);
+        VarintResult result = Uvarint.parse(data);
         Assert.assertEquals(2, result.length);
         Assert.assertEquals(456, result.value);
     }
