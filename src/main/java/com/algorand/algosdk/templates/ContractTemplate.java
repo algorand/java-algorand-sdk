@@ -30,7 +30,7 @@ public class ContractTemplate {
 				Address addr = new Address(value);
 				byteValue = addr.getBytes();
 			} else {
-				byteValue = value.getBytes();
+				byteValue = Encoder.decodeFromBase64(value);
 			}
 		}
 
@@ -55,10 +55,10 @@ public class ContractTemplate {
 		}
 	}
 
-	public String address;
-	public String program;
+	public Address address;
+	public byte[] program;
 
-	ContractTemplate(String addr, String prog) {
+	ContractTemplate(Address addr, byte[] prog) {
 		address = addr;
 		program = prog;
 	}
@@ -75,7 +75,8 @@ public class ContractTemplate {
 	 * @param value being serialized
 	 * @return byte array holding the serialized bits
 	 */
-	public static byte[] putVarint(int value) {
+	public static byte[] putUVarint(int value) {
+		assert value >= 0 : "putUVarint expects non-negative values.";
 		ArrayList<Byte> buffer = new ArrayList<Byte>();
 		while (value >= 0x80) {
 			buffer.add((byte)((value & 0xFF) | 0x80 ));
@@ -95,7 +96,7 @@ public class ContractTemplate {
 	 * @param bufferOffset position in the buffer to start reading from
 	 * @return pair of values in in array: value, read size 
 	 */
-	public static int[] getVarint(byte [] buffer, int bufferOffset) { 
+	public static int[] getUVarint(byte [] buffer, int bufferOffset) { 
 		int x = 0;
 		int s = 0;
 		for (int i = 0; i < buffer.length; i++) {
@@ -114,60 +115,66 @@ public class ContractTemplate {
 
 
 	/**
-	 * 
 	 * @param program is compiled TEAL program
 	 * @param offsets are the position in the program bytecode of the program parameters
 	 * @param values of the program parameters to inject to the program bytecode
 	 * @return ContractTemplate with the address and the program with the given parameter values
 	 * @throws NoSuchAlgorithmException
 	 */
-	protected static ContractTemplate inject(String program, int [] offsets, ParameterValue[] values) throws NoSuchAlgorithmException {
+	protected static ContractTemplate inject(byte [] program, int [] offsets, ParameterValue[] values) throws NoSuchAlgorithmException {
 
-		int paramIdx = 0;
+		/**
+		 * offsets are the positions of the program arguments in the bytecode.
+		 * Each argument in the program has a place-holder in the bytecode of varying sizes based on the argument type  
+		 * 		BASE64 : placeholder  2 bytes 
+		 * 		ADDRESS: placeholder 32 bytes 
+ 		 * 		INT    : placeholder  1 byte 
+		 */
 		if (offsets.length != values.length) {
 			throw new RuntimeException("offsets and values should have the same number of elements");
 		}
-		byte[] progBytes = Encoder.decodeFromBase64(program);
-
+		
+		int paramIdx = 0;
 		ArrayList<Byte> updatedProgram = new ArrayList<Byte>();
 
-		for (int progIdx = 0; progIdx < progBytes.length; ++progIdx) {
+		for (int progIdx = 0; progIdx < program.length; ) {
 			if (paramIdx < offsets.length && offsets[paramIdx] == progIdx) {
 				ParameterValue value = values[paramIdx];
 				++paramIdx;
 				switch (value.getType()) {
 				case BASE64:
 					byte[] byteValueString = value.getByteValue();
-					byte[] byteValueLength = putVarint(byteValueString.length);
+					byte[] byteValueLength = putUVarint(byteValueString.length);
 					for (byte b : byteValueLength) {
 						updatedProgram.add(b);	
 					}
 					for (byte b : byteValueString) {
 						updatedProgram.add(b);	
 					}
-					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 2; // skip the parameter placeholder bytes in program bytecode
 					break;
 
 				case ADDRESS:
 					for (byte b : value.getByteValue()) {
 						updatedProgram.add(b);
 					}
-					progIdx += 31; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 32; // skip the parameter placeholder bytes in program bytecode
 					break;
 
 				case INT:
-					byte[] byteValue = putVarint(value.getIntValue());
+					byte[] byteValue = putUVarint(value.getIntValue());
 					for (byte b : byteValue) {
 						updatedProgram.add(b);	
 					}
-					progIdx += 0; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
 					break;
 
 				default:
 					throw new RuntimeException("Unrecognized program parameter datatype!");
 				}
 			} else {
-				updatedProgram.add(progBytes[progIdx]);
+				updatedProgram.add(program[progIdx]);
+				progIdx += 1;
 			}
 		}
 
@@ -177,6 +184,6 @@ public class ContractTemplate {
 		}
 		//Address
 		LogicsigSignature ls = new LogicsigSignature(updatedProgramByteArray, new ArrayList<byte[]>());
-		return new ContractTemplate(ls.toAddress().toString(), Encoder.encodeToBase64(updatedProgramByteArray));
+		return new ContractTemplate(ls.toAddress(), updatedProgramByteArray);
 	}
 }

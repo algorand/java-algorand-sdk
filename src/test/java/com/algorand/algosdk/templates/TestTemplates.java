@@ -1,10 +1,10 @@
 package com.algorand.algosdk.templates;
 
 
-import java.math.BigInteger;
-
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.algorand.algosdk.util.Encoder;
 
 
 public class TestTemplates {
@@ -13,8 +13,8 @@ public class TestTemplates {
 	public void testVarInt() {
 
 		int a = 600000;
-		byte[] buffer = ContractTemplate.putVarint((int) a);
-		int [] result = ContractTemplate.getVarint(buffer, 0);
+		byte[] buffer = ContractTemplate.putUVarint((int) a);
+		int [] result = ContractTemplate.getUVarint(buffer, 0);
 		Assert.assertEquals(a, result[0]);
 		Assert.assertEquals(buffer.length, result[1]);
 	}
@@ -37,8 +37,8 @@ public class TestTemplates {
 				"SlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMQEiDjEQIxIQMQcyAxIQ" +
 				"MQgkEhAxCSgSLQEpEhAxCSoSMQIlDRAREA==";
 
-		Assert.assertEquals(goldenProgram, result.program);
-		Assert.assertEquals(goldenAddress,  result.address);
+		Assert.assertEquals(goldenProgram, Encoder.encodeToBase64(result.program));
+		Assert.assertEquals(goldenAddress,  result.address.toString());
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class TestTemplates {
 				"MgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBA=";
 		String goldenAddress = "KPYGWKTV7CKMPMTLQRNGMEQRSYTYD" +
 				"HUOFNV4UDSBDLC44CLIJPQWRTCPBU";
-		Assert.assertEquals(goldenProgram, result.program);        
-		Assert.assertEquals(goldenAddress,  result.address);
+		Assert.assertEquals(goldenProgram, Encoder.encodeToBase64(result.program));        
+		Assert.assertEquals(goldenAddress,  result.address.toString());
 	}
 }

@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import com.algorand.algosdk.templates.ContractTemplate.DataType;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
+import com.algorand.algosdk.util.Encoder;
 
 public class Split {
 	private static String referenceProgram = "ASAIAQUCAAYHCAkmAyDYHIR7TIW5eM/WAZcXdEDqv7BD+baMN6i2/A5JatGbNCDKsaoZHPQ3Zg8zZB/BZ1oDgt77LGo5np3rbto3/gloTyB40AS2H3I72YCbDk4hKpm7J7NnFy2Xrt39TJG0ORFg+zEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBA=";
@@ -43,6 +44,6 @@ public class Split {
 				new ParameterValue(DataType.ADDRESS, receiver1),
 				new ParameterValue(DataType.ADDRESS, receiver2)
 		};
-		return ContractTemplate.inject(referenceProgram, referenceOffsets, values);
+		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), referenceOffsets, values);
 	}
 }
