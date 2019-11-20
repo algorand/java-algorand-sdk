@@ -9,11 +9,9 @@ import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.util.Encoder;
 
 public class HTLC {
-
-	private static String sha256ReferenceProgram = "ASAECAEACSYDIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMQEiDjEQIxIQMQcyAxIQMQgkEhAxCSgSLQEpEhAxCSoSMQIlDRAREA==";
-	private static String keccak256ReferenceProgram = "ASAECAEACSYDIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMQEiDjEQIxIQMQcyAxIQMQgkEhAxCSgSLQIpEhAxCSoSMQIlDRAREA==";
-	private static int [] referenceOffsets = { /*fee*/ 3, /*expiryRound*/ 6, /*receiver*/ 10, /*hashImage*/ 43, /*owner*/ 76};
-
+	
+	private static String referenceProgram = "ASAEBQEABiYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITAQYg5pqWHm8tX3rIZgeSZVK+mCNe0zNjyoiRi7nJOKkVtvkxASIOMRAjEhAxBzIDEhAxCCQSEDEJKBItASkSEDEJKhIxAiUNEBEQ";
+	private static int [] referenceOffsets = {3, 6, 10, 42, 44, 101};
 	/**
 	 * 
 	 * @param owner an address that can receive the asset after the expiry round
@@ -30,32 +28,28 @@ public class HTLC {
 			String receiver, 
 			String hashFunction, 
 			String hashImage, 
-			BigInteger expiryRound, 
-			BigInteger maxFee) throws NoSuchAlgorithmException {
+			int expiryRound, 
+			int maxFee) throws NoSuchAlgorithmException {
 
+		int hashInject = 0;
 		String programToUse;
 		if (hashFunction.equals("sha256")) {
-			programToUse = sha256ReferenceProgram;
+			hashInject = 1;
 		} else if (hashFunction.equals("keccak256")) {
-			programToUse = keccak256ReferenceProgram;
+			hashInject = 2;
 		} else {
 			throw new RuntimeException("invalid hash function supplied");
 		}
 		
 		ParameterValue[] values = {
-				new ParameterValue(DataType.INT, maxFee.intValue()),
-				new ParameterValue(DataType.INT, expiryRound.intValue()),
+				new ParameterValue(DataType.INT, maxFee),
+				new ParameterValue(DataType.INT, expiryRound),
 				new ParameterValue(DataType.ADDRESS, receiver),
 				new ParameterValue(DataType.BASE64, hashImage),
-				new ParameterValue(DataType.ADDRESS, owner)};
+				new ParameterValue(DataType.ADDRESS, owner),
+				new ParameterValue(DataType.INT, hashInject)
+				};
 						
-		return ContractTemplate.inject(programToUse, referenceOffsets, values);
+		return ContractTemplate.inject(referenceProgram, referenceOffsets, values);
 	}
-
-
-	//orig = base64.b64decode(orig)
-
-	//output = base64.b64encode(inject(orig, [4, 7, 8, 9, 10, 14, 20], [100,200,300,400,500, "W6UUUSEAOGLBHT7VFT4H2SDATKKSG6ZBUIJXTZMSLW36YS44FRP5NVAU7U", "f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="], [Types.INT, Types.INT, Types.INT, Types.INT, Types.INT, Types.ADDRESS, Types.BASE64]))
-
-	
 }

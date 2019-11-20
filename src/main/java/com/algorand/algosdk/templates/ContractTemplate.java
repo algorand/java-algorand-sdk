@@ -7,8 +7,6 @@ package com.algorand.algosdk.templates;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.LogicsigSignature;
@@ -147,14 +145,14 @@ public class ContractTemplate {
 					for (byte b : byteValueString) {
 						updatedProgram.add(b);	
 					}
-					progIdx += 2; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
 					break;
 					
 				case ADDRESS:
 					for (byte b : value.getByteValue()) {
 						updatedProgram.add(b);
 					}
-					progIdx += 32; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 31; // skip the parameter placeholder bytes in program bytecode
 					break;
 					
 				case INT:
@@ -162,7 +160,7 @@ public class ContractTemplate {
 					for (byte b : byteValue) {
 						updatedProgram.add(b);	
 					}
-					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
+					progIdx += 0; // skip the parameter placeholder bytes in program bytecode
 					break;
 					
 				default:
