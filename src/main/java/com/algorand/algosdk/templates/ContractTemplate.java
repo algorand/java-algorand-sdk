@@ -56,6 +56,7 @@ public class ContractTemplate {
 			return byteValue;
 		}
 	}
+
 	public String address;
 	public String program;
 

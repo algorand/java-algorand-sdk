@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 
 import com.algorand.algosdk.templates.ContractTemplate.DataType;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
+
 import com.algorand.algosdk.util.Encoder;
 
 public class HTLC {

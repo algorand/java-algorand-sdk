@@ -29,20 +29,13 @@ public class TestTemplates {
     	String hashImg = "f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=";
     	BigInteger expiryRound = BigInteger.valueOf(600000);
     	BigInteger maxFee = BigInteger.valueOf(1000);
-    	ContractTemplate result = HTLC.MakeHTLC(owner, receiver, hashFn, hashImg, expiryRound, maxFee);
 
-    	
+    	ContractTemplate result = HTLC.MakeHTLC(owner, receiver, hashFn, hashImg, expiryRound, maxFee);
  
     	String goldenProgram = "ASAE6AcBAMDPJCYDIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMQEiDjEQIxIQMQcyAxIQMQgkEhAxCSgSLQEpEhAxCSoSMQIlDRAREA==";
     	Assert.assertEquals(goldenProgram, result.program);
     	String goldenAddress = "KNBD7ATNUVQ4NTLOI72EEUWBVMBNKMPHWVBCETERV2W7T2YO6CVMLJRBM4";
         Assert.assertEquals(goldenAddress,  result.address);
-
-    	
-    	
-
-    	
-    	
     }
 
 }
