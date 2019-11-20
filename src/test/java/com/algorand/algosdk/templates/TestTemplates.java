@@ -17,8 +17,8 @@ public class TestTemplates {
 		int [] result = ContractTemplate.getVarint(buffer, 0);
 		Assert.assertEquals(a, result[0]);
 		Assert.assertEquals(buffer.length, result[1]);
-
 	}
+
 	@Test
 	public void testHTLC() throws Exception {
 
@@ -59,47 +59,3 @@ public class TestTemplates {
 		Assert.assertEquals(goldenAddress,  result.address);
 	}
 }
-
-
-/*
-
-golden:
-
-ASAE6AcBAMDPJCYDIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5 IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMQEiDjEQIxIQMQcyAxIQMQgkEhAxCSgSLQEpEhAxCSoSMQIlDRAREA==
-
-result
-
-ASAE6AcBAMDPJCYDIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5 LGY0T3haWC94L0ZPNUxjR0JTS0hXWGZ3dFN4K2oxbmNvU3QzU0FCSnRrR2s9/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohP5MQEiDjEQIxIQMQcyAxIQMQgkEhAxCSgSAQEpEhAxCSoSMQIlDRAREA==
-
-
-
-
-
-golden:	
-
-ASAE6AcBAMDPJCYDIOaal
-h5vLV96yGYHkmVSvpgjXt
-MzY8qIkYu5 yTipFbb5 IH+
-DsWV/8fxTuS3BgUih1l38
-LUsfo9Z3KErd0gASbZBpI
-P68oLsUSlpOp7Q4pGgayA
-5soQW8tgf8VlMlyVaV9qI
-TMQEiDjEQIxIQMQcyAxIQ
-MQgkEhAxCSgSLQEpEhAxC
-SoSMQIlDRAREA==
-
-result
-
-ASAE6AcBAMDPJCYDIOaal
-h5vLV96yGYHkmVSvpgjXt
-MzY8qIkYu5 yTipFbb5 LGY
-0T3haWC94L0ZPNUxjR0JT
-S0hXWGZ3dFN4K2oxbmNvU
-3QzU0FCSnRrR2s9/rygux
-RKWk6ntDikaBrIDmyhBby
-2B/xWUyXJVpX2ohP5MQEi
-DjEQIxIQMQcyAxIQMQgkE
-hAxCSgSAQEpEhAxCSoSMQ
-IlDRAREA==
-
- */

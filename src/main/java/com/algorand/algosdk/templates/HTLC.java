@@ -49,7 +49,6 @@ public class HTLC {
 				new ParameterValue(DataType.ADDRESS, owner),
 				new ParameterValue(DataType.INT, hashInject)
 		};
-
 		return ContractTemplate.inject(referenceProgram, referenceOffsets, values);
 	}
 }

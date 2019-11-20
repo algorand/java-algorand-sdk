@@ -43,7 +43,6 @@ public class Split {
 				new ParameterValue(DataType.ADDRESS, receiver1),
 				new ParameterValue(DataType.ADDRESS, receiver2)
 		};
-
 		return ContractTemplate.inject(referenceProgram, referenceOffsets, values);
 	}
 }
