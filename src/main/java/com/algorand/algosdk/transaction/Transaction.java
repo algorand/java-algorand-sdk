@@ -217,6 +217,7 @@ public class Transaction implements Serializable {
      * @param genesisID
      * @param genesisHash
      * @param assetTotal total asset issuance
+     * @param assetDecimal asset decimal precision
      * @param defaultFrozen whether accounts have this asset frozen by default
      * @param assetUnitName name of unit of the asset
      * @param assetName name of the asset
@@ -228,7 +229,7 @@ public class Transaction implements Serializable {
      * @param clawback account which can issue clawbacks against holder accounts
      */
     private Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       String genesisID, Digest genesisHash, BigInteger assetTotal, boolean defaultFrozen,
+                       String genesisID, Digest genesisHash, BigInteger assetTotal, BigInteger assetDecimals, boolean defaultFrozen,
                        String assetUnitName, String assetName, String url, byte[] metadataHash, 
                        Address manager, Address reserve, Address freeze, Address clawback) {
         this.type = Type.AssetConfig;
@@ -240,7 +241,7 @@ public class Transaction implements Serializable {
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
  
-        this.assetParams = new AssetParams(assetTotal, defaultFrozen, assetUnitName, assetName, url, metadataHash, manager, reserve, freeze, clawback);        
+        this.assetParams = new AssetParams(assetTotal, assetDecimals, defaultFrozen, assetUnitName, assetName, url, metadataHash, manager, reserve, freeze, clawback);        
     }
 
     /**
@@ -253,6 +254,7 @@ public class Transaction implements Serializable {
      * @param genesisID
      * @param genesisHash
      * @param assetTotal total asset issuance
+     * @param assetDecimals asset decimal precision
      * @param defaultFrozen whether accounts have this asset frozen by default
      * @param assetUnitName name of unit of the asset
      * @param assetName name of the asset
@@ -264,12 +266,12 @@ public class Transaction implements Serializable {
      * @param clawback account which can issue clawbacks against holder accounts
      */
     public static Transaction createAssetCreateTransaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       String genesisID, Digest genesisHash, BigInteger assetTotal, boolean defaultFrozen,
+                       String genesisID, Digest genesisHash, BigInteger assetTotal, BigInteger assetDecimals, boolean defaultFrozen,
                        String assetUnitName, String assetName, String url, byte[] metadataHash, 
                        Address manager, Address reserve, Address freeze, Address clawback) {
         return new Transaction(
                 sender, fee, firstValid, lastValid, note,
-                genesisID, genesisHash, assetTotal, defaultFrozen,
+                genesisID, genesisHash, assetTotal, assetDecimals, defaultFrozen,
                 assetUnitName, assetName, url, metadataHash, 
                 manager, reserve, freeze, clawback);
     }
@@ -301,7 +303,7 @@ public class Transaction implements Serializable {
         if (note != null) this.note = note;
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
-        this.assetParams = new AssetParams(BigInteger.valueOf(0), false, "", "", "", null, manager, reserve, freeze, clawback);
+        this.assetParams = new AssetParams(BigInteger.valueOf(0), BigInteger.valueOf(0), false, "", "", "", null, manager, reserve, freeze, clawback);
         assetIndex = index;
     }        
 
@@ -901,6 +903,14 @@ public class Transaction implements Serializable {
         @JsonProperty("t")
         public BigInteger assetTotal = BigInteger.valueOf(0);
 
+        // Decimals specifies the number of digits to display after the decimal
+        // place when displaying this asset. A value of 0 represents an asset
+        // that is not divisible, a value of 1 represents an asset divisible
+        // into tenths, and so on. This value must be between 0 and 19
+        // (inclusive).
+        @JsonProperty("dc")
+        public BigInteger assetDecimals = BigInteger.valueOf(0);
+
         // whether each account has their asset slot frozen for this asset by default
         @JsonProperty("df")
         public boolean assetDefaultFrozen = false;
@@ -940,6 +950,7 @@ public class Transaction implements Serializable {
         
         public AssetParams(
 			   BigInteger assetTotal,
+			   BigInteger assetDecimals,
 			   boolean defaultFrozen,
 			   String assetUnitName,
 			   String assetName,
@@ -950,6 +961,7 @@ public class Transaction implements Serializable {
 			   Address freeze,
 			   Address clawback) {
             if(assetTotal != null) this.assetTotal = assetTotal;
+            if(assetDecimals != null) this.assetDecimals = assetDecimals;
             this.assetDefaultFrozen = defaultFrozen;
             if(assetUnitName != null) this.assetUnitName = assetUnitName;
             if(assetName != null) this.assetName = assetName;
@@ -972,6 +984,7 @@ public class Transaction implements Serializable {
             if (o == null || getClass() != o.getClass()) return false;
             AssetParams that = (AssetParams) o;
             return assetTotal.equals(that.assetTotal) &&
+                assetDecimals.equals(that.assetDecimals) &&
                 (assetDefaultFrozen == that.assetDefaultFrozen) &&
                 assetName.equals(that.assetName) &&
                 assetUnitName.equals(that.assetUnitName) &&
@@ -985,6 +998,7 @@ public class Transaction implements Serializable {
 
         @JsonCreator
         private AssetParams(@JsonProperty("t") BigInteger assetTotal,
+            @JsonProperty("dc") BigInteger assetDecimals,
             @JsonProperty("df") boolean assetDefaultFrozen,
             @JsonProperty("un") String assetUnitName,
             @JsonProperty("an") String assetName,
@@ -994,7 +1008,7 @@ public class Transaction implements Serializable {
             @JsonProperty("r") byte[] assetReserve,
             @JsonProperty("f") byte[] assetFreeze,
             @JsonProperty("c") byte[] assetClawback) {
-            this(assetTotal, assetDefaultFrozen, assetUnitName, assetName, url, metadataHash, new Address(assetManager), new Address(assetReserve), new Address(assetFreeze), new Address(assetClawback));
+            this(assetTotal, assetDecimals, assetDefaultFrozen, assetUnitName, assetName, url, metadataHash, new Address(assetManager), new Address(assetReserve), new Address(assetFreeze), new Address(assetClawback));
         }
         
         /**
