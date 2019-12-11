@@ -101,20 +101,6 @@ public class TestTransaction {
                 true);
 
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
-
-        Transaction.AssetParams expectedAssetParams = new Transaction.AssetParams(
-                BigInteger.valueOf(100),
-                1,
-                false,
-                "testcoin",
-                "tst",
-                "website",
-                new byte[]{},
-                manager,
-                reserve,
-                freeze,
-                clawback);
-
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
 
         byte[] outBytes = Encoder.encodeToMsgPack(stx);
