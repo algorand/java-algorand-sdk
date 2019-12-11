@@ -20,6 +20,17 @@ import java.util.Arrays;
 
 
 public class TestTransaction {
+    private static Account DEFAULT_ACCOUNT = initializeDefaultAccount();
+
+    private static Account initializeDefaultAccount() {
+        try {
+            String mnemonic = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
+            return new Account(mnemonic);
+        } catch (Exception e) {
+            Assert.fail("Failed to initialize static default account.");
+        }
+        return null;
+    }
 
     @Test
     public void testSerialization() throws Exception {
@@ -66,11 +77,6 @@ public class TestTransaction {
 
     @Test
     public void testSerializationAssetConfig() throws Exception {
-
-        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-        byte[] seed = Mnemonic.toKey(FROM_SK);
-        Account account = new Account(seed);
-
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
@@ -87,22 +93,37 @@ public class TestTransaction {
                 null, 
                 "", 
                 new Digest(gh), 
-                BigInteger.valueOf(1234), 
-                manager, 
-                reserve, 
-                freeze, 
+                BigInteger.valueOf(1234),
+                manager,
+                reserve,
+                freeze,
                 clawback,
                 true);
+
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
-        SignedTransaction stx = account.signTransaction(tx);
-        
+
+        Transaction.AssetParams expectedAssetParams = new Transaction.AssetParams(
+                BigInteger.valueOf(100),
+                1,
+                false,
+                "testcoin",
+                "tst",
+                "website",
+                new byte[]{},
+                manager,
+                reserve,
+                freeze,
+                clawback);
+
+        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
+
         byte[] outBytes = Encoder.encodeToMsgPack(stx);
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQBBkfw5n6UevuIMDo2lHyU4dS80JCCQ/vTRUcTx5m0ivX68zTKyuVRrHaTbxbRRc3YpJ4zeVEnC9Fiw3Wf4REwejdHhuiKRhcGFyhKFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRjYWlkzQTSo2ZlZc0NSKJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
 
         SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
 
-        Assert.assertArrayEquals(outBytes, golden);
-        Assert.assertEquals(stx,  o);
+        Assert.assertArrayEquals(golden, outBytes);
+        Assert.assertEquals(stx, o);
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
 
     }
@@ -169,10 +190,6 @@ public class TestTransaction {
     @Test
     public void testSerializationAssetFreeze() throws Exception {
 
-        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-        byte[] seed = Mnemonic.toKey(FROM_SK);
-        Account account = new Account(seed);
-
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
@@ -183,12 +200,12 @@ public class TestTransaction {
                 sender, target, freezeState, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323576), null,
                 new Digest(gh), assetFreezeID);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
-        SignedTransaction stx = account.signTransaction(tx);
+        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         byte[] outBytes = Encoder.encodeToMsgPack(stx);
         SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
         String sss = Encoder.encodeToJson(stx);
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
-        Assert.assertArrayEquals(outBytes, golden);
+        Assert.assertArrayEquals(golden, outBytes);
         Assert.assertEquals(stx, o);
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
 
@@ -236,7 +253,7 @@ public class TestTransaction {
 
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
         Assert.assertEquals(stx, stxDecoded);
-        Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertArrayEquals(golden, signedOutBytes);
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
     }
 
@@ -327,10 +344,6 @@ public class TestTransaction {
     @Test
     public void testMakeAssetAcceptanceTxn() throws Exception {
 
-        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-        byte[] seed = Mnemonic.toKey(FROM_SK);
-        Account account = new Account(seed);
-
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address recipient = addr;
@@ -369,7 +382,7 @@ public class TestTransaction {
             }
           }
          */  
-        SignedTransaction stx = account.signTransaction(tx);
+        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQJ7q2rOT8Sb/wB0F87ld+1zMprxVlYqbUbe+oz0WM63FctIi+K9eYFSqT26XBZ4Rr3+VTJpBE+JLKs8nctl9hgijdHhuiKRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCOiiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=");
 
@@ -382,10 +395,6 @@ public class TestTransaction {
 
     @Test
     public void testMakeAssetTransferTxn() throws Exception {
-
-        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-        byte[] seed = Mnemonic.toKey(FROM_SK);
-        Account account = new Account(seed);
 
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
@@ -434,7 +443,7 @@ public class TestTransaction {
               }
             }
          */
-        SignedTransaction stx = account.signTransaction(tx);
+        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQNkEs3WdfFq6IQKJdF1n0/hbV9waLsvojy9pM1T4fvwfMNdjGQDy+LeesuQUfQVTneJD4VfMP7zKx4OUlItbrwSjdHhuiqRhYW10AaZhY2xvc2XEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pGFyY3bEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9o2ZlZc0KvqJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/4o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaVheGZlcqR4YWlkAQ==");
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
@@ -446,10 +455,6 @@ public class TestTransaction {
 
     @Test
     public void testMakeAssetRevocationTransaction() throws Exception {
-
-        final String FROM_SK = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-        byte[] seed = Mnemonic.toKey(FROM_SK);
-        Account account = new Account(seed);
 
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
@@ -480,7 +485,7 @@ public class TestTransaction {
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
         Assert.assertEquals(o,  tx);
 
-        SignedTransaction stx = account.signTransaction(tx);
+        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         String sss = Encoder.encodeToJson(stx);
         byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQHsgfEAmEHUxLLLR9s+Y/yq5WeoGo/jAArCbany+7ZYwExMySzAhmV7M7S8+LBtJalB4EhzEUMKmt3kNKk6+vAWjdHhuiqRhYW10AaRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRhc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCqqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=");
@@ -535,7 +540,7 @@ public class TestTransaction {
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
         Assert.assertEquals(stx, stxDecoded);
                 
-        Assert.assertArrayEquals(signedOutBytes, golden);
+        Assert.assertArrayEquals(golden, signedOutBytes);
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
     }
 
