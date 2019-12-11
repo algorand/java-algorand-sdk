@@ -78,68 +78,7 @@ public class TestTransaction {
         Assert.assertEquals(tx.genesisHash, o.genesisHash);
     }
 
-    @Test
-    public void testMakeAssetCreateTxn() throws Exception {
-        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
-        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
-        Address sender = addr;
-        Address manager = addr;
-        Address reserve = addr;
-        Address freeze = addr;
-        Address clawback = addr;
-	    String metadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
-
-        Transaction tx = Transaction.createAssetCreateTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(100),
-                0,
-                false,
-                "tst",
-                "testcoin",
-                "website",
-                metadataHash.getBytes(StandardCharsets.UTF_8),
-                manager,
-                reserve,
-                freeze,
-                clawback);
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
-
-        Transaction.AssetParams expectedParams = new Transaction.AssetParams(
-                BigInteger.valueOf(100),
-                0,
-                false,
-                "tst",
-                "testcoin",
-                "website",
-                metadataHash.getBytes(StandardCharsets.UTF_8),
-                manager,
-                reserve,
-                freeze,
-                clawback
-        );
-        assertThat(expectedParams).isEqualToComparingFieldByField(tx.assetParams);
-
-        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
-
-        byte[] outBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQEDd1OMRoQI/rzNlU4iiF50XQXmup3k5czI9hEsNqHT7K4KsfmA/0DUVkbzOwtJdRsHS8trm3Arjpy9r7AXlbAujdHhuh6RhcGFyiaJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aF0ZKJ1bqN0c3SjZmVlzQ+0omZ2zgAE7A+iZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgAE7/ejc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aR0eXBlpGFjZmc=");
-
-        SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
-
-        assertThat(outBytes).isEqualTo(golden);
-        Assert.assertArrayEquals(golden, outBytes);
-        Assert.assertEquals(stx, o);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
-    }
-
-    @Test
-    public void testMakeAssetCreateTxnWithDecimals() throws Exception {
+    private void createAssetTest(int numDecimal, String goldenString) throws Exception {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
@@ -158,7 +97,7 @@ public class TestTransaction {
                 "",
                 new Digest(gh),
                 BigInteger.valueOf(100),
-                1,
+                numDecimal,
                 false,
                 "tst",
                 "testcoin",
@@ -172,7 +111,7 @@ public class TestTransaction {
 
         Transaction.AssetParams expectedParams = new Transaction.AssetParams(
                 BigInteger.valueOf(100),
-                1,
+                numDecimal,
                 false,
                 "tst",
                 "testcoin",
@@ -188,7 +127,7 @@ public class TestTransaction {
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
 
         byte[] outBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQCj5xLqNozR5ahB+LNBlTG+d0gl0vWBrGdAXj1ibsCkvAwOsXs5KHZK1YdLgkdJecQiWm4oiZ+pm5Yg0m3KFqgqjdHhuh6RhcGFyiqJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aJkYwGhZsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hbcQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hcsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hdGSidW6jdHN0o2ZlZc0P3KJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
+        byte[] golden = Encoder.decodeFromBase64(goldenString);
 
         SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
 
@@ -196,6 +135,16 @@ public class TestTransaction {
         Assert.assertArrayEquals(golden, outBytes);
         Assert.assertEquals(stx, o);
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+    }
+
+    @Test
+    public void testMakeAssetCreateTxn() throws Exception {
+        createAssetTest(0, "gqNzaWfEQEDd1OMRoQI/rzNlU4iiF50XQXmup3k5czI9hEsNqHT7K4KsfmA/0DUVkbzOwtJdRsHS8trm3Arjpy9r7AXlbAujdHhuh6RhcGFyiaJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aF0ZKJ1bqN0c3SjZmVlzQ+0omZ2zgAE7A+iZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgAE7/ejc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aR0eXBlpGFjZmc=");
+    }
+
+    @Test
+    public void testMakeAssetCreateTxnWithDecimals() throws Exception {
+        createAssetTest(1, "gqNzaWfEQCj5xLqNozR5ahB+LNBlTG+d0gl0vWBrGdAXj1ibsCkvAwOsXs5KHZK1YdLgkdJecQiWm4oiZ+pm5Yg0m3KFqgqjdHhuh6RhcGFyiqJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aJkYwGhZsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hbcQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hcsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hdGSidW6jdHN0o2ZlZc0P3KJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
     }
 
     @Test
