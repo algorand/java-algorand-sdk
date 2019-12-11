@@ -43,7 +43,7 @@ public class MultisigAddress implements Serializable {
     }
 
     // building an address object helps us generate string representations
-    private Address toAddress() throws NoSuchAlgorithmException {
+    public Address toAddress() throws NoSuchAlgorithmException {
         int numPkBytes = Ed25519PublicKey.KEY_LEN_BYTES * this.publicKeys.size();
         byte[] hashable = new byte[PREFIX.length + 2 + numPkBytes];
         System.arraycopy(PREFIX, 0, hashable, 0, PREFIX.length);

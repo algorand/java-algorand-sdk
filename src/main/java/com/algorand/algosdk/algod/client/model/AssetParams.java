@@ -31,6 +31,9 @@ public class AssetParams {
   @SerializedName("creator")
   private String creator = null;
 
+  @SerializedName("decimals")
+  private Integer decimals = null;
+
   @SerializedName("defaultfrozen")
   private Boolean defaultfrozen = null;
 
@@ -40,6 +43,9 @@ public class AssetParams {
   @SerializedName("managerkey")
   private String managerkey = null;
 
+  @SerializedName("metadatahash")
+  private byte[] metadatahash = null;
+
   @SerializedName("reserveaddr")
   private String reserveaddr = null;
 
@@ -48,6 +54,9 @@ public class AssetParams {
 
   @SerializedName("unitname")
   private String unitname = null;
+
+  @SerializedName("url")
+  private String url = null;
 
   public AssetParams assetname(String assetname) {
     this.assetname = assetname;
@@ -101,6 +110,24 @@ public class AssetParams {
 
   public void setCreator(String creator) {
     this.creator = creator;
+  }
+
+  public AssetParams decimals(Integer decimals) {
+    this.decimals = decimals;
+    return this;
+  }
+
+   /**
+   * Decimals specifies the decimal precision of units of this asset.
+   * @return decimals
+  **/
+  @ApiModelProperty(required = true, value = "Decimals specifies the decimal precision of units of this asset.")
+  public Integer getDecimals() {
+    return decimals;
+  }
+
+  public void setDecimals(Integer decimals) {
+    this.decimals = decimals;
   }
 
   public AssetParams defaultfrozen(Boolean defaultfrozen) {
@@ -157,6 +184,24 @@ public class AssetParams {
     this.managerkey = managerkey;
   }
 
+  public AssetParams metadatahash(byte[] metadatahash) {
+    this.metadatahash = metadatahash;
+    return this;
+  }
+
+   /**
+   * MetadataHash specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application.
+   * @return metadatahash
+  **/
+  @ApiModelProperty(value = "MetadataHash specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application.")
+  public byte[] getMetadatahash() {
+    return metadatahash;
+  }
+
+  public void setMetadatahash(byte[] metadatahash) {
+    this.metadatahash = metadatahash;
+  }
+
   public AssetParams reserveaddr(String reserveaddr) {
     this.reserveaddr = reserveaddr;
     return this;
@@ -211,6 +256,24 @@ public class AssetParams {
     this.unitname = unitname;
   }
 
+  public AssetParams url(String url) {
+    this.url = url;
+    return this;
+  }
+
+   /**
+   * URL specifies a URL where more information about the asset can be retrieved
+   * @return url
+  **/
+  @ApiModelProperty(value = "URL specifies a URL where more information about the asset can be retrieved")
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -224,17 +287,20 @@ public class AssetParams {
     return ObjectUtils.equals(this.assetname, assetParams.assetname) &&
     ObjectUtils.equals(this.clawbackaddr, assetParams.clawbackaddr) &&
     ObjectUtils.equals(this.creator, assetParams.creator) &&
+    ObjectUtils.equals(this.decimals, assetParams.decimals) &&
     ObjectUtils.equals(this.defaultfrozen, assetParams.defaultfrozen) &&
     ObjectUtils.equals(this.freezeaddr, assetParams.freezeaddr) &&
     ObjectUtils.equals(this.managerkey, assetParams.managerkey) &&
+    ObjectUtils.equals(this.metadatahash, assetParams.metadatahash) &&
     ObjectUtils.equals(this.reserveaddr, assetParams.reserveaddr) &&
     ObjectUtils.equals(this.total, assetParams.total) &&
-    ObjectUtils.equals(this.unitname, assetParams.unitname);
+    ObjectUtils.equals(this.unitname, assetParams.unitname) &&
+    ObjectUtils.equals(this.url, assetParams.url);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(assetname, clawbackaddr, creator, defaultfrozen, freezeaddr, managerkey, reserveaddr, total, unitname);
+    return ObjectUtils.hashCodeMulti(assetname, clawbackaddr, creator, decimals, defaultfrozen, freezeaddr, managerkey, metadatahash, reserveaddr, total, unitname, url);
   }
 
 
@@ -245,13 +311,16 @@ public class AssetParams {
     
     sb.append("    assetname: ").append(toIndentedString(assetname)).append("\n");
     sb.append("    clawbackaddr: ").append(toIndentedString(clawbackaddr)).append("\n");
-    sb.append("    creator: ").append(toIndentedString(creator)).append("\n");
+    //  creator is skipped to match with Transaction.AssetParams
+    sb.append("    decimals: ").append(toIndentedString(decimals)).append("\n");
     sb.append("    defaultfrozen: ").append(toIndentedString(defaultfrozen)).append("\n");
     sb.append("    freezeaddr: ").append(toIndentedString(freezeaddr)).append("\n");
     sb.append("    managerkey: ").append(toIndentedString(managerkey)).append("\n");
+    sb.append("    metadatahash: ").append(toIndentedString(metadatahash)).append("\n");
     sb.append("    reserveaddr: ").append(toIndentedString(reserveaddr)).append("\n");
     sb.append("    total: ").append(toIndentedString(total)).append("\n");
     sb.append("    unitname: ").append(toIndentedString(unitname)).append("\n");
+    sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("}");
     return sb.toString();
   }

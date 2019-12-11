@@ -170,19 +170,17 @@ public class DefaultApi {
     }
     /**
      * Build call for assetInformation
-     * @param creator Asset creator public key (required)
      * @param index Asset index (required)
      * @param progressListener Progress listener
      * @param progressRequestListener Progress request listener
      * @return Call to execute
      * @throws ApiException If fail to serialize the request body object
      */
-    public com.squareup.okhttp.Call assetInformationCall(String creator, java.math.BigInteger index, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+    public com.squareup.okhttp.Call assetInformationCall(java.math.BigInteger index, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
         Object localVarPostBody = null;
-        
+
         // create path and map variables
-        String localVarPath = "/v1/account/{creator}/assets/{index}"
-            .replaceAll("\\{" + "creator" + "\\}", apiClient.escapeString(creator.toString()))
+        String localVarPath = "/v1/asset/{index}"
             .replaceAll("\\{" + "index" + "\\}", apiClient.escapeString(index.toString()));
 
         List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -199,7 +197,7 @@ public class DefaultApi {
         if (localVarAccept != null) localVarHeaderParams.put("Accept", localVarAccept);
 
         final String[] localVarContentTypes = {
-            
+            "application/json"
         };
         final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
         localVarHeaderParams.put("Content-Type", localVarContentType);
@@ -219,58 +217,55 @@ public class DefaultApi {
         String[] localVarAuthNames = new String[] { "api_key" };
         return apiClient.buildCall(localVarPath, "GET", localVarQueryParams, localVarCollectionQueryParams, localVarPostBody, localVarHeaderParams, localVarFormParams, localVarAuthNames, progressRequestListener);
     }
-    
+
     @SuppressWarnings("rawtypes")
-    private com.squareup.okhttp.Call assetInformationValidateBeforeCall(String creator, java.math.BigInteger index, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
-        // verify the required parameter 'creator' is set
-        if (creator == null) {
-            throw new ApiException("Missing the required parameter 'creator' when calling assetInformation(Async)");
-        }
+    private com.squareup.okhttp.Call assetInformationValidateBeforeCall(java.math.BigInteger index, final ProgressResponseBody.ProgressListener progressListener, final ProgressRequestBody.ProgressRequestListener progressRequestListener) throws ApiException {
+        
         // verify the required parameter 'index' is set
         if (index == null) {
             throw new ApiException("Missing the required parameter 'index' when calling assetInformation(Async)");
         }
         
-        com.squareup.okhttp.Call call = assetInformationCall(creator, index, progressListener, progressRequestListener);
-        return call; 
+
+        com.squareup.okhttp.Call call = assetInformationCall(index, progressListener, progressRequestListener);
+        return call;
+
     }
 
     /**
      * Get asset information.
-     * Given the asset creator&#x27;s public key, this call returns the asset&#x27;s manager, reserve, freeze, and clawback addresses 
-     * @param creator Asset creator public key (required)
+     * Given the asset&#39;s unique index, this call returns the asset&#39;s creator, manager, reserve, freeze, and clawback addresses 
      * @param index Asset index (required)
      * @return AssetParams
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public AssetParams assetInformation(String creator, java.math.BigInteger index) throws ApiException {
-        ApiResponse<AssetParams> resp = assetInformationWithHttpInfo(creator, index);
+    public AssetParams assetInformation(java.math.BigInteger index) throws ApiException {
+        ApiResponse<AssetParams> resp = assetInformationWithHttpInfo(index);
         return resp.getData();
     }
 
     /**
      * Get asset information.
-     * Given the asset creator&#x27;s public key, this call returns the asset&#x27;s manager, reserve, freeze, and clawback addresses 
-     * @param creator Asset creator public key (required)
+     * Given the asset&#39;s unique index, this call returns the asset&#39;s creator, manager, reserve, freeze, and clawback addresses 
      * @param index Asset index (required)
      * @return ApiResponse&lt;AssetParams&gt;
      * @throws ApiException If fail to call the API, e.g. server error or cannot deserialize the response body
      */
-    public ApiResponse<AssetParams> assetInformationWithHttpInfo(String creator, java.math.BigInteger index) throws ApiException {
-        com.squareup.okhttp.Call call = assetInformationValidateBeforeCall(creator, index, null, null);
+    public ApiResponse<AssetParams> assetInformationWithHttpInfo(java.math.BigInteger index) throws ApiException {
+        com.squareup.okhttp.Call call = assetInformationValidateBeforeCall(index, null, null);
         Type localVarReturnType = new TypeToken<AssetParams>(){}.getType();
         return apiClient.execute(call, localVarReturnType);
     }
+
     /**
      * Get asset information. (asynchronously)
-     * Given the asset creator&#x27;s public key, this call returns the asset&#x27;s manager, reserve, freeze, and clawback addresses 
-     * @param creator Asset creator public key (required)
+     * Given the asset&#39;s unique index, this call returns the asset&#39;s creator, manager, reserve, freeze, and clawback addresses 
      * @param index Asset index (required)
      * @param callback The callback to be executed when the API call finishes
      * @return The request call
      * @throws ApiException If fail to process the API call, e.g. serializing the request body object
      */
-    public com.squareup.okhttp.Call assetInformationAsync(String creator, java.math.BigInteger index, final ApiCallback<AssetParams> callback) throws ApiException {
+    public com.squareup.okhttp.Call assetInformationAsync(java.math.BigInteger index, final ApiCallback<AssetParams> callback) throws ApiException {
 
         ProgressResponseBody.ProgressListener progressListener = null;
         ProgressRequestBody.ProgressRequestListener progressRequestListener = null;
@@ -291,7 +286,7 @@ public class DefaultApi {
             };
         }
 
-        com.squareup.okhttp.Call call = assetInformationValidateBeforeCall(creator, index, progressListener, progressRequestListener);
+        com.squareup.okhttp.Call call = assetInformationValidateBeforeCall(index, progressListener, progressRequestListener);
         Type localVarReturnType = new TypeToken<AssetParams>(){}.getType();
         apiClient.executeAsync(call, localVarReturnType, callback);
         return call;

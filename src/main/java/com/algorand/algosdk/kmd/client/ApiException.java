@@ -33,7 +33,7 @@ public class ApiException extends Exception {
     }
 
     public ApiException(String message, Throwable throwable, int code, Map<String, List<String>> responseHeaders, String responseBody) {
-        super(message, throwable);
+        super(message + " : " + responseBody, throwable);
         this.code = code;
         this.responseHeaders = responseHeaders;
         this.responseBody = responseBody;

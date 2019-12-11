@@ -1,11 +1,27 @@
 package com.algorand.algosdk.account;
 
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.security.SignatureException;
+import java.util.Arrays;
+
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
-import com.algorand.algosdk.crypto.*;
-import com.algorand.algosdk.crypto.Signature;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.LogicsigSignature;
+import com.algorand.algosdk.crypto.MultisigAddress;
+import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
+import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -15,12 +31,6 @@ import com.algorand.algosdk.util.Encoder;
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.*;
-import java.util.Arrays;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.
@@ -151,8 +161,8 @@ public class Account {
      * @throws NoSuchAlgorithmException crypto provider not found
      */
     public SignedTransaction signTransactionWithFeePerByte(Transaction tx, BigInteger feePerByte) throws NoSuchAlgorithmException {
-        Transaction feeTx = transactionWithSuggestedFeePerByte(tx, feePerByte);
-        return this.signTransaction(feeTx);
+        setFeeByFeePerByte(tx, feePerByte);
+        return this.signTransaction(tx);
     }
 
     /**
@@ -181,7 +191,10 @@ public class Account {
      * @param suggestedFeePerByte suggestedFee given by network
      * @return transaction with proper fee set
      * @throws NoSuchAlgorithmException could not estimate tx encoded size.
+     * @deprecated  Replaced by {@link #setFeeByFeePerByte}.
+     * This is unsafe to use because the returned transaction is a shallow copy of copyTx.
      */
+    @Deprecated
     static public Transaction transactionWithSuggestedFeePerByte(Transaction copyTx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
         BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(copyTx));
         if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
@@ -194,17 +207,25 @@ public class Account {
             case KeyRegistration:
                 return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
                         copyTx.votePK, copyTx.selectionPK, copyTx.voteFirst, copyTx.voteLast, copyTx.voteKeyDilution);
-            case AssetConfig:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.assetID, copyTx.assetParams);
-            case AssetFreeze:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.assetFreezeID, copyTx.freezeTarget, copyTx.freezeState);
             case Default:
                 throw new IllegalArgumentException("tx cannot have no type");
             default:
                 throw new RuntimeException("cannot reach");
         }
+    }
+    
+    /**
+     * Sets the transaction fee according to suggestedFeePerByte * estimateTxSize.
+     * @param tx transaction to populate fee field
+     * @param suggestedFeePerByte suggestedFee given by network
+     * @throws NoSuchAlgorithmException could not estimate tx encoded size.
+     */
+    static public void setFeeByFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
+        BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(tx));
+        if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
+            newFee = MIN_TX_FEE_UALGOS;
+        }
+        tx.fee = newFee;
     }
 
     /**
@@ -256,8 +277,8 @@ public class Account {
     /* Multisignature support */
 
     /**
-     * signMultisigTransaction creates a multisig transaction from the input and the multisig identity.
-     * @param from sign as this multisignature identity
+     * signMultisigTransaction creates a multisig transaction from the input and the multisig account.
+     * @param from sign as this multisignature account
      * @param tx the transaction to sign
      * @return SignedTransaction a partially signed multisig transaction
      * @throws NoSuchAlgorithmException if could not sign tx
@@ -265,13 +286,13 @@ public class Account {
     public SignedTransaction signMultisigTransaction(MultisigAddress from, Transaction tx) throws NoSuchAlgorithmException {
         // check that from addr of tx matches multisig preimage
         if (!tx.sender.toString().equals(from.toString())) {
-            throw new IllegalArgumentException("Transaction sender does not match multisig identity");
+            throw new IllegalArgumentException("Transaction sender does not match multisig account");
         }
         // check that account secret key is in multisig pk list
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myI = from.publicKeys.indexOf(myPK);
         if (myI == -1) {
-            throw new IllegalArgumentException("Multisig identity does not contain this secret key");
+            throw new IllegalArgumentException("Multisig account does not contain this secret key");
         }
         // now, create the multisignature
         SignedTransaction txSig = this.signTransaction(tx);
@@ -383,6 +404,109 @@ public class Account {
             return Encoder.encodeToMsgPack(signed);
         } catch (IOException e) {
             throw new IOException("could not encode transactions", e);
+        }
+    }
+
+    /**
+     * Sign LogicSig with account's secret key
+     * @param lsig LogicsigSignature to sign
+     * @return LogicsigSignature with updated signature
+     * @throws IOException
+     */
+    public LogicsigSignature signLogicsig(LogicsigSignature lsig) throws IOException {
+        Signature sig;
+        try {
+            byte[] bytesToSign = lsig.bytesToSign();
+            sig = this.rawSignBytes(bytesToSign);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("could not sign transaction", ex);
+        }
+        lsig.sig = sig;
+        return lsig;
+    }
+
+    /**
+     * Sign LogicSig as multisig
+     * @param lsig LogicsigSignature to sign
+     * @param ma MultisigAddress to format multi signature from
+     * @return LogicsigSignature
+     * @throws IOException
+     */
+    public LogicsigSignature signLogicsig(LogicsigSignature lsig, MultisigAddress ma) throws IOException {
+        Ed25519PublicKey myPK = this.getEd25519PublicKey();
+        int myIndex = ma.publicKeys.indexOf(myPK);
+        if (myIndex == -1) {
+            throw new IllegalArgumentException("Multisig account does not contain this secret key");
+        }
+        // now, create the multisignature
+        Signature sig;
+        try {
+            byte[] bytesToSign = lsig.bytesToSign();
+            sig = this.rawSignBytes(bytesToSign);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("could not sign transaction", ex);
+        }
+
+        MultisigSignature mSig = new MultisigSignature(ma.version, ma.threshold);
+        for (int i = 0; i < ma.publicKeys.size(); i++) {
+            if (i == myIndex) {
+                mSig.subsigs.add(new MultisigSubsig(myPK, sig));
+            } else {
+                mSig.subsigs.add(new MultisigSubsig(ma.publicKeys.get(i)));
+            }
+        }
+        lsig.msig = mSig;
+        return lsig;
+    }
+
+    /**
+     * Appends a signature to multisig logic signed transaction
+     * @param lsig LogicsigSignature append to
+     * @return LogicsigSignature
+     * @throws IllegalArgumentException
+     * @throws NoSuchAlgorithmException
+     */
+    public LogicsigSignature appendToLogicsig(LogicsigSignature lsig) throws IllegalArgumentException, IOException {
+        Ed25519PublicKey myPK = this.getEd25519PublicKey();
+        int myIndex = -1;
+        for (int i = 0; i < lsig.msig.subsigs.size(); i++ ) {
+            MultisigSubsig subsig = lsig.msig.subsigs.get(i);
+            if (subsig.key.equals(myPK)) {
+                myIndex = i;
+            }
+        }
+        if (myIndex == -1) {
+            throw new IllegalArgumentException("Multisig account does not contain this secret key");
+        }
+
+        try {
+            // now, create the multisignature
+            byte[] bytesToSign = lsig.bytesToSign();
+            Signature sig = this.rawSignBytes(bytesToSign);
+            lsig.msig.subsigs.set(myIndex, new MultisigSubsig(myPK, sig));
+            return lsig;
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("could not sign transaction", ex);
+        }
+
+    }
+
+    /**
+     * Creates SignedTransaction from LogicsigSignature and Transaction.
+     * LogicsigSignature must be valid and verifiable against transaction sender field.
+     * @param lsig LogicsigSignature
+     * @param tx Transaction
+     * @return SignedTransaction
+     */
+    public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
+        if (!lsig.verify(tx.sender)) {
+            throw new IllegalArgumentException("verification failed");
+        }
+
+        try {
+            return new SignedTransaction(tx, lsig, tx.txID());
+        } catch (Exception ex) {
+            throw new IOException("could not encode transactions", ex);
         }
     }
 

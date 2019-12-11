@@ -16,6 +16,9 @@ package com.algorand.algosdk.algod.client.model;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+
+import java.util.Map;
+
 import org.apache.commons.lang3.ObjectUtils;
 
 /**
@@ -33,6 +36,12 @@ public class Account {
   @SerializedName("amountwithoutpendingrewards")
   private java.math.BigInteger amountwithoutpendingrewards = null;
 
+  @SerializedName("assets")
+  private Map<java.math.BigInteger, AssetHolding> assets = null;
+
+  @SerializedName("participation")
+  private Participation participation = null;
+    
   @SerializedName("pendingrewards")
   private java.math.BigInteger pendingrewards = null;
 
@@ -44,6 +53,9 @@ public class Account {
 
   @SerializedName("status")
   private String status = null;
+
+  @SerializedName("thisassettotal")
+  private Map<java.math.BigInteger, AssetParams> thisassettotal = null;
 
   public Account address(String address) {
     this.address = address;
@@ -99,6 +111,42 @@ public class Account {
     this.amountwithoutpendingrewards = amountwithoutpendingrewards;
   }
 
+  public Account assets(Map<java.math.BigInteger, AssetHolding> assets) {
+    this.assets = assets;
+    return this;
+  }
+
+   /**
+   * Assets specifies the holdings of assets by this account, indexed by the asset ID.
+   * @return assets
+  **/
+  @ApiModelProperty(value = "Assets specifies the holdings of assets by this account, indexed by the asset ID.")
+  public AssetHolding getHolding(java.math.BigInteger assetIndex) {
+    return assets.get(assetIndex);
+  }
+
+  public void setAssets(Map<java.math.BigInteger, AssetHolding> assets) {
+    this.assets = assets;
+  }
+
+  public Account participation(Participation participation) {
+    this.participation = participation;
+    return this;
+  }
+
+   /**
+   * Get participation
+   * @return participation
+  **/
+  @ApiModelProperty(value = "")
+  public Participation getParticipation() {
+    return participation;
+  }
+
+  public void setParticipation(Participation participation) {
+    this.participation = participation;
+  }
+
   public Account pendingrewards(java.math.BigInteger pendingrewards) {
     this.pendingrewards = pendingrewards;
     return this;
@@ -123,10 +171,10 @@ public class Account {
   }
 
    /**
-   * Rewards indicates the total rewards of MicroAlgos the account has recieved
+   * Rewards indicates the total rewards of MicroAlgos the account has received, including pending rewards.
    * @return rewards
   **/
-  @ApiModelProperty(required = true, value = "Rewards indicates the total rewards of MicroAlgos the account has recieved")
+  @ApiModelProperty(required = true, value = "Rewards indicates the total rewards of MicroAlgos the account has received, including pending rewards.")
   public java.math.BigInteger getRewards() {
     return rewards;
   }
@@ -171,6 +219,24 @@ public class Account {
     this.status = status;
   }
 
+  public Account thisassettotal(Map<java.math.BigInteger, AssetParams> thisassettotal) {
+    this.thisassettotal = thisassettotal;
+    return this;
+  }
+
+   /**
+   * AssetParams specifies the parameters of assets created by this account.
+   * @return thisassettotal
+  **/
+  @ApiModelProperty(value = "AssetParams specifies the parameters of assets created by this account.")
+  public Map<java.math.BigInteger, AssetParams>  getThisassettotal() {
+    return thisassettotal;
+  }
+
+  public void setThisassettotal(Map<java.math.BigInteger, AssetParams> thisassettotal) {
+    this.thisassettotal = thisassettotal;
+  }
+
 
   @Override
   public boolean equals(java.lang.Object o) {
@@ -184,15 +250,18 @@ public class Account {
     return ObjectUtils.equals(this.address, account.address) &&
     ObjectUtils.equals(this.amount, account.amount) &&
     ObjectUtils.equals(this.amountwithoutpendingrewards, account.amountwithoutpendingrewards) &&
+    ObjectUtils.equals(this.assets, account.assets) &&
+    ObjectUtils.equals(this.participation, account.participation) &&
     ObjectUtils.equals(this.pendingrewards, account.pendingrewards) &&
     ObjectUtils.equals(this.rewards, account.rewards) &&
     ObjectUtils.equals(this.round, account.round) &&
-    ObjectUtils.equals(this.status, account.status);
+    ObjectUtils.equals(this.status, account.status) &&
+    ObjectUtils.equals(this.thisassettotal, account.thisassettotal);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(address, amount, amountwithoutpendingrewards, pendingrewards, rewards, round, status);
+    return ObjectUtils.hashCodeMulti(address, amount, amountwithoutpendingrewards, assets, participation, pendingrewards, rewards, round, status, thisassettotal);
   }
 
 
@@ -204,10 +273,13 @@ public class Account {
     sb.append("    address: ").append(toIndentedString(address)).append("\n");
     sb.append("    amount: ").append(toIndentedString(amount)).append("\n");
     sb.append("    amountwithoutpendingrewards: ").append(toIndentedString(amountwithoutpendingrewards)).append("\n");
+    sb.append("    assets: ").append(toIndentedString(assets)).append("\n");
+    sb.append("    participation: ").append(toIndentedString(participation)).append("\n");
     sb.append("    pendingrewards: ").append(toIndentedString(pendingrewards)).append("\n");
     sb.append("    rewards: ").append(toIndentedString(rewards)).append("\n");
     sb.append("    round: ").append(toIndentedString(round)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
+    sb.append("    thisassettotal: ").append(toIndentedString(thisassettotal)).append("\n");
     sb.append("}");
     return sb.toString();
   }
