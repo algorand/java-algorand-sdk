@@ -968,17 +968,25 @@ public class Transaction implements Serializable {
             if(freeze != null) this.assetFreeze = freeze;
             if(clawback != null) this.assetClawback = clawback;
 
-            if (assetUnitName.length() > 8) throw new RuntimeException("assetUnitName cannot be greater than 8 characters");
-            if(assetUnitName != null) this.assetUnitName = assetUnitName;
+            if(assetUnitName != null) {
+                if (assetUnitName.length() > 8) throw new RuntimeException("assetUnitName cannot be greater than 8 characters");
+                this.assetUnitName = assetUnitName;
+            }
 
-            if (assetName.length() > 32) throw new RuntimeException("assetName cannot be greater than 32 characters");
-            if(assetName != null) this.assetName = assetName;
+            if(assetName != null) {
+                if (assetName.length() > 32) throw new RuntimeException("assetName cannot be greater than 32 characters");
+                this.assetName = assetName;
+            }
 
-            if (url.length() > 32) throw new RuntimeException("asset url cannot be greater than 32 characters");
-            if(url != null) this.url = url;
+            if(url != null) {
+                if (url.length() > 32) throw new RuntimeException("asset url cannot be greater than 32 characters");
+                this.url = url;
+            }
 
-            if (metadataHash.length > 32) throw new RuntimeException("asset metadataHash cannot be greater than 32 bytes");
-            if(metadataHash != null) this.metadataHash = metadataHash;
+            if(metadataHash != null) {
+                if (metadataHash.length > 32) throw new RuntimeException("asset metadataHash cannot be greater than 32 bytes");
+                this.metadataHash = metadataHash;
+            }
         }
 
         public AssetParams() {
