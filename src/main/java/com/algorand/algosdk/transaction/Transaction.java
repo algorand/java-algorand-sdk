@@ -267,7 +267,7 @@ public class Transaction implements Serializable {
      */
     public static Transaction createAssetCreateTransaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
-                       String assetUnitName, String assetName, String url, byte[] metadataHash, 
+                       String assetUnitName, String assetName, String url, byte[] metadataHash,
                        Address manager, Address reserve, Address freeze, Address clawback) {
         return new Transaction(
                 sender, fee, firstValid, lastValid, note,
@@ -963,14 +963,22 @@ public class Transaction implements Serializable {
             if(assetTotal != null) this.assetTotal = assetTotal;
             if(assetDecimals != null) this.assetDecimals = assetDecimals;
             this.assetDefaultFrozen = defaultFrozen;
-            if(assetUnitName != null) this.assetUnitName = assetUnitName;
-            if(assetName != null) this.assetName = assetName;
-            if(url != null) this.url = url;
-            if(metadataHash != null) this.metadataHash = metadataHash;
             if(manager != null) this.assetManager = manager;
             if(reserve != null) this.assetReserve = reserve;
             if(freeze != null) this.assetFreeze = freeze;
             if(clawback != null) this.assetClawback = clawback;
+
+            if (assetUnitName.length() > 8) throw new RuntimeException("assetUnitName cannot be greater than 8 characters");
+            if(assetUnitName != null) this.assetUnitName = assetUnitName;
+
+            if (assetName.length() > 32) throw new RuntimeException("assetName cannot be greater than 32 characters");
+            if(assetName != null) this.assetName = assetName;
+
+            if (url.length() > 32) throw new RuntimeException("asset url cannot be greater than 32 characters");
+            if(url != null) this.url = url;
+
+            if (metadataHash.length > 32) throw new RuntimeException("asset metadataHash cannot be greater than 32 bytes");
+            if(metadataHash != null) this.metadataHash = metadataHash;
         }
 
         public AssetParams() {
