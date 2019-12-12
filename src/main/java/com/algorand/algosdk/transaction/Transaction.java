@@ -968,6 +968,11 @@ public class Transaction implements Serializable {
             if(freeze != null) this.assetFreeze = freeze;
             if(clawback != null) this.assetClawback = clawback;
 
+            if(assetDecimals != null) {
+                if (assetDecimals < 0 || assetDecimals > 19) throw new RuntimeException("assetDecimals cannot be less than 0 or greater than 19");
+                this.assetDecimals = assetDecimals;
+            }
+
             if(assetUnitName != null) {
                 if (assetUnitName.length() > 8) throw new RuntimeException("assetUnitName cannot be greater than 8 characters");
                 this.assetUnitName = assetUnitName;
