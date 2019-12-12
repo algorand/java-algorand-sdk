@@ -968,7 +968,7 @@ public class Transaction implements Serializable {
             if(clawback != null) this.assetClawback = clawback;
 
             if(assetDecimals != null) {
-                if (assetDecimals < 0 || assetDecimals > 19) throw new RuntimeException("assetDecimals cannot be greater than 19");
+                if (assetDecimals < 0 || assetDecimals > 19) throw new RuntimeException("assetDecimals cannot be less than 0 or greater than 19");
                 this.assetDecimals = assetDecimals;
             }
 
