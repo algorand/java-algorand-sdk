@@ -961,12 +961,16 @@ public class Transaction implements Serializable {
 			   Address freeze,
 			   Address clawback) {
             if(assetTotal != null) this.assetTotal = assetTotal;
-            if(assetDecimals != null) this.assetDecimals = assetDecimals;
             this.assetDefaultFrozen = defaultFrozen;
             if(manager != null) this.assetManager = manager;
             if(reserve != null) this.assetReserve = reserve;
             if(freeze != null) this.assetFreeze = freeze;
             if(clawback != null) this.assetClawback = clawback;
+
+            if(assetDecimals != null) {
+                if (assetDecimals < 0 || assetDecimals > 19) throw new RuntimeException("assetDecimals cannot be greater than 19");
+                this.assetDecimals = assetDecimals;
+            }
 
             if(assetUnitName != null) {
                 if (assetUnitName.length() > 8) throw new RuntimeException("assetUnitName cannot be greater than 8 characters");
