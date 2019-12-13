@@ -961,6 +961,7 @@ public class Transaction implements Serializable {
 			   Address freeze,
 			   Address clawback) {
             if(assetTotal != null) this.assetTotal = assetTotal;
+            if(assetDecimals != null) this.assetDecimals = assetDecimals;
             this.assetDefaultFrozen = defaultFrozen;
             if(manager != null) this.assetManager = manager;
             if(reserve != null) this.assetReserve = reserve;
