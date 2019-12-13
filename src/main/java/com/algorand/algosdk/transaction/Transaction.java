@@ -991,10 +991,6 @@ public class Transaction implements Serializable {
 
             if(metadataHash != null) {
                 if (metadataHash.length > 32) throw new RuntimeException("asset metadataHash cannot be greater than 32 bytes");
-                this.metadataHash = metadataHash;
-            }
-
-            if(metadataHash != null) {
                 if (!Base64.isBase64(metadataHash)) throw new RuntimeException("asset metadataHash '" + new String(metadataHash) + "' is not base64 encoded");
                 this.metadataHash = metadataHash;
             }
