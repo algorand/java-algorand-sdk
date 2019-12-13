@@ -168,7 +168,7 @@ public class TestTransaction {
             Assert.fail("expected metadataHash validation failure");
         }
         catch( RuntimeException rte) {
-            Assert.assertTrue(rte.getMessage().contains("asset metadataHash is not base64 encoded"));
+            Assert.assertTrue(rte.getMessage().contains("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded"));
         }
 
         try {

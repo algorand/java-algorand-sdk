@@ -995,7 +995,7 @@ public class Transaction implements Serializable {
             }
 
             if(metadataHash != null) {
-                if (!Base64.isBase64(metadataHash)) throw new RuntimeException("asset metadataHash is not base64 encoded");
+                if (!Base64.isBase64(metadataHash)) throw new RuntimeException("asset metadataHash '" + new String(metadataHash) + "' is not base64 encoded");
                 this.metadataHash = metadataHash;
             }
         }
