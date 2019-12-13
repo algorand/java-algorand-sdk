@@ -31,6 +31,9 @@ public class AssetParams {
   @SerializedName("creator")
   private String creator = null;
 
+  @SerializedName("decimals")
+  private Integer decimals = null;
+
   @SerializedName("defaultfrozen")
   private Boolean defaultfrozen = null;
 
@@ -107,6 +110,24 @@ public class AssetParams {
 
   public void setCreator(String creator) {
     this.creator = creator;
+  }
+
+  public AssetParams decimals(Integer decimals) {
+    this.decimals = decimals;
+    return this;
+  }
+
+   /**
+   * Decimals specifies the decimal precision of units of this asset.
+   * @return decimals
+  **/
+  @ApiModelProperty(required = true, value = "Decimals specifies the decimal precision of units of this asset.")
+  public Integer getDecimals() {
+    return decimals;
+  }
+
+  public void setDecimals(Integer decimals) {
+    this.decimals = decimals;
   }
 
   public AssetParams defaultfrozen(Boolean defaultfrozen) {
@@ -266,6 +287,7 @@ public class AssetParams {
     return ObjectUtils.equals(this.assetname, assetParams.assetname) &&
     ObjectUtils.equals(this.clawbackaddr, assetParams.clawbackaddr) &&
     ObjectUtils.equals(this.creator, assetParams.creator) &&
+    ObjectUtils.equals(this.decimals, assetParams.decimals) &&
     ObjectUtils.equals(this.defaultfrozen, assetParams.defaultfrozen) &&
     ObjectUtils.equals(this.freezeaddr, assetParams.freezeaddr) &&
     ObjectUtils.equals(this.managerkey, assetParams.managerkey) &&
@@ -278,7 +300,7 @@ public class AssetParams {
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(assetname, clawbackaddr, creator, defaultfrozen, freezeaddr, managerkey, metadatahash, reserveaddr, total, unitname, url);
+    return ObjectUtils.hashCodeMulti(assetname, clawbackaddr, creator, decimals, defaultfrozen, freezeaddr, managerkey, metadatahash, reserveaddr, total, unitname, url);
   }
 
 
@@ -290,6 +312,7 @@ public class AssetParams {
     sb.append("    assetname: ").append(toIndentedString(assetname)).append("\n");
     sb.append("    clawbackaddr: ").append(toIndentedString(clawbackaddr)).append("\n");
     //  creator is skipped to match with Transaction.AssetParams
+    sb.append("    decimals: ").append(toIndentedString(decimals)).append("\n");
     sb.append("    defaultfrozen: ").append(toIndentedString(defaultfrozen)).append("\n");
     sb.append("    freezeaddr: ").append(toIndentedString(freezeaddr)).append("\n");
     sb.append("    managerkey: ").append(toIndentedString(managerkey)).append("\n");
