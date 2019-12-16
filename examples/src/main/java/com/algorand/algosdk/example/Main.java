@@ -132,7 +132,7 @@ public class Main {
         } else {
             try {
                 SignedTransaction stx = Account.signLogicsigTransaction(lsig, tx);
-                byte[] encodedTxBytes = Encoder.encodeToMsgPack(signedTx);
+                byte[] encodedTxBytes = Encoder.encodeToMsgPack(stx);
                 TransactionID id = algodApiInstance.rawTransaction(encodedTxBytes);
                 System.out.println("Successfully sent tx logic sig tx id: " + id);
             } catch (ApiException e) {
