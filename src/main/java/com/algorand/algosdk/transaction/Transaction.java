@@ -8,6 +8,7 @@ import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -990,6 +991,7 @@ public class Transaction implements Serializable {
 
             if(metadataHash != null) {
                 if (metadataHash.length > 32) throw new RuntimeException("asset metadataHash cannot be greater than 32 bytes");
+                if (!Base64.isBase64(metadataHash)) throw new RuntimeException("asset metadataHash '" + new String(metadataHash) + "' is not base64 encoded");
                 this.metadataHash = metadataHash;
             }
         }

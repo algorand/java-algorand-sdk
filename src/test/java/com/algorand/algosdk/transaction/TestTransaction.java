@@ -138,6 +138,61 @@ public class TestTransaction {
     }
 
     @Test
+    public void testAssetParamsValidation() throws Exception
+    {
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address manager = addr;
+        Address reserve = addr;
+        Address freeze = addr;
+        Address clawback = addr;
+        String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
+        String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
+
+
+        try {
+            Transaction.AssetParams expectedParams = new Transaction.AssetParams(
+                    BigInteger.valueOf(100),
+                    3,
+                    false,
+                    "tst",
+                    "testcoin",
+                    "website",
+                    badMetadataHash.getBytes(StandardCharsets.UTF_8),
+                    manager,
+                    reserve,
+                    freeze,
+                    clawback
+            );
+            Assert.fail("expected metadataHash validation failure");
+        }
+        catch( RuntimeException rte) {
+            Assert.assertTrue(rte.getMessage().contains("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded"));
+        }
+
+        try {
+            Transaction.AssetParams expectedParams = new Transaction.AssetParams(
+                    BigInteger.valueOf(100),
+                    3,
+                    false,
+                    "tst",
+                    "testcoin",
+                    "website",
+                    tooLongMetadataHash.getBytes(StandardCharsets.UTF_8),
+                    manager,
+                    reserve,
+                    freeze,
+                    clawback
+            );
+            Assert.fail("expected metadataHash validation failure");
+        }
+        catch( RuntimeException rte) {
+            Assert.assertTrue(rte.getMessage().contains("asset metadataHash cannot be greater than 32 bytes"));
+        }
+    }
+
+    @Test
     public void testMakeAssetCreateTxn() throws Exception {
         createAssetTest(0, "gqNzaWfEQEDd1OMRoQI/rzNlU4iiF50XQXmup3k5czI9hEsNqHT7K4KsfmA/0DUVkbzOwtJdRsHS8trm3Arjpy9r7AXlbAujdHhuh6RhcGFyiaJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aF0ZKJ1bqN0c3SjZmVlzQ+0omZ2zgAE7A+iZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgAE7/ejc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aR0eXBlpGFjZmc=");
     }
