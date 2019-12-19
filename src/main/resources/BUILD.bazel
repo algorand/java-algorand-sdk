@@ -1,5 +1,0 @@
-filegroup(
-    name = "langspec",
-    srcs = ["langspec.json"],
-    visibility = ["//visibility:public"],
-)
