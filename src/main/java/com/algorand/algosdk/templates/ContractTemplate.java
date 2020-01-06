@@ -162,7 +162,6 @@ public class ContractTemplate {
 					updatedProgram.add(b);
 				}
 				progIdx += value.placeholderSize();
-				//progIdx += value.appendToProgram(updatedProgram);
 			} else {
 				updatedProgram.add(program[progIdx]);
 				progIdx += 1;
