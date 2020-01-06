@@ -16,9 +16,9 @@ public class ContractTemplate {
 
 	/**
 	 * Values are appended to a program at specific offsets. Depending on the type the source template has placeholders
-	 * of differing sizes, this offset is returned by the "updateProgram" method and is used to traverse the template.
-	 *
-	 * Note: Placeholder sizes may differ between SDK implementations.
+	 * of differing sizes. The values are used to generate a byte array appropriate for the type it represents, for
+	 * example some values may include a length in addition to the data. In addition the value knows how large the
+	 * placeholder value is, this placeholder size may differ between different Algorand SDK implementations.
      *
 	 * Placeholder sizes are the following:
 	 * 		BASE64 : 2 bytes
