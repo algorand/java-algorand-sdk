@@ -18,40 +18,65 @@ public class ContractTemplate {
 		BASE64, ADDRESS, INT;
 	}
 
-	public static class ParameterValue {
-		private DataType type;
-		private byte[] byteValue;
-		private int intValue;
-
-		public ParameterValue(DataType dataType, String value) throws NoSuchAlgorithmException {
-			type = dataType;
-
-			if (type == DataType.ADDRESS) {
-				Address addr = new Address(value);
-				byteValue = addr.getBytes();
-			} else {
-				byteValue = Encoder.decodeFromBase64(value);
-			}
-		}
-
-		public ParameterValue(DataType dataType, int value) {
-			type = dataType;
-			intValue = value;
-			if (type != DataType.INT) {
-				throw new RuntimeException("Expecting int type with int value for parameter value.");
-			}
-		}
-
-		public DataType getType() {
-			return type;
-		}
+	abstract static class ParameterValue {
+		abstract public DataType getType();
 
 		public int getIntValue() {
-			return intValue;
+		    throw new IllegalArgumentException();
 		}
 
 		public byte[] getByteValue() {
-			return byteValue;
+			throw new IllegalArgumentException();
+		}
+	}
+
+	public static class IntParameterValue extends ParameterValue {
+		private int value;
+
+		public IntParameterValue(int value) {
+			this.value = value;
+		}
+
+		public int getIntValue() {
+			return this.value;
+		}
+
+		public DataType getType() {
+			return DataType.INT;
+		}
+	}
+
+	abstract public static class ByteParameterValue extends ParameterValue {
+		private byte[] value;
+
+		public ByteParameterValue(byte[] value) throws NoSuchAlgorithmException {
+			this.value = value;
+		}
+
+		public byte[] getByteValue() {
+			return this.value;
+		}
+	}
+
+	public static class AddressParameterValue extends ByteParameterValue {
+
+		public AddressParameterValue(String value) throws NoSuchAlgorithmException {
+			super(new Address(value).getBytes());
+		}
+
+		public DataType getType() {
+			return DataType.ADDRESS;
+		}
+	}
+
+	public static class Base64ParameterValue extends ByteParameterValue {
+
+		public Base64ParameterValue(String value) throws NoSuchAlgorithmException {
+			super(Encoder.decodeFromBase64(value));
+		}
+
+		public DataType getType() {
+			return DataType.BASE64;
 		}
 	}
 

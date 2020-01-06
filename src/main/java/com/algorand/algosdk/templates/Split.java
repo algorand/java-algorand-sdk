@@ -3,8 +3,9 @@ package com.algorand.algosdk.templates;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 
-import com.algorand.algosdk.templates.ContractTemplate.DataType;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
+import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
+import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
 import com.algorand.algosdk.util.Encoder;
 
 public class Split {
@@ -35,14 +36,14 @@ public class Split {
 			int maxFee) throws NoSuchAlgorithmException {
 
 		ParameterValue[] values = {
-				new ParameterValue(DataType.INT, maxFee),
-				new ParameterValue(DataType.INT, expiryRound),
-				new ParameterValue(DataType.INT, ratn),
-				new ParameterValue(DataType.INT, ratd),
-				new ParameterValue(DataType.INT, minPay),
-				new ParameterValue(DataType.ADDRESS, owner),
-				new ParameterValue(DataType.ADDRESS, receiver1),
-				new ParameterValue(DataType.ADDRESS, receiver2)
+				new ContractTemplate.IntParameterValue(maxFee),
+				new IntParameterValue(expiryRound),
+				new IntParameterValue(ratn),
+				new IntParameterValue(ratd),
+				new IntParameterValue(minPay),
+				new AddressParameterValue(owner),
+				new AddressParameterValue(receiver1),
+				new AddressParameterValue(receiver2)
 		};
 		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), referenceOffsets, values);
 	}

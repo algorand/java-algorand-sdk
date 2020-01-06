@@ -4,6 +4,9 @@ import java.security.NoSuchAlgorithmException;
 
 import com.algorand.algosdk.templates.ContractTemplate.DataType;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
+import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
+import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
+import com.algorand.algosdk.templates.ContractTemplate.Base64ParameterValue;
 import com.algorand.algosdk.util.Encoder;
 
 public class HTLC {
@@ -39,12 +42,12 @@ public class HTLC {
 		}
 
 		ParameterValue[] values = {
-				new ParameterValue(DataType.INT, maxFee),
-				new ParameterValue(DataType.INT, expiryRound),
-				new ParameterValue(DataType.ADDRESS, receiver),
-				new ParameterValue(DataType.BASE64, hashImage),
-				new ParameterValue(DataType.ADDRESS, owner),
-				new ParameterValue(DataType.INT, hashInject)
+				new IntParameterValue(maxFee),
+				new IntParameterValue(expiryRound),
+				new AddressParameterValue(receiver),
+				new Base64ParameterValue(hashImage),
+				new AddressParameterValue(owner),
+				new IntParameterValue(hashInject)
 		};
 		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), referenceOffsets, values);
 	}
