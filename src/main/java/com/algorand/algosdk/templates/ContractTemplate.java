@@ -14,20 +14,17 @@ import com.algorand.algosdk.util.Encoder;
 
 public class ContractTemplate {
 
-	public enum DataType {
-		BASE64, ADDRESS, INT;
-	}
-
+	/**
+	 * Values are appended to a program at specific offsets. Depending on the type the source template has placeholders
+	 * of differing sizes, this offset is returned by the "updateProgram" method and is used to traverse the template.
+     *
+	 * Offsets are the following:
+	 * 		BASE64 : placeholder  2 bytes
+	 * 		ADDRESS: placeholder 32 bytes
+	 * 		INT    : placeholder  1 byte
+	 */
 	abstract static class ParameterValue {
-		abstract public DataType getType();
-
-		public int getIntValue() {
-		    throw new IllegalArgumentException();
-		}
-
-		public byte[] getByteValue() {
-			throw new IllegalArgumentException();
-		}
+		abstract public int updateProgram(ArrayList<Byte> program);
 	}
 
 	public static class IntParameterValue extends ParameterValue {
@@ -37,46 +34,46 @@ public class ContractTemplate {
 			this.value = value;
 		}
 
-		public int getIntValue() {
-			return this.value;
-		}
-
-		public DataType getType() {
-			return DataType.INT;
+		public int updateProgram(ArrayList<Byte> program) {
+			byte[] byteValue = putUVarint(value);
+			for (byte b : byteValue) {
+				program.add(b);
+			}
+			return 1; // skip the parameter placeholder bytes in program bytecode
 		}
 	}
 
-	abstract public static class ByteParameterValue extends ParameterValue {
+	public static class AddressParameterValue extends ParameterValue {
 		private byte[] value;
 
-		public ByteParameterValue(byte[] value) throws NoSuchAlgorithmException {
-			this.value = value;
-		}
-
-		public byte[] getByteValue() {
-			return this.value;
-		}
-	}
-
-	public static class AddressParameterValue extends ByteParameterValue {
-
 		public AddressParameterValue(String value) throws NoSuchAlgorithmException {
-			super(new Address(value).getBytes());
+			this.value = new Address(value).getBytes();
 		}
 
-		public DataType getType() {
-			return DataType.ADDRESS;
+		public int updateProgram(ArrayList<Byte> program) {
+			for (byte b : value) {
+				program.add(b);
+			}
+			return 32; // skip the parameter placeholder bytes in program bytecode
 		}
 	}
 
-	public static class Base64ParameterValue extends ByteParameterValue {
+	public static class Base64ParameterValue extends ParameterValue {
+		private byte[] value;
 
-		public Base64ParameterValue(String value) throws NoSuchAlgorithmException {
-			super(Encoder.decodeFromBase64(value));
+		public Base64ParameterValue(String value) {
+			this.value = Encoder.decodeFromBase64(value);
 		}
 
-		public DataType getType() {
-			return DataType.BASE64;
+		public int updateProgram(ArrayList<Byte> program) {
+			byte[] byteValueLength = putUVarint(value.length);
+			for (byte b : byteValueLength) {
+				program.add(b);
+			}
+			for (byte b : value) {
+				program.add(b);
+			}
+			return 2; // skip the parameter placeholder bytes in program bytecode
 		}
 	}
 
@@ -147,14 +144,6 @@ public class ContractTemplate {
 	 * @throws NoSuchAlgorithmException
 	 */
 	protected static ContractTemplate inject(byte [] program, int [] offsets, ParameterValue[] values) throws NoSuchAlgorithmException {
-
-		/**
-		 * offsets are the positions of the program arguments in the bytecode.
-		 * Each argument in the program has a place-holder in the bytecode of varying sizes based on the argument type  
-		 * 		BASE64 : placeholder  2 bytes 
-		 * 		ADDRESS: placeholder 32 bytes 
- 		 * 		INT    : placeholder  1 byte 
-		 */
 		if (offsets.length != values.length) {
 			throw new RuntimeException("offsets and values should have the same number of elements");
 		}
@@ -166,37 +155,7 @@ public class ContractTemplate {
 			if (paramIdx < offsets.length && offsets[paramIdx] == progIdx) {
 				ParameterValue value = values[paramIdx];
 				++paramIdx;
-				switch (value.getType()) {
-				case BASE64:
-					byte[] byteValueString = value.getByteValue();
-					byte[] byteValueLength = putUVarint(byteValueString.length);
-					for (byte b : byteValueLength) {
-						updatedProgram.add(b);	
-					}
-					for (byte b : byteValueString) {
-						updatedProgram.add(b);	
-					}
-					progIdx += 2; // skip the parameter placeholder bytes in program bytecode
-					break;
-
-				case ADDRESS:
-					for (byte b : value.getByteValue()) {
-						updatedProgram.add(b);
-					}
-					progIdx += 32; // skip the parameter placeholder bytes in program bytecode
-					break;
-
-				case INT:
-					byte[] byteValue = putUVarint(value.getIntValue());
-					for (byte b : byteValue) {
-						updatedProgram.add(b);	
-					}
-					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
-					break;
-
-				default:
-					throw new RuntimeException("Unrecognized program parameter datatype!");
-				}
+				progIdx += value.updateProgram(updatedProgram);
 			} else {
 				updatedProgram.add(program[progIdx]);
 				progIdx += 1;

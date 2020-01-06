@@ -2,7 +2,6 @@ package com.algorand.algosdk.templates;
 
 import java.security.NoSuchAlgorithmException;
 
-import com.algorand.algosdk.templates.ContractTemplate.DataType;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;

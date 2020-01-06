@@ -1,6 +1,5 @@
 package com.algorand.algosdk.templates;
 
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
