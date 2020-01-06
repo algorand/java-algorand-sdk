@@ -17,63 +17,66 @@ public class ContractTemplate {
 	/**
 	 * Values are appended to a program at specific offsets. Depending on the type the source template has placeholders
 	 * of differing sizes, this offset is returned by the "updateProgram" method and is used to traverse the template.
+	 *
+	 * Note: Placeholder sizes may differ between SDK implementations.
      *
-	 * Offsets are the following:
-	 * 		BASE64 : placeholder  2 bytes
-	 * 		ADDRESS: placeholder 32 bytes
-	 * 		INT    : placeholder  1 byte
+	 * Placeholder sizes are the following:
+	 * 		BASE64 : 2 bytes
+	 * 		ADDRESS: 32 bytes
+	 * 		INT    : 1 byte
 	 */
 	abstract static class ParameterValue {
-		abstract public int updateProgram(ArrayList<Byte> program);
+        private final byte[] value;
+
+        protected ParameterValue(byte[] value) {
+        	this.value = value;
+		}
+
+		public byte[] toBytes() {
+			return value;
+		}
+		abstract public int placeholderSize();
 	}
 
 	public static class IntParameterValue extends ParameterValue {
-		private int value;
-
 		public IntParameterValue(int value) {
-			this.value = value;
+			super(putUVarint(value));
 		}
 
-		public int updateProgram(ArrayList<Byte> program) {
-			byte[] byteValue = putUVarint(value);
-			for (byte b : byteValue) {
-				program.add(b);
-			}
-			return 1; // skip the parameter placeholder bytes in program bytecode
+		public int placeholderSize() {
+			return 1;
 		}
 	}
 
 	public static class AddressParameterValue extends ParameterValue {
-		private byte[] value;
-
 		public AddressParameterValue(String value) throws NoSuchAlgorithmException {
-			this.value = new Address(value).getBytes();
+			super(new Address(value).getBytes());
 		}
 
-		public int updateProgram(ArrayList<Byte> program) {
-			for (byte b : value) {
-				program.add(b);
-			}
-			return 32; // skip the parameter placeholder bytes in program bytecode
+		public int placeholderSize() {
+			return 32;
 		}
 	}
 
 	public static class Base64ParameterValue extends ParameterValue {
-		private byte[] value;
-
 		public Base64ParameterValue(String value) {
-			this.value = Encoder.decodeFromBase64(value);
+			this(Encoder.decodeFromBase64(value));
 		}
 
-		public int updateProgram(ArrayList<Byte> program) {
-			byte[] byteValueLength = putUVarint(value.length);
-			for (byte b : byteValueLength) {
-				program.add(b);
-			}
-			for (byte b : value) {
-				program.add(b);
-			}
-			return 2; // skip the parameter placeholder bytes in program bytecode
+		public Base64ParameterValue(byte[] value) {
+			super(convertToBytes(value));
+		}
+
+		private static byte[] convertToBytes(byte[] value) {
+			byte[] len = putUVarint(value.length);
+			byte[] result = new byte[len.length + value.length];
+			System.arraycopy(len, 0, result, 0, len.length);
+			System.arraycopy(value, 0, result, len.length, value.length);
+			return result;
+		}
+
+		public int placeholderSize() {
+			return 2;
 		}
 	}
 
@@ -155,7 +158,11 @@ public class ContractTemplate {
 			if (paramIdx < offsets.length && offsets[paramIdx] == progIdx) {
 				ParameterValue value = values[paramIdx];
 				++paramIdx;
-				progIdx += value.updateProgram(updatedProgram);
+				for (byte b : value.toBytes()) {
+					updatedProgram.add(b);
+				}
+				progIdx += value.placeholderSize();
+				//progIdx += value.appendToProgram(updatedProgram);
 			} else {
 				updatedProgram.add(program[progIdx]);
 				progIdx += 1;
