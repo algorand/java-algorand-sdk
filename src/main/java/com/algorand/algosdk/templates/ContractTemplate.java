@@ -97,7 +97,7 @@ public class ContractTemplate {
 	 * @param value being serialized
 	 * @return byte array holding the serialized bits
 	 */
-	public static byte[] putUVarint(int value) {
+	protected static byte[] putUVarint(int value) {
 		assert value >= 0 : "putUVarint expects non-negative values.";
 		ArrayList<Byte> buffer = new ArrayList<Byte>();
 		while (value >= 0x80) {
@@ -118,7 +118,7 @@ public class ContractTemplate {
 	 * @param bufferOffset position in the buffer to start reading from
 	 * @return pair of values in in array: value, read size 
 	 */
-	public static int[] getUVarint(byte [] buffer, int bufferOffset) { 
+	protected static int[] getUVarint(byte [] buffer, int bufferOffset) {
 		int x = 0;
 		int s = 0;
 		for (int i = 0; i < buffer.length; i++) {
