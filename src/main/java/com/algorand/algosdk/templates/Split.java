@@ -35,7 +35,7 @@ public class Split {
 			int maxFee) throws NoSuchAlgorithmException {
 
 		ParameterValue[] values = {
-				new ContractTemplate.IntParameterValue(maxFee),
+				new IntParameterValue(maxFee),
 				new IntParameterValue(expiryRound),
 				new IntParameterValue(ratn),
 				new IntParameterValue(ratd),
