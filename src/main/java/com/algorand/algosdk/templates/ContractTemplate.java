@@ -14,44 +14,69 @@ import com.algorand.algosdk.util.Encoder;
 
 public class ContractTemplate {
 
-	public enum DataType {
-		BASE64, ADDRESS, INT;
+	/**
+	 * Values are appended to a program at specific offsets. Depending on the type the source template has placeholders
+	 * of differing sizes. The values are used to generate a byte array appropriate for the type it represents, for
+	 * example some values may include a length in addition to the data. In addition the value knows how large the
+	 * placeholder value is, this placeholder size may differ between different Algorand SDK implementations.
+     *
+	 * Placeholder sizes are the following:
+	 * 		BASE64 : 2 bytes
+	 * 		ADDRESS: 32 bytes
+	 * 		INT    : 1 byte
+	 */
+	abstract static class ParameterValue {
+        private final byte[] value;
+
+        protected ParameterValue(byte[] value) {
+        	this.value = value;
+		}
+
+		public byte[] toBytes() {
+			return value;
+		}
+		abstract public int placeholderSize();
 	}
 
-	public static class ParameterValue {
-		private DataType type;
-		private byte[] byteValue;
-		private int intValue;
-
-		public ParameterValue(DataType dataType, String value) throws NoSuchAlgorithmException {
-			type = dataType;
-
-			if (type == DataType.ADDRESS) {
-				Address addr = new Address(value);
-				byteValue = addr.getBytes();
-			} else {
-				byteValue = Encoder.decodeFromBase64(value);
-			}
+	public static class IntParameterValue extends ParameterValue {
+		public IntParameterValue(int value) {
+			super(putUVarint(value));
 		}
 
-		public ParameterValue(DataType dataType, int value) {
-			type = dataType;
-			intValue = value;
-			if (type != DataType.INT) {
-				throw new RuntimeException("Expecting int type with int value for parameter value.");
-			}
+		public int placeholderSize() {
+			return 1;
+		}
+	}
+
+	public static class AddressParameterValue extends ParameterValue {
+		public AddressParameterValue(String value) throws NoSuchAlgorithmException {
+			super(new Address(value).getBytes());
 		}
 
-		public DataType getType() {
-			return type;
+		public int placeholderSize() {
+			return 32;
+		}
+	}
+
+	public static class Base64ParameterValue extends ParameterValue {
+		public Base64ParameterValue(String value) {
+			this(Encoder.decodeFromBase64(value));
 		}
 
-		public int getIntValue() {
-			return intValue;
+		public Base64ParameterValue(byte[] value) {
+			super(convertToBytes(value));
 		}
 
-		public byte[] getByteValue() {
-			return byteValue;
+		private static byte[] convertToBytes(byte[] value) {
+			byte[] len = putUVarint(value.length);
+			byte[] result = new byte[len.length + value.length];
+			System.arraycopy(len, 0, result, 0, len.length);
+			System.arraycopy(value, 0, result, len.length, value.length);
+			return result;
+		}
+
+		public int placeholderSize() {
+			return 2;
 		}
 	}
 
@@ -75,7 +100,7 @@ public class ContractTemplate {
 	 * @param value being serialized
 	 * @return byte array holding the serialized bits
 	 */
-	public static byte[] putUVarint(int value) {
+	protected static byte[] putUVarint(int value) {
 		assert value >= 0 : "putUVarint expects non-negative values.";
 		ArrayList<Byte> buffer = new ArrayList<Byte>();
 		while (value >= 0x80) {
@@ -96,7 +121,7 @@ public class ContractTemplate {
 	 * @param bufferOffset position in the buffer to start reading from
 	 * @return pair of values in in array: value, read size 
 	 */
-	public static int[] getUVarint(byte [] buffer, int bufferOffset) { 
+	protected static int[] getUVarint(byte [] buffer, int bufferOffset) {
 		int x = 0;
 		int s = 0;
 		for (int i = 0; i < buffer.length; i++) {
@@ -122,14 +147,6 @@ public class ContractTemplate {
 	 * @throws NoSuchAlgorithmException
 	 */
 	protected static ContractTemplate inject(byte [] program, int [] offsets, ParameterValue[] values) throws NoSuchAlgorithmException {
-
-		/**
-		 * offsets are the positions of the program arguments in the bytecode.
-		 * Each argument in the program has a place-holder in the bytecode of varying sizes based on the argument type  
-		 * 		BASE64 : placeholder  2 bytes 
-		 * 		ADDRESS: placeholder 32 bytes 
- 		 * 		INT    : placeholder  1 byte 
-		 */
 		if (offsets.length != values.length) {
 			throw new RuntimeException("offsets and values should have the same number of elements");
 		}
@@ -141,37 +158,10 @@ public class ContractTemplate {
 			if (paramIdx < offsets.length && offsets[paramIdx] == progIdx) {
 				ParameterValue value = values[paramIdx];
 				++paramIdx;
-				switch (value.getType()) {
-				case BASE64:
-					byte[] byteValueString = value.getByteValue();
-					byte[] byteValueLength = putUVarint(byteValueString.length);
-					for (byte b : byteValueLength) {
-						updatedProgram.add(b);	
-					}
-					for (byte b : byteValueString) {
-						updatedProgram.add(b);	
-					}
-					progIdx += 2; // skip the parameter placeholder bytes in program bytecode
-					break;
-
-				case ADDRESS:
-					for (byte b : value.getByteValue()) {
-						updatedProgram.add(b);
-					}
-					progIdx += 32; // skip the parameter placeholder bytes in program bytecode
-					break;
-
-				case INT:
-					byte[] byteValue = putUVarint(value.getIntValue());
-					for (byte b : byteValue) {
-						updatedProgram.add(b);	
-					}
-					progIdx += 1; // skip the parameter placeholder bytes in program bytecode
-					break;
-
-				default:
-					throw new RuntimeException("Unrecognized program parameter datatype!");
+				for (byte b : value.toBytes()) {
+					updatedProgram.add(b);
 				}
+				progIdx += value.placeholderSize();
 			} else {
 				updatedProgram.add(program[progIdx]);
 				progIdx += 1;
