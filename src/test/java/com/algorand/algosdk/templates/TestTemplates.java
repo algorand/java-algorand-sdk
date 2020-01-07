@@ -1,6 +1,7 @@
 package com.algorand.algosdk.templates;
 
 
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import org.junit.Test;
 
@@ -54,7 +55,7 @@ public class TestTemplates {
 	public void testPeriodicPayment() throws Exception {
 		String goldenAddress = "IJPPJDULMZNQXBIGCLCWVP5P4VD6U564BHC7C5CMZB2FVXKGZSIVPJFPT4";
 		String goldenProgram = "ASAHAQoLAOcHkE7AxAcmAiB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaSD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEzEQIhIxASMOEDECJBglEhAxBCEEMQIIEhAxBigSEDEJMgMSMQcpEhAxCCEFEhAxCSkSMQcyAxIQMQIhBg0QMQglEhAREA==";
-		String goldenWithdrawalTransaction = "gqRsc2lngaFsxJcBIAcBCgsA5weQTsDEByYCIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMRAiEjEBIw4QMQIkGCUSEDEEIQQxAggSEDEGKBIQMQkyAxIxBykSEDEIIQUSEDEJKRIxBzIDEhAxAiEGDRAxCCUSEBEQo3R4bomjYW10zScQo2ZlZQqiZnbNBLqiZ2jEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpomx2zQihomx4xCB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaaNyY3bEIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITo3NuZMQgQl70jotmWwuFBhLFar+v5Ufqd9wJxfF0TMh0Wt1GzJGkdHlwZaNwYXk=";
+		String goldenWithdrawalTransaction = "gqRsc2lngaFsxJcBIAcBCgsA5weQTsDEByYCIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMRAiEjEBIw4QMQIkGCUSEDEEIQQxAggSEDEGKBIQMQkyAxIxBykSEDEIIQUSEDEJKRIxBzIDEhAxAiEGDRAxCCUSEBEQo3R4bomjYW10zScQo2ZlZc0KHqJmds0EuqJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmibHbNCKGibHjEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpo3JjdsQg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohOjc25kxCBCXvSOi2ZbC4UGEsVqv6/lR+p33AnF8XRMyHRa3UbMkaR0eXBlo3BheQ==";
 
 		int fee = 10;
 		String addr = "726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM";
@@ -65,7 +66,7 @@ public class TestTemplates {
 		assertThat(Encoder.encodeToBase64(result.program)).isEqualTo(goldenProgram);
 		assertThat(result.address.toString()).isEqualTo(goldenAddress);
 
-		String genesisHash = "f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=";
+		Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
 
 		SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result.program, 1210, genesisHash);
 		assertThat(Encoder.encodeToMsgPack(stx)).isEqualTo(Encoder.decodeFromBase64(goldenWithdrawalTransaction));

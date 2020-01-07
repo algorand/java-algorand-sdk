@@ -74,7 +74,7 @@ public class PeriodicPayment {
      * @param genesisHash genesis hash in base64.
      * @return Signed withdrawal transaction.
      */
-    public static SignedTransaction MakeWithdrawalTransaction(final byte[] contract, final int firstValid, final String genesisHash) throws IOException, NoSuchAlgorithmException {
+    public static SignedTransaction MakeWithdrawalTransaction(final byte[] contract, final int firstValid, final Digest genesisHash) throws IOException, NoSuchAlgorithmException {
         Logic.ProgramData data = Logic.readProgram(contract, null);
         int amount = data.intBlock.get(5);
         int withdrawingWindow = data.intBlock.get(4);
@@ -91,15 +91,16 @@ public class PeriodicPayment {
         Address address = lsig.toAddress();
         Transaction tx = new Transaction(
                 address,
-                 BigInteger.valueOf(fee),
-                 BigInteger.valueOf(firstValid),
-                 BigInteger.valueOf(firstValid + withdrawingWindow),
-                 null,
-                 BigInteger.valueOf(amount),
-                 receiver,
-                 "",
-                 new Digest(Encoder.decodeFromBase64(genesisHash)));
+                BigInteger.valueOf(fee),
+                BigInteger.valueOf(firstValid),
+                BigInteger.valueOf(firstValid + withdrawingWindow),
+                null,
+                BigInteger.valueOf(amount),
+                receiver,
+                "",
+                genesisHash);
         tx.setLease(leaseValue);
+        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(fee));
 
         if (!lsig.verify(tx.sender)) {
             throw new IllegalArgumentException("Failed to verify transaction.");
