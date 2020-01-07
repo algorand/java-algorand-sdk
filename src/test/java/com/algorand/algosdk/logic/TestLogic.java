@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.io.*;
 import java.util.*;
 
+import static com.algorand.algosdk.logic.Logic.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestLogic {
@@ -49,7 +50,7 @@ public class TestLogic {
             0x20, 0x05, 0x00, 0x01, (byte)0xc8, 0x03, 0x7b, 0x02
         };
 
-        IntConstBlock results = Logic.readIntConstBlock(data, 0);
+        IntConstBlock results = readIntConstBlock(data, 0);
         assertThat(results.size).isEqualTo(data.length);
         assertThat(results.results)
                 .extracting("value")
@@ -65,11 +66,9 @@ public class TestLogic {
                 new byte[]{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32, 0x33 },
                 new byte[]{ 0x1, 0x2 });
 
-        ByteConstBlock results = Logic.readByteConstBlock(data, 0);
+        Logic.ByteConstBlock results = readByteConstBlock(data, 0);
         assertThat(results.size).isEqualTo(data.length);
-        assertThat(results.results)
-                .extracting("value")
-                .containsExactlyElementsOf(values);
+        assertThat(results.results).containsExactlyElementsOf(values);
     }
 
     @Test
@@ -79,17 +78,17 @@ public class TestLogic {
         };
 
         // Null argument
-        Logic.ProgramData programData = Logic.readProgram(program, null);
+        ProgramData programData = readProgram(program, null);
         assertThat(programData.good).isTrue();
-        assertThat(programData.intBlock.results).extracting("value")
+        assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isNull();
 
         // No argument
         ArrayList<byte[]> args = new ArrayList<>();
-        programData = Logic.readProgram(program, args);
+        programData = readProgram(program, args);
         assertThat(programData.good).isTrue();
-        assertThat(programData.intBlock.results).extracting("value")
+        assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isNull();
 
@@ -98,9 +97,9 @@ public class TestLogic {
         Arrays.fill(arg, (byte)0x31);
         args.add(arg);
 
-        programData = Logic.readProgram(program, args);
+        programData = readProgram(program, args);
         assertThat(programData.good).isTrue();
-        assertThat(programData.intBlock.results).extracting("value")
+        assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isNull();
 
@@ -110,9 +109,9 @@ public class TestLogic {
         byte[] program2 = new byte[program.length + int1.length];
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(int1, 0, program2, program.length, int1.length);
-        programData = Logic.readProgram(program2, args);
+        programData = readProgram(program2, args);
         Assert.assertTrue(programData.good);
-        assertThat(programData.intBlock.results).extracting("value")
+        assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isNull();
    }
@@ -128,7 +127,7 @@ public class TestLogic {
         Arrays.fill(arg, (byte)0x31);
         args.add(arg);
 
-        Logic.ProgramData programData = Logic.readProgram(program, args);
+        ProgramData programData = readProgram(program, args);
         assertThat(programData.good).isFalse();
     }
 
@@ -143,7 +142,7 @@ public class TestLogic {
 
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(int1, 0, program2, program.length, int1.length);
-        boolean valid = Logic.checkProgram(program2, args);
+        boolean valid = checkProgram(program2, args);
         Assert.assertFalse(valid);
    }
 
@@ -154,7 +153,7 @@ public class TestLogic {
         };
         ArrayList<byte[]> args = new ArrayList<byte[]>();
 
-        boolean valid = Logic.checkProgram(program, args);
+        boolean valid = checkProgram(program, args);
         Assert.assertFalse(valid);
     }
 
@@ -165,7 +164,7 @@ public class TestLogic {
         };
         ArrayList<byte[]> args = new ArrayList<byte[]>();
 
-        boolean valid = Logic.checkProgram(program, args);
+        boolean valid = checkProgram(program, args);
         Assert.assertTrue(valid);
 
         byte[] keccak25610 = new byte[10];
@@ -174,7 +173,7 @@ public class TestLogic {
         byte[] program2 = new byte[program.length + keccak25610.length];
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(keccak25610, 0, program2, program.length, keccak25610.length);
-        valid = Logic.checkProgram(program2, args);
+        valid = checkProgram(program2, args);
         Assert.assertTrue(valid);
 
         byte[] keccak256800 = new byte[800];
@@ -182,7 +181,7 @@ public class TestLogic {
         byte[] program3 = new byte[program.length + keccak256800.length];
         System.arraycopy(program, 0, program3, 0, program.length);
         System.arraycopy(keccak256800, 0, program3, program.length, keccak256800.length);
-        valid = Logic.checkProgram(program3, args);
+        valid = checkProgram(program3, args);
         Assert.assertFalse(valid);
     }
 }

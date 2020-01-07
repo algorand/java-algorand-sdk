@@ -43,16 +43,69 @@ public class Logic {
 
     public static class ProgramData {
         public final boolean good;
-        public final IntConstBlock intBlock;
-        public final ByteConstBlock byteBlock;
+        public final ArrayList<Integer> intBlock;
+        public final ArrayList<byte[]> byteBlock;
 
-        public ProgramData(final boolean good, final IntConstBlock intBlock, final ByteConstBlock byteBlock) {
+        public ProgramData(final boolean good, final ArrayList<Integer> intBlock, final ArrayList<byte[]> byteBlock) {
             this.good = good;
             this.intBlock = intBlock;
             this.byteBlock = byteBlock;
         }
     }
 
+    public static class VarintResult {
+        final public int value;
+        final public int length;
+
+        public VarintResult(int value, int length) {
+            this.value = value;
+            this.length = length;
+        }
+
+        public VarintResult() {
+            this.value = 0;
+            this.length = 0;
+        }
+    }
+
+    public static class IntConstBlock {
+        public final int size;
+        public final ArrayList<Integer> results;
+
+        IntConstBlock(final int size, final ArrayList<Integer> results) {
+            this.size = size;
+            this.results = results;
+        }
+    }
+
+    public static class ByteConstBlock {
+        public final int size;
+        public final ArrayList<byte[]> results;
+
+        ByteConstBlock(int size, ArrayList<byte[]> results) {
+            this.size = size;
+            this.results = results;
+        }
+    }
+
+    protected static class Uvarint {
+        public static VarintResult parse(byte[] data) {
+            int x = 0;
+            int s = 0;
+            for (int i = 0; i < data.length; i++) {
+                int b = data[i] & 0xff;
+                if (b < 0x80) {
+                    if (i > 9 || i == 9 && b > 1) {
+                        return new VarintResult(0, -(i + 1));
+                    }
+                    return new VarintResult(x | (b & 0xff) << s, i + 1);
+                }
+                x |= ((b & 0x7f) & 0xff) << s;
+                s += 7;
+            }
+            return new VarintResult();
+        }
+    }
 
     private static LangSpec langSpec;
     private static Operation[] opcodes;
@@ -101,7 +154,7 @@ public class Logic {
         }
 
         if (args == null) {
-            args = new ArrayList<byte[]>();
+            args = new ArrayList<>();
         }
 
         int cost = 0;
@@ -153,11 +206,13 @@ public class Logic {
             throw new IllegalArgumentException("program too costly to run");
         }
 
-        return new ProgramData(true, intBlock, byteBlock);
+        return new ProgramData(true,
+                intBlock != null ? intBlock.results : null,
+                byteBlock != null ? byteBlock.results : null);
     }
 
     static IntConstBlock readIntConstBlock(byte[] program, int pc) {
-        ArrayList<VarintResult> results = new ArrayList<>();
+        ArrayList<Integer> results = new ArrayList<>();
 
         int size = 1;
         VarintResult result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
@@ -179,13 +234,13 @@ public class Logic {
                 );
             }
             size += result.length;
-            results.add(result);
+            results.add(result.value);
         }
         return new IntConstBlock(size, results);
     }
 
     static ByteConstBlock readByteConstBlock(byte[] program, int pc) {
-        ArrayList<ByteConstResult> results = new ArrayList<>();
+        ArrayList<byte[]> results = new ArrayList<>();
         int size = 1;
         VarintResult result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
         if (result.length <= 0) {
@@ -211,78 +266,9 @@ public class Logic {
             }
             byte[] buff = new byte[result.value];
             System.arraycopy(program, pc + size, buff, 0, result.value);
-            results.add(new ByteConstResult(buff, result.length + result.value));
+            results.add(buff);
             size += result.value;
         }
         return new ByteConstBlock(size, results);
-    }
-}
-
-class Uvarint {
-    public static VarintResult parse(byte[] data) {
-        int x = 0;
-        int s = 0;
-        for (int i = 0; i < data.length; i++) {
-            int b = data[i] & 0xff;
-            if (b < 0x80) {
-                if (i > 9 || i == 9 && b > 1) {
-                    return new VarintResult(0, -(i + 1));
-                }
-                return new VarintResult(x | (b & 0xff) << s, i + 1);
-            }
-            x |= ((b & 0x7f) & 0xff) << s;
-            s += 7;
-        }
-        return new VarintResult();
-    }
-}
-
-class VarintResult {
-    final public int value;
-    final public int length;
-
-    public VarintResult(int value, int length) {
-        this.value = value;
-        this.length = length;
-    }
-
-    public VarintResult() {
-        this.value = 0;
-        this.length = 0;
-    }
-}
-
-class IntConstBlock {
-    public final int size;
-    public final ArrayList<VarintResult> results;
-
-    IntConstBlock(final int size, final ArrayList<VarintResult> results) {
-        this.size = size;
-        this.results = results;
-    }
-}
-
-class ByteConstBlock {
-    public final int size;
-    public final ArrayList<ByteConstResult> results;
-
-    ByteConstBlock(int size, ArrayList<ByteConstResult> results) {
-        this.size = size;
-        this.results = results;
-    }
-}
-
-class ByteConstResult {
-    final public byte[] value;
-    final public int length;
-
-    public ByteConstResult(byte[] value, int length) {
-        this.value = value;
-        this.length = length;
-    }
-
-    public ByteConstResult() {
-        this.value = new byte[]{};
-        this.length = 0;
     }
 }
