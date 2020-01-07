@@ -1,12 +1,13 @@
 package com.algorand.algosdk.logic;
 
+import com.google.common.collect.ImmutableList;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestLogic {
 
@@ -47,8 +48,12 @@ public class TestLogic {
         byte[] data = {
             0x20, 0x05, 0x00, 0x01, (byte)0xc8, 0x03, 0x7b, 0x02
         };
-        int size = Logic.checkIntConstBlock(data, 0);
-        Assert.assertEquals(data.length, size);
+
+        IntConstBlock results = Logic.readIntConstBlock(data, 0);
+        assertThat(results.size).isEqualTo(data.length);
+        assertThat(results.results)
+                .extracting("value")
+                .containsExactlyElementsOf(ImmutableList.of(0, 1, 456, 123, 2));
     }
 
     @Test
@@ -56,8 +61,15 @@ public class TestLogic {
         byte[] data = {
             0x026, 0x02, 0x0d, 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32, 0x33, 0x02, 0x01, 0x02
         };
-        int size = Logic.checkByteConstBlock(data, 0);
-        Assert.assertEquals(data.length, size);
+        List<byte[]> values = ImmutableList.of(
+                new byte[]{ 0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38, 0x39, 0x30, 0x31, 0x32, 0x33 },
+                new byte[]{ 0x1, 0x2 });
+
+        ByteConstBlock results = Logic.readByteConstBlock(data, 0);
+        assertThat(results.size).isEqualTo(data.length);
+        assertThat(results.results)
+                .extracting("value")
+                .containsExactlyElementsOf(values);
     }
 
     @Test
@@ -65,27 +77,44 @@ public class TestLogic {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
         };
-        boolean valid = Logic.checkProgram(program, null);
-        Assert.assertTrue(valid);
 
-        ArrayList<byte[]> args = new ArrayList<byte[]>();
-        valid = Logic.checkProgram(program, args);
-        Assert.assertTrue(valid);
+        // Null argument
+        Logic.ProgramData programData = Logic.readProgram(program, null);
+        assertThat(programData.good).isTrue();
+        assertThat(programData.intBlock.results).extracting("value")
+                .containsExactlyElementsOf(ImmutableList.of(1));
+        assertThat(programData.byteBlock).isNull();
 
+        // No argument
+        ArrayList<byte[]> args = new ArrayList<>();
+        programData = Logic.readProgram(program, args);
+        assertThat(programData.good).isTrue();
+        assertThat(programData.intBlock.results).extracting("value")
+                .containsExactlyElementsOf(ImmutableList.of(1));
+        assertThat(programData.byteBlock).isNull();
+
+        // Unused argument
         byte[] arg = new byte[10];
         Arrays.fill(arg, (byte)0x31);
         args.add(arg);
 
-        valid = Logic.checkProgram(program, args);
-        Assert.assertTrue(valid);
+        programData = Logic.readProgram(program, args);
+        assertThat(programData.good).isTrue();
+        assertThat(programData.intBlock.results).extracting("value")
+                .containsExactlyElementsOf(ImmutableList.of(1));
+        assertThat(programData.byteBlock).isNull();
 
+        // ???
         byte[] int1 = new byte[10];
         Arrays.fill(int1, (byte)0x22);
         byte[] program2 = new byte[program.length + int1.length];
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(int1, 0, program2, program.length, int1.length);
-        valid = Logic.checkProgram(program2, args);
-        Assert.assertTrue(valid);
+        programData = Logic.readProgram(program2, args);
+        Assert.assertTrue(programData.good);
+        assertThat(programData.intBlock.results).extracting("value")
+                .containsExactlyElementsOf(ImmutableList.of(1));
+        assertThat(programData.byteBlock).isNull();
    }
 
     @Test(expected = IllegalArgumentException.class)
@@ -99,8 +128,8 @@ public class TestLogic {
         Arrays.fill(arg, (byte)0x31);
         args.add(arg);
 
-        boolean valid = Logic.checkProgram(program, args);
-        Assert.assertFalse(valid);
+        Logic.ProgramData programData = Logic.readProgram(program, args);
+        assertThat(programData.good).isFalse();
     }
 
     @Test(expected = IllegalArgumentException.class)

@@ -41,8 +41,25 @@ public class Logic {
         String[] Group;
     }
 
+    public static class ProgramData {
+        public final boolean good;
+        public final IntConstBlock intBlock;
+        public final ByteConstBlock byteBlock;
+
+        public ProgramData(final boolean good, final IntConstBlock intBlock, final ByteConstBlock byteBlock) {
+            this.good = good;
+            this.intBlock = intBlock;
+            this.byteBlock = byteBlock;
+        }
+    }
+
+
     private static LangSpec langSpec;
     private static Operation[] opcodes;
+
+    public static boolean checkProgram(byte[] program, ArrayList<byte[]> args) throws IOException {
+        return readProgram(program, args).good;
+    }
 
     /**
      * Performs basic program validation: instruction count and program cost
@@ -51,7 +68,10 @@ public class Logic {
      * @return boolean
      * @throws IOException
      */
-    public static boolean checkProgram(byte[] program, ArrayList<byte[]> args) throws IOException {
+    public static ProgramData readProgram(byte[] program, ArrayList<byte[]> args) throws IOException {
+        IntConstBlock intBlock = null;
+        ByteConstBlock byteBlock = null;
+
         if (langSpec == null) {
             Reader reader;
             try {
@@ -115,10 +135,12 @@ public class Logic {
             if (size == 0) {
                 switch (op.Opcode) {
                     case INTCBLOCK_OPCODE:
-                        size = checkIntConstBlock(program, pc);
+                        intBlock = readIntConstBlock(program, pc);
+                        size += intBlock.size;
                         break;
                     case BYTECBLOCK_OPCODE:
-                        size = checkByteConstBlock(program, pc);
+                        byteBlock = readByteConstBlock(program, pc);
+                        size += byteBlock.size;
                         break;
                     default:
                         throw new IllegalArgumentException("invalid instruction");
@@ -131,10 +153,12 @@ public class Logic {
             throw new IllegalArgumentException("program too costly to run");
         }
 
-        return true;
+        return new ProgramData(true, intBlock, byteBlock);
     }
 
-    static int checkIntConstBlock(byte[] program, int pc) {
+    static IntConstBlock readIntConstBlock(byte[] program, int pc) {
+        ArrayList<VarintResult> results = new ArrayList<>();
+
         int size = 1;
         VarintResult result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
         if (result.length <= 0) {
@@ -155,11 +179,13 @@ public class Logic {
                 );
             }
             size += result.length;
+            results.add(result);
         }
-        return size;
+        return new IntConstBlock(size, results);
     }
 
-    static int checkByteConstBlock(byte[] program, int pc) {
+    static ByteConstBlock readByteConstBlock(byte[] program, int pc) {
+        ArrayList<ByteConstResult> results = new ArrayList<>();
         int size = 1;
         VarintResult result = Uvarint.parse(Arrays.copyOfRange(program, pc + size, program.length));
         if (result.length <= 0) {
@@ -183,9 +209,12 @@ public class Logic {
             if (pc + size >= program.length) {
                 throw new IllegalArgumentException("byte[] const block exceeds program length");
             }
+            byte[] buff = new byte[result.value];
+            System.arraycopy(program, pc + size, buff, 0, result.value);
+            results.add(new ByteConstResult(buff, result.length + result.value));
             size += result.value;
         }
-        return size;
+        return new ByteConstBlock(size, results);
     }
 }
 
@@ -209,8 +238,8 @@ class Uvarint {
 }
 
 class VarintResult {
-    public int value;
-    public int length;
+    final public int value;
+    final public int length;
 
     public VarintResult(int value, int length) {
         this.value = value;
@@ -219,6 +248,41 @@ class VarintResult {
 
     public VarintResult() {
         this.value = 0;
+        this.length = 0;
+    }
+}
+
+class IntConstBlock {
+    public final int size;
+    public final ArrayList<VarintResult> results;
+
+    IntConstBlock(final int size, final ArrayList<VarintResult> results) {
+        this.size = size;
+        this.results = results;
+    }
+}
+
+class ByteConstBlock {
+    public final int size;
+    public final ArrayList<ByteConstResult> results;
+
+    ByteConstBlock(int size, ArrayList<ByteConstResult> results) {
+        this.size = size;
+        this.results = results;
+    }
+}
+
+class ByteConstResult {
+    final public byte[] value;
+    final public int length;
+
+    public ByteConstResult(byte[] value, int length) {
+        this.value = value;
+        this.length = length;
+    }
+
+    public ByteConstResult() {
+        this.value = new byte[]{};
         this.length = 0;
     }
 }
