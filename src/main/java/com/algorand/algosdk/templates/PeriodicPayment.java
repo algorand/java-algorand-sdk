@@ -72,9 +72,9 @@ public class PeriodicPayment {
      * @param contract contract containing information, this should be provided by the payer.
      * @param firstValid first round the transaction should be valid.
      * @param genesisHash genesis hash in base64.
-     * @return Signed withdrawl transaction.
+     * @return Signed withdrawal transaction.
      */
-    public static SignedTransaction MakeWithdrawlTransaction(final byte[] contract, final int firstValid, final String genesisHash) throws IOException, NoSuchAlgorithmException {
+    public static SignedTransaction MakeWithdrawalTransaction(final byte[] contract, final int firstValid, final String genesisHash) throws IOException, NoSuchAlgorithmException {
         Logic.ProgramData data = Logic.readProgram(contract, null);
         int amount = data.intBlock.get(5);
         int withdrawingWindow = data.intBlock.get(4);
