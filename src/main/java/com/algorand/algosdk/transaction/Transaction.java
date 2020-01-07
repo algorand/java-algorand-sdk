@@ -512,10 +512,8 @@ public class Transaction implements Serializable {
      * unrelated to asset management)
      * @param lastRound is the last round this txn is valid
      * @param note
-     * @param genesisID corresponds to the id of the network
      * @param genesisHash corresponds to the base64-encoded hash of the genesis
      * of the network
-     * @param assetIndex is the asset index
      **/
     private Transaction(
             Type type,
