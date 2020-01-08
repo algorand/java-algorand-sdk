@@ -2,6 +2,7 @@ package com.algorand.algosdk.templates;
 
 
 import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import org.junit.Test;
 
@@ -15,10 +16,10 @@ public class TestTemplates {
 	@Test 
 	public void testVarInt() {
 		int a = 600000;
-		byte[] buffer = ContractTemplate.putUVarint((int) a);
-		int [] result = ContractTemplate.getUVarint(buffer, 0);
-		assertThat(result[0]).isEqualTo(a);
-		assertThat(result[1]).isEqualTo(buffer.length);
+		byte[] buffer = Logic.putUVarint((int) a);
+		Logic.VarintResult result = Logic.getUVarint(buffer, 0);
+		assertThat(result.value).isEqualTo(a);
+		assertThat(result.length).isEqualTo(buffer.length);
 	}
 
 	@Test
@@ -68,7 +69,7 @@ public class TestTemplates {
 
 		Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
 
-		SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result.program, 1210, genesisHash);
+		SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result, 1210, genesisHash);
 		assertThat(Encoder.encodeToMsgPack(stx)).isEqualTo(Encoder.decodeFromBase64(goldenWithdrawalTransaction));
 	}
 }

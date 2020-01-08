@@ -15,7 +15,7 @@ public class TestLogic {
     @Test
     public void testParseUvarint1() throws Exception {
         byte[] data = {0x01};
-        VarintResult result = Uvarint.parse(data);
+        VarintResult result = getUVarint(data, 0);
         Assert.assertEquals(1, result.length);
         Assert.assertEquals(1, result.value);
     }
@@ -23,7 +23,7 @@ public class TestLogic {
     @Test
     public void testParseUvarint2() throws Exception {
         byte[] data = {0x02};
-        VarintResult result = Uvarint.parse(data);
+        VarintResult result = getUVarint(data, 0);
         Assert.assertEquals(1, result.length);
         Assert.assertEquals(2, result.value);
     }
@@ -31,7 +31,7 @@ public class TestLogic {
     @Test
     public void testParseUvarint3() throws Exception {
         byte[] data = {0x7b};
-        VarintResult result = Uvarint.parse(data);
+        VarintResult result = getUVarint(data, 0);
         Assert.assertEquals(1, result.length);
         Assert.assertEquals(123, result.value);
     }
@@ -39,7 +39,15 @@ public class TestLogic {
     @Test
     public void testParseUvarint4() throws Exception {
         byte[] data = {(byte)0xc8, 0x03};
-        VarintResult result = Uvarint.parse(data);
+        VarintResult result = getUVarint(data, 0);
+        Assert.assertEquals(2, result.length);
+        Assert.assertEquals(456, result.value);
+    }
+
+    @Test
+    public void testParseUvarint4AtOffset() throws Exception {
+        byte[] data = {0x0, 0x0, (byte)0xc8, 0x03};
+        VarintResult result = getUVarint(data, 2);
         Assert.assertEquals(2, result.length);
         Assert.assertEquals(456, result.value);
     }
@@ -82,7 +90,7 @@ public class TestLogic {
         assertThat(programData.good).isTrue();
         assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
-        assertThat(programData.byteBlock).isNull();
+        assertThat(programData.byteBlock).isEmpty();
 
         // No argument
         ArrayList<byte[]> args = new ArrayList<>();
@@ -90,7 +98,7 @@ public class TestLogic {
         assertThat(programData.good).isTrue();
         assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
-        assertThat(programData.byteBlock).isNull();
+        assertThat(programData.byteBlock).isEmpty();
 
         // Unused argument
         byte[] arg = new byte[10];
@@ -101,7 +109,7 @@ public class TestLogic {
         assertThat(programData.good).isTrue();
         assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
-        assertThat(programData.byteBlock).isNull();
+        assertThat(programData.byteBlock).isEmpty();
 
         // ???
         byte[] int1 = new byte[10];
@@ -113,7 +121,7 @@ public class TestLogic {
         Assert.assertTrue(programData.good);
         assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
-        assertThat(programData.byteBlock).isNull();
+        assertThat(programData.byteBlock).isEmpty();
    }
 
     @Test(expected = IllegalArgumentException.class)

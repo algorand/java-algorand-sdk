@@ -74,12 +74,16 @@ public class PeriodicPayment {
      * @param genesisHash genesis hash in base64.
      * @return Signed withdrawal transaction.
      */
-    public static SignedTransaction MakeWithdrawalTransaction(final byte[] contract, final int firstValid, final Digest genesisHash) throws IOException, NoSuchAlgorithmException {
-        Logic.ProgramData data = Logic.readProgram(contract, null);
-        int amount = data.intBlock.get(5);
-        int withdrawingWindow = data.intBlock.get(4);
-        int period = data.intBlock.get(2);
+    public static SignedTransaction MakeWithdrawalTransaction(final ContractTemplate contract, final int firstValid, final Digest genesisHash) throws IOException, NoSuchAlgorithmException {
+        Logic.ProgramData data = Logic.readProgram(contract.program, null);
+        if (data.intBlock.size() != 7 || data.byteBlock.size() != 2) {
+            throw new IllegalArgumentException("Unexpected contract data. Expected 7 int constants and 2 byte constants, found " + data.intBlock.size() + " and " + data.byteBlock.size());
+        }
+
         int fee = data.intBlock.get(1);
+        int period = data.intBlock.get(2);
+        int withdrawingWindow = data.intBlock.get(4);
+        int amount = data.intBlock.get(5);
         byte[] leaseValue = data.byteBlock.get(0);
         Address receiver = new Address(data.byteBlock.get(1));
 
@@ -87,7 +91,7 @@ public class PeriodicPayment {
             throw new IllegalArgumentException("invalid contract: firstValid must be divisible by the period");
         }
 
-        LogicsigSignature lsig = new LogicsigSignature(contract, null);
+        LogicsigSignature lsig = new LogicsigSignature(contract.program, null);
         Address address = lsig.toAddress();
         Transaction tx = new Transaction(
                 address,
