@@ -7,6 +7,7 @@ import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.Lease;
 import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.codec.binary.Base64;
 
@@ -27,7 +28,6 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Transaction implements Serializable {
     private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
-    private static final int LEASE_LENGTH = 32;
     @JsonProperty("type")
     public Type type = Type.Default;
 
@@ -512,10 +512,8 @@ public class Transaction implements Serializable {
      * unrelated to asset management)
      * @param lastRound is the last round this txn is valid
      * @param note
-     * @param genesisID corresponds to the id of the network
      * @param genesisHash corresponds to the base64-encoded hash of the genesis
      * of the network
-     * @param assetIndex is the asset index
      **/
     private Transaction(
             Type type,
@@ -754,7 +752,7 @@ public class Transaction implements Serializable {
      * @param lease 32 byte lease
      **/
     public void setLease(byte[] lease) {
-        if (lease.length != LEASE_LENGTH && lease.length != 0) {
+        if (!Lease.valid(lease)) {
             throw new RuntimeException("The lease should be an empty array or a 32 byte array.");
         }
         this.lease = lease;
