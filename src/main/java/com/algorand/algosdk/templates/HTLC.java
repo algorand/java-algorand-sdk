@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
-import com.algorand.algosdk.templates.ContractTemplate.Base64ParameterValue;
+import com.algorand.algosdk.templates.ContractTemplate.BytesParameterValue;
 import com.algorand.algosdk.util.Encoder;
 
 public class HTLC {
@@ -44,7 +44,7 @@ public class HTLC {
 				new IntParameterValue(maxFee),
 				new IntParameterValue(expiryRound),
 				new AddressParameterValue(receiver),
-				new Base64ParameterValue(hashImage),
+				new BytesParameterValue(hashImage),
 				new AddressParameterValue(owner),
 				new IntParameterValue(hashInject)
 		};

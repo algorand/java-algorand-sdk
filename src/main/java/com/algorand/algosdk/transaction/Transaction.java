@@ -7,7 +7,6 @@ import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.Lease;
 import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.codec.binary.Base64;
 
@@ -51,7 +50,7 @@ public class Transaction implements Serializable {
     @JsonProperty("grp")
     public Digest group = new Digest();
     @JsonProperty("lx")
-    public byte[] lease; 
+    public byte[] lease;
 
     /* payment fields  *********************************************************/
     @JsonProperty("amt")
@@ -750,12 +749,26 @@ public class Transaction implements Serializable {
      * specifying this lease can be confirmed. 
      * The Size is fixed at 32 bytes. 
      * @param lease 32 byte lease
+     *
+     * @Deprecated use setLease(Lease)
      **/
+    @Deprecated
+    @JsonIgnore
     public void setLease(byte[] lease) {
-        if (!Lease.valid(lease)) {
-            throw new RuntimeException("The lease should be an empty array or a 32 byte array.");
-        }
-        this.lease = lease;
+        setLease(new Lease(lease));
+    }
+
+    /** Lease enforces mutual exclusion of transactions.  If this field
+     * is nonzero, then once the transaction is confirmed, it acquires
+     * the lease identified by the (Sender, Lease) pair of the
+     * transaction until the LastValid round passes.  While this
+     * transaction possesses the lease, no other transaction
+     * specifying this lease can be confirmed.
+     * The Size is fixed at 32 bytes.
+     * @param lease Lease object
+     **/
+    public void setLease(Lease lease) {
+        this.lease = lease.getBytes();
     }
 
     /**

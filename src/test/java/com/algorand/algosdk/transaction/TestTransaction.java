@@ -411,7 +411,7 @@ public class TestTransaction {
         Assert.assertTrue(jsonSerializeDeserializeCheck(stx2));
 
 
-        Digest gid = TxGroup.computeGroupID(new Transaction[]{tx1, tx2});
+        Digest gid = TxGroup.computeGroupID(tx1, tx2);
         tx1.assignGroupID(gid);
         tx2.assignGroupID(gid);
 
@@ -432,19 +432,19 @@ public class TestTransaction {
         Assert.assertTrue(Arrays.equals(concat, Encoder.decodeFromBase64(goldenTxg)));
 
         // check assignGroupID
-        Transaction[] result = TxGroup.assignGroupID(new Transaction[]{tx1, tx2}, null);
+        Transaction[] result = TxGroup.assignGroupID(null, tx1, tx2);
         Assert.assertEquals(result.length, 2);
 
-        result = TxGroup.assignGroupID(new Transaction[]{tx1, tx2}, from);
+        result = TxGroup.assignGroupID(from, tx1, tx2);
         Assert.assertEquals(result.length, 2);
 
-        result = TxGroup.assignGroupID(new Transaction[]{tx1, tx2}, to);
+        result = TxGroup.assignGroupID(to, tx1, tx2);
         Assert.assertEquals(result.length, 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testTransactionGroupEmpty() throws IOException {
-        TxGroup.computeGroupID(new Transaction[]{});
+        TxGroup.computeGroupID();
         Assert.fail("no expected exception");
     }
 
@@ -610,6 +610,18 @@ public class TestTransaction {
     }
 
     @Test
+    public void testLeaseEncoding() throws Exception {
+        Transaction tx = new Transaction();
+        //byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
+        String lease = "JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=";
+        tx.setLease(new Lease(lease));
+        byte[] packed = Encoder.encodeToMsgPack(tx);
+        Transaction txDecoded = Encoder.decodeFromMsgPack(packed, Transaction.class);
+        assertThat(txDecoded.lease).isEqualTo(tx.lease);
+        assertThat(txDecoded.lease).isEqualTo(Encoder.decodeFromBase64(lease));
+    }
+
+    @Test
     public void testTransactionWithLease() throws Exception {
 
         final String FROM_SK = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
@@ -621,8 +633,6 @@ public class TestTransaction {
         Address closeTo = new Address("IDUTJEUIEVSMXTU4LGTJWZ2UE2E6TIODUKU6UW3FU3UKIQQ77RLUBBBFLA");
         byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQOMmFSIKsZvpW0txwzhmbgQjxv6IyN7BbV5sZ2aNgFbVcrWUnqPpQQxfPhV/wdu9jzEPUU1jAujYtcNCxJ7ONgejdHhujKNhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0FLKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqJseMQgAQIDBAECAwQBAgMEAQIDBAECAwQBAgMEAQIDBAECAwSkbm90ZcQI6gAVR0Nsv5ajcmN2xCB7bOJP61uswLFk4pwiLFf19j3Dh9Q5BIJYQRxf4Q98AqNzbmTEIOfw+E0GgR358xyNh4sRVfRnHVGhhcIAkIZn9ElYcGihpHR5cGWjcGF5=");
 
-        String mn = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
-        byte[] gh = Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=");
         BigInteger firstValidRound = BigInteger.valueOf(12466);
         BigInteger lastValidRound = BigInteger.valueOf(13466);
         BigInteger amountToSend = BigInteger.valueOf(1000);
@@ -641,7 +651,7 @@ public class TestTransaction {
                 toAddr,
                 closeTo);
         byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
-        tx.setLease(lease);
+        tx.setLease(new Lease(lease));
         Account.setFeeByFeePerByte(tx, tx.fee);
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);

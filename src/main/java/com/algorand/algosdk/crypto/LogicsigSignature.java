@@ -61,6 +61,10 @@ public class LogicsigSignature {
         this.msig = msig;
     }
 
+    public LogicsigSignature(byte[] logic) {
+        this(logic, null);
+    }
+
     public LogicsigSignature(byte[] logic, ArrayList<byte[]> args) {
         this(logic, args, null, null);
     }

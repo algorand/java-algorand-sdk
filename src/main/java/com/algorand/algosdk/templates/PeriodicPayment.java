@@ -10,9 +10,9 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
-import com.algorand.algosdk.templates.ContractTemplate.Base64ParameterValue;
+import com.algorand.algosdk.templates.ContractTemplate.BytesParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
-import com.algorand.algosdk.util.Lease;
+import com.algorand.algosdk.transaction.Lease;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -44,11 +44,7 @@ public class PeriodicPayment {
     /**
      * Need a way to specify the lease for testing.
      */
-    protected static ContractTemplate MakePeriodicPayment(final String receiver, final int amount, final int withdrawingWindow, final int period, final int fee, final int timeout, final byte[] lease) throws NoSuchAlgorithmException {
-        if (!Lease.valid(lease)) {
-            throw new IllegalArgumentException("The lease should be an empty array or a 32 byte array.");
-        }
-
+    protected static ContractTemplate MakePeriodicPayment(final String receiver, final int amount, final int withdrawingWindow, final int period, final int fee, final int timeout, final Lease lease) throws NoSuchAlgorithmException {
         if (withdrawingWindow < 0 || withdrawingWindow > 1000) {
             throw new IllegalArgumentException("The withdrawingWindow must be a positive number less than 1000");
         }
@@ -59,7 +55,7 @@ public class PeriodicPayment {
                 new IntParameterValue(withdrawingWindow),
                 new IntParameterValue(amount),
                 new IntParameterValue(timeout),
-                new Base64ParameterValue(lease == null ? Lease.makeRandomLease() : lease),
+                new BytesParameterValue(lease == null ? new Lease() : lease),
                 new AddressParameterValue(receiver)
         };
 
@@ -84,14 +80,14 @@ public class PeriodicPayment {
         int period = data.intBlock.get(2);
         int withdrawingWindow = data.intBlock.get(4);
         int amount = data.intBlock.get(5);
-        byte[] leaseValue = data.byteBlock.get(0);
+        Lease lease = new Lease(data.byteBlock.get(0));
         Address receiver = new Address(data.byteBlock.get(1));
 
         if (firstValid % period != 0) {
             throw new IllegalArgumentException("invalid contract: firstValid must be divisible by the period");
         }
 
-        LogicsigSignature lsig = new LogicsigSignature(contract.program, null);
+        LogicsigSignature lsig = new LogicsigSignature(contract.program);
         Address address = lsig.toAddress();
         Transaction tx = new Transaction(
                 address,
@@ -103,7 +99,7 @@ public class PeriodicPayment {
                 receiver,
                 "",
                 genesisHash);
-        tx.setLease(leaseValue);
+        tx.setLease(lease);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(fee));
 
         if (!lsig.verify(tx.sender)) {

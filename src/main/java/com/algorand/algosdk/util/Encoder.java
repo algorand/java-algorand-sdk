@@ -34,6 +34,18 @@ public class Encoder {
 
     /**
      * Convenience method for deserializing arbitrary objects encoded with canonical msg-pack
+     * @param input base64 encoded byte array representing canonical msg-pack encoding
+     * @param tClass class of type of object to deserialize as
+     * @param <T> object type
+     * @return deserialized object
+     * @throws IOException if decoding failed
+     */
+    public static <T> T decodeFromMsgPack(String input, Class<T> tClass) throws IOException {
+        return decodeFromMsgPack(decodeFromBase64(input), tClass);
+    }
+
+    /**
+     * Convenience method for deserializing arbitrary objects encoded with canonical msg-pack
      * @param input byte array representing canonical msg-pack encoding
      * @param tClass class of type of object to deserialize as
      * @param <T> object type
