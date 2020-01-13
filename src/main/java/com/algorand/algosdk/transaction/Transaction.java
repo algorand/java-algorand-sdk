@@ -7,6 +7,7 @@ import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.Lease;
 import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.codec.binary.Base64;
 
