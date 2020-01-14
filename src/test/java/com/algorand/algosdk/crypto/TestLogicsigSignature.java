@@ -26,7 +26,7 @@ public class TestLogicsigSignature {
         String programHash = "6Z3C3LDVWGMX23BMSYMANACQOSINPFIRF77H7N3AWJZYV6OH6GWTJKVMXY";
         Address sender = new Address(programHash);
 
-        LogicsigSignature lsig = new LogicsigSignature(program, null);
+        LogicsigSignature lsig = new LogicsigSignature(program);
         Assert.assertEquals(program, lsig.logic);
         Assert.assertEquals(null, lsig.args);
         Assert.assertEquals(null, lsig.sig);
@@ -54,14 +54,14 @@ public class TestLogicsigSignature {
         Assert.assertTrue(lsig.equals(lsig1));
 
         // check serialization with null args
-        lsig = new LogicsigSignature(program, null);
+        lsig = new LogicsigSignature(program);
         outBytes = Encoder.encodeToMsgPack(lsig);
         lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
         Assert.assertTrue(lsig.equals(lsig1));
 
         // check modified program fails on verification
         program[3] = 2;
-        lsig = new LogicsigSignature(program, null);
+        lsig = new LogicsigSignature(program);
         verified = lsig.verify(sender);
         Assert.assertFalse(verified);
     }
@@ -71,7 +71,7 @@ public class TestLogicsigSignature {
         byte[] program = {
             0x02, 0x20, 0x01, 0x01, 0x22
         };
-        new LogicsigSignature(program, null);
+        new LogicsigSignature(program);
         Assert.assertTrue(false);
     }
 
@@ -81,7 +81,7 @@ public class TestLogicsigSignature {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
         };
 
-        LogicsigSignature lsig = new LogicsigSignature(program, null);
+        LogicsigSignature lsig = new LogicsigSignature(program);
         Account account = new Account();
         lsig = account.signLogicsig(lsig);
         Assert.assertEquals(program, lsig.logic);
@@ -123,7 +123,7 @@ public class TestLogicsigSignature {
         Account acc3 = new Account(mn3);
         Account account = new Account();
 
-        LogicsigSignature lsig = new LogicsigSignature(program, null);
+        LogicsigSignature lsig = new LogicsigSignature(program);
         lsig = acc1.signLogicsig(lsig, ma);
         Assert.assertEquals(program, lsig.logic);
         Assert.assertEquals(null, lsig.args);
@@ -147,7 +147,7 @@ public class TestLogicsigSignature {
         Assert.assertTrue(verified);
 
         // Add a single signature and ensure it fails
-        LogicsigSignature lsig1 = new LogicsigSignature(program, null);
+        LogicsigSignature lsig1 = new LogicsigSignature(program);
         lsig1 = account.signLogicsig(lsig1);
         lsig.sig = lsig1.sig;
         verified = lsig.verify(ma.toAddress());

@@ -1,6 +1,8 @@
 package com.algorand.algosdk.crypto;
 
+import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -29,6 +31,15 @@ public class Digest implements Serializable {
             throw new IllegalArgumentException("digest wrong length");
         }
         System.arraycopy(bytes, 0, this.bytes, 0, DIG_LEN_BYTES);
+    }
+
+    /**
+     * Create a new digest from a base64 encoded string.
+     * @param digest base64 encoded string
+     */
+    @JsonIgnore
+    public Digest(String digest) {
+        this(Encoder.decodeFromBase64(digest));
     }
 
     // default values for serializer to ignore

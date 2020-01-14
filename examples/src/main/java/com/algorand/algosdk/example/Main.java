@@ -102,8 +102,8 @@ public class Main {
             // This is generally expected, but should give us an informative error message.
             System.err.println("Exception when calling algod#rawTransaction: " + e.getResponseBody());
         }
-        // let's create a transaction group
-        Digest gid = TxGroup.computeGroupID(new Transaction[]{tx ,tx});
+        // Let's create a transaction group, for example purposes the same transaction is being added twice.
+        Digest gid = TxGroup.computeGroupID(tx, tx);
         tx.assignGroupID(gid);
         signedTx = src.signTransactionWithFeePerByte(tx, feePerByte);
         try {
