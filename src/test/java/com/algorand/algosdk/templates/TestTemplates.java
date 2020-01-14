@@ -128,8 +128,8 @@ public class TestTemplates {
 
 		// Generate signed transactions (using data that would be passed to another person).
 		List<SignedTransaction> stxns = DynamicFee.MakeReimbursementTransactions(
-				sdf.txn,
-				sdf.lsig,
+				Encoder.decodeFromMsgPack(txn, Transaction.class),
+				Encoder.decodeFromMsgPack(signedLsig, LogicsigSignature.class),
 				account2,
 				1234);
 
