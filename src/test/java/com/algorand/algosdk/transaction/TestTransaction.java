@@ -612,7 +612,6 @@ public class TestTransaction {
     @Test
     public void testLeaseEncoding() throws Exception {
         Transaction tx = new Transaction();
-        //byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
         String lease = "JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=";
         tx.setLease(new Lease(lease));
         byte[] packed = Encoder.encodeToMsgPack(tx);
