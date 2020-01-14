@@ -117,16 +117,9 @@ public class TestTemplates {
 		// Sign contract
 		DynamicFee.SignedDynamicFee sdf = DynamicFee.SignDynamicFee(program, account1, gh);
 
+		// Generate signed transactions (using data that would be passed to another person).
 		byte[] signedLsig = Encoder.encodeToMsgPack(sdf.lsig);
 		byte[] txn = Encoder.encodeToMsgPack(sdf.txn);
-
-    /*
-		String goldenLsig = "gqFsxLEBIAUCAYgnuWC6YCYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhCjc2lnxEAhLNdfdDp9Wbi0YwsEQCpP7TVHbHG7y41F4MoESNW/vL1guS+5Wj4f5V9fmM63/VKTSMFidHOSwm5o+pbV5lYH";
-		assertThat(signedLsig).isEqualTo(Encoder.decodeFromBase64(goldenLsig));
-		assertThat(Encoder.encodeToMsgPack(sdf.txn)).isEqualTo(Encoder.decodeFromBase64(goldenTxn));
-    */
-
-		// Generate signed transactions (using data that would be passed to another person).
 		List<SignedTransaction> stxns = DynamicFee.MakeReimbursementTransactions(
 				Encoder.decodeFromMsgPack(txn, Transaction.class),
 				Encoder.decodeFromMsgPack(signedLsig, LogicsigSignature.class),
@@ -137,7 +130,6 @@ public class TestTemplates {
 		for (SignedTransaction stxn : stxns) {
 			stxStr += Encoder.encodeToBase64(Encoder.encodeToMsgPack(stxn));
 		}
-		System.out.println(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stxns.get(0))));
 
 		String goldenStxns = "gqRsc2lngqFsxLEBIAUCAYgnuWC6YCYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhCjc2lnxEAhLNdfdDp9Wbi0YwsEQCpP7TVHbHG7y41F4MoESNW/vL1guS+5Wj4f5V9fmM63/VKTSMFidHOSwm5o+pbV5lYHo3R4boujYW10zROIpWNsb3NlxCDmmpYeby1feshmB5JlUr6YI17TM2PKiJGLuck4qRW2+aNmZWXOAAWq6qJmds0wOaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBRpaRVpA3ImXU4/ENcrzp+jsooLVHC7bF5kCGUK0KORaJsds0wOqJseMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjcmN2xCD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiE6NzbmTEIIU9h0wnKapwajF0N7K4zy3orGLF+rQ8kLIk/vW6FhPvpHR5cGWjcGF5gqNzaWfEQAilsGaC4M4zfYN5QpvREdHEC0DjI2ZWCXSIwwyUWHg2dzd5gKR2Cqu+iUmiCU1hOTTiOump3PILTgWeG0ZkUAajdHhuiqNhbXTOAAWq6qNmZWXOAATzvqJmds0wOaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBRpaRVpA3ImXU4/ENcrzp+jsooLVHC7bF5kCGUK0KORaJsds0wOqJseMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjcmN2xCCFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT76NzbmTEICuIj6PMWBK0XH0TqQSTWXj6UWxbhN7Y9jUpXyQ1xxxGpHR5cGWjcGF5";
 		assertThat(stxStr).isEqualTo(goldenStxns);
