@@ -128,10 +128,6 @@ public class DynamicFee {
      * Encoder.decodeFromMsgPack(encodedTxn, Transaction.class),
      * Encoder.decodeFromMsgPack(encodedLsig, LogicsigSignature.class),
      *
-     * Create the Transaction and LogicsigSignature objects from base64 encoded objects:
-     * Encoder.decodeFromMsgPack(encodedTxn, Transaction.class),
-     * Encoder.decodeFromMsgPack(encodedLsig, LogicsigSignature.class),
-     *
      * @param txn main transaction from payer
      * @param lsig signed logic received from payer
      * @param account an account initialized with a signing key.
