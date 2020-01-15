@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.*;
 import java.util.Arrays;
 import java.util.Random;
 
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+/**
+ * Lease parameter, no transaction may also acquire this lease until lastValid.
+ */
 public class Lease {
     public static final int LEASE_LENGTH = 32;
     private final byte[] data;
