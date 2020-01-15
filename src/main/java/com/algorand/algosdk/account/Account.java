@@ -227,11 +227,7 @@ public class Account {
      */
     static public void setFeeByFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
         BigInteger size = estimatedEncodedSize(tx);
-        BigInteger newFee = suggestedFeePerByte.multiply(size);
-        if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
-            newFee = MIN_TX_FEE_UALGOS;
-        }
-        tx.fee = newFee;
+        tx.setFee(suggestedFeePerByte.multiply(size));
     }
 
     /**

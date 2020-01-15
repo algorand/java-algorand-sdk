@@ -9,14 +9,10 @@ import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
-import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 import com.algorand.algosdk.util.Encoder;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -70,10 +66,16 @@ public class TestTemplates {
 		String goldenProgram = "ASAHAQoLAOcHkE7AxAcmAiB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaSD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEzEQIhIxASMOEDECJBglEhAxBCEEMQIIEhAxBigSEDEJMgMSMQcpEhAxCCEFEhAxCSkSMQcyAxIQMQIhBg0QMQglEhAREA==";
 		String goldenWithdrawalTransaction = "gqRsc2lngaFsxJcBIAcBCgsA5weQTsDEByYCIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMRAiEjEBIw4QMQIkGCUSEDEEIQQxAggSEDEGKBIQMQkyAxIxBykSEDEIIQUSEDEJKRIxBzIDEhAxAiEGDRAxCCUSEBEQo3R4bomjYW10zScQo2ZlZc0KHqJmds0EuqJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmibHbNCKGibHjEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpo3JjdsQg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohOjc25kxCBCXvSOi2ZbC4UGEsVqv6/lR+p33AnF8XRMyHRa3UbMkaR0eXBlo3BheQ==";
 
-		int fee = 10;
 		String addr = "726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM";
 		Lease lease = new Lease("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
-		ContractTemplate result = PeriodicPayment.MakePeriodicPayment(addr, 10000, 999, 11, fee, 123456, lease);
+		ContractTemplate result = PeriodicPayment.MakePeriodicPayment(
+				addr,
+				10000,
+				999,
+				11,
+				10,
+				123456,
+				lease);
 
 
 		assertThat(Encoder.encodeToBase64(result.program)).isEqualTo(goldenProgram);
@@ -82,7 +84,15 @@ public class TestTemplates {
 		Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
 
 		SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result, 1210, genesisHash);
-		assertThat(Encoder.encodeToMsgPack(stx)).isEqualTo(Encoder.decodeFromBase64(goldenWithdrawalTransaction));
+		assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenWithdrawalTransaction);
+	}
+
+	@Test
+	public void decode() throws Exception {
+		String golden= "iqNhbXTNE4ilY2xvc2XEIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5o2ZlZc0D6KJmds0wOaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmibHbNMDqibHjEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpo3JjdsQg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohOjc25kxCCFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT76R0eXBlo3BheQ==";
+		Map m = Encoder.decodeFromMsgPack(golden, Map.class);
+		System.out.println(m);
+
 	}
 
 	@Test
@@ -91,6 +101,7 @@ public class TestTemplates {
 		String goldenAddress = "GCI4WWDIWUFATVPOQ372OZYG52EULPUZKI7Y34MXK3ZJKIBZXHD2H5C5TI";
 		// algotmpl -d ${GOPATH}/src/github.com/algorand/go-algorand/tools/teal/templates/ dynamic-fee --amt 5000 --cls 42NJMHTPFVPXVSDGA6JGKUV6TARV5UZTMPFIREMLXHETRKIVW34QFSDFRE --to 726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM --fv 12345 --lv 12346 --lease "f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="
 		String golden = "ASAFAgGIJ7lgumAmAyD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEyDmmpYeby1feshmB5JlUr6YI17TM2PKiJGLuck4qRW2+SB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaTIEIhIzABAjEhAzAAcxABIQMwAIMQESEDEWIxIQMRAjEhAxBygSEDEJKRIQMQgkEhAxAiUSEDEEIQQSEDEGKhIQ";
+
 
 		// Initialize inputs
 		Address addr1 = new Address("726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM");
@@ -119,15 +130,18 @@ public class TestTemplates {
 		String encodedLsig = Encoder.encodeToBase64(Encoder.encodeToMsgPack(sdf.lsig));
 		String encodedTxn = Encoder.encodeToBase64(Encoder.encodeToMsgPack(sdf.txn));
 
-		String goldenTxn = "iaNhbXTNE4ilY2xvc2XEIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5omZ2zTA5omdoxCB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaaJsds0wOqJseMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjcmN2xCD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiE6NzbmTEIIU9h0wnKapwajF0N7K4zy3orGLF+rQ8kLIk/vW6FhPvpHR5cGWjcGF5";
+		String goldenTxn = "iqNhbXTNE4ilY2xvc2XEIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5o2ZlZc0D6KJmds0wOaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmibHbNMDqibHjEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpo3JjdsQg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohOjc25kxCCFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT76R0eXBlo3BheQ==";
 		String goldenLsig = "gqFsxLEBIAUCAYgnuWC6YCYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhCjc2lnxEAhLNdfdDp9Wbi0YwsEQCpP7TVHbHG7y41F4MoESNW/vL1guS+5Wj4f5V9fmM63/VKTSMFidHOSwm5o+pbV5lYH";
 		assertThat(encodedLsig).isEqualTo(goldenLsig);
 		assertThat(encodedTxn).isEqualTo(goldenTxn);
 
+		Transaction decodedTxn = Encoder.decodeFromMsgPack(encodedTxn, Transaction.class);
+		LogicsigSignature decodedLsig = Encoder.decodeFromMsgPack(encodedLsig, LogicsigSignature.class);
+
 		// Generate signed transactions (using data that would be passed to another person).
 		byte[] stxns = DynamicFee.MakeReimbursementTransactions(
-				Encoder.decodeFromMsgPack(encodedTxn, Transaction.class),
-				Encoder.decodeFromMsgPack(encodedLsig, LogicsigSignature.class),
+				decodedTxn,
+				decodedLsig,
 				account2,
 				1234);
 

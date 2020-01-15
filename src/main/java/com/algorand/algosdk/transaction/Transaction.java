@@ -1,6 +1,7 @@
 package com.algorand.algosdk.transaction;
 
 
+import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
@@ -8,6 +9,7 @@ import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.transaction.Lease;
 import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.codec.binary.Base64;
 
@@ -37,7 +39,7 @@ public class Transaction implements Serializable {
     @JsonProperty("snd")
     public Address sender = new Address();
     @JsonProperty("fee")
-    public BigInteger fee = BigInteger.valueOf(0);
+    public BigInteger fee = Account.MIN_TX_FEE_UALGOS;
     @JsonProperty("fv")
     public BigInteger firstValid = BigInteger.valueOf(0);
     @JsonProperty("lv")
@@ -164,7 +166,7 @@ public class Transaction implements Serializable {
                        BigInteger amount, Address receiver, Address closeRemainderTo) {
         this.type = Type.Payment;
         if (sender != null) this.sender = sender;
-        if (fee != null) this.fee = fee;
+        setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         if (note != null) this.note = note;
@@ -195,7 +197,7 @@ public class Transaction implements Serializable {
         // populate with default values which will be ignored...
         this.type = Type.KeyRegistration;        
         if (sender != null) this.sender = sender;
-        if (fee != null) this.fee = fee;
+        setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         if (note != null) this.note = note;
@@ -235,7 +237,7 @@ public class Transaction implements Serializable {
                        Address manager, Address reserve, Address freeze, Address clawback) {
         this.type = Type.AssetConfig;
         if (sender != null) this.sender = sender;
-        if (fee != null) this.fee = fee;
+        setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         if (note != null) this.note = note;
@@ -298,7 +300,7 @@ public class Transaction implements Serializable {
  
         this.type = Type.AssetConfig;
         if (sender != null) this.sender = sender;
-        if (fee != null) this.fee = fee;
+        setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         if (note != null) this.note = note;
@@ -475,7 +477,7 @@ public class Transaction implements Serializable {
                         boolean freezeState) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
-        if (fee != null) this.fee = fee;
+        setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         if (note != null) this.note = note;
@@ -503,7 +505,11 @@ public class Transaction implements Serializable {
         this.freezeState = freezeState;
     }
 
-    public Transaction() {}
+    // Used by Jackson to determine "default" values.
+    protected Transaction() {
+        // Override the default to 0 so that it will be serialized
+        this.fee = BigInteger.valueOf(0);
+    }
 
     /**
      * Base constructor with flat fee for asset xfer/freeze/destroy transactions.
@@ -524,7 +530,7 @@ public class Transaction implements Serializable {
             Digest genesisHash) {
 
         this.type = type;
-        if (flatFee != null) this.fee = flatFee;
+        setFee(flatFee);
         if (firstRound != null) this.firstValid = firstRound;
         if (lastRound != null) this.lastValid = lastRound;
         if (note != null) this.note = note;
@@ -742,6 +748,25 @@ public class Transaction implements Serializable {
         return tx;
     }
 
+    /**
+     * Set a transaction fee taking the minimum transaction fee into consideration.
+     * @param fee
+     *
+     * @Deprecated a transaction builder is coming.
+     */
+    @Deprecated
+    public void setFee(BigInteger fee) {
+        if (fee != null) {
+            this.fee = fee;
+        } else  {
+            this.fee = Account.MIN_TX_FEE_UALGOS;
+        }
+
+        if (this.fee.compareTo(Account.MIN_TX_FEE_UALGOS) < 0) {
+            this.fee = Account.MIN_TX_FEE_UALGOS;
+        }
+    }
+
     /** Lease enforces mutual exclusion of transactions.  If this field
      * is nonzero, then once the transaction is confirmed, it acquires
      * the lease identified by the (Sender, Lease) pair of the
@@ -906,7 +931,8 @@ public class Transaction implements Serializable {
                 assetCloseTo.equals(that.assetCloseTo) &&
                 freezeTarget.equals(that.freezeTarget) &&
                 assetFreezeID.equals(that.assetFreezeID) &&
-                freezeState == that.freezeState;
+                freezeState == that.freezeState &&
+                Arrays.equals(lease, ((Transaction) o).lease);
     }
 
     @JsonPropertyOrder(alphabetic=true)
