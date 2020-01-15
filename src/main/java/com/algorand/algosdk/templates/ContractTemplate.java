@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.logic.Logic;
+import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.util.Encoder;
 
 public class ContractTemplate {
@@ -54,18 +55,30 @@ public class ContractTemplate {
 			super(new Address(value).getBytes());
 		}
 
+		public AddressParameterValue(Address address) throws NoSuchAlgorithmException {
+			super(address.getBytes());
+		}
+
+		public AddressParameterValue(byte[] value) throws NoSuchAlgorithmException {
+			super(value);
+        }
+
 		public int placeholderSize() {
 			return 32;
 		}
 	}
 
-	public static class Base64ParameterValue extends ParameterValue {
-		public Base64ParameterValue(String value) {
+	public static class BytesParameterValue extends ParameterValue {
+		public BytesParameterValue(String value) {
 			this(Encoder.decodeFromBase64(value));
 		}
 
-		public Base64ParameterValue(byte[] value) {
+		public BytesParameterValue(byte[] value) {
 			super(convertToBytes(value));
+		}
+
+		public BytesParameterValue(Lease value) {
+			this(value.getBytes());
 		}
 
 		private static byte[] convertToBytes(byte[] value) {
@@ -100,9 +113,18 @@ public class ContractTemplate {
 	 * @param prog bytes of program.
 	 */
 	public ContractTemplate(byte[] prog) throws NoSuchAlgorithmException {
-		address = new LogicsigSignature(prog, new ArrayList<byte[]>()).toAddress();
-		program = prog;
+		this(new LogicsigSignature(prog));
 	}
+
+    /**
+     * Initialize a contract template.
+     *
+     * @param lsig the contract's LogicsigSignature.
+     */
+    public ContractTemplate(LogicsigSignature lsig) throws NoSuchAlgorithmException {
+        address = lsig.toAddress();
+        program = lsig.logic;
+    }
 
 	/**
 	 * @param program is compiled TEAL program

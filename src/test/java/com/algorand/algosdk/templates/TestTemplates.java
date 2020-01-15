@@ -1,12 +1,24 @@
 package com.algorand.algosdk.templates;
 
 
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.logic.Logic;
+import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
+import com.google.common.collect.ImmutableList;
 import org.junit.Test;
 
 import com.algorand.algosdk.util.Encoder;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -60,7 +72,7 @@ public class TestTemplates {
 
 		int fee = 10;
 		String addr = "726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM";
-		byte[] lease = Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
+		Lease lease = new Lease("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
 		ContractTemplate result = PeriodicPayment.MakePeriodicPayment(addr, 10000, 999, 11, fee, 123456, lease);
 
 

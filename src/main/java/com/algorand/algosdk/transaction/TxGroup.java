@@ -31,9 +31,7 @@ public class TxGroup implements Serializable{
      * @param txns array of transactions
      * @return Digest
      */
-    public static Digest computeGroupID(
-        Transaction[] txns
-    ) throws IOException, IllegalArgumentException {
+    public static Digest computeGroupID(Transaction ...txns) throws IOException, IllegalArgumentException {
         if (txns == null || txns.length == 0) {
             throw new IllegalArgumentException("empty transaction list");
         }
@@ -55,16 +53,28 @@ public class TxGroup implements Serializable{
      * Assigns group id to a given array of unsigned transactions
      * @param txns array of transactions
      * @param address optional sender address specifying which transaction return
-     * @return Digest
+     * @return array of grouped transactions, optionally filtered with the address parameter.
      */
+    public static Transaction[] assignGroupID(Address address, Transaction ...txns) throws IOException {
+        return assignGroupID(txns, address);
+    }
+
+    /**
+     * Assigns group id to a given array of unsigned transactions
+     * @param txns array of transactions
+     * @param address optional sender address specifying which transaction return
+     * @return array of grouped transactions, optionally filtered with the address parameter.
+     *
+     * @Deprecated use assignGroupID(address, Transaction ...txns)
+     */
+    @Deprecated // Jan 8, 2020
     public static Transaction[] assignGroupID(
         Transaction[] txns, Address address
     ) throws IOException {
         Digest gid = TxGroup.computeGroupID(txns);
         ArrayList<Transaction> result = new ArrayList<Transaction>();
-        for (int i = 0; i < txns.length; i++) {
-            if (address == null || address.toString() == "" || address == txns[i].sender) {
-                Transaction tx = txns[i];
+        for (Transaction tx : txns) {
+            if (address == null || address.toString() == "" || address == tx.sender) {
                 tx.assignGroupID(gid);
                 result.add(tx);
             }

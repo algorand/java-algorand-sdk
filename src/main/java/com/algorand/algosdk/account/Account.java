@@ -55,6 +55,11 @@ public class Account {
         this((SecureRandom)null);
     }
 
+    /**
+     * Create a new account from an rfc8037 private key.
+     * @param seed
+     * @throws NoSuchAlgorithmException
+     */
     public Account(byte[] seed) throws NoSuchAlgorithmException {
         // seed here corresponds to rfc8037 private key, corresponds to seed in go impl
         // BC for instance takes the seed as private key straight up
@@ -221,7 +226,8 @@ public class Account {
      * @throws NoSuchAlgorithmException could not estimate tx encoded size.
      */
     static public void setFeeByFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
-        BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(tx));
+        BigInteger size = estimatedEncodedSize(tx);
+        BigInteger newFee = suggestedFeePerByte.multiply(size);
         if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
             newFee = MIN_TX_FEE_UALGOS;
         }

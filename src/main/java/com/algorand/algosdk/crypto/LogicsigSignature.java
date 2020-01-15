@@ -61,10 +61,26 @@ public class LogicsigSignature {
         this.msig = msig;
     }
 
-    public LogicsigSignature(byte[] logic, ArrayList<byte[]> args) {
-        this(logic, args, null, null);
+    /**
+     * Unsigned logicsig object.
+     * @param logicsig
+     */
+    public LogicsigSignature(byte[] logicsig) {
+        this(logicsig, null);
     }
 
+    /**
+     * Unsigned logicsig object, and its arguments.
+     * @param logicsig
+     * @param args
+     */
+    public LogicsigSignature(byte[] logicsig, ArrayList<byte[]> args) {
+        this(logicsig, args, null, null);
+    }
+
+    /**
+     * Uninitialized object used for serializer to ignore default values.
+     */
     public LogicsigSignature() {
         this.logic = null;
         this.args = null;
