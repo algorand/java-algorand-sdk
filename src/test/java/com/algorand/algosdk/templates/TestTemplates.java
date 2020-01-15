@@ -116,13 +116,18 @@ public class TestTemplates {
 
 		// Sign contract
 		DynamicFee.SignedDynamicFee sdf = DynamicFee.SignDynamicFee(program, account1, gh);
+		String encodedLsig = Encoder.encodeToBase64(Encoder.encodeToMsgPack(sdf.lsig));
+		String encodedTxn = Encoder.encodeToBase64(Encoder.encodeToMsgPack(sdf.txn));
+
+		String goldenTxn = "iaNhbXTNE4ilY2xvc2XEIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5omZ2zTA5omdoxCB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaaJsds0wOqJseMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjcmN2xCD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiE6NzbmTEIIU9h0wnKapwajF0N7K4zy3orGLF+rQ8kLIk/vW6FhPvpHR5cGWjcGF5";
+		String goldenLsig = "gqFsxLEBIAUCAYgnuWC6YCYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhCjc2lnxEAhLNdfdDp9Wbi0YwsEQCpP7TVHbHG7y41F4MoESNW/vL1guS+5Wj4f5V9fmM63/VKTSMFidHOSwm5o+pbV5lYH";
+		assertThat(encodedLsig).isEqualTo(goldenLsig);
+		assertThat(encodedTxn).isEqualTo(goldenTxn);
 
 		// Generate signed transactions (using data that would be passed to another person).
-		byte[] signedLsig = Encoder.encodeToMsgPack(sdf.lsig);
-		byte[] txn = Encoder.encodeToMsgPack(sdf.txn);
 		List<SignedTransaction> stxns = DynamicFee.MakeReimbursementTransactions(
-				Encoder.decodeFromMsgPack(txn, Transaction.class),
-				Encoder.decodeFromMsgPack(signedLsig, LogicsigSignature.class),
+				Encoder.decodeFromMsgPack(encodedTxn, Transaction.class),
+				Encoder.decodeFromMsgPack(encodedLsig, LogicsigSignature.class),
 				account2,
 				1234);
 

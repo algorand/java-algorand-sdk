@@ -79,6 +79,11 @@ public class DynamicFee {
      * get_transactions() to update fields and create the auxiliary
      * transaction.
      *
+     * The transaction and logicsig should be sent to the other party as base64 encoded objects:
+     * SignedDynamicFee sdf = DynamicFee.SignDynamicFee(...);
+     * String encodedLsig = Encoder.encodeToBase64(Encoder.encodeToMsgPack(sdf.lsig));
+     * String encodedTxn = Encoder.encodeToBase64(Encoder.encodeToMsgPack(sdf.txn));
+     *
      * @param contract DynamicFee contract created with MakeDynamicFee.
      * @param senderAccount sender account to sign the transaction.
      * @param genesisHash Genesis hash for the network where the transaction will be submitted.
@@ -116,6 +121,10 @@ public class DynamicFee {
      * Create and sign the secondary dynamic fee transaction, update
      * transaction fields, and sign as the fee payer; return both
      * transactions.
+     *
+     * Create the Transaction and LogicsigSignature objects from base64 encoded objects:
+     * Encoder.decodeFromMsgPack(encodedTxn, Transaction.class),
+     * Encoder.decodeFromMsgPack(encodedLsig, LogicsigSignature.class),
      *
      * @param txn main transaction from payer
      * @param lsig signed logic received from payer
