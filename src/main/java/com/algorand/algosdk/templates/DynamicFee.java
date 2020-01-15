@@ -16,9 +16,11 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.transaction.Lease;
 import com.google.common.collect.ImmutableList;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -120,7 +122,7 @@ public class DynamicFee {
     /**
      * Create and sign the secondary dynamic fee transaction, update
      * transaction fields, and sign as the fee payer; return both
-     * transactions.
+     * transactions ready to be sent.
      *
      * Create the Transaction and LogicsigSignature objects from base64 encoded objects:
      * Encoder.decodeFromMsgPack(encodedTxn, Transaction.class),
@@ -131,7 +133,7 @@ public class DynamicFee {
      * @param account an account initialized with a signing key.
      * @param feePerByte fee per byte, for both transactions
      */
-    public static List<SignedTransaction> MakeReimbursementTransactions(final Transaction txn, final LogicsigSignature lsig, final Account account, final int feePerByte) throws NoSuchAlgorithmException, IOException {
+    public static byte[] MakeReimbursementTransactions(final Transaction txn, final LogicsigSignature lsig, final Account account, final int feePerByte) throws NoSuchAlgorithmException, IOException {
         // Due to an issue with how transactions are initialized, the fee at
         // this point is inconsistent between SDKs. Adjust the fee here to
         // allow the same goldens to be used across all SDKs.
@@ -157,6 +159,9 @@ public class DynamicFee {
         SignedTransaction stx1 = new SignedTransaction(txn, lsig, txn.txID());
         SignedTransaction stx2 = account.signTransaction(txn2);
 
-        return ImmutableList.of(stx1, stx2);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(Encoder.encodeToMsgPack(stx1));
+        baos.write(Encoder.encodeToMsgPack(stx2));
+        return baos.toByteArray();
     }
 }
