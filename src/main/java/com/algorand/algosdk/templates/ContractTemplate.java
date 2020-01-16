@@ -161,4 +161,18 @@ public class ContractTemplate {
 
 		return new ContractTemplate(updatedProgramByteArray);
 	}
+
+	protected static Logic.ProgramData readAndVerifyContract(byte[] program, int numInts, int numByteArrays) {
+		try {
+			Logic.ProgramData data = Logic.readProgram(program, null);
+
+			if (!data.good || data.intBlock.size() != numInts || data.byteBlock.size() != numByteArrays) {
+				throw new IllegalArgumentException("Invalid contract detected.");
+			}
+
+			return data;
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Unable to parse contract.");
+		}
+	}
 }

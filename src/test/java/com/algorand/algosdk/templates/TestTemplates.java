@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
 public class TestTemplates {
-	@Test
+	@Test 
 	public void testVarInt() {
 		int a = 600000;
 		byte[] buffer = Logic.putUVarint((int) a);
@@ -130,5 +130,66 @@ public class TestTemplates {
 
 		String goldenStxns = "gqRsc2lngqFsxLEBIAUCAYgnuWC6YCYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhCjc2lnxEAhLNdfdDp9Wbi0YwsEQCpP7TVHbHG7y41F4MoESNW/vL1guS+5Wj4f5V9fmM63/VKTSMFidHOSwm5o+pbV5lYHo3R4boujYW10zROIpWNsb3NlxCDmmpYeby1feshmB5JlUr6YI17TM2PKiJGLuck4qRW2+aNmZWXOAAWq6qJmds0wOaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBRpaRVpA3ImXU4/ENcrzp+jsooLVHC7bF5kCGUK0KORaJsds0wOqJseMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjcmN2xCD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiE6NzbmTEIIU9h0wnKapwajF0N7K4zy3orGLF+rQ8kLIk/vW6FhPvpHR5cGWjcGF5gqNzaWfEQAilsGaC4M4zfYN5QpvREdHEC0DjI2ZWCXSIwwyUWHg2dzd5gKR2Cqu+iUmiCU1hOTTiOump3PILTgWeG0ZkUAajdHhuiqNhbXTOAAWq6qNmZWXOAATzvqJmds0wOaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBRpaRVpA3ImXU4/ENcrzp+jsooLVHC7bF5kCGUK0KORaJsds0wOqJseMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjcmN2xCCFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT76NzbmTEICuIj6PMWBK0XH0TqQSTWXj6UWxbhN7Y9jUpXyQ1xxxGpHR5cGWjcGF5";
 		assertThat(Encoder.encodeToBase64(stxns)).isEqualTo(goldenStxns);
+	}
+
+	@Test
+	public void testLimitOrder() throws Exception {
+	    Address owner = new Address("726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM");
+	    int assetId = 12345;
+	    int ratn = 30;
+		int ratd = 100;
+		int expirationRound = 123456;
+	    int minTrade = 10000;
+	    int maxFee = 5000000;
+	    ContractTemplate contract = LimitOrder.MakeLimitOrder(
+	    		owner,
+				assetId,
+				ratn,
+				ratd,
+				expirationRound,
+				minTrade,
+				maxFee);
+
+	    String goldenAddress = "LXQWT2XLIVNFS54VTLR63UY5K6AMIEWI7YTVE6LB4RWZDBZKH22ZO3S36I";
+        String goldenProgram = "ASAKAAHAlrECApBOBLlgZB7AxAcmASD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEzEWIhIxECMSEDEBJA4QMgQjEkAAVTIEJRIxCCEEDRAxCTIDEhAzARAhBRIQMwERIQYSEDMBFCgSEDMBEzIDEhAzARIhBx01AjUBMQghCB01BDUDNAE0Aw1AACQ0ATQDEjQCNAQPEEAAFgAxCSgSMQIhCQ0QMQcyAxIQMQgiEhAQ";
+		String encodedContract = Encoder.encodeToBase64(contract.program);
+        assertThat(encodedContract).isEqualTo(goldenProgram);
+		assertThat(contract.address.toString()).isEqualTo(goldenAddress);
+
+		// Test swap transaction
+        byte[] pk1 = Encoder.decodeFromBase64("cv8E0Ln24FSkwDgGeuXKStOTGcze5u8yldpXxgrBxumFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT7w==");
+        Account sender = new Account(pk1);
+		Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
+		ContractTemplate serializedContract = new ContractTemplate(encodedContract);
+
+		// Verify invalid exchange rate generates an error.
+		boolean invalidExchangeRatExceptionThrown = false;
+        try {
+			LimitOrder.MakeSwapAssetsTransaction(
+					serializedContract,
+					111111,
+					sender,
+					1000,
+					370371, // The correct amount would be 370370
+					333333,
+					444444,
+					genesisHash);
+		} catch (Exception e) {
+            assertThat(e).hasMessageStartingWith("The provided amounts to not meet the contract exchange rate of assetAmount = algoAmount");
+        	invalidExchangeRatExceptionThrown = true;
+		}
+        assertThat(invalidExchangeRatExceptionThrown).isTrue();
+
+        // Verify transactions with correct exchange rate.
+		LimitOrder.MakeSwapAssetsTransaction(
+				serializedContract,
+				111111,
+				sender,
+				1000,
+				370370,
+				333333,
+				444444,
+				genesisHash);
+
 	}
 }
