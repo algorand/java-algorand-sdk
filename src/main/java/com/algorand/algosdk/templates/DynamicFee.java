@@ -139,7 +139,7 @@ public class DynamicFee {
         // Reimbursement transaction
         Transaction txn2 = new Transaction(
                 account.getAddress(),
-                BigInteger.valueOf(feePerByte),
+                BigInteger.valueOf(0),
                 txn.firstValid,
                 txn.lastValid,
                 null,

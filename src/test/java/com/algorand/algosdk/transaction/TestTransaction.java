@@ -107,7 +107,6 @@ public class TestTransaction {
                 reserve,
                 freeze,
                 clawback);
-        tx.fee = BigInteger.valueOf(10);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
 
         Transaction.AssetParams expectedParams = new Transaction.AssetParams(
@@ -226,7 +225,6 @@ public class TestTransaction {
                 freeze,
                 clawback,
                 true);
-        tx.fee = BigInteger.valueOf(10);
 
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
@@ -318,7 +316,6 @@ public class TestTransaction {
                 null,
                 new Digest(gh),
                 assetFreezeID);
-        tx.fee = BigInteger.valueOf(10);
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
@@ -361,7 +358,6 @@ public class TestTransaction {
                 amountToSend,
                 toAddr,
                 closeTo);
-        tx.fee = BigInteger.valueOf(4);
 
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(4));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
@@ -482,7 +478,6 @@ public class TestTransaction {
                 "",
                 new Digest(gh),
                 assetIndex);
-        tx.fee = BigInteger.valueOf(10); // Slight discrepencies across SDKs require this for the fees to match.
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
@@ -540,7 +535,6 @@ public class TestTransaction {
                 "",
                 new Digest(gh),
                 assetIndex);
-        tx.fee = BigInteger.valueOf(10);
 
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
@@ -602,7 +596,6 @@ public class TestTransaction {
                 "",
                 new Digest(gh),
                 assetIndex);
-        tx.fee = BigInteger.valueOf(10);
 
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
@@ -676,7 +669,6 @@ public class TestTransaction {
                 amountToSend,
                 toAddr,
                 closeTo);
-        tx.fee = BigInteger.valueOf(4);
         byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
         tx.setLease(new Lease(lease));
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(4));
