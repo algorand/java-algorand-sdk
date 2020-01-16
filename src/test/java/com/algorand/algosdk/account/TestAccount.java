@@ -34,7 +34,7 @@ public class TestAccount {
         Transaction tx = new Transaction(
                 new Address(FROM_ADDR),
                 new Address(TO_ADDR),
-                BigInteger.valueOf(1), // Min tx fee
+                Account.MIN_TX_FEE_UALGOS,
                 BigInteger.valueOf(1234),
                 BigInteger.valueOf(106575),
                 BigInteger.valueOf(107575),
@@ -74,7 +74,7 @@ public class TestAccount {
         Transaction tx = new Transaction(
                 new Address(FROM_ADDR),
                 new Address(TO_ADDR),
-                BigInteger.valueOf(0), // Min txn fee
+                Account.MIN_TX_FEE_UALGOS,
                 BigInteger.valueOf(1234),
                 BigInteger.valueOf(0),
                 BigInteger.valueOf(107575),

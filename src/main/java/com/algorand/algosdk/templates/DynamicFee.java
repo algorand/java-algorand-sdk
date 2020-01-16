@@ -103,7 +103,7 @@ public class DynamicFee {
 
         Transaction txn = new Transaction(
                 senderAccount.getAddress(),
-                BigInteger.valueOf(0),
+                Account.MIN_TX_FEE_UALGOS,
                 firstValid,
                 lastValid,
                 null,

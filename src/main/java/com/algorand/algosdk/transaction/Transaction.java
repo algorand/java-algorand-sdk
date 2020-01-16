@@ -6,10 +6,8 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
-import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.transaction.Lease;
 import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.codec.binary.Base64;
 
@@ -154,7 +152,7 @@ public class Transaction implements Serializable {
      */
     public Transaction(Address fromAddr, Address toAddr, long amount, long firstRound, long lastRound,
                        String genesisID, Digest genesisHash) {
-        this(fromAddr, BigInteger.valueOf(0), BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr, genesisID, genesisHash);
+        this(fromAddr, Account.MIN_TX_FEE_UALGOS, BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr, genesisID, genesisHash);
     }
 
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
@@ -762,9 +760,15 @@ public class Transaction implements Serializable {
             this.fee = Account.MIN_TX_FEE_UALGOS;
         }
 
+        /*
+        // Cannot set this here without risk to breaking existing programs.
+        // Because of this common pattern:
+        // Transaction tx = new Transaction(fee = 10, ...);
+        // Account.setFeeByFeePerByte(tx, tx.fee);
         if (this.fee.compareTo(Account.MIN_TX_FEE_UALGOS) < 0) {
             this.fee = Account.MIN_TX_FEE_UALGOS;
         }
+         */
     }
 
     /** Lease enforces mutual exclusion of transactions.  If this field
