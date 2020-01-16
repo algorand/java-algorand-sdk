@@ -1,12 +1,14 @@
 package com.algorand.algosdk.templates;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.BytesParameterValue;
 import com.algorand.algosdk.util.Encoder;
+import com.google.common.collect.ImmutableList;
 
 public class HTLC {
 
@@ -39,14 +41,14 @@ public class HTLC {
 			throw new RuntimeException("invalid hash function supplied");
 		}
 
-		ParameterValue[] values = {
+		List<ParameterValue> values = ImmutableList.of(
 				new IntParameterValue(3, maxFee),
 				new IntParameterValue(6, expiryRound),
 				new AddressParameterValue(10, receiver),
 				new BytesParameterValue(42, hashImage),
 				new AddressParameterValue(45, owner),
 				new IntParameterValue(102, hashInject)
-		};
+		);
 		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), values);
 	}
 }

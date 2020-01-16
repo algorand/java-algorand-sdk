@@ -7,6 +7,7 @@ package com.algorand.algosdk.templates;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.LogicsigSignature;
@@ -139,12 +140,11 @@ public class ContractTemplate {
 	 * @return ContractTemplate with the address and the program with the given parameter values
 	 * @throws NoSuchAlgorithmException
 	 */
-	protected static ContractTemplate inject(byte [] program, ParameterValue[] values) throws NoSuchAlgorithmException {
+	protected static ContractTemplate inject(byte [] program, List<ParameterValue> values) throws NoSuchAlgorithmException {
 		int paramIdx = 0;
 		ArrayList<Byte> updatedProgram = new ArrayList<Byte>();
 
 		int progIdx = 0;
-		//for (int progIdx = 0; progIdx < program.length; ) {
 		for (ParameterValue value : values) {
 			while (progIdx < value.getOffset()) {
 				updatedProgram.add(program[progIdx++]);

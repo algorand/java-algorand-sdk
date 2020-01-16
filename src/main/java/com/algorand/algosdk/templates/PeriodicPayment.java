@@ -13,10 +13,12 @@ import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.BytesParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
 import com.algorand.algosdk.transaction.Lease;
+import com.google.common.collect.ImmutableList;
 
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public class PeriodicPayment {
     private static String referenceProgram = "ASAHAQoLAAwNDiYCAQYg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohMxECISMQEjDhAxAiQYJRIQMQQhBDECCBIQMQYoEhAxCTIDEjEHKRIQMQghBRIQMQkpEjEHMgMSEDECIQYNEDEIJRIQERA=";
@@ -48,7 +50,7 @@ public class PeriodicPayment {
             throw new IllegalArgumentException("The withdrawingWindow must be a positive number less than 1000");
         }
 
-        ParameterValue[] values = new ParameterValue[] {
+        List<ParameterValue> values = ImmutableList.of(
                 new IntParameterValue(4, fee),
                 new IntParameterValue(5, period),
                 new IntParameterValue(7, withdrawingWindow),
@@ -56,7 +58,7 @@ public class PeriodicPayment {
                 new IntParameterValue(9, timeout),
                 new BytesParameterValue(12, lease == null ? new Lease() : lease),
                 new AddressParameterValue(15, receiver)
-        };
+        );
 
         return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), values);
     }

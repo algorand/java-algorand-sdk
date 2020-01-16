@@ -49,14 +49,14 @@ public class DynamicFee {
 
         byte[] program = Encoder.decodeFromBase64(referenceProgram);
 
-        ParameterValue[] values = {
+        List<ParameterValue> values = ImmutableList.of(
                 new IntParameterValue(5, amount),
                 new IntParameterValue(6, firstValid),
                 new IntParameterValue(7, lastValid == null ? firstValid + 1000 : lastValid),
                 new AddressParameterValue(11, receiver),
                 new AddressParameterValue(44, closeRemainderAddress == null ? new Address() : closeRemainderAddress),
                 new BytesParameterValue(76, lease == null ? new Lease() : lease)
-        };
+        );
 
         return ContractTemplate.inject(program, values);
     }
