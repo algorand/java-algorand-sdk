@@ -99,7 +99,7 @@ public class LimitOrder {
         int ratn = data.intBlock.get(8);
 
         // Verify the exchange rate ratio
-        if (assetAmount * ratd >= algoAmount * ratn) {
+        if (assetAmount * ratd < algoAmount * ratn) {
             throw new IllegalArgumentException("The provided amounts to not meet the contract exchange rate of assetAmount = algoAmount * " + ratn + " / " + ratd);
         }
 

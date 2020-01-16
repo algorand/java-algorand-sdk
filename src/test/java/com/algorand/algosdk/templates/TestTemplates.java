@@ -170,7 +170,7 @@ public class TestTemplates {
 					111111,
 					sender,
 					1000,
-					370371, // The correct amount would be 370370
+					370371, // The correct amount is at most 370370
 					333333,
 					444444,
 					genesisHash);
@@ -181,7 +181,7 @@ public class TestTemplates {
         assertThat(invalidExchangeRatExceptionThrown).isTrue();
 
         // Verify transactions with correct exchange rate.
-		LimitOrder.MakeSwapAssetsTransaction(
+		byte[] transactions = LimitOrder.MakeSwapAssetsTransaction(
 				serializedContract,
 				111111,
 				sender,
@@ -191,5 +191,7 @@ public class TestTemplates {
 				444444,
 				genesisHash);
 
+		String goldenTxnGroup = "gqRsc2lngaFsxLcBIAoAAcCWsQICkE4EuWBkHsDEByYBIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMRYiEjEQIxIQMQEkDhAyBCMSQABVMgQlEjEIIQQNEDEJMgMSEDMBECEFEhAzAREhBhIQMwEUKBIQMwETMgMSEDMBEiEHHTUCNQExCCEIHTUENQM0ATQDDUAAJDQBNAMSNAI0BA8QQAAWADEJKBIxAiEJDRAxBzIDEhAxCCISEBCjdHhuiaNhbXTOAAGyB6NmZWXOAAOCcKJmds4ABRYVomdoxCB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaaNncnDEIPHz6fmzA+OW+rthTJ32hdWufJuoHP045frGtgsg/s6Nomx2zgAGyByjcmN2xCCFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT76NzbmTEIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITpHR5cGWjcGF5gqNzaWfEQFMzCILZYg7/+effKDB4R+dBOKeA1XBVmn1TFRJNo9J6IYCazKxFjbcxwpwHkmqBi6PDG2XG75MB9xYE2cmykwGjdHhui6RhYW10zgABsgemYWNsb3NlwKRhcmN2xCD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiE6NmZWXOAAPQkKJmds4ABRYVomdoxCB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaaNncnDEIPHz6fmzA+OW+rthTJ32hdWufJuoHP045frGtgsg/s6Nomx2zgAGyByjc25kxCCFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT76R0eXBlpWF4ZmVypHhhaWTNMDk=";
+		assertThat(Encoder.encodeToBase64(transactions)).isEqualTo(goldenTxnGroup);
 	}
 }
