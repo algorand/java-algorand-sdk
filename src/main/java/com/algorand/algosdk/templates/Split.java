@@ -1,15 +1,16 @@
 package com.algorand.algosdk.templates;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
 import com.algorand.algosdk.util.Encoder;
+import com.google.common.collect.ImmutableList;
 
 public class Split {
 	private static String referenceProgram = "ASAIAQUCAAYHCAkmAyDYHIR7TIW5eM/WAZcXdEDqv7BD+baMN6i2/A5JatGbNCDKsaoZHPQ3Zg8zZB/BZ1oDgt77LGo5np3rbto3/gloTyB40AS2H3I72YCbDk4hKpm7J7NnFy2Xrt39TJG0ORFg+zEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBA=";
-	private static int [] referenceOffsets = {4, 7, 8, 9, 10, 14, 47, 80};
 
 	/**
 	 * 
@@ -34,16 +35,17 @@ public class Split {
 			int minPay,
 			int maxFee) throws NoSuchAlgorithmException {
 
-		ParameterValue[] values = {
-				new IntParameterValue(maxFee),
-				new IntParameterValue(expiryRound),
-				new IntParameterValue(ratn),
-				new IntParameterValue(ratd),
-				new IntParameterValue(minPay),
-				new AddressParameterValue(owner),
-				new AddressParameterValue(receiver1),
-				new AddressParameterValue(receiver2)
-		};
-		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), referenceOffsets, values);
+		List<ParameterValue> values = ImmutableList.of(
+				new IntParameterValue(4, maxFee),
+				new IntParameterValue(7, expiryRound),
+				new IntParameterValue(8, ratn),
+				new IntParameterValue(9, ratd),
+				new IntParameterValue(10, minPay),
+				new AddressParameterValue(14, owner),
+				new AddressParameterValue(47, receiver1),
+				new AddressParameterValue(80, receiver2)
+		);
+
+		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), values);
 	}
 }

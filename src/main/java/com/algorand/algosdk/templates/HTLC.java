@@ -1,17 +1,18 @@
 package com.algorand.algosdk.templates;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.BytesParameterValue;
 import com.algorand.algosdk.util.Encoder;
+import com.google.common.collect.ImmutableList;
 
 public class HTLC {
 
 	private static String referenceProgram = "ASAEBQEABiYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITAQYg5pqWHm8tX3rIZgeSZVK+mCNe0zNjyoiRi7nJOKkVtvkxASIOMRAjEhAxBzIDEhAxCCQSEDEJKBItASkSEDEJKhIxAiUNEBEQ";
-	private static int [] referenceOffsets = {3, 6, 10, 42, 45, 102};
 	/**
 	 * 
 	 * @param owner an address that can receive the asset after the expiry round
@@ -40,14 +41,14 @@ public class HTLC {
 			throw new RuntimeException("invalid hash function supplied");
 		}
 
-		ParameterValue[] values = {
-				new IntParameterValue(maxFee),
-				new IntParameterValue(expiryRound),
-				new AddressParameterValue(receiver),
-				new BytesParameterValue(hashImage),
-				new AddressParameterValue(owner),
-				new IntParameterValue(hashInject)
-		};
-		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), referenceOffsets, values);
+		List<ParameterValue> values = ImmutableList.of(
+				new IntParameterValue(3, maxFee),
+				new IntParameterValue(6, expiryRound),
+				new AddressParameterValue(10, receiver),
+				new BytesParameterValue(42, hashImage),
+				new AddressParameterValue(45, owner),
+				new IntParameterValue(102, hashInject)
+		);
+		return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), values);
 	}
 }
