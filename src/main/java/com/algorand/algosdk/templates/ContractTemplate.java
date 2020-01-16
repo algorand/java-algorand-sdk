@@ -21,28 +21,35 @@ public class ContractTemplate {
 	 * of differing sizes. The values are used to generate a byte array appropriate for the type it represents, for
 	 * example some values may include a length in addition to the data. In addition the value knows how large the
 	 * placeholder value is, this placeholder size may differ between different Algorand SDK implementations.
-     *
+	 *
 	 * Placeholder sizes are the following:
-	 * 		BASE64 : 2 bytes
-	 * 		ADDRESS: 32 bytes
-	 * 		INT    : 1 byte
+	 *   BASE64 : 2 bytes
+	 *   ADDRESS: 32 bytes
+	 *   INT    : 1 byte
 	 */
 	abstract static class ParameterValue {
-        private final byte[] value;
+		private final int offset;
+		private final byte[] value;
 
-        protected ParameterValue(byte[] value) {
-        	this.value = value;
+		protected ParameterValue(int offset, byte[] value) {
+			this.value = value;
+			this.offset = offset;
 		}
 
 		public byte[] toBytes() {
 			return value;
 		}
+
+		public int getOffset() {
+			return offset;
+		}
+
 		abstract public int placeholderSize();
 	}
 
 	public static class IntParameterValue extends ParameterValue {
-		public IntParameterValue(int value) {
-			super(Logic.putUVarint(value));
+		public IntParameterValue(int offset, int value) {
+			super(offset, Logic.putUVarint(value));
 		}
 
 		public int placeholderSize() {
@@ -51,17 +58,17 @@ public class ContractTemplate {
 	}
 
 	public static class AddressParameterValue extends ParameterValue {
-		public AddressParameterValue(String value) throws NoSuchAlgorithmException {
-			super(new Address(value).getBytes());
+		public AddressParameterValue(int offset, String value) throws NoSuchAlgorithmException {
+			super(offset, new Address(value).getBytes());
 		}
 
-		public AddressParameterValue(Address address) throws NoSuchAlgorithmException {
-			super(address.getBytes());
+		public AddressParameterValue(int offset, Address address) throws NoSuchAlgorithmException {
+			super(offset, address.getBytes());
 		}
 
-		public AddressParameterValue(byte[] value) throws NoSuchAlgorithmException {
-			super(value);
-        }
+		public AddressParameterValue(int offset, byte[] value) throws NoSuchAlgorithmException {
+			super(offset, value);
+		}
 
 		public int placeholderSize() {
 			return 32;
@@ -69,16 +76,16 @@ public class ContractTemplate {
 	}
 
 	public static class BytesParameterValue extends ParameterValue {
-		public BytesParameterValue(String value) {
-			this(Encoder.decodeFromBase64(value));
+		public BytesParameterValue(int offset, String value) {
+			this(offset, Encoder.decodeFromBase64(value));
 		}
 
-		public BytesParameterValue(byte[] value) {
-			super(convertToBytes(value));
+		public BytesParameterValue(int offset, byte[] value) {
+			super(offset, convertToBytes(value));
 		}
 
-		public BytesParameterValue(Lease value) {
-			this(value.getBytes());
+		public BytesParameterValue(int offset, Lease value) {
+			this(offset, value.getBytes());
 		}
 
 		private static byte[] convertToBytes(byte[] value) {
@@ -116,43 +123,42 @@ public class ContractTemplate {
 		this(new LogicsigSignature(prog));
 	}
 
-    /**
-     * Initialize a contract template.
-     *
-     * @param lsig the contract's LogicsigSignature.
-     */
-    public ContractTemplate(LogicsigSignature lsig) throws NoSuchAlgorithmException {
-        address = lsig.toAddress();
-        program = lsig.logic;
-    }
+	/**
+	 * Initialize a contract template.
+	 *
+	 * @param lsig the contract's LogicsigSignature.
+	 */
+	public ContractTemplate(LogicsigSignature lsig) throws NoSuchAlgorithmException {
+		address = lsig.toAddress();
+		program = lsig.logic;
+	}
 
 	/**
 	 * @param program is compiled TEAL program
-	 * @param offsets are the position in the program bytecode of the program parameters
 	 * @param values of the program parameters to inject to the program bytecode
 	 * @return ContractTemplate with the address and the program with the given parameter values
 	 * @throws NoSuchAlgorithmException
 	 */
-	protected static ContractTemplate inject(byte [] program, int [] offsets, ParameterValue[] values) throws NoSuchAlgorithmException {
-		if (offsets.length != values.length) {
-			throw new RuntimeException("offsets and values should have the same number of elements");
-		}
-		
+	protected static ContractTemplate inject(byte [] program, ParameterValue[] values) throws NoSuchAlgorithmException {
 		int paramIdx = 0;
 		ArrayList<Byte> updatedProgram = new ArrayList<Byte>();
 
-		for (int progIdx = 0; progIdx < program.length; ) {
-			if (paramIdx < offsets.length && offsets[paramIdx] == progIdx) {
-				ParameterValue value = values[paramIdx];
-				++paramIdx;
-				for (byte b : value.toBytes()) {
-					updatedProgram.add(b);
-				}
-				progIdx += value.placeholderSize();
-			} else {
-				updatedProgram.add(program[progIdx]);
-				progIdx += 1;
+		int progIdx = 0;
+		//for (int progIdx = 0; progIdx < program.length; ) {
+		for (ParameterValue value : values) {
+			while (progIdx < value.getOffset()) {
+				updatedProgram.add(program[progIdx++]);
 			}
+
+			++paramIdx;
+			for (byte b : value.toBytes()) {
+				updatedProgram.add(b);
+			}
+			progIdx += value.placeholderSize();
+		}
+		// append remainder of program.
+		while (progIdx < program.length) {
+			updatedProgram.add(program[progIdx++]);
 		}
 
 		byte [] updatedProgramByteArray = new byte[updatedProgram.size()];

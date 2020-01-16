@@ -20,7 +20,6 @@ import java.security.NoSuchAlgorithmException;
 
 public class PeriodicPayment {
     private static String referenceProgram = "ASAHAQoLAAwNDiYCAQYg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohMxECISMQEjDhAxAiQYJRIQMQQhBDECCBIQMQYoEhAxCTIDEjEHKRIQMQghBRIQMQkpEjEHMgMSEDECIQYNEDEIJRIQERA=";
-    private static int [] referenceOffsets = {4, 5, 7, 8, 9, 12, 15};
 
     /**
      * PeriodicPayment contract enables creating an account which allows the
@@ -50,16 +49,16 @@ public class PeriodicPayment {
         }
 
         ParameterValue[] values = new ParameterValue[] {
-                new IntParameterValue(fee),
-                new IntParameterValue(period),
-                new IntParameterValue(withdrawingWindow),
-                new IntParameterValue(amount),
-                new IntParameterValue(timeout),
-                new BytesParameterValue(lease == null ? new Lease() : lease),
-                new AddressParameterValue(receiver)
+                new IntParameterValue(4, fee),
+                new IntParameterValue(5, period),
+                new IntParameterValue(7, withdrawingWindow),
+                new IntParameterValue(8, amount),
+                new IntParameterValue(9, timeout),
+                new BytesParameterValue(12, lease == null ? new Lease() : lease),
+                new AddressParameterValue(15, receiver)
         };
 
-        return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), referenceOffsets, values);
+        return ContractTemplate.inject(Encoder.decodeFromBase64(referenceProgram), values);
     }
 
     /**

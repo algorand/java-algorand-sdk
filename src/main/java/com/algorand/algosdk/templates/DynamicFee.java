@@ -26,7 +26,6 @@ import java.util.Objects;
 
 public class DynamicFee {
     protected static String referenceProgram = "ASAFAgEFBgcmAyD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEyDmmpYeby1feshmB5JlUr6YI17TM2PKiJGLuck4qRW2+QEGMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhA=";
-    private static int [] referenceOffsets = {5, 6, 7, 11, 44, 76};
 
     /**
      * DynamicFee contract allows you to create a transaction without
@@ -51,15 +50,15 @@ public class DynamicFee {
         byte[] program = Encoder.decodeFromBase64(referenceProgram);
 
         ParameterValue[] values = {
-                new IntParameterValue(amount),
-                new IntParameterValue(firstValid),
-                new IntParameterValue(lastValid == null ? firstValid + 1000 : lastValid),
-                new AddressParameterValue(receiver),
-                new AddressParameterValue(closeRemainderAddress == null ? new Address() : closeRemainderAddress),
-                new BytesParameterValue(lease == null ? new Lease() : lease)
+                new IntParameterValue(5, amount),
+                new IntParameterValue(6, firstValid),
+                new IntParameterValue(7, lastValid == null ? firstValid + 1000 : lastValid),
+                new AddressParameterValue(11, receiver),
+                new AddressParameterValue(44, closeRemainderAddress == null ? new Address() : closeRemainderAddress),
+                new BytesParameterValue(76, lease == null ? new Lease() : lease)
         };
 
-        return ContractTemplate.inject(program, referenceOffsets, values);
+        return ContractTemplate.inject(program, values);
     }
 
     /**
