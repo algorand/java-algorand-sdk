@@ -141,7 +141,6 @@ public class ContractTemplate {
 	 * @throws NoSuchAlgorithmException
 	 */
 	protected static ContractTemplate inject(byte [] program, List<ParameterValue> values) throws NoSuchAlgorithmException {
-		int paramIdx = 0;
 		ArrayList<Byte> updatedProgram = new ArrayList<Byte>();
 
 		int progIdx = 0;
@@ -150,7 +149,6 @@ public class ContractTemplate {
 				updatedProgram.add(program[progIdx++]);
 			}
 
-			++paramIdx;
 			for (byte b : value.toBytes()) {
 				updatedProgram.add(b);
 			}
