@@ -51,6 +51,13 @@ public class Lease {
         return Encoder.encodeToBase64(this.data);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        return Arrays.equals(((Lease)o).data, data);
+    }
+
     /**
      * Validates a lease byte array. The lease should be an empty array or a 32 byte array.
      * @param value a lease byte array.

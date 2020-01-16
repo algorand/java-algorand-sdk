@@ -226,12 +226,14 @@ public class Account {
      * @throws NoSuchAlgorithmException could not estimate tx encoded size.
      */
     static public void setFeeByFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
+        tx.fee = suggestedFeePerByte;
         BigInteger size = estimatedEncodedSize(tx);
-        BigInteger newFee = suggestedFeePerByte.multiply(size);
-        if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
-            newFee = MIN_TX_FEE_UALGOS;
+
+        BigInteger fee = suggestedFeePerByte.multiply(size);
+        if (fee.compareTo(Account.MIN_TX_FEE_UALGOS) < 0) {
+            fee = Account.MIN_TX_FEE_UALGOS;
         }
-        tx.fee = newFee;
+        tx.setFee(fee);
     }
 
     /**

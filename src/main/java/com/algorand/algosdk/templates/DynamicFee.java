@@ -103,7 +103,7 @@ public class DynamicFee {
 
         Transaction txn = new Transaction(
                 senderAccount.getAddress(),
-                BigInteger.valueOf(0),
+                Account.MIN_TX_FEE_UALGOS,
                 firstValid,
                 lastValid,
                 null,
@@ -134,16 +134,12 @@ public class DynamicFee {
      * @param feePerByte fee per byte, for both transactions
      */
     public static byte[] MakeReimbursementTransactions(final Transaction txn, final LogicsigSignature lsig, final Account account, final int feePerByte) throws NoSuchAlgorithmException, IOException {
-        // Due to an issue with how transactions are initialized, the fee at
-        // this point is inconsistent between SDKs. Adjust the fee here to
-        // allow the same goldens to be used across all SDKs.
-        txn.fee = Account.MIN_TX_FEE_UALGOS;
         Account.setFeeByFeePerByte(txn, BigInteger.valueOf(feePerByte));
 
         // Reimbursement transaction
         Transaction txn2 = new Transaction(
                 account.getAddress(),
-                BigInteger.valueOf(feePerByte),
+                BigInteger.valueOf(0),
                 txn.firstValid,
                 txn.lastValid,
                 null,

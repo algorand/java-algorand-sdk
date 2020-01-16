@@ -100,6 +100,7 @@ public class PeriodicPayment {
                 "",
                 genesisHash);
         tx.setLease(lease);
+
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(fee));
 
         if (!lsig.verify(tx.sender)) {
