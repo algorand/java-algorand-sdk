@@ -1,11 +1,11 @@
 package com.algorand.algosdk.crypto;
 
+import com.algorand.algosdk.util.Encoder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 public class TestMultisigAddress {
     @Test
@@ -21,5 +21,24 @@ public class TestMultisigAddress {
         ));
 
         Assert.assertEquals("UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM", addr.toString());
+
+        Assert.assertTrue(jsonSerializeDeserializeCheck(addr));
+    }
+
+    private static boolean jsonSerializeDeserializeCheck(MultisigAddress msig) {
+        String encoded, encoded2;
+        try {
+            encoded = Encoder.encodeToJson(msig);
+            ObjectMapper om = new ObjectMapper();
+            MultisigAddress multisigAddress1 = om.readerFor(msig.getClass()).readValue(encoded.getBytes());
+            Assert.assertEquals(msig, multisigAddress1);
+            encoded2 = Encoder.encodeToJson(multisigAddress1);
+            Assert.assertEquals(encoded.trim(), encoded2.trim());
+            MultisigAddress multisigAddress2 = om.readerFor(msig.getClass()).readValue(encoded2.getBytes());
+            Assert.assertEquals(multisigAddress1, multisigAddress2);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

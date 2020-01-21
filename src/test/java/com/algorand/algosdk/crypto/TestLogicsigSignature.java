@@ -1,11 +1,11 @@
 package com.algorand.algosdk.crypto;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.util.Encoder;
@@ -64,6 +64,7 @@ public class TestLogicsigSignature {
         lsig = new LogicsigSignature(program);
         verified = lsig.verify(sender);
         Assert.assertFalse(verified);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(lsig));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -96,6 +97,7 @@ public class TestLogicsigSignature {
         byte[] outBytes = Encoder.encodeToMsgPack(lsig);
         LogicsigSignature lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
         Assert.assertTrue(lsig.equals(lsig1));
+        Assert.assertTrue(jsonSerializeDeserializeCheck(lsig));
     }
 
     @Test
@@ -166,5 +168,23 @@ public class TestLogicsigSignature {
         Assert.assertTrue(lsig.equals(lsig2));
         verified = lsig2.verify(ma.toAddress());
         Assert.assertTrue(verified);
+        Assert.assertTrue(jsonSerializeDeserializeCheck(lsig2));
+    }
+
+    private static boolean jsonSerializeDeserializeCheck(LogicsigSignature lsig) {
+        String encoded, encoded2;
+        try {
+            encoded = Encoder.encodeToJson(lsig);
+            ObjectMapper om = new ObjectMapper();
+            LogicsigSignature decodedLogicSignature = om.readerFor(lsig.getClass()).readValue(encoded.getBytes());
+            Assert.assertEquals(lsig, decodedLogicSignature);
+            encoded2 = Encoder.encodeToJson(decodedLogicSignature);
+            Assert.assertEquals(encoded, encoded2);
+            LogicsigSignature decodedLogicSignature2 = om.readerFor(lsig.getClass()).readValue(encoded2.getBytes());
+            Assert.assertEquals(decodedLogicSignature, decodedLogicSignature2);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
     }
 }

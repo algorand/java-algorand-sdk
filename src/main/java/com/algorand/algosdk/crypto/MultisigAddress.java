@@ -1,29 +1,38 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.Digester;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * MultisigAddress is a convenience class for handling multisignature public identities.
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonPropertyOrder(alphabetic = true)
 public class MultisigAddress implements Serializable {
+    @JsonProperty("version")
     public final int version;
+    @JsonProperty("threshold")
     public final int threshold;
+    @JsonProperty("publicKeys")
     public final List<Ed25519PublicKey> publicKeys = new ArrayList<>();
 
     private static final byte[] PREFIX = "MultisigAddr".getBytes(StandardCharsets.UTF_8);
 
+    @JsonCreator
     public MultisigAddress(
-            int version,
-            int threshold,
-            List<Ed25519PublicKey> publicKeys
+            @JsonProperty("version") int version,
+            @JsonProperty("threshold") int threshold,
+            @JsonProperty("publicKeys") List<Ed25519PublicKey> publicKeys
     ) {
         this.version = version;
         this.threshold = threshold;
@@ -68,5 +77,20 @@ public class MultisigAddress implements Serializable {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MultisigAddress that = (MultisigAddress) o;
+        return version == that.version &&
+                threshold == that.threshold &&
+                Objects.equals(publicKeys, that.publicKeys);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(version, threshold, publicKeys);
     }
 }
