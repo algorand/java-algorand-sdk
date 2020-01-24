@@ -1,7 +1,6 @@
 package com.algorand.algosdk.crypto;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -10,11 +9,18 @@ import java.util.Arrays;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.util.Encoder;
 
+import static org.assertj.core.api.Assertions.*;
+
 public class TestLogicsigSignature {
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testLogicsigEmptyCreation() throws Exception {
-        new LogicsigSignature(null, null);
-        Assert.assertTrue(false);
+        try {
+            new LogicsigSignature(null, null);
+            fail("Should have thrown a NPE.");
+        } catch (NullPointerException npe) {
+            return;
+        }
+        fail("Should have thrown a NPE.");
     }
 
     @Test
@@ -27,13 +33,13 @@ public class TestLogicsigSignature {
         Address sender = new Address(programHash);
 
         LogicsigSignature lsig = new LogicsigSignature(program);
-        Assert.assertEquals(program, lsig.logic);
-        Assert.assertEquals(null, lsig.args);
-        Assert.assertEquals(null, lsig.sig);
-        Assert.assertEquals(null, lsig.msig);
+        assertThat(lsig.logic).isEqualTo(program);
+        assertThat(lsig.args).isNull();
+        assertThat(lsig.sig).isNull();
+        assertThat(lsig.msig).isNull();
         boolean verified = lsig.verify(sender);
-        Assert.assertTrue(verified);
-        Assert.assertEquals(sender, lsig.toAddress());
+        assertThat(verified).isTrue();
+        assertThat(lsig.toAddress()).isEqualTo(sender);
 
         byte[] arg1 = {1, 2, 3};
         byte[] arg2 = {4, 5, 6};
@@ -41,39 +47,45 @@ public class TestLogicsigSignature {
         args.add(arg2);
 
         lsig = new LogicsigSignature(program, args);
-        Assert.assertEquals(program, lsig.logic);
-        Assert.assertEquals(args, lsig.args);
-        Assert.assertEquals(null, lsig.sig);
-        Assert.assertEquals(null, lsig.msig);
+        assertThat(lsig.logic).isEqualTo(program);
+        assertThat(lsig.args).isEqualTo(args);
+        assertThat(lsig.sig).isNull();
+        assertThat(lsig.msig).isNull();
         verified = lsig.verify(sender);
-        Assert.assertTrue(verified);
+        assertThat(verified).isTrue();
+        assertThat(lsig.toAddress()).isEqualTo(sender);
 
         // check serialization
         byte[] outBytes = Encoder.encodeToMsgPack(lsig);
         LogicsigSignature lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
-        Assert.assertTrue(lsig.equals(lsig1));
+        assertThat(lsig).isEqualTo(lsig1);
 
         // check serialization with null args
         lsig = new LogicsigSignature(program);
         outBytes = Encoder.encodeToMsgPack(lsig);
         lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
-        Assert.assertTrue(lsig.equals(lsig1));
+        assertThat(lsig).isEqualTo(lsig1);
 
         // check modified program fails on verification
         program[3] = 2;
         lsig = new LogicsigSignature(program);
         verified = lsig.verify(sender);
-        Assert.assertFalse(verified);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(lsig));
+        assertThat(verified).isFalse();
+        jsonSerializeDeserializeCheck(lsig);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testLogicsigInvalidProgramCreation() throws Exception {
         byte[] program = {
             0x02, 0x20, 0x01, 0x01, 0x22
         };
-        new LogicsigSignature(program);
-        Assert.assertTrue(false);
+        try {
+            new LogicsigSignature(program);
+            fail("An IllegalArgumentException should have been thrown.");
+        } catch (IllegalArgumentException e) {
+            return;
+        }
+        fail("An IllegalArgumentException should have been thrown.");
     }
 
     @Test
@@ -85,19 +97,20 @@ public class TestLogicsigSignature {
         LogicsigSignature lsig = new LogicsigSignature(program);
         Account account = new Account();
         lsig = account.signLogicsig(lsig);
-        Assert.assertEquals(program, lsig.logic);
-        Assert.assertEquals(null, lsig.args);
-        Assert.assertNotEquals(null, lsig.sig);
-        Assert.assertNotEquals(new Signature(), lsig.sig);
-        Assert.assertEquals(null, lsig.msig);
+        assertThat(lsig.logic).isEqualTo(program);
+        assertThat(lsig.args).isNull();
+        assertThat(lsig.sig)
+                .isNotEqualTo(new Signature())
+                .isNotNull();
+        assertThat(lsig.msig).isNull();
         boolean verified = lsig.verify(account.getAddress());
-        Assert.assertTrue(verified);
+        assertThat(verified).isTrue();
 
         // check serialization
         byte[] outBytes = Encoder.encodeToMsgPack(lsig);
         LogicsigSignature lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
-        Assert.assertTrue(lsig.equals(lsig1));
-        Assert.assertTrue(jsonSerializeDeserializeCheck(lsig));
+        assertThat(lsig1).isEqualTo(lsig);
+        jsonSerializeDeserializeCheck(lsig);
     }
 
     @Test
@@ -127,64 +140,64 @@ public class TestLogicsigSignature {
 
         LogicsigSignature lsig = new LogicsigSignature(program);
         lsig = acc1.signLogicsig(lsig, ma);
-        Assert.assertEquals(program, lsig.logic);
-        Assert.assertEquals(null, lsig.args);
-        Assert.assertEquals(null, lsig.sig);
-        Assert.assertNotEquals(null, lsig.msig);
-        Assert.assertNotEquals(new MultisigSignature(), lsig.msig);
+        assertThat(lsig.logic).isEqualTo(program);
+        assertThat(lsig.args).isNull();
+        assertThat(lsig.sig).isNull();
+        assertThat(lsig.msig)
+                .isNotEqualTo(new MultisigSignature())
+                .isNotNull();
         boolean verified = lsig.verify(ma.toAddress());
-        Assert.assertFalse(verified);
+        assertThat(verified).isFalse();
 
         boolean caught = false;
         try {
             account.appendToLogicsig(lsig);
-            Assert.fail();
+            fail("Should have thrown IllegalArgumentException exception.");
         } catch(IllegalArgumentException ex) {
             caught = true;
         }
-        Assert.assertTrue(caught);
+        assertThat(caught).isTrue();
 
         lsig = acc2.appendToLogicsig(lsig);
         verified = lsig.verify(ma.toAddress());
-        Assert.assertTrue(verified);
+        assertThat(verified).isTrue();
 
         // Add a single signature and ensure it fails
         LogicsigSignature lsig1 = new LogicsigSignature(program);
         lsig1 = account.signLogicsig(lsig1);
         lsig.sig = lsig1.sig;
         verified = lsig.verify(ma.toAddress());
-        Assert.assertFalse(verified);
+        assertThat(verified).isFalse();
         verified = lsig.verify(account.getAddress());
-        Assert.assertFalse(verified);
+        assertThat(verified).isFalse();
 
         // Remove and ensure it still works
         lsig.sig = null;
         verified = lsig.verify(ma.toAddress());
-        Assert.assertTrue(verified);
+        assertThat(verified).isTrue();
 
         // check serialization
         byte[] outBytes = Encoder.encodeToMsgPack(lsig);
         LogicsigSignature lsig2 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
-        Assert.assertTrue(lsig.equals(lsig2));
+        assertThat(lsig2).isEqualTo(lsig);
         verified = lsig2.verify(ma.toAddress());
-        Assert.assertTrue(verified);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(lsig2));
+        assertThat(verified).isTrue();
+        jsonSerializeDeserializeCheck(lsig2);
     }
 
-    private static boolean jsonSerializeDeserializeCheck(LogicsigSignature lsig) {
+    private static void jsonSerializeDeserializeCheck(LogicsigSignature lsig) {
         String encoded, encoded2;
         try {
             encoded = Encoder.encodeToJson(lsig);
             ObjectMapper om = new ObjectMapper();
             LogicsigSignature decodedLogicSignature = om.readerFor(lsig.getClass()).readValue(encoded.getBytes());
-            Assert.assertEquals(lsig, decodedLogicSignature);
+            assertThat(decodedLogicSignature).isEqualTo(lsig);
             encoded2 = Encoder.encodeToJson(decodedLogicSignature);
-            Assert.assertEquals(encoded, encoded2);
+            assertThat(encoded2).isEqualTo(encoded);
             LogicsigSignature decodedLogicSignature2 = om.readerFor(lsig.getClass()).readValue(encoded2.getBytes());
-            Assert.assertEquals(decodedLogicSignature, decodedLogicSignature2);
+            assertThat(decodedLogicSignature2).isEqualTo(decodedLogicSignature);
         } catch (Exception e) {
-            return false;
+            fail("Should not have thrown an exception.", e);
         }
-        return true;
     }
 }

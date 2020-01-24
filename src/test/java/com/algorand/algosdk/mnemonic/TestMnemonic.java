@@ -1,11 +1,12 @@
 package com.algorand.algosdk.mnemonic;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Random;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class TestMnemonic {
 
@@ -14,9 +15,9 @@ public class TestMnemonic {
         byte[] zeroKeys = new byte[32];
         String expectedMn = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon invest";
         String mn = Mnemonic.fromKey(zeroKeys);
-        Assert.assertEquals(expectedMn, mn);
+        assertThat(mn).isEqualTo(expectedMn);
         byte[] goBack = Mnemonic.toKey(mn);
-        Assert.assertArrayEquals(zeroKeys, goBack);
+        assertThat(goBack).isEqualTo(zeroKeys);
     }
 
     @Test
@@ -24,10 +25,11 @@ public class TestMnemonic {
         String mn = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon zzz invest";
         try {
             byte[] keyBytes = Mnemonic.toKey(mn);
-            Assert.fail("Did not fail on invalid mnemonic");
+            fail("Expected an IllegalArgumentException.");
         } catch (IllegalArgumentException e) {
             return;
         }
+        fail("Expected an IllegalArgumentException.");
     }
 
     @Test
@@ -38,7 +40,7 @@ public class TestMnemonic {
             r.nextBytes(randKey);
             String mn = Mnemonic.fromKey(Arrays.copyOf(randKey, randKey.length));
             byte[] regenKey = Mnemonic.toKey(mn);
-            Assert.assertArrayEquals(randKey, regenKey);
+            assertThat(regenKey).isEqualTo(randKey);
         }
     }
 
@@ -65,11 +67,12 @@ public class TestMnemonic {
             String corruptedMn = s.toString();
             try {
                 byte[] recKey = Mnemonic.toKey(corruptedMn);
-                Assert.fail("Corrupted checksum should not have validated");
+                fail("Corrupted checksum should throw a GeneralSecurityException");
             } catch (GeneralSecurityException e) {
                 // should have failed
                 continue;
             }
+            fail("Corrupted checksum should throw a GeneralSecurityException");
         }
     }
 
@@ -84,10 +87,11 @@ public class TestMnemonic {
             r.nextBytes(randKey);
             try {
                 String mn = Mnemonic.fromKey(randKey);
-                Assert.fail("Invalid key length should be illegal argument to mnemonic generator");
+                fail("Invalid key length should throw IllegalArgumentException");
             } catch (IllegalArgumentException e) {
                 continue;
             }
+            fail("Invalid key length should throw IllegalArgumentException");
         }
     }
 
