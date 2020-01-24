@@ -1,6 +1,5 @@
 package com.algorand.algosdk.transaction;
 
-
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.util.Digester;
@@ -13,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
-
 
 /**
  * TxGroup exports computeGroupID and assignGroupID functions

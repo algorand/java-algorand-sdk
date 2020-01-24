@@ -1,7 +1,6 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.TestUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import java.util.ArrayList;

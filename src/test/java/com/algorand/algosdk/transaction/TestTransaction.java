@@ -9,7 +9,6 @@ import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Test;
 
@@ -20,7 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.*;
-
 
 public class TestTransaction {
     private static Account DEFAULT_ACCOUNT = initializeDefaultAccount();

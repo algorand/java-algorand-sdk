@@ -1,6 +1,5 @@
 package com.algorand.algosdk.util;
 
-import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;

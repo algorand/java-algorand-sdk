@@ -1,9 +1,6 @@
 package com.algorand.algosdk.crypto;
 
-import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;

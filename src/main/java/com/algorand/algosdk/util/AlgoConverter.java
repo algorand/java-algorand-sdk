@@ -1,6 +1,5 @@
 package com.algorand.algosdk.util;
 
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
