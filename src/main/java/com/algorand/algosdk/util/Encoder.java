@@ -1,5 +1,6 @@
 package com.algorand.algosdk.util;
 
+import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -74,6 +75,17 @@ public class Encoder {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
         return objectMapper.writeValueAsString(o);
+    }
+
+    /**
+     * Encode an object as json.
+     * @param o object to encode
+     * @return json string
+     * @throws JsonProcessingException error
+     */
+    public static <T> T decodeFromJson(String input, Class<T> tClass) throws IOException {
+        ObjectMapper om = new ObjectMapper();
+        return om.readerFor(tClass).readValue(input);
     }
 
     /**

@@ -8,6 +8,7 @@ import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.TestUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.junit.Test;
@@ -131,7 +132,7 @@ public class TestTransaction {
         assertThat(decodedOut).isEqualTo(stx);
         assertThat(encodedOut).isEqualTo(goldenString);
         assertThat(decodedOut).isEqualTo(stx);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -234,7 +235,7 @@ public class TestTransaction {
 
         assertThat(encodedOutBytes).isEqualTo(goldenString);
         assertThat(o).isEqualTo(stx);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -323,7 +324,7 @@ public class TestTransaction {
 
         assertThat(encodedOutBytes).isEqualTo(goldenString);
         assertThat(o).isEqualTo(stx);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -368,7 +369,7 @@ public class TestTransaction {
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
         assertThat(stxDecoded).isEqualTo(stx);
         assertThat(encodedOutBytes).isEqualTo(goldenString);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -408,8 +409,8 @@ public class TestTransaction {
 
         assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx1))).isEqualTo(goldenTx1);
         assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx2))).isEqualTo(goldenTx2);
-        assertThat(jsonSerializeDeserializeCheck(stx1)).isTrue();
-        assertThat(jsonSerializeDeserializeCheck(stx2)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx1);
+        TestUtil.serializeDeserializeCheck(stx2);
 
 
         Digest gid = TxGroup.computeGroupID(tx1, tx2);
@@ -503,7 +504,7 @@ public class TestTransaction {
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
         assertThat(stxDecoded).isEqualTo(stx);
         assertThat(encodedOutBytes).isEqualTo(goldenString);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
 
@@ -565,7 +566,7 @@ public class TestTransaction {
 
         assertThat(stxDecoded).isEqualTo(stx);
         assertThat(encodedOutBytes).isEqualTo(goldenString);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -608,7 +609,7 @@ public class TestTransaction {
 
         assertThat(stxDecoded).isEqualTo(stx);
         assertThat(encodedOutBytes).isEqualTo(goldenString);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -680,19 +681,6 @@ public class TestTransaction {
 
         assertThat(stxDecoded).isEqualTo(stx);
         assertThat(encodedOutBytes).isEqualTo(goldenString);
-        assertThat(jsonSerializeDeserializeCheck(stx)).isTrue();
-    }
-
-    private static boolean jsonSerializeDeserializeCheck(SignedTransaction tx) {
-        String encoded, encoded2;
-        try {
-            encoded = Encoder.encodeToJson(tx);
-            ObjectMapper om = new ObjectMapper();
-            SignedTransaction decodedTx = om.readerFor(tx.getClass()).readValue(encoded.getBytes());
-            encoded2 = Encoder.encodeToJson(decodedTx);
-        } catch (Exception e) {
-            return false;
-        }
-        return encoded.contentEquals(encoded2);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 }
