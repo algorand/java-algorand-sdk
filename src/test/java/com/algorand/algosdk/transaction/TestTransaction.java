@@ -10,8 +10,6 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.*;
@@ -31,7 +29,7 @@ public class TestTransaction {
             String mnemonic = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
             return new Account(mnemonic);
         } catch (Exception e) {
-            Assertions.fail("Failed to initialize static default account.");
+            fail("Failed to initialize static default account.");
         }
         return null;
     }
@@ -164,7 +162,7 @@ public class TestTransaction {
                     freeze,
                     clawback
             );
-            Assertions.fail("expected metadataHash validation failure");
+            fail("expected metadataHash validation failure");
         }
         catch( RuntimeException rte) {
             assertThat(rte.getMessage().contains("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded")).isTrue();
@@ -184,7 +182,7 @@ public class TestTransaction {
                     freeze,
                     clawback
             );
-            Assertions.fail("expected metadataHash validation failure");
+            fail("expected metadataHash validation failure");
         }
         catch( RuntimeException rte) {
             assertThat(rte.getMessage().contains("asset metadataHash cannot be greater than 32 bytes")).isTrue();
@@ -449,13 +447,13 @@ public class TestTransaction {
     @Test(expected = IllegalArgumentException.class)
     public void testTransactionGroupEmpty() throws IOException {
         TxGroup.computeGroupID();
-        Assertions.fail("no expected exception");
+        fail("no expected exception");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testTransactionGroupNull() throws IOException {
         TxGroup.computeGroupID();
-        Assertions.fail("no expected exception");
+        fail("no expected exception");
     }
 
     @Test

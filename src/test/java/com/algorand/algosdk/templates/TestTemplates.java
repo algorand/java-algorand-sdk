@@ -13,8 +13,6 @@ import org.junit.Test;
 
 import com.algorand.algosdk.util.Encoder;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.*;
 
 

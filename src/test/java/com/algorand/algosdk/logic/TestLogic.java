@@ -1,14 +1,12 @@
 package com.algorand.algosdk.logic;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.*;
 import java.util.*;
 
 import static com.algorand.algosdk.logic.Logic.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 public class TestLogic {
 
@@ -16,40 +14,40 @@ public class TestLogic {
     public void testParseUvarint1() throws Exception {
         byte[] data = {0x01};
         VarintResult result = getUVarint(data, 0);
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals(1, result.value);
+        assertThat(result.length).isEqualTo(1);
+        assertThat(result.value).isEqualTo(1);
     }
 
     @Test
     public void testParseUvarint2() throws Exception {
         byte[] data = {0x02};
         VarintResult result = getUVarint(data, 0);
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals(2, result.value);
+        assertThat(result.length).isEqualTo(1);
+        assertThat(result.value).isEqualTo(2);
     }
 
     @Test
     public void testParseUvarint3() throws Exception {
         byte[] data = {0x7b};
         VarintResult result = getUVarint(data, 0);
-        Assert.assertEquals(1, result.length);
-        Assert.assertEquals(123, result.value);
+        assertThat(result.length).isEqualTo(1);
+        assertThat(result.value).isEqualTo(123);
     }
 
     @Test
     public void testParseUvarint4() throws Exception {
         byte[] data = {(byte)0xc8, 0x03};
         VarintResult result = getUVarint(data, 0);
-        Assert.assertEquals(2, result.length);
-        Assert.assertEquals(456, result.value);
+        assertThat(result.length).isEqualTo(2);
+        assertThat(result.value).isEqualTo(456);
     }
 
     @Test
     public void testParseUvarint4AtOffset() throws Exception {
         byte[] data = {0x0, 0x0, (byte)0xc8, 0x03};
         VarintResult result = getUVarint(data, 2);
-        Assert.assertEquals(2, result.length);
-        Assert.assertEquals(456, result.value);
+        assertThat(result.length).isEqualTo(2);
+        assertThat(result.value).isEqualTo(456);
     }
 
     @Test
@@ -118,7 +116,7 @@ public class TestLogic {
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(int1, 0, program2, program.length, int1.length);
         programData = readProgram(program2, args);
-        Assert.assertTrue(programData.good);
+        assertThat(programData.good).isTrue();
         assertThat(programData.intBlock).extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isEmpty();
@@ -151,7 +149,7 @@ public class TestLogic {
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(int1, 0, program2, program.length, int1.length);
         boolean valid = checkProgram(program2, args);
-        Assert.assertFalse(valid);
+        assertThat(valid).isFalse();
    }
 
     @Test(expected = IllegalArgumentException.class)
@@ -162,7 +160,7 @@ public class TestLogic {
         ArrayList<byte[]> args = new ArrayList<byte[]>();
 
         boolean valid = checkProgram(program, args);
-        Assert.assertFalse(valid);
+        assertThat(valid).isFalse();
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -173,7 +171,7 @@ public class TestLogic {
         ArrayList<byte[]> args = new ArrayList<byte[]>();
 
         boolean valid = checkProgram(program, args);
-        Assert.assertTrue(valid);
+        assertThat(valid).isTrue();
 
         byte[] keccak25610 = new byte[10];
         Arrays.fill(keccak25610, (byte)0x02);
@@ -182,7 +180,7 @@ public class TestLogic {
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(keccak25610, 0, program2, program.length, keccak25610.length);
         valid = checkProgram(program2, args);
-        Assert.assertTrue(valid);
+        assertThat(valid).isTrue();
 
         byte[] keccak256800 = new byte[800];
         Arrays.fill(keccak256800, (byte)0x02);
@@ -190,6 +188,6 @@ public class TestLogic {
         System.arraycopy(program, 0, program3, 0, program.length);
         System.arraycopy(keccak256800, 0, program3, program.length, keccak256800.length);
         valid = checkProgram(program3, args);
-        Assert.assertFalse(valid);
+        assertThat(valid).isFalse();
     }
 }
