@@ -77,6 +77,17 @@ public class Encoder {
     }
 
     /**
+     * Encode an object as json.
+     * @param o object to encode
+     * @return json string
+     * @throws JsonProcessingException error
+     */
+    public static <T> T decodeFromJson(String input, Class<T> tClass) throws IOException {
+        ObjectMapper om = new ObjectMapper();
+        return om.readerFor(tClass).readValue(input);
+    }
+
+    /**
      * Convenience method for writing bytes as hex.
      * @param bytes input to encodeToMsgPack as hex string
      * @return encoded hex string

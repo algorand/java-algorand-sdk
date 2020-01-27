@@ -1,10 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.Digester;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.annotation.*;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
@@ -28,11 +25,10 @@ public class MultisigAddress implements Serializable {
 
     private static final byte[] PREFIX = "MultisigAddr".getBytes(StandardCharsets.UTF_8);
 
-    @JsonCreator
     public MultisigAddress(
-            @JsonProperty("version") int version,
-            @JsonProperty("threshold") int threshold,
-            @JsonProperty("publicKeys") List<Ed25519PublicKey> publicKeys
+            int version,
+            int threshold,
+            List<Ed25519PublicKey> publicKeys
     ) {
         this.version = version;
         this.threshold = threshold;
@@ -51,7 +47,30 @@ public class MultisigAddress implements Serializable {
         }
     }
 
-    // building an address object helps us generate string representations
+    // workaround for nested JsonValue classes
+    @JsonCreator
+    private MultisigAddress(
+            @JsonProperty("publicKeys") List<byte[]> publicKeys,
+            @JsonProperty("version")  int version,
+            @JsonProperty("threshold") int threshold
+    ) {
+        this(version, threshold, toKeys(publicKeys));
+    }
+
+    // Helper to convert list of byte[]s to list of Ed25519PublicKeys
+    private static List<Ed25519PublicKey> toKeys(List<byte[]> keys) {
+        List<Ed25519PublicKey> ret = new ArrayList<>();
+        for (byte[] key : keys) {
+            ret.add(new Ed25519PublicKey(key));
+        }
+        return ret;
+    }
+
+    /**
+     * Convert into an address to more easily represent as a string.
+     * @return
+     * @throws NoSuchAlgorithmException
+     */
     public Address toAddress() throws NoSuchAlgorithmException {
         int numPkBytes = Ed25519PublicKey.KEY_LEN_BYTES * this.publicKeys.size();
         byte[] hashable = new byte[PREFIX.length + 2 + numPkBytes];
@@ -84,9 +103,10 @@ public class MultisigAddress implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MultisigAddress that = (MultisigAddress) o;
+
         return version == that.version &&
                 threshold == that.threshold &&
-                Objects.equals(publicKeys, that.publicKeys);
+                publicKeys.equals(that.publicKeys);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.algorand.algosdk.crypto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.util.TestUtil;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class TestLogicsigSignature {
         lsig = new LogicsigSignature(program);
         verified = lsig.verify(sender);
         assertThat(verified).isFalse();
-        jsonSerializeDeserializeCheck(lsig);
+        TestUtil.serializeDeserializeCheck(lsig);
     }
 
     @Test
@@ -110,7 +110,7 @@ public class TestLogicsigSignature {
         byte[] outBytes = Encoder.encodeToMsgPack(lsig);
         LogicsigSignature lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
         assertThat(lsig1).isEqualTo(lsig);
-        jsonSerializeDeserializeCheck(lsig);
+        TestUtil.serializeDeserializeCheck(lsig);
     }
 
     @Test
@@ -182,22 +182,6 @@ public class TestLogicsigSignature {
         assertThat(lsig2).isEqualTo(lsig);
         verified = lsig2.verify(ma.toAddress());
         assertThat(verified).isTrue();
-        jsonSerializeDeserializeCheck(lsig2);
-    }
-
-    private static void jsonSerializeDeserializeCheck(LogicsigSignature lsig) {
-        String encoded, encoded2;
-        try {
-            encoded = Encoder.encodeToJson(lsig);
-            ObjectMapper om = new ObjectMapper();
-            LogicsigSignature decodedLogicSignature = om.readerFor(lsig.getClass()).readValue(encoded.getBytes());
-            assertThat(decodedLogicSignature).isEqualTo(lsig);
-            encoded2 = Encoder.encodeToJson(decodedLogicSignature);
-            assertThat(encoded2).isEqualTo(encoded);
-            LogicsigSignature decodedLogicSignature2 = om.readerFor(lsig.getClass()).readValue(encoded2.getBytes());
-            assertThat(decodedLogicSignature2).isEqualTo(decodedLogicSignature);
-        } catch (Exception e) {
-            fail("Should not have thrown an exception.", e);
-        }
+        TestUtil.serializeDeserializeCheck(lsig2);
     }
 }

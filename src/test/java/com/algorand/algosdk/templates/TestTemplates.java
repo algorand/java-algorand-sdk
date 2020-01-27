@@ -1,6 +1,5 @@
 package com.algorand.algosdk.templates;
 
-
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
@@ -14,7 +13,6 @@ import org.junit.Test;
 import com.algorand.algosdk.util.Encoder;
 
 import static org.assertj.core.api.Assertions.*;
-
 
 public class TestTemplates {
 

@@ -1,6 +1,5 @@
 package com.algorand.algosdk.transaction;
 
-
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;

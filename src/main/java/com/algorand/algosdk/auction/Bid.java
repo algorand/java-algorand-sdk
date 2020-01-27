@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.math.BigInteger;
-import java.util.Objects;
 
 /**
  * A raw serializable Bid class.

@@ -41,7 +41,6 @@ public class TestAccount {
                 new Digest()
         );
         byte[] seed = Mnemonic.toKey(FROM_SK);
-        System.out.println(Encoder.encodeToJson(tx));
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct
         assertThat(new Address(account.getClearTextPublicKey()).toString()).isEqualTo(FROM_ADDR);
@@ -50,7 +49,6 @@ public class TestAccount {
 
         // sign the transaction
         SignedTransaction signedTx = account.signTransaction(tx);
-        System.out.println(Encoder.encodeToJson(signedTx));
 
         byte[] signedTxBytes = Encoder.encodeToMsgPack(signedTx);
         String signedTxHex = Encoder.encodeToHexStr(signedTxBytes);
@@ -80,7 +78,6 @@ public class TestAccount {
                 "",
                 new Digest()
         );
-        System.out.println(Encoder.encodeToJson(tx));
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct
