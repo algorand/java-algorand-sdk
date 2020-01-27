@@ -176,7 +176,7 @@
                         <artifactId>maven-compiler-plugin</artifactId>
                         <version>${maven.compiler.plugin.version}</version>
                         <configuration>
-                          <source>${java.version}</source>
+                            <source>${java.version}</source>
                             <target>${java.version}</target>
                             <testSource>${java.test.version}</testSource>
                             <testTarget>${java.test.version}</testTarget>
