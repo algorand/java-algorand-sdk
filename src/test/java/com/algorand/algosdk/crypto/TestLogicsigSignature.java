@@ -1,26 +1,21 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.TestUtil;
-import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.util.Encoder;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class TestLogicsigSignature {
     @Test
     public void testLogicsigEmptyCreation() throws Exception {
-        try {
-            new LogicsigSignature(null, null);
-            fail("Should have thrown a NPE.");
-        } catch (NullPointerException npe) {
-            return;
-        }
-        fail("Should have thrown a NPE.");
+        assertThatThrownBy(() -> new LogicsigSignature(null, null))
+                .isInstanceOf(NullPointerException.class);
     }
 
     @Test
@@ -79,13 +74,9 @@ public class TestLogicsigSignature {
         byte[] program = {
             0x02, 0x20, 0x01, 0x01, 0x22
         };
-        try {
-            new LogicsigSignature(program);
-            fail("An IllegalArgumentException should have been thrown.");
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-        fail("An IllegalArgumentException should have been thrown.");
+        assertThatThrownBy(() -> new LogicsigSignature(program))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("unsupported version");
     }
 
     @Test
@@ -132,10 +123,8 @@ public class TestLogicsigSignature {
 
         String mn1 = "auction inquiry lava second expand liberty glass involve ginger illness length room item discover ahead table doctor term tackle cement bonus profit right above catch";
         String mn2 = "since during average anxiety protect cherry club long lawsuit loan expand embark forum theory winter park twenty ball kangaroo cram burst board host ability left";
-        String mn3 = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
         Account acc1 = new Account(mn1);
         Account acc2 = new Account(mn2);
-        Account acc3 = new Account(mn3);
         Account account = new Account();
 
         LogicsigSignature lsig = new LogicsigSignature(program);
@@ -149,14 +138,10 @@ public class TestLogicsigSignature {
         boolean verified = lsig.verify(ma.toAddress());
         assertThat(verified).isFalse();
 
-        boolean caught = false;
-        try {
-            account.appendToLogicsig(lsig);
-            fail("Should have thrown IllegalArgumentException exception.");
-        } catch(IllegalArgumentException ex) {
-            caught = true;
-        }
-        assertThat(caught).isTrue();
+        LogicsigSignature lsigLambda = lsig;
+        assertThatThrownBy(() -> account.appendToLogicsig(lsigLambda))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Multisig account does not contain this secret key");
 
         lsig = acc2.appendToLogicsig(lsig);
         verified = lsig.verify(ma.toAddress());

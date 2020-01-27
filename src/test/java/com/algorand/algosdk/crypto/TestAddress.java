@@ -1,6 +1,6 @@
 package com.algorand.algosdk.crypto;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Random;
@@ -8,7 +8,6 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.*;
 
 public class TestAddress {
-
     @Test
     public void testEncodeDecodeStr() throws Exception {
         Random r = new Random();

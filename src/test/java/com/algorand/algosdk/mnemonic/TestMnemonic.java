@@ -1,6 +1,6 @@
 package com.algorand.algosdk.mnemonic;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
@@ -9,7 +9,6 @@ import java.util.Random;
 import static org.assertj.core.api.Assertions.*;
 
 public class TestMnemonic {
-
     @Test
     public void testZeroVector() throws Exception {
         byte[] zeroKeys = new byte[32];
@@ -23,13 +22,9 @@ public class TestMnemonic {
     @Test
     public void testWordNotInList() throws Exception {
         String mn = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon zzz invest";
-        try {
-            byte[] keyBytes = Mnemonic.toKey(mn);
-            fail("Expected an IllegalArgumentException.");
-        } catch (IllegalArgumentException e) {
-            return;
-        }
-        fail("Expected an IllegalArgumentException.");
+        assertThatThrownBy(() -> Mnemonic.toKey(mn))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("mnemonic contains word that is not in word list");
     }
 
     @Test
@@ -65,14 +60,9 @@ public class TestMnemonic {
                 s.append(words[j]);
             }
             String corruptedMn = s.toString();
-            try {
-                byte[] recKey = Mnemonic.toKey(corruptedMn);
-                fail("Corrupted checksum should throw a GeneralSecurityException");
-            } catch (GeneralSecurityException e) {
-                // should have failed
-                continue;
-            }
-            fail("Corrupted checksum should throw a GeneralSecurityException");
+            assertThatThrownBy(() -> Mnemonic.toKey(corruptedMn))
+                    .isInstanceOf(GeneralSecurityException.class)
+                    .hasMessage("checksum failed to validate");
         }
     }
 
@@ -85,13 +75,9 @@ public class TestMnemonic {
         for (int badlen: badLengths) {
             byte[] randKey = new byte[badlen];
             r.nextBytes(randKey);
-            try {
-                String mn = Mnemonic.fromKey(randKey);
-                fail("Invalid key length should throw IllegalArgumentException");
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
-            fail("Invalid key length should throw IllegalArgumentException");
+            assertThatThrownBy(() -> Mnemonic.fromKey(randKey))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("key length must be 32 bytes");
         }
     }
 

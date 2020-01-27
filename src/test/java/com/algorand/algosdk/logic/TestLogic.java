@@ -1,7 +1,7 @@
 package com.algorand.algosdk.logic;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
@@ -9,7 +9,6 @@ import static com.algorand.algosdk.logic.Logic.*;
 import static org.assertj.core.api.Assertions.*;
 
 public class TestLogic {
-
     @Test
     public void testParseUvarint1() throws Exception {
         byte[] data = {0x01};
@@ -122,7 +121,7 @@ public class TestLogic {
         assertThat(programData.byteBlock).isEmpty();
    }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckProgramLongArgs() throws Exception {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
@@ -133,11 +132,12 @@ public class TestLogic {
         Arrays.fill(arg, (byte)0x31);
         args.add(arg);
 
-        ProgramData programData = readProgram(program, args);
-        assertThat(programData.good).isFalse();
+        assertThatThrownBy(() -> readProgram(program, args))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("program too long");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckProgramLong() throws Exception {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
@@ -148,22 +148,24 @@ public class TestLogic {
 
         System.arraycopy(program, 0, program2, 0, program.length);
         System.arraycopy(int1, 0, program2, program.length, int1.length);
-        boolean valid = checkProgram(program2, args);
-        assertThat(valid).isFalse();
+        assertThatThrownBy(() -> checkProgram(program2, args))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("program too long");
    }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckProgramInvalidOpcode() throws Exception {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, (byte)0x81
         };
-        ArrayList<byte[]> args = new ArrayList<byte[]>();
+        ArrayList<byte[]> args = new ArrayList<>();
 
-        boolean valid = checkProgram(program, args);
-        assertThat(valid).isFalse();
+        assertThatThrownBy(() -> checkProgram(program, args))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("invalid instruction");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testCheckProgramCostly() throws Exception {
         byte[] program = {
             0x01, 0x26, 0x01, 0x01, 0x01, 0x01, 0x28, 0x02  // byte 0x01 + keccak256
@@ -187,7 +189,8 @@ public class TestLogic {
         byte[] program3 = new byte[program.length + keccak256800.length];
         System.arraycopy(program, 0, program3, 0, program.length);
         System.arraycopy(keccak256800, 0, program3, program.length, keccak256800.length);
-        valid = checkProgram(program3, args);
-        assertThat(valid).isFalse();
+        assertThatThrownBy(() -> checkProgram(program3, args))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("program too costly to run");
     }
 }
