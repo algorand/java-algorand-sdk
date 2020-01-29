@@ -1,7 +1,7 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.TestUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 

@@ -8,15 +8,14 @@ import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
-import org.junit.Test;
 
 import com.algorand.algosdk.util.Encoder;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class TestTemplates {
-
-	@Test 
+	@Test
 	public void testVarInt() {
 		int a = 600000;
 		byte[] buffer = Logic.putUVarint((int) a);

@@ -102,21 +102,25 @@ cryptographic packages for updates or alternative implementations.
 
 This project uses Maven.
 
-To build:
+**To build**
 ```
 mvn package
 ```
 
-To run the example project, run the following command in the examples
-directory, be sure to update your algod network address and the API token
+**To run the example project**
+Use the following command in the examples directory, be sure to update your algod network address and the API token
 parameters (see examples/README for more information):
 ```
 mvn exec:java -Dexec.mainClass="com.algorand.algosdk.example.Main" -Dexec.args="127.0.0.1:8080 ***X-Algo-API-Token***"
 ```
 
-To test:
+**To test**
+We are using separate version targets for production and testing to allow using JUnit5 for tests. Some IDEs, like IDEA
+do not support this very well. To workaround the issue a special `ide` profile should be enabled if your IDE does not
+support mixed `target` and `testTarget` versions. Regardless of IDE support, the tests can be run from the command line.
+In this case `clean` is used in case an incremental build was made by the IDE with Java8.
 ```
-mvn test
+mvn clean test
 ```
 
 ## deploying artifacts

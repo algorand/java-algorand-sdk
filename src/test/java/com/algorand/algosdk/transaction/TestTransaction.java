@@ -9,8 +9,7 @@ import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -26,7 +25,7 @@ public class TestTransaction {
     private static Account initializeDefaultAccount() {
         try {
             String mnemonic = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-            return new Account(mnemonic);
+           return new Account(mnemonic);
         } catch (Exception e) {
             fail("Failed to initialize static default account.");
         }
@@ -137,8 +136,6 @@ public class TestTransaction {
     public void testAssetParamsValidation() throws Exception
     {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
-        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
-        Address sender = addr;
         Address manager = addr;
         Address reserve = addr;
         Address freeze = addr;
@@ -146,46 +143,35 @@ public class TestTransaction {
         String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
         String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
 
+        assertThatThrownBy(() -> new Transaction.AssetParams(
+                BigInteger.valueOf(100),
+                3,
+                false,
+                "tst",
+                "testcoin",
+                "website",
+                badMetadataHash.getBytes(StandardCharsets.UTF_8),
+                manager,
+                reserve,
+                freeze,
+                clawback))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded");
 
-        try {
-            Transaction.AssetParams expectedParams = new Transaction.AssetParams(
-                    BigInteger.valueOf(100),
-                    3,
-                    false,
-                    "tst",
-                    "testcoin",
-                    "website",
-                    badMetadataHash.getBytes(StandardCharsets.UTF_8),
-                    manager,
-                    reserve,
-                    freeze,
-                    clawback
-            );
-            fail("expected metadataHash validation failure");
-        }
-        catch( RuntimeException rte) {
-            assertThat(rte.getMessage().contains("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded")).isTrue();
-        }
-
-        try {
-            Transaction.AssetParams expectedParams = new Transaction.AssetParams(
-                    BigInteger.valueOf(100),
-                    3,
-                    false,
-                    "tst",
-                    "testcoin",
-                    "website",
-                    tooLongMetadataHash.getBytes(StandardCharsets.UTF_8),
-                    manager,
-                    reserve,
-                    freeze,
-                    clawback
-            );
-            fail("expected metadataHash validation failure");
-        }
-        catch( RuntimeException rte) {
-            assertThat(rte.getMessage().contains("asset metadataHash cannot be greater than 32 bytes")).isTrue();
-        }
+        assertThatThrownBy(() -> new Transaction.AssetParams(
+                BigInteger.valueOf(100),
+                3,
+                false,
+                "tst",
+                "testcoin",
+                "website",
+                tooLongMetadataHash.getBytes(StandardCharsets.UTF_8),
+                manager,
+                reserve,
+                freeze,
+                clawback))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("asset metadataHash cannot be greater than 32 bytes");
     }
 
     @Test
@@ -246,9 +232,7 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
 
-        boolean exceptionCaughtNull = false;
-        try {
-        	Transaction.createAssetConfigureTransaction(
+        assertThatThrownBy(() -> Transaction.createAssetConfigureTransaction(
                 sender,
                 BigInteger.valueOf(10),
                 BigInteger.valueOf(322575),
@@ -261,18 +245,11 @@ public class TestTransaction {
                 reserve,
                 new Address(),
                 clawback,
-                true);
-        } catch (RuntimeException e) {
-            assertThat(e.getMessage()).isEqualTo("strict empty address checking "
-        			+ "requested but empty or default address supplied "
-        			+ "to one or more manager addresses");
-        	exceptionCaughtNull = true;
-        }
-        assertThat(exceptionCaughtNull).isTrue();
+                true))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
 
-        boolean exceptionCaughtDefault = false;
-        try {
-        	Transaction.createAssetConfigureTransaction(
+        assertThatThrownBy(() -> Transaction.createAssetConfigureTransaction(
                 sender,
                 BigInteger.valueOf(10),
                 BigInteger.valueOf(322575),
@@ -285,14 +262,9 @@ public class TestTransaction {
                 reserve,
                 freeze,
                 null,
-                true);
-        } catch (RuntimeException e) {
-            assertThat(e.getMessage()).isEqualTo("strict empty address checking "
-                    + "requested but empty or default address supplied "
-                    + "to one or more manager addresses");
-        	exceptionCaughtDefault = true;
-        }
-        assertThat(exceptionCaughtDefault).isTrue();
+                true))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
     }
 
     @Test
@@ -443,16 +415,18 @@ public class TestTransaction {
         assertThat(result).hasSize(0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testTransactionGroupEmpty() throws IOException {
-        TxGroup.computeGroupID();
-        fail("no expected exception");
+        assertThatThrownBy(() -> TxGroup.computeGroupID())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("empty transaction list");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testTransactionGroupNull() throws IOException {
-        TxGroup.computeGroupID();
-        fail("no expected exception");
+        assertThatThrownBy(() -> TxGroup.computeGroupID())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("empty transaction list");
     }
 
     @Test
