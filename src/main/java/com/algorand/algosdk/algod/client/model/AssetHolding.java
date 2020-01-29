@@ -12,6 +12,7 @@ package com.algorand.algosdk.algod.client.model;
 import com.google.gson.annotations.SerializedName;
 
 import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "AssetParams specifies the holdings of a particular asset.")
 public class AssetHolding {
