@@ -13,7 +13,7 @@ import com.google.gson.annotations.SerializedName;
 
 import io.swagger.annotations.ApiModel;
 
-@ApiModel(description = "AssetParams specifies the parameters for an asset")
+@ApiModel(description = "AssetParams specifies the holdings of a particular asset.")
 public class AssetHolding {
   @SerializedName("creator")
   private String creator = null;
