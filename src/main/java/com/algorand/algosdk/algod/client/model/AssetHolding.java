@@ -26,7 +26,9 @@ public class AssetHolding {
   
 
   /**
-   * Creator specifies the address that created this asset. This is the address where the parameters for this asset can be found, and also the address where unwanted asset units can be sent in the worst case.
+   * Creator specifies the address that created this asset. This is the address
+   * where the parameters for this asset can be found, and also the address
+   * where unwanted asset units can be sent in the worst case.
    * @return creator
    */
   @ApiModelProperty(value = "Creator specifies the address that created this asset. This is the address where the parameters for this asset can be found, and also the address where unwanted asset units can be sent in the worst case.")
