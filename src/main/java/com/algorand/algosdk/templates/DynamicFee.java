@@ -152,7 +152,7 @@ public class DynamicFee {
         txn2.setLease(new Lease(txn.lease));
         Account.setFeeByFeePerByte(txn2, BigInteger.valueOf(feePerByte));
 
-        TxGroup.assignGroupID(null, txn, txn2);
+        TxGroup.assignGroupID(txn, txn2);
         SignedTransaction stx1 = new SignedTransaction(txn, lsig, txn.txID());
         SignedTransaction stx2 = account.signTransaction(txn2);
 

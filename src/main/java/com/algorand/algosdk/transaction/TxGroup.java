@@ -50,6 +50,15 @@ public class TxGroup implements Serializable{
     /**
      * Assigns group id to a given array of unsigned transactions
      * @param txns array of transactions
+     * @return array of grouped transactions, optionally filtered with the address parameter.
+     */
+    public static Transaction[] assignGroupID(Transaction ...txns) throws IOException {
+        return assignGroupID(txns, null);
+    }
+
+    /**
+     * Assigns group id to a given array of unsigned transactions
+     * @param txns array of transactions
      * @param address optional sender address specifying which transaction return
      * @return array of grouped transactions, optionally filtered with the address parameter.
      */
