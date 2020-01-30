@@ -81,37 +81,43 @@ public class LimitOrder {
      *
      * @param contract previously created LimitOrder contract
      * @param assetAmount amount of assets to be sent
+     * @param microAlgoAmount number of algos to transfer
      * @param sender account to sign the payment transaction
-     * @param feePerByte fee per byte used for the transactions
-     * @param algoAmount number of algos to transfer
      * @param firstValid first round on which these txns will be valid
      * @param lastValid last round on which these txns will be valid
      * @param genesisHash Genesis hash for the network where the transaction will be submitted.
+     * @param feePerByte fee per byte used for the transactions
      * @return
      * @throws IOException
      */
-    public static byte[] MakeSwapAssetsTransaction(ContractTemplate contract, Integer assetAmount, Account sender, Integer feePerByte, Integer algoAmount, Integer firstValid, Integer lastValid, Digest genesisHash) throws IOException, NoSuchAlgorithmException {
+    public static byte[] MakeSwapAssetsTransaction(ContractTemplate contract, Integer assetAmount, Integer microAlgoAmount, Account sender, Integer firstValid, Integer lastValid, Digest genesisHash, Integer feePerByte) throws IOException, NoSuchAlgorithmException {
         Logic.ProgramData data = readAndVerifyContract(contract.program, 10, 1);
 
         Address owner = new Address(data.byteBlock.get(0));
+        int minTrade = data.intBlock.get(4);
         int assetId = data.intBlock.get(6);
         int ratd = data.intBlock.get(7);
         int ratn = data.intBlock.get(8);
 
         // Verify the exchange rate ratio
-        if (assetAmount * ratd < algoAmount * ratn) {
-            throw new IllegalArgumentException("The provided amounts to not meet the contract exchange rate of assetAmount = algoAmount * " + ratn + " / " + ratd);
+        if (assetAmount * ratd != microAlgoAmount * ratn) {
+            throw new IllegalArgumentException("The exchange ratio of assets to microalgos must be exactly " + ratn + " / " + ratd);
+        }
+
+        // Verify minTrade amount
+        if (microAlgoAmount < minTrade) {
+            throw new IllegalArgumentException("At least " + minTrade + " microalgos must be requested.");
         }
 
         Transaction tx1 = new Transaction(
-                owner,
+                contract.address,
                 Account.MIN_TX_FEE_UALGOS,
                 BigInteger.valueOf(firstValid),
                 BigInteger.valueOf(lastValid),
                 null,
                 "",
                 genesisHash,
-                BigInteger.valueOf(assetAmount),
+                BigInteger.valueOf(microAlgoAmount),
                 sender.getAddress(),
                 null);
         setFeeByFeePerByte(tx1, BigInteger.valueOf(feePerByte));
@@ -130,7 +136,7 @@ public class LimitOrder {
                 BigInteger.valueOf(assetId));
         setFeeByFeePerByte(tx2, BigInteger.valueOf(feePerByte));
 
-        TxGroup.assignGroupID(null, tx1, tx2);
+        TxGroup.assignGroupID(tx1, tx2);
         LogicsigSignature lsig = new LogicsigSignature(contract.program);
         SignedTransaction stx1 = new SignedTransaction(tx1, lsig, tx1.txID());
         SignedTransaction stx2 = sender.signTransaction(tx2);
