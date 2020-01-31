@@ -20,6 +20,8 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import static com.algorand.algosdk.templates.ContractTemplate.readAndVerifyContract;
+
 public class PeriodicPayment {
     private static String referenceProgram = "ASAHAQoLAAwNDiYCAQYg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohMxECISMQEjDhAxAiQYJRIQMQQhBDECCBIQMQYoEhAxCTIDEjEHKRIQMQghBRIQMQkpEjEHMgMSEDECIQYNEDEIJRIQERA=";
 
@@ -72,10 +74,7 @@ public class PeriodicPayment {
      * @return Signed withdrawal transaction.
      */
     public static SignedTransaction MakeWithdrawalTransaction(final ContractTemplate contract, final int firstValid, final Digest genesisHash) throws IOException, NoSuchAlgorithmException {
-        Logic.ProgramData data = Logic.readProgram(contract.program, null);
-        if (data.intBlock.size() != 7 || data.byteBlock.size() != 2) {
-            throw new IllegalArgumentException("Unexpected contract data. Expected 7 int constants and 2 byte constants, found " + data.intBlock.size() + " and " + data.byteBlock.size());
-        }
+        Logic.ProgramData data = readAndVerifyContract(contract.program, 7, 2);
 
         int fee = data.intBlock.get(1);
         int period = data.intBlock.get(2);

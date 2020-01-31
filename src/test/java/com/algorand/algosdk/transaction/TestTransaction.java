@@ -404,7 +404,7 @@ public class TestTransaction {
         assertThat(Encoder.encodeToBase64(concat)).isEqualTo(goldenTxg);
 
         // check assignGroupID
-        Transaction[] result = TxGroup.assignGroupID(null, tx1, tx2);
+        Transaction[] result = TxGroup.assignGroupID(tx1, tx2);
         assertThat(result).hasSize(2);
 
         result = TxGroup.assignGroupID(from, tx1, tx2);

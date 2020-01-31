@@ -23,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Objects;
 
+import static com.algorand.algosdk.templates.ContractTemplate.readAndVerifyContract;
+
 public class DynamicFee {
     protected static String referenceProgram = "ASAFAgEFBgcmAyD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEyDmmpYeby1feshmB5JlUr6YI17TM2PKiJGLuck4qRW2+QEGMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhA=";
 
@@ -90,7 +92,8 @@ public class DynamicFee {
      * @return
      */
     public static SignedDynamicFee SignDynamicFee(final ContractTemplate contract, final Account senderAccount, final Digest genesisHash) throws IOException {
-        Logic.ProgramData data = Logic.readProgram(contract.program, null);
+        Logic.ProgramData data = readAndVerifyContract(contract.program, 5, 3);
+
         Address receiverAddress = new Address(data.byteBlock.get(0));
         Address closeToAddress = new Address(data.byteBlock.get(1));
         Lease lease = new Lease(data.byteBlock.get(2));
@@ -149,7 +152,7 @@ public class DynamicFee {
         txn2.setLease(new Lease(txn.lease));
         Account.setFeeByFeePerByte(txn2, BigInteger.valueOf(feePerByte));
 
-        TxGroup.assignGroupID(null, txn, txn2);
+        TxGroup.assignGroupID(txn, txn2);
         SignedTransaction stx1 = new SignedTransaction(txn, lsig, txn.txID());
         SignedTransaction stx2 = account.signTransaction(txn2);
 

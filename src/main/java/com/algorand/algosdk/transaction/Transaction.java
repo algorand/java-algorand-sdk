@@ -737,10 +737,10 @@ public class Transaction implements Serializable {
                 note, //note
                 genesisHash); // gh
 
-        tx.assetReceiver = assetReceiver; //arcv
-        tx.assetCloseTo = assetCloseTo; // aclose
-        tx.assetAmount = assetAmount; // aamt
-        tx.sender = assetSender; // snd
+        if (assetReceiver != null) tx.assetReceiver = assetReceiver; //arcv
+        if (assetCloseTo != null) tx.assetCloseTo = assetCloseTo; // aclose
+        if (assetAmount != null) tx.assetAmount = assetAmount; // aamt
+        if (assetSender != null) tx.sender = assetSender; // snd
         if (assetIndex != null) tx.xferAsset = assetIndex;
         return tx;
     }
