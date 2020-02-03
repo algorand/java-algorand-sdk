@@ -44,16 +44,53 @@ public class TestTemplates {
 
     @Test
     public void testSplit() throws Exception {
-        String addr1 = "WO3QIJ6T4DZHBX5PWJH26JLHFSRT7W7M2DJOULPXDTUS6TUX7ZRIO4KDFY";
-        String addr2 = "W6UUUSEAOGLBHT7VFT4H2SDATKKSG6ZBUIJXTZMSLW36YS44FRP5NVAU7U";
-        String addr3 = "XCIBIN7RT4ZXGBMVAMU3QS6L5EKB7XGROC5EPCNHHYXUIBAA5Q6C5Y7NEU";
+        Address addr1 = new Address("WO3QIJ6T4DZHBX5PWJH26JLHFSRT7W7M2DJOULPXDTUS6TUX7ZRIO4KDFY");
+        Address addr2 = new Address("W6UUUSEAOGLBHT7VFT4H2SDATKKSG6ZBUIJXTZMSLW36YS44FRP5NVAU7U");
+        Address addr3 = new Address("XCIBIN7RT4ZXGBMVAMU3QS6L5EKB7XGROC5EPCNHHYXUIBAA5Q6C5Y7NEU");
 
-        ContractTemplate result = Split.MakeSplit(addr1, addr2, addr3, 30, 100, 123456, 10000, 5000000);
+        ContractTemplate result = Split.MakeSplit(
+                addr1,
+                addr2,
+                addr3,
+                30,
+                100,
+                123456,
+                10000,
+                5000000);
         String goldenProgram = "ASAIAcCWsQICAMDEBx5kkE4mAyCztwQn0+DycN+vsk+vJWcsoz/b7NDS6i33HOkvTpf+YiC3qUpIgHGWE8/1LPh9SGCalSN7IaITeeWSXbfsS5wsXyC4kBQ38Z8zcwWVAym4S8vpFB/c0XC6R4mnPi9EBADsPDEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBA=";
         String goldenAddress = "KPYGWKTV7CKMPMTLQRNGMEQRSYTYDHUOFNV4UDSBDLC44CLIJPQWRTCPBU";
 
-        assertThat(Encoder.encodeToBase64(result.program)).isEqualTo(goldenProgram);
+        String encodedProgram = Encoder.encodeToBase64(result.program);
+        assertThat(encodedProgram).isEqualTo(goldenProgram);
         assertThat(result.address.toString()).isEqualTo(goldenAddress);
+
+
+        Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
+        ContractTemplate decodedContract = new ContractTemplate(encodedProgram);
+
+        assertThatThrownBy(() -> Split.GetSendFundsTransaction(
+                decodedContract,
+                3000,
+                10001,
+                100000,
+                101000,
+                30,
+                genesisHash))
+            .isInstanceOf(Exception.class)
+            .hasMessageStartingWith("The token split must be exactly");
+
+
+        byte[] transactions = Split.GetSendFundsTransaction(
+                decodedContract,
+                3000,
+                10000,
+                100000,
+                101000,
+                30,
+                genesisHash);
+
+        String splitTransactionGolden = "gqRsc2lngaFsxM4BIAgBwJaxAgIAwMQHHmSQTiYDILO3BCfT4PJw36+yT68lZyyjP9vs0NLqLfcc6S9Ol/5iILepSkiAcZYTz/Us+H1IYJqVI3shohN55ZJdt+xLnCxfILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8MRAiEjEBIwwQMgQkEkAAGTEJKBIxBzIDEhAxCCUSEDECIQQNECJAAC4zAAAzAQASMQkyAxIQMwAHKRIQMwEHKhIQMwAIIQULMwEIIQYLEhAzAAghBw8QEKN0eG6Jo2FtdM0LuKNmZWXNGnyiZnbOAAGGoKJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBUj84pApqwxDt4sHXW7g0ill7dYquccQVTE7zlen/1sqJsds4AAYqIo3JjdsQgt6lKSIBxlhPP9Sz4fUhgmpUjeyGiE3nlkl237EucLF+jc25kxCBT8GsqdfiUx7JrhFpmEhGWJ4Gejitryg5BGsXOCWhL4aR0eXBlo3BheYKkbHNpZ4GhbMTOASAIAcCWsQICAMDEBx5kkE4mAyCztwQn0+DycN+vsk+vJWcsoz/b7NDS6i33HOkvTpf+YiC3qUpIgHGWE8/1LPh9SGCalSN7IaITeeWSXbfsS5wsXyC4kBQ38Z8zcwWVAym4S8vpFB/c0XC6R4mnPi9EBADsPDEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBCjdHhuiaNhbXTNJxCjZmVlzRp8omZ2zgABhqCiZ2jEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpo2dycMQgVI/OKQKasMQ7eLB11u4NIpZe3WKrnHEFUxO85Xp/9bKibHbOAAGKiKNyY3bEILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8o3NuZMQgU/BrKnX4lMeya4RaZhIRlieBno4ra8oOQRrFzgloS+GkdHlwZaNwYXk=";
+        assertThat(Encoder.encodeToBase64(transactions)).isEqualTo(splitTransactionGolden);
     }
 
     @Test
