@@ -70,8 +70,8 @@ public class TestTemplates {
 
         assertThatThrownBy(() -> Split.GetSendFundsTransaction(
                 decodedContract,
-                3000,
-                10001,
+                30000,
+                100001,
                 100000,
                 101000,
                 30,
@@ -79,17 +79,28 @@ public class TestTemplates {
             .isInstanceOf(Exception.class)
             .hasMessageStartingWith("The token split must be exactly");
 
-
-        byte[] transactions = Split.GetSendFundsTransaction(
+        assertThatThrownBy(() -> Split.GetSendFundsTransaction(
                 decodedContract,
                 3000,
                 10000,
                 100000,
                 101000,
                 30,
+                genesisHash))
+                .isInstanceOf(Exception.class)
+                .hasMessageStartingWith("Receiver one must receive at least");
+
+
+        byte[] transactions = Split.GetSendFundsTransaction(
+                decodedContract,
+                30000,
+                100000,
+                100000,
+                101000,
+                30,
                 genesisHash);
 
-        String splitTransactionGolden = "gqRsc2lngaFsxM4BIAgBwJaxAgIAwMQHHmSQTiYDILO3BCfT4PJw36+yT68lZyyjP9vs0NLqLfcc6S9Ol/5iILepSkiAcZYTz/Us+H1IYJqVI3shohN55ZJdt+xLnCxfILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8MRAiEjEBIwwQMgQkEkAAGTEJKBIxBzIDEhAxCCUSEDECIQQNECJAAC4zAAAzAQASMQkyAxIQMwAHKRIQMwEHKhIQMwAIIQULMwEIIQYLEhAzAAghBw8QEKN0eG6Jo2FtdM0LuKNmZWXNGnyiZnbOAAGGoKJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBUj84pApqwxDt4sHXW7g0ill7dYquccQVTE7zlen/1sqJsds4AAYqIo3JjdsQgt6lKSIBxlhPP9Sz4fUhgmpUjeyGiE3nlkl237EucLF+jc25kxCBT8GsqdfiUx7JrhFpmEhGWJ4Gejitryg5BGsXOCWhL4aR0eXBlo3BheYKkbHNpZ4GhbMTOASAIAcCWsQICAMDEBx5kkE4mAyCztwQn0+DycN+vsk+vJWcsoz/b7NDS6i33HOkvTpf+YiC3qUpIgHGWE8/1LPh9SGCalSN7IaITeeWSXbfsS5wsXyC4kBQ38Z8zcwWVAym4S8vpFB/c0XC6R4mnPi9EBADsPDEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBCjdHhuiaNhbXTNJxCjZmVlzRp8omZ2zgABhqCiZ2jEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpo2dycMQgVI/OKQKasMQ7eLB11u4NIpZe3WKrnHEFUxO85Xp/9bKibHbOAAGKiKNyY3bEILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8o3NuZMQgU/BrKnX4lMeya4RaZhIRlieBno4ra8oOQRrFzgloS+GkdHlwZaNwYXk=";
+        String splitTransactionGolden = "gqRsc2lngaFsxM4BIAgBwJaxAgIAwMQHHmSQTiYDILO3BCfT4PJw36+yT68lZyyjP9vs0NLqLfcc6S9Ol/5iILepSkiAcZYTz/Us+H1IYJqVI3shohN55ZJdt+xLnCxfILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8MRAiEjEBIwwQMgQkEkAAGTEJKBIxBzIDEhAxCCUSEDECIQQNECJAAC4zAAAzAQASMQkyAxIQMwAHKRIQMwEHKhIQMwAIIQULMwEIIQYLEhAzAAghBw8QEKN0eG6Jo2FtdM11MKNmZWXNGnyiZnbOAAGGoKJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCB+I4bEWe7WNX25ZNCc/C4CFyFXNiIH6mwKn604r624gaJsds4AAYqIo3JjdsQgt6lKSIBxlhPP9Sz4fUhgmpUjeyGiE3nlkl237EucLF+jc25kxCBT8GsqdfiUx7JrhFpmEhGWJ4Gejitryg5BGsXOCWhL4aR0eXBlo3BheYKkbHNpZ4GhbMTOASAIAcCWsQICAMDEBx5kkE4mAyCztwQn0+DycN+vsk+vJWcsoz/b7NDS6i33HOkvTpf+YiC3qUpIgHGWE8/1LPh9SGCalSN7IaITeeWSXbfsS5wsXyC4kBQ38Z8zcwWVAym4S8vpFB/c0XC6R4mnPi9EBADsPDEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBCjdHhuiaNhbXTOAAGGoKNmZWXNGriiZnbOAAGGoKJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCB+I4bEWe7WNX25ZNCc/C4CFyFXNiIH6mwKn604r624gaJsds4AAYqIo3JjdsQguJAUN/GfM3MFlQMpuEvL6RQf3NFwukeJpz4vRAQA7Dyjc25kxCBT8GsqdfiUx7JrhFpmEhGWJ4Gejitryg5BGsXOCWhL4aR0eXBlo3BheQ==";
         assertThat(Encoder.encodeToBase64(transactions)).isEqualTo(splitTransactionGolden);
     }
 

@@ -39,7 +39,7 @@ public class Split {
      * @param ratn fraction of money to be paid to the first recipient
      * @param ratd fraction of money to be paid to the second recipient
      * @param expiryRound the round at which the account expires
-     * @param minPay minimum amount to be paid out of the account
+     * @param minPay minimum amount to be paid out of the account to receiver1
      * @param maxFee half of the maximum fee used by each split forwarding group transaction
      * @return ContractTemplate with the address and the program with the given parameter values
      * @throws NoSuchAlgorithmException
@@ -91,7 +91,11 @@ public class Split {
 
         int ratn = data.intBlock.get(5);
         int ratd = data.intBlock.get(6);
+        int minTrade = data.intBlock.get(7);
 
+        if (receiverOneAmount < minTrade) {
+            throw new RuntimeException("Receiver one must receive at least " + minTrade);
+        }
         if (receiverOneAmount * Double.valueOf(ratd) != receiverTwoAmount * Double.valueOf(ratn)) {
             throw new RuntimeException("The token split must be exactly " + ratn + " / " + ratd);
         }
