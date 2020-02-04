@@ -57,8 +57,8 @@ public class Split {
         List<ParameterValue> values = ImmutableList.of(
                 new IntParameterValue(4, maxFee),
                 new IntParameterValue(7, expiryRound),
-                new IntParameterValue(8, ratn),
-                new IntParameterValue(9, ratd),
+                new IntParameterValue(8, ratd),
+                new IntParameterValue(9, ratn),
                 new IntParameterValue(10, minPay),
                 new AddressParameterValue(14, owner),
                 new AddressParameterValue(47, receiver1),
@@ -89,15 +89,18 @@ public class Split {
             Digest genesisHash) throws NoSuchAlgorithmException, IOException {
         Logic.ProgramData data = readAndVerifyContract(contract.program, 8, 3);
 
-        int ratn = data.intBlock.get(5);
-        int ratd = data.intBlock.get(6);
+        int ratn = data.intBlock.get(6);
+        int ratd = data.intBlock.get(5);
         int minTrade = data.intBlock.get(7);
 
         if (receiverOneAmount < minTrade) {
             throw new RuntimeException("Receiver one must receive at least " + minTrade);
         }
-        if (receiverOneAmount * Double.valueOf(ratd) != receiverTwoAmount * Double.valueOf(ratn)) {
-            throw new RuntimeException("The token split must be exactly " + ratn + " / " + ratd);
+
+        BigInteger rcv1 = BigInteger.valueOf(receiverOneAmount).multiply(BigInteger.valueOf(ratd));
+        BigInteger rcv2 = BigInteger.valueOf(receiverTwoAmount).multiply(BigInteger.valueOf(ratn));
+        if (rcv1.equals(rcv2) == false) {
+            throw new RuntimeException("The token split must be exactly " + ratn + " / " + ratd + ", received " + receiverOneAmount + " / " + receiverTwoAmount);
         }
 
         Address receiver1 = new Address(data.byteBlock.get(1));
