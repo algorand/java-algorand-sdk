@@ -5,7 +5,9 @@ import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.Signature;
 import com.fasterxml.jackson.annotation.*;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 /**
@@ -36,12 +38,24 @@ public class SignedTransaction implements Serializable {
         this.transactionID = Objects.requireNonNull(transactionID, "txID must not be null");
     }
 
+    public SignedTransaction(Transaction tx, Signature sig) throws IOException, NoSuchAlgorithmException {
+        this(tx, sig, new MultisigSignature(), new LogicsigSignature(), tx.txID());
+    }
+
     public SignedTransaction(Transaction tx, Signature sig, String txId) {
         this(tx, sig, new MultisigSignature(), new LogicsigSignature(), txId);
     }
 
+    public SignedTransaction(Transaction tx, MultisigSignature mSig) throws IOException, NoSuchAlgorithmException {
+        this(tx, new Signature(), mSig, new LogicsigSignature(), tx.txID());
+    }
+
     public SignedTransaction(Transaction tx, MultisigSignature mSig, String txId) {
         this(tx, new Signature(), mSig, new LogicsigSignature(), txId);
+    }
+
+    public SignedTransaction(Transaction tx, LogicsigSignature lSig) throws IOException, NoSuchAlgorithmException {
+        this(tx, new Signature(), new MultisigSignature(), lSig, tx.txID());
     }
 
     public SignedTransaction(Transaction tx, LogicsigSignature lSig, String txId) {
