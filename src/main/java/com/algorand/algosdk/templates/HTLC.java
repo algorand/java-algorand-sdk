@@ -3,6 +3,7 @@ package com.algorand.algosdk.templates;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.templates.ContractTemplate.ParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.IntParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
@@ -25,8 +26,8 @@ public class HTLC {
 	 * @throws NoSuchAlgorithmException
 	 */
 	public static ContractTemplate MakeHTLC(
-			String owner, 
-			String receiver, 
+			Address owner,
+			Address receiver,
 			String hashFunction, 
 			String hashImage, 
 			int expiryRound, 
