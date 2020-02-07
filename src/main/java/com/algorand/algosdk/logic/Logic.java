@@ -5,7 +5,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,10 +45,10 @@ public class Logic {
      */
     public static class ProgramData {
         public final boolean good;
-        public final List<Integer> intBlock;
-        public final List<byte[]> byteBlock;
+        public final ArrayList<Integer> intBlock;
+        public final ArrayList<byte[]> byteBlock;
 
-        private ProgramData(final boolean good, final List<Integer> intBlock, final List<byte[]> byteBlock) {
+        private ProgramData(final boolean good, final ArrayList<Integer> intBlock, final ArrayList<byte[]> byteBlock) {
             this.good = good;
             this.intBlock = intBlock;
             this.byteBlock = byteBlock;
@@ -76,9 +75,9 @@ public class Logic {
 
     protected static class IntConstBlock {
         public final int size;
-        public final List<Integer> results;
+        public final ArrayList<Integer> results;
 
-        IntConstBlock(final int size, final List<Integer> results) {
+        IntConstBlock(final int size, final ArrayList<Integer> results) {
             this.size = size;
             this.results = results;
         }
@@ -86,9 +85,9 @@ public class Logic {
 
     protected static class ByteConstBlock {
         public final int size;
-        public final List<byte[]> results;
+        public final ArrayList<byte[]> results;
 
-        ByteConstBlock(int size, List<byte[]> results) {
+        ByteConstBlock(int size, ArrayList<byte[]> results) {
             this.size = size;
             this.results = results;
         }
@@ -108,7 +107,7 @@ public class Logic {
      */
     public static byte[] putUVarint(int value) {
         assert value >= 0 : "putUVarint expects non-negative values.";
-        List<Byte> buffer = new ArrayList<>();
+        ArrayList<Byte> buffer = new ArrayList<>();
         while (value >= 0x80) {
             buffer.add((byte)((value & 0xFF) | 0x80 ));
             value >>= 7;
@@ -155,7 +154,7 @@ public class Logic {
      * @return
      * @throws IOException
      */
-    public static boolean checkProgram(byte[] program, List<byte[]> args) throws IOException {
+    public static boolean checkProgram(byte[] program, ArrayList<byte[]> args) throws IOException {
         return readProgram(program, args).good;
     }
 
@@ -166,9 +165,9 @@ public class Logic {
      * @return boolean
      * @throws IOException
      */
-    public static ProgramData readProgram(byte[] program, List<byte[]> args) throws IOException {
-        List<Integer> ints = new ArrayList<>();
-        List<byte[]> bytes = new ArrayList<>();
+    public static ProgramData readProgram(byte[] program, ArrayList<byte[]> args) throws IOException {
+        ArrayList<Integer> ints = new ArrayList<>();
+        ArrayList<byte[]> bytes = new ArrayList<>();
 
         if (langSpec == null) {
             Reader reader;
