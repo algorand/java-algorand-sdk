@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -33,7 +33,7 @@ public class LogicsigSignature {
     @JsonProperty("l")
     public final byte[] logic;
     @JsonProperty("arg")
-    public final ArrayList<byte[]> args;
+    public final List<byte[]> args;
     @JsonProperty("sig")
     public Signature sig;
     @JsonProperty("msig")
@@ -42,7 +42,7 @@ public class LogicsigSignature {
     @JsonCreator
     public LogicsigSignature(
         @JsonProperty("l") byte[] logic,
-        @JsonProperty("arg") ArrayList<byte[]> args,
+        @JsonProperty("arg") List<byte[]> args,
         @JsonProperty("sig") byte[] sig,
         @JsonProperty("msig") MultisigSignature msig
     ) {
@@ -74,7 +74,7 @@ public class LogicsigSignature {
      * @param logicsig
      * @param args
      */
-    public LogicsigSignature(byte[] logicsig, ArrayList<byte[]> args) {
+    public LogicsigSignature(byte[] logicsig, List<byte[]> args) {
         this(logicsig, args, null, null);
     }
 
