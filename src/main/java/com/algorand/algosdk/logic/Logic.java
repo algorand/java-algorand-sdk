@@ -224,7 +224,7 @@ public class Logic {
             int opcode = program[pc] & 0xFF;
             Operation op = opcodes[opcode];
             if (op == null) {
-                throw new IllegalArgumentException("invalid instruction");
+                throw new IllegalArgumentException("invalid instruction: " + opcode);
             }
 
             cost += op.Cost;

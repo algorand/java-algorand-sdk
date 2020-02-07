@@ -217,7 +217,17 @@ public class Account {
                 throw new RuntimeException("cannot reach");
         }
     }
-    
+
+    /**
+     * Sets the transaction fee according to suggestedFeePerByte * estimateTxSize.
+     * @param tx transaction to populate fee field
+     * @param suggestedFeePerByte suggestedFee given by network
+     * @throws NoSuchAlgorithmException could not estimate tx encoded size.
+     */
+    static public void setFeeByFeePerByte(Transaction tx, int suggestedFeePerByte) throws NoSuchAlgorithmException{
+        setFeeByFeePerByte(tx, BigInteger.valueOf(suggestedFeePerByte));
+    }
+
     /**
      * Sets the transaction fee according to suggestedFeePerByte * estimateTxSize.
      * @param tx transaction to populate fee field
@@ -225,6 +235,10 @@ public class Account {
      * @throws NoSuchAlgorithmException could not estimate tx encoded size.
      */
     static public void setFeeByFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
+        if (suggestedFeePerByte.compareTo(BigInteger.ZERO) < 0) {
+            throw new RuntimeException("Cannot set fee to a negative number.");
+        }
+
         tx.fee = suggestedFeePerByte;
         BigInteger size = estimatedEncodedSize(tx);
 

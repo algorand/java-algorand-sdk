@@ -26,18 +26,20 @@ public class Split {
     private static String referenceProgram = "ASAIAQUCAAYHCAkmAyDYHIR7TIW5eM/WAZcXdEDqv7BD+baMN6i2/A5JatGbNCDKsaoZHPQ3Zg8zZB/BZ1oDgt77LGo5np3rbto3/gloTyB40AS2H3I72YCbDk4hKpm7J7NnFy2Xrt39TJG0ORFg+zEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBA=";
 
     /**
-     * Split allows locking assets in an account which allows transfering
-     * to two predefined addresses in a specific M:N ratio. Note that the ratio is
-     * specified by the first address part. For example, if you would like to
-     * have a split where the first address receives 30 percent and the second
-     * receives 70, set ratn and ratd to 30 and 100, respectively. Split also
-     * have an expiry round, in which the owner can transfer back the assets.
+     * Split allows locking algos in an account which allows transfering to two
+     * predefined addresses in a specified ratio such that for the given ratn and
+     * ratd parameters we have:
+     *
+     *     first_recipient_amount * rat_2 == second_recipient_amount * rat_1
+     *
+     * Split also has an expiry round, after which the owner can transfer back
+     * the funds.
      *
      * @param owner the address to refund funds to on timeout
      * @param receiver1 the first recipient in the split account
      * @param receiver2 the second recipient in the split account
-     * @param ratn fraction of money to be paid to the first recipient
-     * @param ratd fraction of money to be paid to the second recipient
+     * @param rat1 how much receiver1 receives (proportionally)
+     * @param rat2 how much receiver2 receives (proportionally)
      * @param expiryRound the round at which the account expires
      * @param minPay minimum amount to be paid out of the account to receiver1
      * @param maxFee half of the maximum fee used by each split forwarding group transaction
@@ -48,8 +50,8 @@ public class Split {
             Address owner,
             Address receiver1,
             Address receiver2,
-            int ratn,
-            int ratd,
+            int rat1,
+            int rat2,
             int expiryRound,
             int minPay,
             int maxFee) throws NoSuchAlgorithmException {
@@ -57,8 +59,8 @@ public class Split {
         List<ParameterValue> values = ImmutableList.of(
                 new IntParameterValue(4, maxFee),
                 new IntParameterValue(7, expiryRound),
-                new IntParameterValue(8, ratd),
-                new IntParameterValue(9, ratn),
+                new IntParameterValue(8, rat2),
+                new IntParameterValue(9, rat1),
                 new IntParameterValue(10, minPay),
                 new AddressParameterValue(14, owner),
                 new AddressParameterValue(47, receiver1),
@@ -79,7 +81,7 @@ public class Split {
      * @param feePerByte fee per byte multiplier
      * @return
      */
-    public static byte[] GetSendFundsTransaction(
+    public static byte[] GetSplitTransactions(
             ContractTemplate contract,
             int receiverOneAmount,
             int receiverTwoAmount,
@@ -89,6 +91,7 @@ public class Split {
             Digest genesisHash) throws NoSuchAlgorithmException, IOException {
         Logic.ProgramData data = readAndVerifyContract(contract.program, 8, 3);
 
+        int maxFee = data.intBlock.get(1);
         int ratn = data.intBlock.get(6);
         int ratd = data.intBlock.get(5);
         int minTrade = data.intBlock.get(7);
@@ -127,6 +130,11 @@ public class Split {
                 null,
                 genesisHash);
         Account.setFeeByFeePerByte(tx2, BigInteger.valueOf(feePerByte));
+
+        if (tx1.fee.longValue() > maxFee || tx2.fee.longValue() > maxFee) {
+            long fee = Math.max(tx1.fee.longValue(), tx2.fee.longValue());
+            throw new RuntimeException("Transaction fee is greater than maxFee: " + fee + " > " + maxFee);
+        }
 
         LogicsigSignature lsig = new LogicsigSignature(contract.program);
         TxGroup.assignGroupID(tx1, tx2);

@@ -68,7 +68,7 @@ public class TestTemplates {
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
         ContractTemplate decodedContract = new ContractTemplate(encodedProgram);
 
-        assertThatThrownBy(() -> Split.GetSendFundsTransaction(
+        assertThatThrownBy(() -> Split.GetSplitTransactions(
                 decodedContract,
                 30000,
                 100001,
@@ -79,7 +79,7 @@ public class TestTemplates {
             .isInstanceOf(Exception.class)
             .hasMessageStartingWith("The token split must be exactly");
 
-        assertThatThrownBy(() -> Split.GetSendFundsTransaction(
+        assertThatThrownBy(() -> Split.GetSplitTransactions(
                 decodedContract,
                 3000,
                 10000,
@@ -87,11 +87,11 @@ public class TestTemplates {
                 101000,
                 30,
                 genesisHash))
-                .isInstanceOf(Exception.class)
-                .hasMessageStartingWith("Receiver one must receive at least");
+            .isInstanceOf(Exception.class)
+            .hasMessageStartingWith("Receiver one must receive at least");
 
 
-        byte[] transactions = Split.GetSendFundsTransaction(
+        byte[] transactions = Split.GetSplitTransactions(
                 decodedContract,
                 30000,
                 100000,
@@ -106,27 +106,27 @@ public class TestTemplates {
 
     @Test
     public void testPeriodicPayment() throws Exception {
-        String goldenAddress = "IJPPJDULMZNQXBIGCLCWVP5P4VD6U564BHC7C5CMZB2FVXKGZSIVPJFPT4";
-        String goldenProgram = "ASAHAQoLAOcHkE7AxAcmAiB/g7Flf/H8U7ktwYFIodZd/C1LH6PWdyhK3dIAEm2QaSD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEzEQIhIxASMOEDECJBglEhAxBCEEMQIIEhAxBigSEDEJMgMSMQcpEhAxCCEFEhAxCSkSMQcyAxIQMQIhBg0QMQglEhAREA==";
-        String goldenWithdrawalTransaction = "gqRsc2lngaFsxJcBIAcBCgsA5weQTsDEByYCIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMRAiEjEBIw4QMQIkGCUSEDEEIQQxAggSEDEGKBIQMQkyAxIxBykSEDEIIQUSEDEJKRIxBzIDEhAxAiEGDRAxCCUSEBEQo3R4bomjYW10zScQo2ZlZc0KHqJmds0EuqJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmibHbNCKGibHjEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpo3JjdsQg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohOjc25kxCBCXvSOi2ZbC4UGEsVqv6/lR+p33AnF8XRMyHRa3UbMkaR0eXBlo3BheQ==";
+        String goldenAddress = "JMS3K4LSHPULANJIVQBTEDP5PZK6HHMDQS4OKHIMHUZZ6OILYO3FVQW7IY";
+        String goldenProgram = "ASAHAegHZABfoMIevKOVASYCIAECAwQFBgcIAQIDBAUGBwgBAgMEBQYHCAECAwQFBgcIIJKvkYTkEzwJf2arzJOxERsSogG9nQzKPkpIoc4TzPTFMRAiEjEBIw4QMQIkGCUSEDEEIQQxAggSEDEGKBIQMQkyAxIxBykSEDEIIQUSEDEJKRIxBzIDEhAxAiEGDRAxCCUSEBEQ";
+        String goldenWithdrawalTransaction = "gqRsc2lngaFsxJkBIAcB6AdkAF+gwh68o5UBJgIgAQIDBAUGBwgBAgMEBQYHCAECAwQFBgcIAQIDBAUGBwggkq+RhOQTPAl/ZqvMk7ERGxKiAb2dDMo+SkihzhPM9MUxECISMQEjDhAxAiQYJRIQMQQhBDECCBIQMQYoEhAxCTIDEjEHKRIQMQghBRIQMQkpEjEHMgMSEDECIQYNEDEIJRIQERCjdHhuiaNhbXTOAAehIKNmZWXNA+iiZnbNBLCiZ2jEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpomx2zQUPomx4xCABAgMEBQYHCAECAwQFBgcIAQIDBAUGBwgBAgMEBQYHCKNyY3bEIJKvkYTkEzwJf2arzJOxERsSogG9nQzKPkpIoc4TzPTFo3NuZMQgSyW1cXI76LA1KKwDMg39flXjnYOEuOUdDD0znzkLw7akdHlwZaNwYXk=";
 
-        String addr = "726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM";
-        Lease lease = new Lease("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
+        Address addr = new Address("SKXZDBHECM6AS73GVPGJHMIRDMJKEAN5TUGMUPSKJCQ44E6M6TC2H2UJ3I");
+        Lease lease = new Lease("AQIDBAUGBwgBAgMEBQYHCAECAwQFBgcIAQIDBAUGBwg=");
         ContractTemplate result = PeriodicPayment.MakePeriodicPayment(
                 addr,
-                10000,
-                999,
-                11,
-                10,
-                123456,
+                500000,
+                95,
+                100,
+                1000,
+                2445756,
                 lease);
 
-        assertThat(Encoder.encodeToBase64(result.program)).isEqualTo(goldenProgram);
         assertThat(result.address.toString()).isEqualTo(goldenAddress);
+        assertThat(Encoder.encodeToBase64(result.program)).isEqualTo(goldenProgram);
 
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
 
-        SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result, 1210, genesisHash);
+        SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result, 1200, 0, genesisHash);
         assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenWithdrawalTransaction);
     }
 
