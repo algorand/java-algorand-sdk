@@ -73,7 +73,7 @@ public class Split {
     /**
      * Generate group transactions to transfer funds according to the contract's ratio.
      *
-     * @param contract
+     * @param contract the contract created with Split.MakeSplit
      * @param receiverOneAmount amount to be transferred to receiver one
      * @param receiverTwoAmount amount to be transferred receiver two
      * @param firstValid first round where the transactions are valid

@@ -85,15 +85,15 @@ public class PeriodicPayment {
      *
      * @param contract contract containing information, this should be provided by the payer.
      * @param firstValid first round the transaction should be valid.
-     * @param feePerByte fee per byte to apply to transaction.
      * @param genesisHash genesis hash in base64.
+     * @param feePerByte fee per byte to apply to transaction.
      * @return Signed withdrawal transaction.
      */
     public static SignedTransaction MakeWithdrawalTransaction(
             final ContractTemplate contract,
             final int firstValid,
-            final int feePerByte,
-            final Digest genesisHash
+            final Digest genesisHash,
+            final int feePerByte
     ) throws IOException, NoSuchAlgorithmException {
         Logic.ProgramData data = readAndVerifyContract(contract.program, 7, 2);
 

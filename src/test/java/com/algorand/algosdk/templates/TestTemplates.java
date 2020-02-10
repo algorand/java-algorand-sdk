@@ -58,8 +58,8 @@ public class TestTemplates {
                 preImageAsBase64,
                 1,
                 100,
-                0,
-                gh);
+                gh,
+                0);
 
         // Verify
         assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenLtxn);
@@ -148,7 +148,7 @@ public class TestTemplates {
 
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
 
-        SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result, 1200, 0, genesisHash);
+        SignedTransaction stx = PeriodicPayment.MakeWithdrawalTransaction(result, 1200, genesisHash, 0);
         assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenWithdrawalTransaction);
     }
 
