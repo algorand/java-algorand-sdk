@@ -74,8 +74,7 @@ public class Split {
      * Generate group transactions to transfer funds according to the contract's ratio.
      *
      * @param contract the contract created with Split.MakeSplit
-     * @param receiverOneAmount amount to be transferred to receiver one
-     * @param receiverTwoAmount amount to be transferred receiver two
+     * @param amount amount to be transferred from the contract to the receivers according to the contract ratio.
      * @param firstValid first round where the transactions are valid
      * @param genesisHash genesis hash
      * @param feePerByte fee per byte multiplier
@@ -83,8 +82,7 @@ public class Split {
      */
     public static byte[] GetSplitTransactions(
             ContractTemplate contract,
-            int receiverOneAmount,
-            int receiverTwoAmount,
+            int amount,
             int firstValid,
             int lastValid,
             int feePerByte,
@@ -92,18 +90,27 @@ public class Split {
         Logic.ProgramData data = readAndVerifyContract(contract.program, 8, 3);
 
         int maxFee = data.intBlock.get(1);
-        int ratn = data.intBlock.get(6);
-        int ratd = data.intBlock.get(5);
+        int rat1 = data.intBlock.get(6);
+        int rat2 = data.intBlock.get(5);
         int minTrade = data.intBlock.get(7);
+
+        Double fraction = Double.valueOf(rat1) / Double.valueOf(rat1+rat2);
+        int receiverOneAmount = Long.valueOf(Math.round(fraction * amount)).intValue();
+        int receiverTwoAmount = Long.valueOf(Math.round((1.0 - fraction) * amount)).intValue();
+
+        // With proper rounding, this should hopefully never happen.
+        if (amount - receiverOneAmount - receiverTwoAmount != 0) {
+            throw new RuntimeException("Unable to exactly split " + amount + " using the contract ratio of " + rat1 + " / " + rat2);
+        }
 
         if (receiverOneAmount < minTrade) {
             throw new RuntimeException("Receiver one must receive at least " + minTrade);
         }
 
-        BigInteger rcv1 = BigInteger.valueOf(receiverOneAmount).multiply(BigInteger.valueOf(ratd));
-        BigInteger rcv2 = BigInteger.valueOf(receiverTwoAmount).multiply(BigInteger.valueOf(ratn));
+        BigInteger rcv1 = BigInteger.valueOf(receiverOneAmount).multiply(BigInteger.valueOf(rat2));
+        BigInteger rcv2 = BigInteger.valueOf(receiverTwoAmount).multiply(BigInteger.valueOf(rat1));
         if (rcv1.equals(rcv2) == false) {
-            throw new RuntimeException("The token split must be exactly " + ratn + " / " + ratd + ", received " + receiverOneAmount + " / " + receiverTwoAmount);
+            throw new RuntimeException("The token split must be exactly " + rat1 + " / " + rat2 + ", received " + receiverOneAmount + " / " + receiverTwoAmount);
         }
 
         Address receiver1 = new Address(data.byteBlock.get(1));

@@ -71,14 +71,17 @@ public class TestTemplates {
         Address addr2 = new Address("W6UUUSEAOGLBHT7VFT4H2SDATKKSG6ZBUIJXTZMSLW36YS44FRP5NVAU7U");
         Address addr3 = new Address("XCIBIN7RT4ZXGBMVAMU3QS6L5EKB7XGROC5EPCNHHYXUIBAA5Q6C5Y7NEU");
 
+        int minPay = 10000;
+        int rat1 = 30;
+        int rat2 = 100;
         ContractTemplate result = Split.MakeSplit(
                 addr1,
                 addr2,
                 addr3,
-                30,
-                100,
+                rat1,
+                rat2,
                 123456,
-                10000,
+                minPay,
                 5000000);
         String goldenProgram = "ASAIAcCWsQICAMDEB2QekE4mAyCztwQn0+DycN+vsk+vJWcsoz/b7NDS6i33HOkvTpf+YiC3qUpIgHGWE8/1LPh9SGCalSN7IaITeeWSXbfsS5wsXyC4kBQ38Z8zcwWVAym4S8vpFB/c0XC6R4mnPi9EBADsPDEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBA=";
         String goldenAddress = "HDY7A4VHBWQWQZJBEMASFOUZKBNGWBMJEMUXAGZ4SPIRQ6C24MJHUZKFGY";
@@ -87,26 +90,23 @@ public class TestTemplates {
         assertThat(encodedProgram).isEqualTo(goldenProgram);
         assertThat(result.address.toString()).isEqualTo(goldenAddress);
 
-
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
         ContractTemplate decodedContract = new ContractTemplate(encodedProgram);
 
         assertThatThrownBy(() -> Split.GetSplitTransactions(
                 decodedContract,
-                30000,
-                100001,
+                130001,
                 100000,
                 101000,
                 30,
                 genesisHash))
             .isInstanceOf(Exception.class)
-            .hasMessageStartingWith("The token split must be exactly");
+            .hasMessageStartingWith("The token split must be exactly ");
 
         assertThatThrownBy(() -> Split.GetSplitTransactions(
                 decodedContract,
-                3000,
+                130,
                 10000,
-                100000,
                 101000,
                 30,
                 genesisHash))
@@ -115,14 +115,13 @@ public class TestTemplates {
 
         byte[] transactions = Split.GetSplitTransactions(
                 decodedContract,
-                30000,
-                100000,
-                100000,
-                101000,
-                30,
+                minPay * (rat1 + rat2),
+                1,
+                100,
+                10000,
                 genesisHash);
 
-        String splitTransactionGolden = "gqRsc2lngaFsxM4BIAgBwJaxAgIAwMQHZB6QTiYDILO3BCfT4PJw36+yT68lZyyjP9vs0NLqLfcc6S9Ol/5iILepSkiAcZYTz/Us+H1IYJqVI3shohN55ZJdt+xLnCxfILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8MRAiEjEBIwwQMgQkEkAAGTEJKBIxBzIDEhAxCCUSEDECIQQNECJAAC4zAAAzAQASMQkyAxIQMwAHKRIQMwEHKhIQMwAIIQULMwEIIQYLEhAzAAghBw8QEKN0eG6Jo2FtdM11MKNmZWXNGnyiZnbOAAGGoKJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCAupOk7wrB8VOi83AKjm0C57z1tr3CJ/NWnIVeXR/GMBKJsds4AAYqIo3JjdsQgt6lKSIBxlhPP9Sz4fUhgmpUjeyGiE3nlkl237EucLF+jc25kxCA48fBypw2haGUhIwEiuplQWmsFiSMpcBs8k9EYeFrjEqR0eXBlo3BheYKkbHNpZ4GhbMTOASAIAcCWsQICAMDEB2QekE4mAyCztwQn0+DycN+vsk+vJWcsoz/b7NDS6i33HOkvTpf+YiC3qUpIgHGWE8/1LPh9SGCalSN7IaITeeWSXbfsS5wsXyC4kBQ38Z8zcwWVAym4S8vpFB/c0XC6R4mnPi9EBADsPDEQIhIxASMMEDIEJBJAABkxCSgSMQcyAxIQMQglEhAxAiEEDRAiQAAuMwAAMwEAEjEJMgMSEDMABykSEDMBByoSEDMACCEFCzMBCCEGCxIQMwAIIQcPEBCjdHhuiaNhbXTOAAGGoKNmZWXNGriiZnbOAAGGoKJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCAupOk7wrB8VOi83AKjm0C57z1tr3CJ/NWnIVeXR/GMBKJsds4AAYqIo3JjdsQguJAUN/GfM3MFlQMpuEvL6RQf3NFwukeJpz4vRAQA7Dyjc25kxCA48fBypw2haGUhIwEiuplQWmsFiSMpcBs8k9EYeFrjEqR0eXBlo3BheQ==";
+        String splitTransactionGolden = "gqRsc2lngaFsxM4BIAgBwJaxAgIAwMQHZB6QTiYDILO3BCfT4PJw36+yT68lZyyjP9vs0NLqLfcc6S9Ol/5iILepSkiAcZYTz/Us+H1IYJqVI3shohN55ZJdt+xLnCxfILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8MRAiEjEBIwwQMgQkEkAAGTEJKBIxBzIDEhAxCCUSEDECIQQNECJAAC4zAAAzAQASMQkyAxIQMwAHKRIQMwEHKhIQMwAIIQULMwEIIQYLEhAzAAghBw8QEKN0eG6Jo2FtdM4ABJPgo2ZlZc4AId/gomZ2AaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBLA74bTV35FJNL1h0K9ZbRU24b4M1JRkD1YTogvvDXbqJsdmSjcmN2xCC3qUpIgHGWE8/1LPh9SGCalSN7IaITeeWSXbfsS5wsX6NzbmTEIDjx8HKnDaFoZSEjASK6mVBaawWJIylwGzyT0Rh4WuMSpHR5cGWjcGF5gqRsc2lngaFsxM4BIAgBwJaxAgIAwMQHZB6QTiYDILO3BCfT4PJw36+yT68lZyyjP9vs0NLqLfcc6S9Ol/5iILepSkiAcZYTz/Us+H1IYJqVI3shohN55ZJdt+xLnCxfILiQFDfxnzNzBZUDKbhLy+kUH9zRcLpHiac+L0QEAOw8MRAiEjEBIwwQMgQkEkAAGTEJKBIxBzIDEhAxCCUSEDECIQQNECJAAC4zAAAzAQASMQkyAxIQMwAHKRIQMwEHKhIQMwAIIQULMwEIIQYLEhAzAAghBw8QEKN0eG6Jo2FtdM4AD0JAo2ZlZc4AId/gomZ2AaJnaMQgf4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGmjZ3JwxCBLA74bTV35FJNL1h0K9ZbRU24b4M1JRkD1YTogvvDXbqJsdmSjcmN2xCC4kBQ38Z8zcwWVAym4S8vpFB/c0XC6R4mnPi9EBADsPKNzbmTEIDjx8HKnDaFoZSEjASK6mVBaawWJIylwGzyT0Rh4WuMSpHR5cGWjcGF5";
         assertThat(Encoder.encodeToBase64(transactions)).isEqualTo(splitTransactionGolden);
     }
 
