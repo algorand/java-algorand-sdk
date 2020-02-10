@@ -28,18 +28,41 @@ public class TestTemplates {
 
     @Test
     public void testHTLC() throws Exception {
+        String goldenAddress = "FBZIR3RWVT2BTGVOG25H3VAOLVD54RTCRNRLQCCJJO6SVSCT5IVDYKNCSU";
+        String goldenProgram = "ASAE6AcBAMDPJCYDIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IBB2YRNPIfx8AiI9UKues2ALw//DcSQjoeR7sfmp2/VfIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMQEiDjEQIxIQMQcyAxIQMQgkEhAxCSgSLQEpEhAxCSoSMQIlDRAREA==";
+        String goldenLtxn = "gqRsc2lngqNhcmeRxAhwcmVpbWFnZaFsxJcBIAToBwEAwM8kJgMg5pqWHm8tX3rIZgeSZVK+mCNe0zNjyoiRi7nJOKkVtvkgEHZhE08h/HwCIj1Qq56zYAvD/8NxJCOh5Hux+anb9V8g/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohMxASIOMRAjEhAxBzIDEhAxCCQSEDEJKBItASkSEDEJKhIxAiUNEBEQo3R4boelY2xvc2XEIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5o2ZlZc0D6KJmdgGiZ2jEIH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpomx2ZKNzbmTEIChyiO42rPQZmq42un3UDl1H3kZii2K4CElLvSrIU+oqpHR5cGWjcGF5";
+
+
+        // Create contract
         Address owner = new Address("726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM");
         Address receiver = new Address("42NJMHTPFVPXVSDGA6JGKUV6TARV5UZTMPFIREMLXHETRKIVW34QFSDFRE");
         String hashFn = "sha256";
-        String hashImg = "f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=";
+        String hashImg = "EHZhE08h/HwCIj1Qq56zYAvD/8NxJCOh5Hux+anb9V8=";
+        ContractTemplate contract = HTLC.MakeHTLC(
+                owner,
+                receiver,
+                hashFn,
+                hashImg,
+                600000,
+                1000);
 
-        ContractTemplate result = HTLC.MakeHTLC(owner, receiver, hashFn, hashImg, 600000, 1000);
+        // Verify
+        assertThat(contract.address.toString()).isEqualTo(goldenAddress);
+        assertThat(Encoder.encodeToBase64(contract.program)).isEqualTo(goldenProgram);
 
-        String goldenAddress = "KNBD7ATNUVQ4NTLOI72EEUWBVMBNKMPHWVBCETERV2W7T2YO6CVMLJRBM4";
-        String goldenProgram = "ASAE6AcBAMDPJCYDIOaalh5vLV96yGYHkmVSvpgjXtMzY8qIkYu5yTipFbb5IH+DsWV/8fxTuS3BgUih1l38LUsfo9Z3KErd0gASbZBpIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMQEiDjEQIxIQMQcyAxIQMQgkEhAxCSgSLQEpEhAxCSoSMQIlDRAREA==";
+        // Create transactions
+        String preImageAsBase64 = "cHJlaW1hZ2U=";
+        Digest gh = new Digest("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
+        SignedTransaction stx = HTLC.GetHTLCTransaction(
+                contract,
+                preImageAsBase64,
+                1,
+                100,
+                0,
+                gh);
 
-        assertThat(Encoder.encodeToBase64(result.program)).isEqualTo(goldenProgram);
-        assertThat(result.address.toString()).isEqualTo(goldenAddress);
+        // Verify
+        assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenLtxn);
     }
 
     @Test
@@ -89,7 +112,6 @@ public class TestTemplates {
                 genesisHash))
             .isInstanceOf(Exception.class)
             .hasMessageStartingWith("Receiver one must receive at least");
-
 
         byte[] transactions = Split.GetSplitTransactions(
                 decodedContract,
