@@ -101,7 +101,8 @@ public class HTLC {
 		int maxFee = data.intBlock.get(0);
 		Address receiver = new Address(data.byteBlock.get(0));
 		byte[] hashImage = data.byteBlock.get(1);
-		int hashFunction = Integer.valueOf(contract.program[136]);
+
+		int hashFunction = Integer.valueOf(contract.program[contract.program.length - 15]);
 
 		// Validate hash function
 		if(hashFunction == 1) {
