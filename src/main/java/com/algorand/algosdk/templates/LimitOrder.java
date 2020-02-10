@@ -53,7 +53,15 @@ public class LimitOrder {
      * @param minTrade the minimum amount (of Algos) to be traded away
      * @param maxFee the maximum fee that can be paid to the network by the account
      */
-    public static ContractTemplate MakeLimitOrder(final Address owner, final Integer assetId, final Integer ratn, final Integer ratd, final Integer expirationRound, final Integer minTrade, final Integer maxFee) throws NoSuchAlgorithmException {
+    public static ContractTemplate MakeLimitOrder(
+            final Address owner,
+            final Integer assetId,
+            final Integer ratn,
+            final Integer ratd,
+            final Integer expirationRound,
+            final Integer minTrade,
+            final Integer maxFee
+    ) throws NoSuchAlgorithmException {
         Objects.requireNonNull(owner);
         Objects.requireNonNull(assetId);
         Objects.requireNonNull(ratn);
@@ -90,10 +98,20 @@ public class LimitOrder {
      * @return
      * @throws IOException
      */
-    public static byte[] MakeSwapAssetsTransaction(ContractTemplate contract, Integer assetAmount, Integer microAlgoAmount, Account sender, Integer firstValid, Integer lastValid, Digest genesisHash, Integer feePerByte) throws IOException, NoSuchAlgorithmException {
+    public static byte[] MakeSwapAssetsTransaction(
+            ContractTemplate contract,
+            Integer assetAmount,
+            Integer microAlgoAmount,
+            Account sender,
+            Integer firstValid,
+            Integer lastValid,
+            Digest genesisHash,
+            Integer feePerByte
+    ) throws IOException, NoSuchAlgorithmException {
         Logic.ProgramData data = readAndVerifyContract(contract.program, 10, 1);
 
         Address owner = new Address(data.byteBlock.get(0));
+        int maxFee = data.intBlock.get(2);
         int minTrade = data.intBlock.get(4);
         int assetId = data.intBlock.get(6);
         int ratd = data.intBlock.get(7);
@@ -135,6 +153,11 @@ public class LimitOrder {
                 genesisHash,
                 BigInteger.valueOf(assetId));
         setFeeByFeePerByte(tx2, BigInteger.valueOf(feePerByte));
+
+        if (tx1.fee.longValue() > maxFee || tx2.fee.longValue() > maxFee) {
+            long fee = Math.max(tx1.fee.longValue(), tx2.fee.longValue());
+            throw new RuntimeException("Transaction fee is greater than maxFee: " + fee + " > " + maxFee);
+        }
 
         TxGroup.assignGroupID(tx1, tx2);
         LogicsigSignature lsig = new LogicsigSignature(contract.program);
