@@ -2,6 +2,7 @@ package com.algorand.algosdk.templates;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,11 @@ import com.algorand.algosdk.templates.ContractTemplate.AddressParameterValue;
 import com.algorand.algosdk.templates.ContractTemplate.BytesParameterValue;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.google.common.collect.ImmutableList;
+import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.bouncycastle.util.Arrays;
 
 import javax.annotation.Signed;
 
@@ -92,15 +96,37 @@ public class HTLC {
 			Digest genesisHash,
 			int feePerByte) throws NoSuchAlgorithmException, IOException {
 
+		// Read program data
 		Logic.ProgramData data = readAndVerifyContract(contract.program, 4, 3);
 		int maxFee = data.intBlock.get(0);
-		// read the hash algorithm
 		Address receiver = new Address(data.byteBlock.get(0));
-		int hashFunction = Integer.valueOf(contract.program[136]);
 		byte[] hashImage = data.byteBlock.get(1);
+		int hashFunction = Integer.valueOf(contract.program[136]);
 
-		// TODO: Verify hash function.
+		// Validate hash function
+		if(hashFunction == 1) {
+			MessageDigest digest = MessageDigest.getInstance("SHA-256");
+			byte[] computedImage = digest.digest(Encoder.decodeFromBase64(preImage));
+			if(Arrays.compareUnsigned(computedImage, hashImage) != 0) {
+				throw new RuntimeException("Unable to verify SHA-256 preImage: sha256(preimage) != image");
+			}
+		}
+		else if (hashFunction == 2) {
+			try {
+				Keccak.Digest256 digest = new Keccak.Digest256();
+				byte[] computedImage = digest.digest(Encoder.decodeFromBase64(preImage));
+				if (Arrays.compareUnsigned(computedImage, hashImage) != 0) {
+					throw new RuntimeException("Unable to verify SHA-256 preImage: sha256(preimage) != image");
+				}
+			} catch (Exception e) {
+				// It's possible that the bouncy castle library is not loaded, in which case skip the validation.
+			}
+		}
+		else {
+			throw new RuntimeException("Invalid contract detected, unable to find a valid hash function ID.");
+		}
 
+		// Generate closeRemainderTo transaction
 		Transaction txn = new Transaction(
 				contract.address,
 				BigInteger.valueOf(0),
@@ -122,6 +148,5 @@ public class HTLC {
 		List<byte[]> args = ImmutableList.of(Encoder.decodeFromBase64(preImage));
 		LogicsigSignature lsig = new LogicsigSignature(contract.program, args);
 		return new SignedTransaction(txn, lsig);
-		//return Encoder.encodeToMsgPack(stx);
 	}
 }
