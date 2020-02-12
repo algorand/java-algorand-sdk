@@ -119,7 +119,7 @@ public class LimitOrder {
 
         // Verify the exchange rate ratio
         if (assetAmount * ratd != microAlgoAmount * ratn) {
-            throw new IllegalArgumentException("The exchange ratio of assets to microalgos must be exactly " + ratn + " / " + ratd);
+            throw new IllegalArgumentException("The exchange ratio of assets to microalgos must be exactly " + ratn + " / " + ratd + ", received " + assetAmount + " / " + microAlgoAmount);
         }
 
         // Verify minTrade amount
