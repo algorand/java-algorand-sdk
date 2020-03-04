@@ -140,7 +140,7 @@ public class DynamicFee {
         // Reimbursement transaction
         Transaction txn2 = new Transaction(
                 account.getAddress(),
-                BigInteger.valueOf(0),
+                BigInteger.valueOf(feePerByte),
                 txn.firstValid,
                 txn.lastValid,
                 null,
@@ -152,13 +152,13 @@ public class DynamicFee {
         txn2.setLease(new Lease(txn.lease));
         Account.setFeeByFeePerByte(txn2, BigInteger.valueOf(feePerByte));
 
-        TxGroup.assignGroupID(txn, txn2);
+        TxGroup.assignGroupID(txn2, txn);
         SignedTransaction stx1 = new SignedTransaction(txn, lsig, txn.txID());
         SignedTransaction stx2 = account.signTransaction(txn2);
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(Encoder.encodeToMsgPack(stx1));
         baos.write(Encoder.encodeToMsgPack(stx2));
+        baos.write(Encoder.encodeToMsgPack(stx1));
         return baos.toByteArray();
     }
 }

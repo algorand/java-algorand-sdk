@@ -162,7 +162,7 @@ public class TestLogic {
 
         assertThatThrownBy(() -> checkProgram(program, args))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("invalid instruction");
+                .hasMessage("invalid instruction: 129");
     }
 
     @Test

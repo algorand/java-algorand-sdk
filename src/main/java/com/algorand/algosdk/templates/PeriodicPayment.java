@@ -29,25 +29,40 @@ public class PeriodicPayment {
      * PeriodicPayment contract enables creating an account which allows the
      * withdrawal of a fixed amount of assets every fixed number of rounds to a
      * specific Algrorand Address. In addition, the contract allows to add
-     * timeout, after which the address can withdraw the rest of the assets.
+     * an expiryRound, after which the address can withdraw the rest of the assets.
      *
      * @param receiver address to receive the assets.
      * @param amount amount of assets to transfer at every cycle.
      * @param withdrawingWindow the number of blocks in which the user can withdraw the asset once the period start (must be < 1000).
      * @param period how often the address can withdraw assets (in rounds).
      * @param fee maximum fee per transaction.
-     * @param timeout a round in which the receiver can withdraw the rest of the funds after.
+     * @param expiryRound a round in which the receiver can withdraw the rest of the funds after.
      *
      * @return PeriodicPayment contract.
      */
-    public static ContractTemplate MakePeriodicPayment(final String receiver, final int amount, final int withdrawingWindow, final int period, final int fee, final int timeout) throws NoSuchAlgorithmException {
-        return MakePeriodicPayment(receiver, amount, withdrawingWindow, period, fee, timeout, null);
+    public static ContractTemplate MakePeriodicPayment(
+            final Address receiver,
+            final int amount,
+            final int withdrawingWindow,
+            final int period,
+            final int fee,
+            final int expiryRound
+    ) throws NoSuchAlgorithmException {
+        return MakePeriodicPayment(receiver, amount, withdrawingWindow, period, fee, expiryRound, null);
     }
 
     /**
      * Need a way to specify the lease for testing.
      */
-    protected static ContractTemplate MakePeriodicPayment(final String receiver, final int amount, final int withdrawingWindow, final int period, final int fee, final int timeout, final Lease lease) throws NoSuchAlgorithmException {
+    protected static ContractTemplate MakePeriodicPayment(
+            final Address receiver,
+            final int amount,
+            final int withdrawingWindow,
+            final int period,
+            final int fee,
+            final int expiryRound,
+            final Lease lease
+    ) throws NoSuchAlgorithmException {
         if (withdrawingWindow < 0 || withdrawingWindow > 1000) {
             throw new IllegalArgumentException("The withdrawingWindow must be a positive number less than 1000");
         }
@@ -57,7 +72,7 @@ public class PeriodicPayment {
                 new IntParameterValue(5, period),
                 new IntParameterValue(7, withdrawingWindow),
                 new IntParameterValue(8, amount),
-                new IntParameterValue(9, timeout),
+                new IntParameterValue(9, expiryRound),
                 new BytesParameterValue(12, lease == null ? new Lease() : lease),
                 new AddressParameterValue(15, receiver)
         );
@@ -71,12 +86,18 @@ public class PeriodicPayment {
      * @param contract contract containing information, this should be provided by the payer.
      * @param firstValid first round the transaction should be valid.
      * @param genesisHash genesis hash in base64.
+     * @param feePerByte fee per byte to apply to transaction.
      * @return Signed withdrawal transaction.
      */
-    public static SignedTransaction MakeWithdrawalTransaction(final ContractTemplate contract, final int firstValid, final Digest genesisHash) throws IOException, NoSuchAlgorithmException {
+    public static SignedTransaction MakeWithdrawalTransaction(
+            final ContractTemplate contract,
+            final int firstValid,
+            final Digest genesisHash,
+            final int feePerByte
+    ) throws IOException, NoSuchAlgorithmException {
         Logic.ProgramData data = readAndVerifyContract(contract.program, 7, 2);
 
-        int fee = data.intBlock.get(1);
+        int maxFee = data.intBlock.get(1);
         int period = data.intBlock.get(2);
         int withdrawingWindow = data.intBlock.get(4);
         int amount = data.intBlock.get(5);
@@ -88,10 +109,9 @@ public class PeriodicPayment {
         }
 
         LogicsigSignature lsig = new LogicsigSignature(contract.program);
-        Address address = lsig.toAddress();
         Transaction tx = new Transaction(
-                address,
-                BigInteger.valueOf(fee),
+                contract.address,
+                BigInteger.valueOf(maxFee),
                 BigInteger.valueOf(firstValid),
                 BigInteger.valueOf(firstValid + withdrawingWindow),
                 null,
@@ -100,8 +120,11 @@ public class PeriodicPayment {
                 "",
                 genesisHash);
         tx.setLease(lease);
+        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(feePerByte));
 
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(fee));
+        if (tx.fee.longValue() > maxFee) {
+            throw new RuntimeException("Withrawl transaction fee too high: " + tx.fee + " > " + maxFee);
+        }
 
         if (!lsig.verify(tx.sender)) {
             throw new IllegalArgumentException("Failed to verify transaction.");
