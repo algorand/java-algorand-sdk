@@ -17,9 +17,6 @@ def setup_sdk():
     subprocess.check_call(['rm -rf target'], shell=True)
     subprocess.check_call(['mvn install -q -DskipTests=true'], shell=True)
 
-    # get feature files/config files/python scripts
-    subprocess.check_call(['git clone --single-branch --branch michelle/test https://github.com/algorand/algorand-sdk-testing.git temp'], shell=True)
-
 
 def test_sdk():
     sys.stdout.flush()
