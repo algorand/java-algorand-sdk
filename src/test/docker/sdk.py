@@ -1,18 +1,7 @@
 #!/usr/bin/env python3
 
-import argparse
-import git
-import os
-import pprint
-import shutil
 import subprocess
-import tarfile
-import time
-import json
-import urllib.request
-from os.path import expanduser, join
 import sys
-
 
 
 default_dirs = { 
@@ -21,15 +10,16 @@ default_dirs = {
     'docker': '/opt/java-algorand-sdk/src/test/docker'
 }
 
-version = "current"
-# version = "past"
-
 def setup_sdk():
     """
     Setup java cucumber environment.
     """    
     subprocess.check_call(['rm -rf target'], shell=True)
     subprocess.check_call(['mvn install -q -DskipTests=true'], shell=True)
+
+    # get feature files/config files/python scripts
+    subprocess.check_call(['git clone --single-branch --branch michelle/test https://github.com/algorand/algorand-sdk-testing.git temp'], shell=True)
+
 
 def test_sdk():
     sys.stdout.flush()
