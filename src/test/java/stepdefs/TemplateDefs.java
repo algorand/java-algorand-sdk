@@ -47,8 +47,8 @@ public class TemplateDefs {
         this.base = base;
     }
 
-    @Given("template test fixture")
-    public void template_test_fixture() {
+    @Given("contract test fixture")
+    public void contract_test_fixture() {
     }
 
     // Shared across contracts.
