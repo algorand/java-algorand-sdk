@@ -394,10 +394,6 @@ public class Transaction implements Serializable {
         Objects.requireNonNull(genesisHash);
         Objects.requireNonNull(assetTotal);
         Objects.requireNonNull(assetDecimals);
-        Objects.requireNonNull(assetUnitName);
-        Objects.requireNonNull(assetName);
-        Objects.requireNonNull(url);
-        Objects.requireNonNull(metadataHash);
 
         AssetParams params = new AssetParams(assetTotal, assetDecimals, defaultFrozen, assetUnitName, assetName, url,
                 metadataHash, manager, reserve, freeze, clawback);
