@@ -7,53 +7,57 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Build an asset freeze transaction.
+ * Build an asset accept transaction.
  */
-public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuilder<T>> extends TransactionBuilder<T> {
-    // asset freeze fields
-    protected Address freezeTarget = null;
+public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuilder<T>> extends TransactionBuilder<T> {
+    protected Address acceptingAccount = null;
     protected BigInteger assetIndex = null;
-    protected boolean freezeState = false;
 
     /**
-     * Initialize a {@link AssetFreezeTransactionBuilder}.
+     * Initialize a {@link AssetAcceptTransactionBuilder}.
      */
-    public static AssetFreezeTransactionBuilder<?> Builder() {
-        return new AssetFreezeTransactionBuilder<>();
+    public static AssetAcceptTransactionBuilder<?> Builder() {
+        return new AssetAcceptTransactionBuilder<>();
     }
 
-    protected AssetFreezeTransactionBuilder() {
-        super(Transaction.Type.AssetFreeze);
+    protected AssetAcceptTransactionBuilder() {
+        super(Transaction.Type.AssetTransfer);
     }
 
     @Override
     protected Transaction buildInternal() {
-        return Transaction.createAssetFreezeTransaction(
-                sender,
-                freezeTarget,
-                freezeState,
-                fee,
+        if (sender != null) {
+            throw new IllegalArgumentException("Do not use 'sender' for asset transfer transactions. Only use 'assetSender'");
+        }
+
+        return Transaction.createAssetTransferTransaction(
+                acceptingAccount,
+                acceptingAccount,
+                new Address(),
+                BigInteger.valueOf(0),
+                flatFee,
                 firstValid,
                 lastValid,
                 note,
+                genesisID,
                 genesisHash,
                 assetIndex);
     }
 
     /**
-     * Set the freezeTarget.
+     * Set the acceptingAccount.
      */
-    public T freezeTarget(Address freezeTarget) {
-        this.freezeTarget = freezeTarget;
+    public T acceptingAccount(Address acceptingAccount) {
+        this.acceptingAccount = acceptingAccount;
         return (T) this;
     }
 
     /**
-     * Set the freezeTarget.
+     * Set the acceptingAccount.
      */
-    public T freezeTarget(String freezeTarget) {
+    public T acceptingAccount(String acceptingAccount) {
         try {
-            this.freezeTarget = new Address(freezeTarget);
+            this.acceptingAccount = new Address(acceptingAccount);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
@@ -61,13 +65,12 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     }
 
     /**
-     * Set the freezeTarget.
+     * Set the acceptingAccount.
      */
-    public T freezeTarget(byte[] freezeTarget) {
-        this.freezeTarget = new Address(freezeTarget);
+    public T acceptingAccount(byte[] acceptingAccount) {
+        this.acceptingAccount = new Address(acceptingAccount);
         return (T) this;
     }
-
 
     /**
      * Set the assetIndex.
@@ -92,14 +95,6 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     public T assetIndex(Long assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
         this.assetIndex = BigInteger.valueOf(assetIndex);
-        return (T) this;
-    }
-
-    /**
-     * Set the freezeState.
-     */
-    public T freezeState(boolean freezeState) {
-        this.freezeState = freezeState;
         return (T) this;
     }
 }

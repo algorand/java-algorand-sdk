@@ -5,11 +5,11 @@ import com.algorand.algosdk.transaction.Transaction;
 import java.math.BigInteger;
 
 /**
- * Build an asset create transaction. This a specialized form of an AssetConfig Transaction with a null index.
+ * Build an asset configure transaction.
  */
 public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactionBuilder<T>> extends AssetCreateTransactionBuilder<T> {
-    BigInteger index = null;
-    boolean strictEmptyAddressChecking = true;
+    protected BigInteger assetIndex = null;
+    protected boolean strictEmptyAddressChecking = true;
 
     /**
      * Initialize a {@link AssetConfigureTransactionBuilder}.
@@ -28,7 +28,7 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
                 note,
                 genesisID,
                 genesisHash,
-                index,
+                assetIndex,
                 manager,
                 reserve,
                 freeze,
@@ -37,28 +37,28 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
     }
 
     /**
-     * Set the index.
+     * Set the assetIndex.
      */
-    public T index(BigInteger index) {
-        this.index = index;
+    public T assetIndex(BigInteger assetIndex) {
+        this.assetIndex = assetIndex;
         return (T) this;
     }
 
     /**
-     * Set the index.
+     * Set the assetIndex.
      */
-    public T index(Integer index) {
-        if (index < 0) throw new IllegalArgumentException("index cannot be a negative value");
-        this.index = BigInteger.valueOf(index);
+    public T assetIndex(Integer assetIndex) {
+        if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
+        this.assetIndex = BigInteger.valueOf(assetIndex);
         return (T) this;
     }
 
     /**
-     * Set the index.
+     * Set the assetIndex.
      */
-    public T index(Long index) {
-        if (index < 0) throw new IllegalArgumentException("index cannot be a negative value");
-        this.index = BigInteger.valueOf(index);
+    public T assetIndex(Long assetIndex) {
+        if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
+        this.assetIndex = BigInteger.valueOf(assetIndex);
         return (T) this;
     }
 

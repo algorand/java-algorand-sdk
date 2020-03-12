@@ -12,15 +12,15 @@ import java.math.BigInteger;
  */
 public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransactionBuilder<T>> extends TransactionBuilder<T> {
     // votePK is the participation public key used in key registration transactions
-    private ParticipationPublicKey votePK = new ParticipationPublicKey();
+    protected ParticipationPublicKey votePK = new ParticipationPublicKey();
     // selectionPK is the VRF private key used in key registration transactions
-    private VRFPublicKey selectionPK = new VRFPublicKey();
+    protected VRFPublicKey selectionPK = new VRFPublicKey();
     // voteFirst is the first round this keyreg tx is valid for
-    private BigInteger voteFirst = BigInteger.valueOf(0);
+    protected BigInteger voteFirst = BigInteger.valueOf(0);
     // voteLast is the last round this keyreg tx is valid for
-    private BigInteger voteLast = BigInteger.valueOf(0);
+    protected BigInteger voteLast = BigInteger.valueOf(0);
     // voteKeyDilution
-    private BigInteger voteKeyDilution = BigInteger.valueOf(0);
+    protected BigInteger voteKeyDilution = BigInteger.valueOf(0);
 
     /**
      * Initialize a {@link KeyRegistrationTransactionBuilder}.
@@ -29,7 +29,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
         return new KeyRegistrationTransactionBuilder<>();
     }
 
-    public KeyRegistrationTransactionBuilder() {
+    protected KeyRegistrationTransactionBuilder() {
         super(Transaction.Type.KeyRegistration);
     }
 

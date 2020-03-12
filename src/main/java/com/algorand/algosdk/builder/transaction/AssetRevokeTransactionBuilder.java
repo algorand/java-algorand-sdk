@@ -12,11 +12,11 @@ import java.security.NoSuchAlgorithmException;
  * only succeeds when the sender is equal the clawback account address.
  */
 public class AssetRevokeTransactionBuilder<T extends AssetRevokeTransactionBuilder<T>> extends TransactionBuilder<T> {
-    Address assetRevokeFrom = null;
-    Address assetReceiver = null;
-    Address assetCloseTo = null;
-    BigInteger assetAmount = null;
-    BigInteger assetIndex = null;
+    protected Address assetRevokeFrom = null;
+    protected Address assetReceiver = null;
+    protected Address assetCloseTo = null;
+    protected BigInteger assetAmount = null;
+    protected BigInteger assetIndex = null;
 
     /**
      * Initialize a {@link AssetRevokeTransactionBuilder}.
@@ -25,7 +25,7 @@ public class AssetRevokeTransactionBuilder<T extends AssetRevokeTransactionBuild
         return new AssetRevokeTransactionBuilder<>();
     }
 
-    public AssetRevokeTransactionBuilder() {
+    protected AssetRevokeTransactionBuilder() {
         super(Transaction.Type.AssetTransfer);
     }
 

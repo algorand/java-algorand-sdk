@@ -10,9 +10,9 @@ import java.security.NoSuchAlgorithmException;
  * Build a payment transaction.
  */
 public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> extends TransactionBuilder<T> {
-    public BigInteger amount = null;
-    public Address receiver = null;
-    public Address closeRemainderTo = null;
+    protected BigInteger amount = null;
+    protected Address receiver = null;
+    protected Address closeRemainderTo = null;
 
     /**
      * Initialize a {@link PaymentTransactionBuilder}.
@@ -21,7 +21,7 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
         return new PaymentTransactionBuilder<>();
     }
 
-    private PaymentTransactionBuilder() {
+    protected PaymentTransactionBuilder() {
         super(Transaction.Type.Payment);
     }
 

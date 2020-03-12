@@ -8,7 +8,7 @@ import java.math.BigInteger;
  * Build an asset destroy transaction.
  */
 public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBuilder<T>> extends TransactionBuilder<T> {
-    private BigInteger index = null;
+    protected BigInteger assetIndex = null;
 
     /**
      * Initialize a {@link AssetDestroyTransactionBuilder}.
@@ -17,7 +17,7 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
         return new AssetDestroyTransactionBuilder<>();
     }
 
-    public AssetDestroyTransactionBuilder() {
+    protected AssetDestroyTransactionBuilder() {
         super(Transaction.Type.AssetConfig);
     }
 
@@ -30,32 +30,32 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
                 lastValid,
                 note,
                 genesisHash,
-                index);
+                assetIndex);
     }
 
     /**
-     * Set the index.
+     * Set the assetIndex.
      */
-    public T index(BigInteger index) {
-        this.index = index;
+    public T assetIndex(BigInteger assetIndex) {
+        this.assetIndex = assetIndex;
         return (T) this;
     }
 
     /**
-     * Set the index.
+     * Set the assetIndex.
      */
-    public T index(Integer index) {
-        if (index < 0) throw new IllegalArgumentException("index cannot be a negative value");
-        this.index = BigInteger.valueOf(index);
+    public T assetIndex(Integer assetIndex) {
+        if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
+        this.assetIndex = BigInteger.valueOf(assetIndex);
         return (T) this;
     }
 
     /**
-     * Set the index.
+     * Set the assetIndex.
      */
-    public T index(Long index) {
-        if (index < 0) throw new IllegalArgumentException("index cannot be a negative value");
-        this.index = BigInteger.valueOf(index);
+    public T assetIndex(Long assetIndex) {
+        if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
+        this.assetIndex = BigInteger.valueOf(assetIndex);
         return (T) this;
     }
 }

@@ -12,17 +12,17 @@ import java.security.NoSuchAlgorithmException;
  * Build an asset create transaction, a specialized form of the AssetConfigurationTransaction with a null index.
  */
 public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuilder<T>> extends TransactionBuilder<T> {
-    BigInteger assetTotal = null;
-    Integer assetDecimals = null;
-    boolean defaultFrozen = false;
-    String assetUnitName = null;
-    String assetName = null;
-    String url = null;
-    byte[] metadataHash = null;
-    Address manager = null;
-    Address reserve = null;
-    Address freeze = null;
-    Address clawback = null;
+    protected BigInteger assetTotal = null;
+    protected Integer assetDecimals = null;
+    protected boolean defaultFrozen = false;
+    protected String assetUnitName = null;
+    protected String assetName = null;
+    protected String url = null;
+    protected byte[] metadataHash = null;
+    protected Address manager = null;
+    protected Address reserve = null;
+    protected Address freeze = null;
+    protected Address clawback = null;
 
     /**
      * Initialize a {@link AssetCreateTransactionBuilder}.
@@ -31,7 +31,7 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
         return new AssetCreateTransactionBuilder<>();
     }
 
-    public AssetCreateTransactionBuilder() {
+    protected AssetCreateTransactionBuilder() {
         super(Transaction.Type.AssetConfig);
     }
 

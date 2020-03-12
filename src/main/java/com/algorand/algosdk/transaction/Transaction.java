@@ -1269,49 +1269,56 @@ public class Transaction implements Serializable {
     /**
      * Create a {@link KeyRegistrationTransactionBuilder}.
      */
-    public static KeyRegistrationTransactionBuilder KeyRegistrationTransactionBuilder() {
+    public static KeyRegistrationTransactionBuilder<?> KeyRegistrationTransactionBuilder() {
         return KeyRegistrationTransactionBuilder.Builder();
     }
 
     /**
      * Create a {@link AssetCreateTransactionBuilder}.
      */
-    public static AssetCreateTransactionBuilder AssetCreateTransactionBuilder() {
+    public static AssetCreateTransactionBuilder<?> AssetCreateTransactionBuilder() {
         return AssetCreateTransactionBuilder.Builder();
     }
 
     /**
      * Create a {@link AssetConfigureTransactionBuilder}.
      */
-    public static AssetConfigureTransactionBuilder AssetConfigureTransactionBuilder() {
+    public static AssetConfigureTransactionBuilder<?> AssetConfigureTransactionBuilder() {
         return AssetConfigureTransactionBuilder.Builder();
     }
 
     /**
      * Create a {@link AssetDestroyTransactionBuilder}.
      */
-    public static AssetDestroyTransactionBuilder AssetDestroyTransactionBuilder() {
+    public static AssetDestroyTransactionBuilder<?> AssetDestroyTransactionBuilder() {
         return AssetDestroyTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link AssetAcceptTransactionBuilder}.
+     */
+    public static AssetAcceptTransactionBuilder<?> AssetAcceptTransactionBuilder() {
+        return AssetAcceptTransactionBuilder.Builder();
     }
 
     /**
      * Create a {@link AssetTransferTransactionBuilder}.
      */
-    public static AssetTransferTransactionBuilder AssetTransferTransactionBuilder() {
+    public static AssetTransferTransactionBuilder<?> AssetTransferTransactionBuilder() {
         return AssetTransferTransactionBuilder.Builder();
     }
 
     /**
      * Create a {@link AssetRevokeTransactionBuilder}.
      */
-    public static AssetRevokeTransactionBuilder AssetRevokeTransactionBuilder() {
+    public static AssetRevokeTransactionBuilder<?> AssetRevokeTransactionBuilder() {
         return AssetRevokeTransactionBuilder.Builder();
     }
 
     /**
      * Create a {@link AssetFreezeTransactionBuilder}.
      */
-    public static AssetFreezeTransactionBuilder AssetFreezeTransactionBuilder() {
+    public static AssetFreezeTransactionBuilder<?> AssetFreezeTransactionBuilder() {
         return AssetFreezeTransactionBuilder.Builder();
     }
 }

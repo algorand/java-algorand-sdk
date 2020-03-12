@@ -45,7 +45,14 @@ public class TestTransaction {
     public void testSerialization() throws Exception {
         Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
         Address to = new Address("CQW2QBBUW5AGFDXMURQBRJN2AM3OHHQWXXI4PEJXRCVTEJ3E5VBTNRTEAE");
-        Transaction tx = new Transaction(from, to, 100, 301, 1300, "", new Digest());
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .receiver(to)
+                .amount(100)
+                .firstValid(301)
+                .lastValid(1300)
+                .genesisHash(new Digest())
+                .build();
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
@@ -66,7 +73,14 @@ public class TestTransaction {
     public void testSerializationMsgpack() throws Exception {
         Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
         Address to = new Address("CQW2QBBUW5AGFDXMURQBRJN2AM3OHHQWXXI4PEJXRCVTEJ3E5VBTNRTEAE");
-        Transaction tx = new Transaction(from, to, 100, 301, 1300, "", new Digest());
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .receiver(to)
+                .amount(100)
+                .firstValid(301)
+                .lastValid(1300)
+                .genesisHash(new Digest())
+                .build();
 
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
@@ -84,26 +98,23 @@ public class TestTransaction {
         Address clawback = addr;
         String metadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
 
-        Transaction tx = Transaction.createAssetCreateTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(100),
-                numDecimal,
-                false,
-                "tst",
-                "testcoin",
-                "website",
-                metadataHash.getBytes(StandardCharsets.UTF_8),
-                manager,
-                reserve,
-                freeze,
-                clawback);
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
+        Transaction tx = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(numDecimal)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("website")
+                .metadataHashUTF8(metadataHash)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
 
         Transaction.AssetParams expectedParams = new Transaction.AssetParams(
                 BigInteger.valueOf(100),
@@ -194,22 +205,19 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
 
-        Transaction tx = Transaction.createAssetConfigureTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(1234),
-                manager,
-                reserve,
-                freeze,
-                clawback,
-                true);
+        Transaction tx = Transaction.AssetConfigureTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetIndex(1234)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
 
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
 
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
@@ -232,39 +240,35 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
 
-        assertThatThrownBy(() -> Transaction.createAssetConfigureTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(1234),
-                manager,
-                reserve,
-                new Address(),
-                clawback,
-                true))
+        assertThatThrownBy(() -> Transaction.AssetConfigureTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetIndex(1234)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(new Address())
+                .build())
             .isInstanceOf(RuntimeException.class)
             .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
 
-        assertThatThrownBy(() -> Transaction.createAssetConfigureTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(1234),
-                manager,
-                reserve,
-                freeze,
-                null,
-                true))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
+        assertThatThrownBy(() -> Transaction.AssetConfigureTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetIndex(1234)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(new Address())
+                .build())
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
     }
 
     @Test
@@ -275,17 +279,16 @@ public class TestTransaction {
         Address target = addr;
         BigInteger assetFreezeID = BigInteger.valueOf(1);
         boolean freezeState = true;
-        Transaction tx = Transaction.createAssetFreezeTransaction(
-                sender,
-                target,
-                freezeState,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323576),
-                null,
-                new Digest(gh),
-                assetFreezeID);
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
+        Transaction tx = Transaction.AssetFreezeTransactionBuilder()
+                .sender(sender)
+                .freezeTarget(target)
+                .freezeState(freezeState)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323576)
+                .genesisHash(gh)
+                .assetIndex(assetFreezeID)
+                .build();
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
         SignedTransaction o = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
@@ -317,18 +320,19 @@ public class TestTransaction {
         String genesisID = "devnet-v33.0";
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="));
 
-        Transaction tx = new Transaction(fromAddr,
-                BigInteger.valueOf(4),
-                firstValidRound,
-                lastValidRound,
-                note,
-                genesisID,
-                genesisHash,
-                amountToSend,
-                toAddr,
-                closeTo);
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(fromAddr)
+                .fee(4)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .note(note)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amountToSend)
+                .receiver(toAddr)
+                .closeRemainderTo(closeTo)
+                .build();
 
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(4));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
         assertThat(o).isEqualTo(tx);
@@ -353,18 +357,32 @@ public class TestTransaction {
         BigInteger firstRound1 = BigInteger.valueOf(710399);
         byte[] note1 = Encoder.decodeFromBase64("wRKw5cJ0CMo=");
 
-        Transaction tx1 = new Transaction(
-            from, fee, firstRound1, firstRound1.add(BigInteger.valueOf(1000)),
-            note1, genesisID, genesisHash, amount, to, null
-        );
+        Transaction tx1 = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .flatFee(fee)
+                .firstValid(firstRound1)
+                .lastValid(firstRound1.longValue() + 1000)
+                .note(note1)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(to)
+                .build();
 
         BigInteger firstRound2 = BigInteger.valueOf(710515);
         byte[] note2 = Encoder.decodeFromBase64("dBlHI6BdrIg=");
 
-        Transaction tx2 = new Transaction(
-            from, fee, firstRound2, firstRound2.add(BigInteger.valueOf(1000)),
-            note2, genesisID, genesisHash, amount, to, null
-        );
+        Transaction tx2 = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .flatFee(fee)
+                .firstValid(firstRound2)
+                .lastValid(firstRound2.longValue() + 1000)
+                .note(note2)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(to)
+                .build();
 
         // check serialization/deserialization without group field
         assertThat(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx1), Transaction.class)).isEqualTo(tx1);
@@ -440,16 +458,14 @@ public class TestTransaction {
         BigInteger firstValidRound = BigInteger.valueOf(322575);
         BigInteger lastValidRound = BigInteger.valueOf(323575);
 
-        Transaction tx = Transaction.createAssetAcceptTransaction(
-                recipient,
-                BigInteger.valueOf(10),
-                firstValidRound,
-                lastValidRound,
-                null,
-                "",
-                new Digest(gh),
-                assetIndex);
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
+        Transaction tx = Transaction.AssetAcceptTransactionBuilder()
+                .acceptingAccount(recipient)
+                .fee(10)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .genesisHash(gh)
+                .assetIndex(assetIndex)
+                .build();
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
         assertThat(o).isEqualTo(tx);
@@ -494,18 +510,18 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323576);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.createAssetTransferTransaction(
-                sender,
-                recipient,
-                closeAssetsTo,
-                amountToSend,
-                BigInteger.valueOf(10),
-                firstValidRound,
-                lastValidRound,
-                null,
-                "",
-                new Digest(gh),
-                assetIndex);
+        Transaction tx = Transaction.AssetTransferTransactionBuilder()
+                .assetSender(sender)
+                .assetReceiver(recipient)
+                .assetCloseTo(closeAssetsTo)
+                .assetAmount(amountToSend)
+                .flatFee(10)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .genesisHash(gh)
+                .assetIndex(assetIndex)
+                .build();
+
 
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
@@ -555,18 +571,18 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323575);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.createAssetRevokeTransaction(
-                revoker,
-                revokeFrom,
-                receiver,
-                amountToSend,
-                BigInteger.valueOf(10),
-                firstValidRound,
-                lastValidRound,
-                null,
-                "",
-                new Digest(gh),
-                assetIndex);
+        Transaction tx = Transaction.AssetRevokeTransactionBuilder()
+                .sender(revoker)
+                .assetRevokeFrom(revokeFrom)
+                .assetReceiver(receiver)
+                .assetAmount(amountToSend)
+                .flatFee(10)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .genesisHash(gh)
+                .assetIndex(assetIndex)
+                .build();
+
 
         Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
@@ -589,20 +605,19 @@ public class TestTransaction {
         Address addr1 = new Address("726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM");
         Address addr2 = new Address("42NJMHTPFVPXVSDGA6JGKUV6TARV5UZTMPFIREMLXHETRKIVW34QFSDFRE");
         Account account1 = new Account(Encoder.decodeFromBase64("cv8E0Ln24FSkwDgGeuXKStOTGcze5u8yldpXxgrBxumFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT7w=="));
-        Account account2 = new Account(Encoder.decodeFromBase64("2qjz96Vj9M6YOqtNlfJUOKac13EHCXyDty94ozCjuwwriI+jzFgStFx9E6kEk1l4+lFsW4Te2PY1KV8kNcccRg=="));
-        Transaction txn = new Transaction(
-                account1.getAddress(),
-                Account.MIN_TX_FEE_UALGOS.multiply(BigInteger.TEN),
-                BigInteger.valueOf(12345),
-                BigInteger.valueOf(12346),
-                null,
-                "",
-                new Digest("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="),
-                BigInteger.valueOf(5000),
-                addr1,
-                addr2);
+
         String lease = "f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=";
-        txn.setLease(new Lease(lease));
+        Transaction txn = Transaction.PaymentTransactionBuilder()
+                .sender(account1.getAddress())
+                .fee(Account.MIN_TX_FEE_UALGOS.longValue() * 10)
+                .firstValid(12345)
+                .lastValid(12346)
+                .genesisHashB64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=")
+                .amount(5000)
+                .receiver(addr1)
+                .closeRemainderTo(addr2)
+                .leaseB64(lease)
+                .build();
 
         byte[] packed = Encoder.encodeToMsgPack(txn);
         Transaction txnDecoded = Encoder.decodeFromMsgPack(packed, Transaction.class);
@@ -629,20 +644,21 @@ public class TestTransaction {
         byte[] note = Encoder.decodeFromBase64("6gAVR0Nsv5Y=");
         String genesisID = "devnet-v33.0";
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="));
-
-        Transaction tx = new Transaction(fromAddr,
-                BigInteger.valueOf(4),
-                firstValidRound,
-                lastValidRound,
-                note,
-                genesisID,
-                genesisHash,
-                amountToSend,
-                toAddr,
-                closeTo);
         byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
-        tx.setLease(new Lease(lease));
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(4));
+
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(fromAddr)
+                .fee(4)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .note(note)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amountToSend)
+                .receiver(toAddr)
+                .closeRemainderTo(closeTo)
+                .lease(lease)
+                .build();
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
         assertThat(o).isEqualTo(tx);

@@ -11,11 +11,11 @@ import java.security.NoSuchAlgorithmException;
  *  The asset receiver must have marked itself as willing to accept the asset.
  */
 public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionBuilder<T>> extends TransactionBuilder<T> {
-    Address assetSender = null;
-    Address assetReceiver = null;
-    Address assetCloseTo = null;
-    BigInteger assetAmount = null;
-    BigInteger assetIndex = null;
+    protected Address assetSender = null;
+    protected Address assetReceiver = null;
+    protected Address assetCloseTo = null;
+    protected BigInteger assetAmount = null;
+    protected BigInteger assetIndex = null;
 
     /**
      * Initialize a {@link AssetTransferTransactionBuilder}.
@@ -24,7 +24,7 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
         return new AssetTransferTransactionBuilder<>();
     }
 
-    public AssetTransferTransactionBuilder() {
+    protected AssetTransferTransactionBuilder() {
         super(Transaction.Type.AssetTransfer);
     }
 

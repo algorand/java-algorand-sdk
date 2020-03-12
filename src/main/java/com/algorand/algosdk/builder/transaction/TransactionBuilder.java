@@ -18,18 +18,18 @@ import java.security.NoSuchAlgorithmException;
  * TransactionBuilder has parameters common to all transactions types.
  */
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
-    final Transaction.Type type;
+    protected final Transaction.Type type;
 
-    Address sender = null;
-    public BigInteger fee = null;
-    public BigInteger flatFee = null;
-    public BigInteger firstValid = null;
-    public BigInteger lastValid = null;
-    public byte[] note = null;
-    public byte[] lease = null;
-    public String genesisID = null;
-    public Digest genesisHash = null;
-    public Digest group = null;
+    protected Address sender = null;
+    protected BigInteger fee = null;
+    protected BigInteger flatFee = null;
+    protected BigInteger firstValid = null;
+    protected BigInteger lastValid = null;
+    protected byte[] note = null;
+    protected byte[] lease = null;
+    protected String genesisID = null;
+    protected Digest genesisHash = null;
+    protected Digest group = null;
 
     protected TransactionBuilder(Transaction.Type type) {
         this.type = type;
@@ -47,6 +47,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         }
 
         Transaction txn = buildInternal();
+
+        if(lease != null) {
+            txn.setLease(lease);
+        }
 
         if(fee != null) {
             try {
