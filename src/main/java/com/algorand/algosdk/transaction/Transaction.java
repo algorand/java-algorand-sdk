@@ -166,7 +166,7 @@ public class Transaction implements Serializable {
         setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
-        if (note != null) this.note = note;
+        setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
         if (amount != null) this.amount = amount;
@@ -197,7 +197,7 @@ public class Transaction implements Serializable {
         setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
-        if (note != null) this.note = note;
+        setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;        
         if (votePK != null) this.votePK = votePK;
@@ -237,7 +237,7 @@ public class Transaction implements Serializable {
         setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
-        if (note != null) this.note = note;
+        setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
  
@@ -300,7 +300,7 @@ public class Transaction implements Serializable {
         setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
-        if (note != null) this.note = note;
+        setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
         this.assetParams = new AssetParams(BigInteger.valueOf(0), 0, false, "", "", "", null, manager, reserve, freeze, clawback);
@@ -477,11 +477,11 @@ public class Transaction implements Serializable {
         setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
-        if (note != null) this.note = note;
+        setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
-        if (lease != null) this.lease = lease;
-        if (group != null) this.group = group;	
+        setLease(lease);
+        if (group != null) this.group = group;
         if (amount != null) this.amount = amount;
         if (receiver != null) this.receiver = receiver;
         if (closeRemainderTo != null) this.closeRemainderTo = closeRemainderTo;
@@ -530,7 +530,7 @@ public class Transaction implements Serializable {
         setFee(flatFee);
         if (firstRound != null) this.firstValid = firstRound;
         if (lastRound != null) this.lastValid = lastRound;
-        if (note != null) this.note = note;
+        setNote(note);
         if (genesisHash != null) this.genesisHash = genesisHash;
     }
 
@@ -745,6 +745,12 @@ public class Transaction implements Serializable {
         return tx;
     }
 
+    private void setNote(byte[] note) {
+        if (note != null && note.length != 0) {
+            this.note = note;
+        }
+    }
+
     /**
      * Set a transaction fee taking the minimum transaction fee into consideration.
      * @param fee
@@ -770,7 +776,8 @@ public class Transaction implements Serializable {
          */
     }
 
-    /** Lease enforces mutual exclusion of transactions.  If this field
+    /**
+     * Lease enforces mutual exclusion of transactions.  If this field
      * is nonzero, then once the transaction is confirmed, it acquires
      * the lease identified by the (Sender, Lease) pair of the
      * transaction until the LastValid round passes.  While this
@@ -784,10 +791,13 @@ public class Transaction implements Serializable {
     @Deprecated
     @JsonIgnore
     public void setLease(byte[] lease) {
-        setLease(new Lease(lease));
+        if (lease != null && lease.length != 0) {
+            setLease(new Lease(lease));
+        }
     }
 
-    /** Lease enforces mutual exclusion of transactions.  If this field
+    /**
+     * Lease enforces mutual exclusion of transactions.  If this field
      * is nonzero, then once the transaction is confirmed, it acquires
      * the lease identified by the (Sender, Lease) pair of the
      * transaction until the LastValid round passes.  While this
@@ -797,7 +807,9 @@ public class Transaction implements Serializable {
      * @param lease Lease object
      **/
     public void setLease(Lease lease) {
-        this.lease = lease.getBytes();
+        if (lease != null) {
+            this.lease = lease.getBytes();
+        }
     }
 
     /**
