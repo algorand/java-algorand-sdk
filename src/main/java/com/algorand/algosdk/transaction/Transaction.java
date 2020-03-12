@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -189,10 +188,10 @@ public class Transaction implements Serializable {
                                                         BigInteger lastValid, byte[] note, String genesisID,
                                                         Digest genesisHash, BigInteger amount, Address receiver,
                                                         Address closeRemainderTo) {
-        Objects.requireNonNull(sender);
-        Objects.requireNonNull(firstValid);
-        Objects.requireNonNull(lastValid);
-        Objects.requireNonNull(genesisHash);
+        Objects.requireNonNull(sender, "sender is required.");
+        Objects.requireNonNull(firstValid, "firstValid is required.");
+        Objects.requireNonNull(lastValid, "lastValid is required.");
+        Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
         if (sender == null && closeRemainderTo == null) {
             throw new IllegalArgumentException("Must set at least one of 'receiver' or 'closeRemainderTo'");
@@ -277,15 +276,15 @@ public class Transaction implements Serializable {
                                                                Digest genesisHash, ParticipationPublicKey votePK,
                                                                VRFPublicKey vrfPK, BigInteger voteFirst,
                                                                BigInteger voteLast, BigInteger voteKeyDilution) {
-        Objects.requireNonNull(sender);
-        Objects.requireNonNull(firstValid);
-        Objects.requireNonNull(lastValid);
-        Objects.requireNonNull(genesisHash);
-        Objects.requireNonNull(votePK);
-        Objects.requireNonNull(vrfPK);
-        Objects.requireNonNull(voteFirst);
-        Objects.requireNonNull(voteLast);
-        Objects.requireNonNull(voteKeyDilution);
+        Objects.requireNonNull(sender, "sender is required");
+        Objects.requireNonNull(firstValid, "firstValid is required");
+        Objects.requireNonNull(lastValid, "lastValid is required");
+        Objects.requireNonNull(genesisHash, "genesisHash is required");
+        Objects.requireNonNull(votePK, "votePK is required");
+        Objects.requireNonNull(vrfPK, "vrfPK is required");
+        Objects.requireNonNull(voteFirst, "voteFirst is required");
+        Objects.requireNonNull(voteLast, "voteLast is required");
+        Objects.requireNonNull(voteKeyDilution, "voteKeyDilution is required");
 
         return new Transaction(
                 Type.KeyRegistration,
@@ -388,12 +387,12 @@ public class Transaction implements Serializable {
                        String assetUnitName, String assetName, String url, byte[] metadataHash,
                        Address manager, Address reserve, Address freeze, Address clawback) {
 
-        Objects.requireNonNull(sender);
-        Objects.requireNonNull(firstValid);
-        Objects.requireNonNull(lastValid);
-        Objects.requireNonNull(genesisHash);
-        Objects.requireNonNull(assetTotal);
-        Objects.requireNonNull(assetDecimals);
+        Objects.requireNonNull(sender, "sender is required.");
+        Objects.requireNonNull(firstValid, "firstValid is required.");
+        Objects.requireNonNull(lastValid, "lastValid is required.");
+        Objects.requireNonNull(genesisHash, "genesisHash is required.");
+        Objects.requireNonNull(assetTotal, "assetTotal is required.");
+        Objects.requireNonNull(assetDecimals, "assetDecimals is required.");
 
         AssetParams params = new AssetParams(assetTotal, assetDecimals, defaultFrozen, assetUnitName, assetName, url,
                 metadataHash, manager, reserve, freeze, clawback);
