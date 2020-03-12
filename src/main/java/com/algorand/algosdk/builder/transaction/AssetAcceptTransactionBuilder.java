@@ -30,12 +30,9 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
             throw new IllegalArgumentException("Do not use 'sender' for asset transfer transactions. Only use 'assetSender'");
         }
 
-        return Transaction.createAssetTransferTransaction(
+        return Transaction.createAssetAcceptTransaction(
                 acceptingAccount,
-                acceptingAccount,
-                new Address(),
-                BigInteger.valueOf(0),
-                flatFee,
+                fee,
                 firstValid,
                 lastValid,
                 note,
