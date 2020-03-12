@@ -116,27 +116,25 @@ public class Split {
         Address receiver1 = new Address(data.byteBlock.get(1));
         Address receiver2 = new Address(data.byteBlock.get(2));
 
-        Transaction tx1 = new Transaction(
-                contract.address,
-                receiver1,
-                null,
-                BigInteger.valueOf(receiverOneAmount),
-                BigInteger.valueOf(firstValid),
-                BigInteger.valueOf(lastValid),
-                null,
-                genesisHash);
-        Account.setFeeByFeePerByte(tx1, BigInteger.valueOf(feePerByte));
+        Transaction tx1 = Transaction.PaymentTransactionBuilder()
+                .sender(contract.address)
+                .receiver(receiver1)
+                .fee(feePerByte)
+                .amount(receiverOneAmount)
+                .firstValid(firstValid)
+                .lastValid(lastValid)
+                .genesisHash(genesisHash)
+                .build();
 
-        Transaction tx2 = new Transaction(
-                contract.address,
-                receiver2,
-                null,
-                BigInteger.valueOf(receiverTwoAmount),
-                BigInteger.valueOf(firstValid),
-                BigInteger.valueOf(lastValid),
-                null,
-                genesisHash);
-        Account.setFeeByFeePerByte(tx2, BigInteger.valueOf(feePerByte));
+        Transaction tx2 = Transaction.PaymentTransactionBuilder()
+                .sender(contract.address)
+                .receiver(receiver2)
+                .fee(feePerByte)
+                .amount(receiverTwoAmount)
+                .firstValid(firstValid)
+                .lastValid(lastValid)
+                .genesisHash(genesisHash)
+                .build();
 
         if (tx1.fee.longValue() > maxFee || tx2.fee.longValue() > maxFee) {
             long fee = Math.max(tx1.fee.longValue(), tx2.fee.longValue());

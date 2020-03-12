@@ -29,16 +29,16 @@ public class TestAccount {
         final String TO_ADDR = "PU7ZTZJ5GSXET2ZPIWDWDT2TQQEP7WXOGXDQ3ARUCZW6PK7D4ULSE6NYCE";
 
         // build unsigned transaction
-        Transaction tx = new Transaction(
-                new Address(FROM_ADDR),
-                new Address(TO_ADDR),
-                Account.MIN_TX_FEE_UALGOS,
-                BigInteger.valueOf(1234),
-                BigInteger.valueOf(106575),
-                BigInteger.valueOf(107575),
-                "",
-                new Digest()
-        );
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(FROM_ADDR)
+                .receiver(TO_ADDR)
+                .flatFee(Account.MIN_TX_FEE_UALGOS)
+                .amount(1234)
+                .firstValid(106575)
+                .lastValid(107575)
+                .genesisHash(new Digest())
+                .build();
+
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct
@@ -67,16 +67,15 @@ public class TestAccount {
         final String TO_ADDR = "PU7ZTZJ5GSXET2ZPIWDWDT2TQQEP7WXOGXDQ3ARUCZW6PK7D4ULSE6NYCE";
 
         // build unsigned transaction
-        Transaction tx = new Transaction(
-                new Address(FROM_ADDR),
-                new Address(TO_ADDR),
-                Account.MIN_TX_FEE_UALGOS,
-                BigInteger.valueOf(1234),
-                BigInteger.valueOf(0),
-                BigInteger.valueOf(107575),
-                "",
-                new Digest()
-        );
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(FROM_ADDR)
+                .receiver(TO_ADDR)
+                .flatFee(Account.MIN_TX_FEE_UALGOS)
+                .amount(1234)
+                .firstValid(0)
+                .lastValid(107575)
+                .genesisHash(new Digest())
+                .build();
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct
@@ -129,17 +128,17 @@ public class TestAccount {
         MultisigAddress addr = makeTestMsigAddr();
 
         // build unsigned transaction
-        Transaction tx = new Transaction(
-                new Address(addr.toString()),
-                BigInteger.valueOf(217000), // fee
-                BigInteger.valueOf(972508), // first valid
-                BigInteger.valueOf(973508), // last valid
-                Encoder.decodeFromBase64("tFF5Ofz60nE="), // note
-                BigInteger.valueOf(5000), // amount
-                new Address("DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA"), // receiver
-                "testnet-v31.0", // genesisID
-                new Digest() // genesisHash
-        );
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(addr.toString())
+                .flatFee(217000)
+                .firstValid(972508)
+                .lastValid(973508)
+                .noteB64("tFF5Ofz60nE=")
+                .amount(5000)
+                .receiver("DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA")
+                .genesisID("testnet-v31.0")
+                .genesisHash(new Digest())
+                .build();
 
         byte[] seed = Mnemonic.toKey("auction inquiry lava second expand liberty glass involve ginger illness length room item discover ahead table doctor term tackle cement bonus profit right above catch");
         Account account = new Account(seed);
@@ -244,10 +243,17 @@ public class TestAccount {
         BigInteger firstRound = BigInteger.valueOf(2063137);
         byte[] note = Encoder.decodeFromBase64("8xMCTuLQ810=");
 
-        Transaction tx = new Transaction(
-            from, fee, firstRound, firstRound.add(BigInteger.valueOf(1000)),
-            note, genesisID, genesisHash, amount, to, null
-        );
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .flatFee(fee)
+                .firstValid(firstRound)
+                .lastValid(firstRound.longValue() + 1000)
+                .note(note)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(to)
+                .build();
 
         /*
         {

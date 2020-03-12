@@ -109,18 +109,16 @@ public class PeriodicPayment {
         }
 
         LogicsigSignature lsig = new LogicsigSignature(contract.program);
-        Transaction tx = new Transaction(
-                contract.address,
-                BigInteger.valueOf(maxFee),
-                BigInteger.valueOf(firstValid),
-                BigInteger.valueOf(firstValid + withdrawingWindow),
-                null,
-                BigInteger.valueOf(amount),
-                receiver,
-                "",
-                genesisHash);
-        tx.setLease(lease);
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(feePerByte));
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(contract.address)
+                .receiver(receiver)
+                .fee(feePerByte)
+                .firstValid(firstValid)
+                .lastValid(firstValid + withdrawingWindow)
+                .amount(amount)
+                .genesisHash(genesisHash)
+                .lease(lease)
+                .build();
 
         if (tx.fee.longValue() > maxFee) {
             throw new RuntimeException("Withrawl transaction fee too high: " + tx.fee + " > " + maxFee);

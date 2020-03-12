@@ -194,6 +194,10 @@ public class Transaction implements Serializable {
         Objects.requireNonNull(lastValid);
         Objects.requireNonNull(genesisHash);
 
+        if (sender == null && closeRemainderTo == null) {
+            throw new IllegalArgumentException("Must set at least one of 'receiver' or 'closeRemainderTo'");
+        }
+
         return new Transaction(
                 Type.Payment,
                 //header fields
