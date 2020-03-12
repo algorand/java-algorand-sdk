@@ -115,6 +115,20 @@ public class DynamicFee {
                 closeToAddress);
         txn.setLease(lease);
 
+        /*
+        Transaction txn = Transaction.PaymentTransactionBuilder()
+                .sender(senderAccount.getAddress())
+                .flatFee(Account.MIN_TX_FEE_UALGOS)
+                .firstValid(firstValid)
+                .lastValid(lastValid)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(receiverAddress)
+                .closeRemainderTo(closeToAddress)
+                .lease(lease)
+                .build();
+         */
+
         LogicsigSignature lsig = senderAccount.signLogicsig(new LogicsigSignature(contract.program));
 
         return new SignedDynamicFee(txn, lsig);
@@ -138,6 +152,7 @@ public class DynamicFee {
         Account.setFeeByFeePerByte(txn, BigInteger.valueOf(feePerByte));
 
         // Reimbursement transaction
+        /*
         Transaction txn2 = new Transaction(
                 account.getAddress(),
                 BigInteger.valueOf(feePerByte),
@@ -149,6 +164,17 @@ public class DynamicFee {
                 txn.fee,
                 txn.sender,
                 null);
+        */
+        Transaction txn2 = Transaction.PaymentTransactionBuilder()
+                .sender(account.getAddress())
+                .fee(feePerByte)
+                .firstValid(txn.firstValid)
+                .lastValid(txn.lastValid)
+                .genesisID(txn.genesisID)
+                .genesisHash(txn.genesisHash)
+                .amount(txn.fee)
+                .receiver(txn.sender)
+                .build();
         txn2.setLease(new Lease(txn.lease));
         Account.setFeeByFeePerByte(txn2, BigInteger.valueOf(feePerByte));
 

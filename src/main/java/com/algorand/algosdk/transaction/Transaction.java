@@ -1,6 +1,7 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.builder.transaction.*;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
@@ -14,10 +15,12 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A raw serializable transaction class, used to generate transactions to broadcast to the network.
@@ -128,11 +131,13 @@ public class Transaction implements Serializable {
      * @param firstRound first valid round
      * @param lastRound last valid round
      */
+    @Deprecated
     public Transaction(Address fromAddr, Address toAddr, BigInteger fee, BigInteger amount, BigInteger firstRound,
                        BigInteger lastRound) {
         this(fromAddr, fee, firstRound, lastRound, null, amount, toAddr, "", new Digest());
     }
 
+    @Deprecated
     public Transaction(Address fromAddr, Address toAddr, BigInteger fee, BigInteger amount, BigInteger firstRound,
                        BigInteger lastRound,
                        String genesisID, Digest genesisHash) {
@@ -149,16 +154,19 @@ public class Transaction implements Serializable {
      * @param genesisID genesis id
      * @param genesisHash genesis hash
      */
+    @Deprecated
     public Transaction(Address fromAddr, Address toAddr, long amount, long firstRound, long lastRound,
                        String genesisID, Digest genesisHash) {
         this(fromAddr, Account.MIN_TX_FEE_UALGOS, BigInteger.valueOf(firstRound), BigInteger.valueOf(lastRound), null, BigInteger.valueOf(amount), toAddr, genesisID, genesisHash);
     }
 
+    @Deprecated
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        BigInteger amount, Address receiver, String genesisID, Digest genesisHash) {
         this(sender, fee, firstValid, lastValid, note, genesisID, genesisHash, amount, receiver, new Address());
     }
 
+    @Deprecated
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note, String genesisID, Digest genesisHash,
                        BigInteger amount, Address receiver, Address closeRemainderTo) {
         this.type = Type.Payment;
@@ -175,6 +183,55 @@ public class Transaction implements Serializable {
     }
 
     /**
+     * Create a payment transaction.
+     */
+    public static Transaction createPaymentTransaction(Address sender, BigInteger fee, BigInteger firstValid,
+                                                        BigInteger lastValid, byte[] note, String genesisID,
+                                                        Digest genesisHash, BigInteger amount, Address receiver,
+                                                        Address closeRemainderTo) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(firstValid);
+        Objects.requireNonNull(lastValid);
+        Objects.requireNonNull(genesisHash);
+
+        return new Transaction(
+                Type.Payment,
+                //header fields
+                sender,
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                genesisHash,
+                null,
+                null,
+                // payment fields
+                amount,
+                receiver,
+                closeRemainderTo,
+                // keyreg fields
+                null,
+                null,
+                null,
+                null,
+                // voteKeyDilution
+                null,
+                // asset creation and configuration
+                null,
+                null,
+                // asset transfer fields
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false); // default value which wont be included in the serialized object.
+    }
+
+    /**
      * Create a key registration transaction. No field can be null except the note field.
      * @param sender source address
      * @param fee transaction fee
@@ -187,6 +244,7 @@ public class Transaction implements Serializable {
      * @param voteLast key reg valid last round
      * @param voteKeyDilution key reg dilution
      */
+    @Deprecated
     public Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash,
                        ParticipationPublicKey votePK, VRFPublicKey vrfPK,
@@ -205,6 +263,61 @@ public class Transaction implements Serializable {
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
+    }
+
+    /**
+     * Create a key registration transaction.
+     */
+    public static Transaction createKeyRegistrationTransaction(Address sender, BigInteger fee, BigInteger firstValid,
+                                                               BigInteger lastValid, byte[] note, String genesisID,
+                                                               Digest genesisHash, ParticipationPublicKey votePK,
+                                                               VRFPublicKey vrfPK, BigInteger voteFirst,
+                                                               BigInteger voteLast, BigInteger voteKeyDilution) {
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(firstValid);
+        Objects.requireNonNull(lastValid);
+        Objects.requireNonNull(genesisHash);
+        Objects.requireNonNull(votePK);
+        Objects.requireNonNull(vrfPK);
+        Objects.requireNonNull(voteFirst);
+        Objects.requireNonNull(voteLast);
+        Objects.requireNonNull(voteKeyDilution);
+
+        return new Transaction(
+                Type.KeyRegistration,
+                //header fields
+                sender,
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                genesisHash,
+                null,
+                null,
+                // payment fields
+                null,
+                null,
+                null,
+                // keyreg fields
+                votePK,
+                vrfPK,
+                voteFirst,
+                voteLast,
+                // voteKeyDilution
+                voteKeyDilution,
+                // asset creation and configuration
+                null,
+                null,
+                // asset transfer fields
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false); // default value which wont be included in the serialized object.
     }
 
     /**
@@ -228,6 +341,7 @@ public class Transaction implements Serializable {
      * @param freeze account which can freeze or unfreeze holder accounts
      * @param clawback account which can issue clawbacks against holder accounts
      */
+    @Deprecated
     private Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
                        String assetUnitName, String assetName, String url, byte[] metadataHash, 
@@ -269,11 +383,55 @@ public class Transaction implements Serializable {
                        String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
                        String assetUnitName, String assetName, String url, byte[] metadataHash,
                        Address manager, Address reserve, Address freeze, Address clawback) {
+
+        Objects.requireNonNull(sender);
+        Objects.requireNonNull(firstValid);
+        Objects.requireNonNull(lastValid);
+        Objects.requireNonNull(genesisHash);
+        Objects.requireNonNull(assetTotal);
+        Objects.requireNonNull(assetDecimals);
+        Objects.requireNonNull(assetUnitName);
+        Objects.requireNonNull(assetName);
+        Objects.requireNonNull(url);
+        Objects.requireNonNull(metadataHash);
+
+        AssetParams params = new AssetParams(assetTotal, assetDecimals, defaultFrozen, assetUnitName, assetName, url,
+                metadataHash, manager, reserve, freeze, clawback);
         return new Transaction(
-                sender, fee, firstValid, lastValid, note,
-                genesisID, genesisHash, assetTotal, assetDecimals, defaultFrozen,
-                assetUnitName, assetName, url, metadataHash, 
-                manager, reserve, freeze, clawback);
+                Type.AssetConfig,
+                //header fields
+                sender,
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                genesisHash,
+                null,
+                null,
+                // payment fields
+                null,
+                null,
+                null,
+                // keyreg fields
+                null,
+                null,
+                null,
+                null,
+                // voteKeyDilution
+                null,
+                // asset creation and configuration
+                params,
+                null,
+                // asset transfer fields
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                false); // default value which wont be included in the serialized object.
     }
     
     /**
@@ -399,44 +557,45 @@ public class Transaction implements Serializable {
                         @JsonProperty("faid") BigInteger assetFreezeID,
                         @JsonProperty("afrz") boolean freezeState) {
         this(
-	     type,
-	     //header fields
-	     new Address(sender),
-	     fee,
-	     firstValid,
-	     lastValid,
-	     note,
-	     genesisID,
-	     new Digest(genesisHash),
-	     lease,
-	     new Digest(group),
-	     // payment fields
-	     amount,
-	     new Address(receiver),
-	     new Address(closeRemainderTo),
-	     // keyreg fields
-	     new ParticipationPublicKey(votePK),
-	     new VRFPublicKey(vrfPK),
-	     voteFirst,
-	     voteLast,
-	     voteKeyDilution,
-	     // asset creation and configuration
-	     assetParams,
-	     assetIndex,
-	     // asset transfer fields
-	     xferAsset,
-	     assetAmount,
-	     new Address(assetSender),
-	     new Address(assetReceiver),
-	     new Address(assetCloseTo),
-	     new Address(freezeTarget),
-	     assetFreezeID,
-	     freezeState);
+             type,
+             //header fields
+             new Address(sender),
+             fee,
+             firstValid,
+             lastValid,
+             note,
+             genesisID,
+             new Digest(genesisHash),
+             lease,
+             new Digest(group),
+             // payment fields
+             amount,
+             new Address(receiver),
+             new Address(closeRemainderTo),
+             // keyreg fields
+             new ParticipationPublicKey(votePK),
+             new VRFPublicKey(vrfPK),
+             voteFirst,
+             voteLast,
+             voteKeyDilution,
+             // asset creation and configuration
+             assetParams,
+             assetIndex,
+             // asset transfer fields
+             xferAsset,
+             assetAmount,
+             new Address(assetSender),
+             new Address(assetReceiver),
+             new Address(assetCloseTo),
+             new Address(freezeTarget),
+             assetFreezeID,
+             freezeState);
     }
 
     /**
      * This is the private constructor which takes all the fields of Transaction
-     **/
+     * TODO: Make this the only public constructor.
+     */
     private Transaction(
                         Type type,
                         //header fields
@@ -985,7 +1144,7 @@ public class Transaction implements Serializable {
         // metadata. The format of this metadata is up to the application.
         @JsonProperty("am")
         public byte [] metadataHash;
-	
+
         // the address which has the ability to reconfigure the asset
         @JsonProperty("m")
         public Address assetManager = new Address();
@@ -1003,17 +1162,17 @@ public class Transaction implements Serializable {
         public Address assetClawback = new Address();
         
         public AssetParams(
-			   BigInteger assetTotal,
-			   Integer assetDecimals,
-			   boolean defaultFrozen,
-			   String assetUnitName,
-			   String assetName,
-			   String url,
-			   byte [] metadataHash,
-			   Address manager,
-			   Address reserve,
-			   Address freeze,
-			   Address clawback) {
+                BigInteger assetTotal,
+                Integer assetDecimals,
+                boolean defaultFrozen,
+                String assetUnitName,
+                String assetName,
+                String url,
+                byte [] metadataHash,
+                Address manager,
+                Address reserve,
+                Address freeze,
+                Address clawback) {
             if(assetTotal != null) this.assetTotal = assetTotal;
             if(assetDecimals != null) this.assetDecimals = assetDecimals;
             this.assetDefaultFrozen = defaultFrozen;
@@ -1097,5 +1256,62 @@ public class Transaction implements Serializable {
           }
           return o.toString().replace("\n", "\n    ");
         }
+    }
+
+
+    /**
+     * Create a {@link PaymentTransactionBuilder}.
+     */
+    public static PaymentTransactionBuilder<?> PaymentTransactionBuilder() {
+        return PaymentTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link KeyRegistrationTransactionBuilder}.
+     */
+    public static KeyRegistrationTransactionBuilder KeyRegistrationTransactionBuilder() {
+        return KeyRegistrationTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link AssetCreateTransactionBuilder}.
+     */
+    public static AssetCreateTransactionBuilder AssetCreateTransactionBuilder() {
+        return AssetCreateTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link AssetConfigureTransactionBuilder}.
+     */
+    public static AssetConfigureTransactionBuilder AssetConfigureTransactionBuilder() {
+        return AssetConfigureTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link AssetDestroyTransactionBuilder}.
+     */
+    public static AssetDestroyTransactionBuilder AssetDestroyTransactionBuilder() {
+        return AssetDestroyTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link AssetTransferTransactionBuilder}.
+     */
+    public static AssetTransferTransactionBuilder AssetTransferTransactionBuilder() {
+        return AssetTransferTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link AssetRevokeTransactionBuilder}.
+     */
+    public static AssetRevokeTransactionBuilder AssetRevokeTransactionBuilder() {
+        return AssetRevokeTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link AssetFreezeTransactionBuilder}.
+     */
+    public static AssetFreezeTransactionBuilder AssetFreezeTransactionBuilder() {
+        return AssetFreezeTransactionBuilder.Builder();
     }
 }
