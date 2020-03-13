@@ -184,6 +184,7 @@ public class Transaction implements Serializable {
     /**
      * Create a payment transaction.
      */
+    @Deprecated
     public static Transaction createPaymentTransaction(Address sender, BigInteger fee, BigInteger firstValid,
                                                         BigInteger lastValid, byte[] note, String genesisID,
                                                         Digest genesisHash, BigInteger amount, Address receiver,
@@ -271,6 +272,7 @@ public class Transaction implements Serializable {
     /**
      * Create a key registration transaction.
      */
+    @Deprecated
     public static Transaction createKeyRegistrationTransaction(Address sender, BigInteger fee, BigInteger firstValid,
                                                                BigInteger lastValid, byte[] note, String genesisID,
                                                                Digest genesisHash, ParticipationPublicKey votePK,
@@ -382,6 +384,7 @@ public class Transaction implements Serializable {
      * @param freeze account which can freeze or unfreeze holder accounts
      * @param clawback account which can issue clawbacks against holder accounts
      */
+    @Deprecated
     public static Transaction createAssetCreateTransaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
                        String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
                        String assetUnitName, String assetName, String url, byte[] metadataHash,
@@ -480,6 +483,7 @@ public class Transaction implements Serializable {
      * @param clawback account which can issue clawbacks against holder accounts
      * @param strictEmptyAddressChecking if true, disallow empty admin accounts from being set (preventing accidental disable of admin features)
      */
+    @Deprecated
     public static Transaction createAssetConfigureTransaction(
     		Address sender, 
     		BigInteger fee, 
@@ -706,6 +710,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset index
      **/
+    @Deprecated
     public static Transaction createAssetAcceptTransaction( //AssetTransaction
             Address acceptingAccount, 
             BigInteger flatFee,
@@ -744,6 +749,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset ID to destroy
      **/
+    @Deprecated
     public static Transaction createAssetDestroyTransaction(
             Address senderAccount, 
             BigInteger flatFee,
@@ -777,6 +783,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset ID to destroy
      **/
+    @Deprecated
     public static Transaction createAssetFreezeTransaction(
             Address senderAccount, 
             Address accountToFreeze,
@@ -821,6 +828,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset index
      **/
+    @Deprecated
     public static Transaction createAssetRevokeTransaction(// AssetTransaction
             Address transactionSender,
             Address assetRevokedFrom,
@@ -874,6 +882,7 @@ public class Transaction implements Serializable {
      * of the network
      * @param assetIndex is the asset index
      **/
+    @Deprecated
     public static Transaction createAssetTransferTransaction(// AssetTransaction
             Address assetSender,
             Address assetReceiver,
@@ -1308,10 +1317,10 @@ public class Transaction implements Serializable {
     }
 
     /**
-     * Create a {@link AssetRevokeTransactionBuilder}.
+     * Create a {@link AssetClawbackTransactionBuilder}.
      */
-    public static AssetRevokeTransactionBuilder<?> AssetRevokeTransactionBuilder() {
-        return AssetRevokeTransactionBuilder.Builder();
+    public static AssetClawbackTransactionBuilder<?> AssetClawbackTransactionBuilder() {
+        return AssetClawbackTransactionBuilder.Builder();
     }
 
     /**

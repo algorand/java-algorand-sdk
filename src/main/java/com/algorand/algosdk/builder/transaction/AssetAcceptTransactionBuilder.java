@@ -7,7 +7,7 @@ import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Build an asset accept transaction.
+ * Build an asset accept transaction, which is used to mark an acount as willing to accept an asset.
  */
 public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected Address acceptingAccount = null;
@@ -43,6 +43,8 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     /**
      * Set the acceptingAccount.
+     * @param acceptingAccount The acceptingAccount.
+     * @return This builder.
      */
     public T acceptingAccount(Address acceptingAccount) {
         this.acceptingAccount = acceptingAccount;
@@ -50,7 +52,9 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
     }
 
     /**
-     * Set the acceptingAccount.
+     * Set the acceptingAccount in the human-readable address format.
+     * @param acceptingAccount The acceptingAccount.
+     * @return This builder.
      */
     public T acceptingAccount(String acceptingAccount) {
         try {
@@ -62,7 +66,9 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
     }
 
     /**
-     * Set the acceptingAccount.
+     * Set the acceptingAccount in the raw 32 byte format.
+     * @param acceptingAccount The acceptingAccount.
+     * @return This builder.
      */
     public T acceptingAccount(byte[] acceptingAccount) {
         this.acceptingAccount = new Address(acceptingAccount);
@@ -71,6 +77,8 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(BigInteger assetIndex) {
         this.assetIndex = assetIndex;
@@ -79,6 +87,8 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Integer assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -88,6 +98,8 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Long assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");

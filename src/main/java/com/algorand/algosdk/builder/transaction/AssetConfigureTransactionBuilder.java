@@ -38,6 +38,8 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(BigInteger assetIndex) {
         this.assetIndex = assetIndex;
@@ -46,6 +48,8 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Integer assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -55,6 +59,8 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Long assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -64,6 +70,8 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
 
     /**
      * Whether to disallow empty admin accounts from being set. They cannot be reset to the correct address later
+     * @param strictEmptyAddressChecking The strictEmptyAddressChecking value.
+     * @return This builder.
      */
     public T strictEmptyAddressChecking(boolean strictEmptyAddressChecking) {
         this.strictEmptyAddressChecking = strictEmptyAddressChecking;

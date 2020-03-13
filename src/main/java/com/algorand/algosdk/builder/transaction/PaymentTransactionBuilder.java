@@ -32,8 +32,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the amount.
-     * @param amount
+     * Set the number of microalgos to transfer from sender to receiver.
+     * @param amount The number of microalgos to transfer.
+     * @return This builder.
      */
     public T amount(BigInteger amount) {
         this.amount = amount;
@@ -41,8 +42,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the amount.
-     * @param amount
+     * Set the number of microalgos to transfer from sender to receiver.
+     * @param amount The number of microalgos to transfer.
+     * @return This builder.
      */
     public T amount(Integer amount) {
         if (amount < 0) throw new IllegalArgumentException("amount cannot be a negative value");
@@ -51,8 +53,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the amount.
-     * @param amount
+     * Set the number of microalgos to transfer from sender to receiver.
+     * @param amount The number of microalgos to transfer.
+     * @return This builder.
      */
     public T amount(Long amount) {
         if (amount < 0) throw new IllegalArgumentException("amount cannot be a negative value");
@@ -61,8 +64,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the receiver.
-     * @param receiver
+     * Set the receiver of the payment.
+     * @param receiver The receiver.
+     * @return This builder.
      */
     public T receiver(Address receiver) {
         this.receiver = receiver;
@@ -70,8 +74,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the receiver.
-     * @param receiver
+     * Set the receiver of the payment in the human-readable address format.
+     * @param receiver The receiver.
+     * @return This builder.
      */
     public T receiver(String receiver) {
         try {
@@ -83,8 +88,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the receiver.
-     * @param receiver
+     * Set the receiver of the payment in the raw 32 byte format.
+     * @param receiver The receiver.
+     * @return This builder.
      */
     public T receiver(byte[] receiver) {
         this.receiver = new Address(receiver);
@@ -92,8 +98,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the closeRemainderTo.
-     * @param closeRemainderTo
+     * Set the closeRemainderTo account. This account will receive any remaining balance in the sender account after the amount has been removed.
+     * @param closeRemainderTo The closeRemainderTo account.
+     * @return This builder.
      */
     public T closeRemainderTo(Address closeRemainderTo) {
         this.closeRemainderTo = closeRemainderTo;
@@ -101,8 +108,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the closeRemainderTo.
-     * @param closeRemainderTo
+     * Set the closeRemainderTo account in the human-readable address format. This account will receive any remaining balance in the sender account after the amount has been removed.
+     * @param closeRemainderTo The closeRemainderTo account.
+     * @return This builder.
      */
     public T closeRemainderTo(String closeRemainderTo) {
         try {
@@ -114,8 +122,9 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     /**
-     * Set the closeRemainderTo.
-     * @param closeRemainderTo
+     * Set the closeRemainderTo account in the raw 32 byte format. This account will receive any remaining balance in the sender account after the amount has been removed.
+     * @param closeRemainderTo The closeRemainderTo account.
+     * @return This builder.
      */
     public T closeRemainderTo(byte[] closeRemainderTo) {
         this.closeRemainderTo = new Address(closeRemainderTo);

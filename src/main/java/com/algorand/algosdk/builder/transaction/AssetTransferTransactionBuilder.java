@@ -8,10 +8,9 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Build an asset transfer transaction for sending some asset from an asset holder to another user.
- *  The asset receiver must have marked itself as willing to accept the asset.
+ * The asset receiver must have marked itself as willing to accept the asset.
  */
 public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionBuilder<T>> extends TransactionBuilder<T> {
-    protected Address assetSender = null;
     protected Address assetReceiver = null;
     protected Address assetCloseTo = null;
     protected BigInteger assetAmount = null;
@@ -30,12 +29,8 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
 
     @Override
     protected Transaction buildInternal() {
-        if (sender != null) {
-            throw new IllegalArgumentException("Do not use 'sender' for asset transfer transactions. Only use 'assetSender'");
-        }
-
         return Transaction.createAssetTransferTransaction(
-                assetSender,
+                sender,
                 assetReceiver,
                 assetCloseTo,
                 assetAmount,
@@ -49,35 +44,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetSender.
-     */
-    public T assetSender(Address assetSender) {
-        this.assetSender = assetSender;
-        return (T) this;
-    }
-
-    /**
-     * Set the assetSender.
-     */
-    public T assetSender(String assetSender) {
-        try {
-            this.assetSender = new Address(assetSender);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        }
-        return (T) this;
-    }
-
-    /**
-     * Set the assetSender.
-     */
-    public T assetSender(byte[] assetSender) {
-        this.assetSender = new Address(assetSender);
-        return (T) this;
-    }
-
-    /**
-     * Set the assetReceiver.
+     * Set the assetReceiver account. This is the account who will receive the funds.
+     * @param assetReceiver The assetReceiver account.
+     * @return this builder.
      */
     public T assetReceiver(Address assetReceiver) {
         this.assetReceiver = assetReceiver;
@@ -85,7 +54,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetReceiver.
+     * Set the assetReceiver account in the human-readable address format. This is the account who will receive the funds.
+     * @param assetReceiver The assetReceiver account.
+     * @return this builder.
      */
     public T assetReceiver(String assetReceiver) {
         try {
@@ -97,7 +68,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetReceiver.
+     * Set the assetReceiver account in the raw 32 byte format. This is the account who will receive the funds.
+     * @param assetReceiver The assetReceiver account.
+     * @return this builder.
      */
     public T assetReceiver(byte[] assetReceiver) {
         this.assetReceiver = new Address(assetReceiver);
@@ -105,7 +78,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetCloseTo.
+     * Set the assetCloseTo account. If set this account will recieve any remaining balance after the assetAmount has been removed from the balance.
+     * @param assetCloseTo The assetCloseTo account.
+     * @return this builder.
      */
     public T assetCloseTo(Address assetCloseTo) {
         this.assetCloseTo = assetCloseTo;
@@ -113,7 +88,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetCloseTo.
+     * Set the assetCloseTo account in the human-readable address format. If set this account will recieve any remaining balance after the assetAmount has been removed from the balance.
+     * @param assetCloseTo The assetCloseTo account.
+     * @return this builder.
      */
     public T assetCloseTo(String assetCloseTo) {
         try {
@@ -125,7 +102,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetCloseTo.
+     * Set the assetCloseTo account in the raw 32 byte format. If set this account will recieve any remaining balance after the assetAmount has been removed from the balance.
+     * @param assetCloseTo The assetCloseTo account.
+     * @return this builder.
      */
     public T assetCloseTo(byte[] assetCloseTo) {
         this.assetCloseTo = new Address(assetCloseTo);
@@ -134,6 +113,8 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(BigInteger assetIndex) {
         this.assetIndex = assetIndex;
@@ -142,6 +123,8 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Integer assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -151,6 +134,8 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Long assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -159,7 +144,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetAmount.
+     * Set the assetAmount. The number of assets to transfer from sender to assetReceiver.
+     * @param assetAmount The assetAmount.
+     * @return This builder.
      */
     public T assetAmount(BigInteger assetAmount) {
         this.assetAmount = assetAmount;
@@ -167,7 +154,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetAmount.
+     * Set the assetAmount. The number of assets to transfer from sender to assetReceiver.
+     * @param assetAmount The assetAmount.
+     * @return This builder.
      */
     public T assetAmount(Integer assetAmount) {
         if (assetAmount < 0) throw new IllegalArgumentException("assetAmount cannot be a negative value");
@@ -176,7 +165,9 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     /**
-     * Set the assetAmount.
+     * Set the assetAmount. The number of assets to transfer from sender to assetReceiver.
+     * @param assetAmount The assetAmount.
+     * @return This builder.
      */
     public T assetAmount(Long assetAmount) {
         if (assetAmount < 0) throw new IllegalArgumentException("assetAmount cannot be a negative value");

@@ -138,7 +138,7 @@ public class LimitOrder {
                 .build();
 
         Transaction tx2 = Transaction.AssetTransferTransactionBuilder()
-                .assetSender(sender.getAddress())
+                .sender(sender.getAddress())
                 .assetReceiver(owner)
                 .assetAmount(assetAmount)
                 .fee(feePerByte)

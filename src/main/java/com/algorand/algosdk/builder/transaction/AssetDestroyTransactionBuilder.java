@@ -35,6 +35,8 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(BigInteger assetIndex) {
         this.assetIndex = assetIndex;
@@ -43,6 +45,8 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Integer assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -52,6 +56,8 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Long assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");

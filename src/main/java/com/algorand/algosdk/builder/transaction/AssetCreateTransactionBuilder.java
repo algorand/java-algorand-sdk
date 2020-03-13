@@ -60,7 +60,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the assetTotal.
+     * Set the assetTotal, the total number of the asset issued.
+     * @param assetTotal The assetTotal.
+     * @return this builder.
      */
     public T assetTotal(BigInteger assetTotal) {
         this.assetTotal = assetTotal;
@@ -68,7 +70,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the assetTotal.
+     * Set the assetTotal, the total number of the asset issued.
+     * @param assetTotal The assetTotal.
+     * @return this builder.
      */
     public T assetTotal(Integer assetTotal) {
         if (assetTotal < 0) throw new IllegalArgumentException("assetTotal cannot be a negative value");
@@ -77,7 +81,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the assetTotal.
+     * Set the assetTotal, the total number of the asset issued.
+     * @param assetTotal The assetTotal.
+     * @return this builder.
      */
     public T assetTotal(Long assetTotal) {
         if (assetTotal < 0) throw new IllegalArgumentException("assetTotal cannot be a negative value");
@@ -86,7 +92,13 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the number of decimals.
+     * assetDecimals specifies the number of digits to display after the decimal
+     * place when displaying this asset. A value of 0 represents an asset
+     * that is not divisible, a value of 1 represents an asset divisible
+     * into tenths, and so on. This value must be between 0 and 19
+     * (inclusive).
+     * @param assetDecimals The assetDecimals.
+     * @return this builder.
      */
     public T assetDecimals(int assetDecimals) {
         this.assetDecimals = assetDecimals;
@@ -94,7 +106,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set defaultFrozen.
+     * Set whether accounts have this asset frozen by default.
+     * @param defaultFrozen The defaultFrozen value.
+     * @return this builder.
      */
     public T defaultFrozen(boolean defaultFrozen) {
         this.defaultFrozen = defaultFrozen;
@@ -102,7 +116,10 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set assetUnitName.
+     * Set an assetUnitName used to describe the name of a single unit of the asset.
+     * This value must be between 0 and 8 characters (inclusive).
+     * @param assetUnitName The assetUnitName.
+     * @return this builder.
      */
     public T assetUnitName(String assetUnitName) {
         this.assetUnitName = assetUnitName;
@@ -110,7 +127,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set assetName.
+     * Set the assetName used to describe the asset. This value must be between 0 and 32 characters (inclusive).
+     * @param assetName The assetName.
+     * @return this builder.
      */
     public T assetName(String assetName) {
         this.assetName = assetName;
@@ -118,7 +137,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set url.
+     * Set url. This value must be between 0 and 32 characters (inclusive).
+     * @param url The asset url.
+     * @return this builder.
      */
     public T url(String url) {
         this.url = url;
@@ -127,7 +148,8 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
 
     /**
      * Set the metadataHash field.
-     * @param metadataHash
+     * @param metadataHash The metadataHash.
+     * @return this builder.
      */
     public T metadataHash(byte[] metadataHash) {
         this.metadataHash = metadataHash;
@@ -135,7 +157,8 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
     /**
      * Set the metadataHash field using a UTF-8 encoded string.
-     * @param metadataHash
+     * @param metadataHash The metadataHash.
+     * @return this builder.
      */
     public T metadataHashUTF8(String metadataHash) {
         this.metadataHash = metadataHash.getBytes(StandardCharsets.UTF_8);
@@ -144,7 +167,8 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
 
     /**
      * Set the metadataHash field using a Base64 encoded string.
-     * @param metadataHash
+     * @param metadataHash The metadataHash.
+     * @return this builder.
      */
     public T metadataHashB64(String metadataHash) {
         this.metadataHash = Encoder.decodeFromBase64(metadataHash);
@@ -153,8 +177,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
 
 
     /**
-     * Set the manager.
-     * @param manager
+     * Set the manager account. The manager account can reconfigure the asset.
+     * @param manager The manager account.
+     * @return this builder.
      */
     public T manager(Address manager) {
         this.manager = manager;
@@ -162,8 +187,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the manager.
-     * @param manager
+     * Set the manager account in the human-readable address format. The manager account can reconfigure the asset.
+     * @param manager The manager account.
+     * @return this builder.
      */
     public T manager(String manager) {
         try {
@@ -175,8 +201,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the manager.
-     * @param manager
+     * Set the manager account in the raw 32 byte format. The manager account can reconfigure the asset.
+     * @param manager The manager account.
+     * @return this builder.
      */
     public T manager(byte[] manager) {
         this.manager = new Address(manager);
@@ -184,8 +211,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the reserve.
-     * @param reserve
+     * Set the reserve account. The reserve account holds all assets which are considered non-minted.
+     * @param reserve The reserve account.
+     * @return this builder.
      */
     public T reserve(Address reserve) {
         this.reserve = reserve;
@@ -193,8 +221,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the reserve.
-     * @param reserve
+     * Set the reserve account in the human-readable address format. The reserve account holds all assets which are considered non-minted.
+     * @param reserve The reserve account.
+     * @return this builder.
      */
     public T reserve(String reserve) {
         try {
@@ -206,8 +235,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the reserve.
-     * @param reserve
+     * Set the reserve account in the raw 32 byte format. The reserve account holds all assets which are considered non-minted.
+     * @param reserve The reserve account.
+     * @return this builder.
      */
     public T reserve(byte[] reserve) {
         this.reserve = new Address(reserve);
@@ -215,8 +245,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the freeze.
-     * @param freeze
+     * Set the freeze account. The account which can freeze or thaw holder accounts.
+     * @param freeze The freeze account.
+     * @return this builder.
      */
     public T freeze(Address freeze) {
         this.freeze = freeze;
@@ -224,8 +255,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the freeze.
-     * @param freeze
+     * Set the freeze account in the human-readable address format. The account which can freeze or thaw holder accounts.
+     * @param freeze The freeze account.
+     * @return this builder.
      */
     public T freeze(String freeze) {
         try {
@@ -237,8 +269,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the freeze.
-     * @param freeze
+     * Set the freeze account in the raw 32 byte format. The account which can freeze or thaw holder accounts.
+     * @param freeze The freeze account.
+     * @return this builder.
      */
     public T freeze(byte[] freeze) {
         this.freeze = new Address(freeze);
@@ -246,8 +279,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the clawback.
-     * @param clawback
+     * Set the clawback account. This account can clawback assets from holder accounts.
+     * @param clawback The clawback account.
+     * @return this builder.
      */
     public T clawback(Address clawback) {
         this.clawback = clawback;
@@ -255,8 +289,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the clawback.
-     * @param clawback
+     * Set the clawback account in the human-readable address format. This account can clawback assets from holder accounts.
+     * @param clawback The clawback account.
+     * @return this builder.
      */
     public T clawback(String clawback) {
         try {
@@ -268,8 +303,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     /**
-     * Set the clawback.
-     * @param clawback
+     * Set the clawback account in the raw 32 byte format. This account can clawback assets from holder accounts.
+     * @param clawback The clawback account.
+     * @return this builder.
      */
     public T clawback(byte[] clawback) {
         this.clawback = new Address(clawback);

@@ -41,7 +41,9 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     }
 
     /**
-     * Set the freezeTarget.
+     * Set the freezeTarget account. This is the account that will be frozen or thawed.
+     * @param freezeTarget The freezeTarget account.
+     * @return this builder.
      */
     public T freezeTarget(Address freezeTarget) {
         this.freezeTarget = freezeTarget;
@@ -49,7 +51,9 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     }
 
     /**
-     * Set the freezeTarget.
+     * Set the freezeTarget account in the human-readable address format. This is the account that will be frozen or thawed.
+     * @param freezeTarget The freezeTarget account.
+     * @return this builder.
      */
     public T freezeTarget(String freezeTarget) {
         try {
@@ -61,7 +65,9 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     }
 
     /**
-     * Set the freezeTarget.
+     * Set the freezeTarget account in the raw 32 byte format. This is the account that will be frozen or thawed.
+     * @param freezeTarget The freezeTarget account.
+     * @return this builder.
      */
     public T freezeTarget(byte[] freezeTarget) {
         this.freezeTarget = new Address(freezeTarget);
@@ -71,6 +77,8 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(BigInteger assetIndex) {
         this.assetIndex = assetIndex;
@@ -79,6 +87,8 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Integer assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -88,6 +98,8 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
 
     /**
      * Set the assetIndex.
+     * @param assetIndex The assetIndex.
+     * @return This builder.
      */
     public T assetIndex(Long assetIndex) {
         if (assetIndex < 0) throw new IllegalArgumentException("assetIndex cannot be a negative value");
@@ -96,7 +108,9 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     }
 
     /**
-     * Set the freezeState.
+     * Set the freezeState of the freezeTarget account.
+     * @param freezeState The freezeState.
+     * @return This builder.
      */
     public T freezeState(boolean freezeState) {
         this.freezeState = freezeState;

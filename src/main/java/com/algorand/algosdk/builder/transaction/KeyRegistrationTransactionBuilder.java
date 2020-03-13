@@ -40,7 +40,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set participation public key.
+     * Set participation public key used in key registration transactions.
+     * @param pk The participation public key.
+     * @return This builder.
      */
     public T participationPublicKey(ParticipationPublicKey pk) {
         this.votePK = pk;
@@ -48,7 +50,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set participation public key.
+     * Set participation public key used in key registration transactions in the raw 32 byte format.
+     * @param pk The participation public key.
+     * @return This builder.
      */
     public T participationPublicKey(byte[] pk) {
         this.votePK = new ParticipationPublicKey(pk);
@@ -56,7 +60,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set participation public key.
+     * Set participation public key used in key registration transactions as a base64 encoded representation of the raw 32 byte format.
+     * @param pk The participation public key.
+     * @return This builder.
      */
     public T participationPublicKeyBase64(String pk) {
         this.votePK = new ParticipationPublicKey(Encoder.decodeFromBase64(pk));
@@ -64,7 +70,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set selection public key.
+     * Set selection public key for the VRF private key used in key registration transactions.
+     * @param pk The public selection key.
+     * @return This builder.
      */
     public T selectionPublicKey(VRFPublicKey pk) {
         this.selectionPK = pk;
@@ -72,7 +80,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set selection public key.
+     * Set selection public key for the VRF private key used in key registration transactions in the raw 32 byte format
+     * @param pk The public selection key.
+     * @return This builder.
      */
     public T selectionPublicKey(byte[] pk) {
         this.selectionPK = new VRFPublicKey(pk);
@@ -80,7 +90,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set selection public key.
+     * Set selection public key for the VRF private key used in key registration transactions as a base64 encoded representation of the raw 32 byte format.
+     * @param pk The public selection key.
+     * @return This builder.
      */
     public T selectionPublicKeyBase64(String pk) {
         this.selectionPK = new VRFPublicKey(Encoder.decodeFromBase64(pk));
@@ -88,8 +100,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteFirst.
-     * @param voteFirst
+     * Set the voteFirst value. It is the first round in which the data in this transaction will be considered.
+     * @param voteFirst The voteFirst value.
+     * @return This builder.
      */
     public T voteFirst(BigInteger voteFirst) {
         this.voteFirst = voteFirst;
@@ -97,8 +110,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteFirst.
-     * @param voteFirst
+     * Set the voteFirst value. It is the first round in which the data in this transaction will be considered.
+     * @param voteFirst The voteFirst value.
+     * @return This builder.
      */
     public T voteFirst(Integer voteFirst) {
         if (voteFirst < 0) throw new IllegalArgumentException("voteFirst cannot be a negative value");
@@ -107,8 +121,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteFirst.
-     * @param voteFirst
+     * Set the voteFirst value. It is the first round in which the data in this transaction will be considered.
+     * @param voteFirst The voteFirst value.
+     * @return This builder.
      */
     public T voteFirst(Long voteFirst) {
         if (voteFirst < 0) throw new IllegalArgumentException("voteFirst cannot be a negative value");
@@ -117,8 +132,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteLast.
-     * @param voteLast
+     * Set the voteLast value. It is the last round in which the data in this transaction will be considered.
+     * @param voteLast The voteLast value.
+     * @return This builder.
      */
     public T voteLast(BigInteger voteLast) {
         this.voteLast = voteLast;
@@ -126,8 +142,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteLast.
-     * @param voteLast
+     * Set the voteLast value. It is the last round in which the data in this transaction will be considered.
+     * @param voteLast The voteLast value.
+     * @return This builder.
      */
     public T voteLast(Integer voteLast) {
         if (voteLast < 0) throw new IllegalArgumentException("voteLast cannot be a negative value");
@@ -136,8 +153,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteLast.
-     * @param voteLast
+     * Set the voteLast value. It is the last round in which the data in this transaction will be considered.
+     * @param voteLast The voteLast value.
+     * @return This builder.
      */
     public T voteLast(Long voteLast) {
         if (voteLast < 0) throw new IllegalArgumentException("voteLast cannot be a negative value");
@@ -146,8 +164,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteKeyDilution.
-     * @param voteKeyDilution
+     * Set the voteKeyDilution value. This is used to indicate the number of subkeys in each batch of participation keys.
+     * @param voteKeyDilution The voteKeyDilution value.
+     * @return This builder.
      */
     public T voteKeyDilution(BigInteger voteKeyDilution) {
         this.voteKeyDilution = voteKeyDilution;
@@ -155,8 +174,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteKeyDilution.
-     * @param voteKeyDilution
+     * Set the voteKeyDilution value. This is used to indicate the number of subkeys in each batch of participation keys.
+     * @param voteKeyDilution The voteKeyDilution value.
+     * @return This builder.
      */
     public T voteKeyDilution(Integer voteKeyDilution) {
         if (voteKeyDilution < 0) throw new IllegalArgumentException("voteKeyDilution cannot be a negative value");
@@ -165,8 +185,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     /**
-     * Set the voteKeyDilution.
-     * @param voteKeyDilution
+     * Set the voteKeyDilution value. This is used to indicate the number of subkeys in each batch of participation keys.
+     * @param voteKeyDilution The voteKeyDilution value.
+     * @return This builder.
      */
     public T voteKeyDilution(Long voteKeyDilution) {
         if (voteKeyDilution < 0) throw new IllegalArgumentException("voteKeyDilution cannot be a negative value");

@@ -511,7 +511,7 @@ public class TestTransaction {
         BigInteger amountToSend = BigInteger.valueOf(1);
 
         Transaction tx = Transaction.AssetTransferTransactionBuilder()
-                .assetSender(sender)
+                .sender(sender)
                 .assetReceiver(recipient)
                 .assetCloseTo(closeAssetsTo)
                 .assetAmount(amountToSend)
