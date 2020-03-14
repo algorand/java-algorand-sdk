@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
  * only succeeds when the sender is equal the clawback account address.
  */
 public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionBuilder<T>> extends TransactionBuilder<T> {
-    protected Address assetRevokeFrom = null;
+    protected Address assetClawbackFrom = null;
     protected Address assetReceiver = null;
     protected Address assetCloseTo = null;
     protected BigInteger assetAmount = null;
@@ -33,7 +33,7 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
     protected Transaction buildInternal() {
         return Transaction.createAssetRevokeTransaction(
                 sender,
-                assetRevokeFrom,
+                assetClawbackFrom,
                 assetReceiver,
                 assetAmount,
                 fee,
@@ -46,23 +46,23 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
     }
 
     /**
-     * Set the assetRevokeFrom account. This is the asset who will have assets removed from their account.
-     * @param assetRevokeFrom The assetRevokeFrom account.
+     * Set the assetClawbackFrom account. This is the asset who will have assets removed from their account.
+     * @param assetClawbackFrom The assetClawbackFrom account.
      * @return this builder.
      */
-    public T assetRevokeFrom(Address assetRevokeFrom) {
-        this.assetRevokeFrom = assetRevokeFrom;
+    public T assetClawbackFrom(Address assetClawbackFrom) {
+        this.assetClawbackFrom = assetClawbackFrom;
         return (T) this;
     }
 
     /**
-     * Set the assetRevokeFrom account. This is the asset who will have assets removed from their account.
-     * @param assetRevokeFrom The assetRevokeFrom account.
+     * Set the assetClawbackFrom account. This is the asset who will have assets removed from their account.
+     * @param assetClawbackFrom The assetClawbackFrom account.
      * @return this builder.
      */
-    public T assetRevokeFrom(String assetRevokeFrom) {
+    public T assetClawbackFrom(String assetClawbackFrom) {
         try {
-            this.assetRevokeFrom = new Address(assetRevokeFrom);
+            this.assetClawbackFrom = new Address(assetClawbackFrom);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
@@ -70,12 +70,12 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
     }
 
     /**
-     * Set the assetRevokeFrom account. This is the asset who will have assets removed from their account.
-     * @param assetRevokeFrom The assetRevokeFrom account.
+     * Set the assetClawbackFrom account. This is the asset who will have assets removed from their account.
+     * @param assetClawbackFrom The assetClawbackFrom account.
      * @return this builder.
      */
-    public T assetRevokeFrom(byte[] assetRevokeFrom) {
-        this.assetRevokeFrom = new Address(assetRevokeFrom);
+    public T assetClawbackFrom(byte[] assetClawbackFrom) {
+        this.assetClawbackFrom = new Address(assetClawbackFrom);
         return (T) this;
     }
 

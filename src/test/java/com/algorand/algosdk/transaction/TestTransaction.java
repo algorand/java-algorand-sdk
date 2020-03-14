@@ -571,9 +571,9 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323575);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.AssetRevokeTransactionBuilder()
+        Transaction tx = Transaction.AssetClawbackTransactionBuilder()
                 .sender(revoker)
-                .assetRevokeFrom(revokeFrom)
+                .assetClawbackFrom(revokeFrom)
                 .assetReceiver(receiver)
                 .assetAmount(amountToSend)
                 .flatFee(10)
