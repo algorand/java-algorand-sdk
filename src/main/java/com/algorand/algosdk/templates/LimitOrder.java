@@ -127,32 +127,26 @@ public class LimitOrder {
             throw new IllegalArgumentException("At least " + minTrade + " microalgos must be requested.");
         }
 
-        Transaction tx1 = new Transaction(
-                contract.address,
-                Account.MIN_TX_FEE_UALGOS,
-                BigInteger.valueOf(firstValid),
-                BigInteger.valueOf(lastValid),
-                null,
-                "",
-                genesisHash,
-                BigInteger.valueOf(microAlgoAmount),
-                sender.getAddress(),
-                null);
-        setFeeByFeePerByte(tx1, BigInteger.valueOf(feePerByte));
+        Transaction tx1 = Transaction.PaymentTransactionBuilder()
+                .sender(contract.address)
+                .fee(feePerByte)
+                .firstValid(firstValid)
+                .lastValid(lastValid)
+                .genesisHash(genesisHash)
+                .amount(microAlgoAmount)
+                .receiver(sender.getAddress())
+                .build();
 
-        Transaction tx2 = Transaction.createAssetTransferTransaction(
-                sender.getAddress(),
-                owner,
-                null,
-                BigInteger.valueOf(assetAmount),
-                Account.MIN_TX_FEE_UALGOS,
-                BigInteger.valueOf(firstValid),
-                BigInteger.valueOf(lastValid),
-                null,
-                "",
-                genesisHash,
-                BigInteger.valueOf(assetId));
-        setFeeByFeePerByte(tx2, BigInteger.valueOf(feePerByte));
+        Transaction tx2 = Transaction.AssetTransferTransactionBuilder()
+                .sender(sender.getAddress())
+                .assetReceiver(owner)
+                .assetAmount(assetAmount)
+                .fee(feePerByte)
+                .firstValid(firstValid)
+                .lastValid(lastValid)
+                .genesisHash(genesisHash)
+                .assetIndex(assetId)
+                .build();
 
         if (tx1.fee.longValue() > maxFee || tx2.fee.longValue() > maxFee) {
             long fee = Math.max(tx1.fee.longValue(), tx2.fee.longValue());

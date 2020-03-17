@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.LogicsigSignature;
@@ -127,19 +128,16 @@ public class HTLC {
 			throw new RuntimeException("Invalid contract detected, unable to find a valid hash function ID.");
 		}
 
-		// Generate closeRemainderTo transaction
-		Transaction txn = new Transaction(
-				contract.address,
-				BigInteger.valueOf(0),
-				BigInteger.valueOf(firstValid),
-				BigInteger.valueOf(lastValid),
-				null,
-				"",
-				genesisHash,
-				BigInteger.ZERO,
-				null,
-				receiver
-		);
+		Transaction txn = Transaction.PaymentTransactionBuilder()
+				.sender(contract.address)
+				.fee(0)
+				.firstValid(firstValid)
+				.lastValid(lastValid)
+				.genesisHash(genesisHash)
+				.amount(0)
+				.closeRemainderTo(receiver)
+				.build();
+
 		Account.setFeeByFeePerByte(txn, feePerByte);
 
 		if (txn.fee.intValue() > maxFee) {
