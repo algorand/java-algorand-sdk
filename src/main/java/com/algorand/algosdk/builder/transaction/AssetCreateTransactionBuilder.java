@@ -10,6 +10,29 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Build an asset create transaction, a specialized form of the AssetConfigurationTransaction with a null index.
+ *
+ * Required parameters:
+ *     assetTotal
+ *     assetDecimals
+ *     defaultFrozen
+ *     genesisHash
+ *
+ * Optional parameters:
+ *     assetName
+ *     assetUnitName
+ *     url
+ *     metadataHash
+ *     manager
+ *     reserve
+ *     freeze
+ *     clawback
+ *
+ * Optional global parameters
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
  */
 public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger assetTotal = null;

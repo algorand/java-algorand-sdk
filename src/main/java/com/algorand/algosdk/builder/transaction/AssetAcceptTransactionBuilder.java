@@ -8,9 +8,23 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Build an asset accept transaction, which is used to mark an acount as willing to accept an asset.
+ *
+ * Required parameters:
+ *     acceptingAccount
+ *     assetIndex
+ *     firstValid
+ *     genesisHash
+ *
+ * Optional global parameters:
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     lease
+ *     group
+ *
+ *  Note: The acceptingAccount setters map to the 'sender' field internally. Using both will override each other.
  */
 public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuilder<T>> extends TransactionBuilder<T> {
-    protected Address acceptingAccount = null;
     protected BigInteger assetIndex = null;
 
     /**
@@ -26,12 +40,8 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     @Override
     protected Transaction buildInternal() {
-        if (sender != null) {
-            throw new IllegalArgumentException("Do not use 'sender' for asset transfer transactions. Only use 'assetSender'");
-        }
-
         return Transaction.createAssetAcceptTransaction(
-                acceptingAccount,
+                sender,
                 fee,
                 firstValid,
                 lastValid,
@@ -47,7 +57,7 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
      * @return This builder.
      */
     public T acceptingAccount(Address acceptingAccount) {
-        this.acceptingAccount = acceptingAccount;
+        this.sender = acceptingAccount;
         return (T) this;
     }
 
@@ -58,7 +68,7 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
      */
     public T acceptingAccount(String acceptingAccount) {
         try {
-            this.acceptingAccount = new Address(acceptingAccount);
+            this.sender = new Address(acceptingAccount);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(e);
         }
@@ -71,7 +81,7 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
      * @return This builder.
      */
     public T acceptingAccount(byte[] acceptingAccount) {
-        this.acceptingAccount = new Address(acceptingAccount);
+        this.sender = new Address(acceptingAccount);
         return (T) this;
     }
 

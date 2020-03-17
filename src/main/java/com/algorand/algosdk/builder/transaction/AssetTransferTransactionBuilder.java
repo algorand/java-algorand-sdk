@@ -9,6 +9,23 @@ import java.security.NoSuchAlgorithmException;
 /**
  * Build an asset transfer transaction for sending some asset from an asset holder to another user.
  * The asset receiver must have marked itself as willing to accept the asset.
+ *
+ * Required parameters:
+ *     sender
+ *     assetReceiver
+ *     assetAmount
+ *     assetIndex
+ *     genesisHash
+ *
+ * Optional parameters:
+ *     assetCloseTo
+ *
+ * Optional global parameters:
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
  */
 public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected Address assetReceiver = null;

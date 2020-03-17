@@ -9,6 +9,23 @@ import java.math.BigInteger;
 
 /**
  * Build a keyreg transaction.
+ *
+ * Required parameters:
+ *     genesisHash
+ *
+ * Optional parameters:
+ *     votePK
+ *     selectionPK
+ *     voteFirst
+ *     voteLast
+ *     voteKeyDilution
+ *
+ * Optional global parameters:
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
  */
 public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransactionBuilder<T>> extends TransactionBuilder<T> {
     // votePK is the participation public key used in key registration transactions

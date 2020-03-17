@@ -6,6 +6,17 @@ import java.math.BigInteger;
 
 /**
  * Build an asset destroy transaction.
+ *
+ * Required parameters:
+ *     assetIndex
+ *     genesisHash
+ *
+ * Optional global parameters
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
  */
 public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger assetIndex = null;

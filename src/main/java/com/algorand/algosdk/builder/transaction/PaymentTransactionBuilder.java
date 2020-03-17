@@ -8,6 +8,22 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Build a payment transaction.
+ *
+ * Required parameters:
+ *     sender
+ *     receiver
+ *     amount
+ *     genesisHash
+ *
+ * Optional parameters:
+ *     closeRemainderTo
+ *
+ * Optional global parameters:
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
  */
 public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger amount = null;

@@ -6,6 +6,26 @@ import java.math.BigInteger;
 
 /**
  * Build an asset configure transaction.
+ *
+ * Required parameters:
+ *     assetIndex
+ *     genesisHash
+ *
+ * Optional parameters:
+ *     manager
+ *     reserve
+ *     freeze
+ *     clawback
+ *
+ * Optional global parameters
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
+ *
+ * You may only set addresses which are not zero for the existing asset.
+ * Do not set assetUnitName, assetName, url, metadataHash, assetDecimals, assetTotal or defaultFrozen.
  */
 public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactionBuilder<T>> extends AssetCreateTransactionBuilder<T> {
     protected BigInteger assetIndex = null;
@@ -20,6 +40,28 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
 
     @Override
     protected Transaction buildInternal() {
+        if (this.assetUnitName != null) {
+            throw new IllegalArgumentException("Must not set assetUnitName.");
+        }
+        if (this.assetName != null) {
+            throw new IllegalArgumentException("Must not set assetName.");
+        }
+        if (this.url != null) {
+            throw new IllegalArgumentException("Must not set url.");
+        }
+        if (this.metadataHash != null) {
+            throw new IllegalArgumentException("Must not set metadataHash.");
+        }
+        if (this.assetDecimals != null) {
+            throw new IllegalArgumentException("Must not set assetDecimals.");
+        }
+        if (this.assetTotal != null) {
+            throw new IllegalArgumentException("Must not set assetTotal.");
+        }
+        if (this.defaultFrozen != false) {
+            throw new IllegalArgumentException("Must not set defaultFrozen.");
+        }
+
         return Transaction.createAssetConfigureTransaction(
                 sender,
                 fee,

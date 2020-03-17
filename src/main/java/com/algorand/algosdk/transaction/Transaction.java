@@ -282,11 +282,13 @@ public class Transaction implements Serializable {
         Objects.requireNonNull(firstValid, "firstValid is required");
         Objects.requireNonNull(lastValid, "lastValid is required");
         Objects.requireNonNull(genesisHash, "genesisHash is required");
+        /*
         Objects.requireNonNull(votePK, "votePK is required");
         Objects.requireNonNull(vrfPK, "vrfPK is required");
         Objects.requireNonNull(voteFirst, "voteFirst is required");
         Objects.requireNonNull(voteLast, "voteLast is required");
         Objects.requireNonNull(voteKeyDilution, "voteKeyDilution is required");
+         */
 
         return new Transaction(
                 Type.KeyRegistration,
@@ -596,10 +598,11 @@ public class Transaction implements Serializable {
     }
 
     /**
-     * This is the private constructor which takes all the fields of Transaction
-     * TODO: Make this the only public constructor.
+     * Constructor which takes all the fields of Transaction.
+     * For details about which fields to use with different transaction types, refer to the developer documentation:
+     * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
      */
-    private Transaction(
+    public Transaction(
                         Type type,
                         //header fields
                         Address sender,

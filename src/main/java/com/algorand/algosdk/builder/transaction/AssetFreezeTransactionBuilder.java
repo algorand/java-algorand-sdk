@@ -8,6 +8,19 @@ import java.security.NoSuchAlgorithmException;
 
 /**
  * Build an asset freeze transaction.
+ *
+ * Required parameters:
+ *     assetIndex
+ *     freezeTarget
+ *     freezeState
+ *     genesisHash
+ *
+ * Optional global parameters
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
  */
 public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuilder<T>> extends TransactionBuilder<T> {
     // asset freeze fields

@@ -5,11 +5,29 @@ import com.algorand.algosdk.transaction.Transaction;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Build an asset clawback transaction. These transactions allow the asset clawback account
  * to take assets away from holders of the asset. This is a specialized form of an AssetConfig transaction which
  * only succeeds when the sender is equal the clawback account address.
+ *
+ * Required parameters:
+ *     sender
+ *     assetClawbackFrom
+ *     assetReceiver
+ *     assetAmount
+ *     genesisHash
+ *
+ * Optional parameters:
+ *     assetCloseTo
+ *
+ * Optional global parameters:
+ *     fee/flatFee
+ *     note
+ *     genesisID
+ *     group
+ *     lease
  */
 public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected Address assetClawbackFrom = null;
@@ -31,18 +49,51 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
 
     @Override
     protected Transaction buildInternal() {
-        return Transaction.createAssetRevokeTransaction(
+        Objects.requireNonNull(sender, "sender is required.");
+        Objects.requireNonNull(assetClawbackFrom, "assetClawbackFrom is required.");
+        Objects.requireNonNull(assetReceiver, "assetReceiver is required.");
+        Objects.requireNonNull(assetAmount, "assetAmount is required.");
+        Objects.requireNonNull(firstValid, "firstValid is required.");
+        Objects.requireNonNull(lastValid, "lastValid is required.");
+        Objects.requireNonNull(genesisHash, "genesisHash is required.");
+
+
+        return new Transaction(
+                Transaction.Type.AssetTransfer,
+                //header fields
                 sender,
-                assetClawbackFrom,
-                assetReceiver,
-                assetAmount,
                 fee,
                 firstValid,
                 lastValid,
                 note,
                 genesisID,
                 genesisHash,
-                assetIndex);
+                null,
+                null,
+                // payment fields
+                null,
+                null,
+                null,
+                // keyreg fields
+                null,
+                null,
+                null,
+                null,
+                // voteKeyDilution
+                null,
+                // asset creation and configuration
+                null,
+                null,
+                // asset transfer fields
+                assetIndex,
+                assetAmount,
+                assetClawbackFrom,
+                assetReceiver,
+                assetCloseTo,
+                // asset freeze fields
+                null,
+                null,
+                false); // default value which wont be included in the serialized object.
     }
 
     /**

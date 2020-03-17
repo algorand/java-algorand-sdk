@@ -47,6 +47,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
             throw new IllegalArgumentException("Cannot set both fee and flatFee.");
         }
 
+        if (lastValid == null && firstValid != null) {
+            lastValid = firstValid.add(BigInteger.valueOf(1000));
+        }
+
         Transaction txn = buildInternal();
 
         if(lease != null) {
