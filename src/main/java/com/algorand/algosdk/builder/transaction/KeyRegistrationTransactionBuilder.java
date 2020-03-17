@@ -52,8 +52,19 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
 
     @Override
     protected Transaction buildInternal() {
-        return Transaction.createKeyRegistrationTransaction(sender, fee, firstValid, lastValid, note, genesisID, genesisHash,
-                votePK, selectionPK, voteFirst, voteLast, voteKeyDilution);
+        return Transaction.createKeyRegistrationTransaction(
+                sender,
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                genesisHash,
+                votePK,
+                selectionPK,
+                voteFirst,
+                voteLast,
+                voteKeyDilution);
     }
 
     /**
