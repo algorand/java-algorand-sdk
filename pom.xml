@@ -33,8 +33,13 @@
     </developers>
 
     <properties>
+        <skip.integration.tests>true</skip.integration.tests>
         <junit5.version>5.5.2</junit5.version>
+        <junit5.platform.version>1.5.2</junit5.platform.version>
+        <cucumber.version>5.5.0</cucumber.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+          <!--<maven.surefire.version>3.0.0-M4</maven.surefire.version>-->
+        <maven.surefire.version>2.22.2</maven.surefire.version>
 
         <!-- Test sources at 1.8 to allow using JUnit5 -->
         <java.version>1.7</java.version>
@@ -137,10 +142,26 @@
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
             <version>${junit5.version}</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-console</artifactId>
+            <version>${junit5.platform.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -148,6 +169,28 @@
             <version>2.9.1</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
         <!-- end test dependencies -->
     </dependencies>
@@ -158,8 +201,81 @@
         <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.0.0-M4</version>
+            <version>${maven.surefire.version}</version>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+            <executions>
+              <execution>
+                <id>unit-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <skipTests>false</skipTests>
+                  <includes>
+                    <include>**/*Test*.*</include>
+                  </includes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>integration-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                    <skipTests>${skip.integration.tests}</skipTests>
+                  <includes>
+                    <include>**/*IT.*</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.8</version>
+          <executions>
+              <execution>
+                  <!--Work around. Surefire does not use JUnits Test Engine discovery functionality -->
+                  <id>CLI-test</id>
+                  <phase>integration-test</phase>
+                  <goals>
+                      <goal>run</goal>
+                  </goals>
+                  <configuration>
+                      <target>
+                          <echo message="Running JUnit Platform CLI"/>
+                          <java classname="org.junit.platform.console.ConsoleLauncher"
+                                fork="true"
+                                failonerror="false"
+                                newenvironment="true"
+                                maxmemory="512m"
+                                classpathref="maven.test.classpath">
+                              <arg value="--include-engine"/>
+                              <arg value="cucumber"/>
+                              <arg value="--scan-classpath"/>
+                              <arg value="${project.build.testOutputDirectory}"/>
+                              <arg value="--reports-dir"/>
+                              <arg value="${project.build.directory}/cucumber-reports"/>
+                          </java>
+                      </target>
+                  </configuration>
+              </execution>
+          </executions>
+        </plugin>
+        <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.22.2</version>
+        </plugin>
+        <plugin>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <version>2.22.2</version>
+        </plugin>
+
       </plugins>
     </build>
 

@@ -677,18 +677,17 @@ public class TestTransaction {
         Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
         Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
 
-        Transaction tx = new Transaction(
-                fromAddr,
-                BigInteger.valueOf(4),
-                BigInteger.ONE,
-                BigInteger.TEN,
-                new byte[]{},
-                "",
-                new Digest(),
-                BigInteger.ONE,
-                toAddr,
-                null);
-        tx.setLease(new byte[]{});
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(fromAddr)
+                .fee(4)
+                .firstValid(1)
+                .lastValid(10)
+                .amount(1)
+                .genesisHash(new Digest())
+                .receiver(toAddr)
+                .note(new byte[]{})
+                .lease(new byte[]{})
+                .build();
 
         assertThat(tx.note).isNull();
         assertThat(tx.lease).isNull();
