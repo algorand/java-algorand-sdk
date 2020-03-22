@@ -54,6 +54,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class StepdefsIT {
+    public StepdefsIT() {
+        System.out.println("Created stepdefs....");
+        System.out.println("Created stepdefs....");
+        System.out.println("Created stepdefs....");
+        System.out.println("Created stepdefs....");
+        System.out.println("Created stepdefs....");
+        System.out.println("Created stepdefs....");
+        System.out.println("Created stepdefs....");
+        System.out.println("Created stepdefs....");
+    }
     TransactionParams params;
     SignedTransaction stx;
     SignedTransaction[] stxs;
