@@ -19,8 +19,8 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class TemplateDefsIT {
-    StepdefsIT base;
+public class TemplateDefs {
+    Stepdefs base;
 
     ContractTemplate contract;
 
@@ -43,14 +43,14 @@ public class TemplateDefsIT {
     Long contractFundAmount = 100000000L;
 
 
-    public TemplateDefsIT(StepdefsIT base) {
+    public TemplateDefs(Stepdefs base) {
         this.base = base;
     }
 
     @Given("contract test fixture")
     public void contract_test_fixture() {
-        System.out.println("Contract test fixture...");
-        System.out.println("base exists: " + (this.base != null));
+        //System.out.println("Contract test fixture...");
+        //System.out.println("base exists: " + (this.base != null));
     }
 
     // Shared across contracts.

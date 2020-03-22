@@ -53,17 +53,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
-public class StepdefsIT {
-    public StepdefsIT() {
-        System.out.println("Created stepdefs....");
-        System.out.println("Created stepdefs....");
-        System.out.println("Created stepdefs....");
-        System.out.println("Created stepdefs....");
-        System.out.println("Created stepdefs....");
-        System.out.println("Created stepdefs....");
-        System.out.println("Created stepdefs....");
-        System.out.println("Created stepdefs....");
-    }
+public class Stepdefs {
     TransactionParams params;
     SignedTransaction stx;
     SignedTransaction[] stxs;
@@ -182,8 +172,7 @@ public class StepdefsIT {
                 exists = true;
             }
         }
-        System.out.println("Does this work at all...");
-        assertThat(exists).isTrue().withFailMessage("walletExist");
+        assertThat(exists).isTrue();
     }
 
     @When("I get the wallet handle")
@@ -201,8 +190,7 @@ public class StepdefsIT {
         req.setWalletHandleToken(handle);
         req.setWalletPassword(walletPswd);
         byte[] mdk = kcl.exportMasterKey(req).getMasterDerivationKey();
-        System.out.println("Does this work at all...");
-        assertThat(mdk.length).isGreaterThan(0).withFailMessage("derivation key");
+        assertThat(mdk.length).isGreaterThan(0);
     }
 
     @When("I rename the wallet")
@@ -220,8 +208,7 @@ public class StepdefsIT {
         WalletInfoRequest req = new WalletInfoRequest();
         req.setWalletHandleToken(handle);
         String name = kcl.getWalletInfo(req).getWalletHandle().getWallet().getName();
-        System.out.println("Does this work at all...");
-        assertThat(name).isEqualTo(walletName).withFailMessage("getWalletInfo");
+        assertThat(name).isEqualTo(walletName);
     }
 
     @When("I renew the wallet handle")
@@ -248,8 +235,7 @@ public class StepdefsIT {
         } catch(Exception e){
             err = true;
         }
-        System.out.println("Does this work at all...");
-        assertThat(err).isTrue().withFailMessage("tryHandle");
+        assertThat(err).isTrue();
     }
 
     @Given("payment transaction parameters {int} {int} {int} {string} {string} {string} {int} {string} {string}")
@@ -370,23 +356,20 @@ public class StepdefsIT {
     @Then("the signed transaction should equal the golden {string}")
     public void equalGolden(String golden) throws JsonProcessingException{
         byte[] signedTxBytes = Encoder.encodeToMsgPack(stx);
-        System.out.println("Does this work at all...");
-        assertThat(Encoder.encodeToBase64(signedTxBytes)).isEqualTo(golden).withFailMessage("equalGolden");
+        assertThat(Encoder.encodeToBase64(signedTxBytes)).isEqualTo(golden);
 
     }
 
     @Then("the multisig transaction should equal the golden {string}")
     public void equalMsigGolden(String golden) throws JsonProcessingException{
         byte[] signedTxBytes = Encoder.encodeToMsgPack(stx);
-        System.out.println("Does this work at all...");
-        assertThat(Encoder.encodeToBase64(signedTxBytes)).isEqualTo(golden).withFailMessage("equalMsigGolden");
+        assertThat(Encoder.encodeToBase64(signedTxBytes)).isEqualTo(golden);
     }
 
 
     @Then("the multisig address should equal the golden {string}")
     public void equalMsigAddrGolden(String golden){
-        System.out.println("Does this work at all...");
-        assertThat(msig.toString()).isEqualTo(golden).withFailMessage("equalMsigAddrGolden");
+        assertThat(msig.toString()).isEqualTo(golden);
     }
 
     @When("I get versions with algod")
@@ -396,8 +379,7 @@ public class StepdefsIT {
 
     @Then("v1 should be in the versions")
     public void v1InVersions(){
-        System.out.println("Does this work at all...");
-        assertThat(versions).contains("v1").withFailMessage("v1InVersions");
+        assertThat(versions).contains("v1");
     }
 
     @When("I get versions with kmd")
@@ -442,8 +424,7 @@ public class StepdefsIT {
                 exists = true;
             }
         }
-        System.out.println("Does this work at all...");
-        assertThat(exists).isTrue().withFailMessage("msigInWallet");
+        assertThat(exists).isTrue();
     }
 
     @When("I export the multisig")
@@ -463,8 +444,7 @@ public class StepdefsIT {
                 eq = false;
             }
         }
-        System.out.println("Does this work at all...");
-        assertThat(eq).isTrue().withFailMessage("msigEq");
+        assertThat(eq).isTrue();
     }
     @When("I delete the multisig")
     public void deleteMsig() throws com.algorand.algosdk.kmd.client.ApiException{
@@ -488,8 +468,7 @@ public class StepdefsIT {
                 }
             }
         }
-        System.out.println("Does this work at all...");
-        assertThat(exists).isFalse().withFailMessage("msigNotInWallet");
+        assertThat(exists).isFalse();
     }
 
     @When("I generate a key using kmd")
@@ -511,8 +490,7 @@ public class StepdefsIT {
                 exists = true;
             }
         }
-        System.out.println("Does this work at all...");
-        assertThat(exists).isFalse().withFailMessage("keyInWallet");
+        assertThat(exists).isTrue();
     }
 
     @When("I delete the key")
@@ -535,8 +513,7 @@ public class StepdefsIT {
                 exists = true;
             }
         }
-        System.out.println("Does this work at all...");
-        assertThat(exists).isFalse().withFailMessage("keyNotInWallet");
+        assertThat(exists).isFalse();
     }
 
     @When("I generate a key")
@@ -572,8 +549,7 @@ public class StepdefsIT {
         req.setWalletHandleToken(handle);
         req.setWalletPassword(walletPswd);
         byte[] exported = Arrays.copyOfRange(kcl.exportKey(req).getPrivateKey(), 0, 32);
-        System.out.println("Does this work at all...");
-        assertThat(Encoder.encodeToBase64(sk)).isEqualTo(Encoder.encodeToBase64(exported)).withFailMessage("expSkEq");
+        assertThat(Encoder.encodeToBase64(sk)).isEqualTo(Encoder.encodeToBase64(exported));
         DeleteKeyRequest deleteReq = new DeleteKeyRequest();
         deleteReq.setAddress(pk.toString());
         deleteReq.setWalletHandleToken(handle);
@@ -696,26 +672,21 @@ public class StepdefsIT {
     @Then("the transaction should go through")
     public void checkTxn() throws ApiException, InterruptedException{
         String ans = acl.pendingTransactionInformation(txid).getFrom();
-        System.out.println("Does this work at all...");
-        assertThat(pk.toString()).isEqualTo(ans).withFailMessage("checkTxn1");
+        assertThat(pk.toString()).isEqualTo(ans);
         acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
-        System.out.println("Does this work at all...");
-        assertThat(acl.transactionInformation(pk.toString(), txid).getFrom()).isEqualTo(pk.toString()).withFailMessage("checkTxn2");
-        System.out.println("Does this work at all...");
-        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString()).withFailMessage("checkTxn3");
+        assertThat(acl.transactionInformation(pk.toString(), txid).getFrom()).isEqualTo(pk.toString());
+        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
     }
 
     @Then("I can get the transaction by ID")
     public void txnbyID() throws ApiException, InterruptedException{
         acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
-        System.out.println("Does this work at all...");
-        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString()).withFailMessage("txnbyID");
+        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
     }
 
     @Then("the transaction should not go through")
     public void txnFail(){
-        System.out.println("Does this work at all...");
-        assertThat(err).isTrue().withFailMessage("txnFail");
+        assertThat(err).isTrue();
     }
 
     @When("I sign the transaction with kmd")
@@ -728,9 +699,7 @@ public class StepdefsIT {
     }
     @Then("the signed transaction should equal the kmd signed transaction")
     public void signBothEqual() throws JsonProcessingException {
-        System.out.println("Does this work at all...");
-        assertThat(Encoder.encodeToBase64(stxBytes)).isEqualTo(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx)))
-            .withFailMessage("signBothEqual");
+        assertThat(Encoder.encodeToBase64(stxBytes)).isEqualTo(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx)));
     }
 
     @When("I sign the multisig transaction with kmd")
@@ -752,9 +721,7 @@ public class StepdefsIT {
 
     @Then("the multisig transaction should equal the kmd signed multisig transaction")
     public void signMsigBothEqual() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException {
-        System.out.println("Does this work at all...");
-        assertThat(Encoder.encodeToBase64(stxBytes)).isEqualTo(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx.mSig)))
-            .withFailMessage("signMsigBothEqual");
+        assertThat(Encoder.encodeToBase64(stxBytes)).isEqualTo(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx.mSig)));
         DeleteMultisigRequest req = new DeleteMultisigRequest();
         req.setAddress(msig.toString());
         req.setWalletHandleToken(handle);
@@ -806,8 +773,7 @@ public class StepdefsIT {
         inputStream.read(data);
         SignedTransaction stxold = Encoder.decodeFromMsgPack(data, SignedTransaction.class);
         inputStream.close();
-        System.out.println("Does this work at all...");
-        assertThat(stxnew).isEqualTo(stxold).withFailMessage("checkEnc");
+        assertThat(stxnew).isEqualTo(stxold);
     }
 
     @Then("I do my part")
@@ -843,37 +809,29 @@ public class StepdefsIT {
 
     @Then("I get transactions by address and round")
     public void txnsByAddrRound() throws ApiException{
-        System.out.println("Does this work at all...");
         assertThat(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions())
-                .isInstanceOf(List.class)
-                .withFailMessage("txnsByAddrRound");
+                .isInstanceOf(List.class);
         //Assert.assertTrue(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
     }
 
     @Then("I get transactions by address only")
     public void txnsByAddrOnly() throws ApiException{
-        System.out.println("Does this work at all...");
         assertThat(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(10)).getTransactions())
-                .isInstanceOf(List.class)
-                .withFailMessage("txnsByAddrOnly");
+                .isInstanceOf(List.class);
         //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
     }
 
     @Then("I get transactions by address and date")
     public void txnsByAddrDate() throws ApiException{
-        System.out.println("Does this work at all...");
         assertThat(acl.transactions(addresses.get(0), null, null, LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10)).getTransactions())
-                .isInstanceOf(List.class)
-                .withFailMessage("txnsByAddrDate");
+                .isInstanceOf(List.class);
         //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
     }
 
     @Then("I get pending transactions")
     public void pendingTxns() throws ApiException{
-        System.out.println("Does this work at all...");
         assertThat(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns())
-            .isInstanceOf(TransactionList.class)
-            .withFailMessage("pendingTxns");
+            .isInstanceOf(TransactionList.class);
         //Assert.assertTrue(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns() instanceof TransactionList);
     }
 
@@ -889,8 +847,7 @@ public class StepdefsIT {
 
     @Then("the fee in the suggested params should equal the suggested fee")
     public void checkSuggested() {
-        System.out.println("Does this work at all...");
-        assertThat(paramsFee).isEqualTo(fee).withFailMessage("checkSuggested");
+        assertThat(paramsFee).isEqualTo(fee);
     }
 
     @When("I create a bid")
@@ -914,8 +871,7 @@ public class StepdefsIT {
 
     @Then("the bid should still be the same")
     public void checkBid() {
-        System.out.println("Does this work at all...");
-        assertThat(sbid).isEqualTo(oldBid).withFailMessage("checkBid");
+        assertThat(sbid).isEqualTo(oldBid);
     }
 
     @When("I decode the address")
@@ -931,8 +887,7 @@ public class StepdefsIT {
 
     @Then("the address should still be the same")
     public void checkAddr() {
-        System.out.println("Does this work at all...");
-        assertThat(address).isEqualTo(oldAddr).withFailMessage("checkAddr");
+        assertThat(address).isEqualTo(oldAddr);
     }
 
     @When("I convert the private key back to a mnemonic")
@@ -942,8 +897,7 @@ public class StepdefsIT {
 
     @Then("the mnemonic should still be the same as {string}")
     public void checkMn(String mn) {
-        System.out.println("Does this work at all...");
-        assertThat(mnemonic).isEqualTo(mn).withFailMessage("checkMn");
+        assertThat(mnemonic).isEqualTo(mn);
     }
 
     @Given("mnemonic for master derivation key {string}")
@@ -1010,8 +964,7 @@ public class StepdefsIT {
 
     @Then("it should still be the same amount of microalgos {long}")
     public void checkMicro(long ma) {
-        System.out.println("Does this work at all...");
-        assertThat(microalgos).isEqualTo(BigInteger.valueOf(ma)).withFailMessage("checkMicro");
+        assertThat(microalgos).isEqualTo(BigInteger.valueOf(ma));
     }
 
     @Then("I get account information")
@@ -1031,7 +984,6 @@ public class StepdefsIT {
 
     @When("I get recent transactions, limited by {int} transactions")
     public void i_get_recent_transactions_limited_by_count(int cnt) throws ApiException {
-        System.out.println("Does this work at all...");
         assertThat(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(cnt)).getTransactions())
                 .isInstanceOf(List.class);
         //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(cnt)).getTransactions() instanceof List<?>);
@@ -1072,18 +1024,11 @@ public class StepdefsIT {
 
     @Then("the asset info should match the expected asset info")
     public void the_asset_info_should_match_the_expected_asset_info() throws JsonProcessingException, NoSuchAlgorithmException {
-        System.out.println("Does this work at all...");
-        System.out.println("Does this work at all...");
-        System.out.println("Does this work at all...");
-        System.out.println("Does this work at all...");
-        assertThat(this.expectedParams.assetManager).isEqualTo(this.queriedParams.getManagerkey()).withFailMessage("asset info - manager");
-        assertThat(this.expectedParams.assetReserve).isEqualTo(this.queriedParams.getReserveaddr()).withFailMessage("asset info - reserve");;
-        assertThat(this.expectedParams.assetFreeze).isEqualTo(this.queriedParams.getFreezeaddr()).withFailMessage("asset info - freeze");;
-        assertThat(this.expectedParams.assetClawback).isEqualTo(this.queriedParams.getClawbackaddr()).withFailMessage("asset info - clawback");;
-        //Assert.assertTrue(this.expectedParams.assetManager.compareTo(this.queriedParams.getManagerkey()));
-        //Assert.assertTrue(this.expectedParams.assetReserve.compareTo(this.queriedParams.getReserveaddr()));
-        //Assert.assertTrue(this.expectedParams.assetFreeze.compareTo(this.queriedParams.getFreezeaddr()));
-        //Assert.assertTrue(this.expectedParams.assetClawback.compareTo(this.queriedParams.getClawbackaddr()));
+        // Can't use a regular assertj call because 'compareTo' isn't a regular comparator.
+        assertThat(this.expectedParams.assetManager.compareTo(this.queriedParams.getManagerkey())).isTrue();
+        assertThat(this.expectedParams.assetReserve.compareTo(this.queriedParams.getReserveaddr())).isTrue();
+        assertThat(this.expectedParams.assetFreeze.compareTo(this.queriedParams.getFreezeaddr())).isTrue();
+        assertThat(this.expectedParams.assetClawback.compareTo(this.queriedParams.getClawbackaddr())).isTrue();
     }
 
     @When("I create a no-managers asset reconfigure transaction")
@@ -1124,7 +1069,6 @@ public class StepdefsIT {
         } catch (ApiException e) {
             exists = false;
         }
-        System.out.println("Does this work at all...");
         assertThat(exists).isFalse();
     }
 
@@ -1149,8 +1093,7 @@ public class StepdefsIT {
         com.algorand.algosdk.algod.client.model.Account accountResp =
                 this.acl.accountInformation(this.creator);
         AssetHolding holding = accountResp.getHolding(this.assetID);
-        System.out.println("Does this work at all...");
-        assertThat(holding.getAmount()).isEqualTo(BigInteger.valueOf(expectedBal)).withFailMessage("creator remaining");
+        assertThat(holding.getAmount()).isEqualTo(BigInteger.valueOf(expectedBal));
     }
 
     @Then("I update the asset index")
