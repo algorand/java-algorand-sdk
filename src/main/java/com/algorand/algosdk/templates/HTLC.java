@@ -40,7 +40,7 @@ public class HTLC {
 	 *
 	 * More formally, algos can be transfered under only two circumstances:
 	 *     1. To receiver if hash_function(arg_0) = hash_value
-	 *     2. To owner if txn.FirstValid > expiry_round
+	 *     2. To owner if txn.FirstValid &gt; expiry_round
 	 * 
 	 * @param owner an address that can receive the asset after the expiry round
 	 * @param receiver address to receive Algos

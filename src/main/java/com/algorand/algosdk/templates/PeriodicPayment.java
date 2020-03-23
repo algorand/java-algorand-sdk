@@ -33,7 +33,7 @@ public class PeriodicPayment {
      *
      * @param receiver address to receive the assets.
      * @param amount amount of assets to transfer at every cycle.
-     * @param withdrawingWindow the number of blocks in which the user can withdraw the asset once the period start (must be < 1000).
+     * @param withdrawingWindow the number of blocks in which the user can withdraw the asset once the period start (must be &lt; 1000).
      * @param period how often the address can withdraw assets (in rounds).
      * @param fee maximum fee per transaction.
      * @param expiryRound a round in which the receiver can withdraw the rest of the funds after.
