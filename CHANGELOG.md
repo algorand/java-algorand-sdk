@@ -1,3 +1,6 @@
+# 1.3.1
+- Fix javadoc and build pom.xml.
+
 # 1.3.0
 - Added additional Algorand Smart Contracts (ASC)
     - Added support for Dynamic Fee contract
