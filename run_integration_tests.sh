@@ -14,6 +14,7 @@ cp sdk.py temp/docker
 # Copy feature files into the project resources
 mkdir -p src/test/resources/com/algorand/algosdk/integration
 cp temp/features/integration/* src/test/resources/com/algorand/algosdk/integration
+cp temp/features/offline.feature src/test/resources/com/algorand/algosdk/integration
 
 # Build and execute the docker container
 docker build -t sdk-testing -f Dockerfile "$(pwd)"
