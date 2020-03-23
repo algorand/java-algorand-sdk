@@ -1,10 +1,6 @@
 dist: bionic
 language: java
 
-install:
-  - curl https://raw.githubusercontent.com/algorand/algorand-sdk-testing/master/scripts/sdkupdate.sh -o ~/sdkupdate.sh
-  - chmod +x ~/sdkupdate.sh
-
 script:
   - mvn test
-  - ~/sdkupdate.sh --java
+  - ./run_integration_tests.sh
