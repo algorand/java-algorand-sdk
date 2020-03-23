@@ -5,6 +5,7 @@ com.algorand.algosdk.algod.client.auth
 com.algorand.algosdk.algod.client.lib
 com.algorand.algosdk.algod.client.model
 com.algorand.algosdk.auction
+com.algorand.algosdk.builder.transaction
 com.algorand.algosdk.crypto
 com.algorand.algosdk.kmd.client
 com.algorand.algosdk.kmd.client.api
