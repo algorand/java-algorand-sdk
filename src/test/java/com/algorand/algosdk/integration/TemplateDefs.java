@@ -49,8 +49,6 @@ public class TemplateDefs {
 
     @Given("contract test fixture")
     public void contract_test_fixture() {
-        //System.out.println("Contract test fixture...");
-        //System.out.println("base exists: " + (this.base != null));
     }
 
     // Shared across contracts.
