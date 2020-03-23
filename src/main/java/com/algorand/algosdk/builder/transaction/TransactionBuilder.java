@@ -314,7 +314,6 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      * lease can be confirmed.
      * @param lease The lease.
      * @return This builder.
-     * @param lease
      */
     public T lease(byte[] lease) {
         this.lease = lease;

@@ -38,9 +38,9 @@ public class LimitOrder {
      * - gtxn[1] asset from Other to Me
      *
      * We want to get at least some amount of the other asset per our Algos
-     *   gtxn[1].AssetAmount / gtxn[0].Amount >= N / D
+     *   gtxn[1].AssetAmount / gtxn[0].Amount &gt;= N / D
      *   ===
-     *   gtxn[1].AssetAmount * D >= gtxn[0].Amount * N
+     *   gtxn[1].AssetAmount * D &gt;= gtxn[0].Amount * N
      *
      * close-out case:
      * - txn alone, close out value after timeout

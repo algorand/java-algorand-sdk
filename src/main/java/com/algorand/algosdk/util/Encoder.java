@@ -78,8 +78,9 @@ public class Encoder {
 
     /**
      * Encode an object as json.
-     * @param o object to encode
-     * @return json string
+     * @param input json string to decode
+     * @param tClass class to decode the json string into
+     * @return object specified by tClass
      * @throws JsonProcessingException error
      */
     public static <T> T decodeFromJson(String input, Class<T> tClass) throws IOException {
