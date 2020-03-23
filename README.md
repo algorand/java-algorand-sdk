@@ -128,9 +128,9 @@ mvn clean test
 The generated pom file provides maven compatibility and deploy capabilities.
 ```
 mvn clean install
-mvn clean deploy -P github
-mvn clean site -P github  # for javadoc
-mvn clean deploy -P release
+mvn clean deploy -P github,default
+mvn clean site -P github,default  # for javadoc
+mvn clean deploy -P release,default
 ```
 
 ## Updating the `algod` and `kmd` REST clients
