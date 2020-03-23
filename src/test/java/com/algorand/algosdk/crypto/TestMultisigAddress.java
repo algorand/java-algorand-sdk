@@ -1,11 +1,11 @@
 package com.algorand.algosdk.crypto;
 
-import org.junit.Assert;
-import org.junit.Test;
+import com.algorand.algosdk.util.TestUtil;
+import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Random;
+
+import static org.assertj.core.api.Assertions.*;
 
 public class TestMultisigAddress {
     @Test
@@ -20,6 +20,7 @@ public class TestMultisigAddress {
                 new Ed25519PublicKey(three.getBytes())
         ));
 
-        Assert.assertEquals("UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM", addr.toString());
+        assertThat(addr.toString()).isEqualTo("UCE2U2JC4O4ZR6W763GUQCG57HQCDZEUJY4J5I6VYY4HQZUJDF7AKZO5GM");
+        TestUtil.serializeDeserializeCheck(addr);
     }
 }

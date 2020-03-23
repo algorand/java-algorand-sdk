@@ -1,12 +1,13 @@
 package com.algorand.algosdk.crypto;
 
+import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * A serializable class representing a SHA512-256 Digest
@@ -31,7 +32,18 @@ public class Digest implements Serializable {
         System.arraycopy(bytes, 0, this.bytes, 0, DIG_LEN_BYTES);
     }
 
-    // default values for serializer to ignore
+    /**
+     * Create a new digest from a base64 encoded string.
+     * @param base64StringDigest base64 encoded string
+     */
+    @JsonIgnore
+    public Digest(String base64StringDigest) {
+        this(Encoder.decodeFromBase64(base64StringDigest));
+    }
+
+    /**
+     * Uninitialized object used for serializer to ignore default values.
+     */
     public Digest() {
     }
 

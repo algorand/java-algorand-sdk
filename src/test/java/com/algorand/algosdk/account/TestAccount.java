@@ -10,101 +10,97 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.crypto.Signature;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
 
-public class TestAccount {
+import static org.assertj.core.api.Assertions.*;
 
+public class TestAccount {
     @Test
     public void testSignsTransactionE2E() throws Exception {
-        final String REF_SIG_TXN = "82a3736967c4402f7d02826bc77dcd2a6e4d098ddcb619c4670c1dd98eba9a96f8d9a56e4fe8ff9868cee08ef1eae822bca9e99353244402717ad5850fd8136e0652f7295bd10da374786e87a3616d74cd04d2a366656501a26676ce0001a04fa26c76ce0001a437a3726376c4207d3f99e53d34ae49eb2f458761cf538408ffdaee35c70d8234166de7abe3e517a3736e64c4201bd63dc672b0bb29d42fcafa3422a4d385c0c8169bb01595babf8855cf596979a474797065a3706179";
-        final String REF_TX_ID = "YGE4O2RBSMVPSPPXBK3SR45M453TRQA3L6U3GG7VYFLZL54Y4EZQ";
+        final String REF_SIG_TXN = "82a3736967c4403f5a5cbc5cb038b0d29a53c0adf8a643822da0e41681bcab050e406fd40af20aa56a2f8c0e05d3bee8d4e8489ef13438151911b31b5ed5b660cac6bae4080507a374786e87a3616d74cd04d2a3666565cd03e8a26676ce0001a04fa26c76ce0001a437a3726376c4207d3f99e53d34ae49eb2f458761cf538408ffdaee35c70d8234166de7abe3e517a3736e64c4201bd63dc672b0bb29d42fcafa3422a4d385c0c8169bb01595babf8855cf596979a474797065a3706179";
+        final String REF_TX_ID = "BXSNCHKYEXB4AQXFRROUJGZ4ZWD7WL2F5D27YUPFR7ONDK5TMN5Q";
         final String FROM_ADDR = "DPLD3RTSWC5STVBPZL5DIIVE2OC4BSAWTOYBLFN2X6EFLT2ZNF4SMX64UA";
         final String FROM_SK = "actress tongue harbor tray suspect odor load topple vocal avoid ignore apple lunch unknown tissue museum once switch captain place lemon sail outdoor absent creek";
         final String TO_ADDR = "PU7ZTZJ5GSXET2ZPIWDWDT2TQQEP7WXOGXDQ3ARUCZW6PK7D4ULSE6NYCE";
 
         // build unsigned transaction
-        Transaction tx = new Transaction(
-                new Address(FROM_ADDR),
-                new Address(TO_ADDR),
-                BigInteger.valueOf(1),
-                BigInteger.valueOf(1234),
-                BigInteger.valueOf(106575),
-                BigInteger.valueOf(107575),
-                "",
-                new Digest()
-        );
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(FROM_ADDR)
+                .receiver(TO_ADDR)
+                .flatFee(Account.MIN_TX_FEE_UALGOS)
+                .amount(1234)
+                .firstValid(106575)
+                .lastValid(107575)
+                .genesisHash(new Digest())
+                .build();
+
         byte[] seed = Mnemonic.toKey(FROM_SK);
-        System.out.println(Encoder.encodeToJson(tx));
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct
-        Assert.assertEquals(FROM_ADDR, new Address(account.getClearTextPublicKey()).toString());
+        assertThat(new Address(account.getClearTextPublicKey()).toString()).isEqualTo(FROM_ADDR);
         // make sure address was also correctly computed
-        Assert.assertEquals(FROM_ADDR, account.getAddress().toString());
+        assertThat(account.getAddress().toString()).isEqualTo(FROM_ADDR);
 
         // sign the transaction
         SignedTransaction signedTx = account.signTransaction(tx);
-        System.out.println(Encoder.encodeToJson(signedTx));
 
         byte[] signedTxBytes = Encoder.encodeToMsgPack(signedTx);
         String signedTxHex = Encoder.encodeToHexStr(signedTxBytes);
-        Assert.assertEquals(REF_SIG_TXN, signedTxHex);
+        assertThat(signedTxHex).isEqualTo(REF_SIG_TXN);
 
         // verify transaction ID
         String txID = signedTx.transactionID;
-        Assert.assertEquals(REF_TX_ID, txID);
+        assertThat(txID).isEqualTo(REF_TX_ID);
     }
 
     @Test
     public void testSignsTransactionZeroValE2E() throws Exception {
-        final String REF_SIG_TXN = "82a3736967c440dfca36ff10b07b0b354f5593ef8ba9a2d10ff0256b1a8f3c17e7951c1e4d745e5c48d5d11ced0c2a3b91e622f5dbfdb72b5fbe4e2ea1b18b23bb34cf946dbe09a374786e86a3616d74cd04d2a366656501a26c76ce0001a437a3726376c4207d3f99e53d34ae49eb2f458761cf538408ffdaee35c70d8234166de7abe3e517a3736e64c4201bd63dc672b0bb29d42fcafa3422a4d385c0c8169bb01595babf8855cf596979a474797065a3706179";
-        final String REF_TX_ID = "Y5RLONMU6BDW5WFVLWMYY52PMXCUNWG4LMT3JBA2OV4E6W6RRLXQ";
+        final String REF_SIG_TXN = "82a3736967c440fc12c24dc9d7c48ff0bfb3464c3f4d429088ffe98353a844ba833fd32aaef577e78b49e2674f9998fa5ddfc49db52d8e0c258cafdb5d55ab73edd6678d4b230ea374786e86a3616d74cd04d2a3666565cd03e8a26c76ce0001a437a3726376c4207d3f99e53d34ae49eb2f458761cf538408ffdaee35c70d8234166de7abe3e517a3736e64c4201bd63dc672b0bb29d42fcafa3422a4d385c0c8169bb01595babf8855cf596979a474797065a3706179";
+        final String REF_TX_ID = "LH7ZXC6OO2LMDSDUIGA42WTILX7TX2K6HE4JVHGAR2UFYU6JZQOA";
         final String FROM_ADDR = "DPLD3RTSWC5STVBPZL5DIIVE2OC4BSAWTOYBLFN2X6EFLT2ZNF4SMX64UA";
         final String FROM_SK = "actress tongue harbor tray suspect odor load topple vocal avoid ignore apple lunch unknown tissue museum once switch captain place lemon sail outdoor absent creek";
         final String TO_ADDR = "PU7ZTZJ5GSXET2ZPIWDWDT2TQQEP7WXOGXDQ3ARUCZW6PK7D4ULSE6NYCE";
 
         // build unsigned transaction
-        Transaction tx = new Transaction(
-                new Address(FROM_ADDR),
-                new Address(TO_ADDR),
-                BigInteger.valueOf(1),
-                BigInteger.valueOf(1234),
-                BigInteger.valueOf(0),
-                BigInteger.valueOf(107575),
-                "",
-                new Digest()
-        );
-        System.out.println(Encoder.encodeToJson(tx));
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(FROM_ADDR)
+                .receiver(TO_ADDR)
+                .flatFee(Account.MIN_TX_FEE_UALGOS)
+                .amount(1234)
+                .firstValid(0)
+                .lastValid(107575)
+                .genesisHash(new Digest())
+                .build();
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
         // make sure public key generated from mnemonic is correct
-        Assert.assertEquals(FROM_ADDR, new Address(account.getClearTextPublicKey()).toString());
+        assertThat(new Address(account.getClearTextPublicKey()).toString()).isEqualTo(FROM_ADDR);
         // make sure address was also correctly computed
-        Assert.assertEquals(FROM_ADDR, account.getAddress().toString());
+        assertThat(account.getAddress().toString()).isEqualTo(FROM_ADDR);
 
         // sign the transaction
         SignedTransaction signedTx = account.signTransaction(tx);
         byte[] signedTxBytes = Encoder.encodeToMsgPack(signedTx);
         String signedTxHex = Encoder.encodeToHexStr(signedTxBytes);
-        Assert.assertEquals(REF_SIG_TXN, signedTxHex);
+        assertThat(signedTxHex).isEqualTo(REF_SIG_TXN);
 
         // verify transaction ID
         String txID = signedTx.transactionID;
-        Assert.assertEquals(REF_TX_ID, txID);
+        assertThat(txID).isEqualTo(REF_TX_ID);
     }
 
     @Test
     public void testKeygen() throws Exception {
         for (int i = 0; i < 100; i++) {
             Account account = new Account();
-            Assert.assertTrue(account.getClearTextPublicKey().length > 0);
-            Assert.assertNotNull(account.getAddress());
-            Assert.assertArrayEquals(account.getClearTextPublicKey(), account.getAddress().getBytes());
+            assertThat(account.getClearTextPublicKey()).isNotEmpty();
+            assertThat(account.getAddress()).isNotNull();
+            assertThat(account.getClearTextPublicKey()).isEqualTo(account.getAddress().getBytes());
         }
     }
 
@@ -113,7 +109,7 @@ public class TestAccount {
         final String FROM_SK = "actress tongue harbor tray suspect odor load topple vocal avoid ignore apple lunch unknown tissue museum once switch captain place lemon sail outdoor absent creek";
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
-        Assert.assertEquals(FROM_SK, account.toMnemonic());
+        assertThat(account.toMnemonic()).isEqualTo(FROM_SK);
     }
 
     private MultisigAddress makeTestMsigAddr() throws Exception {
@@ -132,17 +128,17 @@ public class TestAccount {
         MultisigAddress addr = makeTestMsigAddr();
 
         // build unsigned transaction
-        Transaction tx = new Transaction(
-                new Address(addr.toString()),
-                BigInteger.valueOf(217000), // fee
-                BigInteger.valueOf(972508), // first valid
-                BigInteger.valueOf(973508), // last valid
-                Encoder.decodeFromBase64("tFF5Ofz60nE="), // note
-                BigInteger.valueOf(5000), // amount
-                new Address("DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA"), // receiver
-                "testnet-v31.0", // genesisID
-                new Digest() // genesisHash
-        );
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(addr.toString())
+                .flatFee(217000)
+                .firstValid(972508)
+                .lastValid(973508)
+                .noteB64("tFF5Ofz60nE=")
+                .amount(5000)
+                .receiver("DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA")
+                .genesisID("testnet-v31.0")
+                .genesisHash(new Digest())
+                .build();
 
         byte[] seed = Mnemonic.toKey("auction inquiry lava second expand liberty glass involve ginger illness length room item discover ahead table doctor term tackle cement bonus profit right above catch");
         Account account = new Account(seed);
@@ -150,11 +146,11 @@ public class TestAccount {
         byte[] enc = Encoder.encodeToMsgPack(stx);
 
         // check the bytes convenience function is correct
-        Assert.assertArrayEquals(enc, account.signMultisigTransactionBytes(addr, tx));
+        assertThat(account.signMultisigTransactionBytes(addr, tx)).isEqualTo(enc);
 
         // check main signature is correct
         byte[] golden = Encoder.decodeFromBase64("gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAdvZ3y9GsInBPutdwKc7Jy+an13CcjSV1lcvRAYQKYOxXwfgT5B/mK14R57ueYJTYyoDO8zBY6kQmBalWkm95AIGicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaN0eG6Jo2FtdM0TiKNmZWXOAANPqKJmds4ADtbco2dlbq10ZXN0bmV0LXYzMS4womx2zgAO2sSkbm90ZcQItFF5Ofz60nGjcmN2xCAbfsCwS+pht5aQl+bL9AfhCKcFNR0LyYq+sSIJqKuBeKNzbmTEII2StImQAXOgTfpDWaNmamr86ixCoF3Zwfc+66VHgDfppHR5cGWjcGF5");
-        Assert.assertArrayEquals(golden, enc);
+        assertThat(enc).isEqualTo(golden);
     }
 
     @Test
@@ -166,7 +162,7 @@ public class TestAccount {
         Account account = new Account(seed);
         byte[] appended = account.appendMultisigTransactionBytes(addr, firstTxBytes);
         byte[] expected = Encoder.decodeFromBase64("gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAdvZ3y9GsInBPutdwKc7Jy+an13CcjSV1lcvRAYQKYOxXwfgT5B/mK14R57ueYJTYyoDO8zBY6kQmBalWkm95AIKicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxoXPEQE4cdVDpoVoVVokXRGz6O9G3Ojljd+kd6d2AahXLPGDPtT/QA9DI1rB4w8cEDTy7gd5Padkn5EZC2pjzGh0McAeBonBrxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaN0aHICoXYBo3R4bomjYW10zROIo2ZlZc4AA0+oomZ2zgAO1tyjZ2VurXRlc3RuZXQtdjMxLjCibHbOAA7axKRub3RlxAi0UXk5/PrScaNyY3bEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4o3NuZMQgjZK0iZABc6BN+kNZo2ZqavzqLEKgXdnB9z7rpUeAN+mkdHlwZaNwYXk=");
-        Assert.assertArrayEquals(expected, appended);
+        assertThat(appended).isEqualTo(expected);
     }
 
     @Test
@@ -182,7 +178,7 @@ public class TestAccount {
 
         // check main signature is correct
         byte[] golden = Encoder.decodeFromBase64("gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAujReoxR7FeTUTqgOn+rS20XOF3ENA+JrSgZ5yvrDPg3NQAzQzUXddB0PVvPRn490oVSQaHEIY05EDJXVBFPJD4GicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaN0eG6Jo2ZlZc4AA8jAomZ2zgAO+dqibHbOAA79wqZzZWxrZXnEIDISKyvWPdxTMZYXpapTxLHCb+PcyvKNNiK1aXehQFyGo3NuZMQgjZK0iZABc6BN+kNZo2ZqavzqLEKgXdnB9z7rpUeAN+mkdHlwZaZrZXlyZWemdm90ZWtkzScQp3ZvdGVrZXnEIHAb1/uRKwezCBH/KB2f7pVj5YAuICaJIxklj3f6kx6Ip3ZvdGVsc3TOAA9CQA==");
-        Assert.assertArrayEquals(golden, enc);
+        assertThat(enc).isEqualTo(golden);
     }
 
     @Test
@@ -194,7 +190,7 @@ public class TestAccount {
         Account account = new Account(seed);
         byte[] appended = account.appendMultisigTransactionBytes(addr, firstTxBytes);
         byte[] expected = Encoder.decodeFromBase64("gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAujReoxR7FeTUTqgOn+rS20XOF3ENA+JrSgZ5yvrDPg3NQAzQzUXddB0PVvPRn490oVSQaHEIY05EDJXVBFPJD4GicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgqJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGhc8RArIVZWayeobzKSv+zpJJmbrjsglY5J09/1KU37T5cSl595mMotqO7a2Hmz0XaRxoS6pVhsc2YSkMiU/YhHJCcA6N0aHICoXYBo3R4bomjZmVlzgADyMCiZnbOAA752qJsds4ADv3CpnNlbGtlecQgMhIrK9Y93FMxlhelqlPEscJv49zK8o02IrVpd6FAXIajc25kxCCNkrSJkAFzoE36Q1mjZmpq/OosQqBd2cH3PuulR4A36aR0eXBlpmtleXJlZ6Z2b3Rla2TNJxCndm90ZWtlecQgcBvX+5ErB7MIEf8oHZ/ulWPlgC4gJokjGSWPd/qTHoindm90ZWxzdM4AD0JA");
-        Assert.assertArrayEquals(expected, appended);
+        assertThat(appended).isEqualTo(expected);
     }
 
     @Test
@@ -204,8 +200,8 @@ public class TestAccount {
         byte[] expected = Encoder.decodeFromBase64("gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAujReoxR7FeTUTqgOn+rS20XOF3ENA+JrSgZ5yvrDPg3NQAzQzUXddB0PVvPRn490oVSQaHEIY05EDJXVBFPJD4KicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxoXPEQL+OpofQO+jcVrRlVexAA/wzlQv34nHNaKkOcDXCYCmqWXK5keRk3AbR5Jj4sMowGgHZZphwk1bKkmLiXV/pog+ConBrxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaFzxECshVlZrJ6hvMpK/7OkkmZuuOyCVjknT3/UpTftPlxKXn3mYyi2o7trYebPRdpHGhLqlWGxzZhKQyJT9iEckJwDo3RocgKhdgGjdHhuiaNmZWXOAAPIwKJmds4ADvnaomx2zgAO/cKmc2Vsa2V5xCAyEisr1j3cUzGWF6WqU8Sxwm/j3MryjTYitWl3oUBchqNzbmTEII2StImQAXOgTfpDWaNmamr86ixCoF3Zwfc+66VHgDfppHR5cGWma2V5cmVnpnZvdGVrZM0nEKd2b3Rla2V5xCBwG9f7kSsHswgR/ygdn+6VY+WALiAmiSMZJY93+pMeiKd2b3RlbHN0zgAPQkA=");
         byte[] a = Account.mergeMultisigTransactionBytes(firstAndThird, secondAndThird);
         byte[] b = Account.mergeMultisigTransactionBytes(secondAndThird, firstAndThird);
-        Assert.assertArrayEquals(a, b);
-        Assert.assertArrayEquals(expected, a);
+        assertThat(a).isEqualTo(b);
+        assertThat(a).isEqualTo(expected);
     }
 
     @Test
@@ -214,11 +210,11 @@ public class TestAccount {
         new Random().nextBytes(b);
         Account account = new Account();
         Signature signature = account.signBytes(b);
-        Assert.assertTrue(account.getAddress().verifyBytes(b, signature));
+        assertThat(account.getAddress().verifyBytes(b, signature)).isTrue();
         int firstByte = (int) b[0];
         firstByte = (firstByte+1) % 256;
         b[0] = (byte) firstByte;
-        Assert.assertFalse(account.getAddress().verifyBytes(b, signature));
+        assertThat(account.getAddress().verifyBytes(b, signature)).isFalse();
     }
 
     @Test
@@ -226,11 +222,11 @@ public class TestAccount {
         byte[] message = Encoder.decodeFromBase64("rTs7+dUj");
         Signature signature = new Signature(Encoder.decodeFromBase64("COEBmoD+ysVECoyVOAsvMAjFxvKeQVkYld+RSHMnEiHsypqrfj2EdYqhrm4t7dK3ZOeSQh3aXiZK/zqQDTPBBw=="));
         Address address = new Address("DPLD3RTSWC5STVBPZL5DIIVE2OC4BSAWTOYBLFN2X6EFLT2ZNF4SMX64UA");
-        Assert.assertTrue(address.verifyBytes(message, signature));
+        assertThat(address.verifyBytes(message, signature)).isTrue();
         int firstByte = (int) message[0];
         firstByte = (firstByte+1) % 256;
         message[0] = (byte) firstByte;
-        Assert.assertFalse(address.verifyBytes(message, signature));
+        assertThat(address.verifyBytes(message, signature)).isFalse();
     }
 
     @Test
@@ -247,10 +243,17 @@ public class TestAccount {
         BigInteger firstRound = BigInteger.valueOf(2063137);
         byte[] note = Encoder.decodeFromBase64("8xMCTuLQ810=");
 
-        Transaction tx = new Transaction(
-            from, fee, firstRound, firstRound.add(BigInteger.valueOf(1000)),
-            note, genesisID, genesisHash, amount, to, null
-        );
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .flatFee(fee)
+                .firstValid(firstRound)
+                .lastValid(firstRound.longValue() + 1000)
+                .note(note)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(to)
+                .build();
 
         /*
         {
@@ -292,6 +295,6 @@ public class TestAccount {
         account.signLogicsig(lsig);
         SignedTransaction stx = Account.signLogicsigTransaction(lsig, tx);
 
-        Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx), Encoder.decodeFromBase64(goldenTx)));
+        assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenTx);
     }
 }

@@ -1,6 +1,5 @@
 package com.algorand.algosdk.crypto;
 
-
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
@@ -22,8 +21,6 @@ import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import java.io.IOException;
-
-
 
 /**
  * Address represents a serializable 32-byte length Algorand address.

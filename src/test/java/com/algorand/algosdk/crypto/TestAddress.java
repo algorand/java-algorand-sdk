@@ -1,13 +1,13 @@
 package com.algorand.algosdk.crypto;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Random;
 
-public class TestAddress {
+import static org.assertj.core.api.Assertions.*;
 
+public class TestAddress {
     @Test
     public void testEncodeDecodeStr() throws Exception {
         Random r = new Random();
@@ -17,7 +17,7 @@ public class TestAddress {
             Address addr = new Address(randKey);
             String addrStr = addr.encodeAsString();
             Address reencAddr = new Address(addrStr);
-            Assert.assertEquals(addr, reencAddr);
+            assertThat(reencAddr).isEqualTo(addr);
         }
     }
 
@@ -28,7 +28,7 @@ public class TestAddress {
         for (int i = 0; i < bytes.length; i++) {
             bytes[i] = (byte)0xff; // careful with signedness
         }
-        Assert.assertEquals(golden, new Address(bytes).toString());
+        assertThat(new Address(bytes).toString()).isEqualTo(golden);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TestAddress {
         in = new ObjectInputStream(bis);
         Address o = (Address)in.readObject();
         in.close();
-        Assert.assertEquals(o, a);
-        Assert.assertEquals("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ", o.encodeAsString());
+        assertThat(o).isEqualTo(a);
+        assertThat("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ").isEqualTo(o.encodeAsString());
     }
 }

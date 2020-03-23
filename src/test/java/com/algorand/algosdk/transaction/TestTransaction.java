@@ -8,10 +8,8 @@ import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.Assert;
-import org.junit.Test;
+import com.algorand.algosdk.util.TestUtil;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.math.BigInteger;
@@ -21,25 +19,40 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.*;
 
-
 public class TestTransaction {
     private static Account DEFAULT_ACCOUNT = initializeDefaultAccount();
 
     private static Account initializeDefaultAccount() {
         try {
             String mnemonic = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-            return new Account(mnemonic);
+           return new Account(mnemonic);
         } catch (Exception e) {
-            Assert.fail("Failed to initialize static default account.");
+            fail("Failed to initialize static default account.");
         }
         return null;
+    }
+
+    private void assertEqual(Transaction actual, Transaction expected) {
+        assertThat(actual).isEqualTo(expected);
+        assertThat(actual.sender).isEqualTo(expected.sender);
+        assertThat(actual.receiver).isEqualTo(expected.receiver);
+        assertThat(actual.amount).isEqualTo(expected.amount);
+        assertThat(actual.lastValid).isEqualTo(expected.lastValid);
+        assertThat(actual.genesisHash).isEqualTo(expected.genesisHash);
     }
 
     @Test
     public void testSerialization() throws Exception {
         Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
         Address to = new Address("CQW2QBBUW5AGFDXMURQBRJN2AM3OHHQWXXI4PEJXRCVTEJ3E5VBTNRTEAE");
-        Transaction tx = new Transaction(from, to, 100, 301, 1300, "", new Digest());
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .receiver(to)
+                .amount(100)
+                .firstValid(301)
+                .lastValid(1300)
+                .genesisHash(new Digest())
+                .build();
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         ObjectOutput out = null;
@@ -53,29 +66,26 @@ public class TestTransaction {
         in = new ObjectInputStream(bis);
         Transaction o = (Transaction) in.readObject();
         in.close();
-        Assert.assertEquals(tx, o);
-        Assert.assertEquals(tx.sender, o.sender);
-        Assert.assertEquals(tx.receiver, o.receiver);
-        Assert.assertEquals(tx.amount, o.amount);
-        Assert.assertEquals(tx.lastValid, o.lastValid);
-        Assert.assertEquals(tx.genesisHash, o.genesisHash);
+        assertEqual(o, tx);
     }
 
     @Test
     public void testSerializationMsgpack() throws Exception {
         Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
         Address to = new Address("CQW2QBBUW5AGFDXMURQBRJN2AM3OHHQWXXI4PEJXRCVTEJ3E5VBTNRTEAE");
-        Transaction tx = new Transaction(from, to, 100, 301, 1300, "", new Digest());
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .receiver(to)
+                .amount(100)
+                .firstValid(301)
+                .lastValid(1300)
+                .genesisHash(new Digest())
+                .build();
 
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
 
-        Assert.assertEquals(tx, o);
-        Assert.assertEquals(tx.sender, o.sender);
-        Assert.assertEquals(tx.receiver, o.receiver);
-        Assert.assertEquals(tx.amount, o.amount);
-        Assert.assertEquals(tx.lastValid, o.lastValid);
-        Assert.assertEquals(tx.genesisHash, o.genesisHash);
+        assertEqual(o, tx);
     }
 
     private void createAssetTest(int numDecimal, String goldenString) throws Exception {
@@ -88,26 +98,23 @@ public class TestTransaction {
         Address clawback = addr;
         String metadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
 
-        Transaction tx = Transaction.createAssetCreateTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(100),
-                numDecimal,
-                false,
-                "tst",
-                "testcoin",
-                "website",
-                metadataHash.getBytes(StandardCharsets.UTF_8),
-                manager,
-                reserve,
-                freeze,
-                clawback);
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
+        Transaction tx = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(numDecimal)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("website")
+                .metadataHashUTF8(metadataHash)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
 
         Transaction.AssetParams expectedParams = new Transaction.AssetParams(
                 BigInteger.valueOf(100),
@@ -126,23 +133,20 @@ public class TestTransaction {
 
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
 
-        byte[] outBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64(goldenString);
+        String encodedOut = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
 
-        SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
+        SignedTransaction decodedOut = Encoder.decodeFromMsgPack(encodedOut, SignedTransaction.class);
 
-        assertThat(outBytes).isEqualTo(golden);
-        Assert.assertArrayEquals(golden, outBytes);
-        Assert.assertEquals(stx, o);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+        assertThat(decodedOut).isEqualTo(stx);
+        assertThat(encodedOut).isEqualTo(goldenString);
+        assertThat(decodedOut).isEqualTo(stx);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
     public void testAssetParamsValidation() throws Exception
     {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
-        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
-        Address sender = addr;
         Address manager = addr;
         Address reserve = addr;
         Address freeze = addr;
@@ -150,46 +154,35 @@ public class TestTransaction {
         String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
         String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
 
+        assertThatThrownBy(() -> new Transaction.AssetParams(
+                BigInteger.valueOf(100),
+                3,
+                false,
+                "tst",
+                "testcoin",
+                "website",
+                badMetadataHash.getBytes(StandardCharsets.UTF_8),
+                manager,
+                reserve,
+                freeze,
+                clawback))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded");
 
-        try {
-            Transaction.AssetParams expectedParams = new Transaction.AssetParams(
-                    BigInteger.valueOf(100),
-                    3,
-                    false,
-                    "tst",
-                    "testcoin",
-                    "website",
-                    badMetadataHash.getBytes(StandardCharsets.UTF_8),
-                    manager,
-                    reserve,
-                    freeze,
-                    clawback
-            );
-            Assert.fail("expected metadataHash validation failure");
-        }
-        catch( RuntimeException rte) {
-            Assert.assertTrue(rte.getMessage().contains("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded"));
-        }
-
-        try {
-            Transaction.AssetParams expectedParams = new Transaction.AssetParams(
-                    BigInteger.valueOf(100),
-                    3,
-                    false,
-                    "tst",
-                    "testcoin",
-                    "website",
-                    tooLongMetadataHash.getBytes(StandardCharsets.UTF_8),
-                    manager,
-                    reserve,
-                    freeze,
-                    clawback
-            );
-            Assert.fail("expected metadataHash validation failure");
-        }
-        catch( RuntimeException rte) {
-            Assert.assertTrue(rte.getMessage().contains("asset metadataHash cannot be greater than 32 bytes"));
-        }
+        assertThatThrownBy(() -> new Transaction.AssetParams(
+                BigInteger.valueOf(100),
+                3,
+                false,
+                "tst",
+                "testcoin",
+                "website",
+                tooLongMetadataHash.getBytes(StandardCharsets.UTF_8),
+                manager,
+                reserve,
+                freeze,
+                clawback))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("asset metadataHash cannot be greater than 32 bytes");
     }
 
     @Test
@@ -212,33 +205,29 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
 
-        Transaction tx = Transaction.createAssetConfigureTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(1234),
-                manager,
-                reserve,
-                freeze,
-                clawback,
-                true);
+        Transaction tx = Transaction.AssetConfigureTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetIndex(1234)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
 
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
 
-        byte[] outBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQBBkfw5n6UevuIMDo2lHyU4dS80JCCQ/vTRUcTx5m0ivX68zTKyuVRrHaTbxbRRc3YpJ4zeVEnC9Fiw3Wf4REwejdHhuiKRhcGFyhKFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRjYWlkzQTSo2ZlZc0NSKJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
+        String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        String goldenString = "gqNzaWfEQBBkfw5n6UevuIMDo2lHyU4dS80JCCQ/vTRUcTx5m0ivX68zTKyuVRrHaTbxbRRc3YpJ4zeVEnC9Fiw3Wf4REwejdHhuiKRhcGFyhKFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRjYWlkzQTSo2ZlZc0NSKJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn";
 
-        SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
+        SignedTransaction o = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
 
-        Assert.assertArrayEquals(golden, outBytes);
-        Assert.assertEquals(stx, o);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
-
+        assertThat(encodedOutBytes).isEqualTo(goldenString);
+        assertThat(o).isEqualTo(stx);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -251,78 +240,64 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
 
-        boolean exceptionCaughtNull = false;
-        try {
-        	Transaction.createAssetConfigureTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(1234),
-                manager,
-                reserve,
-                new Address(),
-                clawback,
-                true);
-        } catch (RuntimeException e) {
-        	Assert.assertEquals("strict empty address checking "
-        			+ "requested but empty or default address supplied "
-        			+ "to one or more manager addresses",  e.getMessage());
-        	exceptionCaughtNull = true;
-        }
-        Assert.assertTrue(exceptionCaughtNull);
+        assertThatThrownBy(() -> Transaction.AssetConfigureTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetIndex(1234)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(new Address())
+                .build())
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
 
-        boolean exceptionCaughtDefault = false;
-        try {
-        	Transaction.createAssetConfigureTransaction(
-                sender,
-                BigInteger.valueOf(10),
-                BigInteger.valueOf(322575),
-                BigInteger.valueOf(323575),
-                null,
-                "",
-                new Digest(gh),
-                BigInteger.valueOf(1234),
-                manager,
-                reserve,
-                freeze,
-                null,
-                true);
-        } catch (RuntimeException e) {
-        	Assert.assertEquals("strict empty address checking "
-        			+ "requested but empty or default address supplied "
-        			+ "to one or more manager addresses",  e.getMessage());
-        	exceptionCaughtDefault = true;
-        }
-        Assert.assertTrue(exceptionCaughtDefault);
+        assertThatThrownBy(() -> Transaction.AssetConfigureTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetIndex(1234)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(new Address())
+                .build())
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
     }
 
     @Test
     public void testSerializationAssetFreeze() throws Exception {
-
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
         Address target = addr;
         BigInteger assetFreezeID = BigInteger.valueOf(1);
         boolean freezeState = true;
-        Transaction tx = Transaction.createAssetFreezeTransaction(
-                sender, target, freezeState, BigInteger.valueOf(10), BigInteger.valueOf(322575), BigInteger.valueOf(323576), null,
-                new Digest(gh), assetFreezeID);
-        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
+        Transaction tx = Transaction.AssetFreezeTransactionBuilder()
+                .sender(sender)
+                .freezeTarget(target)
+                .freezeState(freezeState)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323576)
+                .genesisHash(gh)
+                .assetIndex(assetFreezeID)
+                .build();
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
-        byte[] outBytes = Encoder.encodeToMsgPack(stx);
-        SignedTransaction o = Encoder.decodeFromMsgPack(outBytes, SignedTransaction.class);
+        String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        SignedTransaction o = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
         String sss = Encoder.encodeToJson(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==");
-        Assert.assertArrayEquals(golden, outBytes);
-        Assert.assertEquals(stx, o);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+        String goldenString = "gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==";
 
-        return;
+        assertThat(encodedOutBytes).isEqualTo(goldenString);
+        assertThat(o).isEqualTo(stx);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -334,7 +309,7 @@ public class TestTransaction {
         Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
         Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
         Address closeTo = new Address("IDUTJEUIEVSMXTU4LGTJWZ2UE2E6TIODUKU6UW3FU3UKIQQ77RLUBBBFLA");
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQPhUAZ3xkDDcc8FvOVo6UinzmKBCqs0woYSfodlmBMfQvGbeUx3Srxy3dyJDzv7rLm26BRv9FnL2/AuT7NYfiAWjdHhui6NhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0EmKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqRub3RlxAjqABVHQ2y/lqNyY3bEIHts4k/rW6zAsWTinCIsV/X2PcOH1DkEglhBHF/hD3wCo3NuZMQg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGkdHlwZaNwYXk=");
+        String goldenString = "gqNzaWfEQPhUAZ3xkDDcc8FvOVo6UinzmKBCqs0woYSfodlmBMfQvGbeUx3Srxy3dyJDzv7rLm26BRv9FnL2/AuT7NYfiAWjdHhui6NhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0EmKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqRub3RlxAjqABVHQ2y/lqNyY3bEIHts4k/rW6zAsWTinCIsV/X2PcOH1DkEglhBHF/hD3wCo3NuZMQg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGkdHlwZaNwYXk=";
 
         String mn = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
         byte[] gh = Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=");
@@ -345,29 +320,30 @@ public class TestTransaction {
         String genesisID = "devnet-v33.0";
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="));
 
-        Transaction tx = new Transaction(fromAddr,
-                BigInteger.valueOf(4),
-                firstValidRound,
-                lastValidRound,
-                note,
-                genesisID,
-                genesisHash,
-                amountToSend,
-                toAddr,
-                closeTo);
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(fromAddr)
+                .fee(4)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .note(note)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amountToSend)
+                .receiver(toAddr)
+                .closeRemainderTo(closeTo)
+                .build();
 
-        Account.setFeeByFeePerByte(tx, tx.fee);
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
-        Assert.assertEquals(o,  tx);
+        assertThat(o).isEqualTo(tx);
 
         SignedTransaction stx = account.signTransaction(tx);
-        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
+        String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
 
-        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
-        Assert.assertEquals(stx, stxDecoded);
-        Assert.assertArrayEquals(golden, signedOutBytes);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
+        assertThat(stxDecoded).isEqualTo(stx);
+        assertThat(encodedOutBytes).isEqualTo(goldenString);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -381,22 +357,36 @@ public class TestTransaction {
         BigInteger firstRound1 = BigInteger.valueOf(710399);
         byte[] note1 = Encoder.decodeFromBase64("wRKw5cJ0CMo=");
 
-        Transaction tx1 = new Transaction(
-            from, fee, firstRound1, firstRound1.add(BigInteger.valueOf(1000)),
-            note1, genesisID, genesisHash, amount, to, null
-        );
+        Transaction tx1 = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .flatFee(fee)
+                .firstValid(firstRound1)
+                .lastValid(firstRound1.longValue() + 1000)
+                .note(note1)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(to)
+                .build();
 
         BigInteger firstRound2 = BigInteger.valueOf(710515);
         byte[] note2 = Encoder.decodeFromBase64("dBlHI6BdrIg=");
 
-        Transaction tx2 = new Transaction(
-            from, fee, firstRound2, firstRound2.add(BigInteger.valueOf(1000)),
-            note2, genesisID, genesisHash, amount, to, null
-        );
+        Transaction tx2 = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .flatFee(fee)
+                .firstValid(firstRound2)
+                .lastValid(firstRound2.longValue() + 1000)
+                .note(note2)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(to)
+                .build();
 
         // check serialization/deserialization without group field
-        Assert.assertEquals(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx1), Transaction.class), tx1);
-        Assert.assertEquals(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx2), Transaction.class), tx2);
+        assertThat(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx1), Transaction.class)).isEqualTo(tx1);
+        assertThat(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx2), Transaction.class)).isEqualTo(tx2);
 
         String goldenTx1 = "gaN0eG6Ko2FtdM0H0KNmZWXNA+iiZnbOAArW/6NnZW6rZGV2bmV0LXYxLjCiZ2jEILAtz+3tknW6iiStLW4gnSvbXUqW3ul3ghinaDc5pY9Bomx2zgAK2uekbm90ZcQIwRKw5cJ0CMqjcmN2xCCj8AKs8kPYlx63ppj1w5410qkMRGZ9FYofNYPXxGpNLKNzbmTEIKPwAqzyQ9iXHremmPXDnjXSqQxEZn0Vih81g9fEak0spHR5cGWjcGF5";
         String goldenTx2 = "gaN0eG6Ko2FtdM0H0KNmZWXNA+iiZnbOAArXc6NnZW6rZGV2bmV0LXYxLjCiZ2jEILAtz+3tknW6iiStLW4gnSvbXUqW3ul3ghinaDc5pY9Bomx2zgAK21ukbm90ZcQIdBlHI6BdrIijcmN2xCCj8AKs8kPYlx63ppj1w5410qkMRGZ9FYofNYPXxGpNLKNzbmTEIKPwAqzyQ9iXHremmPXDnjXSqQxEZn0Vih81g9fEak0spHR5cGWjcGF5";
@@ -405,19 +395,19 @@ public class TestTransaction {
         SignedTransaction stx1 = new SignedTransaction(tx1, new Signature(), new MultisigSignature(), new LogicsigSignature(), tx1.txID());
         SignedTransaction stx2 = new SignedTransaction(tx2, new Signature(), new MultisigSignature(), new LogicsigSignature(), tx2.txID());
 
-        Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx1), Encoder.decodeFromBase64(goldenTx1)));
-        Assert.assertTrue(Arrays.equals(Encoder.encodeToMsgPack(stx2), Encoder.decodeFromBase64(goldenTx2)));
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx1));
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx2));
+        assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx1))).isEqualTo(goldenTx1);
+        assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx2))).isEqualTo(goldenTx2);
+        TestUtil.serializeDeserializeCheck(stx1);
+        TestUtil.serializeDeserializeCheck(stx2);
 
 
-        Digest gid = TxGroup.computeGroupID(new Transaction[]{tx1, tx2});
+        Digest gid = TxGroup.computeGroupID(tx1, tx2);
         tx1.assignGroupID(gid);
         tx2.assignGroupID(gid);
 
         // check serialization/deserialization with group field set
-        Assert.assertEquals(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx1), Transaction.class), tx1);
-        Assert.assertEquals(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx2), Transaction.class), tx2);
+        assertThat(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx1), Transaction.class)).isEqualTo(tx1);
+        assertThat(Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(tx2), Transaction.class)).isEqualTo(tx2);
 
         // goal clerk group sets Group to every transaction and concatenate them in output file
         // simulating that behavior here
@@ -429,29 +419,32 @@ public class TestTransaction {
         byte[] concat = Arrays.copyOf(stx1Enc, stx1Enc.length + stx2Enc.length);
         System.arraycopy(stx2Enc, 0, concat, stx1Enc.length, stx2Enc.length);
 
-        Assert.assertTrue(Arrays.equals(concat, Encoder.decodeFromBase64(goldenTxg)));
+        assertThat(Encoder.encodeToBase64(concat)).isEqualTo(goldenTxg);
 
         // check assignGroupID
-        Transaction[] result = TxGroup.assignGroupID(new Transaction[]{tx1, tx2}, null);
-        Assert.assertEquals(result.length, 2);
+        Transaction[] result = TxGroup.assignGroupID(tx1, tx2);
+        assertThat(result).hasSize(2);
 
-        result = TxGroup.assignGroupID(new Transaction[]{tx1, tx2}, from);
-        Assert.assertEquals(result.length, 2);
+        result = TxGroup.assignGroupID(from, tx1, tx2);
+        assertThat(result).hasSize(2);
 
-        result = TxGroup.assignGroupID(new Transaction[]{tx1, tx2}, to);
-        Assert.assertEquals(result.length, 0);
+
+        result = TxGroup.assignGroupID(to, tx1, tx2);
+        assertThat(result).hasSize(0);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testTransactionGroupEmpty() throws IOException {
-        TxGroup.computeGroupID(new Transaction[]{});
-        Assert.fail("no expected exception");
+        assertThatThrownBy(() -> TxGroup.computeGroupID())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("empty transaction list");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testTransactionGroupNull() throws IOException {
-        TxGroup.computeGroupID(null);
-        Assert.fail("no expected exception");
+        assertThatThrownBy(() -> TxGroup.computeGroupID())
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("empty transaction list");
     }
 
     @Test
@@ -465,20 +458,17 @@ public class TestTransaction {
         BigInteger firstValidRound = BigInteger.valueOf(322575);
         BigInteger lastValidRound = BigInteger.valueOf(323575);
 
-        Transaction tx = Transaction.createAssetAcceptTransaction(
-                recipient,
-                BigInteger.valueOf(10),
-                firstValidRound,
-                lastValidRound,
-                null,
-                "",
-                new Digest(gh),
-                assetIndex);
-
-        Account.setFeeByFeePerByte(tx, tx.fee);
+        Transaction tx = Transaction.AssetAcceptTransactionBuilder()
+                .acceptingAccount(recipient)
+                .fee(10)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .genesisHash(gh)
+                .assetIndex(assetIndex)
+                .build();
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
-        Assert.assertEquals(o,  tx);
+        assertThat(o).isEqualTo(tx);
 
         /*  Example from: go-algorand-sdk/transaction/transaction_test.go
         {
@@ -496,13 +486,13 @@ public class TestTransaction {
           }
          */
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
-        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQJ7q2rOT8Sb/wB0F87ld+1zMprxVlYqbUbe+oz0WM63FctIi+K9eYFSqT26XBZ4Rr3+VTJpBE+JLKs8nctl9hgijdHhuiKRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCOiiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=");
+        String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        String goldenString = "gqNzaWfEQJ7q2rOT8Sb/wB0F87ld+1zMprxVlYqbUbe+oz0WM63FctIi+K9eYFSqT26XBZ4Rr3+VTJpBE+JLKs8nctl9hgijdHhuiKRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCOiiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=";
 
-        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
-        Assert.assertEquals(stx, stxDecoded);
-        Assert.assertArrayEquals(signedOutBytes, golden);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
+        assertThat(stxDecoded).isEqualTo(stx);
+        assertThat(encodedOutBytes).isEqualTo(goldenString);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
 
@@ -520,23 +510,23 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323576);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.createAssetTransferTransaction(
-                sender,
-                recipient,
-                closeAssetsTo,
-                amountToSend,
-                BigInteger.valueOf(10),
-                firstValidRound,
-                lastValidRound,
-                null,
-                "",
-                new Digest(gh),
-                assetIndex);
+        Transaction tx = Transaction.AssetTransferTransactionBuilder()
+                .sender(sender)
+                .assetReceiver(recipient)
+                .assetCloseTo(closeAssetsTo)
+                .assetAmount(amountToSend)
+                .flatFee(10)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .genesisHash(gh)
+                .assetIndex(assetIndex)
+                .build();
 
-        Account.setFeeByFeePerByte(tx, tx.fee);
+
+        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
-        Assert.assertEquals(o,  tx);
+        assertThat(o).isEqualTo(tx);
 
         /*
          * Golden from: go-algorand-sdk/transaction/transaction_test.go
@@ -557,13 +547,14 @@ public class TestTransaction {
             }
          */
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
-        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQNkEs3WdfFq6IQKJdF1n0/hbV9waLsvojy9pM1T4fvwfMNdjGQDy+LeesuQUfQVTneJD4VfMP7zKx4OUlItbrwSjdHhuiqRhYW10AaZhY2xvc2XEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pGFyY3bEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9o2ZlZc0KvqJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/4o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaVheGZlcqR4YWlkAQ==");
-        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
+        String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        String goldenString = "gqNzaWfEQNkEs3WdfFq6IQKJdF1n0/hbV9waLsvojy9pM1T4fvwfMNdjGQDy+LeesuQUfQVTneJD4VfMP7zKx4OUlItbrwSjdHhuiqRhYW10AaZhY2xvc2XEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pGFyY3bEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9o2ZlZc0KvqJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/4o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaVheGZlcqR4YWlkAQ==";
 
-        Assert.assertEquals(stx, stxDecoded);
-        Assert.assertArrayEquals(signedOutBytes, golden);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
+
+        assertThat(stxDecoded).isEqualTo(stx);
+        assertThat(encodedOutBytes).isEqualTo(goldenString);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
     @Test
@@ -580,33 +571,59 @@ public class TestTransaction {
         BigInteger lastValidRound = BigInteger.valueOf(323575);
         BigInteger amountToSend = BigInteger.valueOf(1);
 
-        Transaction tx = Transaction.createAssetRevokeTransaction(
-                revoker,
-                revokeFrom,
-                receiver,
-                amountToSend,
-                BigInteger.valueOf(10),
-                firstValidRound,
-                lastValidRound,
-                null,
-                "",
-                new Digest(gh),
-                assetIndex);
+        Transaction tx = Transaction.AssetClawbackTransactionBuilder()
+                .sender(revoker)
+                .assetClawbackFrom(revokeFrom)
+                .assetReceiver(receiver)
+                .assetAmount(amountToSend)
+                .flatFee(10)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .genesisHash(gh)
+                .assetIndex(assetIndex)
+                .build();
 
-        Account.setFeeByFeePerByte(tx, tx.fee);
+
+        Account.setFeeByFeePerByte(tx, BigInteger.valueOf(10));
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
-        Assert.assertEquals(o,  tx);
+        assertThat(o).isEqualTo(tx);
 
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         String sss = Encoder.encodeToJson(stx);
-        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQHsgfEAmEHUxLLLR9s+Y/yq5WeoGo/jAArCbany+7ZYwExMySzAhmV7M7S8+LBtJalB4EhzEUMKmt3kNKk6+vAWjdHhuiqRhYW10AaRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRhc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCqqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=");
-        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
+        String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        String goldenString = "gqNzaWfEQHsgfEAmEHUxLLLR9s+Y/yq5WeoGo/jAArCbany+7ZYwExMySzAhmV7M7S8+LBtJalB4EhzEUMKmt3kNKk6+vAWjdHhuiqRhYW10AaRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRhc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCqqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=";
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
 
-        Assert.assertEquals(stx, stxDecoded);
-        Assert.assertArrayEquals(signedOutBytes, golden);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+        assertThat(stxDecoded).isEqualTo(stx);
+        assertThat(encodedOutBytes).isEqualTo(goldenString);
+        TestUtil.serializeDeserializeCheck(stx);
+    }
+
+    @Test
+    public void testEncoding() throws Exception {
+        Address addr1 = new Address("726KBOYUJJNE5J5UHCSGQGWIBZWKCBN4WYD7YVSTEXEVNFPWUIJ7TAEOPM");
+        Address addr2 = new Address("42NJMHTPFVPXVSDGA6JGKUV6TARV5UZTMPFIREMLXHETRKIVW34QFSDFRE");
+        Account account1 = new Account(Encoder.decodeFromBase64("cv8E0Ln24FSkwDgGeuXKStOTGcze5u8yldpXxgrBxumFPYdMJymqcGoxdDeyuM8t6Kxixfq0PJCyJP71uhYT7w=="));
+
+        String lease = "f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=";
+        Transaction txn = Transaction.PaymentTransactionBuilder()
+                .sender(account1.getAddress())
+                .fee(Account.MIN_TX_FEE_UALGOS.longValue() * 10)
+                .firstValid(12345)
+                .lastValid(12346)
+                .genesisHashB64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=")
+                .amount(5000)
+                .receiver(addr1)
+                .closeRemainderTo(addr2)
+                .leaseB64(lease)
+                .build();
+
+        byte[] packed = Encoder.encodeToMsgPack(txn);
+        Transaction txnDecoded = Encoder.decodeFromMsgPack(packed, Transaction.class);
+        assertThat(txnDecoded.lease).isEqualTo(txn.lease);
+        assertThat(txnDecoded.lease).isEqualTo(Encoder.decodeFromBase64(lease));
+        assertThat(txnDecoded).isEqualTo(txn);
     }
 
     @Test
@@ -619,54 +636,60 @@ public class TestTransaction {
         Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
         Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
         Address closeTo = new Address("IDUTJEUIEVSMXTU4LGTJWZ2UE2E6TIODUKU6UW3FU3UKIQQ77RLUBBBFLA");
-        byte[] golden = Encoder.decodeFromBase64("gqNzaWfEQOMmFSIKsZvpW0txwzhmbgQjxv6IyN7BbV5sZ2aNgFbVcrWUnqPpQQxfPhV/wdu9jzEPUU1jAujYtcNCxJ7ONgejdHhujKNhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0FLKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqJseMQgAQIDBAECAwQBAgMEAQIDBAECAwQBAgMEAQIDBAECAwSkbm90ZcQI6gAVR0Nsv5ajcmN2xCB7bOJP61uswLFk4pwiLFf19j3Dh9Q5BIJYQRxf4Q98AqNzbmTEIOfw+E0GgR358xyNh4sRVfRnHVGhhcIAkIZn9ElYcGihpHR5cGWjcGF5=");
+        String goldenString = "gqNzaWfEQOMmFSIKsZvpW0txwzhmbgQjxv6IyN7BbV5sZ2aNgFbVcrWUnqPpQQxfPhV/wdu9jzEPUU1jAujYtcNCxJ7ONgejdHhujKNhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0FLKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqJseMQgAQIDBAECAwQBAgMEAQIDBAECAwQBAgMEAQIDBAECAwSkbm90ZcQI6gAVR0Nsv5ajcmN2xCB7bOJP61uswLFk4pwiLFf19j3Dh9Q5BIJYQRxf4Q98AqNzbmTEIOfw+E0GgR358xyNh4sRVfRnHVGhhcIAkIZn9ElYcGihpHR5cGWjcGF5";
 
-        String mn = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
-        byte[] gh = Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=");
         BigInteger firstValidRound = BigInteger.valueOf(12466);
         BigInteger lastValidRound = BigInteger.valueOf(13466);
         BigInteger amountToSend = BigInteger.valueOf(1000);
         byte[] note = Encoder.decodeFromBase64("6gAVR0Nsv5Y=");
         String genesisID = "devnet-v33.0";
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="));
-
-        Transaction tx = new Transaction(fromAddr,
-                BigInteger.valueOf(4),
-                firstValidRound,
-                lastValidRound,
-                note,
-                genesisID,
-                genesisHash,
-                amountToSend,
-                toAddr,
-                closeTo);
         byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
-        tx.setLease(lease);
-        Account.setFeeByFeePerByte(tx, tx.fee);
+
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(fromAddr)
+                .fee(4)
+                .firstValid(firstValidRound)
+                .lastValid(lastValidRound)
+                .note(note)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amountToSend)
+                .receiver(toAddr)
+                .closeRemainderTo(closeTo)
+                .lease(lease)
+                .build();
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
         Transaction o = Encoder.decodeFromMsgPack(outBytes, Transaction.class);
-        Assert.assertEquals(o,  tx);
+        assertThat(o).isEqualTo(tx);
 
         SignedTransaction stx = account.signTransaction(tx);
-        byte[] signedOutBytes = Encoder.encodeToMsgPack(stx);
+        String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
 
-        SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(signedOutBytes, SignedTransaction.class);
-        Assert.assertEquals(stx, stxDecoded);
-
-        Assert.assertArrayEquals(signedOutBytes, golden);
-        Assert.assertTrue(jsonSerializeDeserializeCheck(stx));
+        assertThat(stxDecoded).isEqualTo(stx);
+        assertThat(encodedOutBytes).isEqualTo(goldenString);
+        TestUtil.serializeDeserializeCheck(stx);
     }
 
-    private static boolean jsonSerializeDeserializeCheck(SignedTransaction tx) {
-        String encoded, encoded2;
-        try {
-            encoded = Encoder.encodeToJson(tx);
-            ObjectMapper om = new ObjectMapper();
-            SignedTransaction decodedTx = om.readerFor(tx.getClass()).readValue(encoded.getBytes());
-            encoded2 = Encoder.encodeToJson(decodedTx);
-        } catch (Exception e) {
-            return false;
-        }
-        return encoded.contentEquals(encoded2);
+    @Test
+    public void EmptyByteArraysShouldBeRejected() throws Exception {
+        Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+        Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
+
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(fromAddr)
+                .fee(4)
+                .firstValid(1)
+                .lastValid(10)
+                .amount(1)
+                .genesisHash(new Digest())
+                .receiver(toAddr)
+                .note(new byte[]{})
+                .lease(new byte[]{})
+                .build();
+
+        assertThat(tx.note).isNull();
+        assertThat(tx.lease).isNull();
     }
 }

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * A serializable class representing a participation key.

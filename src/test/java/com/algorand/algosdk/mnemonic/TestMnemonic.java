@@ -1,33 +1,30 @@
 package com.algorand.algosdk.mnemonic;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.Random;
 
-public class TestMnemonic {
+import static org.assertj.core.api.Assertions.*;
 
+public class TestMnemonic {
     @Test
     public void testZeroVector() throws Exception {
         byte[] zeroKeys = new byte[32];
         String expectedMn = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon invest";
         String mn = Mnemonic.fromKey(zeroKeys);
-        Assert.assertEquals(expectedMn, mn);
+        assertThat(mn).isEqualTo(expectedMn);
         byte[] goBack = Mnemonic.toKey(mn);
-        Assert.assertArrayEquals(zeroKeys, goBack);
+        assertThat(goBack).isEqualTo(zeroKeys);
     }
 
     @Test
     public void testWordNotInList() throws Exception {
         String mn = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon zzz invest";
-        try {
-            byte[] keyBytes = Mnemonic.toKey(mn);
-            Assert.fail("Did not fail on invalid mnemonic");
-        } catch (IllegalArgumentException e) {
-            return;
-        }
+        assertThatThrownBy(() -> Mnemonic.toKey(mn))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("mnemonic contains word that is not in word list");
     }
 
     @Test
@@ -38,7 +35,7 @@ public class TestMnemonic {
             r.nextBytes(randKey);
             String mn = Mnemonic.fromKey(Arrays.copyOf(randKey, randKey.length));
             byte[] regenKey = Mnemonic.toKey(mn);
-            Assert.assertArrayEquals(randKey, regenKey);
+            assertThat(regenKey).isEqualTo(randKey);
         }
     }
 
@@ -63,13 +60,9 @@ public class TestMnemonic {
                 s.append(words[j]);
             }
             String corruptedMn = s.toString();
-            try {
-                byte[] recKey = Mnemonic.toKey(corruptedMn);
-                Assert.fail("Corrupted checksum should not have validated");
-            } catch (GeneralSecurityException e) {
-                // should have failed
-                continue;
-            }
+            assertThatThrownBy(() -> Mnemonic.toKey(corruptedMn))
+                    .isInstanceOf(GeneralSecurityException.class)
+                    .hasMessage("checksum failed to validate");
         }
     }
 
@@ -82,12 +75,9 @@ public class TestMnemonic {
         for (int badlen: badLengths) {
             byte[] randKey = new byte[badlen];
             r.nextBytes(randKey);
-            try {
-                String mn = Mnemonic.fromKey(randKey);
-                Assert.fail("Invalid key length should be illegal argument to mnemonic generator");
-            } catch (IllegalArgumentException e) {
-                continue;
-            }
+            assertThatThrownBy(() -> Mnemonic.fromKey(randKey))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("key length must be 32 bytes");
         }
     }
 

@@ -1,6 +1,5 @@
 package com.algorand.algosdk.account;
 
-
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -46,7 +45,7 @@ public class Account {
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
-    private static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
+    public static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
 
     /**
      * Account creates a new, random account.
@@ -55,6 +54,11 @@ public class Account {
         this((SecureRandom)null);
     }
 
+    /**
+     * Create a new account from an rfc8037 private key.
+     * @param seed
+     * @throws NoSuchAlgorithmException
+     */
     public Account(byte[] seed) throws NoSuchAlgorithmException {
         // seed here corresponds to rfc8037 private key, corresponds to seed in go impl
         // BC for instance takes the seed as private key straight up
@@ -213,7 +217,17 @@ public class Account {
                 throw new RuntimeException("cannot reach");
         }
     }
-    
+
+    /**
+     * Sets the transaction fee according to suggestedFeePerByte * estimateTxSize.
+     * @param tx transaction to populate fee field
+     * @param suggestedFeePerByte suggestedFee given by network
+     * @throws NoSuchAlgorithmException could not estimate tx encoded size.
+     */
+    static public void setFeeByFeePerByte(Transaction tx, int suggestedFeePerByte) throws NoSuchAlgorithmException{
+        setFeeByFeePerByte(tx, BigInteger.valueOf(suggestedFeePerByte));
+    }
+
     /**
      * Sets the transaction fee according to suggestedFeePerByte * estimateTxSize.
      * @param tx transaction to populate fee field
@@ -221,11 +235,18 @@ public class Account {
      * @throws NoSuchAlgorithmException could not estimate tx encoded size.
      */
     static public void setFeeByFeePerByte(Transaction tx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
-        BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(tx));
-        if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
-            newFee = MIN_TX_FEE_UALGOS;
+        if (suggestedFeePerByte.compareTo(BigInteger.ZERO) < 0) {
+            throw new RuntimeException("Cannot set fee to a negative number.");
         }
-        tx.fee = newFee;
+
+        tx.fee = suggestedFeePerByte;
+        BigInteger size = estimatedEncodedSize(tx);
+
+        BigInteger fee = suggestedFeePerByte.multiply(size);
+        if (fee.compareTo(Account.MIN_TX_FEE_UALGOS) < 0) {
+            fee = Account.MIN_TX_FEE_UALGOS;
+        }
+        tx.setFee(fee);
     }
 
     /**
