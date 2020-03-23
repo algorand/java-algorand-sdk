@@ -1,3 +1,11 @@
+# 1.3.0
+- Added additional Algorand Smart Contracts (ASC)
+    - Added support for Dynamic Fee contract
+    - Added support for Limit Order contract
+    - Added support for Periodic Payment contract
+- Added new builder patterns for creating Transactions, see com.algorand.algosdk.builder.transaction.*
+- Add missing getters to AssetHolding model object.
+
 # 1.2.1
 # Added
 - Added asset decimals field.
