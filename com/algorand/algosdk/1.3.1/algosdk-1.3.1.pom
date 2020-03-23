@@ -4,7 +4,7 @@
 
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>1.2.1</version>
+    <version>1.3.1</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -33,8 +33,19 @@
     </developers>
 
     <properties>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <skip.integration.tests>true</skip.integration.tests>
+        <junit5.vintage.version>4.13.3</junit5.vintage.version>
+        <junit5.version>5.6.0</junit5.version>
+        <junit5.platform.version>1.5.2</junit5.platform.version>
+        <cucumber.version>5.5.0</cucumber.version>
+        <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
+        <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
+        <maven.surefire.version>3.0.0-M4</maven.surefire.version>
+
+        <!-- Test sources at 1.8 to allow using JUnit5 -->
+        <java.version>1.7</java.version>
+        <java.test.version>1.8</java.test.version>
+
         <!-- github server corresponds to entry in ~/.m2/settings.xml -->
         <github.global.server>github</github.global.server>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -111,13 +122,15 @@
           <artifactId>threetenbp</artifactId>
           <version>1.3.5</version>
         </dependency>
-        <!-- test dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.12</version>
-            <scope>test</scope>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+          <version>28.2-android</version>
         </dependency>
+
+        <!-- test dependencies -->
+
+        <!-- assertions library -->
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
@@ -126,10 +139,154 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- junit 5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit5.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- cucumber -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- cucumber dependency injection -->
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-picocontainer</artifactId>
+            <version>${cucumber.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- end test dependencies -->
     </dependencies>
 
+    <build>
+      <plugins>
+        <!-- Newer version of surefire plugin for running JUnit5 tests. -->
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven.surefire.version}</version>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+            <executions>
+              <execution>
+                <id>unit-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <skipTests>false</skipTests>
+                  <includes>
+                    <include>**/*Test*.*</include>
+                  </includes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>integration-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                    <skipTests>${skip.integration.tests}</skipTests>
+                  <includes>
+                    <include>**/*IT.*</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
+        </plugin>
+      </plugins>
+    </build>
+
     <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${maven.compiler.plugin.version}</version>
+                        <configuration>
+                            <source>${java.version}</source>
+                            <target>${java.version}</target>
+                            <testSource>${java.test.version}</testSource>
+                            <testTarget>${java.test.version}</testTarget>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- IDE Profile: https://youtrack.jetbrains.com/issue/IDEA-85478#focus=streamItem-27-1994481.0-0 -->
+        <!-- Note: IntelliJ doesn't support different targets: https://youtrack.jetbrains.com/issue/IDEA-85478 -->
+        <!-- Automatically activated when IDEA sets a property, putting this second overrides source/target. -->
+        <profile>
+            <id>ide</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>idea.maven.embedder.version</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>${maven.compiler.plugin.version}</version>
+                        <configuration>
+                            <source>${java.test.version}</source>
+                            <target>${java.test.version}</target>
+                            <testSource>${java.test.version}</testSource>
+                            <testTarget>${java.test.version}</testTarget>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <!--
                 Maven release profile.
@@ -193,8 +350,9 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>${maven.javadoc.plugin.version}</version>
                         <configuration>
+                          <source>${java.version}</source>
                           <doclint>none</doclint>
                         </configuration>
                         <executions>
@@ -291,7 +449,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>${maven.javadoc.plugin.version}</version>
                         <configuration>
                           <doclint>none</doclint>
                         </configuration>
@@ -340,5 +498,4 @@
             </build>
         </profile>
     </profiles>
-
 </project>
