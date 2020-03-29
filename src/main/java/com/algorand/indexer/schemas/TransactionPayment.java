@@ -11,8 +11,10 @@ public class TransactionPayment {
 	public String receiver;
 	
 	public TransactionPayment (String json) {
-		JsonNode node = Utils.getRoot(json);
-		
+		this(Utils.getRoot(json));
+	}
+
+	public TransactionPayment (JsonNode node) {	
 		this.closeRemainderTo = Utils.getString("close-remainder-to", node);
 		this.closeAmount = Utils.getLong("close-amount", node);
 		this.amount = Utils.getLong("amount", node);

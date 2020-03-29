@@ -3,6 +3,7 @@ package com.algorand.indexer.utils;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.indexer.schemas.MiniAssetHolding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -44,6 +45,16 @@ public class Utils {
 		return node.findPath(pathName).asBoolean();
 	}
 	
+	public static String getBase64String(String pathName, JsonNode node) {
+		try {
+			return Encoder.encodeToBase64(node.findPath(pathName).binaryValue());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	public static ArrayNode getArrayNode(String pathName, JsonNode node) {
 		return (ArrayNode) node.findPath(pathName);
 	}
@@ -51,4 +62,5 @@ public class Utils {
 	public static JsonNode getNode(String pathName, JsonNode parent) {
 		return parent.findPath(pathName);
 	}
+	
 }
