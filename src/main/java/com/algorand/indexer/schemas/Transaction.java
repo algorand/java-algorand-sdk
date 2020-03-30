@@ -33,8 +33,10 @@ public class Transaction {
 	public Long receiverRewards;
 	
 	public Transaction(String json) {
-		JsonNode node = Utils.getRoot(json);
-		
+			this(Utils.getRoot(json));
+	}
+	
+	public Transaction(JsonNode node) { 
 		this.assetTransferTransaction = new TransactionAssetTransfer(
 				Utils.getNode("asset-transfer-transaction", node));
 		this.note = Utils.getString("note", node);
@@ -66,7 +68,7 @@ public class Transaction {
 		this.type = Utils.getString("type", node);
 		this.keyregTransaction = new TransactionKeyreg(
 				Utils.getNode("keyreg-transaction", node));
-			this.receiverRewards = Utils.getLong("receiver-rewards", node);
+		this.receiverRewards = Utils.getLong("receiver-rewards", node);
 				
 	}
 }

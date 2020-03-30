@@ -1,8 +1,13 @@
 package com.algorand.indexer.lookup;
 
 import com.algorand.indexer.client.Query;
+
+import java.io.IOException;
+
 import com.algorand.indexer.client.Client;
 import com.algorand.indexer.schemas.AssetBalances;
+import com.algorand.indexer.schemas.AssetBalancesResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class LookupAssetBalances extends Query {
 	private long limit;
@@ -59,7 +64,7 @@ public class LookupAssetBalances extends Query {
 		return this;
 	}
 	
-	public AssetBalances lookup() {
+	public AssetBalancesResponse lookup() {
 		String response;
 		try {
 			response = request();
@@ -68,7 +73,16 @@ public class LookupAssetBalances extends Query {
 			e.printStackTrace();
 			return null;
 		}
-		return new AssetBalances(response);
+		ObjectMapper mapper = new ObjectMapper();
+		AssetBalancesResponse resp;
+		try {
+			resp = mapper.readValue(response, AssetBalancesResponse.class);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		return resp;
 	}
 
 	protected String getRequestString() {

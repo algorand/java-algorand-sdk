@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.indexer.schemas.MiniAssetHolding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
