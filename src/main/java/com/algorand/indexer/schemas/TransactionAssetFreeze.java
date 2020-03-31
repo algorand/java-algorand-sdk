@@ -1,23 +1,14 @@
 package com.algorand.indexer.schemas;
 
-import com.algorand.indexer.utils.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TransactionAssetFreeze {
+	@JsonProperty("new-freeze-status")
 	public boolean newFreezeStatus;
-	public long assetId;
-	public String address;
-	
-	
-	public TransactionAssetFreeze(JsonNode node) {
-		this.newFreezeStatus = Utils.getBoolean("new-freeze-status", node);
-		this.assetId = Utils.getLong("asset-id", node);
-		this.address = Utils.getString("address", node);
-	}	
-		
-	public TransactionAssetFreeze(String json) {
-		this(Utils.getRoot(json));
-	}
-	
 
+	@JsonProperty("asset-id")
+	public long assetId;
+
+	@JsonProperty("address")
+	public String address;
 }

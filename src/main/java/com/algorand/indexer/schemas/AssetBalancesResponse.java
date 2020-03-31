@@ -14,11 +14,4 @@ public class AssetBalancesResponse {
 	
 	@JsonProperty("balances")
 	public List<MiniAssetHolding> balances;
-	
-	public AssetBalancesResponse() {}
-	public AssetBalancesResponse(String nextToken, long currentRound, List<MiniAssetHolding> balances) {
-		this.nextToken = nextToken;
-		this.currentRound = currentRound;
-		this.balances = balances;
-	}
 }

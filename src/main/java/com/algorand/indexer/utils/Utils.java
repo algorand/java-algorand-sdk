@@ -11,23 +11,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public class Utils {
 
-	public static JsonNode getRoot(String json) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		JsonNode root;
-		try {
-			root = objectMapper.readTree(json);
-		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		return root;
-	}
-	
 	public static long getLong(String pathName, JsonNode node) {
 		return node.findPath(pathName).asLong();
 	}

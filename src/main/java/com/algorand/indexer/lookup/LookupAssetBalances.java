@@ -1,11 +1,9 @@
 package com.algorand.indexer.lookup;
 
-import com.algorand.indexer.client.Query;
-
 import java.io.IOException;
 
 import com.algorand.indexer.client.Client;
-import com.algorand.indexer.schemas.AssetBalances;
+import com.algorand.indexer.client.Query;
 import com.algorand.indexer.schemas.AssetBalancesResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
