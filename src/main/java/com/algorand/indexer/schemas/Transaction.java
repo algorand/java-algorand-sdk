@@ -34,7 +34,7 @@ public class Transaction {
 	@JsonProperty("close-rewards")
 	public long closeRewards;
 
-	@JsonProperty("pathName")
+	@JsonProperty("round-time")
 	public long roundTime;
 
 	@JsonProperty("first-valid")
@@ -80,5 +80,5 @@ public class Transaction {
 	public TransactionKeyreg keyregTransaction;
 
 	@JsonProperty("receiver-rewards")
-	public Long receiverRewards;
+	public long receiverRewards;
 }

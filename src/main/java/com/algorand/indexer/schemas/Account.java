@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Account {
+
 	@JsonProperty("reward-base")
 	public long rewardBase;
 

@@ -1,38 +1,42 @@
 package com.algorand.indexer.schemas;
 
-import com.algorand.indexer.utils.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AssetParams {
-	
+
+	@JsonProperty("reserve")
 	public String reserve;
+
+	@JsonProperty("creator")
 	public String creator;
+
+	@JsonProperty("unit-name")
 	public String unitName;
+
+	@JsonProperty("metadata-hash")
 	public String metadataHash;
+
+	@JsonProperty("total")
 	public long total;
+
+	@JsonProperty("url")
 	public String url;
+
+	@JsonProperty("freeze")
 	public String freeze;
-	public short decimals;
+
+	@JsonProperty("decimals")
+	public long decimals;
+
+	@JsonProperty("manager")
 	public String manager;
+
+	@JsonProperty("clawback")
 	public String clawback;
+
+	@JsonProperty("default-frozen")
 	public boolean defaultFrozen;
+
+	@JsonProperty("name")
 	public String name;
-	
-	public AssetParams(String json) {
-		this(Utils.getRoot(json));
-	}
-	public AssetParams(JsonNode node) {
-		this.reserve = Utils.getString("reserve", node);
-		this.creator = Utils.getString("creator", node);
-		this.unitName = Utils.getString("unit-name", node);
-		this.metadataHash = Utils.getBase64String("metadata-hash", node);
-		this.total = Utils.getLong("total", node);
-		this.url = Utils.getString("url", node);
-		this.freeze = Utils.getString("freeze", node);
-		this.decimals = (short)Utils.getLong("decimals", node);
-		this.manager = Utils.getString("manager", node);
-		this.clawback = Utils.getString("clawback", node);
-		this.defaultFrozen = Utils.getBoolean("default-frozen", node);
-		this.name = Utils.getString("name", node);
-	}
 }

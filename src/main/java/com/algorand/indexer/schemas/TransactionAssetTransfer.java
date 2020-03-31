@@ -1,21 +1,21 @@
 package com.algorand.indexer.schemas;
 
-import com.algorand.indexer.utils.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TransactionAssetTransfer {
 
+	@JsonProperty("amount")
 	public long amount;
+
+	@JsonProperty("asset-id")
 	public long assetId;
+
+	@JsonProperty("sender")
 	public String sender;
+
+	@JsonProperty("close-to")
 	public String closeTo;
+
+	@JsonProperty("receiver")
 	public String receiver;
-	
-	public TransactionAssetTransfer(JsonNode node) {
-		this.amount = Utils.getLong("amount", node);
-		this.assetId = Utils.getLong("asset-id", node);
-		this.sender = Utils.getString("sender", node);
-		this.closeTo = Utils.getString("close-to", node);
-		this.receiver = Utils.getString("receiver", node);
-	}
 }

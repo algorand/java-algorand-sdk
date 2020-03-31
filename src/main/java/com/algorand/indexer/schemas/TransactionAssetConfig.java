@@ -1,15 +1,12 @@
 package com.algorand.indexer.schemas;
 
-import com.algorand.indexer.utils.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TransactionAssetConfig {
 
+	@JsonProperty("params")
 	public AssetParams params;
+
+	@JsonProperty("asset-id")
 	public long assetId;
-	
-	public TransactionAssetConfig(JsonNode node) {
-		this.params = new AssetParams(Utils.getNode("params", node));
-		this.assetId = Utils.getLong("asset-id", node);
-	}
 }

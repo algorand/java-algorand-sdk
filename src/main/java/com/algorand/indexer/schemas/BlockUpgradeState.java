@@ -1,23 +1,21 @@
 package com.algorand.indexer.schemas;
 
-import com.algorand.indexer.utils.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BlockUpgradeState {
+
+	@JsonProperty("next-protocol")
 	public String nextProtocol;
+
+	@JsonProperty("next-protocol-vote-before")
 	public long nextProtocolVoteBefore;
+
+	@JsonProperty("next-protocol-approvals")
 	public long nextProtocolApprovals;
+
+	@JsonProperty("next-protocol-switch-on")
 	public long nextProtocolSwitchOn;
+
+	@JsonProperty("current-protocol")
 	public String currentProtocol;
-	
-	public BlockUpgradeState(String json) {
-		this(Utils.getRoot(json));
-	}
-	public BlockUpgradeState(JsonNode node) {
-		this.nextProtocol = Utils.getString("next-protocol", node);
-		this.nextProtocolVoteBefore = Utils.getLong("next-protocol-vote-before", node);
-		this.nextProtocolApprovals = Utils.getLong("next-protocol-approvals", node);
-		this.nextProtocolSwitchOn = Utils.getLong("next-protocol-switch-on", node);
-		this.currentProtocol = Utils.getString("current-protocol", node);
-	}
 }

@@ -1,10 +1,15 @@
 package com.algorand.indexer.schemas;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TransactionSignature {
 
-	public TransactionSignature(JsonNode node) {
-		
-	}
+	@JsonProperty("multisig")
+	public TransactionSignatureMultisig multisig;
+
+	@JsonProperty("logicsig")
+	public TransactionSignatureLogicsig logicsig;
+
+	@JsonProperty("sig")
+	public String sig;
 }
