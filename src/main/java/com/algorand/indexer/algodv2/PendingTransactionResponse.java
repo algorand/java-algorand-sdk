@@ -15,17 +15,30 @@ public class PendingTransactionResponse {
 	public long assetIndex;
 
 	/*
-		The raw transaction encoded as a JSON string or Base64 encoded message pack 
-		object. 
+		Rewards in microalgos applied to the close remainder to account. 
 	 */
-	@JsonProperty("txn")
-	public String txn;
+	@JsonProperty("close-rewards")
+	public long closeRewards;
 
 	/*
 		Closing amount for the transaction. 
 	 */
 	@JsonProperty("closing-amount")
 	public long closingAmount;
+
+	/*
+		The round where this transaction was confirmed, if present. 
+	 */
+	@JsonProperty("confirmed-round")
+	public long confirmedRound;
+
+	/*
+		Indicates that the transaction was kicked out of this node's transaction pool 
+		(and specifies why that happened). An empty string indicates the transaction 
+		wasn't kicked out of this node's txpool due to an error. 
+	 */
+	@JsonProperty("pool-error")
+	public String poolError;
 
 	/*
 		Rewards in microalgos applied to the receiver account. 
@@ -40,24 +53,11 @@ public class PendingTransactionResponse {
 	public long senderRewards;
 
 	/*
-		Indicates that the transaction was kicked out of this node's transaction pool 
-		(and specifies why that happened). An empty string indicates the transaction 
-		wasn't kicked out of this node's txpool due to an error. 
+		The raw transaction encoded as a JSON string or Base64 encoded message pack 
+		object. 
 	 */
-	@JsonProperty("pool-error")
-	public String poolError;
-
-	/*
-		The round where this transaction was confirmed, if present. 
-	 */
-	@JsonProperty("confirmed-round")
-	public long confirmedRound;
-
-	/*
-		Rewards in microalgos applied to the close remainder to account. 
-	 */
-	@JsonProperty("close-rewards")
-	public long closeRewards;
+	@JsonProperty("txn")
+	public String txn;
 
 	@Override
 	public boolean equals(Object o) {
@@ -67,13 +67,13 @@ public class PendingTransactionResponse {
 
 		PendingTransactionResponse other = (PendingTransactionResponse) o;
 		if (!Objects.deepEquals(this.assetIndex, other.assetIndex)) return false;
-		if (!Objects.deepEquals(this.txn, other.txn)) return false;
+		if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
 		if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;
+		if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
+		if (!Objects.deepEquals(this.poolError, other.poolError)) return false;
 		if (!Objects.deepEquals(this.receiverRewards, other.receiverRewards)) return false;
 		if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;
-		if (!Objects.deepEquals(this.poolError, other.poolError)) return false;
-		if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
-		if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
+		if (!Objects.deepEquals(this.txn, other.txn)) return false;
 
 		return true;
 	}

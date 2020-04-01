@@ -14,16 +14,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AssetHolding {
 
 	/*
+		(a) number of units held. 
+	 */
+	@JsonProperty("amount")
+	public long amount;
+
+	/*
 		Asset ID of the holding. 
 	 */
 	@JsonProperty("asset-id")
 	public long assetId;
-
-	/*
-		(f) whether or not the holding is frozen. 
-	 */
-	@JsonProperty("is-frozen")
-	public boolean isFrozen;
 
 	/*
 		Address that created this asset. This is the address where the parameters for 
@@ -34,10 +34,10 @@ public class AssetHolding {
 	public String creator;
 
 	/*
-		(a) number of units held. 
+		(f) whether or not the holding is frozen. 
 	 */
-	@JsonProperty("amount")
-	public long amount;
+	@JsonProperty("is-frozen")
+	public boolean isFrozen;
 
 	@Override
 	public boolean equals(Object o) {
@@ -46,10 +46,10 @@ public class AssetHolding {
 		if (o == null) return false;
 
 		AssetHolding other = (AssetHolding) o;
-		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
-		if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
-		if (!Objects.deepEquals(this.creator, other.creator)) return false;
 		if (!Objects.deepEquals(this.amount, other.amount)) return false;
+		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
+		if (!Objects.deepEquals(this.creator, other.creator)) return false;
+		if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
 
 		return true;
 	}

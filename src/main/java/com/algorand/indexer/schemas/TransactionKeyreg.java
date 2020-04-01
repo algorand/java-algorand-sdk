@@ -14,16 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TransactionKeyreg {
 
 	/*
-		(votekey) Participation public key used in key registration transactions. 
+		(nonpart) Mark the account as participating or non-participating. 
 	 */
-	@JsonProperty("vote-participation-key")
-	public String voteParticipationKey;
-
-	/*
-		(votekd) Number of subkeys in each batch of participation keys. 
-	 */
-	@JsonProperty("vote-key-dilution")
-	public long voteKeyDilution;
+	@JsonProperty("non-participation")
+	public boolean nonParticipation;
 
 	/*
 		(selkey) Public key used with the Verified Random Function (VRF) result during 
@@ -39,16 +33,22 @@ public class TransactionKeyreg {
 	public long voteFirstValid;
 
 	/*
-		(nonpart) Mark the account as participating or non-participating. 
+		(votekd) Number of subkeys in each batch of participation keys. 
 	 */
-	@JsonProperty("non-participation")
-	public boolean nonParticipation;
+	@JsonProperty("vote-key-dilution")
+	public long voteKeyDilution;
 
 	/*
 		(votelst) Last round this participation key is valid. 
 	 */
 	@JsonProperty("vote-last-valid")
 	public long voteLastValid;
+
+	/*
+		(votekey) Participation public key used in key registration transactions. 
+	 */
+	@JsonProperty("vote-participation-key")
+	public String voteParticipationKey;
 
 	@Override
 	public boolean equals(Object o) {
@@ -57,12 +57,12 @@ public class TransactionKeyreg {
 		if (o == null) return false;
 
 		TransactionKeyreg other = (TransactionKeyreg) o;
-		if (!Objects.deepEquals(this.voteParticipationKey, other.voteParticipationKey)) return false;
-		if (!Objects.deepEquals(this.voteKeyDilution, other.voteKeyDilution)) return false;
+		if (!Objects.deepEquals(this.nonParticipation, other.nonParticipation)) return false;
 		if (!Objects.deepEquals(this.selectionParticipationKey, other.selectionParticipationKey)) return false;
 		if (!Objects.deepEquals(this.voteFirstValid, other.voteFirstValid)) return false;
-		if (!Objects.deepEquals(this.nonParticipation, other.nonParticipation)) return false;
+		if (!Objects.deepEquals(this.voteKeyDilution, other.voteKeyDilution)) return false;
 		if (!Objects.deepEquals(this.voteLastValid, other.voteLastValid)) return false;
+		if (!Objects.deepEquals(this.voteParticipationKey, other.voteParticipationKey)) return false;
 
 		return true;
 	}

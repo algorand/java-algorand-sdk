@@ -12,14 +12,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class MiniAssetHolding {
 
-	@JsonProperty("is-frozen")
-	public boolean isFrozen;
-
 	@JsonProperty("address")
 	public String address;
 
 	@JsonProperty("amount")
 	public long amount;
+
+	@JsonProperty("is-frozen")
+	public boolean isFrozen;
 
 	@Override
 	public boolean equals(Object o) {
@@ -28,9 +28,9 @@ public class MiniAssetHolding {
 		if (o == null) return false;
 
 		MiniAssetHolding other = (MiniAssetHolding) o;
-		if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
 		if (!Objects.deepEquals(this.address, other.address)) return false;
 		if (!Objects.deepEquals(this.amount, other.amount)) return false;
+		if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
 
 		return true;
 	}

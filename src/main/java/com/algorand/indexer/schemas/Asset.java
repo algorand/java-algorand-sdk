@@ -12,14 +12,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Asset {
 
-	@JsonProperty("params")
-	public AssetParams params;
-
 	/*
 		unique asset identifier 
 	 */
 	@JsonProperty("index")
 	public long index;
+
+	@JsonProperty("params")
+	public AssetParams params;
 
 	@Override
 	public boolean equals(Object o) {
@@ -28,8 +28,8 @@ public class Asset {
 		if (o == null) return false;
 
 		Asset other = (Asset) o;
-		if (!Objects.deepEquals(this.params, other.params)) return false;
 		if (!Objects.deepEquals(this.index, other.index)) return false;
+		if (!Objects.deepEquals(this.params, other.params)) return false;
 
 		return true;
 	}

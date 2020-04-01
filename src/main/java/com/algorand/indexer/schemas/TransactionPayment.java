@@ -14,11 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TransactionPayment {
 
 	/*
-		(close) when set, indicates that the sending account should be closed and all 
-		remaining funds be transferred to this address. 
+		(amt) number of MicroAlgos intended to be transferred. 
 	 */
-	@JsonProperty("close-remainder-to")
-	public String closeRemainderTo;
+	@JsonProperty("amount")
+	public long amount;
 
 	/*
 		Number of MicroAlgos that were sent to the close-remainder-to address when 
@@ -28,10 +27,11 @@ public class TransactionPayment {
 	public long closeAmount;
 
 	/*
-		(amt) number of MicroAlgos intended to be transferred. 
+		(close) when set, indicates that the sending account should be closed and all 
+		remaining funds be transferred to this address. 
 	 */
-	@JsonProperty("amount")
-	public long amount;
+	@JsonProperty("close-remainder-to")
+	public String closeRemainderTo;
 
 	/*
 		(rcv) receiver's address. 
@@ -46,9 +46,9 @@ public class TransactionPayment {
 		if (o == null) return false;
 
 		TransactionPayment other = (TransactionPayment) o;
-		if (!Objects.deepEquals(this.closeRemainderTo, other.closeRemainderTo)) return false;
-		if (!Objects.deepEquals(this.closeAmount, other.closeAmount)) return false;
 		if (!Objects.deepEquals(this.amount, other.amount)) return false;
+		if (!Objects.deepEquals(this.closeAmount, other.closeAmount)) return false;
+		if (!Objects.deepEquals(this.closeRemainderTo, other.closeRemainderTo)) return false;
 		if (!Objects.deepEquals(this.receiver, other.receiver)) return false;
 
 		return true;

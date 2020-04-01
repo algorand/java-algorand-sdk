@@ -14,31 +14,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TransactionParams {
 
 	/*
-		GenesisID is an ID listed in the genesis block. 
-	 */
-	@JsonProperty("genesis-id")
-	public String genesisId;
-
-	/*
-		GenesisHash is the hash of the genesis block. 
-	 */
-	@JsonProperty("genesis-hash")
-	public String genesisHash;
-
-	/*
-		The minimum transaction fee (not per byte) required for the txn to validate for 
-		the current network protocol. 
-	 */
-	@JsonProperty("min-fee")
-	public long minFee;
-
-	/*
-		LastRound indicates the last round seen 
-	 */
-	@JsonProperty("last-round")
-	public long lastRound;
-
-	/*
 		ConsensusVersion indicates the consensus protocol version as of LastRound. 
 	 */
 	@JsonProperty("consensus-version")
@@ -52,6 +27,31 @@ public class TransactionParams {
 	@JsonProperty("fee")
 	public long fee;
 
+	/*
+		GenesisHash is the hash of the genesis block. 
+	 */
+	@JsonProperty("genesis-hash")
+	public String genesisHash;
+
+	/*
+		GenesisID is an ID listed in the genesis block. 
+	 */
+	@JsonProperty("genesis-id")
+	public String genesisId;
+
+	/*
+		LastRound indicates the last round seen 
+	 */
+	@JsonProperty("last-round")
+	public long lastRound;
+
+	/*
+		The minimum transaction fee (not per byte) required for the txn to validate for 
+		the current network protocol. 
+	 */
+	@JsonProperty("min-fee")
+	public long minFee;
+
 	@Override
 	public boolean equals(Object o) {
 
@@ -59,12 +59,12 @@ public class TransactionParams {
 		if (o == null) return false;
 
 		TransactionParams other = (TransactionParams) o;
-		if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
-		if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
-		if (!Objects.deepEquals(this.minFee, other.minFee)) return false;
-		if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
 		if (!Objects.deepEquals(this.consensusVersion, other.consensusVersion)) return false;
 		if (!Objects.deepEquals(this.fee, other.fee)) return false;
+		if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
+		if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
+		if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
+		if (!Objects.deepEquals(this.minFee, other.minFee)) return false;
 
 		return true;
 	}

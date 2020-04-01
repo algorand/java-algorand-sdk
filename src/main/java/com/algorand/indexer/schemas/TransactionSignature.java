@@ -13,11 +13,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class TransactionSignature {
 
-	@JsonProperty("multisig")
-	public TransactionSignatureMultisig multisig;
-
 	@JsonProperty("logicsig")
 	public TransactionSignatureLogicsig logicsig;
+
+	@JsonProperty("multisig")
+	public TransactionSignatureMultisig multisig;
 
 	/*
 		(sig) Standard ed25519 signature. 
@@ -32,8 +32,8 @@ public class TransactionSignature {
 		if (o == null) return false;
 
 		TransactionSignature other = (TransactionSignature) o;
-		if (!Objects.deepEquals(this.multisig, other.multisig)) return false;
 		if (!Objects.deepEquals(this.logicsig, other.logicsig)) return false;
+		if (!Objects.deepEquals(this.multisig, other.multisig)) return false;
 		if (!Objects.deepEquals(this.sig, other.sig)) return false;
 
 		return true;

@@ -14,16 +14,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AssetParams {
 
 	/*
-		(m) Address of account used to manage the keys of this asset and to destroy it. 
+		(c) Address of account used to clawback holdings of this asset. If empty, 
+		clawback is not permitted. 
 	 */
-	@JsonProperty("manager")
-	public String manager;
+	@JsonProperty("clawback")
+	public String clawback;
 
 	/*
-		(au) URL where more information about the asset can be retrieved. 
+		The address that created this asset. This is the address where the parameters 
+		for this asset can be found, and also the address where unwanted asset units can 
+		be sent in the worst case. 
 	 */
-	@JsonProperty("url")
-	public String url;
+	@JsonProperty("creator")
+	public String creator;
 
 	/*
 		(dc) The number of digits to use after the decimal point when displaying this 
@@ -33,12 +36,6 @@ public class AssetParams {
 	 */
 	@JsonProperty("decimals")
 	public long decimals;
-
-	/*
-		(un) Name of a unit of this asset, as supplied by the creator. 
-	 */
-	@JsonProperty("unit-name")
-	public String unitName;
 
 	/*
 		(df) Whether holdings of this asset are frozen by default. 
@@ -54,31 +51,10 @@ public class AssetParams {
 	public String freeze;
 
 	/*
-		(an) Name of this asset, as supplied by the creator. 
+		(m) Address of account used to manage the keys of this asset and to destroy it. 
 	 */
-	@JsonProperty("name")
-	public String name;
-
-	/*
-		(c) Address of account used to clawback holdings of this asset. If empty, 
-		clawback is not permitted. 
-	 */
-	@JsonProperty("clawback")
-	public String clawback;
-
-	/*
-		(t) The total number of units of this asset. 
-	 */
-	@JsonProperty("total")
-	public long total;
-
-	/*
-		The address that created this asset. This is the address where the parameters 
-		for this asset can be found, and also the address where unwanted asset units can 
-		be sent in the worst case. 
-	 */
-	@JsonProperty("creator")
-	public String creator;
+	@JsonProperty("manager")
+	public String manager;
 
 	/*
 		(am) A commitment to some unspecified asset metadata. The format of this 
@@ -88,10 +64,34 @@ public class AssetParams {
 	public String metadataHash;
 
 	/*
+		(an) Name of this asset, as supplied by the creator. 
+	 */
+	@JsonProperty("name")
+	public String name;
+
+	/*
 		(r) Address of account holding reserve (non-minted) units of this asset. 
 	 */
 	@JsonProperty("reserve")
 	public String reserve;
+
+	/*
+		(t) The total number of units of this asset. 
+	 */
+	@JsonProperty("total")
+	public long total;
+
+	/*
+		(un) Name of a unit of this asset, as supplied by the creator. 
+	 */
+	@JsonProperty("unit-name")
+	public String unitName;
+
+	/*
+		(au) URL where more information about the asset can be retrieved. 
+	 */
+	@JsonProperty("url")
+	public String url;
 
 	@Override
 	public boolean equals(Object o) {
@@ -100,18 +100,18 @@ public class AssetParams {
 		if (o == null) return false;
 
 		AssetParams other = (AssetParams) o;
-		if (!Objects.deepEquals(this.manager, other.manager)) return false;
-		if (!Objects.deepEquals(this.url, other.url)) return false;
+		if (!Objects.deepEquals(this.clawback, other.clawback)) return false;
+		if (!Objects.deepEquals(this.creator, other.creator)) return false;
 		if (!Objects.deepEquals(this.decimals, other.decimals)) return false;
-		if (!Objects.deepEquals(this.unitName, other.unitName)) return false;
 		if (!Objects.deepEquals(this.defaultFrozen, other.defaultFrozen)) return false;
 		if (!Objects.deepEquals(this.freeze, other.freeze)) return false;
-		if (!Objects.deepEquals(this.name, other.name)) return false;
-		if (!Objects.deepEquals(this.clawback, other.clawback)) return false;
-		if (!Objects.deepEquals(this.total, other.total)) return false;
-		if (!Objects.deepEquals(this.creator, other.creator)) return false;
+		if (!Objects.deepEquals(this.manager, other.manager)) return false;
 		if (!Objects.deepEquals(this.metadataHash, other.metadataHash)) return false;
+		if (!Objects.deepEquals(this.name, other.name)) return false;
 		if (!Objects.deepEquals(this.reserve, other.reserve)) return false;
+		if (!Objects.deepEquals(this.total, other.total)) return false;
+		if (!Objects.deepEquals(this.unitName, other.unitName)) return false;
+		if (!Objects.deepEquals(this.url, other.url)) return false;
 
 		return true;
 	}

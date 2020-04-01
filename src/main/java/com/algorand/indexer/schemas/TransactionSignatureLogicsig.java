@@ -15,17 +15,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TransactionSignatureLogicsig {
 
 	/*
+		(arg) Logic arguments, base64 encoded. 
+	 */
+	@JsonProperty("args")
+	public List<String> args;
+
+	/*
 		(l) Program signed by a signature or multi signature, or hashed to be the 
 		address of ana ccount. Base64 encoded TEAL program. 
 	 */
 	@JsonProperty("logic")
 	public String logic;
-
-	/*
-		(arg) Logic arguments, base64 encoded. 
-	 */
-	@JsonProperty("args")
-	public List<String> args;
 
 	@JsonProperty("multisig-signature")
 	public TransactionSignatureMultisig multisigSignature;
@@ -43,8 +43,8 @@ public class TransactionSignatureLogicsig {
 		if (o == null) return false;
 
 		TransactionSignatureLogicsig other = (TransactionSignatureLogicsig) o;
-		if (!Objects.deepEquals(this.logic, other.logic)) return false;
 		if (!Objects.deepEquals(this.args, other.args)) return false;
+		if (!Objects.deepEquals(this.logic, other.logic)) return false;
 		if (!Objects.deepEquals(this.multisigSignature, other.multisigSignature)) return false;
 		if (!Objects.deepEquals(this.signature, other.signature)) return false;
 

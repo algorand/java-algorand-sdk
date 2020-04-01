@@ -13,17 +13,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class BlockUpgradeState {
 
 	/*
+		(proto) The current protocol version. 
+	 */
+	@JsonProperty("current-protocol")
+	public String currentProtocol;
+
+	/*
 		(nextproto) The next proposed protocol version. 
 	 */
 	@JsonProperty("next-protocol")
 	public String nextProtocol;
-
-	/*
-		(nextbefore) Deadline round for this protocol upgrade (No votes will be consider 
-		after this round). 
-	 */
-	@JsonProperty("next-protocol-vote-before")
-	public long nextProtocolVoteBefore;
 
 	/*
 		(nextyes) Number of blocks which approved the protocol upgrade. 
@@ -38,10 +37,11 @@ public class BlockUpgradeState {
 	public long nextProtocolSwitchOn;
 
 	/*
-		(proto) The current protocol version. 
+		(nextbefore) Deadline round for this protocol upgrade (No votes will be consider 
+		after this round). 
 	 */
-	@JsonProperty("current-protocol")
-	public String currentProtocol;
+	@JsonProperty("next-protocol-vote-before")
+	public long nextProtocolVoteBefore;
 
 	@Override
 	public boolean equals(Object o) {
@@ -50,11 +50,11 @@ public class BlockUpgradeState {
 		if (o == null) return false;
 
 		BlockUpgradeState other = (BlockUpgradeState) o;
+		if (!Objects.deepEquals(this.currentProtocol, other.currentProtocol)) return false;
 		if (!Objects.deepEquals(this.nextProtocol, other.nextProtocol)) return false;
-		if (!Objects.deepEquals(this.nextProtocolVoteBefore, other.nextProtocolVoteBefore)) return false;
 		if (!Objects.deepEquals(this.nextProtocolApprovals, other.nextProtocolApprovals)) return false;
 		if (!Objects.deepEquals(this.nextProtocolSwitchOn, other.nextProtocolSwitchOn)) return false;
-		if (!Objects.deepEquals(this.currentProtocol, other.currentProtocol)) return false;
+		if (!Objects.deepEquals(this.nextProtocolVoteBefore, other.nextProtocolVoteBefore)) return false;
 
 		return true;
 	}

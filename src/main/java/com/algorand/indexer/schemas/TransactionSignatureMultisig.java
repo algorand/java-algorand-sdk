@@ -15,6 +15,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TransactionSignatureMultisig {
 
 	/*
+		(subsig) holds pairs of public key and signatures. 
+	 */
+	@JsonProperty("subsignature")
+	public List<TransactionSignatureMultisigSubsignature> subsignature;
+
+	/*
 		(thr) 
 	 */
 	@JsonProperty("threshold")
@@ -26,12 +32,6 @@ public class TransactionSignatureMultisig {
 	@JsonProperty("version")
 	public long version;
 
-	/*
-		(subsig) holds pairs of public key and signatures. 
-	 */
-	@JsonProperty("subsignature")
-	public List<TransactionSignatureMultisigSubsignature> subsignature;
-
 	@Override
 	public boolean equals(Object o) {
 
@@ -39,9 +39,9 @@ public class TransactionSignatureMultisig {
 		if (o == null) return false;
 
 		TransactionSignatureMultisig other = (TransactionSignatureMultisig) o;
+		if (!Objects.deepEquals(this.subsignature, other.subsignature)) return false;
 		if (!Objects.deepEquals(this.threshold, other.threshold)) return false;
 		if (!Objects.deepEquals(this.version, other.version)) return false;
-		if (!Objects.deepEquals(this.subsignature, other.subsignature)) return false;
 
 		return true;
 	}

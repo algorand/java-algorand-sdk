@@ -14,17 +14,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class Version {
 
-	@JsonProperty("genesis-id")
-	public String genesisId;
-
-	@JsonProperty("versions")
-	public List<String> versions;
-
 	@JsonProperty("build")
 	public VersionBuild build;
 
 	@JsonProperty("genesis-hash")
 	public String genesisHash;
+
+	@JsonProperty("genesis-id")
+	public String genesisId;
+
+	@JsonProperty("versions")
+	public List<String> versions;
 
 	@Override
 	public boolean equals(Object o) {
@@ -33,10 +33,10 @@ public class Version {
 		if (o == null) return false;
 
 		Version other = (Version) o;
-		if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
-		if (!Objects.deepEquals(this.versions, other.versions)) return false;
 		if (!Objects.deepEquals(this.build, other.build)) return false;
 		if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
+		if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
+		if (!Objects.deepEquals(this.versions, other.versions)) return false;
 
 		return true;
 	}

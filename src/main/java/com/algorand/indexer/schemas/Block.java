@@ -14,16 +14,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Block {
 
 	/*
-		(ts) Block creation timestamp in seconds since eposh 
-	 */
-	@JsonProperty("timestamp")
-	public long timestamp;
-
-	/*
 		(gh) hash to which this block belongs. 
 	 */
 	@JsonProperty("genesis-hash")
 	public String genesisHash;
+
+	/*
+		(gen) ID to which this block belongs. 
+	 */
+	@JsonProperty("genesis-id")
+	public String genesisId;
 
 	/*
 		(prev) Previous block hash. 
@@ -31,27 +31,14 @@ public class Block {
 	@JsonProperty("previous-block-hash")
 	public String previousBlockHash;
 
-	@JsonProperty("upgrade-state")
-	public BlockUpgradeState upgradeState;
-
-	/*
-		(txns) list of transactions corresponding to a given round. 
-	 */
-	@JsonProperty("transactions")
-	public List<Transaction> transactions;
-
-	/*
-		(tc) TxnCounter counts the number of transactions committed in the ledger, from 
-		the time at which support for this feature was introduced. Specifically, 
-		TxnCounter is the number of the next transaction that will be committed after 
-		this block. It is 0 when no transactions have ever been committed (since 
-		TxnCounter started being supported). 
-	 */
-	@JsonProperty("txn-counter")
-	public long txnCounter;
-
 	@JsonProperty("rewards")
 	public BlockRewards rewards;
+
+	/*
+		(rnd) Current round on which this block was appended to the chain. 
+	 */
+	@JsonProperty("round")
+	public long round;
 
 	/*
 		(seed) Sortition seed. 
@@ -60,10 +47,16 @@ public class Block {
 	public String seed;
 
 	/*
-		(gen) ID to which this block belongs. 
+		(ts) Block creation timestamp in seconds since eposh 
 	 */
-	@JsonProperty("genesis-id")
-	public String genesisId;
+	@JsonProperty("timestamp")
+	public long timestamp;
+
+	/*
+		(txns) list of transactions corresponding to a given round. 
+	 */
+	@JsonProperty("transactions")
+	public List<Transaction> transactions;
 
 	/*
 		(txn) TransactionsRoot authenticates the set of transactions appearing in the 
@@ -77,10 +70,17 @@ public class Block {
 	public String transactionsRoot;
 
 	/*
-		(rnd) Current round on which this block was appended to the chain. 
+		(tc) TxnCounter counts the number of transactions committed in the ledger, from 
+		the time at which support for this feature was introduced. Specifically, 
+		TxnCounter is the number of the next transaction that will be committed after 
+		this block. It is 0 when no transactions have ever been committed (since 
+		TxnCounter started being supported). 
 	 */
-	@JsonProperty("round")
-	public long round;
+	@JsonProperty("txn-counter")
+	public long txnCounter;
+
+	@JsonProperty("upgrade-state")
+	public BlockUpgradeState upgradeState;
 
 	@JsonProperty("upgrade-vote")
 	public BlockUpgradeVote upgradeVote;
@@ -92,17 +92,17 @@ public class Block {
 		if (o == null) return false;
 
 		Block other = (Block) o;
-		if (!Objects.deepEquals(this.timestamp, other.timestamp)) return false;
 		if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
-		if (!Objects.deepEquals(this.previousBlockHash, other.previousBlockHash)) return false;
-		if (!Objects.deepEquals(this.upgradeState, other.upgradeState)) return false;
-		if (!Objects.deepEquals(this.transactions, other.transactions)) return false;
-		if (!Objects.deepEquals(this.txnCounter, other.txnCounter)) return false;
-		if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
-		if (!Objects.deepEquals(this.seed, other.seed)) return false;
 		if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
-		if (!Objects.deepEquals(this.transactionsRoot, other.transactionsRoot)) return false;
+		if (!Objects.deepEquals(this.previousBlockHash, other.previousBlockHash)) return false;
+		if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
 		if (!Objects.deepEquals(this.round, other.round)) return false;
+		if (!Objects.deepEquals(this.seed, other.seed)) return false;
+		if (!Objects.deepEquals(this.timestamp, other.timestamp)) return false;
+		if (!Objects.deepEquals(this.transactions, other.transactions)) return false;
+		if (!Objects.deepEquals(this.transactionsRoot, other.transactionsRoot)) return false;
+		if (!Objects.deepEquals(this.txnCounter, other.txnCounter)) return false;
+		if (!Objects.deepEquals(this.upgradeState, other.upgradeState)) return false;
 		if (!Objects.deepEquals(this.upgradeVote, other.upgradeVote)) return false;
 
 		return true;

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -105,11 +106,21 @@ public class Generator {
 		return sb.toString();
 	}
 	
-	static boolean writeProperties(StringBuffer buffer, JsonNode properties) {
+	static Iterator<Entry<String, JsonNode>> getSortedProperties(JsonNode properties) {
 		Iterator<Entry<String, JsonNode>> props = properties.fields();
-		boolean importList = false;
+		TreeMap<String, JsonNode> propMap = new TreeMap<String, JsonNode>();
 		while (props.hasNext()) {
-			Entry<String, JsonNode> prop = props.next();
+			Entry<String, JsonNode> e = props.next();
+			propMap.put(e.getKey(), e.getValue());
+		}
+		Iterator<Entry<String, JsonNode>>sortedProps = propMap.entrySet().iterator();
+		return sortedProps;
+	}
+	
+	static boolean writeProperties(StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties) {
+		boolean importList = false;
+		while (properties.hasNext()) {
+			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop);
 			String desc;
@@ -131,7 +142,7 @@ public class Generator {
 		return importList;
 	}
 		
-	static void writeCompareMethod(String className, StringBuffer buffer, JsonNode properties) {
+	static void writeCompareMethod(String className, StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties) {
 		buffer.append("	@Override\n" + 
 				"	public boolean equals(Object o) {\n" + 
 				"\n" + 
@@ -139,9 +150,8 @@ public class Generator {
 				"		if (o == null) return false;\n");
 		buffer.append("\n"); 
 		buffer.append("		" + className + " other = (" + className + ") o;\n");
-		Iterator<Entry<String, JsonNode>> props = properties.fields();
-		while (props.hasNext()) {
-			Entry<String, JsonNode> prop = props.next();
+		while (properties.hasNext()) {
+			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop);
 			buffer.append("		if (!Objects.deepEquals(this." + javaName + ", other." + javaName + ")) return false;\n");
@@ -164,9 +174,10 @@ public class Generator {
 				"	}\n");
 	}
 	
-	static void writeClass(String className, JsonNode properties, String desc, String directory) throws IOException {
+	static void writeClass(String className, JsonNode propertiesNode, String desc, String directory) throws IOException {
 		System.out.println("Generating ... " + className);
 
+		Iterator<Entry<String, JsonNode>> properties = getSortedProperties(propertiesNode);
 		BufferedWriter bw = getFileWriter(className, directory);
 	
 		StringBuffer imports = new StringBuffer();
@@ -175,6 +186,7 @@ public class Generator {
 				
 		importList = importList || writeProperties(body, properties);
 		body.append("\n");
+		properties = getSortedProperties(propertiesNode);
 		writeCompareMethod(className, body, properties);
 		body.append("\n");		
 		writeToStringMethod(body);

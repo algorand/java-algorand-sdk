@@ -19,18 +19,11 @@ public class BlockRewards {
 	public String feeSink;
 
 	/*
-		(rate) Number of new MicroAlgos added to the participation stake from rewards at 
-		the next round. 
+		(rwcalr) number of leftover MicroAlgos after the distribution of rewards-rate 
+		MicroAlgos for every reward unit in the next round. 
 	 */
-	@JsonProperty("rewards-rate")
-	public long rewardsRate;
-
-	/*
-		(rwd) accepts periodic injections from the fee-sink and continually 
-		redistributes them as rewards. 
-	 */
-	@JsonProperty("rewards-pool")
-	public String rewardsPool;
+	@JsonProperty("rewards-calculation-round")
+	public long rewardsCalculationRound;
 
 	/*
 		(earn) How many rewards, in MicroAlgos, have been distributed to each RewardUnit 
@@ -40,18 +33,25 @@ public class BlockRewards {
 	public long rewardsLevel;
 
 	/*
+		(rwd) accepts periodic injections from the fee-sink and continually 
+		redistributes them as rewards. 
+	 */
+	@JsonProperty("rewards-pool")
+	public String rewardsPool;
+
+	/*
+		(rate) Number of new MicroAlgos added to the participation stake from rewards at 
+		the next round. 
+	 */
+	@JsonProperty("rewards-rate")
+	public long rewardsRate;
+
+	/*
 		(frac) Number of leftover MicroAlgos after the distribution of 
 		RewardsRate/rewardUnits MicroAlgos for every reward unit in the next round. 
 	 */
 	@JsonProperty("rewards-residue")
 	public long rewardsResidue;
-
-	/*
-		(rwcalr) number of leftover MicroAlgos after the distribution of rewards-rate 
-		MicroAlgos for every reward unit in the next round. 
-	 */
-	@JsonProperty("rewards-calculation-round")
-	public long rewardsCalculationRound;
 
 	@Override
 	public boolean equals(Object o) {
@@ -61,11 +61,11 @@ public class BlockRewards {
 
 		BlockRewards other = (BlockRewards) o;
 		if (!Objects.deepEquals(this.feeSink, other.feeSink)) return false;
-		if (!Objects.deepEquals(this.rewardsRate, other.rewardsRate)) return false;
-		if (!Objects.deepEquals(this.rewardsPool, other.rewardsPool)) return false;
-		if (!Objects.deepEquals(this.rewardsLevel, other.rewardsLevel)) return false;
-		if (!Objects.deepEquals(this.rewardsResidue, other.rewardsResidue)) return false;
 		if (!Objects.deepEquals(this.rewardsCalculationRound, other.rewardsCalculationRound)) return false;
+		if (!Objects.deepEquals(this.rewardsLevel, other.rewardsLevel)) return false;
+		if (!Objects.deepEquals(this.rewardsPool, other.rewardsPool)) return false;
+		if (!Objects.deepEquals(this.rewardsRate, other.rewardsRate)) return false;
+		if (!Objects.deepEquals(this.rewardsResidue, other.rewardsResidue)) return false;
 
 		return true;
 	}

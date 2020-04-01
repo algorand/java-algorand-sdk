@@ -14,10 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TransactionAssetFreeze {
 
 	/*
-		(afrz) The new freeze status. 
+		(fadd) Address of the account whose asset is being frozen or thawed. 
 	 */
-	@JsonProperty("new-freeze-status")
-	public boolean newFreezeStatus;
+	@JsonProperty("address")
+	public String address;
 
 	/*
 		(faid) ID of the asset being frozen or thawed. 
@@ -26,10 +26,10 @@ public class TransactionAssetFreeze {
 	public long assetId;
 
 	/*
-		(fadd) Address of the account whose asset is being frozen or thawed. 
+		(afrz) The new freeze status. 
 	 */
-	@JsonProperty("address")
-	public String address;
+	@JsonProperty("new-freeze-status")
+	public boolean newFreezeStatus;
 
 	@Override
 	public boolean equals(Object o) {
@@ -38,9 +38,9 @@ public class TransactionAssetFreeze {
 		if (o == null) return false;
 
 		TransactionAssetFreeze other = (TransactionAssetFreeze) o;
-		if (!Objects.deepEquals(this.newFreezeStatus, other.newFreezeStatus)) return false;
-		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
 		if (!Objects.deepEquals(this.address, other.address)) return false;
+		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
+		if (!Objects.deepEquals(this.newFreezeStatus, other.newFreezeStatus)) return false;
 
 		return true;
 	}

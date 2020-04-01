@@ -9,10 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class SupplyResponse {
 
 	/*
-		TotalMoney 
+		Round 
 	 */
-	@JsonProperty("total-money")
-	public long totalMoney;
+	@JsonProperty("current_round")
+	public long current_round;
 
 	/*
 		OnlineMoney 
@@ -21,10 +21,10 @@ public class SupplyResponse {
 	public long onlineMoney;
 
 	/*
-		Round 
+		TotalMoney 
 	 */
-	@JsonProperty("current_round")
-	public long current_round;
+	@JsonProperty("total-money")
+	public long totalMoney;
 
 	@Override
 	public boolean equals(Object o) {
@@ -33,9 +33,9 @@ public class SupplyResponse {
 		if (o == null) return false;
 
 		SupplyResponse other = (SupplyResponse) o;
-		if (!Objects.deepEquals(this.totalMoney, other.totalMoney)) return false;
-		if (!Objects.deepEquals(this.onlineMoney, other.onlineMoney)) return false;
 		if (!Objects.deepEquals(this.current_round, other.current_round)) return false;
+		if (!Objects.deepEquals(this.onlineMoney, other.onlineMoney)) return false;
+		if (!Objects.deepEquals(this.totalMoney, other.totalMoney)) return false;
 
 		return true;
 	}

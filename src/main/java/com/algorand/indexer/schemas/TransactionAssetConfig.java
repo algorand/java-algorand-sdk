@@ -14,14 +14,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class TransactionAssetConfig {
 
-	@JsonProperty("params")
-	public AssetParams params;
-
 	/*
 		(xaid) ID of the asset being configured or empty if creating. 
 	 */
 	@JsonProperty("asset-id")
 	public long assetId;
+
+	@JsonProperty("params")
+	public AssetParams params;
 
 	@Override
 	public boolean equals(Object o) {
@@ -30,8 +30,8 @@ public class TransactionAssetConfig {
 		if (o == null) return false;
 
 		TransactionAssetConfig other = (TransactionAssetConfig) o;
-		if (!Objects.deepEquals(this.params, other.params)) return false;
 		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
+		if (!Objects.deepEquals(this.params, other.params)) return false;
 
 		return true;
 	}

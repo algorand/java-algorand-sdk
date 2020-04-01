@@ -14,10 +14,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AccountParticipation {
 
 	/*
+		(sel) Selection public key (if any) currently registered for this round. 
+	 */
+	@JsonProperty("selection-participation-key")
+	public String selectionParticipationKey;
+
+	/*
 		(voteFst) First round for which this participation is valid. 
 	 */
 	@JsonProperty("vote-first-valid")
 	public long voteFirstValid;
+
+	/*
+		(voteKD) Number of subkeys in each batch of participation keys. 
+	 */
+	@JsonProperty("vote-key-dilution")
+	public long voteKeyDilution;
 
 	/*
 		(voteLst) Last round for which this participation is valid. 
@@ -32,18 +44,6 @@ public class AccountParticipation {
 	@JsonProperty("vote-participation-key")
 	public String voteParticipationKey;
 
-	/*
-		(voteKD) Number of subkeys in each batch of participation keys. 
-	 */
-	@JsonProperty("vote-key-dilution")
-	public long voteKeyDilution;
-
-	/*
-		(sel) Selection public key (if any) currently registered for this round. 
-	 */
-	@JsonProperty("selection-participation-key")
-	public String selectionParticipationKey;
-
 	@Override
 	public boolean equals(Object o) {
 
@@ -51,11 +51,11 @@ public class AccountParticipation {
 		if (o == null) return false;
 
 		AccountParticipation other = (AccountParticipation) o;
+		if (!Objects.deepEquals(this.selectionParticipationKey, other.selectionParticipationKey)) return false;
 		if (!Objects.deepEquals(this.voteFirstValid, other.voteFirstValid)) return false;
+		if (!Objects.deepEquals(this.voteKeyDilution, other.voteKeyDilution)) return false;
 		if (!Objects.deepEquals(this.voteLastValid, other.voteLastValid)) return false;
 		if (!Objects.deepEquals(this.voteParticipationKey, other.voteParticipationKey)) return false;
-		if (!Objects.deepEquals(this.voteKeyDilution, other.voteKeyDilution)) return false;
-		if (!Objects.deepEquals(this.selectionParticipationKey, other.selectionParticipationKey)) return false;
 
 		return true;
 	}

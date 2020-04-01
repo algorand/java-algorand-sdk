@@ -15,13 +15,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Account {
 
 	/*
-		amount of MicroAlgos of pending rewards in this account. 
+		the account public key 
 	 */
-	@JsonProperty("pending-rewards")
-	public long pendingRewards;
+	@JsonProperty("address")
+	public String address;
 
-	@JsonProperty("participation")
-	public AccountParticipation participation;
+	/*
+		(algo) total number of MicroAlgos in the account 
+	 */
+	@JsonProperty("amount")
+	public long amount;
 
 	/*
 		specifies the amount of MicroAlgos in the account, without the pending rewards. 
@@ -37,24 +40,20 @@ public class Account {
 	public List<AssetHolding> assets;
 
 	/*
-		(ern) total rewards of MicroAlgos the account has received, including pending 
-		rewards. 
-	 */
-	@JsonProperty("rewards")
-	public long rewards;
-
-	/*
 		(apar) parameters of assets created by this account. Note: the raw account uses 
 		`map[int] -> Asset` for this type. 
 	 */
 	@JsonProperty("created-assets")
 	public List<Asset> createdAssets;
 
+	@JsonProperty("participation")
+	public AccountParticipation participation;
+
 	/*
-		(algo) total number of MicroAlgos in the account 
+		amount of MicroAlgos of pending rewards in this account. 
 	 */
-	@JsonProperty("amount")
-	public long amount;
+	@JsonProperty("pending-rewards")
+	public long pendingRewards;
 
 	/*
 		(ebase) used as part of the rewards computation. Only applicable to accounts 
@@ -64,10 +63,17 @@ public class Account {
 	public long rewardBase;
 
 	/*
-		the account public key 
+		(ern) total rewards of MicroAlgos the account has received, including pending 
+		rewards. 
 	 */
-	@JsonProperty("address")
-	public String address;
+	@JsonProperty("rewards")
+	public long rewards;
+
+	/*
+		The round for which this information is relevant. 
+	 */
+	@JsonProperty("round")
+	public long round;
 
 	/*
 		(onl) delegation status of the account's MicroAlgos * Offline - indicates that 
@@ -85,12 +91,6 @@ public class Account {
 	@JsonProperty("type")
 	public String type;
 
-	/*
-		The round for which this information is relevant. 
-	 */
-	@JsonProperty("round")
-	public long round;
-
 	@Override
 	public boolean equals(Object o) {
 
@@ -98,18 +98,18 @@ public class Account {
 		if (o == null) return false;
 
 		Account other = (Account) o;
-		if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;
-		if (!Objects.deepEquals(this.participation, other.participation)) return false;
+		if (!Objects.deepEquals(this.address, other.address)) return false;
+		if (!Objects.deepEquals(this.amount, other.amount)) return false;
 		if (!Objects.deepEquals(this.amountWithoutPendingRewards, other.amountWithoutPendingRewards)) return false;
 		if (!Objects.deepEquals(this.assets, other.assets)) return false;
-		if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
 		if (!Objects.deepEquals(this.createdAssets, other.createdAssets)) return false;
-		if (!Objects.deepEquals(this.amount, other.amount)) return false;
+		if (!Objects.deepEquals(this.participation, other.participation)) return false;
+		if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;
 		if (!Objects.deepEquals(this.rewardBase, other.rewardBase)) return false;
-		if (!Objects.deepEquals(this.address, other.address)) return false;
+		if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
+		if (!Objects.deepEquals(this.round, other.round)) return false;
 		if (!Objects.deepEquals(this.status, other.status)) return false;
 		if (!Objects.deepEquals(this.type, other.type)) return false;
-		if (!Objects.deepEquals(this.round, other.round)) return false;
 
 		return true;
 	}

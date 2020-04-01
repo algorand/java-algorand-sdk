@@ -10,6 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class TransactionsResponse {
 
 	/*
+		Round at which the results were computed. 
+	 */
+	@JsonProperty("current-round")
+	public long currentRound;
+
+	/*
 		Used for pagination, when making another request provide this token with the 
 		next parameter. 
 	 */
@@ -19,12 +25,6 @@ public class TransactionsResponse {
 	@JsonProperty("transactions")
 	public List<Transaction> transactions;
 
-	/*
-		Round at which the results were computed. 
-	 */
-	@JsonProperty("current-round")
-	public long currentRound;
-
 	@Override
 	public boolean equals(Object o) {
 
@@ -32,9 +32,9 @@ public class TransactionsResponse {
 		if (o == null) return false;
 
 		TransactionsResponse other = (TransactionsResponse) o;
+		if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
 		if (!Objects.deepEquals(this.nextToken, other.nextToken)) return false;
 		if (!Objects.deepEquals(this.transactions, other.transactions)) return false;
-		if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
 
 		return true;
 	}

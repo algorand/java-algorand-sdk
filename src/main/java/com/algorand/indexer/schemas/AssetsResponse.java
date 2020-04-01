@@ -9,6 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AssetsResponse {
 
+	@JsonProperty("assets")
+	public List<Asset> assets;
+
 	/*
 		Round at which the results were computed. 
 	 */
@@ -22,9 +25,6 @@ public class AssetsResponse {
 	@JsonProperty("next-token")
 	public String nextToken;
 
-	@JsonProperty("assets")
-	public List<Asset> assets;
-
 	@Override
 	public boolean equals(Object o) {
 
@@ -32,9 +32,9 @@ public class AssetsResponse {
 		if (o == null) return false;
 
 		AssetsResponse other = (AssetsResponse) o;
+		if (!Objects.deepEquals(this.assets, other.assets)) return false;
 		if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
 		if (!Objects.deepEquals(this.nextToken, other.nextToken)) return false;
-		if (!Objects.deepEquals(this.assets, other.assets)) return false;
 
 		return true;
 	}

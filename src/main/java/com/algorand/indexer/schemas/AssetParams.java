@@ -14,10 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class AssetParams {
 
 	/*
-		(r) Address of account holding reserve (non-minted) units of this asset. 
+		(c) Address of account used to clawback holdings of this asset. If empty, 
+		clawback is not permitted. 
 	 */
-	@JsonProperty("reserve")
-	public String reserve;
+	@JsonProperty("clawback")
+	public String clawback;
 
 	/*
 		The address that created this asset. This is the address where the parameters 
@@ -26,38 +27,6 @@ public class AssetParams {
 	 */
 	@JsonProperty("creator")
 	public String creator;
-
-	/*
-		(un) Name of a unit of this asset, as supplied by the creator. 
-	 */
-	@JsonProperty("unit-name")
-	public String unitName;
-
-	/*
-		(am) A commitment to some unspecified asset metadata. The format of this 
-		metadata is up to the application. 
-	 */
-	@JsonProperty("metadata-hash")
-	public String metadataHash;
-
-	/*
-		(t) The total number of units of this asset. 
-	 */
-	@JsonProperty("total")
-	public long total;
-
-	/*
-		(au) URL where more information about the asset can be retrieved. 
-	 */
-	@JsonProperty("url")
-	public String url;
-
-	/*
-		(f) Address of account used to freeze holdings of this asset. If empty, freezing 
-		is not permitted. 
-	 */
-	@JsonProperty("freeze")
-	public String freeze;
 
 	/*
 		(dc) The number of digits to use after the decimal point when displaying this 
@@ -69,29 +38,60 @@ public class AssetParams {
 	public long decimals;
 
 	/*
-		(m) Address of account used to manage the keys of this asset and to destroy it. 
-	 */
-	@JsonProperty("manager")
-	public String manager;
-
-	/*
-		(c) Address of account used to clawback holdings of this asset. If empty, 
-		clawback is not permitted. 
-	 */
-	@JsonProperty("clawback")
-	public String clawback;
-
-	/*
 		(df) Whether holdings of this asset are frozen by default. 
 	 */
 	@JsonProperty("default-frozen")
 	public boolean defaultFrozen;
 
 	/*
+		(f) Address of account used to freeze holdings of this asset. If empty, freezing 
+		is not permitted. 
+	 */
+	@JsonProperty("freeze")
+	public String freeze;
+
+	/*
+		(m) Address of account used to manage the keys of this asset and to destroy it. 
+	 */
+	@JsonProperty("manager")
+	public String manager;
+
+	/*
+		(am) A commitment to some unspecified asset metadata. The format of this 
+		metadata is up to the application. 
+	 */
+	@JsonProperty("metadata-hash")
+	public String metadataHash;
+
+	/*
 		(an) Name of this asset, as supplied by the creator. 
 	 */
 	@JsonProperty("name")
 	public String name;
+
+	/*
+		(r) Address of account holding reserve (non-minted) units of this asset. 
+	 */
+	@JsonProperty("reserve")
+	public String reserve;
+
+	/*
+		(t) The total number of units of this asset. 
+	 */
+	@JsonProperty("total")
+	public long total;
+
+	/*
+		(un) Name of a unit of this asset, as supplied by the creator. 
+	 */
+	@JsonProperty("unit-name")
+	public String unitName;
+
+	/*
+		(au) URL where more information about the asset can be retrieved. 
+	 */
+	@JsonProperty("url")
+	public String url;
 
 	@Override
 	public boolean equals(Object o) {
@@ -100,18 +100,18 @@ public class AssetParams {
 		if (o == null) return false;
 
 		AssetParams other = (AssetParams) o;
-		if (!Objects.deepEquals(this.reserve, other.reserve)) return false;
-		if (!Objects.deepEquals(this.creator, other.creator)) return false;
-		if (!Objects.deepEquals(this.unitName, other.unitName)) return false;
-		if (!Objects.deepEquals(this.metadataHash, other.metadataHash)) return false;
-		if (!Objects.deepEquals(this.total, other.total)) return false;
-		if (!Objects.deepEquals(this.url, other.url)) return false;
-		if (!Objects.deepEquals(this.freeze, other.freeze)) return false;
-		if (!Objects.deepEquals(this.decimals, other.decimals)) return false;
-		if (!Objects.deepEquals(this.manager, other.manager)) return false;
 		if (!Objects.deepEquals(this.clawback, other.clawback)) return false;
+		if (!Objects.deepEquals(this.creator, other.creator)) return false;
+		if (!Objects.deepEquals(this.decimals, other.decimals)) return false;
 		if (!Objects.deepEquals(this.defaultFrozen, other.defaultFrozen)) return false;
+		if (!Objects.deepEquals(this.freeze, other.freeze)) return false;
+		if (!Objects.deepEquals(this.manager, other.manager)) return false;
+		if (!Objects.deepEquals(this.metadataHash, other.metadataHash)) return false;
 		if (!Objects.deepEquals(this.name, other.name)) return false;
+		if (!Objects.deepEquals(this.reserve, other.reserve)) return false;
+		if (!Objects.deepEquals(this.total, other.total)) return false;
+		if (!Objects.deepEquals(this.unitName, other.unitName)) return false;
+		if (!Objects.deepEquals(this.url, other.url)) return false;
 
 		return true;
 	}

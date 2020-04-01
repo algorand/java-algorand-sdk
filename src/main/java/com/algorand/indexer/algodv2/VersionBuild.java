@@ -12,23 +12,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class VersionBuild {
 
-	@JsonProperty("minor")
-	public long minor;
-
-	@JsonProperty("channel")
-	public String channel;
-
-	@JsonProperty("major")
-	public long major;
+	@JsonProperty("branch")
+	public String branch;
 
 	@JsonProperty("build-number")
 	public long buildNumber;
 
-	@JsonProperty("branch")
-	public String branch;
+	@JsonProperty("channel")
+	public String channel;
 
 	@JsonProperty("commit-hash")
 	public String commitHash;
+
+	@JsonProperty("major")
+	public long major;
+
+	@JsonProperty("minor")
+	public long minor;
 
 	@Override
 	public boolean equals(Object o) {
@@ -37,12 +37,12 @@ public class VersionBuild {
 		if (o == null) return false;
 
 		VersionBuild other = (VersionBuild) o;
-		if (!Objects.deepEquals(this.minor, other.minor)) return false;
-		if (!Objects.deepEquals(this.channel, other.channel)) return false;
-		if (!Objects.deepEquals(this.major, other.major)) return false;
-		if (!Objects.deepEquals(this.buildNumber, other.buildNumber)) return false;
 		if (!Objects.deepEquals(this.branch, other.branch)) return false;
+		if (!Objects.deepEquals(this.buildNumber, other.buildNumber)) return false;
+		if (!Objects.deepEquals(this.channel, other.channel)) return false;
 		if (!Objects.deepEquals(this.commitHash, other.commitHash)) return false;
+		if (!Objects.deepEquals(this.major, other.major)) return false;
+		if (!Objects.deepEquals(this.minor, other.minor)) return false;
 
 		return true;
 	}

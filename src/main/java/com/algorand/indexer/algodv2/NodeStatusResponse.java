@@ -9,29 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class NodeStatusResponse {
 
 	/*
-		NextVersionRound is the round at which the next consensus version will apply 
-	 */
-	@JsonProperty("next-version-round")
-	public long nextVersionRound;
-
-	/*
-		NextVersion of consensus protocol to use 
-	 */
-	@JsonProperty("next-version")
-	public String nextVersion;
-
-	/*
 		CatchupTime in nanoseconds 
 	 */
 	@JsonProperty("catchup-time")
 	public long catchupTime;
-
-	/*
-		StoppedAtUnsupportedRound indicates that the node does not support the new 
-		rounds and has stopped making progress 
-	 */
-	@JsonProperty("stopped-at-unsupported-round")
-	public boolean stoppedAtUnsupportedRound;
 
 	/*
 		LastRound indicates the last round seen 
@@ -40,10 +21,22 @@ public class NodeStatusResponse {
 	public long lastRound;
 
 	/*
-		TimeSinceLastRound in nanoseconds 
+		LastVersion indicates the last consensus version supported 
 	 */
-	@JsonProperty("time-since-last-round")
-	public long timeSinceLastRound;
+	@JsonProperty("last-version")
+	public String lastVersion;
+
+	/*
+		NextVersion of consensus protocol to use 
+	 */
+	@JsonProperty("next-version")
+	public String nextVersion;
+
+	/*
+		NextVersionRound is the round at which the next consensus version will apply 
+	 */
+	@JsonProperty("next-version-round")
+	public long nextVersionRound;
 
 	/*
 		NextVersionSupported indicates whether the next consensus version is supported 
@@ -53,10 +46,17 @@ public class NodeStatusResponse {
 	public boolean nextVersionSupported;
 
 	/*
-		LastVersion indicates the last consensus version supported 
+		StoppedAtUnsupportedRound indicates that the node does not support the new 
+		rounds and has stopped making progress 
 	 */
-	@JsonProperty("last-version")
-	public String lastVersion;
+	@JsonProperty("stopped-at-unsupported-round")
+	public boolean stoppedAtUnsupportedRound;
+
+	/*
+		TimeSinceLastRound in nanoseconds 
+	 */
+	@JsonProperty("time-since-last-round")
+	public long timeSinceLastRound;
 
 	@Override
 	public boolean equals(Object o) {
@@ -65,14 +65,14 @@ public class NodeStatusResponse {
 		if (o == null) return false;
 
 		NodeStatusResponse other = (NodeStatusResponse) o;
-		if (!Objects.deepEquals(this.nextVersionRound, other.nextVersionRound)) return false;
-		if (!Objects.deepEquals(this.nextVersion, other.nextVersion)) return false;
 		if (!Objects.deepEquals(this.catchupTime, other.catchupTime)) return false;
-		if (!Objects.deepEquals(this.stoppedAtUnsupportedRound, other.stoppedAtUnsupportedRound)) return false;
 		if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
-		if (!Objects.deepEquals(this.timeSinceLastRound, other.timeSinceLastRound)) return false;
-		if (!Objects.deepEquals(this.nextVersionSupported, other.nextVersionSupported)) return false;
 		if (!Objects.deepEquals(this.lastVersion, other.lastVersion)) return false;
+		if (!Objects.deepEquals(this.nextVersion, other.nextVersion)) return false;
+		if (!Objects.deepEquals(this.nextVersionRound, other.nextVersionRound)) return false;
+		if (!Objects.deepEquals(this.nextVersionSupported, other.nextVersionSupported)) return false;
+		if (!Objects.deepEquals(this.stoppedAtUnsupportedRound, other.stoppedAtUnsupportedRound)) return false;
+		if (!Objects.deepEquals(this.timeSinceLastRound, other.timeSinceLastRound)) return false;
 
 		return true;
 	}

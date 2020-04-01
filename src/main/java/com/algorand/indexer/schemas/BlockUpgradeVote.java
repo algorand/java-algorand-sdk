@@ -13,12 +13,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class BlockUpgradeVote {
 
 	/*
-		(upgradeprop) Indicates a proposed upgrade. 
-	 */
-	@JsonProperty("upgrade-propose")
-	public String upgradePropose;
-
-	/*
 		(upgradeyes) Indicates a yes vote for the current proposal. 
 	 */
 	@JsonProperty("upgrade-approve")
@@ -30,6 +24,12 @@ public class BlockUpgradeVote {
 	@JsonProperty("upgrade-delay")
 	public long upgradeDelay;
 
+	/*
+		(upgradeprop) Indicates a proposed upgrade. 
+	 */
+	@JsonProperty("upgrade-propose")
+	public String upgradePropose;
+
 	@Override
 	public boolean equals(Object o) {
 
@@ -37,9 +37,9 @@ public class BlockUpgradeVote {
 		if (o == null) return false;
 
 		BlockUpgradeVote other = (BlockUpgradeVote) o;
-		if (!Objects.deepEquals(this.upgradePropose, other.upgradePropose)) return false;
 		if (!Objects.deepEquals(this.upgradeApprove, other.upgradeApprove)) return false;
 		if (!Objects.deepEquals(this.upgradeDelay, other.upgradeDelay)) return false;
+		if (!Objects.deepEquals(this.upgradePropose, other.upgradePropose)) return false;
 
 		return true;
 	}
