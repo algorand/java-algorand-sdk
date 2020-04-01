@@ -9,7 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(thr) 
+	(msig) structure holding multiple subsignatures. Definition: crypto/multisig.go 
+	: MultisigSig 
  */
 public class TransactionSignatureMultisig {
 

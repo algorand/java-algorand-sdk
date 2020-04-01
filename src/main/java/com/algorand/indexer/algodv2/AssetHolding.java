@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	Asset ID of the holding. 
+	Describes an asset held by an account. Definition: data/basics/userBalance.go : 
+	AssetHolding 
  */
 public class AssetHolding {
 

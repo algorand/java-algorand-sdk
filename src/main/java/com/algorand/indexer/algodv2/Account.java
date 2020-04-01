@@ -9,7 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	amount of MicroAlgos of pending rewards in this account. 
+	Account information at a given round. Definition: data/basics/userBalance.go : 
+	AccountData 
  */
 public class Account {
 

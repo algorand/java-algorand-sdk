@@ -1,5 +1,6 @@
 package com.algorand.indexer.algodv2;
 
+import java.util.List;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +14,7 @@ public class PendingTransactionsResponse {
 		message pack object. 
 	 */
 	@JsonProperty("top-transactions")
-	public String topTransactions;
+	public List<String> topTransactions;
 
 	/*
 		Total number of transactions in the pool. 

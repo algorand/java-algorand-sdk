@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(ebase) used as part of the rewards computation. Only applicable to accounts 
-	which are participating. 
+	Account information at a given round. Definition: data/basics/userBalance.go : 
+	AccountData 
  */
 public class Account {
 

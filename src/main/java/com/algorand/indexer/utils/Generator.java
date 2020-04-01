@@ -61,10 +61,10 @@ public class Generator {
 
 	static String getType(JsonNode prop) {
 
-		JsonNode typeNode = prop.findValue("type");
+		JsonNode typeNode = prop.get("type");
 		String type = "";
 		if (typeNode == null) {
-			typeNode = prop.findValue("$ref");
+			typeNode = prop.get("$ref");
 			type = getTypeNameFromRef(typeNode.asText());
 			return type;
 		}
@@ -76,7 +76,7 @@ public class Generator {
 		case "string":
 			return "String";
 		case "array":
-			JsonNode arrayTypeNode = prop.findValue("items");
+			JsonNode arrayTypeNode = prop.get("items");
 			String typeName = getType(arrayTypeNode);
 			return "List<" + typeName + ">";
 		}
@@ -113,8 +113,8 @@ public class Generator {
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop);
 			String desc;
-			if (prop.getValue().findValue("description") != null) {
-				desc = prop.getValue().findValue("description").asText();
+			if (prop.getValue().get("description") != null) {
+				desc = prop.getValue().get("description").asText();
 				desc = formatComment(desc, "\t");
 				buffer.append(desc);
 			}
@@ -217,10 +217,10 @@ public class Generator {
 			Entry<String, JsonNode> cls = classes.next();
 			String desc = null;
 			if (cls.getValue().get("description") != null) {
-					desc = cls.getValue().findValue("description").asText();
+					desc = cls.getValue().get("description").asText();
 					desc = formatComment(desc, "");
 			}
-			writeClass(cls.getKey(), cls.getValue().findValue("properties"), desc, args[1]);
+			writeClass(cls.getKey(), cls.getValue().get("properties"), desc, args[1]);
 		}
 		
 		// Generate classes for the return types which have more than one return type
@@ -229,13 +229,13 @@ public class Generator {
 		while (returnTypes.hasNext()) {
 			Entry<String, JsonNode> rtype = returnTypes.next();
 			System.out.println("looking at: " + rtype.getKey());
-			JsonNode rSchema = rtype.getValue().findValue("content").findValue("application/json").findValue("schema");
+			JsonNode rSchema = rtype.getValue().get("content").get("application/json").get("schema");
 			if (rSchema == null 
-					|| rSchema.findValue("properties") == null 
-					|| rSchema.findValue("properties").size() == 1) {
+					|| rSchema.get("properties") == null 
+					|| rSchema.get("properties").size() == 1) {
 				continue;
 			}
-			writeClass(rtype.getKey(), rSchema.findValue("properties"), null, args[1]);
+			writeClass(rtype.getKey(), rSchema.get("properties"), null, args[1]);
 		}
 	}
 }

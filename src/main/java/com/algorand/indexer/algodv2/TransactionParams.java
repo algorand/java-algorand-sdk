@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	GenesisID is an ID listed in the genesis block. 
+	TransactionParams contains the parameters that help a client construct a new 
+	transaction. 
  */
 public class TransactionParams {
 

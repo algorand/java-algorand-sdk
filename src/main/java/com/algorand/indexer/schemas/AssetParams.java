@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(r) Address of account holding reserve (non-minted) units of this asset. 
+	AssetParams specifies the parameters for an asset. (apar) when part of an 
+	AssetConfig transaction. Definition: data/transactions/asset.go : AssetParams 
  */
 public class AssetParams {
 

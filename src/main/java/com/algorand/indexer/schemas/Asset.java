@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	unique asset identifier 
+	Specifies both the unique identifier and the parameters for an asset 
  */
 public class Asset {
 

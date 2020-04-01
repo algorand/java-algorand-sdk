@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(m) Address of account used to manage the keys of this asset and to destroy it. 
+	AssetParams specifies the parameters for an asset. (apar) when part of an 
+	AssetConfig transaction. Definition: data/transactions/asset.go : AssetParams 
  */
 public class AssetParams {
 

@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(f) whether or not the holding is frozen. 
+	Describes an asset held by an account. Definition: data/basics/userBalance.go : 
+	AssetHolding 
  */
 public class AssetHolding {
 

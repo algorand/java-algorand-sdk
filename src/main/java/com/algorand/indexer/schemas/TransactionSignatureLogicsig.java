@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(l) Program signed by a signature or multi signature, or hashed to be the 
-	address of ana ccount. Base64 encoded TEAL program. 
+	(lsig) Programatic transaction signature. Definition: 
+	data/transactions/logicsig.go 
  */
 public class TransactionSignatureLogicsig {
 

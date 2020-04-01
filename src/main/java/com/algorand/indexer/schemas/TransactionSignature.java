@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(sig) Standard ed25519 signature. 
+	Validation signature associated with some data. Only one of the signatures 
+	should be provided. 
  */
 public class TransactionSignature {
 

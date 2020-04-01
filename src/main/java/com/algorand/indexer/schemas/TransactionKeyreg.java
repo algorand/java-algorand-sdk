@@ -8,7 +8,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(votekey) Participation public key used in key registration transactions. 
+	Fields for a keyreg transaction. Definition: data/transactions/keyreg.go : 
+	KeyregTxnFields 
  */
 public class TransactionKeyreg {
 

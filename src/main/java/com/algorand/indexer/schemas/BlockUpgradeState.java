@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	(nextproto) The next proposed protocol version. 
+	Fields relating to a protocol upgrade. 
  */
 public class BlockUpgradeState {
 
