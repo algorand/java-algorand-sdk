@@ -3,15 +3,12 @@ package com.algorand.indexer.utils;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -86,6 +83,28 @@ public class Generator {
 		return type;
 	}
 
+	static String formatComment(String comment, String tab) {
+		StringBuffer sb = new StringBuffer();
+		
+		comment = comment.replace("\\[", "(");
+		comment = comment.replace("\\]", ")");
+		
+		sb.append("\n"+tab+"/*\n"+tab+"\t");
+		StringTokenizer st = new StringTokenizer(comment);
+		int line = 0;
+		while (st.hasMoreTokens()) {
+			String token = st.nextToken();
+			if (line + token.length() > 80) {
+				line = 0;
+				sb.append("\n\t"+tab);
+			} 
+			sb.append(token + " ");
+			line += token.length() + 1;
+		}
+		sb.append("\n"+tab+" */");
+		return sb.toString();
+	}
+	
 	static boolean writeProperties(StringBuffer buffer, JsonNode properties) {
 		Iterator<Entry<String, JsonNode>> props = properties.fields();
 		boolean importList = false;
@@ -93,6 +112,12 @@ public class Generator {
 			Entry<String, JsonNode> prop = props.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop);
+			String desc;
+			if (prop.getValue().findValue("description") != null) {
+				desc = prop.getValue().findValue("description").asText();
+				desc = formatComment(desc, "\t");
+				buffer.append(desc);
+			}
 			
 			buffer.append("\n\t" + "@JsonProperty(\"" + jprop + "\")\n");
 			buffer.append("\tpublic ");
@@ -106,6 +131,75 @@ public class Generator {
 		return importList;
 	}
 		
+	static void writeCompareMethod(String className, StringBuffer buffer, JsonNode properties) {
+		buffer.append("	@Override\n" + 
+				"	public boolean equals(Object o) {\n" + 
+				"\n" + 
+				"		if (this == o) return true;\n" + 
+				"		if (o == null) return false;\n");
+		buffer.append("\n"); 
+		buffer.append("		" + className + " other = (" + className + ") o;\n");
+		Iterator<Entry<String, JsonNode>> props = properties.fields();
+		while (props.hasNext()) {
+			Entry<String, JsonNode> prop = props.next();
+			String jprop = prop.getKey();
+			String javaName = getCamelCase(jprop);
+			buffer.append("		if (!Objects.deepEquals(this." + javaName + ", other." + javaName + ")) return false;\n");
+		}
+		buffer.append("\n		return true;\n	}\n");
+	}
+	
+	static void writeToStringMethod(StringBuffer buffer) {
+		buffer.append(
+				"	@Override\n" + 
+				"	public String toString() {\n" + 
+				"		ObjectMapper om = new ObjectMapper(); \n" + 
+				"		String jsonStr;\n" + 
+				"		try {\n" + 
+				"			jsonStr = om.writeValueAsString(this);\n" + 
+				"		} catch (JsonProcessingException e) {\n" + 
+				"			throw new RuntimeException(e.getMessage());\n" + 
+				"		}\n" + 
+				"		return jsonStr;\n" + 
+				"	}\n");
+	}
+	
+	static void writeClass(String className, JsonNode properties, String desc, String directory) throws IOException {
+		System.out.println("Generating ... " + className);
+
+		BufferedWriter bw = getFileWriter(className, directory);
+	
+		StringBuffer imports = new StringBuffer();
+		StringBuffer body = new StringBuffer();
+		boolean importList = false;
+				
+		importList = importList || writeProperties(body, properties);
+		body.append("\n");
+		writeCompareMethod(className, body, properties);
+		body.append("\n");		
+		writeToStringMethod(body);
+		
+		if (importList) {
+			imports.append("import java.util.List;\n");
+		}
+		imports.append("import java.util.Objects;\n"); // used by Objects.deepEquals
+		imports.append("\n");
+		imports.append("import com.fasterxml.jackson.annotation.JsonProperty;\n");
+		imports.append("import com.fasterxml.jackson.core.JsonProcessingException;\n"); // used by toString
+		imports.append("import com.fasterxml.jackson.databind.ObjectMapper;\n"); // used by toString
+		imports.append("\n");		
+		
+		bw.append(imports);
+		if (desc != null) {
+			bw.append(desc);
+			bw.append("\n");
+		}
+		bw.append("public class " + className + " {\n");
+		bw.append(body);
+		bw.append("}\n");
+		bw.close();
+	}
+	
 	public static void main(String [] args) throws JsonProcessingException, IOException {
 		if (args.length != 2) {
 			System.out.println("usage: java Generator specfile packageName");
@@ -115,30 +209,33 @@ public class Generator {
 		FileInputStream fis = new FileInputStream(f);
 		
 		JsonNode root = getRoot(fis);
-		JsonNode schemas = root.findPath("components").findPath("schemas");
 		
+		// Generate classes for the schemas
+		JsonNode schemas = root.get("components").get("schemas");
 		Iterator<Entry<String, JsonNode>> classes = schemas.fields();
 		while (classes.hasNext()) {
 			Entry<String, JsonNode> cls = classes.next();
-			System.out.println(cls.getKey());
-			BufferedWriter bw = getFileWriter(cls.getKey(), args[1]);
-		
-			StringBuffer imports = new StringBuffer();
-			StringBuffer properties = new StringBuffer();
-			boolean importList = false;
-					
-			importList = importList || writeProperties(properties, cls.getValue().findValue("properties"));
-			
-			if (importList) {
-				imports.append("import java.util.List;\n\n");
+			String desc = null;
+			if (cls.getValue().get("description") != null) {
+					desc = cls.getValue().findValue("description").asText();
+					desc = formatComment(desc, "");
 			}
-			imports.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
-			
-			bw.append(imports);
-			bw.append("public class " + cls.getKey() + " {\n");
-			bw.append(properties);
-			bw.append("}\n");
-			bw.close();
+			writeClass(cls.getKey(), cls.getValue().findValue("properties"), desc, args[1]);
+		}
+		
+		// Generate classes for the return types which have more than one return type
+		JsonNode returns = root.get("components").get("responses");
+		Iterator<Entry<String, JsonNode>> returnTypes = returns.fields();
+		while (returnTypes.hasNext()) {
+			Entry<String, JsonNode> rtype = returnTypes.next();
+			System.out.println("looking at: " + rtype.getKey());
+			JsonNode rSchema = rtype.getValue().findValue("content").findValue("application/json").findValue("schema");
+			if (rSchema == null 
+					|| rSchema.findValue("properties") == null 
+					|| rSchema.findValue("properties").size() == 1) {
+				continue;
+			}
+			writeClass(rtype.getKey(), rSchema.findValue("properties"), null, args[1]);
 		}
 	}
 }
