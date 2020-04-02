@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class error-model {
+public class ErrorModel {
 
 	@JsonProperty("data")
 	public String data;
@@ -20,7 +20,7 @@ public class error-model {
 		if (this == o) return true;
 		if (o == null) return false;
 
-		error-model other = (error-model) o;
+		ErrorModel other = (ErrorModel) o;
 		if (!Objects.deepEquals(this.data, other.data)) return false;
 		if (!Objects.deepEquals(this.msg, other.msg)) return false;
 

@@ -32,8 +32,8 @@ public class Generator {
 		return bw;
 	}
 	
-	static String getCamelCase(String name) {
-		boolean capNext = false;
+	static String getCamelCase(String name, boolean firstCap) {
+		boolean capNext = firstCap;
 		char [] newName = new char[name.length()+1];
 		int n = 0;
 		for (int i = 0; i < name.length(); i++) {
@@ -122,7 +122,7 @@ public class Generator {
 		while (properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
-			String javaName = getCamelCase(jprop);
+			String javaName = getCamelCase(jprop, false);
 			String desc;
 			if (prop.getValue().get("description") != null) {
 				desc = prop.getValue().get("description").asText();
@@ -153,7 +153,7 @@ public class Generator {
 		while (properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
-			String javaName = getCamelCase(jprop);
+			String javaName = getCamelCase(jprop, false);
 			buffer.append("		if (!Objects.deepEquals(this." + javaName + ", other." + javaName + ")) return false;\n");
 		}
 		buffer.append("\n		return true;\n	}\n");
@@ -178,6 +178,7 @@ public class Generator {
 		System.out.println("Generating ... " + className);
 
 		Iterator<Entry<String, JsonNode>> properties = getSortedProperties(propertiesNode);
+		className = Generator.getCamelCase(className, true);
 		BufferedWriter bw = getFileWriter(className, directory);
 	
 		StringBuffer imports = new StringBuffer();
