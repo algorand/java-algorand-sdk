@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
@@ -13,6 +14,7 @@ import java.util.TreeMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 
 public class Generator {
@@ -28,7 +30,6 @@ public class Generator {
 	static BufferedWriter getFileWriter(String className, String pkg) throws IOException {
 		//System.out.println(System.getProperty("user.dir"));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("./src/main/java/com/algorand/indexer/" + pkg + "/" + className + ".java")));
-		bw.append("package com.algorand.indexer." + pkg + ";\n\n");
 		return bw;
 	}
 	
@@ -116,6 +117,27 @@ public class Generator {
 		Iterator<Entry<String, JsonNode>>sortedProps = propMap.entrySet().iterator();
 		return sortedProps;
 	}
+
+	static Iterator<Entry<String, JsonNode>> getSortedParameters(JsonNode properties, JsonNode parameterDefs ) {
+		TreeMap<String, JsonNode> tm = new TreeMap<String, JsonNode>();
+		if (properties.isArray()) {
+			ArrayNode jsonArrayNode = (ArrayNode) properties;
+			for (int i = 0; i < jsonArrayNode.size(); i++) {
+				JsonNode node = jsonArrayNode.get(i);
+				JsonNode typeNode = null;
+				if (node.get("$ref") != null) {
+					String typeName = Generator.getTypeNameFromRef(node.get("$ref").asText());
+					typeNode = parameterDefs.get(typeName);
+				} else {
+					typeNode = node;
+				}
+				tm.put(typeNode.get("name").asText(), typeNode);
+			}
+			Iterator<Entry<String, JsonNode>>sortedParams = tm.entrySet().iterator();
+			return sortedParams;
+		}
+		return null;
+	}
 	
 	static boolean writeProperties(StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties) {
 		boolean importList = false;
@@ -180,7 +202,8 @@ public class Generator {
 		Iterator<Entry<String, JsonNode>> properties = getSortedProperties(propertiesNode);
 		className = Generator.getCamelCase(className, true);
 		BufferedWriter bw = getFileWriter(className, directory);
-	
+		bw.append("package com.algorand.indexer." + directory + ";\n\n");
+
 		StringBuffer imports = new StringBuffer();
 		StringBuffer body = new StringBuffer();
 		boolean importList = false;
@@ -213,6 +236,163 @@ public class Generator {
 		bw.close();
 	}
 	
+	static ArrayList<String> getPathInserts(String path) {
+		ArrayList<String> nPath = new ArrayList<String>();
+		StringTokenizer st = new StringTokenizer(path, "/");
+		while (st.hasMoreTokens()) {
+			String elt = st.nextToken();
+			if (elt.charAt(0) == '{') {
+				String jName = Generator.getCamelCase(elt.substring(1, elt.length()-1), false);
+				nPath.add(jName);
+			} else {
+				nPath.add("\"" + elt + "\"");
+			}
+		}
+		return nPath;
+	}
+	
+	static String getQueryResponseMethod(String returnType) {
+		String ret = 
+				"	public " + returnType + " lookup() {\n" + 
+				"		String response;\n" + 
+				"		try {\n" + 
+				"			response = request();\n" + 
+				"		} catch (Exception e) {\n" + 
+				"			// TODO Auto-generated catch block\n" + 
+				"			e.printStackTrace();\n" + 
+				"			return null;\n" + 
+				"		}\n" + 
+				"		ObjectMapper mapper = new ObjectMapper();\n" + 
+				"		" + returnType + " resp;\n" + 
+				"		try {\n" + 
+				"			resp = mapper.readValue(response, " + returnType + ".class);\n" + 
+				"		} catch (IOException e) {\n" + 
+				"			// TODO Auto-generated catch block\n" + 
+				"			e.printStackTrace();\n" + 
+				"			return null;\n" + 
+				"		}\n" + 
+				"		return resp;\n" + 
+				"	}\n" + 
+				"";
+		return ret;
+	}
+	
+	static String processQueryParams(
+			Iterator<Entry<String, JsonNode>> properties,
+			JsonNode parameterDefs, 
+			String className, 			
+			String path,
+			String returnType) {
+		
+		StringBuffer decls = new StringBuffer();
+		StringBuffer bools = new StringBuffer();
+		StringBuffer builders = new StringBuffer();
+		StringBuffer requestMethod = new StringBuffer();
+		
+		// add the constructor
+		builders.append("	public "+className+"(Client client) {\n" + 
+				"		super(client);\n" + 
+				"	}\n");
+		requestMethod.append(Generator.getQueryResponseMethod(returnType));
+		requestMethod.append("	protected String getRequestString() {\n" + 
+				"		StringBuffer sb = new StringBuffer();\n");
+		
+		ArrayList<String> al = getPathInserts(path);
+		for (String str : al) {
+			requestMethod.append(
+					"		sb.append(\"/\");\n" +
+					"		sb.append(" + str + ");\n");
+
+		}
+		requestMethod.append(
+				"		sb.append(\"?\");\n\n");
+		requestMethod.append(
+				"		boolean added = false;\n\n");
+		
+		while (properties.hasNext()) {
+			Entry<String, JsonNode> prop = properties.next();
+			String propName = Generator.getCamelCase(prop.getKey(), false);
+			String setterName = Generator.getCamelCase(prop.getKey(), true);
+			setterName = "set" + setterName;
+			String propType = getType(prop.getValue());
+
+			decls.append("\tprivate " + propType + " " + propName + ";\n");
+			bools.append("\tprivate boolean " + propName + "IsSet;\n");
+			builders.append("\tpublic " + className + " " + setterName + "(" + propType + " " + propName + ") {\n");
+			builders.append("\t\tthis." + propName + " = " + propName + ";\n");
+			builders.append("\t\tthis." + propName + "IsSet = true;\n");
+			builders.append("\t\treturn this;\n");
+			builders.append("\t}\n");
+			
+			requestMethod.append(
+					"		if (this."+propName+"IsSet) {\n" + 
+					"			if (added) {\n" + 
+					"				sb.append(\"&\");\n" + 
+					"			}\n" + 
+					"			sb.append(\""+propName+"=\");\n" + 
+					"			sb.append("+propName+");\n" +
+					"			added = true;\n" + 
+					"		}\n");
+		}
+		
+		requestMethod.append("\n" + 
+				"		return sb.toString();\n" + 
+				"	}");
+		
+		StringBuffer ans = new StringBuffer();
+		ans.append(decls);
+		ans.append("\n");
+		ans.append(bools);
+		ans.append("\n");
+		ans.append(builders);
+		ans.append("\n");		
+		ans.append(requestMethod);
+		return ans.toString();
+	}
+
+	static void writeQueryClass(
+			JsonNode spec,
+			JsonNode parameterDefs,
+			String path,
+			String directory,
+			String subDir) throws IOException { 
+
+		String className = spec.get("get").get("operationId").asText();
+		className = Generator.getCamelCase(className, true);
+		JsonNode paramNode = spec.get("get").get("parameters");
+		String returnType = spec.get("get").get("responses").get("200").get("$ref").asText();
+		returnType = Generator.getTypeNameFromRef(returnType);
+		returnType = Generator.getCamelCase(returnType, true);
+		String desc = spec.get("get").get("description").asText();
+		
+		System.out.println("Generating ... " + className);
+		Iterator<Entry<String, JsonNode>> properties = getSortedParameters(paramNode, parameterDefs);
+		
+		BufferedWriter bw = getFileWriter(className, directory+"/"+subDir);
+		bw.append("package com.algorand.indexer." + directory + "." + subDir + ";\n\n");
+
+		String imports = 
+				"import java.io.IOException;\n\n" + 
+				"import com.algorand.indexer.client.Client;\n" + 
+				"import com.algorand.indexer.client.Query;\n" + 
+				"import com.fasterxml.jackson.databind.ObjectMapper;\n" +
+				"import com.algorand.indexer." + directory + "." + returnType + ";\n";
+		
+		bw.append(imports);
+		bw.append("\n");
+		bw.append(Generator.formatComment(desc, ""));
+		bw.append("\npublic class " + className + " extends Query {\n");
+		bw.append(
+				processQueryParams(
+						properties, 
+						parameterDefs, 
+						className, 
+						path,
+						returnType));
+		bw.append("\n}");
+		bw.close();
+	}
+	
 	public static void main(String [] args) throws JsonProcessingException, IOException {
 		if (args.length != 2) {
 			System.out.println("usage: java Generator specfile packageName");
@@ -221,10 +401,13 @@ public class Generator {
 		File f = new File(args[0]);
 		FileInputStream fis = new FileInputStream(f);
 		
-		JsonNode root = getRoot(fis);
-		
+		JsonNode root = getRoot(fis);		
+
+
 		// Generate classes for the schemas
-		JsonNode schemas = root.get("components").get("schemas");
+		JsonNode schemas = root.get("components") != null ? 
+				root.get("components").get("schemas") : 
+					root.get("definitions");
 		Iterator<Entry<String, JsonNode>> classes = schemas.fields();
 		while (classes.hasNext()) {
 			Entry<String, JsonNode> cls = classes.next();
@@ -237,18 +420,33 @@ public class Generator {
 		}
 		
 		// Generate classes for the return types which have more than one return type
-		JsonNode returns = root.get("components").get("responses");
+		JsonNode returns = root.get("components") != null ? 
+				root.get("components").get("responses") : 
+					root.get("responses");
 		Iterator<Entry<String, JsonNode>> returnTypes = returns.fields();
 		while (returnTypes.hasNext()) {
 			Entry<String, JsonNode> rtype = returnTypes.next();
 			System.out.println("looking at: " + rtype.getKey());
-			JsonNode rSchema = rtype.getValue().get("content").get("application/json").get("schema");
+			JsonNode rSchema = rtype.getValue().get("content") != null ? 
+					rtype.getValue().get("content").get("application/json").get("schema") : 
+						rtype.getValue().get("schema"); 
+						
 			if (rSchema == null 
 					|| rSchema.get("properties") == null 
 					|| rSchema.get("properties").size() == 1) {
 				continue;
 			}
 			writeClass(rtype.getKey(), rSchema.get("properties"), null, args[1]);
+		}
+		
+		
+		// Generate the query classes
+		JsonNode paths = root.get("paths");
+		JsonNode parameters = root.get("parameters");		
+		Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
+		while (pathIter.hasNext()) {
+			Entry<String, JsonNode> path = pathIter.next();
+			writeQueryClass(path.getValue(), parameters, path.getKey(), args[1], "lookup");
 		}
 	}
 }

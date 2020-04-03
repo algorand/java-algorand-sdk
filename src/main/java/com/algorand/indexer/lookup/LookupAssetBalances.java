@@ -107,6 +107,7 @@ public class LookupAssetBalances extends Query {
 			}
 			sb.append("next=");
 			sb.append(next);
+			added = true;
 		}
 		
 		
