@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.Block;
 
 
 /*
-	Lookup block. 
+	Lookup block. /blocks/{round-number} 
  */
 public class LookupBlock extends Query {
 	private long roundNumber;
@@ -28,7 +29,7 @@ public class LookupBlock extends Query {
 	public Block lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,25 +46,14 @@ public class LookupBlock extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("blocks");
-		sb.append("/");
-		sb.append(roundNumber);
-		sb.append("?");
-
-		boolean added = false;
-
-		if (this.roundNumberIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("roundNumber=");
-			sb.append(roundNumber);
-			added = true;
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		if  (!this.roundNumberIsSet) {
+			throw new RuntimeException("roundNumber is not set, and it is a required parameter.");
 		}
+		qd.addPathSegment(String.valueOf("blocks"));
+		qd.addPathSegment(String.valueOf(roundNumber));
 
-		return sb.toString();
+		return qd;
 	}
 }

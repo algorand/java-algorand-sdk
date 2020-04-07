@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AccountResponse;
 
 
 /*
-	Lookup account information. 
+	Lookup account information. /accounts/{account-id} 
  */
 public class LookupAccountByID extends Query {
 	private String accountId;
@@ -35,7 +36,7 @@ public class LookupAccountByID extends Query {
 	public AccountResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -52,33 +53,17 @@ public class LookupAccountByID extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("accounts");
-		sb.append("/");
-		sb.append(accountId);
-		sb.append("?");
-
-		boolean added = false;
-
-		if (this.accountIdIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("accountId=");
-			sb.append(accountId);
-			added = true;
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		if  (!this.accountIdIsSet) {
+			throw new RuntimeException("accountId is not set, and it is a required parameter.");
 		}
 		if (this.roundIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("round=");
-			sb.append(round);
-			added = true;
+			qd.addQuery("round", String.valueOf(round));
 		}
+		qd.addPathSegment(String.valueOf("accounts"));
+		qd.addPathSegment(String.valueOf(accountId));
 
-		return sb.toString();
+		return qd;
 	}
 }

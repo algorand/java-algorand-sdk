@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
@@ -11,6 +12,7 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 /*
 	Get the list of pending transactions, sorted by priority, in decreasing order, 
 	truncated at the end at MAX. If MAX = 0, returns all pending transactions. 
+	/v2/transactions/pending 
  */
 public class GetPendingTransactions extends Query {
 	private String format;
@@ -36,7 +38,7 @@ public class GetPendingTransactions extends Query {
 	public PendingTransactionsResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -53,35 +55,18 @@ public class GetPendingTransactions extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("transactions");
-		sb.append("/");
-		sb.append("pending");
-		sb.append("?");
-
-		boolean added = false;
-
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
 		if (this.formatIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("format=");
-			sb.append(format);
-			added = true;
+			qd.addQuery("format", String.valueOf(format));
 		}
 		if (this.maxIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("max=");
-			sb.append(max);
-			added = true;
+			qd.addQuery("max", String.valueOf(max));
 		}
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("transactions"));
+		qd.addPathSegment(String.valueOf("pending"));
 
-		return sb.toString();
+		return qd;
 	}
 }

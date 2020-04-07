@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
 	Generate (or renew) and register participation keys on the node for a given 
-	account address. 
+	account address. /v2/register-participation-keys/{address} 
  */
 public class RegisterParticipationKeys extends Query {
 	private String address;
@@ -56,7 +57,7 @@ public class RegisterParticipationKeys extends Query {
 	public String lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("post");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,59 +74,27 @@ public class RegisterParticipationKeys extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("register-participation-keys");
-		sb.append("/");
-		sb.append(address);
-		sb.append("?");
-
-		boolean added = false;
-
-		if (this.addressIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("address=");
-			sb.append(address);
-			added = true;
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		if  (!this.addressIsSet) {
+			throw new RuntimeException("address is not set, and it is a required parameter.");
 		}
 		if (this.feeIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("fee=");
-			sb.append(fee);
-			added = true;
+			qd.addQuery("fee", String.valueOf(fee));
 		}
 		if (this.keyDilutionIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("keyDilution=");
-			sb.append(keyDilution);
-			added = true;
+			qd.addQuery("keyDilution", String.valueOf(keyDilution));
 		}
 		if (this.noWaitIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("noWait=");
-			sb.append(noWait);
-			added = true;
+			qd.addQuery("noWait", String.valueOf(noWait));
 		}
 		if (this.roundLastValidIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("roundLastValid=");
-			sb.append(roundLastValid);
-			added = true;
+			qd.addQuery("roundLastValid", String.valueOf(roundLastValid));
 		}
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("register-participation-keys"));
+		qd.addPathSegment(String.valueOf(address));
 
-		return sb.toString();
+		return qd;
 	}
 }

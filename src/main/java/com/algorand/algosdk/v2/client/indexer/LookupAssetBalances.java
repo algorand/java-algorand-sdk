@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
 
 
 /*
-	Lookup the list of accounts who hold this asset 
+	Lookup the list of accounts who hold this asset /assets/{asset-id}/balances 
  */
 public class LookupAssetBalances extends Query {
 	private long assetId;
@@ -63,7 +64,7 @@ public class LookupAssetBalances extends Query {
 	public AssetBalancesResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,67 +81,30 @@ public class LookupAssetBalances extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("assets");
-		sb.append("/");
-		sb.append(assetId);
-		sb.append("/");
-		sb.append("balances");
-		sb.append("?");
-
-		boolean added = false;
-
-		if (this.assetIdIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("assetId=");
-			sb.append(assetId);
-			added = true;
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		if  (!this.assetIdIsSet) {
+			throw new RuntimeException("assetId is not set, and it is a required parameter.");
 		}
 		if (this.currencyGreaterThanIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("currencyGreaterThan=");
-			sb.append(currencyGreaterThan);
-			added = true;
+			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}
 		if (this.currencyLessThanIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("currencyLessThan=");
-			sb.append(currencyLessThan);
-			added = true;
+			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
 		}
 		if (this.limitIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("limit=");
-			sb.append(limit);
-			added = true;
+			qd.addQuery("limit", String.valueOf(limit));
 		}
 		if (this.nextIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("next=");
-			sb.append(next);
-			added = true;
+			qd.addQuery("next", String.valueOf(next));
 		}
 		if (this.roundIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("round=");
-			sb.append(round);
-			added = true;
+			qd.addQuery("round", String.valueOf(round));
 		}
+		qd.addPathSegment(String.valueOf("assets"));
+		qd.addPathSegment(String.valueOf(assetId));
+		qd.addPathSegment(String.valueOf("balances"));
 
-		return sb.toString();
+		return qd;
 	}
 }

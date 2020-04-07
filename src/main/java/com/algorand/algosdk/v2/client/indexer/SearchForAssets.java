@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AssetsResponse;
 
 
 /*
-	Search for assets. 
+	Search for assets. /assets 
  */
 public class SearchForAssets extends Query {
 	private long assetId;
@@ -63,7 +64,7 @@ public class SearchForAssets extends Query {
 	public AssetsResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,63 +81,28 @@ public class SearchForAssets extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("assets");
-		sb.append("?");
-
-		boolean added = false;
-
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
 		if (this.assetIdIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("assetId=");
-			sb.append(assetId);
-			added = true;
+			qd.addQuery("assetId", String.valueOf(assetId));
 		}
 		if (this.creatorIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("creator=");
-			sb.append(creator);
-			added = true;
+			qd.addQuery("creator", String.valueOf(creator));
 		}
 		if (this.limitIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("limit=");
-			sb.append(limit);
-			added = true;
+			qd.addQuery("limit", String.valueOf(limit));
 		}
 		if (this.nameIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("name=");
-			sb.append(name);
-			added = true;
+			qd.addQuery("name", String.valueOf(name));
 		}
 		if (this.nextIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("next=");
-			sb.append(next);
-			added = true;
+			qd.addQuery("next", String.valueOf(next));
 		}
 		if (this.unitIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("unit=");
-			sb.append(unit);
-			added = true;
+			qd.addQuery("unit", String.valueOf(unit));
 		}
+		qd.addPathSegment(String.valueOf("assets"));
 
-		return sb.toString();
+		return qd;
 	}
 }

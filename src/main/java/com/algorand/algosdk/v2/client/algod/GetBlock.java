@@ -4,11 +4,12 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	
+	/v2/blocks/{round} 
  */
 public class GetBlock extends Query {
 	private String format;
@@ -34,7 +35,7 @@ public class GetBlock extends Query {
 	public String lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -51,35 +52,18 @@ public class GetBlock extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("blocks");
-		sb.append("/");
-		sb.append(round);
-		sb.append("?");
-
-		boolean added = false;
-
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
 		if (this.formatIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("format=");
-			sb.append(format);
-			added = true;
+			qd.addQuery("format", String.valueOf(format));
 		}
-		if (this.roundIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("round=");
-			sb.append(round);
-			added = true;
+		if  (!this.roundIsSet) {
+			throw new RuntimeException("round is not set, and it is a required parameter.");
 		}
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("blocks"));
+		qd.addPathSegment(String.valueOf(round));
 
-		return sb.toString();
+		return qd;
 	}
 }

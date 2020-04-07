@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AccountsResponse;
 
 
 /*
-	Search for accounts. 
+	Search for accounts. /accounts 
  */
 public class SearchAccounts extends Query {
 	private String assetId;
@@ -63,7 +64,7 @@ public class SearchAccounts extends Query {
 	public AccountsResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -80,63 +81,28 @@ public class SearchAccounts extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("accounts");
-		sb.append("?");
-
-		boolean added = false;
-
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
 		if (this.assetIdIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("assetId=");
-			sb.append(assetId);
-			added = true;
+			qd.addQuery("assetId", String.valueOf(assetId));
 		}
 		if (this.currencyGreaterThanIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("currencyGreaterThan=");
-			sb.append(currencyGreaterThan);
-			added = true;
+			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}
 		if (this.currencyLessThanIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("currencyLessThan=");
-			sb.append(currencyLessThan);
-			added = true;
+			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
 		}
 		if (this.limitIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("limit=");
-			sb.append(limit);
-			added = true;
+			qd.addQuery("limit", String.valueOf(limit));
 		}
 		if (this.nextIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("next=");
-			sb.append(next);
-			added = true;
+			qd.addQuery("next", String.valueOf(next));
 		}
 		if (this.roundIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("round=");
-			sb.append(round);
-			added = true;
+			qd.addQuery("round", String.valueOf(round));
 		}
+		qd.addPathSegment(String.valueOf("accounts"));
 
-		return sb.toString();
+		return qd;
 	}
 }

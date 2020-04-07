@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /*
-	Search for transactions. 
+	Search for transactions. /transactions 
  */
 public class SearchForTransactions extends Query {
 	private String address;
@@ -140,7 +141,7 @@ public class SearchForTransactions extends Query {
 	public TransactionsResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -157,151 +158,61 @@ public class SearchForTransactions extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("transactions");
-		sb.append("?");
-
-		boolean added = false;
-
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
 		if (this.addressIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("address=");
-			sb.append(address);
-			added = true;
+			qd.addQuery("address", String.valueOf(address));
 		}
 		if (this.addressRoleIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("addressRole=");
-			sb.append(addressRole);
-			added = true;
+			qd.addQuery("addressRole", String.valueOf(addressRole));
 		}
 		if (this.afterTimeIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("afterTime=");
-			sb.append(afterTime);
-			added = true;
+			qd.addQuery("afterTime", String.valueOf(afterTime));
 		}
 		if (this.assetIdIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("assetId=");
-			sb.append(assetId);
-			added = true;
+			qd.addQuery("assetId", String.valueOf(assetId));
 		}
 		if (this.beforeTimeIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("beforeTime=");
-			sb.append(beforeTime);
-			added = true;
+			qd.addQuery("beforeTime", String.valueOf(beforeTime));
 		}
 		if (this.currencyGreaterThanIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("currencyGreaterThan=");
-			sb.append(currencyGreaterThan);
-			added = true;
+			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}
 		if (this.currencyLessThanIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("currencyLessThan=");
-			sb.append(currencyLessThan);
-			added = true;
+			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
 		}
 		if (this.excludeCloseToIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("excludeCloseTo=");
-			sb.append(excludeCloseTo);
-			added = true;
+			qd.addQuery("excludeCloseTo", String.valueOf(excludeCloseTo));
 		}
 		if (this.limitIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("limit=");
-			sb.append(limit);
-			added = true;
+			qd.addQuery("limit", String.valueOf(limit));
 		}
 		if (this.maxRoundIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("maxRound=");
-			sb.append(maxRound);
-			added = true;
+			qd.addQuery("maxRound", String.valueOf(maxRound));
 		}
 		if (this.minRoundIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("minRound=");
-			sb.append(minRound);
-			added = true;
+			qd.addQuery("minRound", String.valueOf(minRound));
 		}
 		if (this.nextIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("next=");
-			sb.append(next);
-			added = true;
+			qd.addQuery("next", String.valueOf(next));
 		}
 		if (this.notePrefixIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("notePrefix=");
-			sb.append(notePrefix);
-			added = true;
+			qd.addQuery("notePrefix", String.valueOf(notePrefix));
 		}
 		if (this.roundIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("round=");
-			sb.append(round);
-			added = true;
+			qd.addQuery("round", String.valueOf(round));
 		}
 		if (this.sigTypeIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("sigType=");
-			sb.append(sigType);
-			added = true;
+			qd.addQuery("sigType", String.valueOf(sigType));
 		}
 		if (this.txIdIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("txId=");
-			sb.append(txId);
-			added = true;
+			qd.addQuery("txId", String.valueOf(txId));
 		}
 		if (this.txTypeIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("txType=");
-			sb.append(txType);
-			added = true;
+			qd.addQuery("txType", String.valueOf(txType));
 		}
+		qd.addPathSegment(String.valueOf("transactions"));
 
-		return sb.toString();
+		return qd;
 	}
 }

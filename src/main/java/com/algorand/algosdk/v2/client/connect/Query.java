@@ -7,12 +7,12 @@ public abstract class Query {
 		this.client = client;
 	}
 		
-	abstract protected String getRequestString();
+	abstract protected QueryData getRequestString();
 	
-	protected String request() throws Exception {
+	protected String request(String getOrPost) throws Exception {
 
-		String requestString = this.getRequestString();
-		String responseString = this.client.executeCall(requestString);
+		QueryData qData = this.getRequestString();
+		String responseString = this.client.executeCall(qData, getOrPost);
 		return responseString;
 	}
 }

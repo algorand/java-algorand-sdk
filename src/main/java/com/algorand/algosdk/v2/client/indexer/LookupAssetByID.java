@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AssetResponse;
 
 
 /*
-	Lookup asset information. 
+	Lookup asset information. /assets/{asset-id} 
  */
 public class LookupAssetByID extends Query {
 	private long assetId;
@@ -28,7 +29,7 @@ public class LookupAssetByID extends Query {
 	public AssetResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -45,25 +46,14 @@ public class LookupAssetByID extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("assets");
-		sb.append("/");
-		sb.append(assetId);
-		sb.append("?");
-
-		boolean added = false;
-
-		if (this.assetIdIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("assetId=");
-			sb.append(assetId);
-			added = true;
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		if  (!this.assetIdIsSet) {
+			throw new RuntimeException("assetId is not set, and it is a required parameter.");
 		}
+		qd.addPathSegment(String.valueOf("assets"));
+		qd.addPathSegment(String.valueOf(assetId));
 
-		return sb.toString();
+		return qd;
 	}
 }

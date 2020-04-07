@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
@@ -11,7 +12,7 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 /*
 	Get the list of pending transactions by address, sorted by priority, in 
 	decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending 
-	transactions. 
+	transactions. /v2/accounts/{address}/transactions/pending 
  */
 public class GetPendingTransactionsByAddress extends Query {
 	private String address;
@@ -44,7 +45,7 @@ public class GetPendingTransactionsByAddress extends Query {
 	public PendingTransactionsResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -61,47 +62,23 @@ public class GetPendingTransactionsByAddress extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("accounts");
-		sb.append("/");
-		sb.append(address);
-		sb.append("/");
-		sb.append("transactions");
-		sb.append("/");
-		sb.append("pending");
-		sb.append("?");
-
-		boolean added = false;
-
-		if (this.addressIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("address=");
-			sb.append(address);
-			added = true;
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		if  (!this.addressIsSet) {
+			throw new RuntimeException("address is not set, and it is a required parameter.");
 		}
 		if (this.formatIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("format=");
-			sb.append(format);
-			added = true;
+			qd.addQuery("format", String.valueOf(format));
 		}
 		if (this.maxIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("max=");
-			sb.append(max);
-			added = true;
+			qd.addQuery("max", String.valueOf(max));
 		}
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("accounts"));
+		qd.addPathSegment(String.valueOf(address));
+		qd.addPathSegment(String.valueOf("transactions"));
+		qd.addPathSegment(String.valueOf("pending"));
 
-		return sb.toString();
+		return qd;
 	}
 }

@@ -5,17 +5,18 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import com.algorand.algosdk.v2.client.connect.Client;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
 import com.algorand.algosdk.v2.client.model.*;
 
 class TestClient extends Client {
 
 	public TestClient() {
-		super("http://www.abc.com");
+		super("http://www.abc.com", 0);
 	}
 
 	@Override
-	public String executeCall(String requestString) throws Exception {
+	public String executeCall(QueryData qData, String getOrPost) throws Exception {
 		
 		return "{\n" + 
 				"  \"balances\": [\n" + 

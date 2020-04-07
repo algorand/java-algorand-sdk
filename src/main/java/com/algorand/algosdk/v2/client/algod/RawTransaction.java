@@ -4,11 +4,12 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
-	
+	/v2/transactions 
  */
 public class RawTransaction extends Query {
 	private String rawtxn;
@@ -27,7 +28,7 @@ public class RawTransaction extends Query {
 	public String lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("post");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -44,25 +45,17 @@ public class RawTransaction extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("transactions");
-		sb.append("?");
-
-		boolean added = false;
-
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
 		if (this.rawtxnIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("rawtxn=");
-			sb.append(rawtxn);
-			added = true;
+			qd.addQuery("rawtxn", String.valueOf(rawtxn));
 		}
+		else {
+			throw new RuntimeException("rawtxn is not set, and it is a required parameter.");
+		}
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("transactions"));
 
-		return sb.toString();
+		return qd;
 	}
 }

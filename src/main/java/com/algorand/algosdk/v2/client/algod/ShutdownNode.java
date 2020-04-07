@@ -4,13 +4,14 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /*
 	Special management endpoint to shutdown the node. Optionally provide a timeout 
 	parameter to indicate that the node should begin shutting down after a number of 
-	seconds. 
+	seconds. /v2/shutdown 
  */
 public class ShutdownNode extends Query {
 	private long timeout;
@@ -29,7 +30,7 @@ public class ShutdownNode extends Query {
 	public String lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("post");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -46,25 +47,14 @@ public class ShutdownNode extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("shutdown");
-		sb.append("?");
-
-		boolean added = false;
-
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
 		if (this.timeoutIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("timeout=");
-			sb.append(timeout);
-			added = true;
+			qd.addQuery("timeout", String.valueOf(timeout));
 		}
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("shutdown"));
 
-		return sb.toString();
+		return qd;
 	}
 }

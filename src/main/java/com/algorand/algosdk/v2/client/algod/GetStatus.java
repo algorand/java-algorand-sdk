@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
 
 
 /*
-	
+	/v2/status 
  */
 public class GetStatus extends Query {
 
@@ -21,7 +22,7 @@ public class GetStatus extends Query {
 	public NodeStatusResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -38,17 +39,11 @@ public class GetStatus extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("status");
-		sb.append("?");
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("status"));
 
-		boolean added = false;
-
-
-		return sb.toString();
+		return qd;
 	}
 }

@@ -4,13 +4,14 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.Account;
 
 
 /*
 	Given a specific account public key, this call returns the accounts status, 
-	balance and spendable amounts 
+	balance and spendable amounts /v2/accounts/{address} 
  */
 public class AccountInformation extends Query {
 	private String address;
@@ -29,7 +30,7 @@ public class AccountInformation extends Query {
 	public Account lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -46,27 +47,15 @@ public class AccountInformation extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("accounts");
-		sb.append("/");
-		sb.append(address);
-		sb.append("?");
-
-		boolean added = false;
-
-		if (this.addressIsSet) {
-			if (added) {
-				sb.append("&");
-			}
-			sb.append("address=");
-			sb.append(address);
-			added = true;
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		if  (!this.addressIsSet) {
+			throw new RuntimeException("address is not set, and it is a required parameter.");
 		}
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("accounts"));
+		qd.addPathSegment(String.valueOf(address));
 
-		return sb.toString();
+		return qd;
 	}
 }

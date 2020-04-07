@@ -4,12 +4,13 @@ import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.SupplyResponse;
 
 
 /*
-	
+	/v2/ledger/supply 
  */
 public class GetSupply extends Query {
 
@@ -21,7 +22,7 @@ public class GetSupply extends Query {
 	public SupplyResponse lookup() {
 		String response;
 		try {
-			response = request();
+			response = request("get");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -38,19 +39,12 @@ public class GetSupply extends Query {
 		}
 		return resp;
 	}
-	protected String getRequestString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("/");
-		sb.append("v2");
-		sb.append("/");
-		sb.append("ledger");
-		sb.append("/");
-		sb.append("supply");
-		sb.append("?");
+	protected QueryData getRequestString() {
+		QueryData qd = new QueryData();
+		qd.addPathSegment(String.valueOf("v2"));
+		qd.addPathSegment(String.valueOf("ledger"));
+		qd.addPathSegment(String.valueOf("supply"));
 
-		boolean added = false;
-
-
-		return sb.toString();
+		return qd;
 	}
 }
