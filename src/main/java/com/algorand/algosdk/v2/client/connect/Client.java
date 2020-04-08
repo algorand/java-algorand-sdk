@@ -14,6 +14,18 @@ public class Client {
 	private String host;
 	private int port;
 
+	public static HttpUrl getHttpUrl(QueryData qData, int port, String host) {
+		HttpUrl.Builder httpUrlBuilder = (new HttpUrl.Builder()).scheme("http").port(port).host(host);
+		for (String ps : qData.pathSegments) {
+			httpUrlBuilder.addPathSegment(ps);
+		}
+		for (Entry<String, String> kvp : qData.queries.entrySet()) {
+			httpUrlBuilder.addQueryParameter(kvp.getKey(), kvp.getValue());
+		}
+		HttpUrl httpUrl = httpUrlBuilder.build();
+		return httpUrl;
+	}
+	
 	public Client(String host, int port) {
 		MediaType.parse("application/json; charset=utf-8");
 		this.host = host;
@@ -23,14 +35,7 @@ public class Client {
 	
 	public String executeCall(QueryData qData, String getOrPost) throws Exception {
 		
-		HttpUrl.Builder httpUrlBuilder = (new HttpUrl.Builder()).scheme("http").port(port).host(host);
-		for (String ps : qData.pathSegments) {
-			httpUrlBuilder.addPathSegment(ps);
-		}
-		for (Entry<String, String> kvp : qData.queries.entrySet()) {
-			httpUrlBuilder.addQueryParameter(kvp.getKey(), kvp.getValue());
-		}
-		HttpUrl httpUrl = httpUrlBuilder.build();
+		HttpUrl httpUrl = getHttpUrl(qData, port, host);
 		Request request = new Request.Builder()
 				.url(httpUrl)
 				.get()

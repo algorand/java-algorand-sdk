@@ -289,6 +289,20 @@ public class Generator {
 		return ret;
 	}
 
+	static boolean isRequired(JsonNode prop) {
+		if (prop.get("required") != null) {
+			return prop.get("required").asBoolean();
+		}
+		return false;
+	}
+	
+	static boolean inPath(JsonNode prop) {
+		if (prop.get("in") != null) {
+			return prop.get("in").asText().compareTo("path") == 0;
+		}
+		return false;
+	}
+
 	static String processQueryParams(
 			Iterator<Entry<String, JsonNode>> properties,
 			String className, 			
@@ -323,32 +337,27 @@ public class Generator {
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
 
-			if (prop.getValue().get("in") != null) {
-				if (prop.getValue().get("in").asText().compareTo("path") == 0) {
-					if (prop.getValue().get("required") != null) {
-						if (prop.getValue().get("required").asBoolean()) {
-							requestMethod.append("		if  (!this."+propName+"IsSet) {\n" + 
-									"			throw new RuntimeException(\"" +
-									propName+" is not set, and it is a required parameter.\");\n" + 
-									"		}\n");
-						}
-					}
-					continue;
-				}
-			}
-			requestMethod.append("		if (this."+propName+"IsSet) {\n" + 
-					"			qd.addQuery(\""+propName+"\", String.valueOf("+propName+"));\n" +
-					"		}\n");
-			if (prop.getValue().get("required") != null) {
-				if (prop.getValue().get("required").asBoolean()) {
-					requestMethod.append("		else {\n" + 
+			if (inPath(prop.getValue())) {
+				if (isRequired(prop.getValue())) {
+					requestMethod.append("		if  (!this."+propName+"IsSet) {\n" + 
 							"			throw new RuntimeException(\"" +
 							propName+" is not set, and it is a required parameter.\");\n" + 
 							"		}\n");
 				}
+				continue;
 			}
+			requestMethod.append("		if (this."+propName+"IsSet) {\n" + 
+					"			qd.addQuery(\""+propName+"\", String.valueOf("+propName+"));\n" +
+					"		}\n");
+			if (isRequired(prop.getValue())) {
+				requestMethod.append("		else {\n" + 
+						"			throw new RuntimeException(\"" +
+						propName+" is not set, and it is a required parameter.\");\n" + 
+						"		}\n");
+			}
+
 		}
-		
+
 		ArrayList<String> al = getPathInserts(path);
 		for (String str : al) {
 			requestMethod.append(
