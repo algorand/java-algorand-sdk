@@ -45,7 +45,7 @@ public class RawTransaction extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if (this.rawtxnIsSet) {
 			qd.addQuery("rawtxn", String.valueOf(rawtxn));

@@ -47,7 +47,7 @@ public class WaitForBlock extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if  (!this.roundIsSet) {
 			throw new RuntimeException("round is not set, and it is a required parameter.");

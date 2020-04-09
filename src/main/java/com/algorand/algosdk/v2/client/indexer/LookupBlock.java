@@ -46,7 +46,7 @@ public class LookupBlock extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if  (!this.roundNumberIsSet) {
 			throw new RuntimeException("roundNumber is not set, and it is a required parameter.");

@@ -47,7 +47,7 @@ public class ShutdownNode extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if (this.timeoutIsSet) {
 			qd.addQuery("timeout", String.valueOf(timeout));

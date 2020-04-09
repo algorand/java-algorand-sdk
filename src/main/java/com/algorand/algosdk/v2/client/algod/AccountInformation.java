@@ -47,7 +47,7 @@ public class AccountInformation extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if  (!this.addressIsSet) {
 			throw new RuntimeException("address is not set, and it is a required parameter.");

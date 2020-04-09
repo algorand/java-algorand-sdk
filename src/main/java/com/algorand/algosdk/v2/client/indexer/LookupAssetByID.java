@@ -46,7 +46,7 @@ public class LookupAssetByID extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if  (!this.assetIdIsSet) {
 			throw new RuntimeException("assetId is not set, and it is a required parameter.");

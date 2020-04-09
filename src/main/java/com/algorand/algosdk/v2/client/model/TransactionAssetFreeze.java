@@ -2,6 +2,8 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,20 +18,65 @@ public class TransactionAssetFreeze {
 	/*
 		(fadd) Address of the account whose asset is being frozen or thawed. 
 	 */
+	private String address;
+	private boolean addressIsSet;
 	@JsonProperty("address")
-	public String address;
+	public void setAddress(String address){
+		this.address = address;
+		addressIsSet = true;
+	}
+	@JsonProperty("address")
+	public String getAddress(){
+		return addressIsSet ? address : null;
+	}
+	/*
+		Check if has a value for address 
+	 */	@JsonIgnore
+	public boolean hasAddress(){
+		return addressIsSet;
+	}
 
 	/*
 		(faid) ID of the asset being frozen or thawed. 
 	 */
+	private long assetId;
+	private boolean assetIdIsSet;
 	@JsonProperty("asset-id")
-	public long assetId;
+	public void setAssetId(long assetId){
+		this.assetId = assetId;
+		assetIdIsSet = true;
+	}
+	@JsonProperty("asset-id")
+	public Long getAssetId(){
+		return assetIdIsSet ? assetId : null;
+	}
+	/*
+		Check if has a value for assetId 
+	 */	@JsonIgnore
+	public boolean hasAssetId(){
+		return assetIdIsSet;
+	}
 
 	/*
 		(afrz) The new freeze status. 
 	 */
+	private boolean newFreezeStatus;
+	private boolean newFreezeStatusIsSet;
 	@JsonProperty("new-freeze-status")
-	public boolean newFreezeStatus;
+	public void setNewFreezeStatus(boolean newFreezeStatus){
+		this.newFreezeStatus = newFreezeStatus;
+		newFreezeStatusIsSet = true;
+	}
+	@JsonProperty("new-freeze-status")
+	public Boolean getNewFreezeStatus(){
+		return newFreezeStatusIsSet ? newFreezeStatus : null;
+	}
+	/*
+		Check if has a value for newFreezeStatus 
+	 */	@JsonIgnore
+	public boolean hasNewFreezeStatus(){
+		return newFreezeStatusIsSet;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -50,7 +97,8 @@ public class TransactionAssetFreeze {
 		ObjectMapper om = new ObjectMapper(); 
 		String jsonStr;
 		try {
-			jsonStr = om.writeValueAsString(this);
+			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
+
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());
 		}

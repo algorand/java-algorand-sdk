@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -62,7 +63,7 @@ public class Generator {
 		return ans;
 	}
 
-	static String getType(JsonNode prop) {
+	static String getType(JsonNode prop, boolean asObject) {
 
 		if (prop.get("$ref") != null) {
 			JsonNode typeNode = prop.get("$ref");
@@ -74,14 +75,14 @@ public class Generator {
 		String type = typeNode.asText();
 		switch (type) {
 		case "integer":
-			return "long";
+			return asObject ? "Long" : "long";
 		case "string":
 			return "String";
 		case "boolean":
-			return "boolean";
+			return asObject ? "Boolean" : "boolean";
 		case "array":
 			JsonNode arrayTypeNode = prop.get("items");
-			String typeName = getType(arrayTypeNode);
+			String typeName = getType(arrayTypeNode, asObject);
 			return "List<" + typeName + ">";
 		}
 		return null;
@@ -157,21 +158,47 @@ public class Generator {
 			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop, false);
-			String desc;
-			if (prop.getValue().get("description") != null) {
-				desc = prop.getValue().get("description").asText();
-				desc = formatComment(desc, "\t");
-				buffer.append(desc);
-			}
-
-			buffer.append("\n\t" + "@JsonProperty(\"" + jprop + "\")\n");
-			buffer.append("\tpublic ");
-			String type = getType(prop.getValue());
+			String getterName = "get" + getCamelCase(jprop, true);
+			String setterName = "set" + getCamelCase(jprop, true);
+			String isSetName = javaName + "IsSet";
+			String hasName = "has" + getCamelCase(jprop, true);
+			String type = getType(prop.getValue(), false);
+			String typeObj = getType(prop.getValue(), true);
 			if (type.contains("List<")) {
 				importList = true;
 			}
-			buffer.append(type + " ");
-			buffer.append(javaName + ";\n");
+
+			String desc = null;
+			if (prop.getValue().get("description") != null) {
+				desc = prop.getValue().get("description").asText();
+				desc = formatComment(desc, "\t");
+			}
+
+			// private type
+			if (desc != null) buffer.append(desc);
+			buffer.append("\n\tprivate " + type + " " + javaName + ";\n");
+
+			// private type is set boolean
+			buffer.append("\tprivate boolean " + isSetName + ";\n");
+
+			// public setter
+			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")\n");
+			buffer.append("\tpublic void " + setterName + "(" + type + " " + javaName + "){"
+					+ "\n\t\tthis." + javaName + " = " + javaName + ";"
+					+ "\n\t\t" + isSetName + " = true;\n"
+					+ "\t}\n");
+
+			// public getter
+			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")\n");
+			buffer.append("\tpublic " + typeObj + " " + getterName + "(){"
+					+ "\n\t\treturn " + isSetName + " ? " + javaName + " : null;\n\t}");
+
+			// public has
+			String hasComment = "Check if has a value for " + javaName;
+			hasComment = formatComment(hasComment, "\t");
+			buffer.append(hasComment);
+			buffer.append("\t@JsonIgnore");
+			buffer.append("\n\tpublic boolean " + hasName + "(){\n\t\treturn " + isSetName + ";\n\t}\n");
 		}
 		return importList;
 	}
@@ -200,7 +227,8 @@ public class Generator {
 						"		ObjectMapper om = new ObjectMapper(); \n" + 
 						"		String jsonStr;\n" + 
 						"		try {\n" + 
-						"			jsonStr = om.writeValueAsString(this);\n" + 
+						"			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);\n" + 
+						"\n" + 
 						"		} catch (JsonProcessingException e) {\n" + 
 						"			throw new RuntimeException(e.getMessage());\n" + 
 						"		}\n" + 
@@ -232,6 +260,9 @@ public class Generator {
 		}
 		imports.append("import java.util.Objects;\n"); // used by Objects.deepEquals
 		imports.append("\n");
+		
+		imports.append("import com.fasterxml.jackson.annotation.JsonIgnore;\n");
+		imports.append("import com.fasterxml.jackson.annotation.JsonInclude.Include;\n");
 		imports.append("import com.fasterxml.jackson.annotation.JsonProperty;\n");
 		imports.append("import com.fasterxml.jackson.core.JsonProcessingException;\n"); // used by toString
 		imports.append("import com.fasterxml.jackson.databind.ObjectMapper;\n"); // used by toString
@@ -295,7 +326,7 @@ public class Generator {
 		}
 		return false;
 	}
-	
+
 	static boolean inPath(JsonNode prop) {
 		if (prop.get("in") != null) {
 			return prop.get("in").asText().compareTo("path") == 0;
@@ -320,14 +351,14 @@ public class Generator {
 				"		super(client);\n" + 
 				"	}\n");
 		requestMethod.append(Generator.getQueryResponseMethod(returnType, getOrPost));
-		requestMethod.append("	protected QueryData getRequestString() {\n" + 
+		requestMethod.append("	public QueryData getRequestString() {\n" + 
 				"		QueryData qd = new QueryData();\n");
 		while (properties != null && properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
 			String propName = Generator.getCamelCase(prop.getKey(), false);
 			String setterName = Generator.getCamelCase(prop.getKey(), true);
 			setterName = "set" + setterName;
-			String propType = getType(prop.getValue());
+			String propType = getType(prop.getValue(), false);
 
 			decls.append("\tprivate " + propType + " " + propName + ";\n");
 			bools.append("\tprivate boolean " + propName + "IsSet;\n");

@@ -2,6 +2,8 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,11 +19,41 @@ public class TransactionAssetConfig {
 	/*
 		(xaid) ID of the asset being configured or empty if creating. 
 	 */
+	private long assetId;
+	private boolean assetIdIsSet;
 	@JsonProperty("asset-id")
-	public long assetId;
+	public void setAssetId(long assetId){
+		this.assetId = assetId;
+		assetIdIsSet = true;
+	}
+	@JsonProperty("asset-id")
+	public Long getAssetId(){
+		return assetIdIsSet ? assetId : null;
+	}
+	/*
+		Check if has a value for assetId 
+	 */	@JsonIgnore
+	public boolean hasAssetId(){
+		return assetIdIsSet;
+	}
 
+	private AssetParams params;
+	private boolean paramsIsSet;
 	@JsonProperty("params")
-	public AssetParams params;
+	public void setParams(AssetParams params){
+		this.params = params;
+		paramsIsSet = true;
+	}
+	@JsonProperty("params")
+	public AssetParams getParams(){
+		return paramsIsSet ? params : null;
+	}
+	/*
+		Check if has a value for params 
+	 */	@JsonIgnore
+	public boolean hasParams(){
+		return paramsIsSet;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -41,7 +73,8 @@ public class TransactionAssetConfig {
 		ObjectMapper om = new ObjectMapper(); 
 		String jsonStr;
 		try {
-			jsonStr = om.writeValueAsString(this);
+			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
+
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());
 		}

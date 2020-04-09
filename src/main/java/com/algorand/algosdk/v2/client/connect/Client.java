@@ -14,6 +14,14 @@ public class Client {
 	private String host;
 	private int port;
 
+	public int getPort() {
+		return port;
+	}
+	
+	public String getHost() {
+		return host;
+	}
+	
 	public static HttpUrl getHttpUrl(QueryData qData, int port, String host) {
 		HttpUrl.Builder httpUrlBuilder = (new HttpUrl.Builder()).scheme("http").port(port).host(host);
 		for (String ps : qData.pathSegments) {

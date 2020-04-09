@@ -44,8 +44,8 @@ public class LookupTests {
 		.setAssetId(3)
 		.lookup();
 
-		for (MiniAssetHolding ah : assetBalances.balances) {
-			assertEquals(1, ah.amount);
+		for (MiniAssetHolding ah : assetBalances.getBalances()) {
+			assertEquals(1, ah.getAmount().longValue());
 		}
 	}
 }

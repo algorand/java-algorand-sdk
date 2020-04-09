@@ -7,15 +7,44 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
+import com.algorand.algosdk.v2.client.connect.Client;
+import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.squareup.okhttp.HttpUrl;
 
 public class TestGen extends Generator {
 
+	static String callExternalCurl(String request) {
+		StringBuffer bw = new StringBuffer();
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        processBuilder.command("curl", "-s", request);
+        try {
+            Process process = processBuilder.start();
+            BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                bw.append(line);
+            }
+
+            process.waitFor();
+            return bw.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+	}
+	
 	void writeQueryMapper(String sdkutilsPath) throws IOException {
 		BufferedWriter bw = getFileWriter("QueryMapper", sdkutilsPath);
 		bw.append("package com.algorand.sdkutils;\n" + 
@@ -126,8 +155,8 @@ public class TestGen extends Generator {
 		return line.substring(0, line.indexOf(":"));
 	}
 
-	void testSamples(BufferedReader br) throws IOException {
-		JsonNode paths = this.root.get("paths");
+	static void testSamples(TestGen tg, BufferedReader br, Client client) throws IOException {
+		JsonNode paths = tg.root.get("paths");
 		JsonNode pathNode = null;
 		while (true) {
 			String line = br.readLine();
@@ -140,10 +169,19 @@ public class TestGen extends Generator {
 				System.out.println(pathNode.toString());
 			} else {
 				// this is a test sample
+				
+				// sample source setup
 				JsonNode paramNode = pathNode.findValue("parameters");
-				Iterator<Entry<String, JsonNode>> properties = getSortedParameters(paramNode);
+				Iterator<Entry<String, JsonNode>> properties = tg.getSortedParameters(paramNode);
 				StringTokenizer st = new StringTokenizer(line, ",");
+				
+				// SDK query setup
+				String methodName = pathNode.findValue("operationId").asText();
+
+				Query query = QueryMapper.getClass(methodName, client);
+				
 				while (properties.hasNext()) {
+					// sample source setup
 					String value = "";
 					if (st.hasMoreTokens()) {
 						value = st.nextToken();
@@ -154,12 +192,28 @@ public class TestGen extends Generator {
 						continue;
 					}
 					
-					System.out.println(parameter.getKey() + ": " + value);
+					// SDK query setup
+					QueryMapper.setValue(query, methodName, parameter.getKey(), value);
+				}
+				
+				// Call the SDK
+				String sdkResponse = QueryMapper.lookup(query, methodName);
+				
+				// Call the node directly using curl
+				QueryData qd = query.getRequestString();
+				HttpUrl httpUrl = Client.getHttpUrl(qd, client.getPort(), client.getHost());
+
+				//callExternalCurl
+				String curlResponse = callExternalCurl(httpUrl.toString());
+				
+				System.out.println(httpUrl.toString()+"\n");
+				System.out.println("SDK:\n" + sdkResponse + "\nCurl:\n" + curlResponse);
+				if (curlResponse.compareTo(sdkResponse) != 0) {
+					throw new RuntimeException("wrong result!");
 				}
 			}
 		}
 	}
-
 	TestGen (JsonNode root) {
 		super();
 		this.root = root;
@@ -183,9 +237,13 @@ public class TestGen extends Generator {
 			bw.close();
 			System.out.println("File written: " + args[2]);
 		} else if (args[1].compareTo("test") == 0) {
+			int port = 8980;
+			String host = "localhost";
+			Client client = new Client(host, port);
+			
 			File inFile = new File(args[2]);
 			BufferedReader br = new BufferedReader(new FileReader(inFile));
-			tg.testSamples(br);
+			testSamples(tg, br, client);
 			br.close();
 			System.out.println("File tested: " + args[2]);
 

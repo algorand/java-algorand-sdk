@@ -158,7 +158,7 @@ public class SearchForTransactions extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if (this.addressIsSet) {
 			qd.addQuery("address", String.valueOf(address));

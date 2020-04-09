@@ -7,7 +7,7 @@ public abstract class Query {
 		this.client = client;
 	}
 		
-	abstract protected QueryData getRequestString();
+	abstract public QueryData getRequestString();
 	
 	protected String request(String getOrPost) throws Exception {
 

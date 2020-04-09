@@ -144,7 +144,7 @@ public class LookupAccountTransactions extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if  (!this.accountIdIsSet) {
 			throw new RuntimeException("accountId is not set, and it is a required parameter.");

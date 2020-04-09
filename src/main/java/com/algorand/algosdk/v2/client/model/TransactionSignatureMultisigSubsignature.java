@@ -2,6 +2,8 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,14 +13,44 @@ public class TransactionSignatureMultisigSubsignature {
 	/*
 		(pk) 
 	 */
+	private String publicKey;
+	private boolean publicKeyIsSet;
 	@JsonProperty("public-key")
-	public String publicKey;
+	public void setPublicKey(String publicKey){
+		this.publicKey = publicKey;
+		publicKeyIsSet = true;
+	}
+	@JsonProperty("public-key")
+	public String getPublicKey(){
+		return publicKeyIsSet ? publicKey : null;
+	}
+	/*
+		Check if has a value for publicKey 
+	 */	@JsonIgnore
+	public boolean hasPublicKey(){
+		return publicKeyIsSet;
+	}
 
 	/*
 		(s) 
 	 */
+	private String signature;
+	private boolean signatureIsSet;
 	@JsonProperty("signature")
-	public String signature;
+	public void setSignature(String signature){
+		this.signature = signature;
+		signatureIsSet = true;
+	}
+	@JsonProperty("signature")
+	public String getSignature(){
+		return signatureIsSet ? signature : null;
+	}
+	/*
+		Check if has a value for signature 
+	 */	@JsonIgnore
+	public boolean hasSignature(){
+		return signatureIsSet;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -38,7 +70,8 @@ public class TransactionSignatureMultisigSubsignature {
 		ObjectMapper om = new ObjectMapper(); 
 		String jsonStr;
 		try {
-			jsonStr = om.writeValueAsString(this);
+			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
+
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());
 		}

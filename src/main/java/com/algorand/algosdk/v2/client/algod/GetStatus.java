@@ -39,7 +39,7 @@ public class GetStatus extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		qd.addPathSegment(String.valueOf("v2"));
 		qd.addPathSegment(String.valueOf("status"));

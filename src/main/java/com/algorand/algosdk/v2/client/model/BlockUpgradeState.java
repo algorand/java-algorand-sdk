@@ -2,6 +2,8 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,33 +17,108 @@ public class BlockUpgradeState {
 	/*
 		(proto) The current protocol version. 
 	 */
+	private String currentProtocol;
+	private boolean currentProtocolIsSet;
 	@JsonProperty("current-protocol")
-	public String currentProtocol;
+	public void setCurrentProtocol(String currentProtocol){
+		this.currentProtocol = currentProtocol;
+		currentProtocolIsSet = true;
+	}
+	@JsonProperty("current-protocol")
+	public String getCurrentProtocol(){
+		return currentProtocolIsSet ? currentProtocol : null;
+	}
+	/*
+		Check if has a value for currentProtocol 
+	 */	@JsonIgnore
+	public boolean hasCurrentProtocol(){
+		return currentProtocolIsSet;
+	}
 
 	/*
 		(nextproto) The next proposed protocol version. 
 	 */
+	private String nextProtocol;
+	private boolean nextProtocolIsSet;
 	@JsonProperty("next-protocol")
-	public String nextProtocol;
+	public void setNextProtocol(String nextProtocol){
+		this.nextProtocol = nextProtocol;
+		nextProtocolIsSet = true;
+	}
+	@JsonProperty("next-protocol")
+	public String getNextProtocol(){
+		return nextProtocolIsSet ? nextProtocol : null;
+	}
+	/*
+		Check if has a value for nextProtocol 
+	 */	@JsonIgnore
+	public boolean hasNextProtocol(){
+		return nextProtocolIsSet;
+	}
 
 	/*
 		(nextyes) Number of blocks which approved the protocol upgrade. 
 	 */
+	private long nextProtocolApprovals;
+	private boolean nextProtocolApprovalsIsSet;
 	@JsonProperty("next-protocol-approvals")
-	public long nextProtocolApprovals;
+	public void setNextProtocolApprovals(long nextProtocolApprovals){
+		this.nextProtocolApprovals = nextProtocolApprovals;
+		nextProtocolApprovalsIsSet = true;
+	}
+	@JsonProperty("next-protocol-approvals")
+	public Long getNextProtocolApprovals(){
+		return nextProtocolApprovalsIsSet ? nextProtocolApprovals : null;
+	}
+	/*
+		Check if has a value for nextProtocolApprovals 
+	 */	@JsonIgnore
+	public boolean hasNextProtocolApprovals(){
+		return nextProtocolApprovalsIsSet;
+	}
 
 	/*
 		(nextswitch) Round on which the protocol upgrade will take effect. 
 	 */
+	private long nextProtocolSwitchOn;
+	private boolean nextProtocolSwitchOnIsSet;
 	@JsonProperty("next-protocol-switch-on")
-	public long nextProtocolSwitchOn;
+	public void setNextProtocolSwitchOn(long nextProtocolSwitchOn){
+		this.nextProtocolSwitchOn = nextProtocolSwitchOn;
+		nextProtocolSwitchOnIsSet = true;
+	}
+	@JsonProperty("next-protocol-switch-on")
+	public Long getNextProtocolSwitchOn(){
+		return nextProtocolSwitchOnIsSet ? nextProtocolSwitchOn : null;
+	}
+	/*
+		Check if has a value for nextProtocolSwitchOn 
+	 */	@JsonIgnore
+	public boolean hasNextProtocolSwitchOn(){
+		return nextProtocolSwitchOnIsSet;
+	}
 
 	/*
 		(nextbefore) Deadline round for this protocol upgrade (No votes will be consider 
 		after this round). 
 	 */
+	private long nextProtocolVoteBefore;
+	private boolean nextProtocolVoteBeforeIsSet;
 	@JsonProperty("next-protocol-vote-before")
-	public long nextProtocolVoteBefore;
+	public void setNextProtocolVoteBefore(long nextProtocolVoteBefore){
+		this.nextProtocolVoteBefore = nextProtocolVoteBefore;
+		nextProtocolVoteBeforeIsSet = true;
+	}
+	@JsonProperty("next-protocol-vote-before")
+	public Long getNextProtocolVoteBefore(){
+		return nextProtocolVoteBeforeIsSet ? nextProtocolVoteBefore : null;
+	}
+	/*
+		Check if has a value for nextProtocolVoteBefore 
+	 */	@JsonIgnore
+	public boolean hasNextProtocolVoteBefore(){
+		return nextProtocolVoteBeforeIsSet;
+	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -64,7 +141,8 @@ public class BlockUpgradeState {
 		ObjectMapper om = new ObjectMapper(); 
 		String jsonStr;
 		try {
-			jsonStr = om.writeValueAsString(this);
+			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
+
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());
 		}

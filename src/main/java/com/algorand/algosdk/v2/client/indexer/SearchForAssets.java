@@ -81,7 +81,7 @@ public class SearchForAssets extends Query {
 		}
 		return resp;
 	}
-	protected QueryData getRequestString() {
+	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if (this.assetIdIsSet) {
 			qd.addQuery("assetId", String.valueOf(assetId));
