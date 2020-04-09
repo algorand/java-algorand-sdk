@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class SupplyResponse {
 
-	/*
-		Round 
+	/**
+	 * Round 
 	 */
 	private long current_round;
 	private boolean current_roundIsSet;
@@ -24,15 +24,15 @@ public class SupplyResponse {
 	public Long getCurrent_round(){
 		return current_roundIsSet ? current_round : null;
 	}
-	/*
-		Check if has a value for current_round 
+	/**
+	 * Check if has a value for current_round 
 	 */	@JsonIgnore
 	public boolean hasCurrent_round(){
 		return current_roundIsSet;
 	}
 
-	/*
-		OnlineMoney 
+	/**
+	 * OnlineMoney 
 	 */
 	private long onlineMoney;
 	private boolean onlineMoneyIsSet;
@@ -45,15 +45,15 @@ public class SupplyResponse {
 	public Long getOnlineMoney(){
 		return onlineMoneyIsSet ? onlineMoney : null;
 	}
-	/*
-		Check if has a value for onlineMoney 
+	/**
+	 * Check if has a value for onlineMoney 
 	 */	@JsonIgnore
 	public boolean hasOnlineMoney(){
 		return onlineMoneyIsSet;
 	}
 
-	/*
-		TotalMoney 
+	/**
+	 * TotalMoney 
 	 */
 	private long totalMoney;
 	private boolean totalMoneyIsSet;
@@ -66,8 +66,8 @@ public class SupplyResponse {
 	public Long getTotalMoney(){
 		return totalMoneyIsSet ? totalMoney : null;
 	}
-	/*
-		Check if has a value for totalMoney 
+	/**
+	 * Check if has a value for totalMoney 
 	 */	@JsonIgnore
 	public boolean hasTotalMoney(){
 		return totalMoneyIsSet;

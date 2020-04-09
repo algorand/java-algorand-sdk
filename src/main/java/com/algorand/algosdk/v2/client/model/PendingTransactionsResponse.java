@@ -11,9 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PendingTransactionsResponse {
 
-	/*
-		An array of transactions encoded as either a JSON string or a Base64 encoded 
-		message pack object. 
+	/**
+	 * An array of transactions encoded as either a JSON string or a Base64 encoded 
+	 * message pack object. 
 	 */
 	private List<String> topTransactions;
 	private boolean topTransactionsIsSet;
@@ -26,15 +26,15 @@ public class PendingTransactionsResponse {
 	public List<String> getTopTransactions(){
 		return topTransactionsIsSet ? topTransactions : null;
 	}
-	/*
-		Check if has a value for topTransactions 
+	/**
+	 * Check if has a value for topTransactions 
 	 */	@JsonIgnore
 	public boolean hasTopTransactions(){
 		return topTransactionsIsSet;
 	}
 
-	/*
-		Total number of transactions in the pool. 
+	/**
+	 * Total number of transactions in the pool. 
 	 */
 	private long totalTransactions;
 	private boolean totalTransactionsIsSet;
@@ -47,8 +47,8 @@ public class PendingTransactionsResponse {
 	public Long getTotalTransactions(){
 		return totalTransactionsIsSet ? totalTransactions : null;
 	}
-	/*
-		Check if has a value for totalTransactions 
+	/**
+	 * Check if has a value for totalTransactions 
 	 */	@JsonIgnore
 	public boolean hasTotalTransactions(){
 		return totalTransactionsIsSet;

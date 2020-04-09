@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
 
 
-/*
-	Lookup the list of accounts who hold this asset /assets/{asset-id}/balances 
+/**
+ * Lookup the list of accounts who hold this asset /assets/{asset-id}/balances 
  */
 public class LookupAssetBalances extends Query {
 	private long assetId;

@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TransactionSignatureMultisigSubsignature {
 
-	/*
-		(pk) 
+	/**
+	 * (pk) 
 	 */
 	private String publicKey;
 	private boolean publicKeyIsSet;
@@ -24,15 +24,15 @@ public class TransactionSignatureMultisigSubsignature {
 	public String getPublicKey(){
 		return publicKeyIsSet ? publicKey : null;
 	}
-	/*
-		Check if has a value for publicKey 
+	/**
+	 * Check if has a value for publicKey 
 	 */	@JsonIgnore
 	public boolean hasPublicKey(){
 		return publicKeyIsSet;
 	}
 
-	/*
-		(s) 
+	/**
+	 * (s) 
 	 */
 	private String signature;
 	private boolean signatureIsSet;
@@ -45,8 +45,8 @@ public class TransactionSignatureMultisigSubsignature {
 	public String getSignature(){
 		return signatureIsSet ? signature : null;
 	}
-	/*
-		Check if has a value for signature 
+	/**
+	 * Check if has a value for signature 
 	 */	@JsonIgnore
 	public boolean hasSignature(){
 		return signatureIsSet;

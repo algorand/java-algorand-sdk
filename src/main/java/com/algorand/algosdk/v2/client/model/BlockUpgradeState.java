@@ -9,13 +9,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields relating to a protocol upgrade. 
+/**
+ * Fields relating to a protocol upgrade. 
  */
 public class BlockUpgradeState {
 
-	/*
-		(proto) The current protocol version. 
+	/**
+	 * (proto) The current protocol version. 
 	 */
 	private String currentProtocol;
 	private boolean currentProtocolIsSet;
@@ -28,15 +28,15 @@ public class BlockUpgradeState {
 	public String getCurrentProtocol(){
 		return currentProtocolIsSet ? currentProtocol : null;
 	}
-	/*
-		Check if has a value for currentProtocol 
+	/**
+	 * Check if has a value for currentProtocol 
 	 */	@JsonIgnore
 	public boolean hasCurrentProtocol(){
 		return currentProtocolIsSet;
 	}
 
-	/*
-		(nextproto) The next proposed protocol version. 
+	/**
+	 * (nextproto) The next proposed protocol version. 
 	 */
 	private String nextProtocol;
 	private boolean nextProtocolIsSet;
@@ -49,15 +49,15 @@ public class BlockUpgradeState {
 	public String getNextProtocol(){
 		return nextProtocolIsSet ? nextProtocol : null;
 	}
-	/*
-		Check if has a value for nextProtocol 
+	/**
+	 * Check if has a value for nextProtocol 
 	 */	@JsonIgnore
 	public boolean hasNextProtocol(){
 		return nextProtocolIsSet;
 	}
 
-	/*
-		(nextyes) Number of blocks which approved the protocol upgrade. 
+	/**
+	 * (nextyes) Number of blocks which approved the protocol upgrade. 
 	 */
 	private long nextProtocolApprovals;
 	private boolean nextProtocolApprovalsIsSet;
@@ -70,15 +70,15 @@ public class BlockUpgradeState {
 	public Long getNextProtocolApprovals(){
 		return nextProtocolApprovalsIsSet ? nextProtocolApprovals : null;
 	}
-	/*
-		Check if has a value for nextProtocolApprovals 
+	/**
+	 * Check if has a value for nextProtocolApprovals 
 	 */	@JsonIgnore
 	public boolean hasNextProtocolApprovals(){
 		return nextProtocolApprovalsIsSet;
 	}
 
-	/*
-		(nextswitch) Round on which the protocol upgrade will take effect. 
+	/**
+	 * (nextswitch) Round on which the protocol upgrade will take effect. 
 	 */
 	private long nextProtocolSwitchOn;
 	private boolean nextProtocolSwitchOnIsSet;
@@ -91,16 +91,16 @@ public class BlockUpgradeState {
 	public Long getNextProtocolSwitchOn(){
 		return nextProtocolSwitchOnIsSet ? nextProtocolSwitchOn : null;
 	}
-	/*
-		Check if has a value for nextProtocolSwitchOn 
+	/**
+	 * Check if has a value for nextProtocolSwitchOn 
 	 */	@JsonIgnore
 	public boolean hasNextProtocolSwitchOn(){
 		return nextProtocolSwitchOnIsSet;
 	}
 
-	/*
-		(nextbefore) Deadline round for this protocol upgrade (No votes will be consider 
-		after this round). 
+	/**
+	 * (nextbefore) Deadline round for this protocol upgrade (No votes will be consider 
+	 * after this round). 
 	 */
 	private long nextProtocolVoteBefore;
 	private boolean nextProtocolVoteBeforeIsSet;
@@ -113,8 +113,8 @@ public class BlockUpgradeState {
 	public Long getNextProtocolVoteBefore(){
 		return nextProtocolVoteBeforeIsSet ? nextProtocolVoteBefore : null;
 	}
-	/*
-		Check if has a value for nextProtocolVoteBefore 
+	/**
+	 * Check if has a value for nextProtocolVoteBefore 
 	 */	@JsonIgnore
 	public boolean hasNextProtocolVoteBefore(){
 		return nextProtocolVoteBeforeIsSet;

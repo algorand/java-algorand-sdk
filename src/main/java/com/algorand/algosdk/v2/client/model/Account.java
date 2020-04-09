@@ -10,14 +10,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Account information at a given round. Definition: data/basics/userBalance.go : 
-	AccountData 
+/**
+ * Account information at a given round. Definition: data/basics/userBalance.go : 
+ * AccountData 
  */
 public class Account {
 
-	/*
-		the account public key 
+	/**
+	 * the account public key 
 	 */
 	private String address;
 	private boolean addressIsSet;
@@ -30,15 +30,15 @@ public class Account {
 	public String getAddress(){
 		return addressIsSet ? address : null;
 	}
-	/*
-		Check if has a value for address 
+	/**
+	 * Check if has a value for address 
 	 */	@JsonIgnore
 	public boolean hasAddress(){
 		return addressIsSet;
 	}
 
-	/*
-		(algo) total number of MicroAlgos in the account 
+	/**
+	 * (algo) total number of MicroAlgos in the account 
 	 */
 	private long amount;
 	private boolean amountIsSet;
@@ -51,15 +51,15 @@ public class Account {
 	public Long getAmount(){
 		return amountIsSet ? amount : null;
 	}
-	/*
-		Check if has a value for amount 
+	/**
+	 * Check if has a value for amount 
 	 */	@JsonIgnore
 	public boolean hasAmount(){
 		return amountIsSet;
 	}
 
-	/*
-		specifies the amount of MicroAlgos in the account, without the pending rewards. 
+	/**
+	 * specifies the amount of MicroAlgos in the account, without the pending rewards. 
 	 */
 	private long amountWithoutPendingRewards;
 	private boolean amountWithoutPendingRewardsIsSet;
@@ -72,16 +72,16 @@ public class Account {
 	public Long getAmountWithoutPendingRewards(){
 		return amountWithoutPendingRewardsIsSet ? amountWithoutPendingRewards : null;
 	}
-	/*
-		Check if has a value for amountWithoutPendingRewards 
+	/**
+	 * Check if has a value for amountWithoutPendingRewards 
 	 */	@JsonIgnore
 	public boolean hasAmountWithoutPendingRewards(){
 		return amountWithoutPendingRewardsIsSet;
 	}
 
-	/*
-		(asset) assets held by this account. Note the raw object uses `map[int] -> 
-		AssetHolding` for this type. 
+	/**
+	 * (asset) assets held by this account. Note the raw object uses `map[int] -> 
+	 * AssetHolding` for this type. 
 	 */
 	private List<AssetHolding> assets;
 	private boolean assetsIsSet;
@@ -94,16 +94,16 @@ public class Account {
 	public List<AssetHolding> getAssets(){
 		return assetsIsSet ? assets : null;
 	}
-	/*
-		Check if has a value for assets 
+	/**
+	 * Check if has a value for assets 
 	 */	@JsonIgnore
 	public boolean hasAssets(){
 		return assetsIsSet;
 	}
 
-	/*
-		(apar) parameters of assets created by this account. Note: the raw account uses 
-		`map[int] -> Asset` for this type. 
+	/**
+	 * (apar) parameters of assets created by this account. Note: the raw account uses 
+	 * `map[int] -> Asset` for this type. 
 	 */
 	private List<Asset> createdAssets;
 	private boolean createdAssetsIsSet;
@@ -116,8 +116,8 @@ public class Account {
 	public List<Asset> getCreatedAssets(){
 		return createdAssetsIsSet ? createdAssets : null;
 	}
-	/*
-		Check if has a value for createdAssets 
+	/**
+	 * Check if has a value for createdAssets 
 	 */	@JsonIgnore
 	public boolean hasCreatedAssets(){
 		return createdAssetsIsSet;
@@ -134,15 +134,15 @@ public class Account {
 	public AccountParticipation getParticipation(){
 		return participationIsSet ? participation : null;
 	}
-	/*
-		Check if has a value for participation 
+	/**
+	 * Check if has a value for participation 
 	 */	@JsonIgnore
 	public boolean hasParticipation(){
 		return participationIsSet;
 	}
 
-	/*
-		amount of MicroAlgos of pending rewards in this account. 
+	/**
+	 * amount of MicroAlgos of pending rewards in this account. 
 	 */
 	private long pendingRewards;
 	private boolean pendingRewardsIsSet;
@@ -155,16 +155,16 @@ public class Account {
 	public Long getPendingRewards(){
 		return pendingRewardsIsSet ? pendingRewards : null;
 	}
-	/*
-		Check if has a value for pendingRewards 
+	/**
+	 * Check if has a value for pendingRewards 
 	 */	@JsonIgnore
 	public boolean hasPendingRewards(){
 		return pendingRewardsIsSet;
 	}
 
-	/*
-		(ebase) used as part of the rewards computation. Only applicable to accounts 
-		which are participating. 
+	/**
+	 * (ebase) used as part of the rewards computation. Only applicable to accounts 
+	 * which are participating. 
 	 */
 	private long rewardBase;
 	private boolean rewardBaseIsSet;
@@ -177,16 +177,16 @@ public class Account {
 	public Long getRewardBase(){
 		return rewardBaseIsSet ? rewardBase : null;
 	}
-	/*
-		Check if has a value for rewardBase 
+	/**
+	 * Check if has a value for rewardBase 
 	 */	@JsonIgnore
 	public boolean hasRewardBase(){
 		return rewardBaseIsSet;
 	}
 
-	/*
-		(ern) total rewards of MicroAlgos the account has received, including pending 
-		rewards. 
+	/**
+	 * (ern) total rewards of MicroAlgos the account has received, including pending 
+	 * rewards. 
 	 */
 	private long rewards;
 	private boolean rewardsIsSet;
@@ -199,15 +199,15 @@ public class Account {
 	public Long getRewards(){
 		return rewardsIsSet ? rewards : null;
 	}
-	/*
-		Check if has a value for rewards 
+	/**
+	 * Check if has a value for rewards 
 	 */	@JsonIgnore
 	public boolean hasRewards(){
 		return rewardsIsSet;
 	}
 
-	/*
-		The round for which this information is relevant. 
+	/**
+	 * The round for which this information is relevant. 
 	 */
 	private long round;
 	private boolean roundIsSet;
@@ -220,18 +220,18 @@ public class Account {
 	public Long getRound(){
 		return roundIsSet ? round : null;
 	}
-	/*
-		Check if has a value for round 
+	/**
+	 * Check if has a value for round 
 	 */	@JsonIgnore
 	public boolean hasRound(){
 		return roundIsSet;
 	}
 
-	/*
-		(onl) delegation status of the account's MicroAlgos * Offline - indicates that 
-		the associated account is delegated. * Online - indicates that the associated 
-		account used as part of the delegation pool. * NotParticipating - indicates that 
-		the associated account is neither a delegator nor a delegate. 
+	/**
+	 * (onl) delegation status of the account's MicroAlgos * Offline - indicates that 
+	 * the associated account is delegated. * Online - indicates that the associated 
+	 * account used as part of the delegation pool. * NotParticipating - indicates that 
+	 * the associated account is neither a delegator nor a delegate. 
 	 */
 	private String status;
 	private boolean statusIsSet;
@@ -244,16 +244,16 @@ public class Account {
 	public String getStatus(){
 		return statusIsSet ? status : null;
 	}
-	/*
-		Check if has a value for status 
+	/**
+	 * Check if has a value for status 
 	 */	@JsonIgnore
 	public boolean hasStatus(){
 		return statusIsSet;
 	}
 
-	/*
-		Indicates what type of signature is used by this account, must be one of: * sig 
-		* msig * lsig 
+	/**
+	 * Indicates what type of signature is used by this account, must be one of: * sig 
+	 * * msig * lsig 
 	 */
 	private String type;
 	private boolean typeIsSet;
@@ -266,8 +266,8 @@ public class Account {
 	public String getType(){
 		return typeIsSet ? type : null;
 	}
-	/*
-		Check if has a value for type 
+	/**
+	 * Check if has a value for type 
 	 */	@JsonIgnore
 	public boolean hasType(){
 		return typeIsSet;

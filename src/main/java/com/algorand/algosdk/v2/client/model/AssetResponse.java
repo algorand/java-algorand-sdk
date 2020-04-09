@@ -21,15 +21,15 @@ public class AssetResponse {
 	public Asset getAsset(){
 		return assetIsSet ? asset : null;
 	}
-	/*
-		Check if has a value for asset 
+	/**
+	 * Check if has a value for asset 
 	 */	@JsonIgnore
 	public boolean hasAsset(){
 		return assetIsSet;
 	}
 
-	/*
-		Round at which the results were computed. 
+	/**
+	 * Round at which the results were computed. 
 	 */
 	private long currentRound;
 	private boolean currentRoundIsSet;
@@ -42,8 +42,8 @@ public class AssetResponse {
 	public Long getCurrentRound(){
 		return currentRoundIsSet ? currentRound : null;
 	}
-	/*
-		Check if has a value for currentRound 
+	/**
+	 * Check if has a value for currentRound 
 	 */	@JsonIgnore
 	public boolean hasCurrentRound(){
 		return currentRoundIsSet;

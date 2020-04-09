@@ -9,14 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Describes an asset held by an account. Definition: data/basics/userBalance.go : 
-	AssetHolding 
+/**
+ * Describes an asset held by an account. Definition: data/basics/userBalance.go : 
+ * AssetHolding 
  */
 public class AssetHolding {
 
-	/*
-		(a) number of units held. 
+	/**
+	 * (a) number of units held. 
 	 */
 	private long amount;
 	private boolean amountIsSet;
@@ -29,15 +29,15 @@ public class AssetHolding {
 	public Long getAmount(){
 		return amountIsSet ? amount : null;
 	}
-	/*
-		Check if has a value for amount 
+	/**
+	 * Check if has a value for amount 
 	 */	@JsonIgnore
 	public boolean hasAmount(){
 		return amountIsSet;
 	}
 
-	/*
-		Asset ID of the holding. 
+	/**
+	 * Asset ID of the holding. 
 	 */
 	private long assetId;
 	private boolean assetIdIsSet;
@@ -50,17 +50,17 @@ public class AssetHolding {
 	public Long getAssetId(){
 		return assetIdIsSet ? assetId : null;
 	}
-	/*
-		Check if has a value for assetId 
+	/**
+	 * Check if has a value for assetId 
 	 */	@JsonIgnore
 	public boolean hasAssetId(){
 		return assetIdIsSet;
 	}
 
-	/*
-		Address that created this asset. This is the address where the parameters for 
-		this asset can be found, and also the address where unwanted asset units can be 
-		sent in the worst case. 
+	/**
+	 * Address that created this asset. This is the address where the parameters for 
+	 * this asset can be found, and also the address where unwanted asset units can be 
+	 * sent in the worst case. 
 	 */
 	private String creator;
 	private boolean creatorIsSet;
@@ -73,15 +73,15 @@ public class AssetHolding {
 	public String getCreator(){
 		return creatorIsSet ? creator : null;
 	}
-	/*
-		Check if has a value for creator 
+	/**
+	 * Check if has a value for creator 
 	 */	@JsonIgnore
 	public boolean hasCreator(){
 		return creatorIsSet;
 	}
 
-	/*
-		(f) whether or not the holding is frozen. 
+	/**
+	 * (f) whether or not the holding is frozen. 
 	 */
 	private boolean isFrozen;
 	private boolean isFrozenIsSet;
@@ -94,8 +94,8 @@ public class AssetHolding {
 	public Boolean getIsFrozen(){
 		return isFrozenIsSet ? isFrozen : null;
 	}
-	/*
-		Check if has a value for isFrozen 
+	/**
+	 * Check if has a value for isFrozen 
 	 */	@JsonIgnore
 	public boolean hasIsFrozen(){
 		return isFrozenIsSet;

@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
-/*
-	Lookup transactions for an asset. /assets/{asset-id}/transactions 
+/**
+ * Lookup transactions for an asset. /assets/{asset-id}/transactions 
  */
 public class LookupAssetTransactions extends Query {
 	private String address;

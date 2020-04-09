@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class NodeStatusResponse {
 
-	/*
-		CatchupTime in nanoseconds 
+	/**
+	 * CatchupTime in nanoseconds 
 	 */
 	private long catchupTime;
 	private boolean catchupTimeIsSet;
@@ -24,15 +24,15 @@ public class NodeStatusResponse {
 	public Long getCatchupTime(){
 		return catchupTimeIsSet ? catchupTime : null;
 	}
-	/*
-		Check if has a value for catchupTime 
+	/**
+	 * Check if has a value for catchupTime 
 	 */	@JsonIgnore
 	public boolean hasCatchupTime(){
 		return catchupTimeIsSet;
 	}
 
-	/*
-		LastRound indicates the last round seen 
+	/**
+	 * LastRound indicates the last round seen 
 	 */
 	private long lastRound;
 	private boolean lastRoundIsSet;
@@ -45,15 +45,15 @@ public class NodeStatusResponse {
 	public Long getLastRound(){
 		return lastRoundIsSet ? lastRound : null;
 	}
-	/*
-		Check if has a value for lastRound 
+	/**
+	 * Check if has a value for lastRound 
 	 */	@JsonIgnore
 	public boolean hasLastRound(){
 		return lastRoundIsSet;
 	}
 
-	/*
-		LastVersion indicates the last consensus version supported 
+	/**
+	 * LastVersion indicates the last consensus version supported 
 	 */
 	private String lastVersion;
 	private boolean lastVersionIsSet;
@@ -66,15 +66,15 @@ public class NodeStatusResponse {
 	public String getLastVersion(){
 		return lastVersionIsSet ? lastVersion : null;
 	}
-	/*
-		Check if has a value for lastVersion 
+	/**
+	 * Check if has a value for lastVersion 
 	 */	@JsonIgnore
 	public boolean hasLastVersion(){
 		return lastVersionIsSet;
 	}
 
-	/*
-		NextVersion of consensus protocol to use 
+	/**
+	 * NextVersion of consensus protocol to use 
 	 */
 	private String nextVersion;
 	private boolean nextVersionIsSet;
@@ -87,15 +87,15 @@ public class NodeStatusResponse {
 	public String getNextVersion(){
 		return nextVersionIsSet ? nextVersion : null;
 	}
-	/*
-		Check if has a value for nextVersion 
+	/**
+	 * Check if has a value for nextVersion 
 	 */	@JsonIgnore
 	public boolean hasNextVersion(){
 		return nextVersionIsSet;
 	}
 
-	/*
-		NextVersionRound is the round at which the next consensus version will apply 
+	/**
+	 * NextVersionRound is the round at which the next consensus version will apply 
 	 */
 	private long nextVersionRound;
 	private boolean nextVersionRoundIsSet;
@@ -108,16 +108,16 @@ public class NodeStatusResponse {
 	public Long getNextVersionRound(){
 		return nextVersionRoundIsSet ? nextVersionRound : null;
 	}
-	/*
-		Check if has a value for nextVersionRound 
+	/**
+	 * Check if has a value for nextVersionRound 
 	 */	@JsonIgnore
 	public boolean hasNextVersionRound(){
 		return nextVersionRoundIsSet;
 	}
 
-	/*
-		NextVersionSupported indicates whether the next consensus version is supported 
-		by this node 
+	/**
+	 * NextVersionSupported indicates whether the next consensus version is supported 
+	 * by this node 
 	 */
 	private boolean nextVersionSupported;
 	private boolean nextVersionSupportedIsSet;
@@ -130,16 +130,16 @@ public class NodeStatusResponse {
 	public Boolean getNextVersionSupported(){
 		return nextVersionSupportedIsSet ? nextVersionSupported : null;
 	}
-	/*
-		Check if has a value for nextVersionSupported 
+	/**
+	 * Check if has a value for nextVersionSupported 
 	 */	@JsonIgnore
 	public boolean hasNextVersionSupported(){
 		return nextVersionSupportedIsSet;
 	}
 
-	/*
-		StoppedAtUnsupportedRound indicates that the node does not support the new 
-		rounds and has stopped making progress 
+	/**
+	 * StoppedAtUnsupportedRound indicates that the node does not support the new 
+	 * rounds and has stopped making progress 
 	 */
 	private boolean stoppedAtUnsupportedRound;
 	private boolean stoppedAtUnsupportedRoundIsSet;
@@ -152,15 +152,15 @@ public class NodeStatusResponse {
 	public Boolean getStoppedAtUnsupportedRound(){
 		return stoppedAtUnsupportedRoundIsSet ? stoppedAtUnsupportedRound : null;
 	}
-	/*
-		Check if has a value for stoppedAtUnsupportedRound 
+	/**
+	 * Check if has a value for stoppedAtUnsupportedRound 
 	 */	@JsonIgnore
 	public boolean hasStoppedAtUnsupportedRound(){
 		return stoppedAtUnsupportedRoundIsSet;
 	}
 
-	/*
-		TimeSinceLastRound in nanoseconds 
+	/**
+	 * TimeSinceLastRound in nanoseconds 
 	 */
 	private long timeSinceLastRound;
 	private boolean timeSinceLastRoundIsSet;
@@ -173,8 +173,8 @@ public class NodeStatusResponse {
 	public Long getTimeSinceLastRound(){
 		return timeSinceLastRoundIsSet ? timeSinceLastRound : null;
 	}
-	/*
-		Check if has a value for timeSinceLastRound 
+	/**
+	 * Check if has a value for timeSinceLastRound 
 	 */	@JsonIgnore
 	public boolean hasTimeSinceLastRound(){
 		return timeSinceLastRoundIsSet;

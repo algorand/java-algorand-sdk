@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 
-/*
-	/v2/transactions/params 
+/**
+ * /v2/transactions/params 
  */
 public class TransactionParams extends Query {
 

@@ -10,14 +10,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	(lsig) Programatic transaction signature. Definition: 
-	data/transactions/logicsig.go 
+/**
+ * (lsig) Programatic transaction signature. Definition: 
+ * data/transactions/logicsig.go 
  */
 public class TransactionSignatureLogicsig {
 
-	/*
-		(arg) Logic arguments, base64 encoded. 
+	/**
+	 * (arg) Logic arguments, base64 encoded. 
 	 */
 	private List<String> args;
 	private boolean argsIsSet;
@@ -30,16 +30,16 @@ public class TransactionSignatureLogicsig {
 	public List<String> getArgs(){
 		return argsIsSet ? args : null;
 	}
-	/*
-		Check if has a value for args 
+	/**
+	 * Check if has a value for args 
 	 */	@JsonIgnore
 	public boolean hasArgs(){
 		return argsIsSet;
 	}
 
-	/*
-		(l) Program signed by a signature or multi signature, or hashed to be the 
-		address of ana ccount. Base64 encoded TEAL program. 
+	/**
+	 * (l) Program signed by a signature or multi signature, or hashed to be the 
+	 * address of ana ccount. Base64 encoded TEAL program. 
 	 */
 	private String logic;
 	private boolean logicIsSet;
@@ -52,8 +52,8 @@ public class TransactionSignatureLogicsig {
 	public String getLogic(){
 		return logicIsSet ? logic : null;
 	}
-	/*
-		Check if has a value for logic 
+	/**
+	 * Check if has a value for logic 
 	 */	@JsonIgnore
 	public boolean hasLogic(){
 		return logicIsSet;
@@ -70,15 +70,15 @@ public class TransactionSignatureLogicsig {
 	public TransactionSignatureMultisig getMultisigSignature(){
 		return multisigSignatureIsSet ? multisigSignature : null;
 	}
-	/*
-		Check if has a value for multisigSignature 
+	/**
+	 * Check if has a value for multisigSignature 
 	 */	@JsonIgnore
 	public boolean hasMultisigSignature(){
 		return multisigSignatureIsSet;
 	}
 
-	/*
-		(sig) ed25519 signature. 
+	/**
+	 * (sig) ed25519 signature. 
 	 */
 	private String signature;
 	private boolean signatureIsSet;
@@ -91,8 +91,8 @@ public class TransactionSignatureLogicsig {
 	public String getSignature(){
 		return signatureIsSet ? signature : null;
 	}
-	/*
-		Check if has a value for signature 
+	/**
+	 * Check if has a value for signature 
 	 */	@JsonIgnore
 	public boolean hasSignature(){
 		return signatureIsSet;

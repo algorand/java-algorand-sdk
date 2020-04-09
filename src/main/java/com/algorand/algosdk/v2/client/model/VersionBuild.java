@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	the current algod build version information. 
+/**
+ * the current algod build version information. 
  */
 public class VersionBuild {
 
@@ -25,8 +25,8 @@ public class VersionBuild {
 	public String getBranch(){
 		return branchIsSet ? branch : null;
 	}
-	/*
-		Check if has a value for branch 
+	/**
+	 * Check if has a value for branch 
 	 */	@JsonIgnore
 	public boolean hasBranch(){
 		return branchIsSet;
@@ -43,8 +43,8 @@ public class VersionBuild {
 	public Long getBuildNumber(){
 		return buildNumberIsSet ? buildNumber : null;
 	}
-	/*
-		Check if has a value for buildNumber 
+	/**
+	 * Check if has a value for buildNumber 
 	 */	@JsonIgnore
 	public boolean hasBuildNumber(){
 		return buildNumberIsSet;
@@ -61,8 +61,8 @@ public class VersionBuild {
 	public String getChannel(){
 		return channelIsSet ? channel : null;
 	}
-	/*
-		Check if has a value for channel 
+	/**
+	 * Check if has a value for channel 
 	 */	@JsonIgnore
 	public boolean hasChannel(){
 		return channelIsSet;
@@ -79,8 +79,8 @@ public class VersionBuild {
 	public String getCommitHash(){
 		return commitHashIsSet ? commitHash : null;
 	}
-	/*
-		Check if has a value for commitHash 
+	/**
+	 * Check if has a value for commitHash 
 	 */	@JsonIgnore
 	public boolean hasCommitHash(){
 		return commitHashIsSet;
@@ -97,8 +97,8 @@ public class VersionBuild {
 	public Long getMajor(){
 		return majorIsSet ? major : null;
 	}
-	/*
-		Check if has a value for major 
+	/**
+	 * Check if has a value for major 
 	 */	@JsonIgnore
 	public boolean hasMajor(){
 		return majorIsSet;
@@ -115,8 +115,8 @@ public class VersionBuild {
 	public Long getMinor(){
 		return minorIsSet ? minor : null;
 	}
-	/*
-		Check if has a value for minor 
+	/**
+	 * Check if has a value for minor 
 	 */	@JsonIgnore
 	public boolean hasMinor(){
 		return minorIsSet;

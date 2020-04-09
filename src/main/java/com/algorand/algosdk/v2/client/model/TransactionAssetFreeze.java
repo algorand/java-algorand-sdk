@@ -9,14 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields for an asset freeze transaction. Definition: data/transactions/asset.go : 
-	AssetFreezeTxnFields 
+/**
+ * Fields for an asset freeze transaction. Definition: data/transactions/asset.go : 
+ * AssetFreezeTxnFields 
  */
 public class TransactionAssetFreeze {
 
-	/*
-		(fadd) Address of the account whose asset is being frozen or thawed. 
+	/**
+	 * (fadd) Address of the account whose asset is being frozen or thawed. 
 	 */
 	private String address;
 	private boolean addressIsSet;
@@ -29,15 +29,15 @@ public class TransactionAssetFreeze {
 	public String getAddress(){
 		return addressIsSet ? address : null;
 	}
-	/*
-		Check if has a value for address 
+	/**
+	 * Check if has a value for address 
 	 */	@JsonIgnore
 	public boolean hasAddress(){
 		return addressIsSet;
 	}
 
-	/*
-		(faid) ID of the asset being frozen or thawed. 
+	/**
+	 * (faid) ID of the asset being frozen or thawed. 
 	 */
 	private long assetId;
 	private boolean assetIdIsSet;
@@ -50,15 +50,15 @@ public class TransactionAssetFreeze {
 	public Long getAssetId(){
 		return assetIdIsSet ? assetId : null;
 	}
-	/*
-		Check if has a value for assetId 
+	/**
+	 * Check if has a value for assetId 
 	 */	@JsonIgnore
 	public boolean hasAssetId(){
 		return assetIdIsSet;
 	}
 
-	/*
-		(afrz) The new freeze status. 
+	/**
+	 * (afrz) The new freeze status. 
 	 */
 	private boolean newFreezeStatus;
 	private boolean newFreezeStatusIsSet;
@@ -71,8 +71,8 @@ public class TransactionAssetFreeze {
 	public Boolean getNewFreezeStatus(){
 		return newFreezeStatusIsSet ? newFreezeStatus : null;
 	}
-	/*
-		Check if has a value for newFreezeStatus 
+	/**
+	 * Check if has a value for newFreezeStatus 
 	 */	@JsonIgnore
 	public boolean hasNewFreezeStatus(){
 		return newFreezeStatusIsSet;

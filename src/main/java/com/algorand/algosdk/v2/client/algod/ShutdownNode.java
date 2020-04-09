@@ -8,10 +8,10 @@ import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Special management endpoint to shutdown the node. Optionally provide a timeout 
-	parameter to indicate that the node should begin shutting down after a number of 
-	seconds. /v2/shutdown 
+/**
+ * Special management endpoint to shutdown the node. Optionally provide a timeout 
+ * parameter to indicate that the node should begin shutting down after a number of 
+ * seconds. /v2/shutdown 
  */
 public class ShutdownNode extends Query {
 	private long timeout;

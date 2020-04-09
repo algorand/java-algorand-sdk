@@ -22,15 +22,15 @@ public class AssetBalancesResponse {
 	public List<MiniAssetHolding> getBalances(){
 		return balancesIsSet ? balances : null;
 	}
-	/*
-		Check if has a value for balances 
+	/**
+	 * Check if has a value for balances 
 	 */	@JsonIgnore
 	public boolean hasBalances(){
 		return balancesIsSet;
 	}
 
-	/*
-		Round at which the results were computed. 
+	/**
+	 * Round at which the results were computed. 
 	 */
 	private long currentRound;
 	private boolean currentRoundIsSet;
@@ -43,16 +43,16 @@ public class AssetBalancesResponse {
 	public Long getCurrentRound(){
 		return currentRoundIsSet ? currentRound : null;
 	}
-	/*
-		Check if has a value for currentRound 
+	/**
+	 * Check if has a value for currentRound 
 	 */	@JsonIgnore
 	public boolean hasCurrentRound(){
 		return currentRoundIsSet;
 	}
 
-	/*
-		Used for pagination, when making another request provide this token with the 
-		next parameter. 
+	/**
+	 * Used for pagination, when making another request provide this token with the 
+	 * next parameter. 
 	 */
 	private String nextToken;
 	private boolean nextTokenIsSet;
@@ -65,8 +65,8 @@ public class AssetBalancesResponse {
 	public String getNextToken(){
 		return nextTokenIsSet ? nextToken : null;
 	}
-	/*
-		Check if has a value for nextToken 
+	/**
+	 * Check if has a value for nextToken 
 	 */	@JsonIgnore
 	public boolean hasNextToken(){
 		return nextTokenIsSet;

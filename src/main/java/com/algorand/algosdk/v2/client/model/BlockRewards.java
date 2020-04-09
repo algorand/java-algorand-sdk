@@ -9,13 +9,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields relating to rewards, 
+/**
+ * Fields relating to rewards, 
  */
 public class BlockRewards {
 
-	/*
-		(fees) accepts transaction fees, it can only spend to the incentive pool. 
+	/**
+	 * (fees) accepts transaction fees, it can only spend to the incentive pool. 
 	 */
 	private String feeSink;
 	private boolean feeSinkIsSet;
@@ -28,16 +28,16 @@ public class BlockRewards {
 	public String getFeeSink(){
 		return feeSinkIsSet ? feeSink : null;
 	}
-	/*
-		Check if has a value for feeSink 
+	/**
+	 * Check if has a value for feeSink 
 	 */	@JsonIgnore
 	public boolean hasFeeSink(){
 		return feeSinkIsSet;
 	}
 
-	/*
-		(rwcalr) number of leftover MicroAlgos after the distribution of rewards-rate 
-		MicroAlgos for every reward unit in the next round. 
+	/**
+	 * (rwcalr) number of leftover MicroAlgos after the distribution of rewards-rate 
+	 * MicroAlgos for every reward unit in the next round. 
 	 */
 	private long rewardsCalculationRound;
 	private boolean rewardsCalculationRoundIsSet;
@@ -50,16 +50,16 @@ public class BlockRewards {
 	public Long getRewardsCalculationRound(){
 		return rewardsCalculationRoundIsSet ? rewardsCalculationRound : null;
 	}
-	/*
-		Check if has a value for rewardsCalculationRound 
+	/**
+	 * Check if has a value for rewardsCalculationRound 
 	 */	@JsonIgnore
 	public boolean hasRewardsCalculationRound(){
 		return rewardsCalculationRoundIsSet;
 	}
 
-	/*
-		(earn) How many rewards, in MicroAlgos, have been distributed to each RewardUnit 
-		of MicroAlgos since genesis. 
+	/**
+	 * (earn) How many rewards, in MicroAlgos, have been distributed to each RewardUnit 
+	 * of MicroAlgos since genesis. 
 	 */
 	private long rewardsLevel;
 	private boolean rewardsLevelIsSet;
@@ -72,16 +72,16 @@ public class BlockRewards {
 	public Long getRewardsLevel(){
 		return rewardsLevelIsSet ? rewardsLevel : null;
 	}
-	/*
-		Check if has a value for rewardsLevel 
+	/**
+	 * Check if has a value for rewardsLevel 
 	 */	@JsonIgnore
 	public boolean hasRewardsLevel(){
 		return rewardsLevelIsSet;
 	}
 
-	/*
-		(rwd) accepts periodic injections from the fee-sink and continually 
-		redistributes them as rewards. 
+	/**
+	 * (rwd) accepts periodic injections from the fee-sink and continually 
+	 * redistributes them as rewards. 
 	 */
 	private String rewardsPool;
 	private boolean rewardsPoolIsSet;
@@ -94,16 +94,16 @@ public class BlockRewards {
 	public String getRewardsPool(){
 		return rewardsPoolIsSet ? rewardsPool : null;
 	}
-	/*
-		Check if has a value for rewardsPool 
+	/**
+	 * Check if has a value for rewardsPool 
 	 */	@JsonIgnore
 	public boolean hasRewardsPool(){
 		return rewardsPoolIsSet;
 	}
 
-	/*
-		(rate) Number of new MicroAlgos added to the participation stake from rewards at 
-		the next round. 
+	/**
+	 * (rate) Number of new MicroAlgos added to the participation stake from rewards at 
+	 * the next round. 
 	 */
 	private long rewardsRate;
 	private boolean rewardsRateIsSet;
@@ -116,16 +116,16 @@ public class BlockRewards {
 	public Long getRewardsRate(){
 		return rewardsRateIsSet ? rewardsRate : null;
 	}
-	/*
-		Check if has a value for rewardsRate 
+	/**
+	 * Check if has a value for rewardsRate 
 	 */	@JsonIgnore
 	public boolean hasRewardsRate(){
 		return rewardsRateIsSet;
 	}
 
-	/*
-		(frac) Number of leftover MicroAlgos after the distribution of 
-		RewardsRate/rewardUnits MicroAlgos for every reward unit in the next round. 
+	/**
+	 * (frac) Number of leftover MicroAlgos after the distribution of 
+	 * RewardsRate/rewardUnits MicroAlgos for every reward unit in the next round. 
 	 */
 	private long rewardsResidue;
 	private boolean rewardsResidueIsSet;
@@ -138,8 +138,8 @@ public class BlockRewards {
 	public Long getRewardsResidue(){
 		return rewardsResidueIsSet ? rewardsResidue : null;
 	}
-	/*
-		Check if has a value for rewardsResidue 
+	/**
+	 * Check if has a value for rewardsResidue 
 	 */	@JsonIgnore
 	public boolean hasRewardsResidue(){
 		return rewardsResidueIsSet;

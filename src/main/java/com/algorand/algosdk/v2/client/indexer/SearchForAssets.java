@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AssetsResponse;
 
 
-/*
-	Search for assets. /assets 
+/**
+ * Search for assets. /assets 
  */
 public class SearchForAssets extends Query {
 	private long assetId;

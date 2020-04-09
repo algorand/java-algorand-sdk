@@ -8,8 +8,8 @@ import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	/v2/blocks/{round} 
+/**
+ * /v2/blocks/{round} 
  */
 public class GetBlock extends Query {
 	private String format;

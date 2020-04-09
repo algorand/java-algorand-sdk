@@ -1,4 +1,4 @@
-package com.algorand.sdkutils;
+package com.algorand.sdkutils.generators;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,7 +11,6 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -105,14 +104,15 @@ public class Generator {
 		comment = comment.replace("\\[", "(");
 		comment = comment.replace("\\]", ")");
 
-		sb.append("\n"+tab+"/*\n"+tab+"\t");
+		sb.append("\n"+tab+"/**");
+		sb.append("\n"+tab+" * ");
 		StringTokenizer st = new StringTokenizer(comment);
 		int line = 0;
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
 			if (line + token.length() > 80) {
 				line = 0;
-				sb.append("\n\t"+tab);
+				sb.append("\n"+tab+" * ");
 			} 
 			sb.append(token + " ");
 			line += token.length() + 1;
@@ -543,6 +543,10 @@ public class Generator {
 		}		
 	}
 
+	public Generator (JsonNode root) {
+		this.root = root;
+	}
+	
 	public static void main(String [] args) throws JsonProcessingException, IOException {
 
 		if (args.length != 2) {
@@ -555,8 +559,7 @@ public class Generator {
 		JsonNode root = getRoot(fis);	
 		String rootPath = args[1]; // com.algorand.algosdk
 
-		Generator g = new Generator();
-		g.root = root;
+		Generator g = new Generator(root);
 
 		// Generate classes from the schemas
 		// com.algorand.algosdk.v2.client.model

@@ -10,9 +10,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Note that we annotate this as a model so that legacy clients can directly import 
-	a swagger generated Version model. 
+/**
+ * Note that we annotate this as a model so that legacy clients can directly import 
+ * a swagger generated Version model. 
  */
 public class Version {
 
@@ -27,8 +27,8 @@ public class Version {
 	public VersionBuild getBuild(){
 		return buildIsSet ? build : null;
 	}
-	/*
-		Check if has a value for build 
+	/**
+	 * Check if has a value for build 
 	 */	@JsonIgnore
 	public boolean hasBuild(){
 		return buildIsSet;
@@ -45,8 +45,8 @@ public class Version {
 	public String getGenesisHash(){
 		return genesisHashIsSet ? genesisHash : null;
 	}
-	/*
-		Check if has a value for genesisHash 
+	/**
+	 * Check if has a value for genesisHash 
 	 */	@JsonIgnore
 	public boolean hasGenesisHash(){
 		return genesisHashIsSet;
@@ -63,8 +63,8 @@ public class Version {
 	public String getGenesisId(){
 		return genesisIdIsSet ? genesisId : null;
 	}
-	/*
-		Check if has a value for genesisId 
+	/**
+	 * Check if has a value for genesisId 
 	 */	@JsonIgnore
 	public boolean hasGenesisId(){
 		return genesisIdIsSet;
@@ -81,8 +81,8 @@ public class Version {
 	public List<String> getVersions(){
 		return versionsIsSet ? versions : null;
 	}
-	/*
-		Check if has a value for versions 
+	/**
+	 * Check if has a value for versions 
 	 */	@JsonIgnore
 	public boolean hasVersions(){
 		return versionsIsSet;

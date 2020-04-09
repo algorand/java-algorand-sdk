@@ -22,15 +22,15 @@ public class AssetsResponse {
 	public List<Asset> getAssets(){
 		return assetsIsSet ? assets : null;
 	}
-	/*
-		Check if has a value for assets 
+	/**
+	 * Check if has a value for assets 
 	 */	@JsonIgnore
 	public boolean hasAssets(){
 		return assetsIsSet;
 	}
 
-	/*
-		Round at which the results were computed. 
+	/**
+	 * Round at which the results were computed. 
 	 */
 	private long currentRound;
 	private boolean currentRoundIsSet;
@@ -43,16 +43,16 @@ public class AssetsResponse {
 	public Long getCurrentRound(){
 		return currentRoundIsSet ? currentRound : null;
 	}
-	/*
-		Check if has a value for currentRound 
+	/**
+	 * Check if has a value for currentRound 
 	 */	@JsonIgnore
 	public boolean hasCurrentRound(){
 		return currentRoundIsSet;
 	}
 
-	/*
-		Used for pagination, when making another request provide this token with the 
-		next parameter. 
+	/**
+	 * Used for pagination, when making another request provide this token with the 
+	 * next parameter. 
 	 */
 	private String nextToken;
 	private boolean nextTokenIsSet;
@@ -65,8 +65,8 @@ public class AssetsResponse {
 	public String getNextToken(){
 		return nextTokenIsSet ? nextToken : null;
 	}
-	/*
-		Check if has a value for nextToken 
+	/**
+	 * Check if has a value for nextToken 
 	 */	@JsonIgnore
 	public boolean hasNextToken(){
 		return nextTokenIsSet;

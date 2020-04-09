@@ -9,13 +9,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Specifies both the unique identifier and the parameters for an asset 
+/**
+ * Specifies both the unique identifier and the parameters for an asset 
  */
 public class Asset {
 
-	/*
-		unique asset identifier 
+	/**
+	 * unique asset identifier 
 	 */
 	private long index;
 	private boolean indexIsSet;
@@ -28,8 +28,8 @@ public class Asset {
 	public Long getIndex(){
 		return indexIsSet ? index : null;
 	}
-	/*
-		Check if has a value for index 
+	/**
+	 * Check if has a value for index 
 	 */	@JsonIgnore
 	public boolean hasIndex(){
 		return indexIsSet;
@@ -46,8 +46,8 @@ public class Asset {
 	public AssetParams getParams(){
 		return paramsIsSet ? params : null;
 	}
-	/*
-		Check if has a value for params 
+	/**
+	 * Check if has a value for params 
 	 */	@JsonIgnore
 	public boolean hasParams(){
 		return paramsIsSet;

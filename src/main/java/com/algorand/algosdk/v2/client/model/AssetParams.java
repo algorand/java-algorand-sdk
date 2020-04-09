@@ -9,15 +9,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	AssetParams specifies the parameters for an asset. (apar) when part of an 
-	AssetConfig transaction. Definition: data/transactions/asset.go : AssetParams 
+/**
+ * AssetParams specifies the parameters for an asset. (apar) when part of an 
+ * AssetConfig transaction. Definition: data/transactions/asset.go : AssetParams 
  */
 public class AssetParams {
 
-	/*
-		(c) Address of account used to clawback holdings of this asset. If empty, 
-		clawback is not permitted. 
+	/**
+	 * (c) Address of account used to clawback holdings of this asset. If empty, 
+	 * clawback is not permitted. 
 	 */
 	private String clawback;
 	private boolean clawbackIsSet;
@@ -30,17 +30,17 @@ public class AssetParams {
 	public String getClawback(){
 		return clawbackIsSet ? clawback : null;
 	}
-	/*
-		Check if has a value for clawback 
+	/**
+	 * Check if has a value for clawback 
 	 */	@JsonIgnore
 	public boolean hasClawback(){
 		return clawbackIsSet;
 	}
 
-	/*
-		The address that created this asset. This is the address where the parameters 
-		for this asset can be found, and also the address where unwanted asset units can 
-		be sent in the worst case. 
+	/**
+	 * The address that created this asset. This is the address where the parameters 
+	 * for this asset can be found, and also the address where unwanted asset units can 
+	 * be sent in the worst case. 
 	 */
 	private String creator;
 	private boolean creatorIsSet;
@@ -53,18 +53,18 @@ public class AssetParams {
 	public String getCreator(){
 		return creatorIsSet ? creator : null;
 	}
-	/*
-		Check if has a value for creator 
+	/**
+	 * Check if has a value for creator 
 	 */	@JsonIgnore
 	public boolean hasCreator(){
 		return creatorIsSet;
 	}
 
-	/*
-		(dc) The number of digits to use after the decimal point when displaying this 
-		asset. If 0, the asset is not divisible. If 1, the base unit of the asset is in 
-		tenths. If 2, the base unit of the asset is in hundredths, and so on. This value 
-		must be between 0 and 19 (inclusive). 
+	/**
+	 * (dc) The number of digits to use after the decimal point when displaying this 
+	 * asset. If 0, the asset is not divisible. If 1, the base unit of the asset is in 
+	 * tenths. If 2, the base unit of the asset is in hundredths, and so on. This value 
+	 * must be between 0 and 19 (inclusive). 
 	 */
 	private long decimals;
 	private boolean decimalsIsSet;
@@ -77,15 +77,15 @@ public class AssetParams {
 	public Long getDecimals(){
 		return decimalsIsSet ? decimals : null;
 	}
-	/*
-		Check if has a value for decimals 
+	/**
+	 * Check if has a value for decimals 
 	 */	@JsonIgnore
 	public boolean hasDecimals(){
 		return decimalsIsSet;
 	}
 
-	/*
-		(df) Whether holdings of this asset are frozen by default. 
+	/**
+	 * (df) Whether holdings of this asset are frozen by default. 
 	 */
 	private boolean defaultFrozen;
 	private boolean defaultFrozenIsSet;
@@ -98,16 +98,16 @@ public class AssetParams {
 	public Boolean getDefaultFrozen(){
 		return defaultFrozenIsSet ? defaultFrozen : null;
 	}
-	/*
-		Check if has a value for defaultFrozen 
+	/**
+	 * Check if has a value for defaultFrozen 
 	 */	@JsonIgnore
 	public boolean hasDefaultFrozen(){
 		return defaultFrozenIsSet;
 	}
 
-	/*
-		(f) Address of account used to freeze holdings of this asset. If empty, freezing 
-		is not permitted. 
+	/**
+	 * (f) Address of account used to freeze holdings of this asset. If empty, freezing 
+	 * is not permitted. 
 	 */
 	private String freeze;
 	private boolean freezeIsSet;
@@ -120,15 +120,15 @@ public class AssetParams {
 	public String getFreeze(){
 		return freezeIsSet ? freeze : null;
 	}
-	/*
-		Check if has a value for freeze 
+	/**
+	 * Check if has a value for freeze 
 	 */	@JsonIgnore
 	public boolean hasFreeze(){
 		return freezeIsSet;
 	}
 
-	/*
-		(m) Address of account used to manage the keys of this asset and to destroy it. 
+	/**
+	 * (m) Address of account used to manage the keys of this asset and to destroy it. 
 	 */
 	private String manager;
 	private boolean managerIsSet;
@@ -141,16 +141,16 @@ public class AssetParams {
 	public String getManager(){
 		return managerIsSet ? manager : null;
 	}
-	/*
-		Check if has a value for manager 
+	/**
+	 * Check if has a value for manager 
 	 */	@JsonIgnore
 	public boolean hasManager(){
 		return managerIsSet;
 	}
 
-	/*
-		(am) A commitment to some unspecified asset metadata. The format of this 
-		metadata is up to the application. 
+	/**
+	 * (am) A commitment to some unspecified asset metadata. The format of this 
+	 * metadata is up to the application. 
 	 */
 	private String metadataHash;
 	private boolean metadataHashIsSet;
@@ -163,15 +163,15 @@ public class AssetParams {
 	public String getMetadataHash(){
 		return metadataHashIsSet ? metadataHash : null;
 	}
-	/*
-		Check if has a value for metadataHash 
+	/**
+	 * Check if has a value for metadataHash 
 	 */	@JsonIgnore
 	public boolean hasMetadataHash(){
 		return metadataHashIsSet;
 	}
 
-	/*
-		(an) Name of this asset, as supplied by the creator. 
+	/**
+	 * (an) Name of this asset, as supplied by the creator. 
 	 */
 	private String name;
 	private boolean nameIsSet;
@@ -184,15 +184,15 @@ public class AssetParams {
 	public String getName(){
 		return nameIsSet ? name : null;
 	}
-	/*
-		Check if has a value for name 
+	/**
+	 * Check if has a value for name 
 	 */	@JsonIgnore
 	public boolean hasName(){
 		return nameIsSet;
 	}
 
-	/*
-		(r) Address of account holding reserve (non-minted) units of this asset. 
+	/**
+	 * (r) Address of account holding reserve (non-minted) units of this asset. 
 	 */
 	private String reserve;
 	private boolean reserveIsSet;
@@ -205,15 +205,15 @@ public class AssetParams {
 	public String getReserve(){
 		return reserveIsSet ? reserve : null;
 	}
-	/*
-		Check if has a value for reserve 
+	/**
+	 * Check if has a value for reserve 
 	 */	@JsonIgnore
 	public boolean hasReserve(){
 		return reserveIsSet;
 	}
 
-	/*
-		(t) The total number of units of this asset. 
+	/**
+	 * (t) The total number of units of this asset. 
 	 */
 	private long total;
 	private boolean totalIsSet;
@@ -226,15 +226,15 @@ public class AssetParams {
 	public Long getTotal(){
 		return totalIsSet ? total : null;
 	}
-	/*
-		Check if has a value for total 
+	/**
+	 * Check if has a value for total 
 	 */	@JsonIgnore
 	public boolean hasTotal(){
 		return totalIsSet;
 	}
 
-	/*
-		(un) Name of a unit of this asset, as supplied by the creator. 
+	/**
+	 * (un) Name of a unit of this asset, as supplied by the creator. 
 	 */
 	private String unitName;
 	private boolean unitNameIsSet;
@@ -247,15 +247,15 @@ public class AssetParams {
 	public String getUnitName(){
 		return unitNameIsSet ? unitName : null;
 	}
-	/*
-		Check if has a value for unitName 
+	/**
+	 * Check if has a value for unitName 
 	 */	@JsonIgnore
 	public boolean hasUnitName(){
 		return unitNameIsSet;
 	}
 
-	/*
-		(au) URL where more information about the asset can be retrieved. 
+	/**
+	 * (au) URL where more information about the asset can be retrieved. 
 	 */
 	private String url;
 	private boolean urlIsSet;
@@ -268,8 +268,8 @@ public class AssetParams {
 	public String getUrl(){
 		return urlIsSet ? url : null;
 	}
-	/*
-		Check if has a value for url 
+	/**
+	 * Check if has a value for url 
 	 */	@JsonIgnore
 	public boolean hasUrl(){
 		return urlIsSet;

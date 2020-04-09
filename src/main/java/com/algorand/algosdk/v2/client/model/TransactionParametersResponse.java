@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TransactionParametersResponse {
 
-	/*
-		ConsensusVersion indicates the consensus protocol version as of LastRound. 
+	/**
+	 * ConsensusVersion indicates the consensus protocol version as of LastRound. 
 	 */
 	private String consensusVersion;
 	private boolean consensusVersionIsSet;
@@ -24,17 +24,17 @@ public class TransactionParametersResponse {
 	public String getConsensusVersion(){
 		return consensusVersionIsSet ? consensusVersion : null;
 	}
-	/*
-		Check if has a value for consensusVersion 
+	/**
+	 * Check if has a value for consensusVersion 
 	 */	@JsonIgnore
 	public boolean hasConsensusVersion(){
 		return consensusVersionIsSet;
 	}
 
-	/*
-		Fee is the suggested transaction fee Fee is in units of micro-Algos per byte. 
-		Fee may fall to zero but transactions must still have a fee of at least 
-		MinTxnFee for the current network protocol. 
+	/**
+	 * Fee is the suggested transaction fee Fee is in units of micro-Algos per byte. 
+	 * Fee may fall to zero but transactions must still have a fee of at least 
+	 * MinTxnFee for the current network protocol. 
 	 */
 	private long fee;
 	private boolean feeIsSet;
@@ -47,15 +47,15 @@ public class TransactionParametersResponse {
 	public Long getFee(){
 		return feeIsSet ? fee : null;
 	}
-	/*
-		Check if has a value for fee 
+	/**
+	 * Check if has a value for fee 
 	 */	@JsonIgnore
 	public boolean hasFee(){
 		return feeIsSet;
 	}
 
-	/*
-		GenesisHash is the hash of the genesis block. 
+	/**
+	 * GenesisHash is the hash of the genesis block. 
 	 */
 	private String genesisHash;
 	private boolean genesisHashIsSet;
@@ -68,15 +68,15 @@ public class TransactionParametersResponse {
 	public String getGenesisHash(){
 		return genesisHashIsSet ? genesisHash : null;
 	}
-	/*
-		Check if has a value for genesisHash 
+	/**
+	 * Check if has a value for genesisHash 
 	 */	@JsonIgnore
 	public boolean hasGenesisHash(){
 		return genesisHashIsSet;
 	}
 
-	/*
-		GenesisID is an ID listed in the genesis block. 
+	/**
+	 * GenesisID is an ID listed in the genesis block. 
 	 */
 	private String genesisId;
 	private boolean genesisIdIsSet;
@@ -89,15 +89,15 @@ public class TransactionParametersResponse {
 	public String getGenesisId(){
 		return genesisIdIsSet ? genesisId : null;
 	}
-	/*
-		Check if has a value for genesisId 
+	/**
+	 * Check if has a value for genesisId 
 	 */	@JsonIgnore
 	public boolean hasGenesisId(){
 		return genesisIdIsSet;
 	}
 
-	/*
-		LastRound indicates the last round seen 
+	/**
+	 * LastRound indicates the last round seen 
 	 */
 	private long lastRound;
 	private boolean lastRoundIsSet;
@@ -110,16 +110,16 @@ public class TransactionParametersResponse {
 	public Long getLastRound(){
 		return lastRoundIsSet ? lastRound : null;
 	}
-	/*
-		Check if has a value for lastRound 
+	/**
+	 * Check if has a value for lastRound 
 	 */	@JsonIgnore
 	public boolean hasLastRound(){
 		return lastRoundIsSet;
 	}
 
-	/*
-		The minimum transaction fee (not per byte) required for the txn to validate for 
-		the current network protocol. 
+	/**
+	 * The minimum transaction fee (not per byte) required for the txn to validate for 
+	 * the current network protocol. 
 	 */
 	private long minFee;
 	private boolean minFeeIsSet;
@@ -132,8 +132,8 @@ public class TransactionParametersResponse {
 	public Long getMinFee(){
 		return minFeeIsSet ? minFee : null;
 	}
-	/*
-		Check if has a value for minFee 
+	/**
+	 * Check if has a value for minFee 
 	 */	@JsonIgnore
 	public boolean hasMinFee(){
 		return minFeeIsSet;

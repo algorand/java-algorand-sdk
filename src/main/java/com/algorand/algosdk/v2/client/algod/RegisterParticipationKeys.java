@@ -8,9 +8,9 @@ import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Generate (or renew) and register participation keys on the node for a given 
-	account address. /v2/register-participation-keys/{address} 
+/**
+ * Generate (or renew) and register participation keys on the node for a given 
+ * account address. /v2/register-participation-keys/{address} 
  */
 public class RegisterParticipationKeys extends Query {
 	private String address;

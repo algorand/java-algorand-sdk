@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
-/*
-	Search for transactions. /transactions 
+/**
+ * Search for transactions. /transactions 
  */
 public class SearchForTransactions extends Query {
 	private String address;

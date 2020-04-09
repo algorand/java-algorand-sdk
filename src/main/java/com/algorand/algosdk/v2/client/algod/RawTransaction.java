@@ -8,8 +8,8 @@ import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	/v2/transactions 
+/**
+ * /v2/transactions 
  */
 public class RawTransaction extends Query {
 	private String rawtxn;

@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
-/*
-	Lookup account transactions. /accounts/{account-id}/transactions 
+/**
+ * Lookup account transactions. /accounts/{account-id}/transactions 
  */
 public class LookupAccountTransactions extends Query {
 	private String accountId;

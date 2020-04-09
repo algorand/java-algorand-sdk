@@ -10,14 +10,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	(msig) structure holding multiple subsignatures. Definition: crypto/multisig.go 
-	: MultisigSig 
+/**
+ * (msig) structure holding multiple subsignatures. Definition: crypto/multisig.go 
+ * : MultisigSig 
  */
 public class TransactionSignatureMultisig {
 
-	/*
-		(subsig) holds pairs of public key and signatures. 
+	/**
+	 * (subsig) holds pairs of public key and signatures. 
 	 */
 	private List<TransactionSignatureMultisigSubsignature> subsignature;
 	private boolean subsignatureIsSet;
@@ -30,15 +30,15 @@ public class TransactionSignatureMultisig {
 	public List<TransactionSignatureMultisigSubsignature> getSubsignature(){
 		return subsignatureIsSet ? subsignature : null;
 	}
-	/*
-		Check if has a value for subsignature 
+	/**
+	 * Check if has a value for subsignature 
 	 */	@JsonIgnore
 	public boolean hasSubsignature(){
 		return subsignatureIsSet;
 	}
 
-	/*
-		(thr) 
+	/**
+	 * (thr) 
 	 */
 	private long threshold;
 	private boolean thresholdIsSet;
@@ -51,15 +51,15 @@ public class TransactionSignatureMultisig {
 	public Long getThreshold(){
 		return thresholdIsSet ? threshold : null;
 	}
-	/*
-		Check if has a value for threshold 
+	/**
+	 * Check if has a value for threshold 
 	 */	@JsonIgnore
 	public boolean hasThreshold(){
 		return thresholdIsSet;
 	}
 
-	/*
-		(v) 
+	/**
+	 * (v) 
 	 */
 	private long version;
 	private boolean versionIsSet;
@@ -72,8 +72,8 @@ public class TransactionSignatureMultisig {
 	public Long getVersion(){
 		return versionIsSet ? version : null;
 	}
-	/*
-		Check if has a value for version 
+	/**
+	 * Check if has a value for version 
 	 */	@JsonIgnore
 	public boolean hasVersion(){
 		return versionIsSet;

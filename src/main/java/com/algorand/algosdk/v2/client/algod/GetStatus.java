@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
 
 
-/*
-	/v2/status 
+/**
+ * /v2/status 
  */
 public class GetStatus extends Query {
 

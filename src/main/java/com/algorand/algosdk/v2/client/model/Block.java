@@ -10,13 +10,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Block information. Definition: data/bookkeeping/block.go : Block 
+/**
+ * Block information. Definition: data/bookkeeping/block.go : Block 
  */
 public class Block {
 
-	/*
-		(gh) hash to which this block belongs. 
+	/**
+	 * (gh) hash to which this block belongs. 
 	 */
 	private String genesisHash;
 	private boolean genesisHashIsSet;
@@ -29,15 +29,15 @@ public class Block {
 	public String getGenesisHash(){
 		return genesisHashIsSet ? genesisHash : null;
 	}
-	/*
-		Check if has a value for genesisHash 
+	/**
+	 * Check if has a value for genesisHash 
 	 */	@JsonIgnore
 	public boolean hasGenesisHash(){
 		return genesisHashIsSet;
 	}
 
-	/*
-		(gen) ID to which this block belongs. 
+	/**
+	 * (gen) ID to which this block belongs. 
 	 */
 	private String genesisId;
 	private boolean genesisIdIsSet;
@@ -50,15 +50,15 @@ public class Block {
 	public String getGenesisId(){
 		return genesisIdIsSet ? genesisId : null;
 	}
-	/*
-		Check if has a value for genesisId 
+	/**
+	 * Check if has a value for genesisId 
 	 */	@JsonIgnore
 	public boolean hasGenesisId(){
 		return genesisIdIsSet;
 	}
 
-	/*
-		(prev) Previous block hash. 
+	/**
+	 * (prev) Previous block hash. 
 	 */
 	private String previousBlockHash;
 	private boolean previousBlockHashIsSet;
@@ -71,8 +71,8 @@ public class Block {
 	public String getPreviousBlockHash(){
 		return previousBlockHashIsSet ? previousBlockHash : null;
 	}
-	/*
-		Check if has a value for previousBlockHash 
+	/**
+	 * Check if has a value for previousBlockHash 
 	 */	@JsonIgnore
 	public boolean hasPreviousBlockHash(){
 		return previousBlockHashIsSet;
@@ -89,15 +89,15 @@ public class Block {
 	public BlockRewards getRewards(){
 		return rewardsIsSet ? rewards : null;
 	}
-	/*
-		Check if has a value for rewards 
+	/**
+	 * Check if has a value for rewards 
 	 */	@JsonIgnore
 	public boolean hasRewards(){
 		return rewardsIsSet;
 	}
 
-	/*
-		(rnd) Current round on which this block was appended to the chain. 
+	/**
+	 * (rnd) Current round on which this block was appended to the chain. 
 	 */
 	private long round;
 	private boolean roundIsSet;
@@ -110,15 +110,15 @@ public class Block {
 	public Long getRound(){
 		return roundIsSet ? round : null;
 	}
-	/*
-		Check if has a value for round 
+	/**
+	 * Check if has a value for round 
 	 */	@JsonIgnore
 	public boolean hasRound(){
 		return roundIsSet;
 	}
 
-	/*
-		(seed) Sortition seed. 
+	/**
+	 * (seed) Sortition seed. 
 	 */
 	private String seed;
 	private boolean seedIsSet;
@@ -131,15 +131,15 @@ public class Block {
 	public String getSeed(){
 		return seedIsSet ? seed : null;
 	}
-	/*
-		Check if has a value for seed 
+	/**
+	 * Check if has a value for seed 
 	 */	@JsonIgnore
 	public boolean hasSeed(){
 		return seedIsSet;
 	}
 
-	/*
-		(ts) Block creation timestamp in seconds since eposh 
+	/**
+	 * (ts) Block creation timestamp in seconds since eposh 
 	 */
 	private long timestamp;
 	private boolean timestampIsSet;
@@ -152,15 +152,15 @@ public class Block {
 	public Long getTimestamp(){
 		return timestampIsSet ? timestamp : null;
 	}
-	/*
-		Check if has a value for timestamp 
+	/**
+	 * Check if has a value for timestamp 
 	 */	@JsonIgnore
 	public boolean hasTimestamp(){
 		return timestampIsSet;
 	}
 
-	/*
-		(txns) list of transactions corresponding to a given round. 
+	/**
+	 * (txns) list of transactions corresponding to a given round. 
 	 */
 	private List<Transaction> transactions;
 	private boolean transactionsIsSet;
@@ -173,20 +173,20 @@ public class Block {
 	public List<Transaction> getTransactions(){
 		return transactionsIsSet ? transactions : null;
 	}
-	/*
-		Check if has a value for transactions 
+	/**
+	 * Check if has a value for transactions 
 	 */	@JsonIgnore
 	public boolean hasTransactions(){
 		return transactionsIsSet;
 	}
 
-	/*
-		(txn) TransactionsRoot authenticates the set of transactions appearing in the 
-		block. More specifically, it's the root of a merkle tree whose leaves are the 
-		block's Txids, in lexicographic order. For the empty block, it's 0. Note that 
-		the TxnRoot does not authenticate the signatures on the transactions, only the 
-		transactions themselves. Two blocks with the same transactions but in a 
-		different order and with different signatures will have the same TxnRoot. 
+	/**
+	 * (txn) TransactionsRoot authenticates the set of transactions appearing in the 
+	 * block. More specifically, it's the root of a merkle tree whose leaves are the 
+	 * block's Txids, in lexicographic order. For the empty block, it's 0. Note that 
+	 * the TxnRoot does not authenticate the signatures on the transactions, only the 
+	 * transactions themselves. Two blocks with the same transactions but in a 
+	 * different order and with different signatures will have the same TxnRoot. 
 	 */
 	private String transactionsRoot;
 	private boolean transactionsRootIsSet;
@@ -199,19 +199,19 @@ public class Block {
 	public String getTransactionsRoot(){
 		return transactionsRootIsSet ? transactionsRoot : null;
 	}
-	/*
-		Check if has a value for transactionsRoot 
+	/**
+	 * Check if has a value for transactionsRoot 
 	 */	@JsonIgnore
 	public boolean hasTransactionsRoot(){
 		return transactionsRootIsSet;
 	}
 
-	/*
-		(tc) TxnCounter counts the number of transactions committed in the ledger, from 
-		the time at which support for this feature was introduced. Specifically, 
-		TxnCounter is the number of the next transaction that will be committed after 
-		this block. It is 0 when no transactions have ever been committed (since 
-		TxnCounter started being supported). 
+	/**
+	 * (tc) TxnCounter counts the number of transactions committed in the ledger, from 
+	 * the time at which support for this feature was introduced. Specifically, 
+	 * TxnCounter is the number of the next transaction that will be committed after 
+	 * this block. It is 0 when no transactions have ever been committed (since 
+	 * TxnCounter started being supported). 
 	 */
 	private long txnCounter;
 	private boolean txnCounterIsSet;
@@ -224,8 +224,8 @@ public class Block {
 	public Long getTxnCounter(){
 		return txnCounterIsSet ? txnCounter : null;
 	}
-	/*
-		Check if has a value for txnCounter 
+	/**
+	 * Check if has a value for txnCounter 
 	 */	@JsonIgnore
 	public boolean hasTxnCounter(){
 		return txnCounterIsSet;
@@ -242,8 +242,8 @@ public class Block {
 	public BlockUpgradeState getUpgradeState(){
 		return upgradeStateIsSet ? upgradeState : null;
 	}
-	/*
-		Check if has a value for upgradeState 
+	/**
+	 * Check if has a value for upgradeState 
 	 */	@JsonIgnore
 	public boolean hasUpgradeState(){
 		return upgradeStateIsSet;
@@ -260,8 +260,8 @@ public class Block {
 	public BlockUpgradeVote getUpgradeVote(){
 		return upgradeVoteIsSet ? upgradeVote : null;
 	}
-	/*
-		Check if has a value for upgradeVote 
+	/**
+	 * Check if has a value for upgradeVote 
 	 */	@JsonIgnore
 	public boolean hasUpgradeVote(){
 		return upgradeVoteIsSet;

@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AccountsResponse;
 
 
-/*
-	Search for accounts. /accounts 
+/**
+ * Search for accounts. /accounts 
  */
 public class SearchAccounts extends Query {
 	private String assetId;

@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.AssetResponse;
 
 
-/*
-	Lookup asset information. /assets/{asset-id} 
+/**
+ * Lookup asset information. /assets/{asset-id} 
  */
 public class LookupAssetByID extends Query {
 	private long assetId;

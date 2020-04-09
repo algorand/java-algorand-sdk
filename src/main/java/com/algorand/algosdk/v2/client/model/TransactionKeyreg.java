@@ -9,14 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields for a keyreg transaction. Definition: data/transactions/keyreg.go : 
-	KeyregTxnFields 
+/**
+ * Fields for a keyreg transaction. Definition: data/transactions/keyreg.go : 
+ * KeyregTxnFields 
  */
 public class TransactionKeyreg {
 
-	/*
-		(nonpart) Mark the account as participating or non-participating. 
+	/**
+	 * (nonpart) Mark the account as participating or non-participating. 
 	 */
 	private boolean nonParticipation;
 	private boolean nonParticipationIsSet;
@@ -29,16 +29,16 @@ public class TransactionKeyreg {
 	public Boolean getNonParticipation(){
 		return nonParticipationIsSet ? nonParticipation : null;
 	}
-	/*
-		Check if has a value for nonParticipation 
+	/**
+	 * Check if has a value for nonParticipation 
 	 */	@JsonIgnore
 	public boolean hasNonParticipation(){
 		return nonParticipationIsSet;
 	}
 
-	/*
-		(selkey) Public key used with the Verified Random Function (VRF) result during 
-		committee selection. 
+	/**
+	 * (selkey) Public key used with the Verified Random Function (VRF) result during 
+	 * committee selection. 
 	 */
 	private String selectionParticipationKey;
 	private boolean selectionParticipationKeyIsSet;
@@ -51,15 +51,15 @@ public class TransactionKeyreg {
 	public String getSelectionParticipationKey(){
 		return selectionParticipationKeyIsSet ? selectionParticipationKey : null;
 	}
-	/*
-		Check if has a value for selectionParticipationKey 
+	/**
+	 * Check if has a value for selectionParticipationKey 
 	 */	@JsonIgnore
 	public boolean hasSelectionParticipationKey(){
 		return selectionParticipationKeyIsSet;
 	}
 
-	/*
-		(votefst) First round this participation key is valid. 
+	/**
+	 * (votefst) First round this participation key is valid. 
 	 */
 	private long voteFirstValid;
 	private boolean voteFirstValidIsSet;
@@ -72,15 +72,15 @@ public class TransactionKeyreg {
 	public Long getVoteFirstValid(){
 		return voteFirstValidIsSet ? voteFirstValid : null;
 	}
-	/*
-		Check if has a value for voteFirstValid 
+	/**
+	 * Check if has a value for voteFirstValid 
 	 */	@JsonIgnore
 	public boolean hasVoteFirstValid(){
 		return voteFirstValidIsSet;
 	}
 
-	/*
-		(votekd) Number of subkeys in each batch of participation keys. 
+	/**
+	 * (votekd) Number of subkeys in each batch of participation keys. 
 	 */
 	private long voteKeyDilution;
 	private boolean voteKeyDilutionIsSet;
@@ -93,15 +93,15 @@ public class TransactionKeyreg {
 	public Long getVoteKeyDilution(){
 		return voteKeyDilutionIsSet ? voteKeyDilution : null;
 	}
-	/*
-		Check if has a value for voteKeyDilution 
+	/**
+	 * Check if has a value for voteKeyDilution 
 	 */	@JsonIgnore
 	public boolean hasVoteKeyDilution(){
 		return voteKeyDilutionIsSet;
 	}
 
-	/*
-		(votelst) Last round this participation key is valid. 
+	/**
+	 * (votelst) Last round this participation key is valid. 
 	 */
 	private long voteLastValid;
 	private boolean voteLastValidIsSet;
@@ -114,15 +114,15 @@ public class TransactionKeyreg {
 	public Long getVoteLastValid(){
 		return voteLastValidIsSet ? voteLastValid : null;
 	}
-	/*
-		Check if has a value for voteLastValid 
+	/**
+	 * Check if has a value for voteLastValid 
 	 */	@JsonIgnore
 	public boolean hasVoteLastValid(){
 		return voteLastValidIsSet;
 	}
 
-	/*
-		(votekey) Participation public key used in key registration transactions. 
+	/**
+	 * (votekey) Participation public key used in key registration transactions. 
 	 */
 	private String voteParticipationKey;
 	private boolean voteParticipationKeyIsSet;
@@ -135,8 +135,8 @@ public class TransactionKeyreg {
 	public String getVoteParticipationKey(){
 		return voteParticipationKeyIsSet ? voteParticipationKey : null;
 	}
-	/*
-		Check if has a value for voteParticipationKey 
+	/**
+	 * Check if has a value for voteParticipationKey 
 	 */	@JsonIgnore
 	public boolean hasVoteParticipationKey(){
 		return voteParticipationKeyIsSet;

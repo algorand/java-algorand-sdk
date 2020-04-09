@@ -9,10 +9,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Contains all fields common to all transactions and serves as an envelope to all 
-	transactions type. Definition: data/transactions/signedtxn.go : SignedTxn 
-	data/transactions/transaction.go : Transaction 
+/**
+ * Contains all fields common to all transactions and serves as an envelope to all 
+ * transactions type. Definition: data/transactions/signedtxn.go : SignedTxn 
+ * data/transactions/transaction.go : Transaction 
  */
 public class Transaction {
 
@@ -27,8 +27,8 @@ public class Transaction {
 	public TransactionAssetConfig getAssetConfigTransaction(){
 		return assetConfigTransactionIsSet ? assetConfigTransaction : null;
 	}
-	/*
-		Check if has a value for assetConfigTransaction 
+	/**
+	 * Check if has a value for assetConfigTransaction 
 	 */	@JsonIgnore
 	public boolean hasAssetConfigTransaction(){
 		return assetConfigTransactionIsSet;
@@ -45,8 +45,8 @@ public class Transaction {
 	public TransactionAssetFreeze getAssetFreezeTransaction(){
 		return assetFreezeTransactionIsSet ? assetFreezeTransaction : null;
 	}
-	/*
-		Check if has a value for assetFreezeTransaction 
+	/**
+	 * Check if has a value for assetFreezeTransaction 
 	 */	@JsonIgnore
 	public boolean hasAssetFreezeTransaction(){
 		return assetFreezeTransactionIsSet;
@@ -63,15 +63,15 @@ public class Transaction {
 	public TransactionAssetTransfer getAssetTransferTransaction(){
 		return assetTransferTransactionIsSet ? assetTransferTransaction : null;
 	}
-	/*
-		Check if has a value for assetTransferTransaction 
+	/**
+	 * Check if has a value for assetTransferTransaction 
 	 */	@JsonIgnore
 	public boolean hasAssetTransferTransaction(){
 		return assetTransferTransactionIsSet;
 	}
 
-	/*
-		(rc) rewards applied to close-remainder-to account. 
+	/**
+	 * (rc) rewards applied to close-remainder-to account. 
 	 */
 	private long closeRewards;
 	private boolean closeRewardsIsSet;
@@ -84,15 +84,15 @@ public class Transaction {
 	public Long getCloseRewards(){
 		return closeRewardsIsSet ? closeRewards : null;
 	}
-	/*
-		Check if has a value for closeRewards 
+	/**
+	 * Check if has a value for closeRewards 
 	 */	@JsonIgnore
 	public boolean hasCloseRewards(){
 		return closeRewardsIsSet;
 	}
 
-	/*
-		(ca) closing amount for transaction. 
+	/**
+	 * (ca) closing amount for transaction. 
 	 */
 	private long closingAmount;
 	private boolean closingAmountIsSet;
@@ -105,15 +105,15 @@ public class Transaction {
 	public Long getClosingAmount(){
 		return closingAmountIsSet ? closingAmount : null;
 	}
-	/*
-		Check if has a value for closingAmount 
+	/**
+	 * Check if has a value for closingAmount 
 	 */	@JsonIgnore
 	public boolean hasClosingAmount(){
 		return closingAmountIsSet;
 	}
 
-	/*
-		Round when the transaction was confirmed. 
+	/**
+	 * Round when the transaction was confirmed. 
 	 */
 	private long confirmedRound;
 	private boolean confirmedRoundIsSet;
@@ -126,15 +126,15 @@ public class Transaction {
 	public Long getConfirmedRound(){
 		return confirmedRoundIsSet ? confirmedRound : null;
 	}
-	/*
-		Check if has a value for confirmedRound 
+	/**
+	 * Check if has a value for confirmedRound 
 	 */	@JsonIgnore
 	public boolean hasConfirmedRound(){
 		return confirmedRoundIsSet;
 	}
 
-	/*
-		Specifies an asset index (ID) if an asset was created with this transaction. 
+	/**
+	 * Specifies an asset index (ID) if an asset was created with this transaction. 
 	 */
 	private long createdAssetIndex;
 	private boolean createdAssetIndexIsSet;
@@ -147,15 +147,15 @@ public class Transaction {
 	public Long getCreatedAssetIndex(){
 		return createdAssetIndexIsSet ? createdAssetIndex : null;
 	}
-	/*
-		Check if has a value for createdAssetIndex 
+	/**
+	 * Check if has a value for createdAssetIndex 
 	 */	@JsonIgnore
 	public boolean hasCreatedAssetIndex(){
 		return createdAssetIndexIsSet;
 	}
 
-	/*
-		(fee) Transaction fee. 
+	/**
+	 * (fee) Transaction fee. 
 	 */
 	private long fee;
 	private boolean feeIsSet;
@@ -168,15 +168,15 @@ public class Transaction {
 	public Long getFee(){
 		return feeIsSet ? fee : null;
 	}
-	/*
-		Check if has a value for fee 
+	/**
+	 * Check if has a value for fee 
 	 */	@JsonIgnore
 	public boolean hasFee(){
 		return feeIsSet;
 	}
 
-	/*
-		(fv) First valid round for this transaction. 
+	/**
+	 * (fv) First valid round for this transaction. 
 	 */
 	private long firstValid;
 	private boolean firstValidIsSet;
@@ -189,15 +189,15 @@ public class Transaction {
 	public Long getFirstValid(){
 		return firstValidIsSet ? firstValid : null;
 	}
-	/*
-		Check if has a value for firstValid 
+	/**
+	 * Check if has a value for firstValid 
 	 */	@JsonIgnore
 	public boolean hasFirstValid(){
 		return firstValidIsSet;
 	}
 
-	/*
-		(gh) Hash of genesis block. 
+	/**
+	 * (gh) Hash of genesis block. 
 	 */
 	private String genesisHash;
 	private boolean genesisHashIsSet;
@@ -210,15 +210,15 @@ public class Transaction {
 	public String getGenesisHash(){
 		return genesisHashIsSet ? genesisHash : null;
 	}
-	/*
-		Check if has a value for genesisHash 
+	/**
+	 * Check if has a value for genesisHash 
 	 */	@JsonIgnore
 	public boolean hasGenesisHash(){
 		return genesisHashIsSet;
 	}
 
-	/*
-		(gen) genesis block ID. 
+	/**
+	 * (gen) genesis block ID. 
 	 */
 	private String genesisId;
 	private boolean genesisIdIsSet;
@@ -231,17 +231,17 @@ public class Transaction {
 	public String getGenesisId(){
 		return genesisIdIsSet ? genesisId : null;
 	}
-	/*
-		Check if has a value for genesisId 
+	/**
+	 * Check if has a value for genesisId 
 	 */	@JsonIgnore
 	public boolean hasGenesisId(){
 		return genesisIdIsSet;
 	}
 
-	/*
-		(grp) Base64 encoded byte array of a sha512/256 digest. When present indicates 
-		that this transaction is part of a transaction group and the value is the 
-		sha512/256 hash of the transactions in that group. 
+	/**
+	 * (grp) Base64 encoded byte array of a sha512/256 digest. When present indicates 
+	 * that this transaction is part of a transaction group and the value is the 
+	 * sha512/256 hash of the transactions in that group. 
 	 */
 	private String group;
 	private boolean groupIsSet;
@@ -254,15 +254,15 @@ public class Transaction {
 	public String getGroup(){
 		return groupIsSet ? group : null;
 	}
-	/*
-		Check if has a value for group 
+	/**
+	 * Check if has a value for group 
 	 */	@JsonIgnore
 	public boolean hasGroup(){
 		return groupIsSet;
 	}
 
-	/*
-		Transaction ID 
+	/**
+	 * Transaction ID 
 	 */
 	private String id;
 	private boolean idIsSet;
@@ -275,15 +275,15 @@ public class Transaction {
 	public String getId(){
 		return idIsSet ? id : null;
 	}
-	/*
-		Check if has a value for id 
+	/**
+	 * Check if has a value for id 
 	 */	@JsonIgnore
 	public boolean hasId(){
 		return idIsSet;
 	}
 
-	/*
-		Offset into the round where this transaction was confirmed. 
+	/**
+	 * Offset into the round where this transaction was confirmed. 
 	 */
 	private long intraRoundOffset;
 	private boolean intraRoundOffsetIsSet;
@@ -296,8 +296,8 @@ public class Transaction {
 	public Long getIntraRoundOffset(){
 		return intraRoundOffsetIsSet ? intraRoundOffset : null;
 	}
-	/*
-		Check if has a value for intraRoundOffset 
+	/**
+	 * Check if has a value for intraRoundOffset 
 	 */	@JsonIgnore
 	public boolean hasIntraRoundOffset(){
 		return intraRoundOffsetIsSet;
@@ -314,15 +314,15 @@ public class Transaction {
 	public TransactionKeyreg getKeyregTransaction(){
 		return keyregTransactionIsSet ? keyregTransaction : null;
 	}
-	/*
-		Check if has a value for keyregTransaction 
+	/**
+	 * Check if has a value for keyregTransaction 
 	 */	@JsonIgnore
 	public boolean hasKeyregTransaction(){
 		return keyregTransactionIsSet;
 	}
 
-	/*
-		(lv) Last valid round for this transaction. 
+	/**
+	 * (lv) Last valid round for this transaction. 
 	 */
 	private long lastValid;
 	private boolean lastValidIsSet;
@@ -335,19 +335,19 @@ public class Transaction {
 	public Long getLastValid(){
 		return lastValidIsSet ? lastValid : null;
 	}
-	/*
-		Check if has a value for lastValid 
+	/**
+	 * Check if has a value for lastValid 
 	 */	@JsonIgnore
 	public boolean hasLastValid(){
 		return lastValidIsSet;
 	}
 
-	/*
-		(lx) Base64 encoded 32-byte array. Lease enforces mutual exclusion of 
-		transactions. If this field is nonzero, then once the transaction is confirmed, 
-		it acquires the lease identified by the (Sender, Lease) pair of the transaction 
-		until the LastValid round passes. While this transaction possesses the lease, no 
-		other transaction specifying this lease can be confirmed. 
+	/**
+	 * (lx) Base64 encoded 32-byte array. Lease enforces mutual exclusion of 
+	 * transactions. If this field is nonzero, then once the transaction is confirmed, 
+	 * it acquires the lease identified by the (Sender, Lease) pair of the transaction 
+	 * until the LastValid round passes. While this transaction possesses the lease, no 
+	 * other transaction specifying this lease can be confirmed. 
 	 */
 	private String lease;
 	private boolean leaseIsSet;
@@ -360,15 +360,15 @@ public class Transaction {
 	public String getLease(){
 		return leaseIsSet ? lease : null;
 	}
-	/*
-		Check if has a value for lease 
+	/**
+	 * Check if has a value for lease 
 	 */	@JsonIgnore
 	public boolean hasLease(){
 		return leaseIsSet;
 	}
 
-	/*
-		(note) Free form data. 
+	/**
+	 * (note) Free form data. 
 	 */
 	private String note;
 	private boolean noteIsSet;
@@ -381,8 +381,8 @@ public class Transaction {
 	public String getNote(){
 		return noteIsSet ? note : null;
 	}
-	/*
-		Check if has a value for note 
+	/**
+	 * Check if has a value for note 
 	 */	@JsonIgnore
 	public boolean hasNote(){
 		return noteIsSet;
@@ -399,15 +399,15 @@ public class Transaction {
 	public TransactionPayment getPaymentTransaction(){
 		return paymentTransactionIsSet ? paymentTransaction : null;
 	}
-	/*
-		Check if has a value for paymentTransaction 
+	/**
+	 * Check if has a value for paymentTransaction 
 	 */	@JsonIgnore
 	public boolean hasPaymentTransaction(){
 		return paymentTransactionIsSet;
 	}
 
-	/*
-		(rr) rewards applied to receiver account. 
+	/**
+	 * (rr) rewards applied to receiver account. 
 	 */
 	private long receiverRewards;
 	private boolean receiverRewardsIsSet;
@@ -420,15 +420,15 @@ public class Transaction {
 	public Long getReceiverRewards(){
 		return receiverRewardsIsSet ? receiverRewards : null;
 	}
-	/*
-		Check if has a value for receiverRewards 
+	/**
+	 * Check if has a value for receiverRewards 
 	 */	@JsonIgnore
 	public boolean hasReceiverRewards(){
 		return receiverRewardsIsSet;
 	}
 
-	/*
-		Time when the block this transaction is in was confirmed. 
+	/**
+	 * Time when the block this transaction is in was confirmed. 
 	 */
 	private long roundTime;
 	private boolean roundTimeIsSet;
@@ -441,15 +441,15 @@ public class Transaction {
 	public Long getRoundTime(){
 		return roundTimeIsSet ? roundTime : null;
 	}
-	/*
-		Check if has a value for roundTime 
+	/**
+	 * Check if has a value for roundTime 
 	 */	@JsonIgnore
 	public boolean hasRoundTime(){
 		return roundTimeIsSet;
 	}
 
-	/*
-		(snd) Sender's address. 
+	/**
+	 * (snd) Sender's address. 
 	 */
 	private String sender;
 	private boolean senderIsSet;
@@ -462,15 +462,15 @@ public class Transaction {
 	public String getSender(){
 		return senderIsSet ? sender : null;
 	}
-	/*
-		Check if has a value for sender 
+	/**
+	 * Check if has a value for sender 
 	 */	@JsonIgnore
 	public boolean hasSender(){
 		return senderIsSet;
 	}
 
-	/*
-		(rs) rewards applied to sender account. 
+	/**
+	 * (rs) rewards applied to sender account. 
 	 */
 	private long senderRewards;
 	private boolean senderRewardsIsSet;
@@ -483,8 +483,8 @@ public class Transaction {
 	public Long getSenderRewards(){
 		return senderRewardsIsSet ? senderRewards : null;
 	}
-	/*
-		Check if has a value for senderRewards 
+	/**
+	 * Check if has a value for senderRewards 
 	 */	@JsonIgnore
 	public boolean hasSenderRewards(){
 		return senderRewardsIsSet;
@@ -501,19 +501,19 @@ public class Transaction {
 	public TransactionSignature getSignature(){
 		return signatureIsSet ? signature : null;
 	}
-	/*
-		Check if has a value for signature 
+	/**
+	 * Check if has a value for signature 
 	 */	@JsonIgnore
 	public boolean hasSignature(){
 		return signatureIsSet;
 	}
 
-	/*
-		(type) Indicates what type of transaction this is. Different types have 
-		different fields. Valid types, and where their fields are stored: * (pay) 
-		payment-transaction * (keyreg) keyreg-transaction * (acfg) 
-		asset-config-transaction * (axfer) asset-transfer-transaction * (afrz) 
-		asset-freeze-transaction 
+	/**
+	 * (type) Indicates what type of transaction this is. Different types have 
+	 * different fields. Valid types, and where their fields are stored: * (pay) 
+	 * payment-transaction * (keyreg) keyreg-transaction * (acfg) 
+	 * asset-config-transaction * (axfer) asset-transfer-transaction * (afrz) 
+	 * asset-freeze-transaction 
 	 */
 	private String type;
 	private boolean typeIsSet;
@@ -526,8 +526,8 @@ public class Transaction {
 	public String getType(){
 		return typeIsSet ? type : null;
 	}
-	/*
-		Check if has a value for type 
+	/**
+	 * Check if has a value for type 
 	 */	@JsonIgnore
 	public boolean hasType(){
 		return typeIsSet;

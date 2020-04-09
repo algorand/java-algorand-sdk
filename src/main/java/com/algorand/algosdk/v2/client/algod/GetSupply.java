@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.SupplyResponse;
 
 
-/*
-	/v2/ledger/supply 
+/**
+ * /v2/ledger/supply 
  */
 public class GetSupply extends Query {
 

@@ -9,15 +9,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields for asset allocation, re-configuration, and destruction. A zero value for 
-	asset-id indicates asset creation. A zero value for the params indicates asset 
-	destruction. Definition: data/transactions/asset.go : AssetConfigTxnFields 
+/**
+ * Fields for asset allocation, re-configuration, and destruction. A zero value for 
+ * asset-id indicates asset creation. A zero value for the params indicates asset 
+ * destruction. Definition: data/transactions/asset.go : AssetConfigTxnFields 
  */
 public class TransactionAssetConfig {
 
-	/*
-		(xaid) ID of the asset being configured or empty if creating. 
+	/**
+	 * (xaid) ID of the asset being configured or empty if creating. 
 	 */
 	private long assetId;
 	private boolean assetIdIsSet;
@@ -30,8 +30,8 @@ public class TransactionAssetConfig {
 	public Long getAssetId(){
 		return assetIdIsSet ? assetId : null;
 	}
-	/*
-		Check if has a value for assetId 
+	/**
+	 * Check if has a value for assetId 
 	 */	@JsonIgnore
 	public boolean hasAssetId(){
 		return assetIdIsSet;
@@ -48,8 +48,8 @@ public class TransactionAssetConfig {
 	public AssetParams getParams(){
 		return paramsIsSet ? params : null;
 	}
-	/*
-		Check if has a value for params 
+	/**
+	 * Check if has a value for params 
 	 */	@JsonIgnore
 	public boolean hasParams(){
 		return paramsIsSet;

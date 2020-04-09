@@ -9,13 +9,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields relating to voting for a protocol upgrade. 
+/**
+ * Fields relating to voting for a protocol upgrade. 
  */
 public class BlockUpgradeVote {
 
-	/*
-		(upgradeyes) Indicates a yes vote for the current proposal. 
+	/**
+	 * (upgradeyes) Indicates a yes vote for the current proposal. 
 	 */
 	private boolean upgradeApprove;
 	private boolean upgradeApproveIsSet;
@@ -28,15 +28,15 @@ public class BlockUpgradeVote {
 	public Boolean getUpgradeApprove(){
 		return upgradeApproveIsSet ? upgradeApprove : null;
 	}
-	/*
-		Check if has a value for upgradeApprove 
+	/**
+	 * Check if has a value for upgradeApprove 
 	 */	@JsonIgnore
 	public boolean hasUpgradeApprove(){
 		return upgradeApproveIsSet;
 	}
 
-	/*
-		(upgradedelay) Indicates the time between acceptance and execution. 
+	/**
+	 * (upgradedelay) Indicates the time between acceptance and execution. 
 	 */
 	private long upgradeDelay;
 	private boolean upgradeDelayIsSet;
@@ -49,15 +49,15 @@ public class BlockUpgradeVote {
 	public Long getUpgradeDelay(){
 		return upgradeDelayIsSet ? upgradeDelay : null;
 	}
-	/*
-		Check if has a value for upgradeDelay 
+	/**
+	 * Check if has a value for upgradeDelay 
 	 */	@JsonIgnore
 	public boolean hasUpgradeDelay(){
 		return upgradeDelayIsSet;
 	}
 
-	/*
-		(upgradeprop) Indicates a proposed upgrade. 
+	/**
+	 * (upgradeprop) Indicates a proposed upgrade. 
 	 */
 	private String upgradePropose;
 	private boolean upgradeProposeIsSet;
@@ -70,8 +70,8 @@ public class BlockUpgradeVote {
 	public String getUpgradePropose(){
 		return upgradeProposeIsSet ? upgradePropose : null;
 	}
-	/*
-		Check if has a value for upgradePropose 
+	/**
+	 * Check if has a value for upgradePropose 
 	 */	@JsonIgnore
 	public boolean hasUpgradePropose(){
 		return upgradeProposeIsSet;

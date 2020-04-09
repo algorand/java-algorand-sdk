@@ -21,8 +21,8 @@ public class ErrorModel {
 	public String getData(){
 		return dataIsSet ? data : null;
 	}
-	/*
-		Check if has a value for data 
+	/**
+	 * Check if has a value for data 
 	 */	@JsonIgnore
 	public boolean hasData(){
 		return dataIsSet;
@@ -39,8 +39,8 @@ public class ErrorModel {
 	public String getMsg(){
 		return msgIsSet ? msg : null;
 	}
-	/*
-		Check if has a value for msg 
+	/**
+	 * Check if has a value for msg 
 	 */	@JsonIgnore
 	public boolean hasMsg(){
 		return msgIsSet;

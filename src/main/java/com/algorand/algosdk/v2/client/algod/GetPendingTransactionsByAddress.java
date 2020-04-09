@@ -9,10 +9,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
 
-/*
-	Get the list of pending transactions by address, sorted by priority, in 
-	decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending 
-	transactions. /v2/accounts/{address}/transactions/pending 
+/**
+ * Get the list of pending transactions by address, sorted by priority, in 
+ * decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending 
+ * transactions. /v2/accounts/{address}/transactions/pending 
  */
 public class GetPendingTransactionsByAddress extends Query {
 	private String address;

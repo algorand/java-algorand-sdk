@@ -9,15 +9,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields for an asset transfer transaction. Definition: data/transactions/asset.go 
-	: AssetTransferTxnFields 
+/**
+ * Fields for an asset transfer transaction. Definition: data/transactions/asset.go 
+ * : AssetTransferTxnFields 
  */
 public class TransactionAssetTransfer {
 
-	/*
-		(aamt) Amount of asset to transfer. A zero amount transferred to self allocates 
-		that asset in the account's Assets map. 
+	/**
+	 * (aamt) Amount of asset to transfer. A zero amount transferred to self allocates 
+	 * that asset in the account's Assets map. 
 	 */
 	private long amount;
 	private boolean amountIsSet;
@@ -30,15 +30,15 @@ public class TransactionAssetTransfer {
 	public Long getAmount(){
 		return amountIsSet ? amount : null;
 	}
-	/*
-		Check if has a value for amount 
+	/**
+	 * Check if has a value for amount 
 	 */	@JsonIgnore
 	public boolean hasAmount(){
 		return amountIsSet;
 	}
 
-	/*
-		(xaid) ID of the asset being transferred. 
+	/**
+	 * (xaid) ID of the asset being transferred. 
 	 */
 	private long assetId;
 	private boolean assetIdIsSet;
@@ -51,17 +51,17 @@ public class TransactionAssetTransfer {
 	public Long getAssetId(){
 		return assetIdIsSet ? assetId : null;
 	}
-	/*
-		Check if has a value for assetId 
+	/**
+	 * Check if has a value for assetId 
 	 */	@JsonIgnore
 	public boolean hasAssetId(){
 		return assetIdIsSet;
 	}
 
-	/*
-		(aclose) Indicates that the asset should be removed from the account's Assets 
-		map, and specifies where the remaining asset holdings should be transferred. 
-		It's always valid to transfer remaining asset holdings to the creator account. 
+	/**
+	 * (aclose) Indicates that the asset should be removed from the account's Assets 
+	 * map, and specifies where the remaining asset holdings should be transferred. 
+	 * It's always valid to transfer remaining asset holdings to the creator account. 
 	 */
 	private String closeTo;
 	private boolean closeToIsSet;
@@ -74,15 +74,15 @@ public class TransactionAssetTransfer {
 	public String getCloseTo(){
 		return closeToIsSet ? closeTo : null;
 	}
-	/*
-		Check if has a value for closeTo 
+	/**
+	 * Check if has a value for closeTo 
 	 */	@JsonIgnore
 	public boolean hasCloseTo(){
 		return closeToIsSet;
 	}
 
-	/*
-		(arcv) Recipient address of the transfer. 
+	/**
+	 * (arcv) Recipient address of the transfer. 
 	 */
 	private String receiver;
 	private boolean receiverIsSet;
@@ -95,17 +95,17 @@ public class TransactionAssetTransfer {
 	public String getReceiver(){
 		return receiverIsSet ? receiver : null;
 	}
-	/*
-		Check if has a value for receiver 
+	/**
+	 * Check if has a value for receiver 
 	 */	@JsonIgnore
 	public boolean hasReceiver(){
 		return receiverIsSet;
 	}
 
-	/*
-		(asnd) The effective sender during a clawback transactions. If this is not a 
-		zero value, the real transaction sender must be the Clawback address from the 
-		AssetParams. 
+	/**
+	 * (asnd) The effective sender during a clawback transactions. If this is not a 
+	 * zero value, the real transaction sender must be the Clawback address from the 
+	 * AssetParams. 
 	 */
 	private String sender;
 	private boolean senderIsSet;
@@ -118,8 +118,8 @@ public class TransactionAssetTransfer {
 	public String getSender(){
 		return senderIsSet ? sender : null;
 	}
-	/*
-		Check if has a value for sender 
+	/**
+	 * Check if has a value for sender 
 	 */	@JsonIgnore
 	public boolean hasSender(){
 		return senderIsSet;

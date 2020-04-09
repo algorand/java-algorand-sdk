@@ -9,8 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	A simplified version of AssetHolding 
+/**
+ * A simplified version of AssetHolding 
  */
 public class MiniAssetHolding {
 
@@ -25,8 +25,8 @@ public class MiniAssetHolding {
 	public String getAddress(){
 		return addressIsSet ? address : null;
 	}
-	/*
-		Check if has a value for address 
+	/**
+	 * Check if has a value for address 
 	 */	@JsonIgnore
 	public boolean hasAddress(){
 		return addressIsSet;
@@ -43,8 +43,8 @@ public class MiniAssetHolding {
 	public Long getAmount(){
 		return amountIsSet ? amount : null;
 	}
-	/*
-		Check if has a value for amount 
+	/**
+	 * Check if has a value for amount 
 	 */	@JsonIgnore
 	public boolean hasAmount(){
 		return amountIsSet;
@@ -61,8 +61,8 @@ public class MiniAssetHolding {
 	public Boolean getIsFrozen(){
 		return isFrozenIsSet ? isFrozen : null;
 	}
-	/*
-		Check if has a value for isFrozen 
+	/**
+	 * Check if has a value for isFrozen 
 	 */	@JsonIgnore
 	public boolean hasIsFrozen(){
 		return isFrozenIsSet;

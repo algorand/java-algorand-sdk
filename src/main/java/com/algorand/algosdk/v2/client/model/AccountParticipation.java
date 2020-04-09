@@ -9,14 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	AccountParticipation describes the parameters used by this account in consensus 
-	protocol. 
+/**
+ * AccountParticipation describes the parameters used by this account in consensus 
+ * protocol. 
  */
 public class AccountParticipation {
 
-	/*
-		(sel) Selection public key (if any) currently registered for this round. 
+	/**
+	 * (sel) Selection public key (if any) currently registered for this round. 
 	 */
 	private String selectionParticipationKey;
 	private boolean selectionParticipationKeyIsSet;
@@ -29,15 +29,15 @@ public class AccountParticipation {
 	public String getSelectionParticipationKey(){
 		return selectionParticipationKeyIsSet ? selectionParticipationKey : null;
 	}
-	/*
-		Check if has a value for selectionParticipationKey 
+	/**
+	 * Check if has a value for selectionParticipationKey 
 	 */	@JsonIgnore
 	public boolean hasSelectionParticipationKey(){
 		return selectionParticipationKeyIsSet;
 	}
 
-	/*
-		(voteFst) First round for which this participation is valid. 
+	/**
+	 * (voteFst) First round for which this participation is valid. 
 	 */
 	private long voteFirstValid;
 	private boolean voteFirstValidIsSet;
@@ -50,15 +50,15 @@ public class AccountParticipation {
 	public Long getVoteFirstValid(){
 		return voteFirstValidIsSet ? voteFirstValid : null;
 	}
-	/*
-		Check if has a value for voteFirstValid 
+	/**
+	 * Check if has a value for voteFirstValid 
 	 */	@JsonIgnore
 	public boolean hasVoteFirstValid(){
 		return voteFirstValidIsSet;
 	}
 
-	/*
-		(voteKD) Number of subkeys in each batch of participation keys. 
+	/**
+	 * (voteKD) Number of subkeys in each batch of participation keys. 
 	 */
 	private long voteKeyDilution;
 	private boolean voteKeyDilutionIsSet;
@@ -71,15 +71,15 @@ public class AccountParticipation {
 	public Long getVoteKeyDilution(){
 		return voteKeyDilutionIsSet ? voteKeyDilution : null;
 	}
-	/*
-		Check if has a value for voteKeyDilution 
+	/**
+	 * Check if has a value for voteKeyDilution 
 	 */	@JsonIgnore
 	public boolean hasVoteKeyDilution(){
 		return voteKeyDilutionIsSet;
 	}
 
-	/*
-		(voteLst) Last round for which this participation is valid. 
+	/**
+	 * (voteLst) Last round for which this participation is valid. 
 	 */
 	private long voteLastValid;
 	private boolean voteLastValidIsSet;
@@ -92,16 +92,16 @@ public class AccountParticipation {
 	public Long getVoteLastValid(){
 		return voteLastValidIsSet ? voteLastValid : null;
 	}
-	/*
-		Check if has a value for voteLastValid 
+	/**
+	 * Check if has a value for voteLastValid 
 	 */	@JsonIgnore
 	public boolean hasVoteLastValid(){
 		return voteLastValidIsSet;
 	}
 
-	/*
-		(vote) root participation public key (if any) currently registered for this 
-		round. 
+	/**
+	 * (vote) root participation public key (if any) currently registered for this 
+	 * round. 
 	 */
 	private String voteParticipationKey;
 	private boolean voteParticipationKeyIsSet;
@@ -114,8 +114,8 @@ public class AccountParticipation {
 	public String getVoteParticipationKey(){
 		return voteParticipationKeyIsSet ? voteParticipationKey : null;
 	}
-	/*
-		Check if has a value for voteParticipationKey 
+	/**
+	 * Check if has a value for voteParticipationKey 
 	 */	@JsonIgnore
 	public boolean hasVoteParticipationKey(){
 		return voteParticipationKeyIsSet;

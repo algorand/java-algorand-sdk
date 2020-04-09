@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.Block;
 
 
-/*
-	Lookup block. /blocks/{round-number} 
+/**
+ * Lookup block. /blocks/{round-number} 
  */
 public class LookupBlock extends Query {
 	private long roundNumber;

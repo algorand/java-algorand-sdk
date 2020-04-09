@@ -9,9 +9,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.algorand.algosdk.v2.client.model.Account;
 
 
-/*
-	Given a specific account public key, this call returns the accounts status, 
-	balance and spendable amounts /v2/accounts/{address} 
+/**
+ * Given a specific account public key, this call returns the accounts status, 
+ * balance and spendable amounts /v2/accounts/{address} 
  */
 public class AccountInformation extends Query {
 	private String address;

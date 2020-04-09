@@ -9,14 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Fields for a payment transaction. Definition: data/transactions/payment.go : 
-	PaymentTxnFields 
+/**
+ * Fields for a payment transaction. Definition: data/transactions/payment.go : 
+ * PaymentTxnFields 
  */
 public class TransactionPayment {
 
-	/*
-		(amt) number of MicroAlgos intended to be transferred. 
+	/**
+	 * (amt) number of MicroAlgos intended to be transferred. 
 	 */
 	private long amount;
 	private boolean amountIsSet;
@@ -29,16 +29,16 @@ public class TransactionPayment {
 	public Long getAmount(){
 		return amountIsSet ? amount : null;
 	}
-	/*
-		Check if has a value for amount 
+	/**
+	 * Check if has a value for amount 
 	 */	@JsonIgnore
 	public boolean hasAmount(){
 		return amountIsSet;
 	}
 
-	/*
-		Number of MicroAlgos that were sent to the close-remainder-to address when 
-		closing the sender account. 
+	/**
+	 * Number of MicroAlgos that were sent to the close-remainder-to address when 
+	 * closing the sender account. 
 	 */
 	private long closeAmount;
 	private boolean closeAmountIsSet;
@@ -51,16 +51,16 @@ public class TransactionPayment {
 	public Long getCloseAmount(){
 		return closeAmountIsSet ? closeAmount : null;
 	}
-	/*
-		Check if has a value for closeAmount 
+	/**
+	 * Check if has a value for closeAmount 
 	 */	@JsonIgnore
 	public boolean hasCloseAmount(){
 		return closeAmountIsSet;
 	}
 
-	/*
-		(close) when set, indicates that the sending account should be closed and all 
-		remaining funds be transferred to this address. 
+	/**
+	 * (close) when set, indicates that the sending account should be closed and all 
+	 * remaining funds be transferred to this address. 
 	 */
 	private String closeRemainderTo;
 	private boolean closeRemainderToIsSet;
@@ -73,15 +73,15 @@ public class TransactionPayment {
 	public String getCloseRemainderTo(){
 		return closeRemainderToIsSet ? closeRemainderTo : null;
 	}
-	/*
-		Check if has a value for closeRemainderTo 
+	/**
+	 * Check if has a value for closeRemainderTo 
 	 */	@JsonIgnore
 	public boolean hasCloseRemainderTo(){
 		return closeRemainderToIsSet;
 	}
 
-	/*
-		(rcv) receiver's address. 
+	/**
+	 * (rcv) receiver's address. 
 	 */
 	private String receiver;
 	private boolean receiverIsSet;
@@ -94,8 +94,8 @@ public class TransactionPayment {
 	public String getReceiver(){
 		return receiverIsSet ? receiver : null;
 	}
-	/*
-		Check if has a value for receiver 
+	/**
+	 * Check if has a value for receiver 
 	 */	@JsonIgnore
 	public boolean hasReceiver(){
 		return receiverIsSet;

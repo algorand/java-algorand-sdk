@@ -9,9 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 
-/*
-	Validation signature associated with some data. Only one of the signatures 
-	should be provided. 
+/**
+ * Validation signature associated with some data. Only one of the signatures 
+ * should be provided. 
  */
 public class TransactionSignature {
 
@@ -26,8 +26,8 @@ public class TransactionSignature {
 	public TransactionSignatureLogicsig getLogicsig(){
 		return logicsigIsSet ? logicsig : null;
 	}
-	/*
-		Check if has a value for logicsig 
+	/**
+	 * Check if has a value for logicsig 
 	 */	@JsonIgnore
 	public boolean hasLogicsig(){
 		return logicsigIsSet;
@@ -44,15 +44,15 @@ public class TransactionSignature {
 	public TransactionSignatureMultisig getMultisig(){
 		return multisigIsSet ? multisig : null;
 	}
-	/*
-		Check if has a value for multisig 
+	/**
+	 * Check if has a value for multisig 
 	 */	@JsonIgnore
 	public boolean hasMultisig(){
 		return multisigIsSet;
 	}
 
-	/*
-		(sig) Standard ed25519 signature. 
+	/**
+	 * (sig) Standard ed25519 signature. 
 	 */
 	private String sig;
 	private boolean sigIsSet;
@@ -65,8 +65,8 @@ public class TransactionSignature {
 	public String getSig(){
 		return sigIsSet ? sig : null;
 	}
-	/*
-		Check if has a value for sig 
+	/**
+	 * Check if has a value for sig 
 	 */	@JsonIgnore
 	public boolean hasSig(){
 		return sigIsSet;

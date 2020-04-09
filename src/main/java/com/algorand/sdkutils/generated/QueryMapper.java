@@ -1,4 +1,4 @@
-package com.algorand.sdkutils;
+package com.algorand.sdkutils.generated;
 
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.connect.Client;
@@ -6,7 +6,7 @@ import com.algorand.algosdk.v2.client.connect.Query;
 
 public class QueryMapper {
 
-	static Query getClass(String name, Client client) {
+	public static Query getClass(String name, Client client) {
 		switch (name) {
 		case "searchAccounts":
 			return new SearchAccounts(client);
@@ -30,7 +30,7 @@ public class QueryMapper {
 		return null;
 	}
 
-	static void setValue(Query q, String className, String property, String value) {
+	public static void setValue(Query q, String className, String property, String value) {
 		switch (className) {
 		case "searchAccounts":
 			switch (property) {
@@ -276,7 +276,7 @@ public class QueryMapper {
 		}
 	}
 
-	static String lookup(Query q, String className) {
+	public static String lookup(Query q, String className) {
 		switch (className) {
 		case "searchAccounts":
 			return ((SearchAccounts)q).lookup().toString();

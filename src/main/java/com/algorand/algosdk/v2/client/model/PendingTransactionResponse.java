@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class PendingTransactionResponse {
 
-	/*
-		The asset index if the transaction was found and it created an asset. 
+	/**
+	 * The asset index if the transaction was found and it created an asset. 
 	 */
 	private long assetIndex;
 	private boolean assetIndexIsSet;
@@ -24,15 +24,15 @@ public class PendingTransactionResponse {
 	public Long getAssetIndex(){
 		return assetIndexIsSet ? assetIndex : null;
 	}
-	/*
-		Check if has a value for assetIndex 
+	/**
+	 * Check if has a value for assetIndex 
 	 */	@JsonIgnore
 	public boolean hasAssetIndex(){
 		return assetIndexIsSet;
 	}
 
-	/*
-		Rewards in microalgos applied to the close remainder to account. 
+	/**
+	 * Rewards in microalgos applied to the close remainder to account. 
 	 */
 	private long closeRewards;
 	private boolean closeRewardsIsSet;
@@ -45,15 +45,15 @@ public class PendingTransactionResponse {
 	public Long getCloseRewards(){
 		return closeRewardsIsSet ? closeRewards : null;
 	}
-	/*
-		Check if has a value for closeRewards 
+	/**
+	 * Check if has a value for closeRewards 
 	 */	@JsonIgnore
 	public boolean hasCloseRewards(){
 		return closeRewardsIsSet;
 	}
 
-	/*
-		Closing amount for the transaction. 
+	/**
+	 * Closing amount for the transaction. 
 	 */
 	private long closingAmount;
 	private boolean closingAmountIsSet;
@@ -66,15 +66,15 @@ public class PendingTransactionResponse {
 	public Long getClosingAmount(){
 		return closingAmountIsSet ? closingAmount : null;
 	}
-	/*
-		Check if has a value for closingAmount 
+	/**
+	 * Check if has a value for closingAmount 
 	 */	@JsonIgnore
 	public boolean hasClosingAmount(){
 		return closingAmountIsSet;
 	}
 
-	/*
-		The round where this transaction was confirmed, if present. 
+	/**
+	 * The round where this transaction was confirmed, if present. 
 	 */
 	private long confirmedRound;
 	private boolean confirmedRoundIsSet;
@@ -87,17 +87,17 @@ public class PendingTransactionResponse {
 	public Long getConfirmedRound(){
 		return confirmedRoundIsSet ? confirmedRound : null;
 	}
-	/*
-		Check if has a value for confirmedRound 
+	/**
+	 * Check if has a value for confirmedRound 
 	 */	@JsonIgnore
 	public boolean hasConfirmedRound(){
 		return confirmedRoundIsSet;
 	}
 
-	/*
-		Indicates that the transaction was kicked out of this node's transaction pool 
-		(and specifies why that happened). An empty string indicates the transaction 
-		wasn't kicked out of this node's txpool due to an error. 
+	/**
+	 * Indicates that the transaction was kicked out of this node's transaction pool 
+	 * (and specifies why that happened). An empty string indicates the transaction 
+	 * wasn't kicked out of this node's txpool due to an error. 
 	 */
 	private String poolError;
 	private boolean poolErrorIsSet;
@@ -110,15 +110,15 @@ public class PendingTransactionResponse {
 	public String getPoolError(){
 		return poolErrorIsSet ? poolError : null;
 	}
-	/*
-		Check if has a value for poolError 
+	/**
+	 * Check if has a value for poolError 
 	 */	@JsonIgnore
 	public boolean hasPoolError(){
 		return poolErrorIsSet;
 	}
 
-	/*
-		Rewards in microalgos applied to the receiver account. 
+	/**
+	 * Rewards in microalgos applied to the receiver account. 
 	 */
 	private long receiverRewards;
 	private boolean receiverRewardsIsSet;
@@ -131,15 +131,15 @@ public class PendingTransactionResponse {
 	public Long getReceiverRewards(){
 		return receiverRewardsIsSet ? receiverRewards : null;
 	}
-	/*
-		Check if has a value for receiverRewards 
+	/**
+	 * Check if has a value for receiverRewards 
 	 */	@JsonIgnore
 	public boolean hasReceiverRewards(){
 		return receiverRewardsIsSet;
 	}
 
-	/*
-		Rewards in microalgos applied to the sender account. 
+	/**
+	 * Rewards in microalgos applied to the sender account. 
 	 */
 	private long senderRewards;
 	private boolean senderRewardsIsSet;
@@ -152,16 +152,16 @@ public class PendingTransactionResponse {
 	public Long getSenderRewards(){
 		return senderRewardsIsSet ? senderRewards : null;
 	}
-	/*
-		Check if has a value for senderRewards 
+	/**
+	 * Check if has a value for senderRewards 
 	 */	@JsonIgnore
 	public boolean hasSenderRewards(){
 		return senderRewardsIsSet;
 	}
 
-	/*
-		The raw transaction encoded as a JSON string or Base64 encoded message pack 
-		object. 
+	/**
+	 * The raw transaction encoded as a JSON string or Base64 encoded message pack 
+	 * object. 
 	 */
 	private String txn;
 	private boolean txnIsSet;
@@ -174,8 +174,8 @@ public class PendingTransactionResponse {
 	public String getTxn(){
 		return txnIsSet ? txn : null;
 	}
-	/*
-		Check if has a value for txn 
+	/**
+	 * Check if has a value for txn 
 	 */	@JsonIgnore
 	public boolean hasTxn(){
 		return txnIsSet;

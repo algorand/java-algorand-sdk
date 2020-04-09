@@ -21,15 +21,15 @@ public class AccountResponse {
 	public Account getAccount(){
 		return accountIsSet ? account : null;
 	}
-	/*
-		Check if has a value for account 
+	/**
+	 * Check if has a value for account 
 	 */	@JsonIgnore
 	public boolean hasAccount(){
 		return accountIsSet;
 	}
 
-	/*
-		Round at which the results were computed. 
+	/**
+	 * Round at which the results were computed. 
 	 */
 	private long currentRound;
 	private boolean currentRoundIsSet;
@@ -42,8 +42,8 @@ public class AccountResponse {
 	public Long getCurrentRound(){
 		return currentRoundIsSet ? currentRound : null;
 	}
-	/*
-		Check if has a value for currentRound 
+	/**
+	 * Check if has a value for currentRound 
 	 */	@JsonIgnore
 	public boolean hasCurrentRound(){
 		return currentRoundIsSet;
