@@ -52,81 +52,151 @@ public class SearchForTransactions extends Query {
 	public SearchForTransactions(Client client) {
 		super(client);
 	}
+
+	/**
+	 * Only include transactions with this address in one of the transaction fields. 
+	 */
 	public SearchForTransactions setAddress(String address) {
 		this.address = address;
 		this.addressIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Combine with the address parameter to define what type of address to search for. 
+	 */
 	public SearchForTransactions setAddressRole(String addressRole) {
 		this.addressRole = addressRole;
 		this.addressRoleIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Include results after the given time. Must be an RFC 3339 formatted string. 
+	 */
 	public SearchForTransactions setAfterTime(String afterTime) {
 		this.afterTime = afterTime;
 		this.afterTimeIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Asset ID 
+	 */
 	public SearchForTransactions setAssetId(long assetId) {
 		this.assetId = assetId;
 		this.assetIdIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Include results before the given time. Must be an RFC 3339 formatted string. 
+	 */
 	public SearchForTransactions setBeforeTime(String beforeTime) {
 		this.beforeTime = beforeTime;
 		this.beforeTimeIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Results should have an amount greater than this value. MicroAlgos are the 
+	 * default currency unless an asset-id is provided, in which case the asset will be 
+	 * used. 
+	 */
 	public SearchForTransactions setCurrencyGreaterThan(long currencyGreaterThan) {
 		this.currencyGreaterThan = currencyGreaterThan;
 		this.currencyGreaterThanIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Results should have an amount less than this value. MicroAlgos are the default 
+	 * currency unless an asset-id is provided, in which case the asset will be used. 
+	 */
 	public SearchForTransactions setCurrencyLessThan(long currencyLessThan) {
 		this.currencyLessThan = currencyLessThan;
 		this.currencyLessThanIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Combine with address and address-role parameters to define what type of address 
+	 * to search for. The close to fields are normally treated as a receiver, if you 
+	 * would like to exclude them set this parameter to true. 
+	 */
 	public SearchForTransactions setExcludeCloseTo(boolean excludeCloseTo) {
 		this.excludeCloseTo = excludeCloseTo;
 		this.excludeCloseToIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Maximum number of results to return. 
+	 */
 	public SearchForTransactions setLimit(long limit) {
 		this.limit = limit;
 		this.limitIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Include results at or before the specified max-round. 
+	 */
 	public SearchForTransactions setMaxRound(long maxRound) {
 		this.maxRound = maxRound;
 		this.maxRoundIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Include results at or after the specified min-round. 
+	 */
 	public SearchForTransactions setMinRound(long minRound) {
 		this.minRound = minRound;
 		this.minRoundIsSet = true;
 		return this;
 	}
+
+	/**
+	 * The next page of results. Use the next token provided by the previous results. 
+	 */
 	public SearchForTransactions setNext(String next) {
 		this.next = next;
 		this.nextIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Specifies a prefix which must be contained in the note field. 
+	 */
 	public SearchForTransactions setNotePrefix(String notePrefix) {
 		this.notePrefix = notePrefix;
 		this.notePrefixIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Include results for the specified round. 
+	 */
 	public SearchForTransactions setRound(long round) {
 		this.round = round;
 		this.roundIsSet = true;
 		return this;
 	}
+
+	/**
+	 * SigType filters just results using the specified type of signature: * sig - 
+	 * Standard * msig - MultiSig * lsig - LogicSig 
+	 */
 	public SearchForTransactions setSigType(String sigType) {
 		this.sigType = sigType;
 		this.sigTypeIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Lookup the specific transaction by ID. 
+	 */
 	public SearchForTransactions setTxId(String txId) {
 		this.txId = txId;
 		this.txIdIsSet = true;

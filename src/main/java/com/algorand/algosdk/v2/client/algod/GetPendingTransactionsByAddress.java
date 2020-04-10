@@ -26,16 +26,28 @@ public class GetPendingTransactionsByAddress extends Query {
 	public GetPendingTransactionsByAddress(Client client) {
 		super(client);
 	}
+
+	/**
+	 * An account public key 
+	 */
 	public GetPendingTransactionsByAddress setAddress(String address) {
 		this.address = address;
 		this.addressIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Configures whether the response object is JSON or MessagePack encoded. 
+	 */
 	public GetPendingTransactionsByAddress setFormat(String format) {
 		this.format = format;
 		this.formatIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Truncated number of transactions to display. If max=0, returns all pending txns. 
+	 */
 	public GetPendingTransactionsByAddress setMax(long max) {
 		this.max = max;
 		this.maxIsSet = true;

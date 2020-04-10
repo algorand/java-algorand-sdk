@@ -57,10 +57,9 @@ public class QueryMapperGenerator extends Generator {
 			Iterator<Entry<String, JsonNode>> properties = getSortedParameters(paramNode);
 			while (properties.hasNext()) {
 				Entry<String, JsonNode> parameter = properties.next();
-				String javaParamName = Generator.getCamelCase(parameter.getKey(), false);
 				String javaSetParamName = Generator.getCamelCase(parameter.getKey(), true);
 				String typeName = parameter.getValue().get("type").asText();
-				setValue.append("			case \""+javaParamName+"\":\n" + 
+				setValue.append("			case \""+parameter.getKey()+"\":\n" + 
 						"				(("+javaClassName+")q).set"+javaSetParamName+"(");
 				switch (typeName) {
 				case "integer":
@@ -73,10 +72,9 @@ public class QueryMapperGenerator extends Generator {
 					setValue.append("Boolean.valueOf(value));\n");
 					break;
 				}
-				setValue.append("			break;\n" + 
-						"");
+				setValue.append("				break;\n");
 			}
-			setValue.append("			}\n");
+			setValue.append("			}\n			break;\n");
 		}
 		
 		getClass.append("		}\n" + 

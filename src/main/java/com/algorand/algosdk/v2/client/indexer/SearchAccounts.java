@@ -13,7 +13,7 @@ import com.algorand.algosdk.v2.client.model.AccountsResponse;
  * Search for accounts. /accounts 
  */
 public class SearchAccounts extends Query {
-	private String assetId;
+	private long assetId;
 	private long currencyGreaterThan;
 	private long currencyLessThan;
 	private long limit;
@@ -30,31 +30,59 @@ public class SearchAccounts extends Query {
 	public SearchAccounts(Client client) {
 		super(client);
 	}
-	public SearchAccounts setAssetId(String assetId) {
+
+	/**
+	 * Asset ID 
+	 */
+	public SearchAccounts setAssetId(long assetId) {
 		this.assetId = assetId;
 		this.assetIdIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Results should have an amount greater than this value. MicroAlgos are the 
+	 * default currency unless an asset-id is provided, in which case the asset will be 
+	 * used. 
+	 */
 	public SearchAccounts setCurrencyGreaterThan(long currencyGreaterThan) {
 		this.currencyGreaterThan = currencyGreaterThan;
 		this.currencyGreaterThanIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Results should have an amount less than this value. MicroAlgos are the default 
+	 * currency unless an asset-id is provided, in which case the asset will be used. 
+	 */
 	public SearchAccounts setCurrencyLessThan(long currencyLessThan) {
 		this.currencyLessThan = currencyLessThan;
 		this.currencyLessThanIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Maximum number of results to return. 
+	 */
 	public SearchAccounts setLimit(long limit) {
 		this.limit = limit;
 		this.limitIsSet = true;
 		return this;
 	}
+
+	/**
+	 * The next page of results. Use the next token provided by the previous results. 
+	 */
 	public SearchAccounts setNext(String next) {
 		this.next = next;
 		this.nextIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Include results for the specified round. For performance reasons, this parameter 
+	 * may be disabled on some configurations. 
+	 */
 	public SearchAccounts setRound(long round) {
 		this.round = round;
 		this.roundIsSet = true;

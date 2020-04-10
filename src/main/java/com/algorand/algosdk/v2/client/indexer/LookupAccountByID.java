@@ -22,11 +22,19 @@ public class LookupAccountByID extends Query {
 	public LookupAccountByID(Client client) {
 		super(client);
 	}
+
+	/**
+	 * account string 
+	 */
 	public LookupAccountByID setAccountId(String accountId) {
 		this.accountId = accountId;
 		this.accountIdIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Include results for the specified round. 
+	 */
 	public LookupAccountByID setRound(long round) {
 		this.round = round;
 		this.roundIsSet = true;

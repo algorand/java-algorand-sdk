@@ -21,6 +21,10 @@ public class AccountInformation extends Query {
 	public AccountInformation(Client client) {
 		super(client);
 	}
+
+	/**
+	 * An account public key 
+	 */
 	public AccountInformation setAddress(String address) {
 		this.address = address;
 		this.addressIsSet = true;

@@ -44,26 +44,29 @@ public class TestGenerator extends Generator {
 		return line.substring(0, line.indexOf(":"));
 	}
 
-	protected static void testSamples(TestGenerator tg, BufferedReader br, Client client) throws IOException {
+	public static boolean testSamples(TestGenerator tg, BufferedReader br, Client client, boolean verbose) throws IOException {
 		JsonNode paths = tg.root.get("paths");
 		JsonNode pathNode = null;
+		boolean failed = false;
 		while (true) {
 			String line = br.readLine();
 			if (line == null) {
 				break;
 			}
+			if (line.trim().replace(",", "").isEmpty()) {
+				continue;
+			}
 			if (line.charAt(0) == '/') {
 				String pathString = getPathFromLine(line);
 				pathNode = paths.get(pathString);
-				System.out.println(pathNode.toString());
 			} else {
 				// this is a test sample
 				
 				// sample source setup
 				JsonNode paramNode = pathNode.findValue("parameters");
 				Iterator<Entry<String, JsonNode>> properties = tg.getSortedParameters(paramNode);
-				StringTokenizer st = new StringTokenizer(line, ",");
-				
+				String[] columns = line.split(",");
+				int colIdx = 0;
 				// SDK query setup
 				String methodName = pathNode.findValue("operationId").asText();
 
@@ -72,37 +75,52 @@ public class TestGenerator extends Generator {
 				while (properties.hasNext()) {
 					// sample source setup
 					String value = "";
-					if (st.hasMoreTokens()) {
-						value = st.nextToken();
+					if (colIdx < columns.length) {
+						value = columns[colIdx];
 						value = value.trim();
 					}
-					Entry<String, JsonNode> parameter = properties.next();					
+					Entry<String, JsonNode> parameter = properties.next();		
+					colIdx++;
 					if (value.isEmpty()) {
 						continue;
 					}
-					
 					// SDK query setup
 					QueryMapper.setValue(query, methodName, parameter.getKey(), value);
 				}
 				
-				// Call the SDK
-				String sdkResponse = QueryMapper.lookup(query, methodName);
-				
 				// Call the node directly using curl
 				QueryData qd = query.getRequestString();
 				HttpUrl httpUrl = Client.getHttpUrl(qd, client.getPort(), client.getHost());
-
+				System.out.println("\n" + httpUrl.toString());
+				
 				//callExternalCurl
 				String curlResponse = callExternalCurl(httpUrl.toString());
 				
-				System.out.println(httpUrl.toString()+"\n");
-				System.out.println("SDK:\n" + sdkResponse + "\nCurl:\n" + curlResponse);
-				if (curlResponse.compareTo(sdkResponse) != 0) {
-					throw new RuntimeException("wrong result!");
+				// Call the SDK
+				String sdkResponse = QueryMapper.lookup(query, methodName);
+				String filter = "round\"";
+				String diff = JsonUtils.showDifferentces(curlResponse, sdkResponse, "curl", "sdk", verbose, filter);
+
+				if (!verbose) {
+					if (!diff.isEmpty()) {
+						System.out.print(diff);
+						if (diff.contentEquals("*" + filter + "\n")) {
+							System.out.println("*PASS!");
+						} else {
+							System.out.println("FAIL!");
+							failed = true;
+						}
+					} else {
+						System.out.println("PASS!");
+					}
+				} else {
+					System.out.print(diff);
 				}
 			}
 		}
+		return !failed;
 	}
+
 	public TestGenerator (JsonNode root) {
 		super(root);
 	}

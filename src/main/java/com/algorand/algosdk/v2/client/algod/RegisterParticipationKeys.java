@@ -28,26 +28,47 @@ public class RegisterParticipationKeys extends Query {
 	public RegisterParticipationKeys(Client client) {
 		super(client);
 	}
+
+	/**
+	 * The `account-id` to update, or `all` to update all accounts. 
+	 */
 	public RegisterParticipationKeys setAddress(String address) {
 		this.address = address;
 		this.addressIsSet = true;
 		return this;
 	}
+
+	/**
+	 * The fee to use when submitting key registration transactions. Defaults to the 
+	 * suggested fee. 
+	 */
 	public RegisterParticipationKeys setFee(long fee) {
 		this.fee = fee;
 		this.feeIsSet = true;
 		return this;
 	}
+
+	/**
+	 * value to use for two-level participation key. 
+	 */
 	public RegisterParticipationKeys setKeyDilution(long keyDilution) {
 		this.keyDilution = keyDilution;
 		this.keyDilutionIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Don't wait for transaction to commit before returning response. 
+	 */
 	public RegisterParticipationKeys setNoWait(boolean noWait) {
 		this.noWait = noWait;
 		this.noWaitIsSet = true;
 		return this;
 	}
+
+	/**
+	 * The last round for which the generated participation keys will be valid. 
+	 */
 	public RegisterParticipationKeys setRoundLastValid(long roundLastValid) {
 		this.roundLastValid = roundLastValid;
 		this.roundLastValidIsSet = true;

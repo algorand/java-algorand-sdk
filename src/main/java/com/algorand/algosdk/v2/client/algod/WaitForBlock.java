@@ -21,6 +21,10 @@ public class WaitForBlock extends Query {
 	public WaitForBlock(Client client) {
 		super(client);
 	}
+
+	/**
+	 * The round to wait until returning status 
+	 */
 	public WaitForBlock setRound(long round) {
 		this.round = round;
 		this.roundIsSet = true;

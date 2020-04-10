@@ -12,8 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class PendingTransactionsResponse {
 
 	/**
-	 * An array of transactions encoded as either a JSON string or a Base64 encoded 
-	 * message pack object. 
+	 * An array of signed transaction objects. 
 	 */
 	private List<String> topTransactions;
 	private boolean topTransactionsIsSet;

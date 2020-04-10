@@ -59,6 +59,27 @@ public class TransactionAssetTransfer {
 	}
 
 	/**
+	 * Number of assets transfered to the close-to account as part of the transaction. 
+	 */
+	private long closeAmount;
+	private boolean closeAmountIsSet;
+	@JsonProperty("close-amount")
+	public void setCloseAmount(long closeAmount){
+		this.closeAmount = closeAmount;
+		closeAmountIsSet = true;
+	}
+	@JsonProperty("close-amount")
+	public Long getCloseAmount(){
+		return closeAmountIsSet ? closeAmount : null;
+	}
+	/**
+	 * Check if has a value for closeAmount 
+	 */	@JsonIgnore
+	public boolean hasCloseAmount(){
+		return closeAmountIsSet;
+	}
+
+	/**
 	 * (aclose) Indicates that the asset should be removed from the account's Assets 
 	 * map, and specifies where the remaining asset holdings should be transferred. 
 	 * It's always valid to transfer remaining asset holdings to the creator account. 
@@ -134,6 +155,7 @@ public class TransactionAssetTransfer {
 		TransactionAssetTransfer other = (TransactionAssetTransfer) o;
 		if (!Objects.deepEquals(this.amount, other.amount)) return false;
 		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
+		if (!Objects.deepEquals(this.closeAmount, other.closeAmount)) return false;
 		if (!Objects.deepEquals(this.closeTo, other.closeTo)) return false;
 		if (!Objects.deepEquals(this.receiver, other.receiver)) return false;
 		if (!Objects.deepEquals(this.sender, other.sender)) return false;

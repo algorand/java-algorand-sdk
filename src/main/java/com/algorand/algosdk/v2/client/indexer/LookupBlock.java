@@ -20,6 +20,10 @@ public class LookupBlock extends Query {
 	public LookupBlock(Client client) {
 		super(client);
 	}
+
+	/**
+	 * Round number 
+	 */
 	public LookupBlock setRoundNumber(long roundNumber) {
 		this.roundNumber = roundNumber;
 		this.roundNumberIsSet = true;

@@ -19,6 +19,10 @@ public class RawTransaction extends Query {
 	public RawTransaction(Client client) {
 		super(client);
 	}
+
+	/**
+	 * The byte encoded signed transaction to broadcast to network 
+	 */
 	public RawTransaction setRawtxn(String rawtxn) {
 		this.rawtxn = rawtxn;
 		this.rawtxnIsSet = true;

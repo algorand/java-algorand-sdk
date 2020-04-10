@@ -2,7 +2,6 @@ package com.algorand.sdkutils.generators;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,22 +10,13 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
 
 public class Generator {
 
 	JsonNode root;
-
-	public static JsonNode getRoot(FileInputStream fileIs) throws JsonProcessingException, IOException {
-		ObjectMapper objectMapper = new ObjectMapper();
-		JsonNode root;
-		root = objectMapper.readTree(fileIs);
-		return root;
-	}
 
 	static BufferedWriter getFileWriter(String className, String directory) throws IOException {
 		//System.out.println(System.getProperty("user.dir"));
@@ -75,16 +65,18 @@ public class Generator {
 		switch (type) {
 		case "integer":
 			return asObject ? "Long" : "long";
+		case "object":
 		case "string":
 			return "String";
 		case "boolean":
-			return asObject ? "Boolean" : "boolean";
+			return asObject ? "Boolean" : "boolean";			
 		case "array":
 			JsonNode arrayTypeNode = prop.get("items");
 			String typeName = getType(arrayTypeNode, asObject);
 			return "List<" + typeName + ">";
+		default:
+			throw new RuntimeException("Unrecognized type: " + type);	
 		}
-		return null;
 	}
 
 	static boolean needsClassImport(String type) {
@@ -362,6 +354,12 @@ public class Generator {
 
 			decls.append("\tprivate " + propType + " " + propName + ";\n");
 			bools.append("\tprivate boolean " + propName + "IsSet;\n");
+			
+			if (prop.getValue().get("description") != null) {
+				String desc = prop.getValue().get("description").asText();
+				desc = formatComment(desc, "\t");
+				builders.append(desc + "\n");
+			}
 			builders.append("\tpublic " + className + " " + setterName + "(" + propType + " " + propName + ") {\n");
 			builders.append("\t\tthis." + propName + " = " + propName + ";\n");
 			builders.append("\t\tthis." + propName + "IsSet = true;\n");
@@ -494,7 +492,7 @@ public class Generator {
 				bw.close();
 	}
 
-	static void generateAlgodIndexerObjects (JsonNode root, String rootPath, String pkg) throws IOException {
+	public static void generateAlgodIndexerObjects (JsonNode root, String rootPath, String pkg) throws IOException {
 
 		JsonNode schemas = root.get("components") != null ? 
 				root.get("components").get("schemas") : 
@@ -511,7 +509,7 @@ public class Generator {
 				}
 	}
 
-	static void generateReturnTypes (JsonNode root, String rootPath, String pkg) throws IOException {
+	public static void generateReturnTypes (JsonNode root, String rootPath, String pkg) throws IOException {
 		JsonNode returns = root.get("components") != null ? 
 				root.get("components").get("responses") : 
 					root.get("responses");
@@ -534,7 +532,7 @@ public class Generator {
 				}
 	}
 
-	void generateIndexerMethods(String rootPath, String pkg, String modelPkg) throws IOException {
+	public void generateIndexerMethods(String rootPath, String pkg, String modelPkg) throws IOException {
 		JsonNode paths = this.root.get("paths");
 		Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
 		while (pathIter.hasNext()) {
@@ -545,46 +543,5 @@ public class Generator {
 
 	public Generator (JsonNode root) {
 		this.root = root;
-	}
-	
-	public static void main(String [] args) throws JsonProcessingException, IOException {
-
-		if (args.length != 2) {
-			System.out.println("usage: java Generator specfile packageRootPath");
-			System.exit(0);
-		}
-		File f = new File(args[0]);
-		FileInputStream fis = new FileInputStream(f);
-
-		JsonNode root = getRoot(fis);	
-		String rootPath = args[1]; // com.algorand.algosdk
-
-		Generator g = new Generator(root);
-
-		// Generate classes from the schemas
-		// com.algorand.algosdk.v2.client.model
-		String pkg = "com.algorand.algosdk.v2.client.model";
-		System.out.println("Generating " + pkg + " to " + rootPath+"/v2/client/model");
-		generateAlgodIndexerObjects(root, rootPath+"/v2/client/model", pkg);
-
-		// Generate classes from the return types which have more than one return element
-		// com.algorand.algosdk.v2.client.model		
-		System.out.println("Generating " + pkg + " to " + rootPath+"/v2/client/model");
-		generateReturnTypes(root, rootPath+"/v2/client/model", pkg);
-
-
-		// Generate the algod methods
-		// com.algorand.algosdk.v2.client.indexer
-		if (args[0].contains("algod")) {
-			String apkg = "com.algorand.algosdk.v2.client.algod";
-			System.out.println("Generating " + apkg + " to " + rootPath+"/v2/client/algod");
-			g.generateIndexerMethods(rootPath+"/v2/client/algod", apkg, pkg);
-		} else {
-			// Generate the indexer methods
-			// com.algorand.algosdk.v2.client.indexer		
-			String ipkg = "com.algorand.algosdk.v2.client.indexer";
-			System.out.println("Generating " + ipkg + " to " + rootPath+"/v2/client/indexer");
-			g.generateIndexerMethods(rootPath+"/v2/client/indexer", ipkg, pkg);
-		}
 	}
 }

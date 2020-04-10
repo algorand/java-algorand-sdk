@@ -60,6 +60,9 @@ public class Client {
 			throw e;
 		}
 		String responseString = response.body().string();
+		if (response.code() != 200) {
+			throw new RuntimeException(responseString);
+		}
 		return responseString;
         // String contentType = response.headers().get("Content-Type");
 

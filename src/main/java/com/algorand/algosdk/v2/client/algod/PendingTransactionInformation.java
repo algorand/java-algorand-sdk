@@ -28,11 +28,19 @@ public class PendingTransactionInformation extends Query {
 	public PendingTransactionInformation(Client client) {
 		super(client);
 	}
+
+	/**
+	 * Configures whether the response object is JSON or MessagePack encoded. 
+	 */
 	public PendingTransactionInformation setFormat(String format) {
 		this.format = format;
 		this.formatIsSet = true;
 		return this;
 	}
+
+	/**
+	 * A transaction id 
+	 */
 	public PendingTransactionInformation setTxid(String txid) {
 		this.txid = txid;
 		this.txidIsSet = true;

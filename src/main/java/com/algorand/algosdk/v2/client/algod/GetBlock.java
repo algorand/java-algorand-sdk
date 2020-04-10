@@ -6,6 +6,7 @@ import com.algorand.algosdk.v2.client.connect.Client;
 import com.algorand.algosdk.v2.client.connect.Query;
 import com.algorand.algosdk.v2.client.connect.QueryData;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.model.BlockResponse;
 
 
 /**
@@ -21,18 +22,26 @@ public class GetBlock extends Query {
 	public GetBlock(Client client) {
 		super(client);
 	}
+
+	/**
+	 * Configures whether the response object is JSON or MessagePack encoded. 
+	 */
 	public GetBlock setFormat(String format) {
 		this.format = format;
 		this.formatIsSet = true;
 		return this;
 	}
+
+	/**
+	 * The round from which to fetch block information. 
+	 */
 	public GetBlock setRound(long round) {
 		this.round = round;
 		this.roundIsSet = true;
 		return this;
 	}
 
-	public String lookup() {
+	public BlockResponse lookup() {
 		String response;
 		try {
 			response = request("get");
@@ -42,9 +51,9 @@ public class GetBlock extends Query {
 			return null;
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		String resp;
+		BlockResponse resp;
 		try {
-			resp = mapper.readValue(response, String.class);
+			resp = mapper.readValue(response, BlockResponse.class);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

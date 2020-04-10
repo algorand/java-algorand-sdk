@@ -30,31 +30,55 @@ public class SearchForAssets extends Query {
 	public SearchForAssets(Client client) {
 		super(client);
 	}
+
+	/**
+	 * Asset ID 
+	 */
 	public SearchForAssets setAssetId(long assetId) {
 		this.assetId = assetId;
 		this.assetIdIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Filter just assets with the given creator address. 
+	 */
 	public SearchForAssets setCreator(String creator) {
 		this.creator = creator;
 		this.creatorIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Maximum number of results to return. 
+	 */
 	public SearchForAssets setLimit(long limit) {
 		this.limit = limit;
 		this.limitIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Filter just assets with the given name. 
+	 */
 	public SearchForAssets setName(String name) {
 		this.name = name;
 		this.nameIsSet = true;
 		return this;
 	}
+
+	/**
+	 * The next page of results. Use the next token provided by the previous results. 
+	 */
 	public SearchForAssets setNext(String next) {
 		this.next = next;
 		this.nextIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Filter just assets with the given unit. 
+	 */
 	public SearchForAssets setUnit(String unit) {
 		this.unit = unit;
 		this.unitIsSet = true;

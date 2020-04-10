@@ -24,11 +24,19 @@ public class GetPendingTransactions extends Query {
 	public GetPendingTransactions(Client client) {
 		super(client);
 	}
+
+	/**
+	 * Configures whether the response object is JSON or MessagePack encoded. 
+	 */
 	public GetPendingTransactions setFormat(String format) {
 		this.format = format;
 		this.formatIsSet = true;
 		return this;
 	}
+
+	/**
+	 * Truncated number of transactions to display. If max=0, returns all pending txns. 
+	 */
 	public GetPendingTransactions setMax(long max) {
 		this.max = max;
 		this.maxIsSet = true;

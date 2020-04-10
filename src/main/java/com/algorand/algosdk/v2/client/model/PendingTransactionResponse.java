@@ -160,8 +160,7 @@ public class PendingTransactionResponse {
 	}
 
 	/**
-	 * The raw transaction encoded as a JSON string or Base64 encoded message pack 
-	 * object. 
+	 * The raw signed transaction. 
 	 */
 	private String txn;
 	private boolean txnIsSet;
