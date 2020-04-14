@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.algod;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
 
@@ -23,17 +21,9 @@ public class GetPendingTransactionsByAddress extends Query {
 	private boolean formatIsSet;
 	private boolean maxIsSet;
 
-	public GetPendingTransactionsByAddress(Client client) {
-		super(client);
-	}
-
-	/**
-	 * An account public key 
-	 */
-	public GetPendingTransactionsByAddress setAddress(String address) {
+	public GetPendingTransactionsByAddress(Client client, String address) {
+		super(client, "get");
 		this.address = address;
-		this.addressIsSet = true;
-		return this;
 	}
 
 	/**
@@ -54,31 +44,14 @@ public class GetPendingTransactionsByAddress extends Query {
 		return this;
 	}
 
-	public PendingTransactionsResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		PendingTransactionsResponse resp;
-		try {
-			resp = mapper.readValue(response, PendingTransactionsResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<PendingTransactionsResponse> execute() throws Exception {
+		Response<PendingTransactionsResponse> resp = baseExecute();
+		resp.setValueType(PendingTransactionsResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if  (!this.addressIsSet) {
-			throw new RuntimeException("address is not set, and it is a required parameter.");
-		}
 		if (this.formatIsSet) {
 			qd.addQuery("format", String.valueOf(format));
 		}

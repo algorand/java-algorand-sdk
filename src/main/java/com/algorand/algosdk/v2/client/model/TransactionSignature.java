@@ -2,18 +2,16 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * Validation signature associated with some data. Only one of the signatures 
  * should be provided. 
  */
-public class TransactionSignature {
+public class TransactionSignature extends PathResponse {
 
 	private TransactionSignatureLogicsig logicsig;
 	private boolean logicsigIsSet;
@@ -84,18 +82,5 @@ public class TransactionSignature {
 		if (!Objects.deepEquals(this.sig, other.sig)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

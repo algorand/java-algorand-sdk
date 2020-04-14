@@ -3,17 +3,15 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * Block information. Definition: data/bookkeeping/block.go : Block 
  */
-public class Block {
+public class Block extends PathResponse {
 
 	/**
 	 * (gh) hash to which this block belongs. 
@@ -288,18 +286,5 @@ public class Block {
 		if (!Objects.deepEquals(this.upgradeVote, other.upgradeVote)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

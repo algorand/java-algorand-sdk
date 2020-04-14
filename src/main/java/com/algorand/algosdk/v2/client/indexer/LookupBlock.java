@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.Block;
 
 
@@ -17,44 +15,19 @@ public class LookupBlock extends Query {
 
 	private boolean roundNumberIsSet;
 
-	public LookupBlock(Client client) {
-		super(client);
-	}
-
-	/**
-	 * Round number 
-	 */
-	public LookupBlock setRoundNumber(long roundNumber) {
+	public LookupBlock(Client client, long roundNumber) {
+		super(client, "get");
 		this.roundNumber = roundNumber;
-		this.roundNumberIsSet = true;
-		return this;
 	}
 
-	public Block lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		Block resp;
-		try {
-			resp = mapper.readValue(response, Block.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<Block> execute() throws Exception {
+		Response<Block> resp = baseExecute();
+		resp.setValueType(Block.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if  (!this.roundNumberIsSet) {
-			throw new RuntimeException("roundNumber is not set, and it is a required parameter.");
-		}
 		qd.addPathSegment(String.valueOf("blocks"));
 		qd.addPathSegment(String.valueOf(roundNumber));
 

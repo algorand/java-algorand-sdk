@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.algod;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
@@ -25,17 +23,9 @@ public class RegisterParticipationKeys extends Query {
 	private boolean noWaitIsSet;
 	private boolean roundLastValidIsSet;
 
-	public RegisterParticipationKeys(Client client) {
-		super(client);
-	}
-
-	/**
-	 * The `account-id` to update, or `all` to update all accounts. 
-	 */
-	public RegisterParticipationKeys setAddress(String address) {
+	public RegisterParticipationKeys(Client client, String address) {
+		super(client, "post");
 		this.address = address;
-		this.addressIsSet = true;
-		return this;
 	}
 
 	/**
@@ -75,31 +65,14 @@ public class RegisterParticipationKeys extends Query {
 		return this;
 	}
 
-	public String lookup() {
-		String response;
-		try {
-			response = request("post");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		String resp;
-		try {
-			resp = mapper.readValue(response, String.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<String> execute() throws Exception {
+		Response<String> resp = baseExecute();
+		resp.setValueType(String.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if  (!this.addressIsSet) {
-			throw new RuntimeException("address is not set, and it is a required parameter.");
-		}
 		if (this.feeIsSet) {
 			qd.addQuery("fee", String.valueOf(fee));
 		}

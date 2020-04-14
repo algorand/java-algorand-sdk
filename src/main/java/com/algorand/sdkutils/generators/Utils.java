@@ -1,6 +1,12 @@
 package com.algorand.sdkutils.generators;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
@@ -10,7 +16,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JsonUtils {
+public class Utils {
 	
 	public static String showDifferentces(
 			String jsonA, String jsonB, 
@@ -63,5 +69,40 @@ public class JsonUtils {
 		root = objectMapper.readTree(fileIs);
 		return root;
 	}
+	
+	public static String readFile(String filename) throws IOException  {
+		
+		FileReader fileReader;
+		try {
+			fileReader = new FileReader(new File (filename));
+		} catch (FileNotFoundException e) {
+			return "";
+		}
+		StringBuffer sb = new StringBuffer();
+		BufferedReader br = new BufferedReader(fileReader);
+		for (String line = br.readLine(); line != null; line = br.readLine()) {
+			sb.append(line + "\n");
+		}
+		br.close();
+		return sb.toString();
+	}
 
+	public static void writeFile(String filename, String content) throws IOException {
+		File file = new File(filename);
+		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+		bw.append(content);
+		bw.close();
+	}
+
+	public static void generateClientFile(String genRoot) throws IOException {
+		// Generate the client file
+		String clientTemplate = Utils.readFile("src/main/java/com/algorand/sdkutils/generators/Client.java.template");
+		String imports = Utils.readFile(genRoot+"algodV2Imports.txt") +  
+				Utils.readFile(genRoot+"indexerImports.txt");
+		String methods = Utils.readFile(genRoot+"algodV2Paths.txt") +  
+				Utils.readFile(genRoot+"indexerPaths.txt");
+		clientTemplate = clientTemplate.replace("IMPORTSGOHERE", imports);
+		clientTemplate = clientTemplate.replace("METHODSGOHERE", methods);
+		Utils.writeFile("src/main/java/com/algorand/algosdk/v2/client/common/Client.java", clientTemplate);
+	}
 }

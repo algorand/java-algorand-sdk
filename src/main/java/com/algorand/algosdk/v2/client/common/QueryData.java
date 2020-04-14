@@ -1,4 +1,4 @@
-package com.algorand.algosdk.v2.client.connect;
+package com.algorand.algosdk.v2.client.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;

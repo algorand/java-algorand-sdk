@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -49,8 +47,9 @@ public class LookupAssetTransactions extends Query {
 	private boolean txIdIsSet;
 	private boolean txTypeIsSet;
 
-	public LookupAssetTransactions(Client client) {
-		super(client);
+	public LookupAssetTransactions(Client client, long assetId) {
+		super(client, "get");
+		this.assetId = assetId;
 	}
 
 	/**
@@ -77,11 +76,6 @@ public class LookupAssetTransactions extends Query {
 	public LookupAssetTransactions setAfterTime(String afterTime) {
 		this.afterTime = afterTime;
 		this.afterTimeIsSet = true;
-		return this;
-	}
-	public LookupAssetTransactions setAssetId(long assetId) {
-		this.assetId = assetId;
-		this.assetIdIsSet = true;
 		return this;
 	}
 
@@ -204,24 +198,10 @@ public class LookupAssetTransactions extends Query {
 		return this;
 	}
 
-	public TransactionsResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		TransactionsResponse resp;
-		try {
-			resp = mapper.readValue(response, TransactionsResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<TransactionsResponse> execute() throws Exception {
+		Response<TransactionsResponse> resp = baseExecute();
+		resp.setValueType(TransactionsResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
@@ -234,9 +214,6 @@ public class LookupAssetTransactions extends Query {
 		}
 		if (this.afterTimeIsSet) {
 			qd.addQuery("afterTime", String.valueOf(afterTime));
-		}
-		if  (!this.assetIdIsSet) {
-			throw new RuntimeException("assetId is not set, and it is a required parameter.");
 		}
 		if (this.beforeTimeIsSet) {
 			qd.addQuery("beforeTime", String.valueOf(beforeTime));

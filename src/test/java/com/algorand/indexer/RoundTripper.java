@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 
 import org.junit.jupiter.api.Test;
 
-import com.algorand.algosdk.v2.client.connect.Client;
+import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
 import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;

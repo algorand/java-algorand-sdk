@@ -10,8 +10,8 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.Test;
 
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.sdkutils.generators.JsonUtils;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.generators.TestGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +23,7 @@ class TestIndexerCases {
 		File f = new File("../openapi-server-generator/scripts/indexer.oas2.yml");
 		FileInputStream fis = new FileInputStream(f);
 
-		JsonNode root = JsonUtils.getRoot(fis);	
+		JsonNode root = Utils.getRoot(fis);	
 		TestGenerator tg = new TestGenerator(root);
 
 		int port = 8980;

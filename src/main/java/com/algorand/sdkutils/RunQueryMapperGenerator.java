@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.algorand.sdkutils.generators.JsonUtils;
+import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.generators.QueryMapperGenerator;
 import com.algorand.sdkutils.generators.TemplateGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,7 +16,7 @@ public class RunQueryMapperGenerator {
 		File f = new File("../openapi-server-generator/scripts/indexer.oas2.yml");
 		FileInputStream fis = new FileInputStream(f);
 
-		JsonNode root = JsonUtils.getRoot(fis);	
+		JsonNode root = Utils.getRoot(fis);	
 		QueryMapperGenerator qmg = new QueryMapperGenerator(root);
 		
 		TemplateGenerator tg = new TemplateGenerator(root);

@@ -1,8 +1,8 @@
 package com.algorand.sdkutils.generated;
 
 import com.algorand.algosdk.v2.client.indexer.*;
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
 
 public class QueryMapper {
 

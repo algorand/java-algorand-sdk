@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
 
 
@@ -27,13 +25,9 @@ public class LookupAssetBalances extends Query {
 	private boolean nextIsSet;
 	private boolean roundIsSet;
 
-	public LookupAssetBalances(Client client) {
-		super(client);
-	}
-	public LookupAssetBalances setAssetId(long assetId) {
+	public LookupAssetBalances(Client client, long assetId) {
+		super(client, "get");
 		this.assetId = assetId;
-		this.assetIdIsSet = true;
-		return this;
 	}
 
 	/**
@@ -84,31 +78,14 @@ public class LookupAssetBalances extends Query {
 		return this;
 	}
 
-	public AssetBalancesResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		AssetBalancesResponse resp;
-		try {
-			resp = mapper.readValue(response, AssetBalancesResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<AssetBalancesResponse> execute() throws Exception {
+		Response<AssetBalancesResponse> resp = baseExecute();
+		resp.setValueType(AssetBalancesResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if  (!this.assetIdIsSet) {
-			throw new RuntimeException("assetId is not set, and it is a required parameter.");
-		}
 		if (this.currencyGreaterThanIsSet) {
 			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}

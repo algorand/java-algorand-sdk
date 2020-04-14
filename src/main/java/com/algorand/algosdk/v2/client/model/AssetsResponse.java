@@ -3,13 +3,11 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class AssetsResponse {
+public class AssetsResponse extends PathResponse {
 
 	private List<Asset> assets;
 	private boolean assetsIsSet;
@@ -84,18 +82,5 @@ public class AssetsResponse {
 		if (!Objects.deepEquals(this.nextToken, other.nextToken)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

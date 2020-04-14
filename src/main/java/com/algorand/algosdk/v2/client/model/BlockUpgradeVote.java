@@ -2,17 +2,15 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * Fields relating to voting for a protocol upgrade. 
  */
-public class BlockUpgradeVote {
+public class BlockUpgradeVote extends PathResponse {
 
 	/**
 	 * (upgradeyes) Indicates a yes vote for the current proposal. 
@@ -89,18 +87,5 @@ public class BlockUpgradeVote {
 		if (!Objects.deepEquals(this.upgradePropose, other.upgradePropose)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

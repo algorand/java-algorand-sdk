@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.AccountsResponse;
 
 
@@ -28,7 +26,7 @@ public class SearchAccounts extends Query {
 	private boolean roundIsSet;
 
 	public SearchAccounts(Client client) {
-		super(client);
+		super(client, "get");
 	}
 
 	/**
@@ -89,24 +87,10 @@ public class SearchAccounts extends Query {
 		return this;
 	}
 
-	public AccountsResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		AccountsResponse resp;
-		try {
-			resp = mapper.readValue(response, AccountsResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<AccountsResponse> execute() throws Exception {
+		Response<AccountsResponse> resp = baseExecute();
+		resp.setValueType(AccountsResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {

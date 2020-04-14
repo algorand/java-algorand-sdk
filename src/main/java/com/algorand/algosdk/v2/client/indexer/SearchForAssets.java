@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.AssetsResponse;
 
 
@@ -28,7 +26,7 @@ public class SearchForAssets extends Query {
 	private boolean unitIsSet;
 
 	public SearchForAssets(Client client) {
-		super(client);
+		super(client, "get");
 	}
 
 	/**
@@ -85,24 +83,10 @@ public class SearchForAssets extends Query {
 		return this;
 	}
 
-	public AssetsResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		AssetsResponse resp;
-		try {
-			resp = mapper.readValue(response, AssetsResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<AssetsResponse> execute() throws Exception {
+		Response<AssetsResponse> resp = baseExecute();
+		resp.setValueType(AssetsResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {

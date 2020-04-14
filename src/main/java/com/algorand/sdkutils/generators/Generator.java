@@ -19,7 +19,6 @@ public class Generator {
 	JsonNode root;
 
 	static BufferedWriter getFileWriter(String className, String directory) throws IOException {
-		//System.out.println(System.getProperty("user.dir"));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(directory + "/" + className + ".java")));
 		return bw;
 	}
@@ -212,22 +211,6 @@ public class Generator {
 		buffer.append("\n		return true;\n	}\n");
 	}
 
-	static void writeToStringMethod(StringBuffer buffer) {
-		buffer.append(
-				"	@Override\n" + 
-						"	public String toString() {\n" + 
-						"		ObjectMapper om = new ObjectMapper(); \n" + 
-						"		String jsonStr;\n" + 
-						"		try {\n" + 
-						"			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);\n" + 
-						"\n" + 
-						"		} catch (JsonProcessingException e) {\n" + 
-						"			throw new RuntimeException(e.getMessage());\n" + 
-						"		}\n" + 
-						"		return jsonStr;\n" + 
-				"	}\n");
-	}
-
 	static void writeClass(String className, JsonNode propertiesNode, String desc, String directory, String pkg) throws IOException {
 		System.out.println("Generating ... " + className);
 
@@ -244,28 +227,23 @@ public class Generator {
 		body.append("\n");
 		properties = getSortedProperties(propertiesNode);
 		writeCompareMethod(className, body, properties);
-		body.append("\n");		
-		writeToStringMethod(body);
 
 		if (importList) {
 			imports.append("import java.util.List;\n");
 		}
 		imports.append("import java.util.Objects;\n"); // used by Objects.deepEquals
 		imports.append("\n");
-		
-		imports.append("import com.fasterxml.jackson.annotation.JsonIgnore;\n");
-		imports.append("import com.fasterxml.jackson.annotation.JsonInclude.Include;\n");
-		imports.append("import com.fasterxml.jackson.annotation.JsonProperty;\n");
-		imports.append("import com.fasterxml.jackson.core.JsonProcessingException;\n"); // used by toString
-		imports.append("import com.fasterxml.jackson.databind.ObjectMapper;\n"); // used by toString
-		imports.append("\n");		
+
+		imports.append("import com.algorand.algosdk.v2.client.common.PathResponse;\n" + 
+				"import com.fasterxml.jackson.annotation.JsonIgnore;\n" + 
+				"import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
 
 		bw.append(imports);
 		if (desc != null) {
 			bw.append(desc);
 			bw.append("\n");
 		}
-		bw.append("public class " + className + " {\n");
+		bw.append("public class " + className + " extends PathResponse {\n");
 		bw.append(body);
 		bw.append("}\n");
 		bw.close();
@@ -288,27 +266,12 @@ public class Generator {
 
 	static String getQueryResponseMethod(String returnType, String getOrPost) {
 		String ret = 
-				"	public " + returnType + " lookup() {\n" + 
-						"		String response;\n" + 
-						"		try {\n" + 
-						"			response = request(\"" + getOrPost + "\");\n" + 
-						"		} catch (Exception e) {\n" + 
-						"			// TODO Auto-generated catch block\n" + 
-						"			e.printStackTrace();\n" + 
-						"			return null;\n" + 
-						"		}\n" + 
-						"		ObjectMapper mapper = new ObjectMapper();\n" + 
-						"		" + returnType + " resp;\n" + 
-						"		try {\n" + 
-						"			resp = mapper.readValue(response, " + returnType + ".class);\n" + 
-						"		} catch (IOException e) {\n" + 
-						"			// TODO Auto-generated catch block\n" + 
-						"			e.printStackTrace();\n" + 
-						"			return null;\n" + 
-						"		}\n" + 
+				"	@Override\n" + 
+						"	public Response<" + returnType + "> execute() throws Exception {\n" + 
+						"		Response<" + returnType + "> resp = baseExecute();\n" + 
+						"		resp.setValueType(" + returnType + ".class);\n" + 
 						"		return resp;\n" + 
-						"	}\n" + 
-						"";
+						"	}\n";
 		return ret;
 	}
 
@@ -327,6 +290,7 @@ public class Generator {
 	}
 
 	static String processQueryParams(
+			StringBuffer generatedPathsEntry,
 			Iterator<Entry<String, JsonNode>> properties,
 			String className, 			
 			String path,
@@ -336,15 +300,17 @@ public class Generator {
 		StringBuffer decls = new StringBuffer();
 		StringBuffer bools = new StringBuffer();
 		StringBuffer builders = new StringBuffer();
+		StringBuffer constructorHeader = new StringBuffer();
+		StringBuffer constructorBody = new StringBuffer();
 		StringBuffer requestMethod = new StringBuffer();
+		
+		StringBuffer generatedPathsEntryBody = new StringBuffer();
 
-		// add the constructor
-		builders.append("	public "+className+"(Client client) {\n" + 
-				"		super(client);\n" + 
-				"	}\n");
 		requestMethod.append(Generator.getQueryResponseMethod(returnType, getOrPost));
 		requestMethod.append("	public QueryData getRequestString() {\n" + 
 				"		QueryData qd = new QueryData();\n");
+		boolean pAdded = false;
+
 		while (properties != null && properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
 			String propName = Generator.getCamelCase(prop.getKey(), false);
@@ -354,7 +320,21 @@ public class Generator {
 
 			decls.append("\tprivate " + propType + " " + propName + ";\n");
 			bools.append("\tprivate boolean " + propName + "IsSet;\n");
-			
+
+
+			if (inPath(prop.getValue())) {
+				constructorHeader.append(", " + propType + " " + propName);
+				constructorBody.append("		this." + propName + " = " + propName + ";\n");
+				
+				if (pAdded) {
+					generatedPathsEntry.append(",\n			");
+				}
+				generatedPathsEntry.append(propType + " " + propName);
+				generatedPathsEntryBody.append(", " + propName);
+				pAdded = true;
+				continue;
+			}
+
 			if (prop.getValue().get("description") != null) {
 				String desc = prop.getValue().get("description").asText();
 				desc = formatComment(desc, "\t");
@@ -366,15 +346,6 @@ public class Generator {
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
 
-			if (inPath(prop.getValue())) {
-				if (isRequired(prop.getValue())) {
-					requestMethod.append("		if  (!this."+propName+"IsSet) {\n" + 
-							"			throw new RuntimeException(\"" +
-							propName+" is not set, and it is a required parameter.\");\n" + 
-							"		}\n");
-				}
-				continue;
-			}
 			requestMethod.append("		if (this."+propName+"IsSet) {\n" + 
 					"			qd.addQuery(\""+propName+"\", String.valueOf("+propName+"));\n" +
 					"		}\n");
@@ -386,6 +357,11 @@ public class Generator {
 			}
 
 		}
+		
+		generatedPathsEntry.append(") {\n");
+		generatedPathsEntry.append("		return new "+className+"((Client) this");
+		generatedPathsEntry.append(generatedPathsEntryBody);
+		generatedPathsEntry.append(");\n	}\n");
 
 		ArrayList<String> al = getPathInserts(path);
 		for (String str : al) {
@@ -403,6 +379,14 @@ public class Generator {
 		ans.append("\n");
 		ans.append(bools);
 		ans.append("\n");
+
+		// constructor
+		ans.append("	public "+className+"(Client client");
+		ans.append(constructorHeader);
+		ans.append(") {\n		super(client, \""+getOrPost+"\");\n");
+		ans.append(constructorBody);
+		ans.append("	}\n");
+
 		ans.append(builders);
 		ans.append("\n");		
 		ans.append(requestMethod);
@@ -423,6 +407,7 @@ public class Generator {
 	}
 
 	void writeQueryClass(
+			StringBuffer generatedPathsEntry,
 			JsonNode spec,
 			String path,
 			String directory,
@@ -439,7 +424,11 @@ public class Generator {
 		}
 
 		String className = spec.get("operationId").asText();
+		String methodName = Generator.getCamelCase(className, false);
 		className = Generator.getCamelCase(className, true);
+		
+		generatedPathsEntry.append("	public " + className + " " + methodName + "(");
+		
 		JsonNode paramNode = spec.get("parameters");
 		String returnType = "String";
 		if (spec.get("responses").get("200").get("$ref") != null) { 
@@ -468,11 +457,10 @@ public class Generator {
 				bw.append("package " + pkg + ";\n\n");
 
 				String imports = 
-						"import java.io.IOException;\n\n" + 
-								"import com.algorand.algosdk.v2.client.connect.Client;\n" + 
-								"import com.algorand.algosdk.v2.client.connect.Query;\n" + 
-								"import com.algorand.algosdk.v2.client.connect.QueryData;\n" + 
-								"import com.fasterxml.jackson.databind.ObjectMapper;\n";
+						"import com.algorand.algosdk.v2.client.common.Client;\n" + 
+								"import com.algorand.algosdk.v2.client.common.Query;\n" + 
+								"import com.algorand.algosdk.v2.client.common.QueryData;\n" + 
+								"import com.algorand.algosdk.v2.client.common.Response;\n";
 				if (needsClassImport(returnType.toLowerCase())) {
 					imports = imports + "import " + modelPkg + "." + returnType + ";\n";
 				}
@@ -483,6 +471,7 @@ public class Generator {
 				bw.append("\npublic class " + className + " extends Query {\n");
 				bw.append(
 						processQueryParams(
+								generatedPathsEntry,
 								properties, 
 								className, 
 								path,
@@ -532,13 +521,26 @@ public class Generator {
 				}
 	}
 
-	public void generateIndexerMethods(String rootPath, String pkg, String modelPkg) throws IOException {
+	public void generateQueryMethods(String rootPath, String pkg, String modelPkg, String gpImpDirFile, String gpMethodsDirFile) throws IOException {
+		// GeneratedPaths file
+		BufferedWriter gpImports = new BufferedWriter(new FileWriter(new File(gpImpDirFile)));
+		BufferedWriter gpMethods = new BufferedWriter(new FileWriter(new File(gpMethodsDirFile)));
+		
+		StringBuffer gpBody = new StringBuffer();
+
 		JsonNode paths = this.root.get("paths");
 		Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
 		while (pathIter.hasNext()) {
 			Entry<String, JsonNode> path = pathIter.next();
-			writeQueryClass(path.getValue(), path.getKey(), rootPath, pkg, modelPkg);
-		}		
+			writeQueryClass(gpBody, path.getValue(), path.getKey(), rootPath, pkg, modelPkg);
+
+			// Fill GeneratedPaths class
+			String className = getCamelCase(path.getValue().findPath("operationId").asText(), true);
+			gpImports.append("import " + pkg + "." + className + ";\n");
+		}
+		gpMethods.append(gpBody);
+		gpMethods.close();
+		gpImports.close();
 	}
 
 	public Generator (JsonNode root) {

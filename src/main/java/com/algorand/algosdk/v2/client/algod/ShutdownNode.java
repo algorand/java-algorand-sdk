@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.algod;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
@@ -19,7 +17,7 @@ public class ShutdownNode extends Query {
 	private boolean timeoutIsSet;
 
 	public ShutdownNode(Client client) {
-		super(client);
+		super(client, "post");
 	}
 	public ShutdownNode setTimeout(long timeout) {
 		this.timeout = timeout;
@@ -27,24 +25,10 @@ public class ShutdownNode extends Query {
 		return this;
 	}
 
-	public String lookup() {
-		String response;
-		try {
-			response = request("post");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		String resp;
-		try {
-			resp = mapper.readValue(response, String.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<String> execute() throws Exception {
+		Response<String> resp = baseExecute();
+		resp.setValueType(String.class);
 		return resp;
 	}
 	public QueryData getRequestString() {

@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.AccountResponse;
 
 
@@ -19,17 +17,9 @@ public class LookupAccountByID extends Query {
 	private boolean accountIdIsSet;
 	private boolean roundIsSet;
 
-	public LookupAccountByID(Client client) {
-		super(client);
-	}
-
-	/**
-	 * account string 
-	 */
-	public LookupAccountByID setAccountId(String accountId) {
+	public LookupAccountByID(Client client, String accountId) {
+		super(client, "get");
 		this.accountId = accountId;
-		this.accountIdIsSet = true;
-		return this;
 	}
 
 	/**
@@ -41,31 +31,14 @@ public class LookupAccountByID extends Query {
 		return this;
 	}
 
-	public AccountResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		AccountResponse resp;
-		try {
-			resp = mapper.readValue(response, AccountResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<AccountResponse> execute() throws Exception {
+		Response<AccountResponse> resp = baseExecute();
+		resp.setValueType(AccountResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if  (!this.accountIdIsSet) {
-			throw new RuntimeException("accountId is not set, and it is a required parameter.");
-		}
 		if (this.roundIsSet) {
 			qd.addQuery("round", String.valueOf(round));
 		}

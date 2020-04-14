@@ -7,9 +7,9 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.sdkutils.generated.QueryMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.squareup.okhttp.HttpUrl;
@@ -99,7 +99,7 @@ public class TestGenerator extends Generator {
 				// Call the SDK
 				String sdkResponse = QueryMapper.lookup(query, methodName);
 				String filter = "round\"";
-				String diff = JsonUtils.showDifferentces(curlResponse, sdkResponse, "curl", "sdk", verbose, filter);
+				String diff = Utils.showDifferentces(curlResponse, sdkResponse, "curl", "sdk", verbose, filter);
 
 				if (!verbose) {
 					if (!diff.isEmpty()) {

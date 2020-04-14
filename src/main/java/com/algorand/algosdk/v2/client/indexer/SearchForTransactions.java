@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -50,7 +48,7 @@ public class SearchForTransactions extends Query {
 	private boolean txTypeIsSet;
 
 	public SearchForTransactions(Client client) {
-		super(client);
+		super(client, "get");
 	}
 
 	/**
@@ -208,24 +206,10 @@ public class SearchForTransactions extends Query {
 		return this;
 	}
 
-	public TransactionsResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		TransactionsResponse resp;
-		try {
-			resp = mapper.readValue(response, TransactionsResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<TransactionsResponse> execute() throws Exception {
+		Response<TransactionsResponse> resp = baseExecute();
+		resp.setValueType(TransactionsResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {

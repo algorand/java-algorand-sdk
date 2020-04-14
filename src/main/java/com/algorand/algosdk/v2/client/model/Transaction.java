@@ -2,11 +2,9 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -14,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * transactions type. Definition: data/transactions/signedtxn.go : SignedTxn 
  * data/transactions/transaction.go : Transaction 
  */
-public class Transaction {
+public class Transaction extends PathResponse {
 
 	private TransactionAssetConfig assetConfigTransaction;
 	private boolean assetConfigTransactionIsSet;
@@ -567,18 +565,5 @@ public class Transaction {
 		if (!Objects.deepEquals(this.type, other.type)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

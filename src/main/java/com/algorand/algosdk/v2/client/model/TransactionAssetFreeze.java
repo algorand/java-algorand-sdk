@@ -2,18 +2,16 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * Fields for an asset freeze transaction. Definition: data/transactions/asset.go : 
  * AssetFreezeTxnFields 
  */
-public class TransactionAssetFreeze {
+public class TransactionAssetFreeze extends PathResponse {
 
 	/**
 	 * (fadd) Address of the account whose asset is being frozen or thawed. 
@@ -90,18 +88,5 @@ public class TransactionAssetFreeze {
 		if (!Objects.deepEquals(this.newFreezeStatus, other.newFreezeStatus)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

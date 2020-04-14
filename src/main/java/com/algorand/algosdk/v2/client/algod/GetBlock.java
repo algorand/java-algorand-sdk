@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.algod;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.BlockResponse;
 
 
@@ -19,8 +17,9 @@ public class GetBlock extends Query {
 	private boolean formatIsSet;
 	private boolean roundIsSet;
 
-	public GetBlock(Client client) {
-		super(client);
+	public GetBlock(Client client, long round) {
+		super(client, "get");
+		this.round = round;
 	}
 
 	/**
@@ -32,42 +31,16 @@ public class GetBlock extends Query {
 		return this;
 	}
 
-	/**
-	 * The round from which to fetch block information. 
-	 */
-	public GetBlock setRound(long round) {
-		this.round = round;
-		this.roundIsSet = true;
-		return this;
-	}
-
-	public BlockResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		BlockResponse resp;
-		try {
-			resp = mapper.readValue(response, BlockResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<BlockResponse> execute() throws Exception {
+		Response<BlockResponse> resp = baseExecute();
+		resp.setValueType(BlockResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if (this.formatIsSet) {
 			qd.addQuery("format", String.valueOf(format));
-		}
-		if  (!this.roundIsSet) {
-			throw new RuntimeException("round is not set, and it is a required parameter.");
 		}
 		qd.addPathSegment(String.valueOf("v2"));
 		qd.addPathSegment(String.valueOf("blocks"));

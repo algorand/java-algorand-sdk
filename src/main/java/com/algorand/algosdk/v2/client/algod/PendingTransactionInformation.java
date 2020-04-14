@@ -1,11 +1,9 @@
 package com.algorand.algosdk.v2.client.algod;
 
-import java.io.IOException;
-
-import com.algorand.algosdk.v2.client.connect.Client;
-import com.algorand.algosdk.v2.client.connect.Query;
-import com.algorand.algosdk.v2.client.connect.QueryData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 
 
@@ -25,8 +23,9 @@ public class PendingTransactionInformation extends Query {
 	private boolean formatIsSet;
 	private boolean txidIsSet;
 
-	public PendingTransactionInformation(Client client) {
-		super(client);
+	public PendingTransactionInformation(Client client, String txid) {
+		super(client, "get");
+		this.txid = txid;
 	}
 
 	/**
@@ -38,42 +37,16 @@ public class PendingTransactionInformation extends Query {
 		return this;
 	}
 
-	/**
-	 * A transaction id 
-	 */
-	public PendingTransactionInformation setTxid(String txid) {
-		this.txid = txid;
-		this.txidIsSet = true;
-		return this;
-	}
-
-	public PendingTransactionResponse lookup() {
-		String response;
-		try {
-			response = request("get");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-		ObjectMapper mapper = new ObjectMapper();
-		PendingTransactionResponse resp;
-		try {
-			resp = mapper.readValue(response, PendingTransactionResponse.class);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	@Override
+	public Response<PendingTransactionResponse> execute() throws Exception {
+		Response<PendingTransactionResponse> resp = baseExecute();
+		resp.setValueType(PendingTransactionResponse.class);
 		return resp;
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
 		if (this.formatIsSet) {
 			qd.addQuery("format", String.valueOf(format));
-		}
-		if  (!this.txidIsSet) {
-			throw new RuntimeException("txid is not set, and it is a required parameter.");
 		}
 		qd.addPathSegment(String.valueOf("v2"));
 		qd.addPathSegment(String.valueOf("transactions"));

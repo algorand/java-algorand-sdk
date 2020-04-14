@@ -2,18 +2,16 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * AccountParticipation describes the parameters used by this account in consensus 
  * protocol. 
  */
-public class AccountParticipation {
+public class AccountParticipation extends PathResponse {
 
 	/**
 	 * (sel) Selection public key (if any) currently registered for this round. 
@@ -135,18 +133,5 @@ public class AccountParticipation {
 		if (!Objects.deepEquals(this.voteParticipationKey, other.voteParticipationKey)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

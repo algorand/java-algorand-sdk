@@ -3,18 +3,16 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * (msig) structure holding multiple subsignatures. Definition: crypto/multisig.go 
  * : MultisigSig 
  */
-public class TransactionSignatureMultisig {
+public class TransactionSignatureMultisig extends PathResponse {
 
 	/**
 	 * (subsig) holds pairs of public key and signatures. 
@@ -91,18 +89,5 @@ public class TransactionSignatureMultisig {
 		if (!Objects.deepEquals(this.version, other.version)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

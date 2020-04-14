@@ -18,8 +18,8 @@ public class QueryMapperGenerator extends Generator {
 		bw.append("package com.algorand.sdkutils.generated;\n" + 
 				"\n" + 
 				"import com.algorand.algosdk.v2.client.indexer.*;\n" + 
-				"import com.algorand.algosdk.v2.client.connect.Client;\n" + 
-				"import com.algorand.algosdk.v2.client.connect.Query;\n\n"
+				"import com.algorand.algosdk.v2.client.common.Client;\n" + 
+				"import com.algorand.algosdk.v2.client.common.Query;\n\n"
 				+ "public class QueryMapper {\n" + 
 				"\n");
 		

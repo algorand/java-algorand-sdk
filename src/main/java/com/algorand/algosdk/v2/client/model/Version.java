@@ -3,18 +3,16 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * Note that we annotate this as a model so that legacy clients can directly import 
  * a swagger generated Version model. 
  */
-public class Version {
+public class Version extends PathResponse {
 
 	private VersionBuild build;
 	private boolean buildIsSet;
@@ -101,18 +99,5 @@ public class Version {
 		if (!Objects.deepEquals(this.versions, other.versions)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

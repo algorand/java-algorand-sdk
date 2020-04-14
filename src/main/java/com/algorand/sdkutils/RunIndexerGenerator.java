@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.algorand.sdkutils.generators.Generator;
-import com.algorand.sdkutils.generators.JsonUtils;
+import com.algorand.sdkutils.generators.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -17,8 +17,9 @@ public class RunIndexerGenerator {
 		File f = new File("../openapi-server-generator/scripts/indexer.oas2.yml");
 		FileInputStream fis = new FileInputStream(f);
 
-		JsonNode root = JsonUtils.getRoot(fis);	
+		JsonNode root = Utils.getRoot(fis);	
 		String rootPath = "src/main/java/com/algorand/algosdk/";
+		String genRoot = "src/main/java/com/algorand/sdkutils/generated/";
 
 		Generator g = new Generator(root);
 
@@ -37,6 +38,11 @@ public class RunIndexerGenerator {
 		// com.algorand.algosdk.v2.client.indexer		
 		String ipkg = "com.algorand.algosdk.v2.client.indexer";
 		System.out.println("Generating " + ipkg + " to " + rootPath+"/v2/client/indexer");
-		g.generateIndexerMethods(rootPath+"/v2/client/indexer", ipkg, pkg);
+		g.generateQueryMethods(rootPath+"/v2/client/indexer",
+				ipkg, pkg, 
+				genRoot+"indexerImports.txt", 
+				genRoot+"indexerPaths.txt");
+		
+		Utils.generateClientFile(genRoot);
 	}
 }

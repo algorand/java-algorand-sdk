@@ -2,18 +2,16 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * AssetParams specifies the parameters for an asset. (apar) when part of an 
  * AssetConfig transaction. Definition: data/transactions/asset.go : AssetParams 
  */
-public class AssetParams {
+public class AssetParams extends PathResponse {
 
 	/**
 	 * (c) Address of account used to clawback holdings of this asset. If empty, 
@@ -296,18 +294,5 @@ public class AssetParams {
 		if (!Objects.deepEquals(this.url, other.url)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }

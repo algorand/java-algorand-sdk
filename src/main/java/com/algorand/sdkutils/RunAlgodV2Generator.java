@@ -5,7 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 
 import com.algorand.sdkutils.generators.Generator;
-import com.algorand.sdkutils.generators.JsonUtils;
+import com.algorand.sdkutils.generators.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -17,9 +17,10 @@ public class RunAlgodV2Generator {
 		File f = new File("../openapi-server-generator/scripts/algod.oas2.yml");
 		FileInputStream fis = new FileInputStream(f);
 
-		JsonNode root = JsonUtils.getRoot(fis);	
+		JsonNode root = Utils.getRoot(fis);	
 		String rootPath = "src/main/java/com/algorand/algosdk/";
-
+		String genRoot = "src/main/java/com/algorand/sdkutils/generated/";
+		
 		Generator g = new Generator(root);
 
 		// Generate classes from the schemas
@@ -37,7 +38,13 @@ public class RunAlgodV2Generator {
 		// com.algorand.algosdk.v2.client.indexer
 		String apkg = "com.algorand.algosdk.v2.client.algod";
 		System.out.println("Generating " + apkg + " to " + rootPath+"/v2/client/algod");
-		g.generateIndexerMethods(rootPath+"/v2/client/algod", apkg, pkg);
+		g.generateQueryMethods(rootPath+"/v2/client/algod", 
+				apkg, pkg, 
+				genRoot+"algodV2Imports.txt", 
+				genRoot+"algodV2Paths.txt");
+		
+		Utils.generateClientFile(genRoot);
+
 	}
 }
 

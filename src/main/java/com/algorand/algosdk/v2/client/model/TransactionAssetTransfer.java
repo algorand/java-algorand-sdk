@@ -2,18 +2,16 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
  * Fields for an asset transfer transaction. Definition: data/transactions/asset.go 
  * : AssetTransferTxnFields 
  */
-public class TransactionAssetTransfer {
+public class TransactionAssetTransfer extends PathResponse {
 
 	/**
 	 * (aamt) Amount of asset to transfer. A zero amount transferred to self allocates 
@@ -161,18 +159,5 @@ public class TransactionAssetTransfer {
 		if (!Objects.deepEquals(this.sender, other.sender)) return false;
 
 		return true;
-	}
-
-	@Override
-	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
-		String jsonStr;
-		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
-
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e.getMessage());
-		}
-		return jsonStr;
 	}
 }
