@@ -52,7 +52,7 @@ public class QueryMapperGenerator extends Generator {
 			
 			//lookUp
 			lookUp.append("		case \""+className+"\":\n" + 
-					"			return (("+javaClassName+")q).execute().toString();\n");
+					"			return (("+javaClassName+")q).execute().body().toString();\n");
 			
 			JsonNode paramNode = path.getValue().findValue("parameters");
 			Iterator<Entry<String, JsonNode>> properties = getSortedParameters(paramNode);

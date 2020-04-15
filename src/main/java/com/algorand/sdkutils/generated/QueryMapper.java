@@ -270,23 +270,23 @@ public class QueryMapper {
 	public static String lookup(Query q, String className) throws Exception {
 		switch (className) {
 		case "searchAccounts":
-			return ((SearchAccounts)q).execute().toString();
+			return ((SearchAccounts)q).execute().body().toString();
 		case "lookupAccountByID":
-			return ((LookupAccountByID)q).execute().toString();
+			return ((LookupAccountByID)q).execute().body().toString();
 		case "lookupAccountTransactions":
-			return ((LookupAccountTransactions)q).execute().toString();
+			return ((LookupAccountTransactions)q).execute().body().toString();
 		case "searchForAssets":
-			return ((SearchForAssets)q).execute().toString();
+			return ((SearchForAssets)q).execute().body().toString();
 		case "lookupAssetByID":
-			return ((LookupAssetByID)q).execute().toString();
+			return ((LookupAssetByID)q).execute().body().toString();
 		case "lookupAssetBalances":
-			return ((LookupAssetBalances)q).execute().toString();
+			return ((LookupAssetBalances)q).execute().body().toString();
 		case "lookupAssetTransactions":
-			return ((LookupAssetTransactions)q).execute().toString();
+			return ((LookupAssetTransactions)q).execute().body().toString();
 		case "lookupBlock":
-			return ((LookupBlock)q).execute().toString();
+			return ((LookupBlock)q).execute().body().toString();
 		case "searchForTransactions":
-			return ((SearchForTransactions)q).execute().toString();
+			return ((SearchForTransactions)q).execute().body().toString();
 		}
 		return null;
 	}
