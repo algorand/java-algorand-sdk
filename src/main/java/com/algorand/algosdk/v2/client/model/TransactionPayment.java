@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -15,89 +14,25 @@ public class TransactionPayment extends PathResponse {
 
 	/**
 	 * (amt) number of MicroAlgos intended to be transferred. 
-	 */
-	private long amount;
-	private boolean amountIsSet;
-	@JsonProperty("amount")
-	public void setAmount(long amount){
-		this.amount = amount;
-		amountIsSet = true;
-	}
-	@JsonProperty("amount")
-	public Long getAmount(){
-		return amountIsSet ? amount : null;
-	}
-	/**
-	 * Check if has a value for amount 
-	 */	@JsonIgnore
-	public boolean hasAmount(){
-		return amountIsSet;
-	}
+	 */	@JsonProperty("amount")
+	public Long amount;
 
 	/**
 	 * Number of MicroAlgos that were sent to the close-remainder-to address when 
 	 * closing the sender account. 
-	 */
-	private long closeAmount;
-	private boolean closeAmountIsSet;
-	@JsonProperty("close-amount")
-	public void setCloseAmount(long closeAmount){
-		this.closeAmount = closeAmount;
-		closeAmountIsSet = true;
-	}
-	@JsonProperty("close-amount")
-	public Long getCloseAmount(){
-		return closeAmountIsSet ? closeAmount : null;
-	}
-	/**
-	 * Check if has a value for closeAmount 
-	 */	@JsonIgnore
-	public boolean hasCloseAmount(){
-		return closeAmountIsSet;
-	}
+	 */	@JsonProperty("close-amount")
+	public Long closeAmount;
 
 	/**
 	 * (close) when set, indicates that the sending account should be closed and all 
 	 * remaining funds be transferred to this address. 
-	 */
-	private String closeRemainderTo;
-	private boolean closeRemainderToIsSet;
-	@JsonProperty("close-remainder-to")
-	public void setCloseRemainderTo(String closeRemainderTo){
-		this.closeRemainderTo = closeRemainderTo;
-		closeRemainderToIsSet = true;
-	}
-	@JsonProperty("close-remainder-to")
-	public String getCloseRemainderTo(){
-		return closeRemainderToIsSet ? closeRemainderTo : null;
-	}
-	/**
-	 * Check if has a value for closeRemainderTo 
-	 */	@JsonIgnore
-	public boolean hasCloseRemainderTo(){
-		return closeRemainderToIsSet;
-	}
+	 */	@JsonProperty("close-remainder-to")
+	public String closeRemainderTo;
 
 	/**
 	 * (rcv) receiver's address. 
-	 */
-	private String receiver;
-	private boolean receiverIsSet;
-	@JsonProperty("receiver")
-	public void setReceiver(String receiver){
-		this.receiver = receiver;
-		receiverIsSet = true;
-	}
-	@JsonProperty("receiver")
-	public String getReceiver(){
-		return receiverIsSet ? receiver : null;
-	}
-	/**
-	 * Check if has a value for receiver 
-	 */	@JsonIgnore
-	public boolean hasReceiver(){
-		return receiverIsSet;
-	}
+	 */	@JsonProperty("receiver")
+	public String receiver;
 
 	@Override
 	public boolean equals(Object o) {

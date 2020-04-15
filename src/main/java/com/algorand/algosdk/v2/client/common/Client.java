@@ -93,66 +93,87 @@ public class Client {
 */
 	}
 	
+	
 	public AccountInformation AccountInformation(String address) {
 		return new AccountInformation((Client) this, address);
 	}
+
 	public GetPendingTransactionsByAddress GetPendingTransactionsByAddress(String address) {
 		return new GetPendingTransactionsByAddress((Client) this, address);
 	}
-	public GetBlock GetBlock(long round) {
+
+	public GetBlock GetBlock(Long round) {
 		return new GetBlock((Client) this, round);
 	}
+
 	public GetSupply GetSupply() {
 		return new GetSupply((Client) this);
 	}
+
 	public RegisterParticipationKeys RegisterParticipationKeys(String address) {
 		return new RegisterParticipationKeys((Client) this, address);
 	}
+
 	public ShutdownNode ShutdownNode() {
 		return new ShutdownNode((Client) this);
 	}
+
 	public GetStatus GetStatus() {
 		return new GetStatus((Client) this);
 	}
-	public WaitForBlock WaitForBlock(long round) {
+
+	public WaitForBlock WaitForBlock(Long round) {
 		return new WaitForBlock((Client) this, round);
 	}
+
 	public RawTransaction RawTransaction() {
 		return new RawTransaction((Client) this);
 	}
+
 	public TransactionParams TransactionParams() {
 		return new TransactionParams((Client) this);
 	}
+
 	public GetPendingTransactions GetPendingTransactions() {
 		return new GetPendingTransactions((Client) this);
 	}
+
 	public PendingTransactionInformation PendingTransactionInformation(String txid) {
 		return new PendingTransactionInformation((Client) this, txid);
 	}
+
 	public SearchAccounts searchAccounts() {
 		return new SearchAccounts((Client) this);
 	}
+
 	public LookupAccountByID lookupAccountByID(String accountId) {
 		return new LookupAccountByID((Client) this, accountId);
 	}
+
 	public LookupAccountTransactions lookupAccountTransactions(String accountId) {
 		return new LookupAccountTransactions((Client) this, accountId);
 	}
+
 	public SearchForAssets searchForAssets() {
 		return new SearchForAssets((Client) this);
 	}
-	public LookupAssetByID lookupAssetByID(long assetId) {
+
+	public LookupAssetByID lookupAssetByID(Long assetId) {
 		return new LookupAssetByID((Client) this, assetId);
 	}
-	public LookupAssetBalances lookupAssetBalances(long assetId) {
+
+	public LookupAssetBalances lookupAssetBalances(Long assetId) {
 		return new LookupAssetBalances((Client) this, assetId);
 	}
-	public LookupAssetTransactions lookupAssetTransactions(long assetId) {
+
+	public LookupAssetTransactions lookupAssetTransactions(Long assetId) {
 		return new LookupAssetTransactions((Client) this, assetId);
 	}
-	public LookupBlock lookupBlock(long roundNumber) {
+
+	public LookupBlock lookupBlock(Long roundNumber) {
 		return new LookupBlock((Client) this, roundNumber);
 	}
+
 	public SearchForTransactions searchForTransactions() {
 		return new SearchForTransactions((Client) this);
 	}

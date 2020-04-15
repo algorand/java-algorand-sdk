@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -11,60 +10,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * A simplified version of AssetHolding 
  */
 public class MiniAssetHolding extends PathResponse {
-
-	private String address;
-	private boolean addressIsSet;
 	@JsonProperty("address")
-	public void setAddress(String address){
-		this.address = address;
-		addressIsSet = true;
-	}
-	@JsonProperty("address")
-	public String getAddress(){
-		return addressIsSet ? address : null;
-	}
-	/**
-	 * Check if has a value for address 
-	 */	@JsonIgnore
-	public boolean hasAddress(){
-		return addressIsSet;
-	}
-
-	private long amount;
-	private boolean amountIsSet;
+	public String address;
 	@JsonProperty("amount")
-	public void setAmount(long amount){
-		this.amount = amount;
-		amountIsSet = true;
-	}
-	@JsonProperty("amount")
-	public Long getAmount(){
-		return amountIsSet ? amount : null;
-	}
-	/**
-	 * Check if has a value for amount 
-	 */	@JsonIgnore
-	public boolean hasAmount(){
-		return amountIsSet;
-	}
-
-	private boolean isFrozen;
-	private boolean isFrozenIsSet;
+	public Long amount;
 	@JsonProperty("is-frozen")
-	public void setIsFrozen(boolean isFrozen){
-		this.isFrozen = isFrozen;
-		isFrozenIsSet = true;
-	}
-	@JsonProperty("is-frozen")
-	public Boolean getIsFrozen(){
-		return isFrozenIsSet ? isFrozen : null;
-	}
-	/**
-	 * Check if has a value for isFrozen 
-	 */	@JsonIgnore
-	public boolean hasIsFrozen(){
-		return isFrozenIsSet;
-	}
+	public Boolean isFrozen;
 
 	@Override
 	public boolean equals(Object o) {

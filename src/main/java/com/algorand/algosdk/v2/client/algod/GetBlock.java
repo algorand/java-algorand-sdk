@@ -12,12 +12,13 @@ import com.algorand.algosdk.v2.client.model.BlockResponse;
  */
 public class GetBlock extends Query {
 	private String format;
-	private long round;
+	private Long round;
 
-	private boolean formatIsSet;
-	private boolean roundIsSet;
 
-	public GetBlock(Client client, long round) {
+	/**
+	 * @param round The round from which to fetch block information. 
+	 */
+	public GetBlock(Client client, Long round) {
 		super(client, "get");
 		this.round = round;
 	}
@@ -27,7 +28,6 @@ public class GetBlock extends Query {
 	 */
 	public GetBlock setFormat(String format) {
 		this.format = format;
-		this.formatIsSet = true;
 		return this;
 	}
 
@@ -39,7 +39,7 @@ public class GetBlock extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.formatIsSet) {
+		if (this.format != null) {
 			qd.addQuery("format", String.valueOf(format));
 		}
 		qd.addPathSegment(String.valueOf("v2"));

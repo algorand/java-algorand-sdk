@@ -3,73 +3,24 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class SupplyResponse extends PathResponse {
 
 	/**
 	 * Round 
-	 */
-	private long current_round;
-	private boolean current_roundIsSet;
-	@JsonProperty("current_round")
-	public void setCurrent_round(long current_round){
-		this.current_round = current_round;
-		current_roundIsSet = true;
-	}
-	@JsonProperty("current_round")
-	public Long getCurrent_round(){
-		return current_roundIsSet ? current_round : null;
-	}
-	/**
-	 * Check if has a value for current_round 
-	 */	@JsonIgnore
-	public boolean hasCurrent_round(){
-		return current_roundIsSet;
-	}
+	 */	@JsonProperty("current_round")
+	public Long current_round;
 
 	/**
 	 * OnlineMoney 
-	 */
-	private long onlineMoney;
-	private boolean onlineMoneyIsSet;
-	@JsonProperty("online-money")
-	public void setOnlineMoney(long onlineMoney){
-		this.onlineMoney = onlineMoney;
-		onlineMoneyIsSet = true;
-	}
-	@JsonProperty("online-money")
-	public Long getOnlineMoney(){
-		return onlineMoneyIsSet ? onlineMoney : null;
-	}
-	/**
-	 * Check if has a value for onlineMoney 
-	 */	@JsonIgnore
-	public boolean hasOnlineMoney(){
-		return onlineMoneyIsSet;
-	}
+	 */	@JsonProperty("online-money")
+	public Long onlineMoney;
 
 	/**
 	 * TotalMoney 
-	 */
-	private long totalMoney;
-	private boolean totalMoneyIsSet;
-	@JsonProperty("total-money")
-	public void setTotalMoney(long totalMoney){
-		this.totalMoney = totalMoney;
-		totalMoneyIsSet = true;
-	}
-	@JsonProperty("total-money")
-	public Long getTotalMoney(){
-		return totalMoneyIsSet ? totalMoney : null;
-	}
-	/**
-	 * Check if has a value for totalMoney 
-	 */	@JsonIgnore
-	public boolean hasTotalMoney(){
-		return totalMoneyIsSet;
-	}
+	 */	@JsonProperty("total-money")
+	public Long totalMoney;
 
 	@Override
 	public boolean equals(Object o) {

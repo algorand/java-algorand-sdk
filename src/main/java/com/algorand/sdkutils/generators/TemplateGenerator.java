@@ -41,7 +41,7 @@ public class TemplateGenerator extends Generator{
 			}
 			
 			if (desc != null) {
-				notes.append(Generator.formatComment(desc, "")+"\n");
+				notes.append(Generator.formatComment(desc, "", true)+"\n");
 			}
 			notes.append(pathString+"\n");
 			
@@ -57,7 +57,7 @@ public class TemplateGenerator extends Generator{
 				}
 				bw.append(", ");
 				if (parameter.getValue().get("description") != null) {
-					notes.append(Generator.formatComment(parameter.getValue().get("description").asText(), "\t")+"\n");
+					notes.append(Generator.formatComment(parameter.getValue().get("description").asText(), "\t", true)+"\n");
 					notes.append("\t"+parameter.getKey()+"\n");
 				}
 			}

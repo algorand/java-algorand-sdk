@@ -13,36 +13,24 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 public class LookupAccountTransactions extends Query {
 	private String accountId;
 	private String afterTime;
-	private long assetId;
+	private Long assetId;
 	private String beforeTime;
-	private long currencyGreaterThan;
-	private long currencyLessThan;
-	private long limit;
-	private long maxRound;
-	private long minRound;
+	private Long currencyGreaterThan;
+	private Long currencyLessThan;
+	private Long limit;
+	private Long maxRound;
+	private Long minRound;
 	private String next;
 	private String notePrefix;
-	private long round;
+	private Long round;
 	private String sigType;
 	private String txId;
 	private String txType;
 
-	private boolean accountIdIsSet;
-	private boolean afterTimeIsSet;
-	private boolean assetIdIsSet;
-	private boolean beforeTimeIsSet;
-	private boolean currencyGreaterThanIsSet;
-	private boolean currencyLessThanIsSet;
-	private boolean limitIsSet;
-	private boolean maxRoundIsSet;
-	private boolean minRoundIsSet;
-	private boolean nextIsSet;
-	private boolean notePrefixIsSet;
-	private boolean roundIsSet;
-	private boolean sigTypeIsSet;
-	private boolean txIdIsSet;
-	private boolean txTypeIsSet;
 
+	/**
+	 * @param accountId account string 
+	 */
 	public LookupAccountTransactions(Client client, String accountId) {
 		super(client, "get");
 		this.accountId = accountId;
@@ -53,16 +41,14 @@ public class LookupAccountTransactions extends Query {
 	 */
 	public LookupAccountTransactions setAfterTime(String afterTime) {
 		this.afterTime = afterTime;
-		this.afterTimeIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Asset ID 
 	 */
-	public LookupAccountTransactions setAssetId(long assetId) {
+	public LookupAccountTransactions setAssetId(Long assetId) {
 		this.assetId = assetId;
-		this.assetIdIsSet = true;
 		return this;
 	}
 
@@ -71,7 +57,6 @@ public class LookupAccountTransactions extends Query {
 	 */
 	public LookupAccountTransactions setBeforeTime(String beforeTime) {
 		this.beforeTime = beforeTime;
-		this.beforeTimeIsSet = true;
 		return this;
 	}
 
@@ -80,9 +65,8 @@ public class LookupAccountTransactions extends Query {
 	 * default currency unless an asset-id is provided, in which case the asset will be 
 	 * used. 
 	 */
-	public LookupAccountTransactions setCurrencyGreaterThan(long currencyGreaterThan) {
+	public LookupAccountTransactions setCurrencyGreaterThan(Long currencyGreaterThan) {
 		this.currencyGreaterThan = currencyGreaterThan;
-		this.currencyGreaterThanIsSet = true;
 		return this;
 	}
 
@@ -90,36 +74,32 @@ public class LookupAccountTransactions extends Query {
 	 * Results should have an amount less than this value. MicroAlgos are the default 
 	 * currency unless an asset-id is provided, in which case the asset will be used. 
 	 */
-	public LookupAccountTransactions setCurrencyLessThan(long currencyLessThan) {
+	public LookupAccountTransactions setCurrencyLessThan(Long currencyLessThan) {
 		this.currencyLessThan = currencyLessThan;
-		this.currencyLessThanIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Maximum number of results to return. 
 	 */
-	public LookupAccountTransactions setLimit(long limit) {
+	public LookupAccountTransactions setLimit(Long limit) {
 		this.limit = limit;
-		this.limitIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Include results at or before the specified max-round. 
 	 */
-	public LookupAccountTransactions setMaxRound(long maxRound) {
+	public LookupAccountTransactions setMaxRound(Long maxRound) {
 		this.maxRound = maxRound;
-		this.maxRoundIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Include results at or after the specified min-round. 
 	 */
-	public LookupAccountTransactions setMinRound(long minRound) {
+	public LookupAccountTransactions setMinRound(Long minRound) {
 		this.minRound = minRound;
-		this.minRoundIsSet = true;
 		return this;
 	}
 
@@ -128,7 +108,6 @@ public class LookupAccountTransactions extends Query {
 	 */
 	public LookupAccountTransactions setNext(String next) {
 		this.next = next;
-		this.nextIsSet = true;
 		return this;
 	}
 
@@ -137,16 +116,14 @@ public class LookupAccountTransactions extends Query {
 	 */
 	public LookupAccountTransactions setNotePrefix(String notePrefix) {
 		this.notePrefix = notePrefix;
-		this.notePrefixIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Include results for the specified round. 
 	 */
-	public LookupAccountTransactions setRound(long round) {
+	public LookupAccountTransactions setRound(Long round) {
 		this.round = round;
-		this.roundIsSet = true;
 		return this;
 	}
 
@@ -156,7 +133,6 @@ public class LookupAccountTransactions extends Query {
 	 */
 	public LookupAccountTransactions setSigType(String sigType) {
 		this.sigType = sigType;
-		this.sigTypeIsSet = true;
 		return this;
 	}
 
@@ -165,12 +141,10 @@ public class LookupAccountTransactions extends Query {
 	 */
 	public LookupAccountTransactions setTxId(String txId) {
 		this.txId = txId;
-		this.txIdIsSet = true;
 		return this;
 	}
 	public LookupAccountTransactions setTxType(String txType) {
 		this.txType = txType;
-		this.txTypeIsSet = true;
 		return this;
 	}
 
@@ -182,46 +156,46 @@ public class LookupAccountTransactions extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.afterTimeIsSet) {
+		if (this.afterTime != null) {
 			qd.addQuery("afterTime", String.valueOf(afterTime));
 		}
-		if (this.assetIdIsSet) {
+		if (this.assetId != null) {
 			qd.addQuery("assetId", String.valueOf(assetId));
 		}
-		if (this.beforeTimeIsSet) {
+		if (this.beforeTime != null) {
 			qd.addQuery("beforeTime", String.valueOf(beforeTime));
 		}
-		if (this.currencyGreaterThanIsSet) {
+		if (this.currencyGreaterThan != null) {
 			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}
-		if (this.currencyLessThanIsSet) {
+		if (this.currencyLessThan != null) {
 			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
 		}
-		if (this.limitIsSet) {
+		if (this.limit != null) {
 			qd.addQuery("limit", String.valueOf(limit));
 		}
-		if (this.maxRoundIsSet) {
+		if (this.maxRound != null) {
 			qd.addQuery("maxRound", String.valueOf(maxRound));
 		}
-		if (this.minRoundIsSet) {
+		if (this.minRound != null) {
 			qd.addQuery("minRound", String.valueOf(minRound));
 		}
-		if (this.nextIsSet) {
+		if (this.next != null) {
 			qd.addQuery("next", String.valueOf(next));
 		}
-		if (this.notePrefixIsSet) {
+		if (this.notePrefix != null) {
 			qd.addQuery("notePrefix", String.valueOf(notePrefix));
 		}
-		if (this.roundIsSet) {
+		if (this.round != null) {
 			qd.addQuery("round", String.valueOf(round));
 		}
-		if (this.sigTypeIsSet) {
+		if (this.sigType != null) {
 			qd.addQuery("sigType", String.valueOf(sigType));
 		}
-		if (this.txIdIsSet) {
+		if (this.txId != null) {
 			qd.addQuery("txId", String.valueOf(txId));
 		}
-		if (this.txTypeIsSet) {
+		if (this.txType != null) {
 			qd.addQuery("txType", String.valueOf(txType));
 		}
 		qd.addPathSegment(String.valueOf("accounts"));

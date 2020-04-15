@@ -12,11 +12,13 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
  * the time. /v2/status/wait-for-block-after/{round}/ 
  */
 public class WaitForBlock extends Query {
-	private long round;
+	private Long round;
 
-	private boolean roundIsSet;
 
-	public WaitForBlock(Client client, long round) {
+	/**
+	 * @param round The round to wait until returning status 
+	 */
+	public WaitForBlock(Client client, Long round) {
 		super(client, "get");
 		this.round = round;
 	}

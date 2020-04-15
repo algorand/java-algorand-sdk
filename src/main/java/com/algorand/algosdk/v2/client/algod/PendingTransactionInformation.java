@@ -20,9 +20,10 @@ public class PendingTransactionInformation extends Query {
 	private String format;
 	private String txid;
 
-	private boolean formatIsSet;
-	private boolean txidIsSet;
 
+	/**
+	 * @param txid A transaction id 
+	 */
 	public PendingTransactionInformation(Client client, String txid) {
 		super(client, "get");
 		this.txid = txid;
@@ -33,7 +34,6 @@ public class PendingTransactionInformation extends Query {
 	 */
 	public PendingTransactionInformation setFormat(String format) {
 		this.format = format;
-		this.formatIsSet = true;
 		return this;
 	}
 
@@ -45,7 +45,7 @@ public class PendingTransactionInformation extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.formatIsSet) {
+		if (this.format != null) {
 			qd.addQuery("format", String.valueOf(format));
 		}
 		qd.addPathSegment(String.valueOf("v2"));

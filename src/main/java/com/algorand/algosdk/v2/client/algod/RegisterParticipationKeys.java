@@ -12,17 +12,15 @@ import com.algorand.algosdk.v2.client.common.Response;
  */
 public class RegisterParticipationKeys extends Query {
 	private String address;
-	private long fee;
-	private long keyDilution;
-	private boolean noWait;
-	private long roundLastValid;
+	private Long fee;
+	private Long keyDilution;
+	private Boolean noWait;
+	private Long roundLastValid;
 
-	private boolean addressIsSet;
-	private boolean feeIsSet;
-	private boolean keyDilutionIsSet;
-	private boolean noWaitIsSet;
-	private boolean roundLastValidIsSet;
 
+	/**
+	 * @param address The `account-id` to update, or `all` to update all accounts. 
+	 */
 	public RegisterParticipationKeys(Client client, String address) {
 		super(client, "post");
 		this.address = address;
@@ -32,36 +30,32 @@ public class RegisterParticipationKeys extends Query {
 	 * The fee to use when submitting key registration transactions. Defaults to the 
 	 * suggested fee. 
 	 */
-	public RegisterParticipationKeys setFee(long fee) {
+	public RegisterParticipationKeys setFee(Long fee) {
 		this.fee = fee;
-		this.feeIsSet = true;
 		return this;
 	}
 
 	/**
 	 * value to use for two-level participation key. 
 	 */
-	public RegisterParticipationKeys setKeyDilution(long keyDilution) {
+	public RegisterParticipationKeys setKeyDilution(Long keyDilution) {
 		this.keyDilution = keyDilution;
-		this.keyDilutionIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Don't wait for transaction to commit before returning response. 
 	 */
-	public RegisterParticipationKeys setNoWait(boolean noWait) {
+	public RegisterParticipationKeys setNoWait(Boolean noWait) {
 		this.noWait = noWait;
-		this.noWaitIsSet = true;
 		return this;
 	}
 
 	/**
 	 * The last round for which the generated participation keys will be valid. 
 	 */
-	public RegisterParticipationKeys setRoundLastValid(long roundLastValid) {
+	public RegisterParticipationKeys setRoundLastValid(Long roundLastValid) {
 		this.roundLastValid = roundLastValid;
-		this.roundLastValidIsSet = true;
 		return this;
 	}
 
@@ -73,16 +67,16 @@ public class RegisterParticipationKeys extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.feeIsSet) {
+		if (this.fee != null) {
 			qd.addQuery("fee", String.valueOf(fee));
 		}
-		if (this.keyDilutionIsSet) {
+		if (this.keyDilution != null) {
 			qd.addQuery("keyDilution", String.valueOf(keyDilution));
 		}
-		if (this.noWaitIsSet) {
+		if (this.noWait != null) {
 			qd.addQuery("noWait", String.valueOf(noWait));
 		}
-		if (this.roundLastValidIsSet) {
+		if (this.roundLastValid != null) {
 			qd.addQuery("roundLastValid", String.valueOf(roundLastValid));
 		}
 		qd.addPathSegment(String.valueOf("v2"));

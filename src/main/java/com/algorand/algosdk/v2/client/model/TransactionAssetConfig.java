@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -16,42 +15,10 @@ public class TransactionAssetConfig extends PathResponse {
 
 	/**
 	 * (xaid) ID of the asset being configured or empty if creating. 
-	 */
-	private long assetId;
-	private boolean assetIdIsSet;
-	@JsonProperty("asset-id")
-	public void setAssetId(long assetId){
-		this.assetId = assetId;
-		assetIdIsSet = true;
-	}
-	@JsonProperty("asset-id")
-	public Long getAssetId(){
-		return assetIdIsSet ? assetId : null;
-	}
-	/**
-	 * Check if has a value for assetId 
-	 */	@JsonIgnore
-	public boolean hasAssetId(){
-		return assetIdIsSet;
-	}
-
-	private AssetParams params;
-	private boolean paramsIsSet;
+	 */	@JsonProperty("asset-id")
+	public Long assetId;
 	@JsonProperty("params")
-	public void setParams(AssetParams params){
-		this.params = params;
-		paramsIsSet = true;
-	}
-	@JsonProperty("params")
-	public AssetParams getParams(){
-		return paramsIsSet ? params : null;
-	}
-	/**
-	 * Check if has a value for params 
-	 */	@JsonIgnore
-	public boolean hasParams(){
-		return paramsIsSet;
-	}
+	public AssetParams params;
 
 	@Override
 	public boolean equals(Object o) {

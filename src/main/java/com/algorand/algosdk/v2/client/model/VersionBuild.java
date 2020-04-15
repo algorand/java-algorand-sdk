@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -11,114 +10,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * the current algod build version information. 
  */
 public class VersionBuild extends PathResponse {
-
-	private String branch;
-	private boolean branchIsSet;
 	@JsonProperty("branch")
-	public void setBranch(String branch){
-		this.branch = branch;
-		branchIsSet = true;
-	}
-	@JsonProperty("branch")
-	public String getBranch(){
-		return branchIsSet ? branch : null;
-	}
-	/**
-	 * Check if has a value for branch 
-	 */	@JsonIgnore
-	public boolean hasBranch(){
-		return branchIsSet;
-	}
-
-	private long buildNumber;
-	private boolean buildNumberIsSet;
+	public String branch;
 	@JsonProperty("build-number")
-	public void setBuildNumber(long buildNumber){
-		this.buildNumber = buildNumber;
-		buildNumberIsSet = true;
-	}
-	@JsonProperty("build-number")
-	public Long getBuildNumber(){
-		return buildNumberIsSet ? buildNumber : null;
-	}
-	/**
-	 * Check if has a value for buildNumber 
-	 */	@JsonIgnore
-	public boolean hasBuildNumber(){
-		return buildNumberIsSet;
-	}
-
-	private String channel;
-	private boolean channelIsSet;
+	public Long buildNumber;
 	@JsonProperty("channel")
-	public void setChannel(String channel){
-		this.channel = channel;
-		channelIsSet = true;
-	}
-	@JsonProperty("channel")
-	public String getChannel(){
-		return channelIsSet ? channel : null;
-	}
-	/**
-	 * Check if has a value for channel 
-	 */	@JsonIgnore
-	public boolean hasChannel(){
-		return channelIsSet;
-	}
-
-	private String commitHash;
-	private boolean commitHashIsSet;
+	public String channel;
 	@JsonProperty("commit-hash")
-	public void setCommitHash(String commitHash){
-		this.commitHash = commitHash;
-		commitHashIsSet = true;
-	}
-	@JsonProperty("commit-hash")
-	public String getCommitHash(){
-		return commitHashIsSet ? commitHash : null;
-	}
-	/**
-	 * Check if has a value for commitHash 
-	 */	@JsonIgnore
-	public boolean hasCommitHash(){
-		return commitHashIsSet;
-	}
-
-	private long major;
-	private boolean majorIsSet;
+	public String commitHash;
 	@JsonProperty("major")
-	public void setMajor(long major){
-		this.major = major;
-		majorIsSet = true;
-	}
-	@JsonProperty("major")
-	public Long getMajor(){
-		return majorIsSet ? major : null;
-	}
-	/**
-	 * Check if has a value for major 
-	 */	@JsonIgnore
-	public boolean hasMajor(){
-		return majorIsSet;
-	}
-
-	private long minor;
-	private boolean minorIsSet;
+	public Long major;
 	@JsonProperty("minor")
-	public void setMinor(long minor){
-		this.minor = minor;
-		minorIsSet = true;
-	}
-	@JsonProperty("minor")
-	public Long getMinor(){
-		return minorIsSet ? minor : null;
-	}
-	/**
-	 * Check if has a value for minor 
-	 */	@JsonIgnore
-	public boolean hasMinor(){
-		return minorIsSet;
-	}
+	public Long minor;
 
 	@Override
 	public boolean equals(Object o) {

@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -14,66 +13,18 @@ public class BlockUpgradeVote extends PathResponse {
 
 	/**
 	 * (upgradeyes) Indicates a yes vote for the current proposal. 
-	 */
-	private boolean upgradeApprove;
-	private boolean upgradeApproveIsSet;
-	@JsonProperty("upgrade-approve")
-	public void setUpgradeApprove(boolean upgradeApprove){
-		this.upgradeApprove = upgradeApprove;
-		upgradeApproveIsSet = true;
-	}
-	@JsonProperty("upgrade-approve")
-	public Boolean getUpgradeApprove(){
-		return upgradeApproveIsSet ? upgradeApprove : null;
-	}
-	/**
-	 * Check if has a value for upgradeApprove 
-	 */	@JsonIgnore
-	public boolean hasUpgradeApprove(){
-		return upgradeApproveIsSet;
-	}
+	 */	@JsonProperty("upgrade-approve")
+	public Boolean upgradeApprove;
 
 	/**
 	 * (upgradedelay) Indicates the time between acceptance and execution. 
-	 */
-	private long upgradeDelay;
-	private boolean upgradeDelayIsSet;
-	@JsonProperty("upgrade-delay")
-	public void setUpgradeDelay(long upgradeDelay){
-		this.upgradeDelay = upgradeDelay;
-		upgradeDelayIsSet = true;
-	}
-	@JsonProperty("upgrade-delay")
-	public Long getUpgradeDelay(){
-		return upgradeDelayIsSet ? upgradeDelay : null;
-	}
-	/**
-	 * Check if has a value for upgradeDelay 
-	 */	@JsonIgnore
-	public boolean hasUpgradeDelay(){
-		return upgradeDelayIsSet;
-	}
+	 */	@JsonProperty("upgrade-delay")
+	public Long upgradeDelay;
 
 	/**
 	 * (upgradeprop) Indicates a proposed upgrade. 
-	 */
-	private String upgradePropose;
-	private boolean upgradeProposeIsSet;
-	@JsonProperty("upgrade-propose")
-	public void setUpgradePropose(String upgradePropose){
-		this.upgradePropose = upgradePropose;
-		upgradeProposeIsSet = true;
-	}
-	@JsonProperty("upgrade-propose")
-	public String getUpgradePropose(){
-		return upgradeProposeIsSet ? upgradePropose : null;
-	}
-	/**
-	 * Check if has a value for upgradePropose 
-	 */	@JsonIgnore
-	public boolean hasUpgradePropose(){
-		return upgradeProposeIsSet;
-	}
+	 */	@JsonProperty("upgrade-propose")
+	public String upgradePropose;
 
 	@Override
 	public boolean equals(Object o) {

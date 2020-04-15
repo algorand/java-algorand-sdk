@@ -11,11 +11,13 @@ import com.algorand.algosdk.v2.client.model.Block;
  * Lookup block. /blocks/{round-number} 
  */
 public class LookupBlock extends Query {
-	private long roundNumber;
+	private Long roundNumber;
 
-	private boolean roundNumberIsSet;
 
-	public LookupBlock(Client client, long roundNumber) {
+	/**
+	 * @param roundNumber Round number 
+	 */
+	public LookupBlock(Client client, Long roundNumber) {
 		super(client, "get");
 		this.roundNumber = roundNumber;
 	}

@@ -11,19 +11,13 @@ import com.algorand.algosdk.v2.client.model.AssetsResponse;
  * Search for assets. /assets 
  */
 public class SearchForAssets extends Query {
-	private long assetId;
+	private Long assetId;
 	private String creator;
-	private long limit;
+	private Long limit;
 	private String name;
 	private String next;
 	private String unit;
 
-	private boolean assetIdIsSet;
-	private boolean creatorIsSet;
-	private boolean limitIsSet;
-	private boolean nameIsSet;
-	private boolean nextIsSet;
-	private boolean unitIsSet;
 
 	public SearchForAssets(Client client) {
 		super(client, "get");
@@ -32,9 +26,8 @@ public class SearchForAssets extends Query {
 	/**
 	 * Asset ID 
 	 */
-	public SearchForAssets setAssetId(long assetId) {
+	public SearchForAssets setAssetId(Long assetId) {
 		this.assetId = assetId;
-		this.assetIdIsSet = true;
 		return this;
 	}
 
@@ -43,16 +36,14 @@ public class SearchForAssets extends Query {
 	 */
 	public SearchForAssets setCreator(String creator) {
 		this.creator = creator;
-		this.creatorIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Maximum number of results to return. 
 	 */
-	public SearchForAssets setLimit(long limit) {
+	public SearchForAssets setLimit(Long limit) {
 		this.limit = limit;
-		this.limitIsSet = true;
 		return this;
 	}
 
@@ -61,7 +52,6 @@ public class SearchForAssets extends Query {
 	 */
 	public SearchForAssets setName(String name) {
 		this.name = name;
-		this.nameIsSet = true;
 		return this;
 	}
 
@@ -70,7 +60,6 @@ public class SearchForAssets extends Query {
 	 */
 	public SearchForAssets setNext(String next) {
 		this.next = next;
-		this.nextIsSet = true;
 		return this;
 	}
 
@@ -79,7 +68,6 @@ public class SearchForAssets extends Query {
 	 */
 	public SearchForAssets setUnit(String unit) {
 		this.unit = unit;
-		this.unitIsSet = true;
 		return this;
 	}
 
@@ -91,22 +79,22 @@ public class SearchForAssets extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.assetIdIsSet) {
+		if (this.assetId != null) {
 			qd.addQuery("assetId", String.valueOf(assetId));
 		}
-		if (this.creatorIsSet) {
+		if (this.creator != null) {
 			qd.addQuery("creator", String.valueOf(creator));
 		}
-		if (this.limitIsSet) {
+		if (this.limit != null) {
 			qd.addQuery("limit", String.valueOf(limit));
 		}
-		if (this.nameIsSet) {
+		if (this.name != null) {
 			qd.addQuery("name", String.valueOf(name));
 		}
-		if (this.nextIsSet) {
+		if (this.next != null) {
 			qd.addQuery("next", String.valueOf(next));
 		}
-		if (this.unitIsSet) {
+		if (this.unit != null) {
 			qd.addQuery("unit", String.valueOf(unit));
 		}
 		qd.addPathSegment(String.valueOf("assets"));

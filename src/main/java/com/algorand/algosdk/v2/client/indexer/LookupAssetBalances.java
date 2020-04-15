@@ -11,21 +11,15 @@ import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
  * Lookup the list of accounts who hold this asset /assets/{asset-id}/balances 
  */
 public class LookupAssetBalances extends Query {
-	private long assetId;
-	private long currencyGreaterThan;
-	private long currencyLessThan;
-	private long limit;
+	private Long assetId;
+	private Long currencyGreaterThan;
+	private Long currencyLessThan;
+	private Long limit;
 	private String next;
-	private long round;
+	private Long round;
 
-	private boolean assetIdIsSet;
-	private boolean currencyGreaterThanIsSet;
-	private boolean currencyLessThanIsSet;
-	private boolean limitIsSet;
-	private boolean nextIsSet;
-	private boolean roundIsSet;
 
-	public LookupAssetBalances(Client client, long assetId) {
+	public LookupAssetBalances(Client client, Long assetId) {
 		super(client, "get");
 		this.assetId = assetId;
 	}
@@ -35,9 +29,8 @@ public class LookupAssetBalances extends Query {
 	 * default currency unless an asset-id is provided, in which case the asset will be 
 	 * used. 
 	 */
-	public LookupAssetBalances setCurrencyGreaterThan(long currencyGreaterThan) {
+	public LookupAssetBalances setCurrencyGreaterThan(Long currencyGreaterThan) {
 		this.currencyGreaterThan = currencyGreaterThan;
-		this.currencyGreaterThanIsSet = true;
 		return this;
 	}
 
@@ -45,18 +38,16 @@ public class LookupAssetBalances extends Query {
 	 * Results should have an amount less than this value. MicroAlgos are the default 
 	 * currency unless an asset-id is provided, in which case the asset will be used. 
 	 */
-	public LookupAssetBalances setCurrencyLessThan(long currencyLessThan) {
+	public LookupAssetBalances setCurrencyLessThan(Long currencyLessThan) {
 		this.currencyLessThan = currencyLessThan;
-		this.currencyLessThanIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Maximum number of results to return. 
 	 */
-	public LookupAssetBalances setLimit(long limit) {
+	public LookupAssetBalances setLimit(Long limit) {
 		this.limit = limit;
-		this.limitIsSet = true;
 		return this;
 	}
 
@@ -65,16 +56,14 @@ public class LookupAssetBalances extends Query {
 	 */
 	public LookupAssetBalances setNext(String next) {
 		this.next = next;
-		this.nextIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Include results for the specified round. 
 	 */
-	public LookupAssetBalances setRound(long round) {
+	public LookupAssetBalances setRound(Long round) {
 		this.round = round;
-		this.roundIsSet = true;
 		return this;
 	}
 
@@ -86,19 +75,19 @@ public class LookupAssetBalances extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.currencyGreaterThanIsSet) {
+		if (this.currencyGreaterThan != null) {
 			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}
-		if (this.currencyLessThanIsSet) {
+		if (this.currencyLessThan != null) {
 			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
 		}
-		if (this.limitIsSet) {
+		if (this.limit != null) {
 			qd.addQuery("limit", String.valueOf(limit));
 		}
-		if (this.nextIsSet) {
+		if (this.next != null) {
 			qd.addQuery("next", String.valueOf(next));
 		}
-		if (this.roundIsSet) {
+		if (this.round != null) {
 			qd.addQuery("round", String.valueOf(round));
 		}
 		qd.addPathSegment(String.valueOf("assets"));

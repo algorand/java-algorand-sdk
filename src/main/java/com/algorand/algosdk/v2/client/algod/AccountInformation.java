@@ -14,8 +14,10 @@ import com.algorand.algosdk.v2.client.model.Account;
 public class AccountInformation extends Query {
 	private String address;
 
-	private boolean addressIsSet;
 
+	/**
+	 * @param address An account public key 
+	 */
 	public AccountInformation(Client client, String address) {
 		super(client, "get");
 		this.address = address;

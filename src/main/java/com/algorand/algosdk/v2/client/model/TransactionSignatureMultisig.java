@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -16,66 +15,18 @@ public class TransactionSignatureMultisig extends PathResponse {
 
 	/**
 	 * (subsig) holds pairs of public key and signatures. 
-	 */
-	private List<TransactionSignatureMultisigSubsignature> subsignature;
-	private boolean subsignatureIsSet;
-	@JsonProperty("subsignature")
-	public void setSubsignature(List<TransactionSignatureMultisigSubsignature> subsignature){
-		this.subsignature = subsignature;
-		subsignatureIsSet = true;
-	}
-	@JsonProperty("subsignature")
-	public List<TransactionSignatureMultisigSubsignature> getSubsignature(){
-		return subsignatureIsSet ? subsignature : null;
-	}
-	/**
-	 * Check if has a value for subsignature 
-	 */	@JsonIgnore
-	public boolean hasSubsignature(){
-		return subsignatureIsSet;
-	}
+	 */	@JsonProperty("subsignature")
+	public List<TransactionSignatureMultisigSubsignature> subsignature;
 
 	/**
 	 * (thr) 
-	 */
-	private long threshold;
-	private boolean thresholdIsSet;
-	@JsonProperty("threshold")
-	public void setThreshold(long threshold){
-		this.threshold = threshold;
-		thresholdIsSet = true;
-	}
-	@JsonProperty("threshold")
-	public Long getThreshold(){
-		return thresholdIsSet ? threshold : null;
-	}
-	/**
-	 * Check if has a value for threshold 
-	 */	@JsonIgnore
-	public boolean hasThreshold(){
-		return thresholdIsSet;
-	}
+	 */	@JsonProperty("threshold")
+	public Long threshold;
 
 	/**
 	 * (v) 
-	 */
-	private long version;
-	private boolean versionIsSet;
-	@JsonProperty("version")
-	public void setVersion(long version){
-		this.version = version;
-		versionIsSet = true;
-	}
-	@JsonProperty("version")
-	public Long getVersion(){
-		return versionIsSet ? version : null;
-	}
-	/**
-	 * Check if has a value for version 
-	 */	@JsonIgnore
-	public boolean hasVersion(){
-		return versionIsSet;
-	}
+	 */	@JsonProperty("version")
+	public Long version;
 
 	@Override
 	public boolean equals(Object o) {

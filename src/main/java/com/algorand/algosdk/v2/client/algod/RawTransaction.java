@@ -12,7 +12,6 @@ import com.algorand.algosdk.v2.client.common.Response;
 public class RawTransaction extends Query {
 	private String rawtxn;
 
-	private boolean rawtxnIsSet;
 
 	public RawTransaction(Client client) {
 		super(client, "post");
@@ -23,7 +22,6 @@ public class RawTransaction extends Query {
 	 */
 	public RawTransaction setRawtxn(String rawtxn) {
 		this.rawtxn = rawtxn;
-		this.rawtxnIsSet = true;
 		return this;
 	}
 
@@ -35,7 +33,7 @@ public class RawTransaction extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.rawtxnIsSet) {
+		if (this.rawtxn != null) {
 			qd.addQuery("rawtxn", String.valueOf(rawtxn));
 		}
 		else {

@@ -11,11 +11,10 @@ import com.algorand.algosdk.v2.client.model.AssetResponse;
  * Lookup asset information. /assets/{asset-id} 
  */
 public class LookupAssetByID extends Query {
-	private long assetId;
+	private Long assetId;
 
-	private boolean assetIdIsSet;
 
-	public LookupAssetByID(Client client, long assetId) {
+	public LookupAssetByID(Client client, Long assetId) {
 		super(client, "get");
 		this.assetId = assetId;
 	}

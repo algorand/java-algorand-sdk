@@ -14,10 +14,8 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
  */
 public class GetPendingTransactions extends Query {
 	private String format;
-	private long max;
+	private Long max;
 
-	private boolean formatIsSet;
-	private boolean maxIsSet;
 
 	public GetPendingTransactions(Client client) {
 		super(client, "get");
@@ -28,16 +26,14 @@ public class GetPendingTransactions extends Query {
 	 */
 	public GetPendingTransactions setFormat(String format) {
 		this.format = format;
-		this.formatIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Truncated number of transactions to display. If max=0, returns all pending txns. 
 	 */
-	public GetPendingTransactions setMax(long max) {
+	public GetPendingTransactions setMax(Long max) {
 		this.max = max;
-		this.maxIsSet = true;
 		return this;
 	}
 
@@ -49,10 +45,10 @@ public class GetPendingTransactions extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.formatIsSet) {
+		if (this.format != null) {
 			qd.addQuery("format", String.valueOf(format));
 		}
-		if (this.maxIsSet) {
+		if (this.max != null) {
 			qd.addQuery("max", String.valueOf(max));
 		}
 		qd.addPathSegment(String.valueOf("v2"));

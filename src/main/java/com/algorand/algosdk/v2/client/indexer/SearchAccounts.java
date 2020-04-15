@@ -11,19 +11,13 @@ import com.algorand.algosdk.v2.client.model.AccountsResponse;
  * Search for accounts. /accounts 
  */
 public class SearchAccounts extends Query {
-	private long assetId;
-	private long currencyGreaterThan;
-	private long currencyLessThan;
-	private long limit;
+	private Long assetId;
+	private Long currencyGreaterThan;
+	private Long currencyLessThan;
+	private Long limit;
 	private String next;
-	private long round;
+	private Long round;
 
-	private boolean assetIdIsSet;
-	private boolean currencyGreaterThanIsSet;
-	private boolean currencyLessThanIsSet;
-	private boolean limitIsSet;
-	private boolean nextIsSet;
-	private boolean roundIsSet;
 
 	public SearchAccounts(Client client) {
 		super(client, "get");
@@ -32,9 +26,8 @@ public class SearchAccounts extends Query {
 	/**
 	 * Asset ID 
 	 */
-	public SearchAccounts setAssetId(long assetId) {
+	public SearchAccounts setAssetId(Long assetId) {
 		this.assetId = assetId;
-		this.assetIdIsSet = true;
 		return this;
 	}
 
@@ -43,9 +36,8 @@ public class SearchAccounts extends Query {
 	 * default currency unless an asset-id is provided, in which case the asset will be 
 	 * used. 
 	 */
-	public SearchAccounts setCurrencyGreaterThan(long currencyGreaterThan) {
+	public SearchAccounts setCurrencyGreaterThan(Long currencyGreaterThan) {
 		this.currencyGreaterThan = currencyGreaterThan;
-		this.currencyGreaterThanIsSet = true;
 		return this;
 	}
 
@@ -53,18 +45,16 @@ public class SearchAccounts extends Query {
 	 * Results should have an amount less than this value. MicroAlgos are the default 
 	 * currency unless an asset-id is provided, in which case the asset will be used. 
 	 */
-	public SearchAccounts setCurrencyLessThan(long currencyLessThan) {
+	public SearchAccounts setCurrencyLessThan(Long currencyLessThan) {
 		this.currencyLessThan = currencyLessThan;
-		this.currencyLessThanIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Maximum number of results to return. 
 	 */
-	public SearchAccounts setLimit(long limit) {
+	public SearchAccounts setLimit(Long limit) {
 		this.limit = limit;
-		this.limitIsSet = true;
 		return this;
 	}
 
@@ -73,7 +63,6 @@ public class SearchAccounts extends Query {
 	 */
 	public SearchAccounts setNext(String next) {
 		this.next = next;
-		this.nextIsSet = true;
 		return this;
 	}
 
@@ -81,9 +70,8 @@ public class SearchAccounts extends Query {
 	 * Include results for the specified round. For performance reasons, this parameter 
 	 * may be disabled on some configurations. 
 	 */
-	public SearchAccounts setRound(long round) {
+	public SearchAccounts setRound(Long round) {
 		this.round = round;
-		this.roundIsSet = true;
 		return this;
 	}
 
@@ -95,22 +83,22 @@ public class SearchAccounts extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.assetIdIsSet) {
+		if (this.assetId != null) {
 			qd.addQuery("assetId", String.valueOf(assetId));
 		}
-		if (this.currencyGreaterThanIsSet) {
+		if (this.currencyGreaterThan != null) {
 			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}
-		if (this.currencyLessThanIsSet) {
+		if (this.currencyLessThan != null) {
 			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
 		}
-		if (this.limitIsSet) {
+		if (this.limit != null) {
 			qd.addQuery("limit", String.valueOf(limit));
 		}
-		if (this.nextIsSet) {
+		if (this.next != null) {
 			qd.addQuery("next", String.valueOf(next));
 		}
-		if (this.roundIsSet) {
+		if (this.round != null) {
 			qd.addQuery("round", String.valueOf(round));
 		}
 		qd.addPathSegment(String.valueOf("accounts"));

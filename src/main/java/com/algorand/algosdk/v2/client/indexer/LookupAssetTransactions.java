@@ -14,40 +14,23 @@ public class LookupAssetTransactions extends Query {
 	private String address;
 	private String addressRole;
 	private String afterTime;
-	private long assetId;
+	private Long assetId;
 	private String beforeTime;
-	private long currencyGreaterThan;
-	private long currencyLessThan;
-	private boolean excludeCloseTo;
-	private long limit;
-	private long maxRound;
-	private long minRound;
+	private Long currencyGreaterThan;
+	private Long currencyLessThan;
+	private Boolean excludeCloseTo;
+	private Long limit;
+	private Long maxRound;
+	private Long minRound;
 	private String next;
 	private String notePrefix;
-	private long round;
+	private Long round;
 	private String sigType;
 	private String txId;
 	private String txType;
 
-	private boolean addressIsSet;
-	private boolean addressRoleIsSet;
-	private boolean afterTimeIsSet;
-	private boolean assetIdIsSet;
-	private boolean beforeTimeIsSet;
-	private boolean currencyGreaterThanIsSet;
-	private boolean currencyLessThanIsSet;
-	private boolean excludeCloseToIsSet;
-	private boolean limitIsSet;
-	private boolean maxRoundIsSet;
-	private boolean minRoundIsSet;
-	private boolean nextIsSet;
-	private boolean notePrefixIsSet;
-	private boolean roundIsSet;
-	private boolean sigTypeIsSet;
-	private boolean txIdIsSet;
-	private boolean txTypeIsSet;
 
-	public LookupAssetTransactions(Client client, long assetId) {
+	public LookupAssetTransactions(Client client, Long assetId) {
 		super(client, "get");
 		this.assetId = assetId;
 	}
@@ -57,7 +40,6 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setAddress(String address) {
 		this.address = address;
-		this.addressIsSet = true;
 		return this;
 	}
 
@@ -66,7 +48,6 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setAddressRole(String addressRole) {
 		this.addressRole = addressRole;
-		this.addressRoleIsSet = true;
 		return this;
 	}
 
@@ -75,7 +56,6 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setAfterTime(String afterTime) {
 		this.afterTime = afterTime;
-		this.afterTimeIsSet = true;
 		return this;
 	}
 
@@ -84,7 +64,6 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setBeforeTime(String beforeTime) {
 		this.beforeTime = beforeTime;
-		this.beforeTimeIsSet = true;
 		return this;
 	}
 
@@ -93,9 +72,8 @@ public class LookupAssetTransactions extends Query {
 	 * default currency unless an asset-id is provided, in which case the asset will be 
 	 * used. 
 	 */
-	public LookupAssetTransactions setCurrencyGreaterThan(long currencyGreaterThan) {
+	public LookupAssetTransactions setCurrencyGreaterThan(Long currencyGreaterThan) {
 		this.currencyGreaterThan = currencyGreaterThan;
-		this.currencyGreaterThanIsSet = true;
 		return this;
 	}
 
@@ -103,9 +81,8 @@ public class LookupAssetTransactions extends Query {
 	 * Results should have an amount less than this value. MicroAlgos are the default 
 	 * currency unless an asset-id is provided, in which case the asset will be used. 
 	 */
-	public LookupAssetTransactions setCurrencyLessThan(long currencyLessThan) {
+	public LookupAssetTransactions setCurrencyLessThan(Long currencyLessThan) {
 		this.currencyLessThan = currencyLessThan;
-		this.currencyLessThanIsSet = true;
 		return this;
 	}
 
@@ -114,36 +91,32 @@ public class LookupAssetTransactions extends Query {
 	 * to search for. The close to fields are normally treated as a receiver, if you 
 	 * would like to exclude them set this parameter to true. 
 	 */
-	public LookupAssetTransactions setExcludeCloseTo(boolean excludeCloseTo) {
+	public LookupAssetTransactions setExcludeCloseTo(Boolean excludeCloseTo) {
 		this.excludeCloseTo = excludeCloseTo;
-		this.excludeCloseToIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Maximum number of results to return. 
 	 */
-	public LookupAssetTransactions setLimit(long limit) {
+	public LookupAssetTransactions setLimit(Long limit) {
 		this.limit = limit;
-		this.limitIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Include results at or before the specified max-round. 
 	 */
-	public LookupAssetTransactions setMaxRound(long maxRound) {
+	public LookupAssetTransactions setMaxRound(Long maxRound) {
 		this.maxRound = maxRound;
-		this.maxRoundIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Include results at or after the specified min-round. 
 	 */
-	public LookupAssetTransactions setMinRound(long minRound) {
+	public LookupAssetTransactions setMinRound(Long minRound) {
 		this.minRound = minRound;
-		this.minRoundIsSet = true;
 		return this;
 	}
 
@@ -152,7 +125,6 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setNext(String next) {
 		this.next = next;
-		this.nextIsSet = true;
 		return this;
 	}
 
@@ -161,16 +133,14 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setNotePrefix(String notePrefix) {
 		this.notePrefix = notePrefix;
-		this.notePrefixIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Include results for the specified round. 
 	 */
-	public LookupAssetTransactions setRound(long round) {
+	public LookupAssetTransactions setRound(Long round) {
 		this.round = round;
-		this.roundIsSet = true;
 		return this;
 	}
 
@@ -180,7 +150,6 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setSigType(String sigType) {
 		this.sigType = sigType;
-		this.sigTypeIsSet = true;
 		return this;
 	}
 
@@ -189,12 +158,10 @@ public class LookupAssetTransactions extends Query {
 	 */
 	public LookupAssetTransactions setTxId(String txId) {
 		this.txId = txId;
-		this.txIdIsSet = true;
 		return this;
 	}
 	public LookupAssetTransactions setTxType(String txType) {
 		this.txType = txType;
-		this.txTypeIsSet = true;
 		return this;
 	}
 
@@ -206,52 +173,52 @@ public class LookupAssetTransactions extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.addressIsSet) {
+		if (this.address != null) {
 			qd.addQuery("address", String.valueOf(address));
 		}
-		if (this.addressRoleIsSet) {
+		if (this.addressRole != null) {
 			qd.addQuery("addressRole", String.valueOf(addressRole));
 		}
-		if (this.afterTimeIsSet) {
+		if (this.afterTime != null) {
 			qd.addQuery("afterTime", String.valueOf(afterTime));
 		}
-		if (this.beforeTimeIsSet) {
+		if (this.beforeTime != null) {
 			qd.addQuery("beforeTime", String.valueOf(beforeTime));
 		}
-		if (this.currencyGreaterThanIsSet) {
+		if (this.currencyGreaterThan != null) {
 			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
 		}
-		if (this.currencyLessThanIsSet) {
+		if (this.currencyLessThan != null) {
 			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
 		}
-		if (this.excludeCloseToIsSet) {
+		if (this.excludeCloseTo != null) {
 			qd.addQuery("excludeCloseTo", String.valueOf(excludeCloseTo));
 		}
-		if (this.limitIsSet) {
+		if (this.limit != null) {
 			qd.addQuery("limit", String.valueOf(limit));
 		}
-		if (this.maxRoundIsSet) {
+		if (this.maxRound != null) {
 			qd.addQuery("maxRound", String.valueOf(maxRound));
 		}
-		if (this.minRoundIsSet) {
+		if (this.minRound != null) {
 			qd.addQuery("minRound", String.valueOf(minRound));
 		}
-		if (this.nextIsSet) {
+		if (this.next != null) {
 			qd.addQuery("next", String.valueOf(next));
 		}
-		if (this.notePrefixIsSet) {
+		if (this.notePrefix != null) {
 			qd.addQuery("notePrefix", String.valueOf(notePrefix));
 		}
-		if (this.roundIsSet) {
+		if (this.round != null) {
 			qd.addQuery("round", String.valueOf(round));
 		}
-		if (this.sigTypeIsSet) {
+		if (this.sigType != null) {
 			qd.addQuery("sigType", String.valueOf(sigType));
 		}
-		if (this.txIdIsSet) {
+		if (this.txId != null) {
 			qd.addQuery("txId", String.valueOf(txId));
 		}
-		if (this.txTypeIsSet) {
+		if (this.txType != null) {
 			qd.addQuery("txType", String.valueOf(txType));
 		}
 		qd.addPathSegment(String.valueOf("assets"));

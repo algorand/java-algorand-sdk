@@ -89,14 +89,19 @@ public class Generator {
 		}
 	}
 
-	static String formatComment(String comment, String tab) {
+	static String formatComment(String comment, String tab, boolean full) {
 		StringBuffer sb = new StringBuffer();
 
 		comment = comment.replace("\\[", "(");
 		comment = comment.replace("\\]", ")");
 
-		sb.append("\n"+tab+"/**");
-		sb.append("\n"+tab+" * ");
+		if (full) {
+			sb.append("\n"+tab+"/**");
+			sb.append("\n"+tab+" * ");
+		} else {
+			sb.append(tab+" * ");			
+		}
+		
 		StringTokenizer st = new StringTokenizer(comment);
 		int line = 0;
 		while (st.hasMoreTokens()) {
@@ -108,7 +113,9 @@ public class Generator {
 			sb.append(token + " ");
 			line += token.length() + 1;
 		}
-		sb.append("\n"+tab+" */");
+		if (full) {
+			sb.append("\n"+tab+" */");
+		}
 		return sb.toString();
 	}
 
@@ -149,47 +156,21 @@ public class Generator {
 			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop, false);
-			String getterName = "get" + getCamelCase(jprop, true);
-			String setterName = "set" + getCamelCase(jprop, true);
-			String isSetName = javaName + "IsSet";
-			String hasName = "has" + getCamelCase(jprop, true);
-			String type = getType(prop.getValue(), false);
 			String typeObj = getType(prop.getValue(), true);
-			if (type.contains("List<")) {
+			if (typeObj.contains("List<")) {
 				importList = true;
 			}
 
 			String desc = null;
 			if (prop.getValue().get("description") != null) {
 				desc = prop.getValue().get("description").asText();
-				desc = formatComment(desc, "\t");
+				desc = formatComment(desc, "\t", true);
 			}
 
-			// private type
+			// public type
 			if (desc != null) buffer.append(desc);
-			buffer.append("\n\tprivate " + type + " " + javaName + ";\n");
-
-			// private type is set boolean
-			buffer.append("\tprivate boolean " + isSetName + ";\n");
-
-			// public setter
-			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")\n");
-			buffer.append("\tpublic void " + setterName + "(" + type + " " + javaName + "){"
-					+ "\n\t\tthis." + javaName + " = " + javaName + ";"
-					+ "\n\t\t" + isSetName + " = true;\n"
-					+ "\t}\n");
-
-			// public getter
-			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")\n");
-			buffer.append("\tpublic " + typeObj + " " + getterName + "(){"
-					+ "\n\t\treturn " + isSetName + " ? " + javaName + " : null;\n\t}");
-
-			// public has
-			String hasComment = "Check if has a value for " + javaName;
-			hasComment = formatComment(hasComment, "\t");
-			buffer.append(hasComment);
-			buffer.append("\t@JsonIgnore");
-			buffer.append("\n\tpublic boolean " + hasName + "(){\n\t\treturn " + isSetName + ";\n\t}\n");
+			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
+			buffer.append("\n\tpublic " + typeObj + " " + javaName + ";\n");
 		}
 		return importList;
 	}
@@ -235,7 +216,6 @@ public class Generator {
 		imports.append("\n");
 
 		imports.append("import com.algorand.algosdk.v2.client.common.PathResponse;\n" + 
-				"import com.fasterxml.jackson.annotation.JsonIgnore;\n" + 
 				"import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
 
 		bw.append(imports);
@@ -303,6 +283,7 @@ public class Generator {
 		StringBuffer constructorHeader = new StringBuffer();
 		StringBuffer constructorBody = new StringBuffer();
 		StringBuffer requestMethod = new StringBuffer();
+		ArrayList<String> constructorComments = new ArrayList<String>();
 		
 		StringBuffer generatedPathsEntryBody = new StringBuffer();
 
@@ -316,13 +297,18 @@ public class Generator {
 			String propName = Generator.getCamelCase(prop.getKey(), false);
 			String setterName = Generator.getCamelCase(prop.getKey(), true);
 			setterName = "set" + setterName;
-			String propType = getType(prop.getValue(), false);
+			String propType = getType(prop.getValue(), true);
 
 			decls.append("\tprivate " + propType + " " + propName + ";\n");
-			bools.append("\tprivate boolean " + propName + "IsSet;\n");
 
 
 			if (inPath(prop.getValue())) {
+				if (prop.getValue().get("description") != null) {
+					String desc = prop.getValue().get("description").asText();
+					desc = formatComment("@param " + propName + " " + desc, "\t", false);
+					constructorComments.add(desc);
+				}
+
 				constructorHeader.append(", " + propType + " " + propName);
 				constructorBody.append("		this." + propName + " = " + propName + ";\n");
 				
@@ -337,16 +323,15 @@ public class Generator {
 
 			if (prop.getValue().get("description") != null) {
 				String desc = prop.getValue().get("description").asText();
-				desc = formatComment(desc, "\t");
+				desc = formatComment(desc, "\t", true);
 				builders.append(desc + "\n");
 			}
 			builders.append("\tpublic " + className + " " + setterName + "(" + propType + " " + propName + ") {\n");
 			builders.append("\t\tthis." + propName + " = " + propName + ";\n");
-			builders.append("\t\tthis." + propName + "IsSet = true;\n");
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
 
-			requestMethod.append("		if (this."+propName+"IsSet) {\n" + 
+			requestMethod.append("		if (this."+propName+" != null) {\n" + 
 					"			qd.addQuery(\""+propName+"\", String.valueOf("+propName+"));\n" +
 					"		}\n");
 			if (isRequired(prop.getValue())) {
@@ -381,6 +366,13 @@ public class Generator {
 		ans.append("\n");
 
 		// constructor
+		if (constructorComments.size() > 0) {
+			ans.append("	/**");
+			for (String elt : constructorComments) {
+				ans.append("\n" + elt);
+			}
+			ans.append("\n	 */\n");
+		}
 		ans.append("	public "+className+"(Client client");
 		ans.append(constructorHeader);
 		ans.append(") {\n		super(client, \""+getOrPost+"\");\n");
@@ -427,7 +419,7 @@ public class Generator {
 		String methodName = Generator.getCamelCase(className, false);
 		className = Generator.getCamelCase(className, true);
 		
-		generatedPathsEntry.append("	public " + className + " " + methodName + "(");
+		generatedPathsEntry.append("\n	public " + className + " " + methodName + "(");
 		
 		JsonNode paramNode = spec.get("parameters");
 		String returnType = "String";
@@ -467,7 +459,7 @@ public class Generator {
 
 				bw.append(imports);
 				bw.append("\n");
-				bw.append(Generator.formatComment(desc, ""));
+				bw.append(Generator.formatComment(desc, "", true));
 				bw.append("\npublic class " + className + " extends Query {\n");
 				bw.append(
 						processQueryParams(
@@ -492,7 +484,7 @@ public class Generator {
 					String desc = null;
 					if (cls.getValue().get("description") != null) {
 						desc = cls.getValue().get("description").asText();
-						desc = formatComment(desc, "");
+						desc = formatComment(desc, "", true);
 					}
 					writeClass(cls.getKey(), cls.getValue().get("properties"), desc, rootPath, pkg);
 				}

@@ -3,52 +3,19 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TransactionSignatureMultisigSubsignature extends PathResponse {
 
 	/**
 	 * (pk) 
-	 */
-	private String publicKey;
-	private boolean publicKeyIsSet;
-	@JsonProperty("public-key")
-	public void setPublicKey(String publicKey){
-		this.publicKey = publicKey;
-		publicKeyIsSet = true;
-	}
-	@JsonProperty("public-key")
-	public String getPublicKey(){
-		return publicKeyIsSet ? publicKey : null;
-	}
-	/**
-	 * Check if has a value for publicKey 
-	 */	@JsonIgnore
-	public boolean hasPublicKey(){
-		return publicKeyIsSet;
-	}
+	 */	@JsonProperty("public-key")
+	public String publicKey;
 
 	/**
 	 * (s) 
-	 */
-	private String signature;
-	private boolean signatureIsSet;
-	@JsonProperty("signature")
-	public void setSignature(String signature){
-		this.signature = signature;
-		signatureIsSet = true;
-	}
-	@JsonProperty("signature")
-	public String getSignature(){
-		return signatureIsSet ? signature : null;
-	}
-	/**
-	 * Check if has a value for signature 
-	 */	@JsonIgnore
-	public boolean hasSignature(){
-		return signatureIsSet;
-	}
+	 */	@JsonProperty("signature")
+	public String signature;
 
 	@Override
 	public boolean equals(Object o) {

@@ -15,12 +15,12 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 public class GetPendingTransactionsByAddress extends Query {
 	private String address;
 	private String format;
-	private long max;
+	private Long max;
 
-	private boolean addressIsSet;
-	private boolean formatIsSet;
-	private boolean maxIsSet;
 
+	/**
+	 * @param address An account public key 
+	 */
 	public GetPendingTransactionsByAddress(Client client, String address) {
 		super(client, "get");
 		this.address = address;
@@ -31,16 +31,14 @@ public class GetPendingTransactionsByAddress extends Query {
 	 */
 	public GetPendingTransactionsByAddress setFormat(String format) {
 		this.format = format;
-		this.formatIsSet = true;
 		return this;
 	}
 
 	/**
 	 * Truncated number of transactions to display. If max=0, returns all pending txns. 
 	 */
-	public GetPendingTransactionsByAddress setMax(long max) {
+	public GetPendingTransactionsByAddress setMax(Long max) {
 		this.max = max;
-		this.maxIsSet = true;
 		return this;
 	}
 
@@ -52,10 +50,10 @@ public class GetPendingTransactionsByAddress extends Query {
 	}
 	public QueryData getRequestString() {
 		QueryData qd = new QueryData();
-		if (this.formatIsSet) {
+		if (this.format != null) {
 			qd.addQuery("format", String.valueOf(format));
 		}
-		if (this.maxIsSet) {
+		if (this.max != null) {
 			qd.addQuery("max", String.valueOf(max));
 		}
 		qd.addPathSegment(String.valueOf("v2"));

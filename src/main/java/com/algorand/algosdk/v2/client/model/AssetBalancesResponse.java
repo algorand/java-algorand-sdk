@@ -4,71 +4,22 @@ import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AssetBalancesResponse extends PathResponse {
-
-	private List<MiniAssetHolding> balances;
-	private boolean balancesIsSet;
 	@JsonProperty("balances")
-	public void setBalances(List<MiniAssetHolding> balances){
-		this.balances = balances;
-		balancesIsSet = true;
-	}
-	@JsonProperty("balances")
-	public List<MiniAssetHolding> getBalances(){
-		return balancesIsSet ? balances : null;
-	}
-	/**
-	 * Check if has a value for balances 
-	 */	@JsonIgnore
-	public boolean hasBalances(){
-		return balancesIsSet;
-	}
+	public List<MiniAssetHolding> balances;
 
 	/**
 	 * Round at which the results were computed. 
-	 */
-	private long currentRound;
-	private boolean currentRoundIsSet;
-	@JsonProperty("current-round")
-	public void setCurrentRound(long currentRound){
-		this.currentRound = currentRound;
-		currentRoundIsSet = true;
-	}
-	@JsonProperty("current-round")
-	public Long getCurrentRound(){
-		return currentRoundIsSet ? currentRound : null;
-	}
-	/**
-	 * Check if has a value for currentRound 
-	 */	@JsonIgnore
-	public boolean hasCurrentRound(){
-		return currentRoundIsSet;
-	}
+	 */	@JsonProperty("current-round")
+	public Long currentRound;
 
 	/**
 	 * Used for pagination, when making another request provide this token with the 
 	 * next parameter. 
-	 */
-	private String nextToken;
-	private boolean nextTokenIsSet;
-	@JsonProperty("next-token")
-	public void setNextToken(String nextToken){
-		this.nextToken = nextToken;
-		nextTokenIsSet = true;
-	}
-	@JsonProperty("next-token")
-	public String getNextToken(){
-		return nextTokenIsSet ? nextToken : null;
-	}
-	/**
-	 * Check if has a value for nextToken 
-	 */	@JsonIgnore
-	public boolean hasNextToken(){
-		return nextTokenIsSet;
-	}
+	 */	@JsonProperty("next-token")
+	public String nextToken;
 
 	@Override
 	public boolean equals(Object o) {
