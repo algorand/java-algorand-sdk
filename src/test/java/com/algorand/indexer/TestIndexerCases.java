@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 class TestIndexerCases {
 
 	@Test
-	void test() throws JsonProcessingException, IOException {
+	void test() throws Exception {
 		File f = new File("../openapi-server-generator/scripts/indexer.oas2.yml");
 		FileInputStream fis = new FileInputStream(f);
 

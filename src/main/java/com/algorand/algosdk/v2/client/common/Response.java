@@ -30,7 +30,7 @@ public class Response<T> {
 		ObjectMapper om = new ObjectMapper(); 
 		String jsonStr;
 		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
+			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this.body());
 
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());

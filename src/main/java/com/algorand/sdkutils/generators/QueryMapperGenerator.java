@@ -27,11 +27,11 @@ public class QueryMapperGenerator extends Generator {
 		StringBuffer setValue = new StringBuffer();
 		StringBuffer lookUp = new StringBuffer();
 		
-		getClass.append("	public static Query getClass(String name, Client client) {\n" + 
+		getClass.append("	public static Query getClass(String name, Client client, String args[]) {\n" + 
 				"		switch (name) {\n");
 		setValue.append("	public static void setValue(Query q, String className, String property, String value) {\n" + 
 				"		switch (className) {\n");
-		lookUp.append("	public static String lookup(Query q, String className) {\n" + 
+		lookUp.append("	public static String lookup(Query q, String className) throws Exception {\n" + 
 				"		switch (className) {\n");
 		
 		JsonNode paths = this.root.get("paths");
@@ -40,10 +40,11 @@ public class QueryMapperGenerator extends Generator {
 			Entry<String, JsonNode> path = pathIter.next();
 			String className = path.getValue().findValue("operationId").asText();
 			String javaClassName = Generator.getCamelCase(className, true);
+			String methodName = Generator.getCamelCase(className, false);
 			
 			// getClass
 			getClass.append("		case \""+className+"\":\n" + 
-					"			return new "+javaClassName+"(client);\n");
+					"			return client."+methodName+"(");
 			
 			//setValue
 			setValue.append("		case \""+className+"\":\n" + 
@@ -51,14 +52,42 @@ public class QueryMapperGenerator extends Generator {
 			
 			//lookUp
 			lookUp.append("		case \""+className+"\":\n" + 
-					"			return (("+javaClassName+")q).lookup().toString();\n");
+					"			return (("+javaClassName+")q).execute().toString();\n");
 			
 			JsonNode paramNode = path.getValue().findValue("parameters");
 			Iterator<Entry<String, JsonNode>> properties = getSortedParameters(paramNode);
+			
+			// The parameters in the path are directly passed to the constructor.
+			// The method with have in order arguments each assigned to the parameter in order. 
+			int argCounter = 0;
+			
 			while (properties.hasNext()) {
 				Entry<String, JsonNode> parameter = properties.next();
 				String javaSetParamName = Generator.getCamelCase(parameter.getKey(), true);
 				String typeName = parameter.getValue().get("type").asText();
+				
+				if (inPath(parameter.getValue())) {
+					if (argCounter > 0) {
+						getClass.append(", ");
+					}
+					switch (typeName) {
+					case "integer":
+						getClass.append("Long.valueOf("+"args[" + argCounter + "])");
+						break;
+					case "string":
+						getClass.append("args[" + argCounter + "]");
+						break;
+					case "boolean":
+						getClass.append("Boolean.valueOf("+"args[" + argCounter + "])");
+						break;
+						default:
+							throw new RuntimeException("Unknow type: " + typeName);
+					}
+
+					argCounter++;
+					continue;
+				}
+				
 				setValue.append("			case \""+parameter.getKey()+"\":\n" + 
 						"				(("+javaClassName+")q).set"+javaSetParamName+"(");
 				switch (typeName) {
@@ -74,9 +103,10 @@ public class QueryMapperGenerator extends Generator {
 				}
 				setValue.append("				break;\n");
 			}
+			getClass.append(");\n");			
 			setValue.append("			}\n			break;\n");
 		}
-		
+
 		getClass.append("		}\n" + 
 				"		return null;\n" + 
 				"	}\n\n");

@@ -3,6 +3,7 @@ package com.algorand.sdkutils.generators;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.StringTokenizer;
@@ -44,7 +45,7 @@ public class TestGenerator extends Generator {
 		return line.substring(0, line.indexOf(":"));
 	}
 
-	public static boolean testSamples(TestGenerator tg, BufferedReader br, Client client, boolean verbose) throws IOException {
+	public static boolean testSamples(TestGenerator tg, BufferedReader br, Client client, boolean verbose) throws Exception {
 		JsonNode paths = tg.root.get("paths");
 		JsonNode pathNode = null;
 		boolean failed = false;
@@ -62,15 +63,32 @@ public class TestGenerator extends Generator {
 			} else {
 				// this is a test sample
 				
-				// sample source setup
-				JsonNode paramNode = pathNode.findValue("parameters");
-				Iterator<Entry<String, JsonNode>> properties = tg.getSortedParameters(paramNode);
 				String[] columns = line.split(",");
+				JsonNode paramNode = pathNode.findValue("parameters");
+				
+				// Get the constructor params
+				ArrayList<String> al = new ArrayList<String>();
+				{
+					int cidx = 0;
+
+					Iterator<Entry<String, JsonNode>> params = tg.getSortedParameters(paramNode);
+					while (params.hasNext()) {
+						JsonNode param = params.next().getValue();
+						if (inPath(param)) {
+							al.add(columns[cidx].trim());
+						}
+						cidx++;
+					}
+				}
+				String args[] = al.toArray(new String[al.size()]);
+				
+				// sample source setup
+				Iterator<Entry<String, JsonNode>> properties = tg.getSortedParameters(paramNode);
 				int colIdx = 0;
 				// SDK query setup
 				String methodName = pathNode.findValue("operationId").asText();
 
-				Query query = QueryMapper.getClass(methodName, client);
+				Query query = QueryMapper.getClass(methodName, client, args);
 				
 				while (properties.hasNext()) {
 					// sample source setup
@@ -85,6 +103,9 @@ public class TestGenerator extends Generator {
 						continue;
 					}
 					// SDK query setup
+					if (inPath(parameter.getValue())) {
+						continue;
+					}
 					QueryMapper.setValue(query, methodName, parameter.getKey(), value);
 				}
 				

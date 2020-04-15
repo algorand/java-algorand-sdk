@@ -6,26 +6,26 @@ import com.algorand.algosdk.v2.client.common.Query;
 
 public class QueryMapper {
 
-	public static Query getClass(String name, Client client) {
+	public static Query getClass(String name, Client client, String args[]) {
 		switch (name) {
 		case "searchAccounts":
-			return new SearchAccounts(client);
+			return client.searchAccounts();
 		case "lookupAccountByID":
-			return new LookupAccountByID(client);
+			return client.lookupAccountByID(args[0]);
 		case "lookupAccountTransactions":
-			return new LookupAccountTransactions(client);
+			return client.lookupAccountTransactions(args[0]);
 		case "searchForAssets":
-			return new SearchForAssets(client);
+			return client.searchForAssets();
 		case "lookupAssetByID":
-			return new LookupAssetByID(client);
+			return client.lookupAssetByID(Long.valueOf(args[0]));
 		case "lookupAssetBalances":
-			return new LookupAssetBalances(client);
+			return client.lookupAssetBalances(Long.valueOf(args[0]));
 		case "lookupAssetTransactions":
-			return new LookupAssetTransactions(client);
+			return client.lookupAssetTransactions(Long.valueOf(args[0]));
 		case "lookupBlock":
-			return new LookupBlock(client);
+			return client.lookupBlock(Long.valueOf(args[0]));
 		case "searchForTransactions":
-			return new SearchForTransactions(client);
+			return client.searchForTransactions();
 		}
 		return null;
 	}
@@ -56,9 +56,6 @@ public class QueryMapper {
 			break;
 		case "lookupAccountByID":
 			switch (property) {
-			case "account-id":
-				((LookupAccountByID)q).setAccountId(value);
-				break;
 			case "round":
 				((LookupAccountByID)q).setRound(Long.valueOf(value));
 				break;
@@ -66,9 +63,6 @@ public class QueryMapper {
 			break;
 		case "lookupAccountTransactions":
 			switch (property) {
-			case "account-id":
-				((LookupAccountTransactions)q).setAccountId(value);
-				break;
 			case "after-time":
 				((LookupAccountTransactions)q).setAfterTime(value);
 				break;
@@ -137,16 +131,10 @@ public class QueryMapper {
 			break;
 		case "lookupAssetByID":
 			switch (property) {
-			case "asset-id":
-				((LookupAssetByID)q).setAssetId(Long.valueOf(value));
-				break;
 			}
 			break;
 		case "lookupAssetBalances":
 			switch (property) {
-			case "asset-id":
-				((LookupAssetBalances)q).setAssetId(Long.valueOf(value));
-				break;
 			case "currency-greater-than":
 				((LookupAssetBalances)q).setCurrencyGreaterThan(Long.valueOf(value));
 				break;
@@ -174,9 +162,6 @@ public class QueryMapper {
 				break;
 			case "after-time":
 				((LookupAssetTransactions)q).setAfterTime(value);
-				break;
-			case "asset-id":
-				((LookupAssetTransactions)q).setAssetId(Long.valueOf(value));
 				break;
 			case "before-time":
 				((LookupAssetTransactions)q).setBeforeTime(value);
@@ -221,9 +206,6 @@ public class QueryMapper {
 			break;
 		case "lookupBlock":
 			switch (property) {
-			case "round-number":
-				((LookupBlock)q).setRoundNumber(Long.valueOf(value));
-				break;
 			}
 			break;
 		case "searchForTransactions":
@@ -285,26 +267,26 @@ public class QueryMapper {
 		}
 	}
 
-	public static String lookup(Query q, String className) {
+	public static String lookup(Query q, String className) throws Exception {
 		switch (className) {
 		case "searchAccounts":
-			return ((SearchAccounts)q).lookup().toString();
+			return ((SearchAccounts)q).execute().toString();
 		case "lookupAccountByID":
-			return ((LookupAccountByID)q).lookup().toString();
+			return ((LookupAccountByID)q).execute().toString();
 		case "lookupAccountTransactions":
-			return ((LookupAccountTransactions)q).lookup().toString();
+			return ((LookupAccountTransactions)q).execute().toString();
 		case "searchForAssets":
-			return ((SearchForAssets)q).lookup().toString();
+			return ((SearchForAssets)q).execute().toString();
 		case "lookupAssetByID":
-			return ((LookupAssetByID)q).lookup().toString();
+			return ((LookupAssetByID)q).execute().toString();
 		case "lookupAssetBalances":
-			return ((LookupAssetBalances)q).lookup().toString();
+			return ((LookupAssetBalances)q).execute().toString();
 		case "lookupAssetTransactions":
-			return ((LookupAssetTransactions)q).lookup().toString();
+			return ((LookupAssetTransactions)q).execute().toString();
 		case "lookupBlock":
-			return ((LookupBlock)q).lookup().toString();
+			return ((LookupBlock)q).execute().toString();
 		case "searchForTransactions":
-			return ((SearchForTransactions)q).lookup().toString();
+			return ((SearchForTransactions)q).execute().toString();
 		}
 		return null;
 	}

@@ -4,12 +4,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.IOException;
 
 import com.algorand.algosdk.v2.client.common.Client;
-import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.generators.TestGenerator;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.algorand.sdkutils.generators.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class RunIndexerTests extends TestGenerator{
@@ -18,7 +16,7 @@ public class RunIndexerTests extends TestGenerator{
 		super(root);
 	}
 
-	public static void main (String args[]) throws JsonProcessingException, IOException {
+	public static void main (String args[]) throws Exception {
 		File f = new File("../openapi-server-generator/scripts/indexer.oas2.yml");
 		FileInputStream fis = new FileInputStream(f);
 
