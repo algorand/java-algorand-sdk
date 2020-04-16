@@ -18,6 +18,7 @@ public class TransactionsResponse extends PathResponse {
 	 * next parameter. 
 	 */	@JsonProperty("next-token")
 	public String nextToken;
+
 	@JsonProperty("transactions")
 	public List<Transaction> transactions;
 

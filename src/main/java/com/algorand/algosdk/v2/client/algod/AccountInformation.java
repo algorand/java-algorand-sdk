@@ -12,8 +12,11 @@ import com.algorand.algosdk.v2.client.model.Account;
  * balance and spendable amounts /v2/accounts/{address} 
  */
 public class AccountInformation extends Query {
-	private String address;
 
+	private String address;
+	public String address() {
+		return this.address;
+	}
 
 	/**
 	 * @param address An account public key 
@@ -29,11 +32,10 @@ public class AccountInformation extends Query {
 		resp.setValueType(Account.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("accounts"));
-		qd.addPathSegment(String.valueOf(address));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("accounts"));
+		addPathSegment(String.valueOf(address));
 
 		return qd;
 	}

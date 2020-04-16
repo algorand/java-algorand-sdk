@@ -17,9 +17,15 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
  * will return an error. /v2/transactions/pending/{txid} 
  */
 public class PendingTransactionInformation extends Query {
-	private String format;
-	private String txid;
 
+	private String format;
+	public String format() {
+		return this.format;
+	}
+	private String txid;
+	public String txid() {
+		return this.txid;
+	}
 
 	/**
 	 * @param txid A transaction id 
@@ -32,8 +38,9 @@ public class PendingTransactionInformation extends Query {
 	/**
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
-	public PendingTransactionInformation setFormat(String format) {
+	public PendingTransactionInformation format(String format) {
 		this.format = format;
+		addQuery("format", String.valueOf(format));
 		return this;
 	}
 
@@ -43,15 +50,11 @@ public class PendingTransactionInformation extends Query {
 		resp.setValueType(PendingTransactionResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		if (this.format != null) {
-			qd.addQuery("format", String.valueOf(format));
-		}
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("transactions"));
-		qd.addPathSegment(String.valueOf("pending"));
-		qd.addPathSegment(String.valueOf(txid));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("transactions"));
+		addPathSegment(String.valueOf("pending"));
+		addPathSegment(String.valueOf(txid));
 
 		return qd;
 	}

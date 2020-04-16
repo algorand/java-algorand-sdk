@@ -6,6 +6,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AssetResponse extends PathResponse {
+
 	@JsonProperty("asset")
 	public Asset asset;
 

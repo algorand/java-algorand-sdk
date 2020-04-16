@@ -7,6 +7,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AccountsResponse extends PathResponse {
+
 	@JsonProperty("accounts")
 	public List<Account> accounts;
 

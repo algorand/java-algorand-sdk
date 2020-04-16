@@ -12,8 +12,11 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
  * the time. /v2/status/wait-for-block-after/{round}/ 
  */
 public class WaitForBlock extends Query {
-	private Long round;
 
+	private Long round;
+	public Long round() {
+		return this.round;
+	}
 
 	/**
 	 * @param round The round to wait until returning status 
@@ -29,12 +32,11 @@ public class WaitForBlock extends Query {
 		resp.setValueType(NodeStatusResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("status"));
-		qd.addPathSegment(String.valueOf("wait-for-block-after"));
-		qd.addPathSegment(String.valueOf(round));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("status"));
+		addPathSegment(String.valueOf("wait-for-block-after"));
+		addPathSegment(String.valueOf(round));
 
 		return qd;
 	}

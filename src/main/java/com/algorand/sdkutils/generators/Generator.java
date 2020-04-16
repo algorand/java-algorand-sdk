@@ -168,7 +168,7 @@ public class Generator {
 			}
 
 			// public type
-			if (desc != null) buffer.append(desc);
+			if (desc != null) buffer.append(desc); else buffer.append("\n");
 			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
 			buffer.append("\n\tpublic " + typeObj + " " + javaName + ";\n");
 		}
@@ -288,18 +288,20 @@ public class Generator {
 		StringBuffer generatedPathsEntryBody = new StringBuffer();
 
 		requestMethod.append(Generator.getQueryResponseMethod(returnType, getOrPost));
-		requestMethod.append("	public QueryData getRequestString() {\n" + 
-				"		QueryData qd = new QueryData();\n");
+		requestMethod.append("	protected QueryData getRequestString() {\n");
 		boolean pAdded = false;
 
 		while (properties != null && properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
 			String propName = Generator.getCamelCase(prop.getKey(), false);
-			String setterName = Generator.getCamelCase(prop.getKey(), true);
-			setterName = "set" + setterName;
+			String setterName = Generator.getCamelCase(prop.getKey(), false);
 			String propType = getType(prop.getValue(), true);
+			String propCode = prop.getKey();
 
-			decls.append("\tprivate " + propType + " " + propName + ";\n");
+			decls.append("\n\tprivate " + propType + " " + propName + ";\n");
+			
+			decls.append("\tpublic " + propType + " " + propName + "() {\n");
+			decls.append("\t\treturn this." + propName + ";\n\t}");
 
 
 			if (inPath(prop.getValue())) {
@@ -328,17 +330,14 @@ public class Generator {
 			}
 			builders.append("\tpublic " + className + " " + setterName + "(" + propType + " " + propName + ") {\n");
 			builders.append("\t\tthis." + propName + " = " + propName + ";\n");
+			builders.append("\t\taddQuery(\"" + propCode + "\", String.valueOf("+propName+"));\n");
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
 
-			requestMethod.append("		if (this."+propName+" != null) {\n" + 
-					"			qd.addQuery(\""+propName+"\", String.valueOf("+propName+"));\n" +
-					"		}\n");
 			if (isRequired(prop.getValue())) {
-				requestMethod.append("		else {\n" + 
-						"			throw new RuntimeException(\"" +
-						propName+" is not set, and it is a required parameter.\");\n" + 
-						"		}\n");
+				requestMethod.append("		if (this."+propName+" == null) {\n"); 
+				requestMethod.append("			throw new RuntimeException(\"" +
+						propCode + " is not set. It is a required parameter.\");\n		}\n");
 			}
 
 		}
@@ -351,7 +350,7 @@ public class Generator {
 		ArrayList<String> al = getPathInserts(path);
 		for (String str : al) {
 			requestMethod.append(
-					"		qd.addPathSegment(String.valueOf(" + str + "));\n");
+					"		addPathSegment(String.valueOf(" + str + "));\n");
 		}
 
 

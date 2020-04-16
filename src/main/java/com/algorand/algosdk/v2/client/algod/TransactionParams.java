@@ -23,11 +23,10 @@ public class TransactionParams extends Query {
 		resp.setValueType(TransactionParametersResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("transactions"));
-		qd.addPathSegment(String.valueOf("params"));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("transactions"));
+		addPathSegment(String.valueOf("params"));
 
 		return qd;
 	}

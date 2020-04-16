@@ -10,16 +10,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * the current algod build version information. 
  */
 public class VersionBuild extends PathResponse {
+
 	@JsonProperty("branch")
 	public String branch;
+
 	@JsonProperty("build-number")
 	public Long buildNumber;
+
 	@JsonProperty("channel")
 	public String channel;
+
 	@JsonProperty("commit-hash")
 	public String commitHash;
+
 	@JsonProperty("major")
 	public Long major;
+
 	@JsonProperty("minor")
 	public Long minor;
 

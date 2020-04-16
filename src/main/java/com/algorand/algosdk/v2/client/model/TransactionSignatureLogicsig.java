@@ -23,6 +23,7 @@ public class TransactionSignatureLogicsig extends PathResponse {
 	 * address of ana ccount. Base64 encoded TEAL program. 
 	 */	@JsonProperty("logic")
 	public String logic;
+
 	@JsonProperty("multisig-signature")
 	public TransactionSignatureMultisig multisigSignature;
 

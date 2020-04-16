@@ -12,12 +12,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * a swagger generated Version model. 
  */
 public class Version extends PathResponse {
+
 	@JsonProperty("build")
 	public VersionBuild build;
+
 	@JsonProperty("genesis-hash")
 	public String genesisHash;
+
 	@JsonProperty("genesis-id")
 	public String genesisId;
+
 	@JsonProperty("versions")
 	public List<String> versions;
 

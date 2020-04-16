@@ -35,97 +35,97 @@ public class QueryMapper {
 		case "searchAccounts":
 			switch (property) {
 			case "asset-id":
-				((SearchAccounts)q).setAssetId(Long.valueOf(value));
+				((SearchAccounts)q).assetId(Long.valueOf(value));
 				break;
 			case "currency-greater-than":
-				((SearchAccounts)q).setCurrencyGreaterThan(Long.valueOf(value));
+				((SearchAccounts)q).currencyGreaterThan(Long.valueOf(value));
 				break;
 			case "currency-less-than":
-				((SearchAccounts)q).setCurrencyLessThan(Long.valueOf(value));
+				((SearchAccounts)q).currencyLessThan(Long.valueOf(value));
 				break;
 			case "limit":
-				((SearchAccounts)q).setLimit(Long.valueOf(value));
+				((SearchAccounts)q).limit(Long.valueOf(value));
 				break;
 			case "next":
-				((SearchAccounts)q).setNext(value);
+				((SearchAccounts)q).next(value);
 				break;
 			case "round":
-				((SearchAccounts)q).setRound(Long.valueOf(value));
+				((SearchAccounts)q).round(Long.valueOf(value));
 				break;
 			}
 			break;
 		case "lookupAccountByID":
 			switch (property) {
 			case "round":
-				((LookupAccountByID)q).setRound(Long.valueOf(value));
+				((LookupAccountByID)q).round(Long.valueOf(value));
 				break;
 			}
 			break;
 		case "lookupAccountTransactions":
 			switch (property) {
 			case "after-time":
-				((LookupAccountTransactions)q).setAfterTime(value);
+				((LookupAccountTransactions)q).afterTime(value);
 				break;
 			case "asset-id":
-				((LookupAccountTransactions)q).setAssetId(Long.valueOf(value));
+				((LookupAccountTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((LookupAccountTransactions)q).setBeforeTime(value);
+				((LookupAccountTransactions)q).beforeTime(value);
 				break;
 			case "currency-greater-than":
-				((LookupAccountTransactions)q).setCurrencyGreaterThan(Long.valueOf(value));
+				((LookupAccountTransactions)q).currencyGreaterThan(Long.valueOf(value));
 				break;
 			case "currency-less-than":
-				((LookupAccountTransactions)q).setCurrencyLessThan(Long.valueOf(value));
+				((LookupAccountTransactions)q).currencyLessThan(Long.valueOf(value));
 				break;
 			case "limit":
-				((LookupAccountTransactions)q).setLimit(Long.valueOf(value));
+				((LookupAccountTransactions)q).limit(Long.valueOf(value));
 				break;
 			case "max-round":
-				((LookupAccountTransactions)q).setMaxRound(Long.valueOf(value));
+				((LookupAccountTransactions)q).maxRound(Long.valueOf(value));
 				break;
 			case "min-round":
-				((LookupAccountTransactions)q).setMinRound(Long.valueOf(value));
+				((LookupAccountTransactions)q).minRound(Long.valueOf(value));
 				break;
 			case "next":
-				((LookupAccountTransactions)q).setNext(value);
+				((LookupAccountTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((LookupAccountTransactions)q).setNotePrefix(value);
+				((LookupAccountTransactions)q).notePrefix(value);
 				break;
 			case "round":
-				((LookupAccountTransactions)q).setRound(Long.valueOf(value));
+				((LookupAccountTransactions)q).round(Long.valueOf(value));
 				break;
 			case "sig-type":
-				((LookupAccountTransactions)q).setSigType(value);
+				((LookupAccountTransactions)q).sigType(value);
 				break;
 			case "tx-id":
-				((LookupAccountTransactions)q).setTxId(value);
+				((LookupAccountTransactions)q).txId(value);
 				break;
 			case "tx-type":
-				((LookupAccountTransactions)q).setTxType(value);
+				((LookupAccountTransactions)q).txType(value);
 				break;
 			}
 			break;
 		case "searchForAssets":
 			switch (property) {
 			case "asset-id":
-				((SearchForAssets)q).setAssetId(Long.valueOf(value));
+				((SearchForAssets)q).assetId(Long.valueOf(value));
 				break;
 			case "creator":
-				((SearchForAssets)q).setCreator(value);
+				((SearchForAssets)q).creator(value);
 				break;
 			case "limit":
-				((SearchForAssets)q).setLimit(Long.valueOf(value));
+				((SearchForAssets)q).limit(Long.valueOf(value));
 				break;
 			case "name":
-				((SearchForAssets)q).setName(value);
+				((SearchForAssets)q).name(value);
 				break;
 			case "next":
-				((SearchForAssets)q).setNext(value);
+				((SearchForAssets)q).next(value);
 				break;
 			case "unit":
-				((SearchForAssets)q).setUnit(value);
+				((SearchForAssets)q).unit(value);
 				break;
 			}
 			break;
@@ -136,71 +136,71 @@ public class QueryMapper {
 		case "lookupAssetBalances":
 			switch (property) {
 			case "currency-greater-than":
-				((LookupAssetBalances)q).setCurrencyGreaterThan(Long.valueOf(value));
+				((LookupAssetBalances)q).currencyGreaterThan(Long.valueOf(value));
 				break;
 			case "currency-less-than":
-				((LookupAssetBalances)q).setCurrencyLessThan(Long.valueOf(value));
+				((LookupAssetBalances)q).currencyLessThan(Long.valueOf(value));
 				break;
 			case "limit":
-				((LookupAssetBalances)q).setLimit(Long.valueOf(value));
+				((LookupAssetBalances)q).limit(Long.valueOf(value));
 				break;
 			case "next":
-				((LookupAssetBalances)q).setNext(value);
+				((LookupAssetBalances)q).next(value);
 				break;
 			case "round":
-				((LookupAssetBalances)q).setRound(Long.valueOf(value));
+				((LookupAssetBalances)q).round(Long.valueOf(value));
 				break;
 			}
 			break;
 		case "lookupAssetTransactions":
 			switch (property) {
 			case "address":
-				((LookupAssetTransactions)q).setAddress(value);
+				((LookupAssetTransactions)q).address(value);
 				break;
 			case "address-role":
-				((LookupAssetTransactions)q).setAddressRole(value);
+				((LookupAssetTransactions)q).addressRole(value);
 				break;
 			case "after-time":
-				((LookupAssetTransactions)q).setAfterTime(value);
+				((LookupAssetTransactions)q).afterTime(value);
 				break;
 			case "before-time":
-				((LookupAssetTransactions)q).setBeforeTime(value);
+				((LookupAssetTransactions)q).beforeTime(value);
 				break;
 			case "currency-greater-than":
-				((LookupAssetTransactions)q).setCurrencyGreaterThan(Long.valueOf(value));
+				((LookupAssetTransactions)q).currencyGreaterThan(Long.valueOf(value));
 				break;
 			case "currency-less-than":
-				((LookupAssetTransactions)q).setCurrencyLessThan(Long.valueOf(value));
+				((LookupAssetTransactions)q).currencyLessThan(Long.valueOf(value));
 				break;
 			case "exclude-close-to":
-				((LookupAssetTransactions)q).setExcludeCloseTo(Boolean.valueOf(value));
+				((LookupAssetTransactions)q).excludeCloseTo(Boolean.valueOf(value));
 				break;
 			case "limit":
-				((LookupAssetTransactions)q).setLimit(Long.valueOf(value));
+				((LookupAssetTransactions)q).limit(Long.valueOf(value));
 				break;
 			case "max-round":
-				((LookupAssetTransactions)q).setMaxRound(Long.valueOf(value));
+				((LookupAssetTransactions)q).maxRound(Long.valueOf(value));
 				break;
 			case "min-round":
-				((LookupAssetTransactions)q).setMinRound(Long.valueOf(value));
+				((LookupAssetTransactions)q).minRound(Long.valueOf(value));
 				break;
 			case "next":
-				((LookupAssetTransactions)q).setNext(value);
+				((LookupAssetTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((LookupAssetTransactions)q).setNotePrefix(value);
+				((LookupAssetTransactions)q).notePrefix(value);
 				break;
 			case "round":
-				((LookupAssetTransactions)q).setRound(Long.valueOf(value));
+				((LookupAssetTransactions)q).round(Long.valueOf(value));
 				break;
 			case "sig-type":
-				((LookupAssetTransactions)q).setSigType(value);
+				((LookupAssetTransactions)q).sigType(value);
 				break;
 			case "tx-id":
-				((LookupAssetTransactions)q).setTxId(value);
+				((LookupAssetTransactions)q).txId(value);
 				break;
 			case "tx-type":
-				((LookupAssetTransactions)q).setTxType(value);
+				((LookupAssetTransactions)q).txType(value);
 				break;
 			}
 			break;
@@ -211,55 +211,55 @@ public class QueryMapper {
 		case "searchForTransactions":
 			switch (property) {
 			case "address":
-				((SearchForTransactions)q).setAddress(value);
+				((SearchForTransactions)q).address(value);
 				break;
 			case "address-role":
-				((SearchForTransactions)q).setAddressRole(value);
+				((SearchForTransactions)q).addressRole(value);
 				break;
 			case "after-time":
-				((SearchForTransactions)q).setAfterTime(value);
+				((SearchForTransactions)q).afterTime(value);
 				break;
 			case "asset-id":
-				((SearchForTransactions)q).setAssetId(Long.valueOf(value));
+				((SearchForTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((SearchForTransactions)q).setBeforeTime(value);
+				((SearchForTransactions)q).beforeTime(value);
 				break;
 			case "currency-greater-than":
-				((SearchForTransactions)q).setCurrencyGreaterThan(Long.valueOf(value));
+				((SearchForTransactions)q).currencyGreaterThan(Long.valueOf(value));
 				break;
 			case "currency-less-than":
-				((SearchForTransactions)q).setCurrencyLessThan(Long.valueOf(value));
+				((SearchForTransactions)q).currencyLessThan(Long.valueOf(value));
 				break;
 			case "exclude-close-to":
-				((SearchForTransactions)q).setExcludeCloseTo(Boolean.valueOf(value));
+				((SearchForTransactions)q).excludeCloseTo(Boolean.valueOf(value));
 				break;
 			case "limit":
-				((SearchForTransactions)q).setLimit(Long.valueOf(value));
+				((SearchForTransactions)q).limit(Long.valueOf(value));
 				break;
 			case "max-round":
-				((SearchForTransactions)q).setMaxRound(Long.valueOf(value));
+				((SearchForTransactions)q).maxRound(Long.valueOf(value));
 				break;
 			case "min-round":
-				((SearchForTransactions)q).setMinRound(Long.valueOf(value));
+				((SearchForTransactions)q).minRound(Long.valueOf(value));
 				break;
 			case "next":
-				((SearchForTransactions)q).setNext(value);
+				((SearchForTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((SearchForTransactions)q).setNotePrefix(value);
+				((SearchForTransactions)q).notePrefix(value);
 				break;
 			case "round":
-				((SearchForTransactions)q).setRound(Long.valueOf(value));
+				((SearchForTransactions)q).round(Long.valueOf(value));
 				break;
 			case "sig-type":
-				((SearchForTransactions)q).setSigType(value);
+				((SearchForTransactions)q).sigType(value);
 				break;
 			case "tx-id":
-				((SearchForTransactions)q).setTxId(value);
+				((SearchForTransactions)q).txId(value);
 				break;
 			case "tx-type":
-				((SearchForTransactions)q).setTxType(value);
+				((SearchForTransactions)q).txType(value);
 				break;
 			}
 			break;

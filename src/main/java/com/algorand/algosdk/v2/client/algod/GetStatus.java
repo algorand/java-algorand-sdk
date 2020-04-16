@@ -23,10 +23,9 @@ public class GetStatus extends Query {
 		resp.setValueType(NodeStatusResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("status"));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("status"));
 
 		return qd;
 	}

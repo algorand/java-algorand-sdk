@@ -11,8 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * should be provided. 
  */
 public class TransactionSignature extends PathResponse {
+
 	@JsonProperty("logicsig")
 	public TransactionSignatureLogicsig logicsig;
+
 	@JsonProperty("multisig")
 	public TransactionSignatureMultisig multisig;
 

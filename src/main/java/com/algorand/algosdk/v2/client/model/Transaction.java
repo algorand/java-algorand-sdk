@@ -12,10 +12,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * data/transactions/transaction.go : Transaction 
  */
 public class Transaction extends PathResponse {
+
 	@JsonProperty("asset-config-transaction")
 	public TransactionAssetConfig assetConfigTransaction;
+
 	@JsonProperty("asset-freeze-transaction")
 	public TransactionAssetFreeze assetFreezeTransaction;
+
 	@JsonProperty("asset-transfer-transaction")
 	public TransactionAssetTransfer assetTransferTransaction;
 
@@ -75,6 +78,7 @@ public class Transaction extends PathResponse {
 	 * Offset into the round where this transaction was confirmed. 
 	 */	@JsonProperty("intra-round-offset")
 	public Long intraRoundOffset;
+
 	@JsonProperty("keyreg-transaction")
 	public TransactionKeyreg keyregTransaction;
 
@@ -96,6 +100,7 @@ public class Transaction extends PathResponse {
 	 * (note) Free form data. 
 	 */	@JsonProperty("note")
 	public String note;
+
 	@JsonProperty("payment-transaction")
 	public TransactionPayment paymentTransaction;
 
@@ -118,6 +123,7 @@ public class Transaction extends PathResponse {
 	 * (rs) rewards applied to sender account. 
 	 */	@JsonProperty("sender-rewards")
 	public Long senderRewards;
+
 	@JsonProperty("signature")
 	public TransactionSignature signature;
 

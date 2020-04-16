@@ -47,7 +47,7 @@ public class TemplateGenerator extends Generator{
 			
 			JsonNode paramNode = path.getValue().findValue("parameters");
 			Iterator<Entry<String, JsonNode>> properties = getSortedParameters(paramNode);
-			bw.append(pathString + ": ");
+			bw.append(pathString + ", ");
 			while (properties.hasNext()) {
 				Entry<String, JsonNode> parameter = properties.next();
 				bw.append(parameter.getKey());

@@ -26,6 +26,7 @@ public class Block extends PathResponse {
 	 * (prev) Previous block hash. 
 	 */	@JsonProperty("previous-block-hash")
 	public String previousBlockHash;
+
 	@JsonProperty("rewards")
 	public BlockRewards rewards;
 
@@ -67,8 +68,10 @@ public class Block extends PathResponse {
 	 * TxnCounter started being supported). 
 	 */	@JsonProperty("txn-counter")
 	public Long txnCounter;
+
 	@JsonProperty("upgrade-state")
 	public BlockUpgradeState upgradeState;
+
 	@JsonProperty("upgrade-vote")
 	public BlockUpgradeVote upgradeVote;
 

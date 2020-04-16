@@ -13,9 +13,15 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
  * /v2/transactions/pending 
  */
 public class GetPendingTransactions extends Query {
-	private String format;
-	private Long max;
 
+	private String format;
+	public String format() {
+		return this.format;
+	}
+	private Long max;
+	public Long max() {
+		return this.max;
+	}
 
 	public GetPendingTransactions(Client client) {
 		super(client, "get");
@@ -24,16 +30,18 @@ public class GetPendingTransactions extends Query {
 	/**
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
-	public GetPendingTransactions setFormat(String format) {
+	public GetPendingTransactions format(String format) {
 		this.format = format;
+		addQuery("format", String.valueOf(format));
 		return this;
 	}
 
 	/**
 	 * Truncated number of transactions to display. If max=0, returns all pending txns. 
 	 */
-	public GetPendingTransactions setMax(Long max) {
+	public GetPendingTransactions max(Long max) {
 		this.max = max;
+		addQuery("max", String.valueOf(max));
 		return this;
 	}
 
@@ -43,17 +51,10 @@ public class GetPendingTransactions extends Query {
 		resp.setValueType(PendingTransactionsResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		if (this.format != null) {
-			qd.addQuery("format", String.valueOf(format));
-		}
-		if (this.max != null) {
-			qd.addQuery("max", String.valueOf(max));
-		}
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("transactions"));
-		qd.addPathSegment(String.valueOf("pending"));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("transactions"));
+		addPathSegment(String.valueOf("pending"));
 
 		return qd;
 	}

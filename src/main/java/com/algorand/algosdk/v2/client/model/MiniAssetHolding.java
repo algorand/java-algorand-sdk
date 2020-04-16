@@ -10,10 +10,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * A simplified version of AssetHolding 
  */
 public class MiniAssetHolding extends PathResponse {
+
 	@JsonProperty("address")
 	public String address;
+
 	@JsonProperty("amount")
 	public Long amount;
+
 	@JsonProperty("is-frozen")
 	public Boolean isFrozen;
 

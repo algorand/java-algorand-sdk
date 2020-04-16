@@ -42,7 +42,7 @@ public class TestGenerator extends Generator {
 	
 
 	static String getPathFromLine(String line) {
-		return line.substring(0, line.indexOf(":"));
+		return line.substring(0, line.indexOf(","));
 	}
 
 	public static boolean testSamples(TestGenerator tg, BufferedReader br, Client client, boolean verbose) throws Exception {
@@ -66,10 +66,13 @@ public class TestGenerator extends Generator {
 				String[] columns = line.split(",");
 				JsonNode paramNode = pathNode.findValue("parameters");
 				
+				// get the url
+				String httpUrl = "http://" + client.getHost() + ":" + client.getPort() + columns[0].substring(1);
+				
 				// Get the constructor params
 				ArrayList<String> al = new ArrayList<String>();
 				{
-					int cidx = 0;
+					int cidx = 1;
 
 					Iterator<Entry<String, JsonNode>> params = tg.getSortedParameters(paramNode);
 					while (params.hasNext()) {
@@ -84,7 +87,7 @@ public class TestGenerator extends Generator {
 				
 				// sample source setup
 				Iterator<Entry<String, JsonNode>> properties = tg.getSortedParameters(paramNode);
-				int colIdx = 0;
+				int colIdx = 1;
 				// SDK query setup
 				String methodName = pathNode.findValue("operationId").asText();
 
@@ -110,12 +113,10 @@ public class TestGenerator extends Generator {
 				}
 				
 				// Call the node directly using curl
-				QueryData qd = query.getRequestString();
-				HttpUrl httpUrl = Client.getHttpUrl(qd, client.getPort(), client.getHost());
-				System.out.println("\n" + httpUrl.toString());
+				System.out.println("\n" + httpUrl);
 				
 				//callExternalCurl
-				String curlResponse = callExternalCurl(httpUrl.toString());
+				String curlResponse = callExternalCurl(httpUrl);
 				
 				// Call the SDK
 				String sdkResponse = QueryMapper.lookup(query, methodName);

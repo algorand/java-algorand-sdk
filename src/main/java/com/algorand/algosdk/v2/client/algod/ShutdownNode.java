@@ -12,14 +12,18 @@ import com.algorand.algosdk.v2.client.common.Response;
  * seconds. /v2/shutdown 
  */
 public class ShutdownNode extends Query {
-	private Long timeout;
 
+	private Long timeout;
+	public Long timeout() {
+		return this.timeout;
+	}
 
 	public ShutdownNode(Client client) {
 		super(client, "post");
 	}
-	public ShutdownNode setTimeout(Long timeout) {
+	public ShutdownNode timeout(Long timeout) {
 		this.timeout = timeout;
+		addQuery("timeout", String.valueOf(timeout));
 		return this;
 	}
 
@@ -29,13 +33,9 @@ public class ShutdownNode extends Query {
 		resp.setValueType(String.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		if (this.timeout != null) {
-			qd.addQuery("timeout", String.valueOf(timeout));
-		}
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("shutdown"));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("shutdown"));
 
 		return qd;
 	}

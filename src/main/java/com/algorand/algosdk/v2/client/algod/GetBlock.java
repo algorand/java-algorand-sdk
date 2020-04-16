@@ -11,9 +11,15 @@ import com.algorand.algosdk.v2.client.model.BlockResponse;
  * /v2/blocks/{round} 
  */
 public class GetBlock extends Query {
-	private String format;
-	private Long round;
 
+	private String format;
+	public String format() {
+		return this.format;
+	}
+	private Long round;
+	public Long round() {
+		return this.round;
+	}
 
 	/**
 	 * @param round The round from which to fetch block information. 
@@ -26,8 +32,9 @@ public class GetBlock extends Query {
 	/**
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
-	public GetBlock setFormat(String format) {
+	public GetBlock format(String format) {
 		this.format = format;
+		addQuery("format", String.valueOf(format));
 		return this;
 	}
 
@@ -37,14 +44,10 @@ public class GetBlock extends Query {
 		resp.setValueType(BlockResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		if (this.format != null) {
-			qd.addQuery("format", String.valueOf(format));
-		}
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("blocks"));
-		qd.addPathSegment(String.valueOf(round));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("blocks"));
+		addPathSegment(String.valueOf(round));
 
 		return qd;
 	}

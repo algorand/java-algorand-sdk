@@ -23,11 +23,10 @@ public class GetSupply extends Query {
 		resp.setValueType(SupplyResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("ledger"));
-		qd.addPathSegment(String.valueOf("supply"));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("ledger"));
+		addPathSegment(String.valueOf("supply"));
 
 		return qd;
 	}

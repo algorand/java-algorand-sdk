@@ -6,8 +6,10 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ErrorModel extends PathResponse {
+
 	@JsonProperty("data")
 	public String data;
+
 	@JsonProperty("msg")
 	public String msg;
 

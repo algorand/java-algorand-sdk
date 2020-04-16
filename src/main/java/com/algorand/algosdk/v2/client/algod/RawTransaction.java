@@ -10,8 +10,11 @@ import com.algorand.algosdk.v2.client.common.Response;
  * /v2/transactions 
  */
 public class RawTransaction extends Query {
-	private String rawtxn;
 
+	private String rawtxn;
+	public String rawtxn() {
+		return this.rawtxn;
+	}
 
 	public RawTransaction(Client client) {
 		super(client, "post");
@@ -20,8 +23,9 @@ public class RawTransaction extends Query {
 	/**
 	 * The byte encoded signed transaction to broadcast to network 
 	 */
-	public RawTransaction setRawtxn(String rawtxn) {
+	public RawTransaction rawtxn(String rawtxn) {
 		this.rawtxn = rawtxn;
+		addQuery("rawtxn", String.valueOf(rawtxn));
 		return this;
 	}
 
@@ -31,16 +35,12 @@ public class RawTransaction extends Query {
 		resp.setValueType(String.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		if (this.rawtxn != null) {
-			qd.addQuery("rawtxn", String.valueOf(rawtxn));
+	protected QueryData getRequestString() {
+		if (this.rawtxn == null) {
+			throw new RuntimeException("rawtxn is not set. It is a required parameter.");
 		}
-		else {
-			throw new RuntimeException("rawtxn is not set, and it is a required parameter.");
-		}
-		qd.addPathSegment(String.valueOf("v2"));
-		qd.addPathSegment(String.valueOf("transactions"));
+		addPathSegment(String.valueOf("v2"));
+		addPathSegment(String.valueOf("transactions"));
 
 		return qd;
 	}

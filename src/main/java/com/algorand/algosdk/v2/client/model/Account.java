@@ -39,6 +39,7 @@ public class Account extends PathResponse {
 	 * `map[int] -> Asset` for this type. 
 	 */	@JsonProperty("created-assets")
 	public List<Asset> createdAssets;
+
 	@JsonProperty("participation")
 	public AccountParticipation participation;
 

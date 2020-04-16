@@ -11,22 +11,67 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
  * Lookup account transactions. /accounts/{account-id}/transactions 
  */
 public class LookupAccountTransactions extends Query {
-	private String accountId;
-	private String afterTime;
-	private Long assetId;
-	private String beforeTime;
-	private Long currencyGreaterThan;
-	private Long currencyLessThan;
-	private Long limit;
-	private Long maxRound;
-	private Long minRound;
-	private String next;
-	private String notePrefix;
-	private Long round;
-	private String sigType;
-	private String txId;
-	private String txType;
 
+	private String accountId;
+	public String accountId() {
+		return this.accountId;
+	}
+	private String afterTime;
+	public String afterTime() {
+		return this.afterTime;
+	}
+	private Long assetId;
+	public Long assetId() {
+		return this.assetId;
+	}
+	private String beforeTime;
+	public String beforeTime() {
+		return this.beforeTime;
+	}
+	private Long currencyGreaterThan;
+	public Long currencyGreaterThan() {
+		return this.currencyGreaterThan;
+	}
+	private Long currencyLessThan;
+	public Long currencyLessThan() {
+		return this.currencyLessThan;
+	}
+	private Long limit;
+	public Long limit() {
+		return this.limit;
+	}
+	private Long maxRound;
+	public Long maxRound() {
+		return this.maxRound;
+	}
+	private Long minRound;
+	public Long minRound() {
+		return this.minRound;
+	}
+	private String next;
+	public String next() {
+		return this.next;
+	}
+	private String notePrefix;
+	public String notePrefix() {
+		return this.notePrefix;
+	}
+	private Long round;
+	public Long round() {
+		return this.round;
+	}
+	private String sigType;
+	public String sigType() {
+		return this.sigType;
+	}
+	private String txId;
+	public String txId() {
+		return this.txId;
+	}
+	private String txType;
+	public String txType() {
+		return this.txType;
+	}
 
 	/**
 	 * @param accountId account string 
@@ -39,24 +84,27 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAccountTransactions setAfterTime(String afterTime) {
+	public LookupAccountTransactions afterTime(String afterTime) {
 		this.afterTime = afterTime;
+		addQuery("after-time", String.valueOf(afterTime));
 		return this;
 	}
 
 	/**
 	 * Asset ID 
 	 */
-	public LookupAccountTransactions setAssetId(Long assetId) {
+	public LookupAccountTransactions assetId(Long assetId) {
 		this.assetId = assetId;
+		addQuery("asset-id", String.valueOf(assetId));
 		return this;
 	}
 
 	/**
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAccountTransactions setBeforeTime(String beforeTime) {
+	public LookupAccountTransactions beforeTime(String beforeTime) {
 		this.beforeTime = beforeTime;
+		addQuery("before-time", String.valueOf(beforeTime));
 		return this;
 	}
 
@@ -65,8 +113,9 @@ public class LookupAccountTransactions extends Query {
 	 * default currency unless an asset-id is provided, in which case the asset will be 
 	 * used. 
 	 */
-	public LookupAccountTransactions setCurrencyGreaterThan(Long currencyGreaterThan) {
+	public LookupAccountTransactions currencyGreaterThan(Long currencyGreaterThan) {
 		this.currencyGreaterThan = currencyGreaterThan;
+		addQuery("currency-greater-than", String.valueOf(currencyGreaterThan));
 		return this;
 	}
 
@@ -74,56 +123,63 @@ public class LookupAccountTransactions extends Query {
 	 * Results should have an amount less than this value. MicroAlgos are the default 
 	 * currency unless an asset-id is provided, in which case the asset will be used. 
 	 */
-	public LookupAccountTransactions setCurrencyLessThan(Long currencyLessThan) {
+	public LookupAccountTransactions currencyLessThan(Long currencyLessThan) {
 		this.currencyLessThan = currencyLessThan;
+		addQuery("currency-less-than", String.valueOf(currencyLessThan));
 		return this;
 	}
 
 	/**
 	 * Maximum number of results to return. 
 	 */
-	public LookupAccountTransactions setLimit(Long limit) {
+	public LookupAccountTransactions limit(Long limit) {
 		this.limit = limit;
+		addQuery("limit", String.valueOf(limit));
 		return this;
 	}
 
 	/**
 	 * Include results at or before the specified max-round. 
 	 */
-	public LookupAccountTransactions setMaxRound(Long maxRound) {
+	public LookupAccountTransactions maxRound(Long maxRound) {
 		this.maxRound = maxRound;
+		addQuery("max-round", String.valueOf(maxRound));
 		return this;
 	}
 
 	/**
 	 * Include results at or after the specified min-round. 
 	 */
-	public LookupAccountTransactions setMinRound(Long minRound) {
+	public LookupAccountTransactions minRound(Long minRound) {
 		this.minRound = minRound;
+		addQuery("min-round", String.valueOf(minRound));
 		return this;
 	}
 
 	/**
 	 * The next page of results. Use the next token provided by the previous results. 
 	 */
-	public LookupAccountTransactions setNext(String next) {
+	public LookupAccountTransactions next(String next) {
 		this.next = next;
+		addQuery("next", String.valueOf(next));
 		return this;
 	}
 
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public LookupAccountTransactions setNotePrefix(String notePrefix) {
+	public LookupAccountTransactions notePrefix(String notePrefix) {
 		this.notePrefix = notePrefix;
+		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}
 
 	/**
 	 * Include results for the specified round. 
 	 */
-	public LookupAccountTransactions setRound(Long round) {
+	public LookupAccountTransactions round(Long round) {
 		this.round = round;
+		addQuery("round", String.valueOf(round));
 		return this;
 	}
 
@@ -131,20 +187,23 @@ public class LookupAccountTransactions extends Query {
 	 * SigType filters just results using the specified type of signature: * sig - 
 	 * Standard * msig - MultiSig * lsig - LogicSig 
 	 */
-	public LookupAccountTransactions setSigType(String sigType) {
+	public LookupAccountTransactions sigType(String sigType) {
 		this.sigType = sigType;
+		addQuery("sig-type", String.valueOf(sigType));
 		return this;
 	}
 
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public LookupAccountTransactions setTxId(String txId) {
+	public LookupAccountTransactions txId(String txId) {
 		this.txId = txId;
+		addQuery("tx-id", String.valueOf(txId));
 		return this;
 	}
-	public LookupAccountTransactions setTxType(String txType) {
+	public LookupAccountTransactions txType(String txType) {
 		this.txType = txType;
+		addQuery("tx-type", String.valueOf(txType));
 		return this;
 	}
 
@@ -154,53 +213,10 @@ public class LookupAccountTransactions extends Query {
 		resp.setValueType(TransactionsResponse.class);
 		return resp;
 	}
-	public QueryData getRequestString() {
-		QueryData qd = new QueryData();
-		if (this.afterTime != null) {
-			qd.addQuery("afterTime", String.valueOf(afterTime));
-		}
-		if (this.assetId != null) {
-			qd.addQuery("assetId", String.valueOf(assetId));
-		}
-		if (this.beforeTime != null) {
-			qd.addQuery("beforeTime", String.valueOf(beforeTime));
-		}
-		if (this.currencyGreaterThan != null) {
-			qd.addQuery("currencyGreaterThan", String.valueOf(currencyGreaterThan));
-		}
-		if (this.currencyLessThan != null) {
-			qd.addQuery("currencyLessThan", String.valueOf(currencyLessThan));
-		}
-		if (this.limit != null) {
-			qd.addQuery("limit", String.valueOf(limit));
-		}
-		if (this.maxRound != null) {
-			qd.addQuery("maxRound", String.valueOf(maxRound));
-		}
-		if (this.minRound != null) {
-			qd.addQuery("minRound", String.valueOf(minRound));
-		}
-		if (this.next != null) {
-			qd.addQuery("next", String.valueOf(next));
-		}
-		if (this.notePrefix != null) {
-			qd.addQuery("notePrefix", String.valueOf(notePrefix));
-		}
-		if (this.round != null) {
-			qd.addQuery("round", String.valueOf(round));
-		}
-		if (this.sigType != null) {
-			qd.addQuery("sigType", String.valueOf(sigType));
-		}
-		if (this.txId != null) {
-			qd.addQuery("txId", String.valueOf(txId));
-		}
-		if (this.txType != null) {
-			qd.addQuery("txType", String.valueOf(txType));
-		}
-		qd.addPathSegment(String.valueOf("accounts"));
-		qd.addPathSegment(String.valueOf(accountId));
-		qd.addPathSegment(String.valueOf("transactions"));
+	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("accounts"));
+		addPathSegment(String.valueOf(accountId));
+		addPathSegment(String.valueOf("transactions"));
 
 		return qd;
 	}
