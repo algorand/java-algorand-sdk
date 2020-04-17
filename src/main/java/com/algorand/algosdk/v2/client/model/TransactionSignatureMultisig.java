@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,7 +17,7 @@ public class TransactionSignatureMultisig extends PathResponse {
 	/**
 	 * (subsig) holds pairs of public key and signatures. 
 	 */	@JsonProperty("subsignature")
-	public List<TransactionSignatureMultisigSubsignature> subsignature;
+	public List<TransactionSignatureMultisigSubsignature> subsignature = new ArrayList<TransactionSignatureMultisigSubsignature>();
 
 	/**
 	 * (thr) 

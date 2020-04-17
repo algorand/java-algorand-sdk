@@ -15,17 +15,7 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 public class GetPendingTransactionsByAddress extends Query {
 
 	private String address;
-	public String address() {
-		return this.address;
-	}
-	private String format;
-	public String format() {
-		return this.format;
-	}
-	private Long max;
-	public Long max() {
-		return this.max;
-	}
+
 
 	/**
 	 * @param address An account public key 
@@ -39,7 +29,6 @@ public class GetPendingTransactionsByAddress extends Query {
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
 	public GetPendingTransactionsByAddress format(String format) {
-		this.format = format;
 		addQuery("format", String.valueOf(format));
 		return this;
 	}
@@ -48,7 +37,6 @@ public class GetPendingTransactionsByAddress extends Query {
 	 * Truncated number of transactions to display. If max=0, returns all pending txns. 
 	 */
 	public GetPendingTransactionsByAddress max(Long max) {
-		this.max = max;
 		addQuery("max", String.valueOf(max));
 		return this;
 	}

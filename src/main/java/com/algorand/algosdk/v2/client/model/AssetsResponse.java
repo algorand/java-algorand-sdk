@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AssetsResponse extends PathResponse {
 
 	@JsonProperty("assets")
-	public List<Asset> assets;
+	public List<Asset> assets = new ArrayList<Asset>();
 
 	/**
 	 * Round at which the results were computed. 

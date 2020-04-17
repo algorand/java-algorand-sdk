@@ -13,9 +13,7 @@ import com.algorand.algosdk.v2.client.model.Block;
 public class LookupBlock extends Query {
 
 	private Long roundNumber;
-	public Long roundNumber() {
-		return this.roundNumber;
-	}
+
 
 	/**
 	 * @param roundNumber Round number 

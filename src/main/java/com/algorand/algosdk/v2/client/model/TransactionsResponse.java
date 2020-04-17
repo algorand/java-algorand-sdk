@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,7 +21,7 @@ public class TransactionsResponse extends PathResponse {
 	public String nextToken;
 
 	@JsonProperty("transactions")
-	public List<Transaction> transactions;
+	public List<Transaction> transactions = new ArrayList<Transaction>();
 
 	@Override
 	public boolean equals(Object o) {

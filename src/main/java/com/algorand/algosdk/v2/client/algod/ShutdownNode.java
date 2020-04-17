@@ -13,16 +13,11 @@ import com.algorand.algosdk.v2.client.common.Response;
  */
 public class ShutdownNode extends Query {
 
-	private Long timeout;
-	public Long timeout() {
-		return this.timeout;
-	}
 
 	public ShutdownNode(Client client) {
 		super(client, "post");
 	}
 	public ShutdownNode timeout(Long timeout) {
-		this.timeout = timeout;
 		addQuery("timeout", String.valueOf(timeout));
 		return this;
 	}

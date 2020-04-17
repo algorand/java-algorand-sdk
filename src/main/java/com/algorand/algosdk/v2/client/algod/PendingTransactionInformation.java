@@ -18,14 +18,8 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
  */
 public class PendingTransactionInformation extends Query {
 
-	private String format;
-	public String format() {
-		return this.format;
-	}
 	private String txid;
-	public String txid() {
-		return this.txid;
-	}
+
 
 	/**
 	 * @param txid A transaction id 
@@ -39,7 +33,6 @@ public class PendingTransactionInformation extends Query {
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
 	public PendingTransactionInformation format(String format) {
-		this.format = format;
 		addQuery("format", String.valueOf(format));
 		return this;
 	}

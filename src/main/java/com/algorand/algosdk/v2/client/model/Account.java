@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,13 +33,13 @@ public class Account extends PathResponse {
 	 * (asset) assets held by this account. Note the raw object uses `map[int] -> 
 	 * AssetHolding` for this type. 
 	 */	@JsonProperty("assets")
-	public List<AssetHolding> assets;
+	public List<AssetHolding> assets = new ArrayList<AssetHolding>();
 
 	/**
 	 * (apar) parameters of assets created by this account. Note: the raw account uses 
 	 * `map[int] -> Asset` for this type. 
 	 */	@JsonProperty("created-assets")
-	public List<Asset> createdAssets;
+	public List<Asset> createdAssets = new ArrayList<Asset>();
 
 	@JsonProperty("participation")
 	public AccountParticipation participation;

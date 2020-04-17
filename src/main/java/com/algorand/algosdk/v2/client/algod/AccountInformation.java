@@ -14,9 +14,7 @@ import com.algorand.algosdk.v2.client.model.Account;
 public class AccountInformation extends Query {
 
 	private String address;
-	public String address() {
-		return this.address;
-	}
+
 
 	/**
 	 * @param address An account public key 

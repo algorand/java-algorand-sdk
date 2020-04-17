@@ -13,9 +13,7 @@ import com.algorand.algosdk.v2.client.model.AssetResponse;
 public class LookupAssetByID extends Query {
 
 	private Long assetId;
-	public Long assetId() {
-		return this.assetId;
-	}
+
 
 	public LookupAssetByID(Client client, Long assetId) {
 		super(client, "get");

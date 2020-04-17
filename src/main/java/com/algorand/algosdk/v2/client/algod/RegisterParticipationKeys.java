@@ -13,25 +13,7 @@ import com.algorand.algosdk.v2.client.common.Response;
 public class RegisterParticipationKeys extends Query {
 
 	private String address;
-	public String address() {
-		return this.address;
-	}
-	private Long fee;
-	public Long fee() {
-		return this.fee;
-	}
-	private Long keyDilution;
-	public Long keyDilution() {
-		return this.keyDilution;
-	}
-	private Boolean noWait;
-	public Boolean noWait() {
-		return this.noWait;
-	}
-	private Long roundLastValid;
-	public Long roundLastValid() {
-		return this.roundLastValid;
-	}
+
 
 	/**
 	 * @param address The `account-id` to update, or `all` to update all accounts. 
@@ -46,7 +28,6 @@ public class RegisterParticipationKeys extends Query {
 	 * suggested fee. 
 	 */
 	public RegisterParticipationKeys fee(Long fee) {
-		this.fee = fee;
 		addQuery("fee", String.valueOf(fee));
 		return this;
 	}
@@ -55,7 +36,6 @@ public class RegisterParticipationKeys extends Query {
 	 * value to use for two-level participation key. 
 	 */
 	public RegisterParticipationKeys keyDilution(Long keyDilution) {
-		this.keyDilution = keyDilution;
 		addQuery("key-dilution", String.valueOf(keyDilution));
 		return this;
 	}
@@ -64,7 +44,6 @@ public class RegisterParticipationKeys extends Query {
 	 * Don't wait for transaction to commit before returning response. 
 	 */
 	public RegisterParticipationKeys noWait(Boolean noWait) {
-		this.noWait = noWait;
 		addQuery("no-wait", String.valueOf(noWait));
 		return this;
 	}
@@ -73,7 +52,6 @@ public class RegisterParticipationKeys extends Query {
 	 * The last round for which the generated participation keys will be valid. 
 	 */
 	public RegisterParticipationKeys roundLastValid(Long roundLastValid) {
-		this.roundLastValid = roundLastValid;
 		addQuery("round-last-valid", String.valueOf(roundLastValid));
 		return this;
 	}

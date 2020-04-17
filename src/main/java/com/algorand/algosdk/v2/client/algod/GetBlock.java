@@ -12,14 +12,8 @@ import com.algorand.algosdk.v2.client.model.BlockResponse;
  */
 public class GetBlock extends Query {
 
-	private String format;
-	public String format() {
-		return this.format;
-	}
 	private Long round;
-	public Long round() {
-		return this.round;
-	}
+
 
 	/**
 	 * @param round The round from which to fetch block information. 
@@ -33,7 +27,6 @@ public class GetBlock extends Query {
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
 	public GetBlock format(String format) {
-		this.format = format;
 		addQuery("format", String.valueOf(format));
 		return this;
 	}

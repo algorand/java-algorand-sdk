@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -48,7 +49,7 @@ public class Block extends PathResponse {
 	/**
 	 * (txns) list of transactions corresponding to a given round. 
 	 */	@JsonProperty("transactions")
-	public List<Transaction> transactions;
+	public List<Transaction> transactions = new ArrayList<Transaction>();
 
 	/**
 	 * (txn) TransactionsRoot authenticates the set of transactions appearing in the 

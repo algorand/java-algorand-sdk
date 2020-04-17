@@ -170,7 +170,12 @@ public class Generator {
 			// public type
 			if (desc != null) buffer.append(desc); else buffer.append("\n");
 			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
-			buffer.append("\n\tpublic " + typeObj + " " + javaName + ";\n");
+			buffer.append("\n\tpublic " + typeObj + " " + javaName);
+			if (typeObj.contains("List<")) {
+				buffer.append(" = new Array" + typeObj + "();\n");
+			} else {
+				buffer.append(";\n");
+			}
 		}
 		return importList;
 	}
@@ -210,6 +215,7 @@ public class Generator {
 		writeCompareMethod(className, body, properties);
 
 		if (importList) {
+			imports.append("import java.util.ArrayList;\n");
 			imports.append("import java.util.List;\n");
 		}
 		imports.append("import java.util.Objects;\n"); // used by Objects.deepEquals
@@ -298,13 +304,8 @@ public class Generator {
 			String propType = getType(prop.getValue(), true);
 			String propCode = prop.getKey();
 
-			decls.append("\n\tprivate " + propType + " " + propName + ";\n");
-			
-			decls.append("\tpublic " + propType + " " + propName + "() {\n");
-			decls.append("\t\treturn this." + propName + ";\n\t}");
-
-
 			if (inPath(prop.getValue())) {
+				decls.append("\n\tprivate " + propType + " " + propName + ";\n");
 				if (prop.getValue().get("description") != null) {
 					String desc = prop.getValue().get("description").asText();
 					desc = formatComment("@param " + propName + " " + desc, "\t", false);
@@ -329,13 +330,12 @@ public class Generator {
 				builders.append(desc + "\n");
 			}
 			builders.append("\tpublic " + className + " " + setterName + "(" + propType + " " + propName + ") {\n");
-			builders.append("\t\tthis." + propName + " = " + propName + ";\n");
 			builders.append("\t\taddQuery(\"" + propCode + "\", String.valueOf("+propName+"));\n");
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
 
 			if (isRequired(prop.getValue())) {
-				requestMethod.append("		if (this."+propName+" == null) {\n"); 
+				requestMethod.append("		if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
 				requestMethod.append("			throw new RuntimeException(\"" +
 						propCode + " is not set. It is a required parameter.\");\n		}\n");
 			}

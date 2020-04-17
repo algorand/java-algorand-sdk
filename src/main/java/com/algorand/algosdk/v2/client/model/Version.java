@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -23,7 +24,7 @@ public class Version extends PathResponse {
 	public String genesisId;
 
 	@JsonProperty("versions")
-	public List<String> versions;
+	public List<String> versions = new ArrayList<String>();
 
 	@Override
 	public boolean equals(Object o) {

@@ -14,9 +14,7 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
 public class WaitForBlock extends Query {
 
 	private Long round;
-	public Long round() {
-		return this.round;
-	}
+
 
 	/**
 	 * @param round The round to wait until returning status 

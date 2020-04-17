@@ -13,65 +13,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 public class LookupAccountTransactions extends Query {
 
 	private String accountId;
-	public String accountId() {
-		return this.accountId;
-	}
-	private String afterTime;
-	public String afterTime() {
-		return this.afterTime;
-	}
-	private Long assetId;
-	public Long assetId() {
-		return this.assetId;
-	}
-	private String beforeTime;
-	public String beforeTime() {
-		return this.beforeTime;
-	}
-	private Long currencyGreaterThan;
-	public Long currencyGreaterThan() {
-		return this.currencyGreaterThan;
-	}
-	private Long currencyLessThan;
-	public Long currencyLessThan() {
-		return this.currencyLessThan;
-	}
-	private Long limit;
-	public Long limit() {
-		return this.limit;
-	}
-	private Long maxRound;
-	public Long maxRound() {
-		return this.maxRound;
-	}
-	private Long minRound;
-	public Long minRound() {
-		return this.minRound;
-	}
-	private String next;
-	public String next() {
-		return this.next;
-	}
-	private String notePrefix;
-	public String notePrefix() {
-		return this.notePrefix;
-	}
-	private Long round;
-	public Long round() {
-		return this.round;
-	}
-	private String sigType;
-	public String sigType() {
-		return this.sigType;
-	}
-	private String txId;
-	public String txId() {
-		return this.txId;
-	}
-	private String txType;
-	public String txType() {
-		return this.txType;
-	}
+
 
 	/**
 	 * @param accountId account string 
@@ -85,7 +27,6 @@ public class LookupAccountTransactions extends Query {
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
 	public LookupAccountTransactions afterTime(String afterTime) {
-		this.afterTime = afterTime;
 		addQuery("after-time", String.valueOf(afterTime));
 		return this;
 	}
@@ -94,7 +35,6 @@ public class LookupAccountTransactions extends Query {
 	 * Asset ID 
 	 */
 	public LookupAccountTransactions assetId(Long assetId) {
-		this.assetId = assetId;
 		addQuery("asset-id", String.valueOf(assetId));
 		return this;
 	}
@@ -103,7 +43,6 @@ public class LookupAccountTransactions extends Query {
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
 	public LookupAccountTransactions beforeTime(String beforeTime) {
-		this.beforeTime = beforeTime;
 		addQuery("before-time", String.valueOf(beforeTime));
 		return this;
 	}
@@ -114,7 +53,6 @@ public class LookupAccountTransactions extends Query {
 	 * used. 
 	 */
 	public LookupAccountTransactions currencyGreaterThan(Long currencyGreaterThan) {
-		this.currencyGreaterThan = currencyGreaterThan;
 		addQuery("currency-greater-than", String.valueOf(currencyGreaterThan));
 		return this;
 	}
@@ -124,7 +62,6 @@ public class LookupAccountTransactions extends Query {
 	 * currency unless an asset-id is provided, in which case the asset will be used. 
 	 */
 	public LookupAccountTransactions currencyLessThan(Long currencyLessThan) {
-		this.currencyLessThan = currencyLessThan;
 		addQuery("currency-less-than", String.valueOf(currencyLessThan));
 		return this;
 	}
@@ -133,7 +70,6 @@ public class LookupAccountTransactions extends Query {
 	 * Maximum number of results to return. 
 	 */
 	public LookupAccountTransactions limit(Long limit) {
-		this.limit = limit;
 		addQuery("limit", String.valueOf(limit));
 		return this;
 	}
@@ -142,7 +78,6 @@ public class LookupAccountTransactions extends Query {
 	 * Include results at or before the specified max-round. 
 	 */
 	public LookupAccountTransactions maxRound(Long maxRound) {
-		this.maxRound = maxRound;
 		addQuery("max-round", String.valueOf(maxRound));
 		return this;
 	}
@@ -151,7 +86,6 @@ public class LookupAccountTransactions extends Query {
 	 * Include results at or after the specified min-round. 
 	 */
 	public LookupAccountTransactions minRound(Long minRound) {
-		this.minRound = minRound;
 		addQuery("min-round", String.valueOf(minRound));
 		return this;
 	}
@@ -160,7 +94,6 @@ public class LookupAccountTransactions extends Query {
 	 * The next page of results. Use the next token provided by the previous results. 
 	 */
 	public LookupAccountTransactions next(String next) {
-		this.next = next;
 		addQuery("next", String.valueOf(next));
 		return this;
 	}
@@ -169,7 +102,6 @@ public class LookupAccountTransactions extends Query {
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
 	public LookupAccountTransactions notePrefix(String notePrefix) {
-		this.notePrefix = notePrefix;
 		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}
@@ -178,7 +110,6 @@ public class LookupAccountTransactions extends Query {
 	 * Include results for the specified round. 
 	 */
 	public LookupAccountTransactions round(Long round) {
-		this.round = round;
 		addQuery("round", String.valueOf(round));
 		return this;
 	}
@@ -188,7 +119,6 @@ public class LookupAccountTransactions extends Query {
 	 * Standard * msig - MultiSig * lsig - LogicSig 
 	 */
 	public LookupAccountTransactions sigType(String sigType) {
-		this.sigType = sigType;
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
 	}
@@ -197,12 +127,10 @@ public class LookupAccountTransactions extends Query {
 	 * Lookup the specific transaction by ID. 
 	 */
 	public LookupAccountTransactions txId(String txId) {
-		this.txId = txId;
 		addQuery("tx-id", String.valueOf(txId));
 		return this;
 	}
 	public LookupAccountTransactions txType(String txType) {
-		this.txType = txType;
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
 	}
