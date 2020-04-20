@@ -20,7 +20,7 @@ import com.algorand.algosdk.v2.client.algod.RawTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
-import com.algorand.algosdk.v2.client.indexer.SearchAccounts;
+import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
 import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
@@ -142,8 +142,8 @@ public class Client {
 		return new PendingTransactionInformation((Client) this, txid);
 	}
 
-	public SearchAccounts searchAccounts() {
-		return new SearchAccounts((Client) this);
+	public SearchForAccounts searchForAccounts() {
+		return new SearchForAccounts((Client) this);
 	}
 
 	public LookupAccountByID lookupAccountByID(String accountId) {

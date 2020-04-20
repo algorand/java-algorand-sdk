@@ -68,7 +68,7 @@ public class AssetParams extends PathResponse {
 	/**
 	 * (t) The total number of units of this asset. 
 	 */	@JsonProperty("total")
-	public Long total;
+	public java.math.BigInteger total;
 
 	/**
 	 * (un) Name of a unit of this asset, as supplied by the creator. 

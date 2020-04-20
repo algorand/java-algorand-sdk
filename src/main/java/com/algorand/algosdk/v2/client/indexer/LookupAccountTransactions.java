@@ -26,8 +26,8 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAccountTransactions afterTime(String afterTime) {
-		addQuery("after-time", String.valueOf(afterTime));
+	public LookupAccountTransactions afterTime(java.util.Date afterTime) {
+		addQuery("after-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(afterTime));
 		return this;
 	}
 
@@ -42,8 +42,8 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAccountTransactions beforeTime(String beforeTime) {
-		addQuery("before-time", String.valueOf(beforeTime));
+	public LookupAccountTransactions beforeTime(java.util.Date beforeTime) {
+		addQuery("before-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(beforeTime));
 		return this;
 	}
 

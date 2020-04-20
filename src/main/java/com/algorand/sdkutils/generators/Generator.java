@@ -59,8 +59,17 @@ public class Generator {
 			return type;
 		}
 
-		JsonNode typeNode = prop.get("type") != null ? prop.get("type") : prop.get("schema").get("type");
-		String type = typeNode.asText();
+		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
+		String type = typeNode.get("type").asText();
+		String format = typeNode.get("x-algorand-format") != null ? typeNode.get("x-algorand-format").asText() : "";
+		if (!format.isEmpty() ) {
+			switch (format) {
+			case "uint64":
+				return "java.math.BigInteger";
+			case "RFC3339 String":
+				return "java.util.Date";
+			}
+		}
 		switch (type) {
 		case "integer":
 			return asObject ? "Long" : "long";
@@ -77,6 +86,37 @@ public class Generator {
 			throw new RuntimeException("Unrecognized type: " + type);	
 		}
 	}
+
+	static String getStringValueOfStatement(String propType, String propName) {
+		switch (propType) {
+		case "java.util.Date":
+			return "new java.text.SimpleDateFormat(\"yyyy-MM-dd'T'h:m:ssZ\").format(" + propName + ")";
+		default:
+			return "String.valueOf("+propName+")";
+		}
+	}
+
+	static String getPropertyWithJsonSetter(String typeObj, String javaName, String jprop){
+		StringBuffer buffer = new StringBuffer();
+		switch (typeObj) {
+		case "java.util.DateTime":
+			throw new RuntimeException("Parsing of time is not yet implemented!");
+		case "String":
+		case "Long":
+		case "long":
+		case "boolean":
+		case "java.math.BigInteger":
+		default: // List and Models with Json properties
+			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
+			buffer.append("\n\tpublic " + typeObj + " " + javaName);
+			if (typeObj.contains("List<")) {
+				buffer.append(" = new Array" + typeObj + "()");
+			}
+			buffer.append(";\n");
+		}
+		return buffer.toString();
+	}
+
 
 	static boolean needsClassImport(String type) {
 		switch (type) {
@@ -150,6 +190,7 @@ public class Generator {
 		return null;
 	}
 
+	// Model class properties
 	static boolean writeProperties(StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties) {
 		boolean importList = false;
 		while (properties.hasNext()) {
@@ -169,13 +210,7 @@ public class Generator {
 
 			// public type
 			if (desc != null) buffer.append(desc); else buffer.append("\n");
-			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
-			buffer.append("\n\tpublic " + typeObj + " " + javaName);
-			if (typeObj.contains("List<")) {
-				buffer.append(" = new Array" + typeObj + "();\n");
-			} else {
-				buffer.append(";\n");
-			}
+			buffer.append(getPropertyWithJsonSetter(typeObj, javaName, jprop));
 		}
 		return importList;
 	}
@@ -330,7 +365,8 @@ public class Generator {
 				builders.append(desc + "\n");
 			}
 			builders.append("\tpublic " + className + " " + setterName + "(" + propType + " " + propName + ") {\n");
-			builders.append("\t\taddQuery(\"" + propCode + "\", String.valueOf("+propName+"));\n");
+			String valueOfString = getStringValueOfStatement(propType, propName);
+			builders.append("\t\taddQuery(\"" + propCode + "\", "+ valueOfString +");\n");
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
 
@@ -347,6 +383,8 @@ public class Generator {
 		generatedPathsEntry.append(generatedPathsEntryBody);
 		generatedPathsEntry.append(");\n	}\n");
 
+		// Add the path construction code. 
+		// The path is constructed in the end, while the query params are added as the 
 		ArrayList<String> al = getPathInserts(path);
 		for (String str : al) {
 			requestMethod.append(

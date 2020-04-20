@@ -2,6 +2,7 @@ package com.algorand.sdkutils.generators;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -17,6 +18,7 @@ public class QueryMapperGenerator extends Generator {
 		BufferedWriter bw = getFileWriter("QueryMapper", sdkutilsPath);
 		bw.append("package com.algorand.sdkutils.generated;\n" + 
 				"\n" + 
+				"import java.text.SimpleDateFormat;\n\n" +
 				"import com.algorand.algosdk.v2.client.indexer.*;\n" + 
 				"import com.algorand.algosdk.v2.client.common.Client;\n" + 
 				"import com.algorand.algosdk.v2.client.common.Query;\n\n"
@@ -29,7 +31,7 @@ public class QueryMapperGenerator extends Generator {
 		
 		getClass.append("	public static Query getClass(String name, Client client, String args[]) {\n" + 
 				"		switch (name) {\n");
-		setValue.append("	public static void setValue(Query q, String className, String property, String value) {\n" + 
+		setValue.append("	public static void setValue(Query q, String className, String property, String value) throws ParseException {\n" + 
 				"		switch (className) {\n");
 		lookUp.append("	public static String lookup(Query q, String className) throws Exception {\n" + 
 				"		switch (className) {\n");
@@ -65,6 +67,8 @@ public class QueryMapperGenerator extends Generator {
 				Entry<String, JsonNode> parameter = properties.next();
 				String javaSetParamName = Generator.getCamelCase(parameter.getKey(), false);
 				String typeName = parameter.getValue().get("type").asText();
+				String format = parameter.getValue().get("x-algorand-format") != null 
+						? parameter.getValue().get("x-algorand-format").asText() : "";
 				
 				if (inPath(parameter.getValue())) {
 					if (argCounter > 0) {
@@ -95,7 +99,13 @@ public class QueryMapperGenerator extends Generator {
 					setValue.append("Long.valueOf(value));\n");
 					break;
 				case "string":
-					setValue.append("value);\n");
+					switch (format) {
+					case "RFC3339 String":
+						setValue.append("new SimpleDateFormat(\"yyyy-MM-dd'T'h:m:ssZ\").parse(value));\n");
+						break;
+					default:
+						setValue.append("value);\n");
+					}
 					break;
 				case "boolean":
 					setValue.append("Boolean.valueOf(value));\n");

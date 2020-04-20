@@ -23,8 +23,8 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Only include transactions with this address in one of the transaction fields. 
 	 */
-	public LookupAssetTransactions address(String address) {
-		addQuery("address", String.valueOf(address));
+	public LookupAssetTransactions address(java.util.Date address) {
+		addQuery("address", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(address));
 		return this;
 	}
 
@@ -39,16 +39,16 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAssetTransactions afterTime(String afterTime) {
-		addQuery("after-time", String.valueOf(afterTime));
+	public LookupAssetTransactions afterTime(java.util.Date afterTime) {
+		addQuery("after-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(afterTime));
 		return this;
 	}
 
 	/**
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAssetTransactions beforeTime(String beforeTime) {
-		addQuery("before-time", String.valueOf(beforeTime));
+	public LookupAssetTransactions beforeTime(java.util.Date beforeTime) {
+		addQuery("before-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(beforeTime));
 		return this;
 	}
 

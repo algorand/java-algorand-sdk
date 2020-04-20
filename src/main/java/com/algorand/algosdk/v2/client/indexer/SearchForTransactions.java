@@ -20,8 +20,8 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Only include transactions with this address in one of the transaction fields. 
 	 */
-	public SearchForTransactions address(String address) {
-		addQuery("address", String.valueOf(address));
+	public SearchForTransactions address(java.util.Date address) {
+		addQuery("address", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(address));
 		return this;
 	}
 
@@ -36,8 +36,8 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public SearchForTransactions afterTime(String afterTime) {
-		addQuery("after-time", String.valueOf(afterTime));
+	public SearchForTransactions afterTime(java.util.Date afterTime) {
+		addQuery("after-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(afterTime));
 		return this;
 	}
 
@@ -52,8 +52,8 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public SearchForTransactions beforeTime(String beforeTime) {
-		addQuery("before-time", String.valueOf(beforeTime));
+	public SearchForTransactions beforeTime(java.util.Date beforeTime) {
+		addQuery("before-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(beforeTime));
 		return this;
 	}
 

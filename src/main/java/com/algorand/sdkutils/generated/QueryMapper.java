@@ -1,5 +1,7 @@
 package com.algorand.sdkutils.generated;
 
+import java.text.SimpleDateFormat;
+
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
@@ -8,8 +10,8 @@ public class QueryMapper {
 
 	public static Query getClass(String name, Client client, String args[]) {
 		switch (name) {
-		case "searchAccounts":
-			return client.searchAccounts();
+		case "searchForAccounts":
+			return client.searchForAccounts();
 		case "lookupAccountByID":
 			return client.lookupAccountByID(args[0]);
 		case "lookupAccountTransactions":
@@ -30,27 +32,27 @@ public class QueryMapper {
 		return null;
 	}
 
-	public static void setValue(Query q, String className, String property, String value) {
+	public static void setValue(Query q, String className, String property, String value) throws ParseException {
 		switch (className) {
-		case "searchAccounts":
+		case "searchForAccounts":
 			switch (property) {
 			case "asset-id":
-				((SearchAccounts)q).assetId(Long.valueOf(value));
+				((SearchForAccounts)q).assetId(Long.valueOf(value));
 				break;
 			case "currency-greater-than":
-				((SearchAccounts)q).currencyGreaterThan(Long.valueOf(value));
+				((SearchForAccounts)q).currencyGreaterThan(Long.valueOf(value));
 				break;
 			case "currency-less-than":
-				((SearchAccounts)q).currencyLessThan(Long.valueOf(value));
+				((SearchForAccounts)q).currencyLessThan(Long.valueOf(value));
 				break;
 			case "limit":
-				((SearchAccounts)q).limit(Long.valueOf(value));
+				((SearchForAccounts)q).limit(Long.valueOf(value));
 				break;
 			case "next":
-				((SearchAccounts)q).next(value);
+				((SearchForAccounts)q).next(value);
 				break;
 			case "round":
-				((SearchAccounts)q).round(Long.valueOf(value));
+				((SearchForAccounts)q).round(Long.valueOf(value));
 				break;
 			}
 			break;
@@ -64,13 +66,13 @@ public class QueryMapper {
 		case "lookupAccountTransactions":
 			switch (property) {
 			case "after-time":
-				((LookupAccountTransactions)q).afterTime(value);
+				((LookupAccountTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "asset-id":
 				((LookupAccountTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((LookupAccountTransactions)q).beforeTime(value);
+				((LookupAccountTransactions)q).beforeTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "currency-greater-than":
 				((LookupAccountTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -155,16 +157,16 @@ public class QueryMapper {
 		case "lookupAssetTransactions":
 			switch (property) {
 			case "address":
-				((LookupAssetTransactions)q).address(value);
+				((LookupAssetTransactions)q).address(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "address-role":
 				((LookupAssetTransactions)q).addressRole(value);
 				break;
 			case "after-time":
-				((LookupAssetTransactions)q).afterTime(value);
+				((LookupAssetTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "before-time":
-				((LookupAssetTransactions)q).beforeTime(value);
+				((LookupAssetTransactions)q).beforeTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "currency-greater-than":
 				((LookupAssetTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -211,19 +213,19 @@ public class QueryMapper {
 		case "searchForTransactions":
 			switch (property) {
 			case "address":
-				((SearchForTransactions)q).address(value);
+				((SearchForTransactions)q).address(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "address-role":
 				((SearchForTransactions)q).addressRole(value);
 				break;
 			case "after-time":
-				((SearchForTransactions)q).afterTime(value);
+				((SearchForTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "asset-id":
 				((SearchForTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((SearchForTransactions)q).beforeTime(value);
+				((SearchForTransactions)q).beforeTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "currency-greater-than":
 				((SearchForTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -269,8 +271,8 @@ public class QueryMapper {
 
 	public static String lookup(Query q, String className) throws Exception {
 		switch (className) {
-		case "searchAccounts":
-			return ((SearchAccounts)q).execute().body().toString();
+		case "searchForAccounts":
+			return ((SearchForAccounts)q).execute().body().toString();
 		case "lookupAccountByID":
 			return ((LookupAccountByID)q).execute().body().toString();
 		case "lookupAccountTransactions":
