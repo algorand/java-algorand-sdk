@@ -7,9 +7,9 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
- * (lsig) Programatic transaction signature. Definition: 
+ * (lsig) Programatic transaction signature. 
+ * Definition: 
  * data/transactions/logicsig.go 
  */
 public class TransactionSignatureLogicsig extends PathResponse {

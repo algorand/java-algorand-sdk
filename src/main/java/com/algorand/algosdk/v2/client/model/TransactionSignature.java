@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
  * Validation signature associated with some data. Only one of the signatures 
  * should be provided. 

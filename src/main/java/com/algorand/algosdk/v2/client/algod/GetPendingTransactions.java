@@ -14,7 +14,6 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
  */
 public class GetPendingTransactions extends Query {
 
-
 	public GetPendingTransactions(Client client) {
 		super(client, "get");
 	}
@@ -41,6 +40,7 @@ public class GetPendingTransactions extends Query {
 		resp.setValueType(PendingTransactionsResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("transactions"));

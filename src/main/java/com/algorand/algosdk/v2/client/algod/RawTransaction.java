@@ -11,7 +11,6 @@ import com.algorand.algosdk.v2.client.common.Response;
  */
 public class RawTransaction extends Query {
 
-
 	public RawTransaction(Client client) {
 		super(client, "post");
 	}
@@ -30,6 +29,7 @@ public class RawTransaction extends Query {
 		resp.setValueType(String.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		if (!qd.queries.containsKey("rawtxn")) {
 			throw new RuntimeException("rawtxn is not set. It is a required parameter.");

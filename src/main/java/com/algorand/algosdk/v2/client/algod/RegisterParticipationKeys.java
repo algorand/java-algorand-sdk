@@ -14,7 +14,6 @@ public class RegisterParticipationKeys extends Query {
 
 	private String address;
 
-
 	/**
 	 * @param address The `account-id` to update, or `all` to update all accounts. 
 	 */
@@ -62,6 +61,7 @@ public class RegisterParticipationKeys extends Query {
 		resp.setValueType(String.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("register-participation-keys"));

@@ -8,12 +8,12 @@ import com.algorand.algosdk.v2.client.model.AssetResponse;
 
 
 /**
- * Lookup asset information. /assets/{asset-id} 
+ * Lookup asset information. 
+ * /assets/{asset-id} 
  */
 public class LookupAssetByID extends Query {
 
 	private Long assetId;
-
 
 	public LookupAssetByID(Client client, Long assetId) {
 		super(client, "get");
@@ -26,6 +26,7 @@ public class LookupAssetByID extends Query {
 		resp.setValueType(AssetResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));

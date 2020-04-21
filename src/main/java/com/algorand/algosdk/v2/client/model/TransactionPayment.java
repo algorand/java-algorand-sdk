@@ -5,10 +5,10 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
- * Fields for a payment transaction. Definition: data/transactions/payment.go : 
- * PaymentTxnFields 
+ * Fields for a payment transaction. 
+ * Definition: 
+ * data/transactions/payment.go : PaymentTxnFields 
  */
 public class TransactionPayment extends PathResponse {
 

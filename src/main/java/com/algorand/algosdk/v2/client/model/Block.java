@@ -7,9 +7,10 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
- * Block information. Definition: data/bookkeeping/block.go : Block 
+ * Block information. 
+ * Definition: 
+ * data/bookkeeping/block.go : Block 
  */
 public class Block extends PathResponse {
 
@@ -63,10 +64,10 @@ public class Block extends PathResponse {
 
 	/**
 	 * (tc) TxnCounter counts the number of transactions committed in the ledger, from 
-	 * the time at which support for this feature was introduced. Specifically, 
-	 * TxnCounter is the number of the next transaction that will be committed after 
-	 * this block. It is 0 when no transactions have ever been committed (since 
-	 * TxnCounter started being supported). 
+	 * the time at which support for this feature was introduced. 
+	 * Specifically, TxnCounter is the number of the next transaction that will be 
+	 * committed after this block. It is 0 when no transactions have ever been 
+	 * committed (since TxnCounter started being supported). 
 	 */	@JsonProperty("txn-counter")
 	public Long txnCounter;
 

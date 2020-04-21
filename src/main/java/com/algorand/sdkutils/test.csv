@@ -24,3 +24,4 @@ q/accounts/BZNKXBBXIVZ7GFAXHNC26ERYUD5TQWWV327IU2N4SKG6WLNFGMMCRQEFZE/transactio
 ,,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,
 /transactions, address(string), address-role(string), after-time(string), asset-id(integer), before-time(string), currency-greater-than(integer), currency-less-than(integer), exclude-close-to(boolean), limit(integer), max-round(integer), min-round(integer), next(string), note-prefix(string), round(integer), sig-type(string), tx-id(string), tx-type(string), 
+q/transactions?limit=10,,,,,,,,,10,,,,,,,,,

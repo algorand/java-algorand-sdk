@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -8,10 +9,10 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Search for transactions. /transactions 
+ * Search for transactions. 
+ * /transactions 
  */
 public class SearchForTransactions extends Query {
-
 
 	public SearchForTransactions(Client client) {
 		super(client, "get");
@@ -135,8 +136,10 @@ public class SearchForTransactions extends Query {
 	}
 
 	/**
-	 * SigType filters just results using the specified type of signature: * sig - 
-	 * Standard * msig - MultiSig * lsig - LogicSig 
+	 * SigType filters just results using the specified type of signature: 
+	 *   sig - Standard 
+	 *   msig - MultiSig 
+	 *   lsig - LogicSig 
 	 */
 	public SearchForTransactions sigType(String sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
@@ -146,10 +149,11 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public SearchForTransactions txId(String txId) {
+	public SearchForTransactions txId(Address txId) {
 		addQuery("tx-id", String.valueOf(txId));
 		return this;
 	}
+
 	public SearchForTransactions txType(String txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
@@ -161,6 +165,7 @@ public class SearchForTransactions extends Query {
 		resp.setValueType(TransactionsResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("transactions"));
 

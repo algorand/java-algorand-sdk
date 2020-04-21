@@ -5,10 +5,14 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -51,7 +55,7 @@ public class Generator {
 		return ans;
 	}
 
-	static String getType(JsonNode prop, boolean asObject) {
+	static String getType(JsonNode prop, boolean asObject, Map<String, Set<String>> imports) {
 
 		if (prop.get("$ref") != null) {
 			JsonNode typeNode = prop.get("$ref");
@@ -68,6 +72,12 @@ public class Generator {
 				return "java.math.BigInteger";
 			case "RFC3339 String":
 				return "java.util.Date";
+			case "Address":
+				addImport(imports, "com.algorand.algosdk.crypto.Address"); 
+				return "Address";
+			case "SignedTransaction":
+				addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
+				return "SignedTransaction";
 			}
 		}
 		switch (type) {
@@ -80,7 +90,7 @@ public class Generator {
 			return asObject ? "Boolean" : "boolean";			
 		case "array":
 			JsonNode arrayTypeNode = prop.get("items");
-			String typeName = getType(arrayTypeNode, asObject);
+			String typeName = getType(arrayTypeNode, asObject, imports);
 			return "List<" + typeName + ">";
 		default:
 			throw new RuntimeException("Unrecognized type: " + type);	
@@ -96,6 +106,37 @@ public class Generator {
 		}
 	}
 
+	static void addImport(Map<String, Set<String>> imports, String imp) {
+		String key = imp.substring(0, imp.indexOf('.'));
+		if (imports.get(key) == null) {
+			imports.put(key, new TreeSet<String>());
+		}
+		imports.get(key).add(imp);
+	}
+	
+	static String getImports(Map<String, Set<String>> imports) {
+		StringBuffer sb = new StringBuffer();
+
+		Set<String> java = imports.get("java");
+		if (java != null) {
+			for (String imp : java) {
+				sb.append("import " + imp + ";\n");
+			}
+			if (imports.get("com") != null) {
+				sb.append("\n");
+			}
+		}
+
+		Set<String> com = imports.get("com");
+		if (com != null) {
+			for (String imp : com) {
+				sb.append("import " + imp + ";\n");
+			}
+		}
+		sb.append("\n");
+		return sb.toString();
+	}
+	
 	static String getPropertyWithJsonSetter(String typeObj, String javaName, String jprop){
 		StringBuffer buffer = new StringBuffer();
 		switch (typeObj) {
@@ -134,9 +175,10 @@ public class Generator {
 
 		comment = comment.replace("\\[", "(");
 		comment = comment.replace("\\]", ")");
+		comment = comment.replace("\n", " __NEWLINE__ ");
 
 		if (full) {
-			sb.append("\n"+tab+"/**");
+			sb.append(tab+"/**");
 			sb.append("\n"+tab+" * ");
 		} else {
 			sb.append(tab+" * ");			
@@ -146,10 +188,20 @@ public class Generator {
 		int line = 0;
 		while (st.hasMoreTokens()) {
 			String token = st.nextToken();
+			if (token.contentEquals("__NEWLINE__")) {
+				if (line == 0) {
+					continue;
+				} else {
+					line = 0;
+					sb.append("\n"+tab+" * ");
+					continue;
+				}
+			}
 			if (line + token.length() > 80) {
 				line = 0;
 				sb.append("\n"+tab+" * ");
 			} 
+			token = token.replace('*', ' ');
 			sb.append(token + " ");
 			line += token.length() + 1;
 		}
@@ -191,15 +243,15 @@ public class Generator {
 	}
 
 	// Model class properties
-	static boolean writeProperties(StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties) {
-		boolean importList = false;
+	static void writeProperties(StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties, Map<String, Set<String>> imports) {
 		while (properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop, false);
-			String typeObj = getType(prop.getValue(), true);
+			String typeObj = getType(prop.getValue(), true, imports);
 			if (typeObj.contains("List<")) {
-				importList = true;
+				addImport(imports, "java.util.ArrayList");
+				addImport(imports, "java.util.List");
 			}
 
 			String desc = null;
@@ -209,10 +261,10 @@ public class Generator {
 			}
 
 			// public type
-			if (desc != null) buffer.append(desc); else buffer.append("\n");
+			if (desc != null) buffer.append(desc);
 			buffer.append(getPropertyWithJsonSetter(typeObj, javaName, jprop));
+			buffer.append("\n");
 		}
-		return importList;
 	}
 
 	static void writeCompareMethod(String className, StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties) {
@@ -240,31 +292,25 @@ public class Generator {
 		BufferedWriter bw = getFileWriter(className, directory);
 		bw.append("package " + pkg + ";\n\n");
 
-		StringBuffer imports = new StringBuffer();
+		HashMap<String, Set<String>> imports = new HashMap<String, Set<String>>();
 		StringBuffer body = new StringBuffer();
-		boolean importList = false;
 
-		importList = importList || writeProperties(body, properties);
-		body.append("\n");
+		writeProperties(body, properties, imports);
+		
 		properties = getSortedProperties(propertiesNode);
 		writeCompareMethod(className, body, properties);
 
-		if (importList) {
-			imports.append("import java.util.ArrayList;\n");
-			imports.append("import java.util.List;\n");
-		}
-		imports.append("import java.util.Objects;\n"); // used by Objects.deepEquals
-		imports.append("\n");
+		addImport(imports, "java.util.Objects"); // used by Objects.deepEquals
 
-		imports.append("import com.algorand.algosdk.v2.client.common.PathResponse;\n" + 
-				"import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
+		addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
+		addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
 
-		bw.append(imports);
+		bw.append(getImports(imports));
 		if (desc != null) {
 			bw.append(desc);
 			bw.append("\n");
 		}
-		bw.append("public class " + className + " extends PathResponse {\n");
+		bw.append("public class " + className + " extends PathResponse {\n\n");
 		bw.append(body);
 		bw.append("}\n");
 		bw.close();
@@ -292,7 +338,7 @@ public class Generator {
 						"		Response<" + returnType + "> resp = baseExecute();\n" + 
 						"		resp.setValueType(" + returnType + ".class);\n" + 
 						"		return resp;\n" + 
-						"	}\n";
+						"	}\n\n";
 		return ret;
 	}
 
@@ -316,10 +362,10 @@ public class Generator {
 			String className, 			
 			String path,
 			String returnType,
-			String getOrPost) {
+			String getOrPost,
+			Map<String, Set<String>> imports) {
 
 		StringBuffer decls = new StringBuffer();
-		StringBuffer bools = new StringBuffer();
 		StringBuffer builders = new StringBuffer();
 		StringBuffer constructorHeader = new StringBuffer();
 		StringBuffer constructorBody = new StringBuffer();
@@ -336,11 +382,11 @@ public class Generator {
 			Entry<String, JsonNode> prop = properties.next();
 			String propName = Generator.getCamelCase(prop.getKey(), false);
 			String setterName = Generator.getCamelCase(prop.getKey(), false);
-			String propType = getType(prop.getValue(), true);
+			String propType = getType(prop.getValue(), true, imports);
 			String propCode = prop.getKey();
 
 			if (inPath(prop.getValue())) {
-				decls.append("\n\tprivate " + propType + " " + propName + ";\n");
+				decls.append("\tprivate " + propType + " " + propName + ";\n");
 				if (prop.getValue().get("description") != null) {
 					String desc = prop.getValue().get("description").asText();
 					desc = formatComment("@param " + propName + " " + desc, "\t", false);
@@ -368,7 +414,7 @@ public class Generator {
 			String valueOfString = getStringValueOfStatement(propType, propName);
 			builders.append("\t\taddQuery(\"" + propCode + "\", "+ valueOfString +");\n");
 			builders.append("\t\treturn this;\n");
-			builders.append("\t}\n");
+			builders.append("\t}\n\n");
 
 			if (isRequired(prop.getValue())) {
 				requestMethod.append("		if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
@@ -391,16 +437,15 @@ public class Generator {
 					"		addPathSegment(String.valueOf(" + str + "));\n");
 		}
 
-
 		requestMethod.append("\n" + 
 				"		return qd;\n" + 
 				"	}");
 
 		StringBuffer ans = new StringBuffer();
 		ans.append(decls);
-		ans.append("\n");
-		ans.append(bools);
-		ans.append("\n");
+		if (!decls.toString().isEmpty()) {
+			ans.append("\n");
+		}
 
 		// constructor
 		if (constructorComments.size() > 0) {
@@ -414,10 +459,9 @@ public class Generator {
 		ans.append(constructorHeader);
 		ans.append(") {\n		super(client, \""+getOrPost+"\");\n");
 		ans.append(constructorBody);
-		ans.append("	}\n");
+		ans.append("	}\n\n");
 
 		ans.append(builders);
-		ans.append("\n");		
 		ans.append(requestMethod);
 		return ans.toString();
 	}
@@ -485,28 +529,31 @@ public class Generator {
 				BufferedWriter bw = getFileWriter(className, directory);
 				bw.append("package " + pkg + ";\n\n");
 
-				String imports = 
-						"import com.algorand.algosdk.v2.client.common.Client;\n" + 
-								"import com.algorand.algosdk.v2.client.common.Query;\n" + 
-								"import com.algorand.algosdk.v2.client.common.QueryData;\n" + 
-								"import com.algorand.algosdk.v2.client.common.Response;\n";
+				Map<String, Set<String>> imports = new HashMap<String, Set<String>>();
+				addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
+				addImport(imports, "com.algorand.algosdk.v2.client.common.Query"); 
+				addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
+				addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
 				if (needsClassImport(returnType.toLowerCase())) {
-					imports = imports + "import " + modelPkg + "." + returnType + ";\n";
+					addImport(imports, modelPkg + "." + returnType);
 				}
 
-				bw.append(imports);
-				bw.append("\n");
-				bw.append(Generator.formatComment(desc, "", true));
-				bw.append("\npublic class " + className + " extends Query {\n");
-				bw.append(
+				StringBuffer sb = new StringBuffer();
+				sb.append("\n");
+				sb.append(Generator.formatComment(desc, "", true));
+				sb.append("\npublic class " + className + " extends Query {\n\n");
+				sb.append(
 						processQueryParams(
 								generatedPathsEntry,
 								properties, 
 								className, 
 								path,
 								returnType, 
-								getOrPost));
-				bw.append("\n}");
+								getOrPost, 
+								imports));
+				sb.append("\n}");
+				bw.append(getImports(imports));
+				bw.append(sb);
 				bw.close();
 	}
 

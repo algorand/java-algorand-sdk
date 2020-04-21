@@ -12,7 +12,6 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
  */
 public class GetStatus extends Query {
 
-
 	public GetStatus(Client client) {
 		super(client, "get");
 	}
@@ -23,6 +22,7 @@ public class GetStatus extends Query {
 		resp.setValueType(NodeStatusResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("status"));

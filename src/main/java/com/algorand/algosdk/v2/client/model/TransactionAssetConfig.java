@@ -5,11 +5,12 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
- * Fields for asset allocation, re-configuration, and destruction. A zero value for 
- * asset-id indicates asset creation. A zero value for the params indicates asset 
- * destruction. Definition: data/transactions/asset.go : AssetConfigTxnFields 
+ * Fields for asset allocation, re-configuration, and destruction. 
+ * A zero value for asset-id indicates asset creation. 
+ * A zero value for the params indicates asset destruction. 
+ * Definition: 
+ * data/transactions/asset.go : AssetConfigTxnFields 
  */
 public class TransactionAssetConfig extends PathResponse {
 

@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -47,7 +48,7 @@ public class PendingTransactionResponse extends PathResponse {
 	/**
 	 * The raw signed transaction. 
 	 */	@JsonProperty("txn")
-	public String txn;
+	public SignedTransaction txn;
 
 	@Override
 	public boolean equals(Object o) {

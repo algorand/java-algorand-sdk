@@ -15,7 +15,6 @@ public class WaitForBlock extends Query {
 
 	private Long round;
 
-
 	/**
 	 * @param round The round to wait until returning status 
 	 */
@@ -30,6 +29,7 @@ public class WaitForBlock extends Query {
 		resp.setValueType(NodeStatusResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("status"));

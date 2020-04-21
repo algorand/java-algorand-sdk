@@ -2,7 +2,6 @@ package com.algorand.sdkutils.generators;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
@@ -19,7 +18,10 @@ public class QueryMapperGenerator extends Generator {
 		bw.append("package com.algorand.sdkutils.generated;\n" + 
 				"\n" + 
 				"import java.text.SimpleDateFormat;\n\n" +
+				"import java.text.ParseException;\n" + 
 				"import com.algorand.algosdk.v2.client.indexer.*;\n" + 
+				"import com.algorand.algosdk.crypto.Address;\n" + 
+				"import java.security.NoSuchAlgorithmException;\n" + 
 				"import com.algorand.algosdk.v2.client.common.Client;\n" + 
 				"import com.algorand.algosdk.v2.client.common.Query;\n\n"
 				+ "public class QueryMapper {\n" + 
@@ -31,7 +33,7 @@ public class QueryMapperGenerator extends Generator {
 		
 		getClass.append("	public static Query getClass(String name, Client client, String args[]) {\n" + 
 				"		switch (name) {\n");
-		setValue.append("	public static void setValue(Query q, String className, String property, String value) throws ParseException {\n" + 
+		setValue.append("	public static void setValue(Query q, String className, String property, String value) throws ParseException, NoSuchAlgorithmException {\n" + 
 				"		switch (className) {\n");
 		lookUp.append("	public static String lookup(Query q, String className) throws Exception {\n" + 
 				"		switch (className) {\n");
@@ -102,6 +104,9 @@ public class QueryMapperGenerator extends Generator {
 					switch (format) {
 					case "RFC3339 String":
 						setValue.append("new SimpleDateFormat(\"yyyy-MM-dd'T'h:m:ssZ\").parse(value));\n");
+						break;
+					case "Address":
+						setValue.append("new Address(value));\n");
 						break;
 					default:
 						setValue.append("value);\n");

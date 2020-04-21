@@ -2,7 +2,10 @@ package com.algorand.sdkutils.generated;
 
 import java.text.SimpleDateFormat;
 
+import java.text.ParseException;
 import com.algorand.algosdk.v2.client.indexer.*;
+import com.algorand.algosdk.crypto.Address;
+import java.security.NoSuchAlgorithmException;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 
@@ -32,7 +35,7 @@ public class QueryMapper {
 		return null;
 	}
 
-	public static void setValue(Query q, String className, String property, String value) throws ParseException {
+	public static void setValue(Query q, String className, String property, String value) throws ParseException, NoSuchAlgorithmException {
 		switch (className) {
 		case "searchForAccounts":
 			switch (property) {
@@ -102,7 +105,7 @@ public class QueryMapper {
 				((LookupAccountTransactions)q).sigType(value);
 				break;
 			case "tx-id":
-				((LookupAccountTransactions)q).txId(value);
+				((LookupAccountTransactions)q).txId(new Address(value));
 				break;
 			case "tx-type":
 				((LookupAccountTransactions)q).txType(value);
@@ -199,7 +202,7 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).sigType(value);
 				break;
 			case "tx-id":
-				((LookupAssetTransactions)q).txId(value);
+				((LookupAssetTransactions)q).txId(new Address(value));
 				break;
 			case "tx-type":
 				((LookupAssetTransactions)q).txType(value);
@@ -258,7 +261,7 @@ public class QueryMapper {
 				((SearchForTransactions)q).sigType(value);
 				break;
 			case "tx-id":
-				((SearchForTransactions)q).txId(value);
+				((SearchForTransactions)q).txId(new Address(value));
 				break;
 			case "tx-type":
 				((SearchForTransactions)q).txType(value);

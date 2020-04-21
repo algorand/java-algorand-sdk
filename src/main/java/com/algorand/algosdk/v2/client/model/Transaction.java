@@ -5,11 +5,13 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
  * Contains all fields common to all transactions and serves as an envelope to all 
- * transactions type. Definition: data/transactions/signedtxn.go : SignedTxn 
+ * transactions type. 
+ * Definition: 
+ * data/transactions/signedtxn.go : SignedTxn 
  * data/transactions/transaction.go : Transaction 
+ * 
  */
 public class Transaction extends PathResponse {
 
@@ -129,10 +131,13 @@ public class Transaction extends PathResponse {
 
 	/**
 	 * (type) Indicates what type of transaction this is. Different types have 
-	 * different fields. Valid types, and where their fields are stored: * (pay) 
-	 * payment-transaction * (keyreg) keyreg-transaction * (acfg) 
-	 * asset-config-transaction * (axfer) asset-transfer-transaction * (afrz) 
-	 * asset-freeze-transaction 
+	 * different fields. 
+	 * Valid types, and where their fields are stored: 
+	 *   (pay) payment-transaction 
+	 *   (keyreg) keyreg-transaction 
+	 *   (acfg) asset-config-transaction 
+	 *   (axfer) asset-transfer-transaction 
+	 *   (afrz) asset-freeze-transaction 
 	 */	@JsonProperty("type")
 	public String type;
 

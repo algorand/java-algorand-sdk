@@ -5,10 +5,10 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
- * Describes an asset held by an account. Definition: data/basics/userBalance.go : 
- * AssetHolding 
+ * Describes an asset held by an account. 
+ * Definition: 
+ * data/basics/userBalance.go : AssetHolding 
  */
 public class AssetHolding extends PathResponse {
 

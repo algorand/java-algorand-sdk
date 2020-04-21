@@ -8,10 +8,10 @@ import com.algorand.algosdk.v2.client.model.AssetsResponse;
 
 
 /**
- * Search for assets. /assets 
+ * Search for assets. 
+ * /assets 
  */
 public class SearchForAssets extends Query {
-
 
 	public SearchForAssets(Client client) {
 		super(client, "get");
@@ -71,6 +71,7 @@ public class SearchForAssets extends Query {
 		resp.setValueType(AssetsResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("assets"));
 

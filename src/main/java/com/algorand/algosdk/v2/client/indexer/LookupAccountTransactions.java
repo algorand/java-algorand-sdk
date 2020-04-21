@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -8,12 +9,12 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Lookup account transactions. /accounts/{account-id}/transactions 
+ * Lookup account transactions. 
+ * /accounts/{account-id}/transactions 
  */
 public class LookupAccountTransactions extends Query {
 
 	private String accountId;
-
 
 	/**
 	 * @param accountId account string 
@@ -115,8 +116,10 @@ public class LookupAccountTransactions extends Query {
 	}
 
 	/**
-	 * SigType filters just results using the specified type of signature: * sig - 
-	 * Standard * msig - MultiSig * lsig - LogicSig 
+	 * SigType filters just results using the specified type of signature: 
+	 *   sig - Standard 
+	 *   msig - MultiSig 
+	 *   lsig - LogicSig 
 	 */
 	public LookupAccountTransactions sigType(String sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
@@ -126,10 +129,11 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public LookupAccountTransactions txId(String txId) {
+	public LookupAccountTransactions txId(Address txId) {
 		addQuery("tx-id", String.valueOf(txId));
 		return this;
 	}
+
 	public LookupAccountTransactions txType(String txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
@@ -141,6 +145,7 @@ public class LookupAccountTransactions extends Query {
 		resp.setValueType(TransactionsResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("accounts"));
 		addPathSegment(String.valueOf(accountId));

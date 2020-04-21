@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -8,12 +9,12 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Lookup transactions for an asset. /assets/{asset-id}/transactions 
+ * Lookup transactions for an asset. 
+ * /assets/{asset-id}/transactions 
  */
 public class LookupAssetTransactions extends Query {
 
 	private Long assetId;
-
 
 	public LookupAssetTransactions(Client client, Long assetId) {
 		super(client, "get");
@@ -130,8 +131,10 @@ public class LookupAssetTransactions extends Query {
 	}
 
 	/**
-	 * SigType filters just results using the specified type of signature: * sig - 
-	 * Standard * msig - MultiSig * lsig - LogicSig 
+	 * SigType filters just results using the specified type of signature: 
+	 *   sig - Standard 
+	 *   msig - MultiSig 
+	 *   lsig - LogicSig 
 	 */
 	public LookupAssetTransactions sigType(String sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
@@ -141,10 +144,11 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public LookupAssetTransactions txId(String txId) {
+	public LookupAssetTransactions txId(Address txId) {
 		addQuery("tx-id", String.valueOf(txId));
 		return this;
 	}
+
 	public LookupAssetTransactions txType(String txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
@@ -156,6 +160,7 @@ public class LookupAssetTransactions extends Query {
 		resp.setValueType(TransactionsResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));

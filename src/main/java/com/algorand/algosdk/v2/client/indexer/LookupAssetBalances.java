@@ -8,12 +8,12 @@ import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
 
 
 /**
- * Lookup the list of accounts who hold this asset /assets/{asset-id}/balances 
+ * Lookup the list of accounts who hold this asset 
+ * /assets/{asset-id}/balances 
  */
 public class LookupAssetBalances extends Query {
 
 	private Long assetId;
-
 
 	public LookupAssetBalances(Client client, Long assetId) {
 		super(client, "get");
@@ -69,6 +69,7 @@ public class LookupAssetBalances extends Query {
 		resp.setValueType(AssetBalancesResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));

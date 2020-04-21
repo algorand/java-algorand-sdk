@@ -20,7 +20,6 @@ public class PendingTransactionInformation extends Query {
 
 	private String txid;
 
-
 	/**
 	 * @param txid A transaction id 
 	 */
@@ -43,6 +42,7 @@ public class PendingTransactionInformation extends Query {
 		resp.setValueType(PendingTransactionResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("transactions"));

@@ -14,7 +14,6 @@ public class GetBlock extends Query {
 
 	private Long round;
 
-
 	/**
 	 * @param round The round from which to fetch block information. 
 	 */
@@ -37,6 +36,7 @@ public class GetBlock extends Query {
 		resp.setValueType(BlockResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("blocks"));

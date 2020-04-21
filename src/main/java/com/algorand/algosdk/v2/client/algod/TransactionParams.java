@@ -12,7 +12,6 @@ import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
  */
 public class TransactionParams extends Query {
 
-
 	public TransactionParams(Client client) {
 		super(client, "get");
 	}
@@ -23,6 +22,7 @@ public class TransactionParams extends Query {
 		resp.setValueType(TransactionParametersResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("transactions"));

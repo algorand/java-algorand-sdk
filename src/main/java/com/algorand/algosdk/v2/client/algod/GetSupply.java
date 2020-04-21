@@ -12,7 +12,6 @@ import com.algorand.algosdk.v2.client.model.SupplyResponse;
  */
 public class GetSupply extends Query {
 
-
 	public GetSupply(Client client) {
 		super(client, "get");
 	}
@@ -23,6 +22,7 @@ public class GetSupply extends Query {
 		resp.setValueType(SupplyResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("ledger"));

@@ -16,7 +16,6 @@ public class GetPendingTransactionsByAddress extends Query {
 
 	private String address;
 
-
 	/**
 	 * @param address An account public key 
 	 */
@@ -47,6 +46,7 @@ public class GetPendingTransactionsByAddress extends Query {
 		resp.setValueType(PendingTransactionsResponse.class);
 		return resp;
 	}
+
 	protected QueryData getRequestString() {
 		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("accounts"));

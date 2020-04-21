@@ -5,10 +5,11 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
- * AssetParams specifies the parameters for an asset. (apar) when part of an 
- * AssetConfig transaction. Definition: data/transactions/asset.go : AssetParams 
+ * AssetParams specifies the parameters for an asset. 
+ * (apar) when part of an AssetConfig transaction. 
+ * Definition: 
+ * data/transactions/asset.go : AssetParams 
  */
 public class AssetParams extends PathResponse {
 

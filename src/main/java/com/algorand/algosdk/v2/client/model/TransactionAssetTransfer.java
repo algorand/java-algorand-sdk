@@ -5,10 +5,10 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 /**
- * Fields for an asset transfer transaction. Definition: data/transactions/asset.go 
- * : AssetTransferTxnFields 
+ * Fields for an asset transfer transaction. 
+ * Definition: 
+ * data/transactions/asset.go : AssetTransferTxnFields 
  */
 public class TransactionAssetTransfer extends PathResponse {
 
