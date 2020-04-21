@@ -27,7 +27,7 @@
         "tags": [
           "search"
         ],
-        "operationId": "searchAccounts",
+        "operationId": "searchForAccounts",
         "parameters": [
           {
             "$ref": "#/parameters/asset-id"
@@ -528,6 +528,13 @@
     "AccountParticipation": {
       "description": "AccountParticipation describes the parameters used by this account in consensus protocol.",
       "type": "object",
+      "required": [
+        "vote-participation-key",
+        "selection-participation-key",
+        "vote-first-valid",
+        "vote-last-valid",
+        "vote-key-dilution"
+      ],
       "properties": {
         "selection-participation-key": {
           "description": "\\[sel\\] Selection public key (if any) currently registered for this round.",
@@ -950,7 +957,8 @@
             "acfg",
             "axfer",
             "afrz"
-          ]
+          ],
+          "x-algorand-format": "tx-type-enum"
         }
       }
     },
