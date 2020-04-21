@@ -14,7 +14,7 @@ public abstract class Query {
 
 	protected abstract QueryData getRequestString();
 
-	public <T>Response<T> baseExecute() throws Exception {
+	protected <T>Response<T> baseExecute() throws Exception {
 
 		QueryData qData = this.getRequestString();
 		com.squareup.okhttp.Response resp = this.client.executeCall(qData, getOrPost);
@@ -25,6 +25,13 @@ public abstract class Query {
 		}
 	}
 
+	public String getRequestUrl(int port, String host) {
+		if (qd.pathSegments.size() == 0) {
+			throw new RuntimeException("getRequestUrl can be called only after calling execute()");
+		}
+		return Client.getHttpUrl(this.qd, port, host).toString();
+	}
+	
 	protected void addQuery(String key, String value) {
 		qd.addQuery(key, value);
 	}

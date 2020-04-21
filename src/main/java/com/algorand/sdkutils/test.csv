@@ -9,7 +9,7 @@ q/accounts/BZNKXBBXIVZ7GFAXHNC26ERYUD5TQWWV327IU2N4SKG6WLNFGMMCRQEFZE,BZNKXBBXIV
 q/accounts/BZNKXBBXIVZ7GFAXHNC26ERYUD5TQWWV327IU2N4SKG6WLNFGMMCRQEFZE/transactions?asset-id=979&currency-greater-than=10000000000&currency-less-than=10000000000&limit=2,BZNKXBBXIVZ7GFAXHNC26ERYUD5TQWWV327IU2N4SKG6WLNFGMMCRQEFZE,,979,,10000000000,10000000000,2,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,
 /assets, asset-id(integer), creator(string), limit(integer), name(string), next(string), unit(string), ,,,,,,,,,,,
-,,,,,,,,,,,,,,,,,,
+q,,,3,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,
 /assets/{asset-id}, asset-id(integer)[R], ,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,

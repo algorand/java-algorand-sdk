@@ -6,14 +6,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.StringTokenizer;
 
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
-import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.sdkutils.generated.QueryMapper;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.squareup.okhttp.HttpUrl;
 
 public class TestGenerator extends Generator {
 	static String callExternalCurl(String request) {
@@ -66,9 +63,6 @@ public class TestGenerator extends Generator {
 				String[] columns = line.split(",");
 				JsonNode paramNode = pathNode.findValue("parameters");
 				
-				// get the url
-				String httpUrl = "http://" + client.getHost() + ":" + client.getPort() + columns[0].substring(1);
-				
 				// Get the constructor params
 				ArrayList<String> al = new ArrayList<String>();
 				{
@@ -112,14 +106,24 @@ public class TestGenerator extends Generator {
 					QueryMapper.setValue(query, methodName, parameter.getKey(), value);
 				}
 				
+				// Call the SDK
+				String sdkResponse = QueryMapper.lookup(query, methodName);
+
+				// get the url
+				String httpUrl = "http://" + client.getHost() + ":" + client.getPort();
+				if (columns[0].substring(1).isEmpty()) {
+					httpUrl = query.getRequestUrl(client.getPort(), client.getHost());
+				} else {
+					httpUrl = httpUrl + columns[0].substring(1);
+				}
+				
 				// Call the node directly using curl
-				System.out.println("\n" + httpUrl);
+				System.out.println("\n******************************************\n" + httpUrl);
 				
 				//callExternalCurl
 				String curlResponse = callExternalCurl(httpUrl);
 				
-				// Call the SDK
-				String sdkResponse = QueryMapper.lookup(query, methodName);
+				// compare the results
 				String filter = "round\"";
 				String diff = Utils.showDifferentces(curlResponse, sdkResponse, "curl", "sdk", verbose, filter);
 
