@@ -1,6 +1,9 @@
 package com.algorand.sdkutils.generators;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -43,9 +46,17 @@ public class TestGenerator extends Generator {
 	}
 
 	public static boolean testSamples(TestGenerator tg, BufferedReader br, Client client, boolean verbose) throws Exception {
+		// create the directory golden if it does not exist
+		File goldenDir = new File("golden");
+		if (!goldenDir.exists()) {
+			goldenDir.mkdir();
+		}
+		
 		JsonNode paths = tg.root.get("paths");
 		JsonNode pathNode = null;
 		boolean failed = false;
+		String operationId = "";
+		int caseCounter = 0;
 		while (true) {
 			String line = br.readLine();
 			if (line == null) {
@@ -57,6 +68,8 @@ public class TestGenerator extends Generator {
 			if (line.charAt(0) == '/') {
 				String pathString = getPathFromLine(line);
 				pathNode = paths.get(pathString);
+				operationId = pathNode.findValue("operationId").asText();
+				caseCounter = 0;
 			} else {
 				// this is a test sample
 				
@@ -117,11 +130,17 @@ public class TestGenerator extends Generator {
 					httpUrl = httpUrl + columns[0].substring(1);
 				}
 				
+				// Prepare the file: 
+				File file = new File("golden/" + operationId + "_" + String.valueOf(caseCounter) + ".json");
+				BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+				
 				// Call the node directly using curl
 				System.out.println("\n******************************************\n" + httpUrl);
+				bw.append(httpUrl + "\n");
 				
 				//callExternalCurl
 				String curlResponse = callExternalCurl(httpUrl);
+				bw.append(Utils.formatJson(curlResponse));
 				
 				// compare the results
 				String filter = "round\"";
@@ -142,6 +161,8 @@ public class TestGenerator extends Generator {
 				} else {
 					System.out.print(diff);
 				}
+				caseCounter++;
+				bw.close();
 			}
 		}
 		return !failed;
