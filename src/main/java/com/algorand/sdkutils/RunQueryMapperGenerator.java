@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class RunQueryMapperGenerator {
 	public static void main (String args[]) throws JsonProcessingException, IOException {
 
-		File f = new File("../openapi-server-generator/scripts/indexer.oas2.yml");
+		File f = new File("src/main/java/com/algorand/sdkutils/indexer.oas2.json");
 		FileInputStream fis = new FileInputStream(f);
 
 		JsonNode root = Utils.getRoot(fis);	

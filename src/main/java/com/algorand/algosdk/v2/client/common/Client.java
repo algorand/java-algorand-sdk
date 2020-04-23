@@ -7,6 +7,7 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.algorand.algosdk.crypto.Address;
 
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
@@ -94,11 +95,11 @@ public class Client {
 	}
 	
 	
-	public AccountInformation AccountInformation(String address) {
+	public AccountInformation AccountInformation(Address address) {
 		return new AccountInformation((Client) this, address);
 	}
 
-	public GetPendingTransactionsByAddress GetPendingTransactionsByAddress(String address) {
+	public GetPendingTransactionsByAddress GetPendingTransactionsByAddress(Address address) {
 		return new GetPendingTransactionsByAddress((Client) this, address);
 	}
 
@@ -110,7 +111,7 @@ public class Client {
 		return new GetSupply((Client) this);
 	}
 
-	public RegisterParticipationKeys RegisterParticipationKeys(String address) {
+	public RegisterParticipationKeys RegisterParticipationKeys(Address address) {
 		return new RegisterParticipationKeys((Client) this, address);
 	}
 

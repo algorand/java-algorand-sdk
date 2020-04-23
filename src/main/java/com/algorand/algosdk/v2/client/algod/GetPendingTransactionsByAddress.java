@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.algod;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -15,12 +16,12 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
  */
 public class GetPendingTransactionsByAddress extends Query {
 
-	private String address;
+	private Address address;
 
 	/**
 	 * @param address An account public key 
 	 */
-	public GetPendingTransactionsByAddress(Client client, String address) {
+	public GetPendingTransactionsByAddress(Client client, Address address) {
 		super(client, "get");
 		this.address = address;
 	}

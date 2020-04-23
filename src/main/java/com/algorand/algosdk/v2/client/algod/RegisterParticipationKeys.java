@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.algod;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -13,12 +14,12 @@ import com.algorand.algosdk.v2.client.common.Response;
  */
 public class RegisterParticipationKeys extends Query {
 
-	private String address;
+	private Address address;
 
 	/**
 	 * @param address The `account-id` to update, or `all` to update all accounts. 
 	 */
-	public RegisterParticipationKeys(Client client, String address) {
+	public RegisterParticipationKeys(Client client, Address address) {
 		super(client, "post");
 		this.address = address;
 	}

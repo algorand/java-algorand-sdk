@@ -14,7 +14,7 @@ public class RunAlgodV2Generator {
 	public static void main (String args[]) throws JsonProcessingException, IOException {
 
 		///Users/shantkarakashian/go/src/github.com/algorand/openapi-server-generator/scripts/algod.oas2.yml src/main/java/com/algorand/algosdk/
-		File f = new File("../openapi-server-generator/scripts/algod.oas2.yml");
+		File f = new File("src/main/java/com/algorand/sdkutils/algod.oas2.json");
 		FileInputStream fis = new FileInputStream(f);
 
 		JsonNode root = Utils.getRoot(fis);	

@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.algod;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -14,12 +15,12 @@ import com.algorand.algosdk.v2.client.model.Account;
  */
 public class AccountInformation extends Query {
 
-	private String address;
+	private Address address;
 
 	/**
 	 * @param address An account public key 
 	 */
-	public AccountInformation(Client client, String address) {
+	public AccountInformation(Client client, Address address) {
 		super(client, "get");
 		this.address = address;
 	}

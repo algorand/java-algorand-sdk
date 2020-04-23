@@ -161,7 +161,7 @@ public class QueryMapper {
 		case "lookupAssetTransactions":
 			switch (property) {
 			case "address":
-				((LookupAssetTransactions)q).address(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((LookupAssetTransactions)q).address(new Address(value));
 				break;
 			case "address-role":
 				((LookupAssetTransactions)q).addressRole(enumLookupAssetTransactionsAddressRole(value));
@@ -217,7 +217,7 @@ public class QueryMapper {
 		case "searchForTransactions":
 			switch (property) {
 			case "address":
-				((SearchForTransactions)q).address(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((SearchForTransactions)q).address(new Address(value));
 				break;
 			case "address-role":
 				((SearchForTransactions)q).addressRole(enumSearchForTransactionsAddressRole(value));

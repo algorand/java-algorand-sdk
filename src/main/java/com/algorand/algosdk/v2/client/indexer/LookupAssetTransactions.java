@@ -24,8 +24,8 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Only include transactions with this address in one of the transaction fields. 
 	 */
-	public LookupAssetTransactions address(java.util.Date address) {
-		addQuery("address", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(address));
+	public LookupAssetTransactions address(Address address) {
+		addQuery("address", String.valueOf(address));
 		return this;
 	}
 
