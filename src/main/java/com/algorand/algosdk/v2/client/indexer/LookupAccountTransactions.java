@@ -121,9 +121,14 @@ public class LookupAccountTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public LookupAccountTransactions sigType(String sigType) {
+	public LookupAccountTransactions sigType(SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
+	}
+	public enum SigType {
+		SIG,
+		MSIG,
+		LSIG
 	}
 
 	/**
@@ -134,9 +139,16 @@ public class LookupAccountTransactions extends Query {
 		return this;
 	}
 
-	public LookupAccountTransactions txType(String txType) {
+	public LookupAccountTransactions txType(TxType txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
+	}
+	public enum TxType {
+		PAY,
+		KEYREG,
+		ACFG,
+		AXFER,
+		AFRZ
 	}
 
 	@Override

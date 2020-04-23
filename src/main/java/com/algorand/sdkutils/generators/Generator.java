@@ -27,7 +27,7 @@ public class Generator {
 		return bw;
 	}
 
-	static String getCamelCase(String name, boolean firstCap) {
+	public static String getCamelCase(String name, boolean firstCap) {
 		boolean capNext = firstCap;
 		char [] newName = new char[name.length()+1];
 		int n = 0;
@@ -55,12 +55,48 @@ public class Generator {
 		return ans;
 	}
 
-	static String getType(JsonNode prop, boolean asObject, Map<String, Set<String>> imports) {
+	static String getEnum(JsonNode prop, String propName, boolean jsonParam) {
+		JsonNode enumNode = prop.get("enum");
+		if (enumNode == null) {
+			throw new RuntimeException("Cannot find enum info in node: " + prop.toString());
+		}
+		StringBuffer sb = new StringBuffer();
+		String enumClassName = getCamelCase(propName, true);
+		sb.append("\tpublic enum " + enumClassName + " {\n");
+		Iterator<JsonNode> elmts = enumNode.elements();
+		while(elmts.hasNext()) {
+			String val = elmts.next().asText();
+			if (jsonParam) {
+				sb.append("\t\t@JsonProperty(\"" + val + "\") ");
+			} else {
+				sb.append("\t\t");
+			}
+			String javaEnum = getCamelCase(val, true).toUpperCase();
+			sb.append(javaEnum);
+			if (elmts.hasNext()) {
+				sb.append(",\n");
+			} else {
+				sb.append("\n");
+			}
+		}
+		sb.append("\t}\n");
+		return sb.toString();
+	}
+	
+	static String getType(
+			JsonNode prop, 
+			boolean asObject,
+			Map<String, Set<String>> imports,
+			String propName, boolean jsonParam) {
 
 		if (prop.get("$ref") != null) {
 			JsonNode typeNode = prop.get("$ref");
 			String type = getTypeNameFromRef(typeNode.asText());
 			return type;
+		}
+		
+		if (prop.get("enum") != null) {
+			return getEnum(prop, propName, jsonParam);
 		}
 
 		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
@@ -90,7 +126,7 @@ public class Generator {
 			return asObject ? "Boolean" : "boolean";			
 		case "array":
 			JsonNode arrayTypeNode = prop.get("items");
-			String typeName = getType(arrayTypeNode, asObject, imports);
+			String typeName = getType(arrayTypeNode, asObject, imports, propName, jsonParam);
 			return "List<" + typeName + ">";
 		default:
 			throw new RuntimeException("Unrecognized type: " + type);	
@@ -148,12 +184,21 @@ public class Generator {
 		case "boolean":
 		case "java.math.BigInteger":
 		default: // List and Models with Json properties
+			String enumBody = null;
 			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
+			if (typeObj.contains("public enum")) {
+				enumBody = typeObj;
+				typeObj = typeObj.substring(13, typeObj.indexOf('{')).trim();
+			}
 			buffer.append("\n\tpublic " + typeObj + " " + javaName);
 			if (typeObj.contains("List<")) {
 				buffer.append(" = new Array" + typeObj + "()");
 			}
 			buffer.append(";\n");
+			if (enumBody != null) {
+				buffer.append(enumBody);
+			}
+
 		}
 		return buffer.toString();
 	}
@@ -248,7 +293,7 @@ public class Generator {
 			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop, false);
-			String typeObj = getType(prop.getValue(), true, imports);
+			String typeObj = getType(prop.getValue(), true, imports, jprop, true);
 			if (typeObj.contains("List<")) {
 				addImport(imports, "java.util.ArrayList");
 				addImport(imports, "java.util.List");
@@ -382,10 +427,13 @@ public class Generator {
 			Entry<String, JsonNode> prop = properties.next();
 			String propName = Generator.getCamelCase(prop.getKey(), false);
 			String setterName = Generator.getCamelCase(prop.getKey(), false);
-			String propType = getType(prop.getValue(), true, imports);
+			String propType = getType(prop.getValue(), true, imports, propName, false);
 			String propCode = prop.getKey();
 
 			if (inPath(prop.getValue())) {
+				if (propType.contains("public enum")) {
+					throw new RuntimeException("Enum in paths is not supported! " + propName);
+				}
 				decls.append("\tprivate " + propType + " " + propName + ";\n");
 				if (prop.getValue().get("description") != null) {
 					String desc = prop.getValue().get("description").asText();
@@ -404,6 +452,13 @@ public class Generator {
 				pAdded = true;
 				continue;
 			}
+			
+			// handle enums
+			String enumBody = null;
+			if (propType.contains("public enum")) {
+				enumBody = propType;
+				propType = propType.substring(13, propType.indexOf('{')).trim();
+			}
 
 			if (prop.getValue().get("description") != null) {
 				String desc = prop.getValue().get("description").asText();
@@ -414,7 +469,11 @@ public class Generator {
 			String valueOfString = getStringValueOfStatement(propType, propName);
 			builders.append("\t\taddQuery(\"" + propCode + "\", "+ valueOfString +");\n");
 			builders.append("\t\treturn this;\n");
-			builders.append("\t}\n\n");
+			builders.append("\t}\n");
+			if (enumBody != null) {
+				builders.append(enumBody);
+			}
+			builders.append("\n");
 
 			if (isRequired(prop.getValue())) {
 				requestMethod.append("		if (!qd.queries.containsKey(\"" + propName + "\")) {\n");

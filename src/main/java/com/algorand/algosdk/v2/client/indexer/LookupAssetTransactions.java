@@ -32,9 +32,14 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Combine with the address parameter to define what type of address to search for. 
 	 */
-	public LookupAssetTransactions addressRole(String addressRole) {
+	public LookupAssetTransactions addressRole(AddressRole addressRole) {
 		addQuery("address-role", String.valueOf(addressRole));
 		return this;
+	}
+	public enum AddressRole {
+		SENDER,
+		RECEIVER,
+		FREEZETARGET
 	}
 
 	/**
@@ -136,9 +141,14 @@ public class LookupAssetTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public LookupAssetTransactions sigType(String sigType) {
+	public LookupAssetTransactions sigType(SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
+	}
+	public enum SigType {
+		SIG,
+		MSIG,
+		LSIG
 	}
 
 	/**
@@ -149,9 +159,16 @@ public class LookupAssetTransactions extends Query {
 		return this;
 	}
 
-	public LookupAssetTransactions txType(String txType) {
+	public LookupAssetTransactions txType(TxType txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
+	}
+	public enum TxType {
+		PAY,
+		KEYREG,
+		ACFG,
+		AXFER,
+		AFRZ
 	}
 
 	@Override

@@ -83,7 +83,12 @@ public class Account extends PathResponse {
 	 *   msig 
 	 *   lsig 
 	 */	@JsonProperty("type")
-	public String type;
+	public Type type;
+	public enum Type {
+		@JsonProperty("sig") SIG,
+		@JsonProperty("msig") MSIG,
+		@JsonProperty("lsig") LSIG
+	}
 
 	@Override
 	public boolean equals(Object o) {

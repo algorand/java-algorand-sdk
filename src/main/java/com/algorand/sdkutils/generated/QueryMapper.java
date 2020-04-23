@@ -8,6 +8,7 @@ import com.algorand.algosdk.crypto.Address;
 import java.security.NoSuchAlgorithmException;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.sdkutils.generators.Generator;
 
 public class QueryMapper {
 
@@ -102,13 +103,13 @@ public class QueryMapper {
 				((LookupAccountTransactions)q).round(Long.valueOf(value));
 				break;
 			case "sig-type":
-				((LookupAccountTransactions)q).sigType(value);
+				((LookupAccountTransactions)q).sigType(enumLookupAccountTransactionsSigType(value));
 				break;
 			case "tx-id":
 				((LookupAccountTransactions)q).txId(new Address(value));
 				break;
 			case "tx-type":
-				((LookupAccountTransactions)q).txType(value);
+				((LookupAccountTransactions)q).txType(enumLookupAccountTransactionsTxType(value));
 				break;
 			}
 			break;
@@ -163,7 +164,7 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).address(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "address-role":
-				((LookupAssetTransactions)q).addressRole(value);
+				((LookupAssetTransactions)q).addressRole(enumLookupAssetTransactionsAddressRole(value));
 				break;
 			case "after-time":
 				((LookupAssetTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
@@ -199,13 +200,13 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).round(Long.valueOf(value));
 				break;
 			case "sig-type":
-				((LookupAssetTransactions)q).sigType(value);
+				((LookupAssetTransactions)q).sigType(enumLookupAssetTransactionsSigType(value));
 				break;
 			case "tx-id":
 				((LookupAssetTransactions)q).txId(new Address(value));
 				break;
 			case "tx-type":
-				((LookupAssetTransactions)q).txType(value);
+				((LookupAssetTransactions)q).txType(enumLookupAssetTransactionsTxType(value));
 				break;
 			}
 			break;
@@ -219,7 +220,7 @@ public class QueryMapper {
 				((SearchForTransactions)q).address(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
 				break;
 			case "address-role":
-				((SearchForTransactions)q).addressRole(value);
+				((SearchForTransactions)q).addressRole(enumSearchForTransactionsAddressRole(value));
 				break;
 			case "after-time":
 				((SearchForTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
@@ -258,13 +259,13 @@ public class QueryMapper {
 				((SearchForTransactions)q).round(Long.valueOf(value));
 				break;
 			case "sig-type":
-				((SearchForTransactions)q).sigType(value);
+				((SearchForTransactions)q).sigType(enumSearchForTransactionsSigType(value));
 				break;
 			case "tx-id":
 				((SearchForTransactions)q).txId(new Address(value));
 				break;
 			case "tx-type":
-				((SearchForTransactions)q).txType(value);
+				((SearchForTransactions)q).txType(enumSearchForTransactionsTxType(value));
 				break;
 			}
 			break;
@@ -294,5 +295,121 @@ public class QueryMapper {
 			return ((SearchForTransactions)q).execute().body().toString();
 		}
 		return null;
+	}
+	private static LookupAccountTransactions.SigType enumLookupAccountTransactionsSigType (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "SIG":
+			return LookupAccountTransactions.SigType.SIG;
+		case "MSIG":
+			return LookupAccountTransactions.SigType.MSIG;
+		case "LSIG":
+			return LookupAccountTransactions.SigType.LSIG;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
+	}
+	private static LookupAccountTransactions.TxType enumLookupAccountTransactionsTxType (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "PAY":
+			return LookupAccountTransactions.TxType.PAY;
+		case "KEYREG":
+			return LookupAccountTransactions.TxType.KEYREG;
+		case "ACFG":
+			return LookupAccountTransactions.TxType.ACFG;
+		case "AXFER":
+			return LookupAccountTransactions.TxType.AXFER;
+		case "AFRZ":
+			return LookupAccountTransactions.TxType.AFRZ;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
+	}
+	private static LookupAssetTransactions.AddressRole enumLookupAssetTransactionsAddressRole (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "SENDER":
+			return LookupAssetTransactions.AddressRole.SENDER;
+		case "RECEIVER":
+			return LookupAssetTransactions.AddressRole.RECEIVER;
+		case "FREEZETARGET":
+			return LookupAssetTransactions.AddressRole.FREEZETARGET;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
+	}
+	private static LookupAssetTransactions.SigType enumLookupAssetTransactionsSigType (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "SIG":
+			return LookupAssetTransactions.SigType.SIG;
+		case "MSIG":
+			return LookupAssetTransactions.SigType.MSIG;
+		case "LSIG":
+			return LookupAssetTransactions.SigType.LSIG;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
+	}
+	private static LookupAssetTransactions.TxType enumLookupAssetTransactionsTxType (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "PAY":
+			return LookupAssetTransactions.TxType.PAY;
+		case "KEYREG":
+			return LookupAssetTransactions.TxType.KEYREG;
+		case "ACFG":
+			return LookupAssetTransactions.TxType.ACFG;
+		case "AXFER":
+			return LookupAssetTransactions.TxType.AXFER;
+		case "AFRZ":
+			return LookupAssetTransactions.TxType.AFRZ;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
+	}
+	private static SearchForTransactions.AddressRole enumSearchForTransactionsAddressRole (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "SENDER":
+			return SearchForTransactions.AddressRole.SENDER;
+		case "RECEIVER":
+			return SearchForTransactions.AddressRole.RECEIVER;
+		case "FREEZETARGET":
+			return SearchForTransactions.AddressRole.FREEZETARGET;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
+	}
+	private static SearchForTransactions.SigType enumSearchForTransactionsSigType (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "SIG":
+			return SearchForTransactions.SigType.SIG;
+		case "MSIG":
+			return SearchForTransactions.SigType.MSIG;
+		case "LSIG":
+			return SearchForTransactions.SigType.LSIG;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
+	}
+	private static SearchForTransactions.TxType enumSearchForTransactionsTxType (String value) { 
+		value = Generator.getCamelCase(value, true).toUpperCase();
+		switch(value) {
+		case "PAY":
+			return SearchForTransactions.TxType.PAY;
+		case "KEYREG":
+			return SearchForTransactions.TxType.KEYREG;
+		case "ACFG":
+			return SearchForTransactions.TxType.ACFG;
+		case "AXFER":
+			return SearchForTransactions.TxType.AXFER;
+		case "AFRZ":
+			return SearchForTransactions.TxType.AFRZ;
+		default:
+			throw new RuntimeException("Unknown enum value: " + value);
+		}
 	}
 }

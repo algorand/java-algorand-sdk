@@ -29,9 +29,14 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Combine with the address parameter to define what type of address to search for. 
 	 */
-	public SearchForTransactions addressRole(String addressRole) {
+	public SearchForTransactions addressRole(AddressRole addressRole) {
 		addQuery("address-role", String.valueOf(addressRole));
 		return this;
+	}
+	public enum AddressRole {
+		SENDER,
+		RECEIVER,
+		FREEZETARGET
 	}
 
 	/**
@@ -141,9 +146,14 @@ public class SearchForTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public SearchForTransactions sigType(String sigType) {
+	public SearchForTransactions sigType(SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
+	}
+	public enum SigType {
+		SIG,
+		MSIG,
+		LSIG
 	}
 
 	/**
@@ -154,9 +164,16 @@ public class SearchForTransactions extends Query {
 		return this;
 	}
 
-	public SearchForTransactions txType(String txType) {
+	public SearchForTransactions txType(TxType txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
+	}
+	public enum TxType {
+		PAY,
+		KEYREG,
+		ACFG,
+		AXFER,
+		AFRZ
 	}
 
 	@Override

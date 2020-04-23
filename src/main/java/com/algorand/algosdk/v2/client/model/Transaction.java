@@ -139,7 +139,14 @@ public class Transaction extends PathResponse {
 	 *   (axfer) asset-transfer-transaction 
 	 *   (afrz) asset-freeze-transaction 
 	 */	@JsonProperty("type")
-	public String type;
+	public Type type;
+	public enum Type {
+		@JsonProperty("pay") PAY,
+		@JsonProperty("keyreg") KEYREG,
+		@JsonProperty("acfg") ACFG,
+		@JsonProperty("axfer") AXFER,
+		@JsonProperty("afrz") AFRZ
+	}
 
 	@Override
 	public boolean equals(Object o) {
