@@ -32,6 +32,7 @@ public class PendingTransactionResponse extends PathResponse {
 	 * Indicates that the transaction was kicked out of this node's transaction pool 
 	 * (and specifies why that happened). An empty string indicates the transaction 
 	 * wasn't kicked out of this node's txpool due to an error. 
+	 * 
 	 */	@JsonProperty("pool-error")
 	public String poolError;
 

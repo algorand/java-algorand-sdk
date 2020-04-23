@@ -8,7 +8,8 @@ import com.algorand.algosdk.v2.client.common.Response;
 
 /**
  * Generate (or renew) and register participation keys on the node for a given 
- * account address. /v2/register-participation-keys/{address} 
+ * account address. 
+ * /v2/register-participation-keys/{address} 
  */
 public class RegisterParticipationKeys extends Query {
 

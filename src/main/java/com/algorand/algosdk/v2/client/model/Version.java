@@ -8,8 +8,8 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Note that we annotate this as a model so that legacy clients can directly import 
- * a swagger generated Version model. 
+ * Note that we annotate this as a model so that legacy clients 
+ * can directly import a swagger generated Version model. 
  */
 public class Version extends PathResponse {
 

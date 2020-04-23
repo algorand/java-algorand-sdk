@@ -25,9 +25,13 @@ public class GetBlock extends Query {
 	/**
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
-	public GetBlock format(String format) {
+	public GetBlock format(Format format) {
 		addQuery("format", String.valueOf(format));
 		return this;
+	}
+	public enum Format {
+		JSON,
+		MSGPACK
 	}
 
 	@Override

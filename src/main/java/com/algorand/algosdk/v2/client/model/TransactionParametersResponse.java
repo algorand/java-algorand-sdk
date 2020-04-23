@@ -8,14 +8,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TransactionParametersResponse extends PathResponse {
 
 	/**
-	 * ConsensusVersion indicates the consensus protocol version as of LastRound. 
+	 * ConsensusVersion indicates the consensus protocol version 
+	 * as of LastRound. 
 	 */	@JsonProperty("consensus-version")
 	public String consensusVersion;
 
 	/**
-	 * Fee is the suggested transaction fee Fee is in units of micro-Algos per byte. 
-	 * Fee may fall to zero but transactions must still have a fee of at least 
-	 * MinTxnFee for the current network protocol. 
+	 * Fee is the suggested transaction fee 
+	 * Fee is in units of micro-Algos per byte. 
+	 * Fee may fall to zero but transactions must still have a fee of 
+	 * at least MinTxnFee for the current network protocol. 
 	 */	@JsonProperty("fee")
 	public Long fee;
 
@@ -35,8 +37,8 @@ public class TransactionParametersResponse extends PathResponse {
 	public Long lastRound;
 
 	/**
-	 * The minimum transaction fee (not per byte) required for the txn to validate for 
-	 * the current network protocol. 
+	 * The minimum transaction fee (not per byte) required for the 
+	 * txn to validate for the current network protocol. 
 	 */	@JsonProperty("min-fee")
 	public Long minFee;
 

@@ -9,7 +9,8 @@ import com.algorand.algosdk.v2.client.common.Response;
 /**
  * Special management endpoint to shutdown the node. Optionally provide a timeout 
  * parameter to indicate that the node should begin shutting down after a number of 
- * seconds. /v2/shutdown 
+ * seconds. 
+ * /v2/shutdown 
  */
 public class ShutdownNode extends Query {
 

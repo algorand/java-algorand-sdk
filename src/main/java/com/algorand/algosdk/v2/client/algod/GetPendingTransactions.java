@@ -21,9 +21,13 @@ public class GetPendingTransactions extends Query {
 	/**
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
-	public GetPendingTransactions format(String format) {
+	public GetPendingTransactions format(Format format) {
 		addQuery("format", String.valueOf(format));
 		return this;
+	}
+	public enum Format {
+		JSON,
+		MSGPACK
 	}
 
 	/**

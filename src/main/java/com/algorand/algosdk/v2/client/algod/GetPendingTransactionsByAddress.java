@@ -10,7 +10,8 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 /**
  * Get the list of pending transactions by address, sorted by priority, in 
  * decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending 
- * transactions. /v2/accounts/{address}/transactions/pending 
+ * transactions. 
+ * /v2/accounts/{address}/transactions/pending 
  */
 public class GetPendingTransactionsByAddress extends Query {
 
@@ -27,9 +28,13 @@ public class GetPendingTransactionsByAddress extends Query {
 	/**
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
-	public GetPendingTransactionsByAddress format(String format) {
+	public GetPendingTransactionsByAddress format(Format format) {
 		addQuery("format", String.valueOf(format));
 		return this;
+	}
+	public enum Format {
+		JSON,
+		MSGPACK
 	}
 
 	/**
