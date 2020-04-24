@@ -3,6 +3,7 @@ package com.algorand.algosdk.v2.client.indexer;
 import java.util.Date;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -131,7 +132,7 @@ public class SearchForTransactions extends Query {
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
 	public SearchForTransactions notePrefix(byte[] notePrefix) {
-		addQuery("note-prefix", String.valueOf(notePrefix));
+		addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
 		return this;
 	}
 
@@ -163,7 +164,7 @@ public class SearchForTransactions extends Query {
 	 * Lookup the specific transaction by ID. 
 	 */
 	public SearchForTransactions txId(String txId) {
-		addQuery("tx-id", String.valueOf(txId));
+		addQuery("txid", String.valueOf(txId));
 		return this;
 	}
 
