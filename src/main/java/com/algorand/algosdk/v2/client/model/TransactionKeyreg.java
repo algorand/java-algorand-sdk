@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -21,7 +22,7 @@ public class TransactionKeyreg extends PathResponse {
 	 * (selkey) Public key used with the Verified Random Function (VRF) result during 
 	 * committee selection. 
 	 */	@JsonProperty("selection-participation-key")
-	public String selectionParticipationKey;
+	public Digest selectionParticipationKey;
 
 	/**
 	 * (votefst) First round this participation key is valid. 
@@ -41,7 +42,7 @@ public class TransactionKeyreg extends PathResponse {
 	/**
 	 * (votekey) Participation public key used in key registration transactions. 
 	 */	@JsonProperty("vote-participation-key")
-	public String voteParticipationKey;
+	public Digest voteParticipationKey;
 
 	@Override
 	public boolean equals(Object o) {

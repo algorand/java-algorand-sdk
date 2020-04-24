@@ -54,7 +54,7 @@ public class AssetParams extends PathResponse {
 	 * (am) A commitment to some unspecified asset metadata. The format of this 
 	 * metadata is up to the application. 
 	 */	@JsonProperty("metadata-hash")
-	public String metadataHash;
+	public byte[] metadataHash;
 
 	/**
 	 * (an) Name of this asset, as supplied by the creator. 

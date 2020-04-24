@@ -24,7 +24,7 @@ public class TransactionParametersResponse extends PathResponse {
 	/**
 	 * GenesisHash is the hash of the genesis block. 
 	 */	@JsonProperty("genesis-hash")
-	public String genesisHash;
+	public byte[] genesisHash;
 
 	/**
 	 * GenesisID is an ID listed in the genesis block. 

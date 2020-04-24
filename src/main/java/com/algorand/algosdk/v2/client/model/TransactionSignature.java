@@ -20,7 +20,7 @@ public class TransactionSignature extends PathResponse {
 	/**
 	 * (sig) Standard ed25519 signature. 
 	 */	@JsonProperty("sig")
-	public String sig;
+	public byte[] sig;
 
 	@Override
 	public boolean equals(Object o) {

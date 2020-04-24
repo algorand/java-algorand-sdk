@@ -10,12 +10,12 @@ public class TransactionSignatureMultisigSubsignature extends PathResponse {
 	/**
 	 * (pk) 
 	 */	@JsonProperty("public-key")
-	public String publicKey;
+	public byte[] publicKey;
 
 	/**
 	 * (s) 
 	 */	@JsonProperty("signature")
-	public String signature;
+	public byte[] signature;
 
 	@Override
 	public boolean equals(Object o) {

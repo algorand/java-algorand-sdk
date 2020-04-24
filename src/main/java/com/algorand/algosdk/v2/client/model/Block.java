@@ -17,7 +17,7 @@ public class Block extends PathResponse {
 	/**
 	 * (gh) hash to which this block belongs. 
 	 */	@JsonProperty("genesis-hash")
-	public String genesisHash;
+	public byte[] genesisHash;
 
 	/**
 	 * (gen) ID to which this block belongs. 
@@ -27,7 +27,7 @@ public class Block extends PathResponse {
 	/**
 	 * (prev) Previous block hash. 
 	 */	@JsonProperty("previous-block-hash")
-	public String previousBlockHash;
+	public byte[] previousBlockHash;
 
 	@JsonProperty("rewards")
 	public BlockRewards rewards;
@@ -40,7 +40,7 @@ public class Block extends PathResponse {
 	/**
 	 * (seed) Sortition seed. 
 	 */	@JsonProperty("seed")
-	public String seed;
+	public byte[] seed;
 
 	/**
 	 * (ts) Block creation timestamp in seconds since eposh 
@@ -60,7 +60,7 @@ public class Block extends PathResponse {
 	 * transactions themselves. Two blocks with the same transactions but in a 
 	 * different order and with different signatures will have the same TxnRoot. 
 	 */	@JsonProperty("transactions-root")
-	public String transactionsRoot;
+	public byte[] transactionsRoot;
 
 	/**
 	 * (tc) TxnCounter counts the number of transactions committed in the ledger, from 

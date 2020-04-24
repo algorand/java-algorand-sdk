@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -11,10 +12,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class MiniAssetHolding extends PathResponse {
 
 	@JsonProperty("address")
-	public String address;
+	public Address address;
 
 	@JsonProperty("amount")
-	public Long amount;
+	public java.math.BigInteger amount;
 
 	@JsonProperty("is-frozen")
 	public Boolean isFrozen;

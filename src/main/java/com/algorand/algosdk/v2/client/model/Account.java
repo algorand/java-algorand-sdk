@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -18,7 +19,7 @@ public class Account extends PathResponse {
 	/**
 	 * the account public key 
 	 */	@JsonProperty("address")
-	public String address;
+	public Address address;
 
 	/**
 	 * (algo) total number of MicroAlgos in the account 

@@ -20,7 +20,7 @@ public class VersionBuild extends PathResponse {
 	public String channel;
 
 	@JsonProperty("commit-hash")
-	public String commitHash;
+	public byte[] commitHash;
 
 	@JsonProperty("major")
 	public Long major;

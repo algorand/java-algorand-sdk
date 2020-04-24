@@ -5,8 +5,10 @@ import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.util.Encoder;
 import java.security.NoSuchAlgorithmException;
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.Settings;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.sdkutils.generators.Generator;
 
@@ -70,13 +72,13 @@ public class QueryMapper {
 		case "lookupAccountTransactions":
 			switch (property) {
 			case "after-time":
-				((LookupAccountTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((LookupAccountTransactions)q).afterTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
 				break;
 			case "asset-id":
 				((LookupAccountTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((LookupAccountTransactions)q).beforeTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((LookupAccountTransactions)q).beforeTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
 				break;
 			case "currency-greater-than":
 				((LookupAccountTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -97,7 +99,7 @@ public class QueryMapper {
 				((LookupAccountTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((LookupAccountTransactions)q).notePrefix(value);
+				((LookupAccountTransactions)q).notePrefix(Encoder.decodeFromBase64(value));
 				break;
 			case "round":
 				((LookupAccountTransactions)q).round(Long.valueOf(value));
@@ -106,7 +108,7 @@ public class QueryMapper {
 				((LookupAccountTransactions)q).sigType(enumLookupAccountTransactionsSigType(value));
 				break;
 			case "tx-id":
-				((LookupAccountTransactions)q).txId(new Address(value));
+				((LookupAccountTransactions)q).txId(value);
 				break;
 			case "tx-type":
 				((LookupAccountTransactions)q).txType(enumLookupAccountTransactionsTxType(value));
@@ -167,10 +169,10 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).addressRole(enumLookupAssetTransactionsAddressRole(value));
 				break;
 			case "after-time":
-				((LookupAssetTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((LookupAssetTransactions)q).afterTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
 				break;
 			case "before-time":
-				((LookupAssetTransactions)q).beforeTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((LookupAssetTransactions)q).beforeTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
 				break;
 			case "currency-greater-than":
 				((LookupAssetTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -194,7 +196,7 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((LookupAssetTransactions)q).notePrefix(value);
+				((LookupAssetTransactions)q).notePrefix(Encoder.decodeFromBase64(value));
 				break;
 			case "round":
 				((LookupAssetTransactions)q).round(Long.valueOf(value));
@@ -203,7 +205,7 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).sigType(enumLookupAssetTransactionsSigType(value));
 				break;
 			case "tx-id":
-				((LookupAssetTransactions)q).txId(new Address(value));
+				((LookupAssetTransactions)q).txId(value);
 				break;
 			case "tx-type":
 				((LookupAssetTransactions)q).txType(enumLookupAssetTransactionsTxType(value));
@@ -223,13 +225,13 @@ public class QueryMapper {
 				((SearchForTransactions)q).addressRole(enumSearchForTransactionsAddressRole(value));
 				break;
 			case "after-time":
-				((SearchForTransactions)q).afterTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((SearchForTransactions)q).afterTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
 				break;
 			case "asset-id":
 				((SearchForTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((SearchForTransactions)q).beforeTime(new SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").parse(value));
+				((SearchForTransactions)q).beforeTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
 				break;
 			case "currency-greater-than":
 				((SearchForTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -253,7 +255,7 @@ public class QueryMapper {
 				((SearchForTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((SearchForTransactions)q).notePrefix(value);
+				((SearchForTransactions)q).notePrefix(Encoder.decodeFromBase64(value));
 				break;
 			case "round":
 				((SearchForTransactions)q).round(Long.valueOf(value));
@@ -262,7 +264,7 @@ public class QueryMapper {
 				((SearchForTransactions)q).sigType(enumSearchForTransactionsSigType(value));
 				break;
 			case "tx-id":
-				((SearchForTransactions)q).txId(new Address(value));
+				((SearchForTransactions)q).txId(value);
 				break;
 			case "tx-type":
 				((SearchForTransactions)q).txType(enumSearchForTransactionsTxType(value));

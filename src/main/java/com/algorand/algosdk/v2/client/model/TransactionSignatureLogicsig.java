@@ -17,13 +17,13 @@ public class TransactionSignatureLogicsig extends PathResponse {
 	/**
 	 * (arg) Logic arguments, base64 encoded. 
 	 */	@JsonProperty("args")
-	public List<String> args = new ArrayList<String>();
+	public List<byte[]> args = new ArrayList<byte[]>();
 
 	/**
 	 * (l) Program signed by a signature or multi signature, or hashed to be the 
 	 * address of ana ccount. Base64 encoded TEAL program. 
 	 */	@JsonProperty("logic")
-	public String logic;
+	public byte[] logic;
 
 	@JsonProperty("multisig-signature")
 	public TransactionSignatureMultisig multisigSignature;
@@ -31,7 +31,7 @@ public class TransactionSignatureLogicsig extends PathResponse {
 	/**
 	 * (sig) ed25519 signature. 
 	 */	@JsonProperty("signature")
-	public String signature;
+	public byte[] signature;
 
 	@Override
 	public boolean equals(Object o) {

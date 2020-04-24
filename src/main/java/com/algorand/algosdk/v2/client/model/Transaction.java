@@ -57,7 +57,7 @@ public class Transaction extends PathResponse {
 	/**
 	 * (gh) Hash of genesis block. 
 	 */	@JsonProperty("genesis-hash")
-	public String genesisHash;
+	public byte[] genesisHash;
 
 	/**
 	 * (gen) genesis block ID. 
@@ -69,7 +69,7 @@ public class Transaction extends PathResponse {
 	 * that this transaction is part of a transaction group and the value is the 
 	 * sha512/256 hash of the transactions in that group. 
 	 */	@JsonProperty("group")
-	public String group;
+	public byte[] group;
 
 	/**
 	 * Transaction ID 
@@ -96,12 +96,12 @@ public class Transaction extends PathResponse {
 	 * until the LastValid round passes. While this transaction possesses the lease, no 
 	 * other transaction specifying this lease can be confirmed. 
 	 */	@JsonProperty("lease")
-	public String lease;
+	public byte[] lease;
 
 	/**
 	 * (note) Free form data. 
 	 */	@JsonProperty("note")
-	public String note;
+	public byte[] note;
 
 	@JsonProperty("payment-transaction")
 	public TransactionPayment paymentTransaction;

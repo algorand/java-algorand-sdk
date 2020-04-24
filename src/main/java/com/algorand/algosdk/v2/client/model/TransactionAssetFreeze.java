@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -15,7 +16,7 @@ public class TransactionAssetFreeze extends PathResponse {
 	/**
 	 * (fadd) Address of the account whose asset is being frozen or thawed. 
 	 */	@JsonProperty("address")
-	public String address;
+	public Address address;
 
 	/**
 	 * (faid) ID of the asset being frozen or thawed. 

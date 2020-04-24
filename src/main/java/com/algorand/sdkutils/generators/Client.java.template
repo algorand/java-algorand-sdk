@@ -12,7 +12,7 @@ import com.algorand.algosdk.crypto.Address;
 IMPORTSGOHERE
 
 public class Client {
-	
+
 	private OkHttpClient client;
 	private String host;
 	private int port;
@@ -20,11 +20,11 @@ public class Client {
 	public int getPort() {
 		return port;
 	}
-	
+
 	public String getHost() {
 		return host;
 	}
-	
+
 	public static HttpUrl getHttpUrl(QueryData qData, int port, String host) {
 		HttpUrl.Builder httpUrlBuilder = (new HttpUrl.Builder()).scheme("http").port(port).host(host);
 		for (String ps : qData.pathSegments) {
@@ -36,16 +36,16 @@ public class Client {
 		HttpUrl httpUrl = httpUrlBuilder.build();
 		return httpUrl;
 	}
-	
+
 	public Client(String host, int port) {
 		MediaType.parse("application/json; charset=utf-8");
 		this.host = host;
 		this.port = port;
 		this.client = new OkHttpClient();
 	}
-	
+
 	public Response executeCall(QueryData qData, String getOrPost) throws Exception {
-		
+
 		HttpUrl httpUrl = getHttpUrl(qData, port, host);
 		Request request = new Request.Builder()
 				.url(httpUrl)
@@ -58,7 +58,7 @@ public class Client {
 				.build();*/
 		Response response = null;
 		try {
-			response = client.newCall(request).execute();	        
+			response = client.newCall(request).execute();
 		} catch (Exception e) {
 			throw e;
 		}
@@ -72,6 +72,5 @@ public class Client {
         // String contentType = response.headers().get("Content-Type");
 */
 	}
-	
-	METHODSGOHERE
-}
+
+	METHODSGOHERE}

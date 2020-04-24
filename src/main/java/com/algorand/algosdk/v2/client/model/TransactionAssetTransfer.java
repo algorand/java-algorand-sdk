@@ -16,7 +16,7 @@ public class TransactionAssetTransfer extends PathResponse {
 	 * (aamt) Amount of asset to transfer. A zero amount transferred to self allocates 
 	 * that asset in the account's Assets map. 
 	 */	@JsonProperty("amount")
-	public Long amount;
+	public java.math.BigInteger amount;
 
 	/**
 	 * (xaid) ID of the asset being transferred. 
@@ -26,7 +26,7 @@ public class TransactionAssetTransfer extends PathResponse {
 	/**
 	 * Number of assets transfered to the close-to account as part of the transaction. 
 	 */	@JsonProperty("close-amount")
-	public Long closeAmount;
+	public java.math.BigInteger closeAmount;
 
 	/**
 	 * (aclose) Indicates that the asset should be removed from the account's Assets 

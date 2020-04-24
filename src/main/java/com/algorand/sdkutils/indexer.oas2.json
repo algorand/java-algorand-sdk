@@ -467,7 +467,8 @@
       "properties": {
         "address": {
           "description": "the account public key",
-          "type": "string"
+          "type": "string",
+          "x-algorand-format": "Address"
         },
         "amount": {
           "description": "\\[algo\\] total number of MicroAlgos in the account",
@@ -539,7 +540,8 @@
         "selection-participation-key": {
           "description": "\\[sel\\] Selection public key (if any) currently registered for this round.",
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "x-algorand-format": "digest"
         },
         "vote-first-valid": {
           "description": "\\[voteFst\\] First round for which this participation is valid.",
@@ -556,7 +558,8 @@
         "vote-participation-key": {
           "description": "\\[vote\\] root participation public key (if any) currently registered for this round.",
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "x-algorand-format": "digest"
         }
       }
     },
@@ -589,7 +592,8 @@
       "properties": {
         "amount": {
           "description": "\\[a\\] number of units held.",
-          "type": "integer"
+           "type": "integer",
+           "x-algorand-format": "uint64"
         },
         "asset-id": {
           "description": "Asset ID of the holding.",
@@ -846,10 +850,12 @@
       ],
       "properties": {
         "address": {
-          "type": "string"
+          "type": "string",
+          "x-algorand-format": "Address"
         },
         "amount": {
-          "type": "integer"
+           "type": "integer",
+           "x-algorand-format": "uint64"
         },
         "is-frozen": {
           "type": "boolean"
@@ -1001,7 +1007,8 @@
       "properties": {
         "address": {
           "description": "\\[fadd\\] Address of the account whose asset is being frozen or thawed.",
-          "type": "string"
+          "type": "string",
+          "x-algorand-format": "Address"
         },
         "asset-id": {
           "description": "\\[faid\\] ID of the asset being frozen or thawed.",
@@ -1024,7 +1031,8 @@
       "properties": {
         "amount": {
           "description": "\\[aamt\\] Amount of asset to transfer. A zero amount transferred to self allocates that asset in the account's Assets map.",
-          "type": "integer"
+           "type": "integer",
+           "x-algorand-format": "uint64"
         },
         "asset-id": {
           "description": "\\[xaid\\] ID of the asset being transferred.",
@@ -1032,7 +1040,8 @@
         },
         "close-amount": {
           "description": "Number of assets transfered to the close-to account as part of the transaction.",
-          "type": "integer"
+           "type": "integer",
+           "x-algorand-format": "uint64"
         },
         "close-to": {
           "description": "\\[aclose\\] Indicates that the asset should be removed from the account's Assets map, and specifies where the remaining asset holdings should be transferred.  It's always valid to transfer remaining asset holdings to the creator account.",
@@ -1059,7 +1068,8 @@
         "selection-participation-key": {
           "description": "\\[selkey\\] Public key used with the Verified Random Function (VRF) result during committee selection.",
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "x-algorand-format": "digest"
         },
         "vote-first-valid": {
           "description": "\\[votefst\\] First round this participation key is valid.",
@@ -1076,7 +1086,8 @@
         "vote-participation-key": {
           "description": "\\[votekey\\] Participation public key used in key registration transactions.",
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "x-algorand-format": "digest"
         }
       }
     },
@@ -1286,6 +1297,7 @@
       "type": "string",
       "description": "Specifies a prefix which must be contained in the note field.",
       "name": "note-prefix",
+      "format": "byte",
       "in": "query"
     },
     "round": {
@@ -1314,7 +1326,6 @@
     },
     "tx-id": {
       "type": "string",
-      "x-algorand-format": "Address",
       "x-go-name": "TxID",
       "description": "Lookup the specific transaction by ID.",
       "name": "tx-id",

@@ -17,7 +17,7 @@ public class Version extends PathResponse {
 	public VersionBuild build;
 
 	@JsonProperty("genesis-hash")
-	public String genesisHash;
+	public byte[] genesisHash;
 
 	@JsonProperty("genesis-id")
 	public String genesisId;

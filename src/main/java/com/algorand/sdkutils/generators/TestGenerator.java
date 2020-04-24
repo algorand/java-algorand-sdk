@@ -120,7 +120,15 @@ public class TestGenerator extends Generator {
 				}
 				
 				// Call the SDK
-				String sdkResponse = QueryMapper.lookup(query, methodName);
+				String sdkResponse = null;
+				try {
+					sdkResponse = QueryMapper.lookup(query, methodName);
+				} catch (Exception e) {
+					System.err.println(line);
+					System.err.println(
+							query.getRequestUrl(client.getPort(), client.getHost()));
+					throw e;
+				}
 
 				// get the url
 				String httpUrl = "http://" + client.getHost() + ":" + client.getPort();

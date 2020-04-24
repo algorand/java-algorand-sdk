@@ -619,7 +619,8 @@
       "properties": {
         "address": {
           "description": "the account public key",
-          "type": "string"
+          "type": "string",
+          "x-algorand-format": "Address"
         },
         "amount": {
           "description": "\\[algo\\] total number of MicroAlgos in the account",
@@ -691,7 +692,8 @@
         "selection-participation-key": {
           "description": "\\[sel\\] Selection public key (if any) currently registered for this round.",
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "x-algorand-format": "digest"
         },
         "vote-first-valid": {
           "description": "\\[voteFst\\] First round for which this participation is valid.",
@@ -741,7 +743,8 @@
       "properties": {
         "amount": {
           "description": "\\[a\\] number of units held.",
-          "type": "integer"
+           "type": "integer",
+           "x-algorand-format": "uint64"
         },
         "asset-id": {
           "description": "Asset ID of the holding.",
@@ -1011,6 +1014,7 @@
       "type": "string",
       "description": "Specifies a prefix which must be contained in the note field.",
       "name": "note-prefix",
+      "format": "byte",
       "in": "query"
     },
     "round": {
@@ -1039,7 +1043,6 @@
     },
     "tx-id": {
       "type": "string",
-      "x-algorand-format": "Address",
       "x-go-name": "TxID",
       "description": "Lookup the specific transaction by ID.",
       "name": "tx-id",

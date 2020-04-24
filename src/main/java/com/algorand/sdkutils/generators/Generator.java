@@ -94,26 +94,38 @@ public class Generator {
 			String type = getTypeNameFromRef(typeNode.asText());
 			return type;
 		}
-		
+
 		if (prop.get("enum") != null) {
 			return getEnum(prop, propName, jsonParam);
 		}
-
+		
 		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
 		String type = typeNode.get("type").asText();
-		String format = typeNode.get("x-algorand-format") != null ? typeNode.get("x-algorand-format").asText() : "";
+		String format = getTypeFormat(typeNode);
 		if (!format.isEmpty() ) {
 			switch (format) {
 			case "uint64":
 				return "java.math.BigInteger";
 			case "RFC3339 String":
-				return "java.util.Date";
+				addImport(imports, "com.algorand.algosdk.v2.client.common.Settings");
+				addImport(imports, "java.util.Date");
+				return "Date";
 			case "Address":
 				addImport(imports, "com.algorand.algosdk.crypto.Address"); 
 				return "Address";
 			case "SignedTransaction":
 				addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
 				return "SignedTransaction";
+			case "byte":
+				if (type.contentEquals("array")) {
+					return "List<byte[]>";
+				}
+				return "byte[]";
+			case "AccountID":
+				break;
+			case "digest":
+				addImport(imports, "com.algorand.algosdk.crypto.Digest");
+				return "Digest";
 			}
 		}
 		switch (type) {
@@ -133,10 +145,17 @@ public class Generator {
 		}
 	}
 
+	public static String getTypeFormat(JsonNode typeNode) {
+		String format = typeNode.get("x-algorand-format") != null ? typeNode.get("x-algorand-format").asText() : "";
+		format = typeNode.get("format") != null && format.isEmpty() ? typeNode.get("format").asText() : format;
+		format = typeNode.get("x-go-name") != null && format.isEmpty() ? typeNode.get("x-go-name").asText() : format;
+		return format;
+	}
+
 	static String getStringValueOfStatement(String propType, String propName) {
 		switch (propType) {
-		case "java.util.Date":
-			return "new java.text.SimpleDateFormat(\"yyyy-MM-dd'T'h:m:ssZ\").format(" + propName + ")";
+		case "Date":
+			return "new java.text.SimpleDateFormat(Settings.DateFormat).format(" + propName + ")";
 		default:
 			return "String.valueOf("+propName+")";
 		}
@@ -149,7 +168,7 @@ public class Generator {
 		}
 		imports.get(key).add(imp);
 	}
-	
+
 	static String getImports(Map<String, Set<String>> imports) {
 		StringBuffer sb = new StringBuffer();
 
@@ -172,7 +191,7 @@ public class Generator {
 		sb.append("\n");
 		return sb.toString();
 	}
-	
+
 	static String getPropertyWithJsonSetter(String typeObj, String javaName, String jprop){
 		StringBuffer buffer = new StringBuffer();
 		switch (typeObj) {
@@ -221,14 +240,13 @@ public class Generator {
 		comment = comment.replace("\\[", "(");
 		comment = comment.replace("\\]", ")");
 		comment = comment.replace("\n", " __NEWLINE__ ");
-
 		if (full) {
 			sb.append(tab+"/**");
 			sb.append("\n"+tab+" * ");
 		} else {
 			sb.append(tab+" * ");			
 		}
-		
+
 		StringTokenizer st = new StringTokenizer(comment);
 		int line = 0;
 		while (st.hasMoreTokens()) {
@@ -341,7 +359,7 @@ public class Generator {
 		StringBuffer body = new StringBuffer();
 
 		writeProperties(body, properties, imports);
-		
+
 		properties = getSortedProperties(propertiesNode);
 		writeCompareMethod(className, body, properties);
 
@@ -416,7 +434,7 @@ public class Generator {
 		StringBuffer constructorBody = new StringBuffer();
 		StringBuffer requestMethod = new StringBuffer();
 		ArrayList<String> constructorComments = new ArrayList<String>();
-		
+
 		StringBuffer generatedPathsEntryBody = new StringBuffer();
 
 		requestMethod.append(Generator.getQueryResponseMethod(returnType, getOrPost));
@@ -443,7 +461,7 @@ public class Generator {
 
 				constructorHeader.append(", " + propType + " " + propName);
 				constructorBody.append("		this." + propName + " = " + propName + ";\n");
-				
+
 				if (pAdded) {
 					generatedPathsEntry.append(",\n			");
 				}
@@ -452,7 +470,7 @@ public class Generator {
 				pAdded = true;
 				continue;
 			}
-			
+
 			// handle enums
 			String enumBody = null;
 			if (propType.contains("public enum")) {
@@ -482,11 +500,11 @@ public class Generator {
 			}
 
 		}
-		
+
 		generatedPathsEntry.append(") {\n");
 		generatedPathsEntry.append("		return new "+className+"((Client) this");
 		generatedPathsEntry.append(generatedPathsEntryBody);
-		generatedPathsEntry.append(");\n	}\n");
+		generatedPathsEntry.append(");\n	}\n\n");
 
 		// Add the path construction code. 
 		// The path is constructed in the end, while the query params are added as the 
@@ -558,9 +576,7 @@ public class Generator {
 		String className = spec.get("operationId").asText();
 		String methodName = Generator.getCamelCase(className, false);
 		className = Generator.getCamelCase(className, true);
-		
-		generatedPathsEntry.append("\n	public " + className + " " + methodName + "(");
-		
+
 		JsonNode paramNode = spec.get("parameters");
 		String returnType = "String";
 		if (spec.get("responses").get("200").get("$ref") != null) { 
@@ -576,44 +592,45 @@ public class Generator {
 				returnType = Generator.getCamelCase(returnType, true);
 			}
 		}
-		String desc = spec.get("description") != null ? 
-				spec.get("description").asText() : "";
-				desc = desc + "\n" + path;
-				System.out.println("Generating ... " + className);
-				Iterator<Entry<String, JsonNode>> properties = null;
-				if ( paramNode != null) {
-					properties = getSortedParameters(paramNode);
-				}
+		String desc = spec.get("description") != null ? spec.get("description").asText() : "";
+		desc = desc + "\n" + path;
+		System.out.println("Generating ... " + className);
+		Iterator<Entry<String, JsonNode>> properties = null;
+		if ( paramNode != null) {
+			properties = getSortedParameters(paramNode);
+		}
 
-				BufferedWriter bw = getFileWriter(className, directory);
-				bw.append("package " + pkg + ";\n\n");
+		BufferedWriter bw = getFileWriter(className, directory);
+		bw.append("package " + pkg + ";\n\n");
 
-				Map<String, Set<String>> imports = new HashMap<String, Set<String>>();
-				addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
-				addImport(imports, "com.algorand.algosdk.v2.client.common.Query"); 
-				addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
-				addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
-				if (needsClassImport(returnType.toLowerCase())) {
-					addImport(imports, modelPkg + "." + returnType);
-				}
+		Map<String, Set<String>> imports = new HashMap<String, Set<String>>();
+		addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
+		addImport(imports, "com.algorand.algosdk.v2.client.common.Query"); 
+		addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
+		addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
+		if (needsClassImport(returnType.toLowerCase())) {
+			addImport(imports, modelPkg + "." + returnType);
+		}
 
-				StringBuffer sb = new StringBuffer();
-				sb.append("\n");
-				sb.append(Generator.formatComment(desc, "", true));
-				sb.append("\npublic class " + className + " extends Query {\n\n");
-				sb.append(
-						processQueryParams(
-								generatedPathsEntry,
-								properties, 
-								className, 
-								path,
-								returnType, 
-								getOrPost, 
-								imports));
-				sb.append("\n}");
-				bw.append(getImports(imports));
-				bw.append(sb);
-				bw.close();
+		StringBuffer sb = new StringBuffer();
+		sb.append("\n");
+		sb.append(Generator.formatComment(desc, "", true));
+		generatedPathsEntry.append(Generator.formatComment(desc, "\t", true));
+		generatedPathsEntry.append("\n	public " + className + " " + methodName + "(");
+		sb.append("\npublic class " + className + " extends Query {\n\n");
+		sb.append(
+				processQueryParams(
+						generatedPathsEntry,
+						properties, 
+						className, 
+						path,
+						returnType, 
+						getOrPost, 
+						imports));
+		sb.append("\n}");
+		bw.append(getImports(imports));
+		bw.append(sb);
+		bw.close();
 	}
 
 	public static void generateAlgodIndexerObjects (JsonNode root, String rootPath, String pkg) throws IOException {
@@ -660,7 +677,7 @@ public class Generator {
 		// GeneratedPaths file
 		BufferedWriter gpImports = new BufferedWriter(new FileWriter(new File(gpImpDirFile)));
 		BufferedWriter gpMethods = new BufferedWriter(new FileWriter(new File(gpMethodsDirFile)));
-		
+
 		StringBuffer gpBody = new StringBuffer();
 
 		JsonNode paths = this.root.get("paths");

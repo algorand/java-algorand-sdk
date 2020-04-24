@@ -15,7 +15,7 @@ public class AssetHolding extends PathResponse {
 	/**
 	 * (a) number of units held. 
 	 */	@JsonProperty("amount")
-	public Long amount;
+	public java.math.BigInteger amount;
 
 	/**
 	 * Asset ID of the holding. 

@@ -20,9 +20,11 @@ public class QueryMapperGenerator extends Generator {
 				"import java.text.SimpleDateFormat;\n\n" +
 				"import java.text.ParseException;\n" + 
 				"import com.algorand.algosdk.v2.client.indexer.*;\n" + 
-				"import com.algorand.algosdk.crypto.Address;\n" + 
+				"import com.algorand.algosdk.crypto.Address;\n" +
+				"import com.algorand.algosdk.util.Encoder;\n" +
 				"import java.security.NoSuchAlgorithmException;\n" + 
 				"import com.algorand.algosdk.v2.client.common.Client;\n" + 
+				"import com.algorand.algosdk.v2.client.common.Settings;\n" + 
 				"import com.algorand.algosdk.v2.client.common.Query;\n" +
 				"import com.algorand.sdkutils.generators.Generator;\n\n"
 				+ "public class QueryMapper {\n" + 
@@ -74,8 +76,7 @@ public class QueryMapperGenerator extends Generator {
 				Iterator<JsonNode> enumVals = parameter.getValue().get("enum") == null ? null : 
 															parameter.getValue().get("enum").elements();
 				String javaEnumName = Generator.getCamelCase(parameter.getKey(), true);
-				String format = parameter.getValue().get("x-algorand-format") != null 
-						? parameter.getValue().get("x-algorand-format").asText() : "";
+				String format = Generator.getTypeFormat(parameter.getValue());
 				
 				if (inPath(parameter.getValue())) {
 					if (argCounter > 0) {
@@ -91,8 +92,8 @@ public class QueryMapperGenerator extends Generator {
 					case "boolean":
 						getClass.append("Boolean.valueOf("+"args[" + argCounter + "])");
 						break;
-						default:
-							throw new RuntimeException("Unknow type: " + typeName);
+					default:
+						throw new RuntimeException("Unknow type: " + typeName);
 					}
 
 					argCounter++;
@@ -108,10 +109,13 @@ public class QueryMapperGenerator extends Generator {
 				case "string":
 					switch (format) {
 					case "RFC3339 String":
-						setValue.append("new SimpleDateFormat(\"yyyy-MM-dd'T'h:m:ssZ\").parse(value));\n");
+						setValue.append("new SimpleDateFormat(Settings.DateFormat).parse(value));\n");
 						break;
 					case "Address":
 						setValue.append("new Address(value));\n");
+						break;
+					case "byte":
+						setValue.append("Encoder.decodeFromBase64(value));\n");
 						break;
 					default:
 						if (enumVals != null) {

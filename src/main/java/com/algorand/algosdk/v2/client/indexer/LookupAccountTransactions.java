@@ -1,10 +1,12 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import com.algorand.algosdk.crypto.Address;
+import java.util.Date;
+
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.common.Settings;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -27,8 +29,8 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAccountTransactions afterTime(java.util.Date afterTime) {
-		addQuery("after-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(afterTime));
+	public LookupAccountTransactions afterTime(Date afterTime) {
+		addQuery("after-time", new java.text.SimpleDateFormat(Settings.DateFormat).format(afterTime));
 		return this;
 	}
 
@@ -43,8 +45,8 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
-	public LookupAccountTransactions beforeTime(java.util.Date beforeTime) {
-		addQuery("before-time", new java.text.SimpleDateFormat("yyyy-MM-dd'T'h:m:ssZ").format(beforeTime));
+	public LookupAccountTransactions beforeTime(Date beforeTime) {
+		addQuery("before-time", new java.text.SimpleDateFormat(Settings.DateFormat).format(beforeTime));
 		return this;
 	}
 
@@ -102,7 +104,7 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public LookupAccountTransactions notePrefix(String notePrefix) {
+	public LookupAccountTransactions notePrefix(byte[] notePrefix) {
 		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}
@@ -134,7 +136,7 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public LookupAccountTransactions txId(Address txId) {
+	public LookupAccountTransactions txId(String txId) {
 		addQuery("tx-id", String.valueOf(txId));
 		return this;
 	}
