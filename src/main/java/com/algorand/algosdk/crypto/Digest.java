@@ -34,11 +34,19 @@ public class Digest implements Serializable {
 
     /**
      * Create a new digest from a base64 encoded string.
-     * @param base64StringDigest base64 encoded string
+     * @param base32StringDigest base64 encoded string
      */
     @JsonIgnore
-    public Digest(String base64StringDigest) {
-        this(Encoder.decodeFromBase64(base64StringDigest));
+    public Digest(String base32StringDigest) {
+        this(Encoder.decodeFromBase32StripPad(base32StringDigest));
+    }
+
+    /**
+     * Encode the digest to a string.
+     */
+    @Override
+    public String toString() {
+        return Encoder.encodeToBase32StripPad(bytes);
     }
 
     /**

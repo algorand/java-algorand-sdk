@@ -51,7 +51,7 @@ public class TestTemplates {
 
         // Create transactions
         String preImageAsBase64 = "cHJlaW1hZ2U=";
-        Digest gh = new Digest("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
+        Digest gh = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
         SignedTransaction stx = HTLC.GetHTLCTransaction(
                 contract,
                 preImageAsBase64,
@@ -164,7 +164,7 @@ public class TestTemplates {
         Account account1 = new Account(pk1);
         Account account2 = new Account(pk2);
         Lease lease = new Lease("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
-        Digest gh = new Digest("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk=");
+        Digest gh = new Digest(Encoder.decodeFromBase64("f4OxZX/x/FO5LcGBSKHWXfwtSx+j1ncoSt3SABJtkGk="));
 
         // Create contract.
         ContractTemplate program = DynamicFee.MakeDynamicFee(
