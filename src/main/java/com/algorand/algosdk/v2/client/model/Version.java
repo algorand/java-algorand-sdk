@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,7 +17,14 @@ public class Version extends PathResponse {
 	@JsonProperty("build")
 	public VersionBuild build;
 
-	@JsonProperty("genesis-hash")
+ @JsonProperty("genesis-hash")
+	public void genesisHash(String base64Encoded) {
+		 this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("genesis-hash")
+	 public String genesisHash() {
+		 return Encoder.encodeToBase64(this.genesisHash);
+	 }
 	public byte[] genesisHash;
 
 	@JsonProperty("genesis-id")

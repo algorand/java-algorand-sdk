@@ -30,7 +30,7 @@ public class RunIndexerTests extends TestGenerator{
 
 		File inFile = new File("./src/main/java/com/algorand/sdkutils/test.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));
-		boolean passed = testSamples(tg, br, client, true);
+		boolean passed = testSamples(tg, br, client, false);
 		if (!passed) {
 			System.out.println("[FAILED]");
 		} else {

@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,7 +19,14 @@ public class Account extends PathResponse {
 
 	/**
 	 * the account public key 
-	 */	@JsonProperty("address")
+	 */ @JsonProperty("address")
+	public void address(String address) throws NoSuchAlgorithmException {
+		 this.address = new Address(address);
+	 }
+	 @JsonProperty("address")
+	 public String address() throws NoSuchAlgorithmException {
+		 return this.address.encodeAsString();
+	 }
 	public Address address;
 
 	/**

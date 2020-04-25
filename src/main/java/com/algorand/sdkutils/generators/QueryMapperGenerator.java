@@ -115,7 +115,7 @@ public class QueryMapperGenerator extends Generator {
 						setValue.append("new Address(value));\n");
 						break;
 					case "byte":
-						setValue.append("Encoder.decodeFromBase64(value));\n");
+						setValue.append("value);\n");
 						break;
 					default:
 						if (enumVals != null) {

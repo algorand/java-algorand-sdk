@@ -152,22 +152,19 @@ public class TestGenerator extends Generator {
 				
 				// compare the results
 				String filter = "round\"";
-				String diff = Utils.showDifferentces(curlResponse, sdkResponse, "curl", "sdk", verbose, filter);
+				DiffResult dr = Utils.showDifferentces(curlResponse, sdkResponse, "curl", "sdk", filter);
 
+				
 				if (!verbose) {
-					if (!diff.isEmpty()) {
-						System.out.print(diff);
-						if (diff.contentEquals("*" + filter + "\n")) {
-							System.out.println("*PASS!");
-						} else {
-							System.out.println("FAIL!");
-							failed = true;
-						}
-					} else {
-						System.out.println("PASS!");
-					}
+					System.out.print(dr.justDiff);
 				} else {
-					System.out.print(diff);
+					System.out.print(dr.fullOutput);
+				}
+				if (!dr.pass) {
+					failed = true;
+					System.out.println("Test " + caseCounter + " [FAILED!]");
+				}else {
+					System.out.println("Test " + caseCounter + " [PASSED!]");
 				}
 				caseCounter++;
 				bw.close();

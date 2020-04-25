@@ -130,7 +130,7 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public SearchForTransactions notePrefix(byte[] notePrefix) {
+	public SearchForTransactions notePrefix(String notePrefix) {
 		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}

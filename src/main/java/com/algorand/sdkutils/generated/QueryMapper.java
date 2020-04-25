@@ -1,15 +1,22 @@
 package com.algorand.sdkutils.generated;
 
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.text.ParseException;
-import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.util.Encoder;
-import java.security.NoSuchAlgorithmException;
 import com.algorand.algosdk.v2.client.common.Client;
-import com.algorand.algosdk.v2.client.common.Settings;
 import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.Settings;
+import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
+import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
+import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
+import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
+import com.algorand.algosdk.v2.client.indexer.LookupAssetTransactions;
+import com.algorand.algosdk.v2.client.indexer.LookupBlock;
+import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
+import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
+import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 import com.algorand.sdkutils.generators.Generator;
 
 public class QueryMapper {
@@ -99,7 +106,7 @@ public class QueryMapper {
 				((LookupAccountTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((LookupAccountTransactions)q).notePrefix(Encoder.decodeFromBase64(value));
+				((LookupAccountTransactions)q).notePrefix(value);
 				break;
 			case "round":
 				((LookupAccountTransactions)q).round(Long.valueOf(value));
@@ -196,7 +203,7 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((LookupAssetTransactions)q).notePrefix(Encoder.decodeFromBase64(value));
+				((LookupAssetTransactions)q).notePrefix(value);
 				break;
 			case "round":
 				((LookupAssetTransactions)q).round(Long.valueOf(value));
@@ -255,7 +262,7 @@ public class QueryMapper {
 				((SearchForTransactions)q).next(value);
 				break;
 			case "note-prefix":
-				((SearchForTransactions)q).notePrefix(Encoder.decodeFromBase64(value));
+				((SearchForTransactions)q).notePrefix(value);
 				break;
 			case "round":
 				((SearchForTransactions)q).round(Long.valueOf(value));

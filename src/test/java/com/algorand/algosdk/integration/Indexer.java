@@ -40,7 +40,7 @@ public class Indexer {
 
         assertThat(block.timestamp).isEqualTo(unixTimestamp);
         assertThat(block.transactions).hasSize(numTransactions);
-        assertThat(block.previousBlockHash).isEqualTo(previousBlockHash);
+        assertThat(block.previousBlockHash()).isEqualTo(previousBlockHash);
     }
 
     @When("I lookup account {string} with {int}")
@@ -57,7 +57,7 @@ public class Indexer {
                 .findFirst();
         assertThat(asset).isPresent();
         assertThat(asset.get().isFrozen).isEqualTo(Boolean.parseBoolean(frozenStatus));
-        assertThat(asset.get().amount).isEqualTo(amount);
+        assertThat(asset.get().amount.longValueExact()).isEqualTo(amount);
     }
 
     @Then("The account has {long} μalgos and {int} assets")
@@ -77,6 +77,6 @@ public class Indexer {
         assertThat(asset).isPresent();
         assertThat(asset.get().params.name).isEqualTo(assetName);
         assertThat(asset.get().params.unitName).isEqualTo(assetUnit);
-        assertThat(asset.get().params.total).isEqualTo(assetTotal);
+        assertThat(asset.get().params.total.longValueExact()).isEqualTo(assetTotal);
     }
 }

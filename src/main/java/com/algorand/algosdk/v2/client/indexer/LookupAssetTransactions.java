@@ -125,7 +125,7 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public LookupAssetTransactions notePrefix(byte[] notePrefix) {
+	public LookupAssetTransactions notePrefix(String notePrefix) {
 		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}
