@@ -51,7 +51,9 @@ public class TemplateGenerator extends Generator{
 			while (properties.hasNext()) {
 				Entry<String, JsonNode> parameter = properties.next();
 				bw.append(parameter.getKey());
-				bw.append("(" + parameter.getValue().get("type").asText() + ")");
+				
+				JsonNode typeNode = parameter.getValue().get("type") != null ? parameter.getValue() : parameter.getValue().get("schema");
+				bw.append("(" + typeNode.get("type").asText() + ")");
 				if (isRequired(parameter.getValue())) {
 					bw.append("[R]");
 				}

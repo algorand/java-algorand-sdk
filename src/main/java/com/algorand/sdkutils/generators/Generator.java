@@ -46,7 +46,7 @@ class TypeDef {
 }
 
 public class Generator {	
-	JsonNode root;
+	protected JsonNode root;
 
 	static BufferedWriter getFileWriter(String className, String directory) throws IOException {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(directory + "/" + className + ".java")));
@@ -387,6 +387,10 @@ public class Generator {
 
 	Iterator<Entry<String, JsonNode>> getSortedParameters(JsonNode properties) {
 		TreeMap<String, JsonNode> tm = new TreeMap<String, JsonNode>();
+		if (properties == null) {
+			return tm.entrySet().iterator();
+		}
+
 		if (properties.isArray()) {
 			ArrayNode jsonArrayNode = (ArrayNode) properties;
 			for (int i = 0; i < jsonArrayNode.size(); i++) {

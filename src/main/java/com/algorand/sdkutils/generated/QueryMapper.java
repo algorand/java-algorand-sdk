@@ -1,21 +1,17 @@
 package com.algorand.sdkutils.generated;
-
+import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
-import java.text.ParseException;
-import com.algorand.algosdk.v2.client.model.Enums;
-import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.util.Encoder;
-import java.security.NoSuchAlgorithmException;
-import com.algorand.algosdk.v2.client.common.Client;
-import com.algorand.algosdk.v2.client.common.Settings;
-import com.algorand.algosdk.v2.client.common.Query;
-import com.algorand.sdkutils.generators.Generator;
+import com.algorand.algosdk.v2.client.algod.*;
+import com.algorand.algosdk.v2.client.indexer.*;
+import com.algorand.algosdk.v2.client.model.Enums;
+import com.algorand.algosdk.v2.client.common.*;
 
 public class QueryMapper {
 
-	public static Query getClass(String name, Client client, String args[]) {
+	public static Query getClass(String name, Client client, String args[]) throws NoSuchAlgorithmException {
 		switch (name) {
 		case "searchForAccounts":
 			return client.searchForAccounts();
@@ -35,6 +31,30 @@ public class QueryMapper {
 			return client.lookupBlock(Long.valueOf(args[0]));
 		case "searchForTransactions":
 			return client.searchForTransactions();
+		case "AccountInformation":
+			return client.AccountInformation(new Address(args[0]));
+		case "GetPendingTransactionsByAddress":
+			return client.GetPendingTransactionsByAddress(new Address(args[0]));
+		case "GetBlock":
+			return client.GetBlock(Long.valueOf(args[0]));
+		case "GetSupply":
+			return client.GetSupply();
+		case "RegisterParticipationKeys":
+			return client.RegisterParticipationKeys(new Address(args[0]));
+		case "ShutdownNode":
+			return client.ShutdownNode();
+		case "GetStatus":
+			return client.GetStatus();
+		case "WaitForBlock":
+			return client.WaitForBlock(Long.valueOf(args[0]));
+		case "RawTransaction":
+			return client.RawTransaction();
+		case "TransactionParams":
+			return client.TransactionParams();
+		case "GetPendingTransactions":
+			return client.GetPendingTransactions();
+		case "PendingTransactionInformation":
+			return client.PendingTransactionInformation(args[0]);
 		}
 		return null;
 	}
@@ -272,6 +292,90 @@ public class QueryMapper {
 				break;
 			}
 			break;
+		case "AccountInformation":
+			switch (property) {
+			}
+			break;
+		case "GetPendingTransactionsByAddress":
+			switch (property) {
+			case "format":
+				((GetPendingTransactionsByAddress)q).format(getFormat(value));
+				break;
+			case "max":
+				((GetPendingTransactionsByAddress)q).max(Long.valueOf(value));
+				break;
+			}
+			break;
+		case "GetBlock":
+			switch (property) {
+			case "format":
+				((GetBlock)q).format(getFormat(value));
+				break;
+			}
+			break;
+		case "GetSupply":
+			switch (property) {
+			}
+			break;
+		case "RegisterParticipationKeys":
+			switch (property) {
+			case "fee":
+				((RegisterParticipationKeys)q).fee(Long.valueOf(value));
+				break;
+			case "key-dilution":
+				((RegisterParticipationKeys)q).keyDilution(Long.valueOf(value));
+				break;
+			case "no-wait":
+				((RegisterParticipationKeys)q).noWait(Boolean.valueOf(value));
+				break;
+			case "round-last-valid":
+				((RegisterParticipationKeys)q).roundLastValid(Long.valueOf(value));
+				break;
+			}
+			break;
+		case "ShutdownNode":
+			switch (property) {
+			case "timeout":
+				((ShutdownNode)q).timeout(Long.valueOf(value));
+				break;
+			}
+			break;
+		case "GetStatus":
+			switch (property) {
+			}
+			break;
+		case "WaitForBlock":
+			switch (property) {
+			}
+			break;
+		case "RawTransaction":
+			switch (property) {
+			case "rawtxn":
+				((RawTransaction)q).rawtxn(value);
+				break;
+			}
+			break;
+		case "TransactionParams":
+			switch (property) {
+			}
+			break;
+		case "GetPendingTransactions":
+			switch (property) {
+			case "format":
+				((GetPendingTransactions)q).format(getFormat(value));
+				break;
+			case "max":
+				((GetPendingTransactions)q).max(Long.valueOf(value));
+				break;
+			}
+			break;
+		case "PendingTransactionInformation":
+			switch (property) {
+			case "format":
+				((PendingTransactionInformation)q).format(getFormat(value));
+				break;
+			}
+			break;
 
 		}
 	}
@@ -296,6 +400,30 @@ public class QueryMapper {
 			return ((LookupBlock)q).execute().body().toString();
 		case "searchForTransactions":
 			return ((SearchForTransactions)q).execute().body().toString();
+		case "AccountInformation":
+			return ((AccountInformation)q).execute().body().toString();
+		case "GetPendingTransactionsByAddress":
+			return ((GetPendingTransactionsByAddress)q).execute().body().toString();
+		case "GetBlock":
+			return ((GetBlock)q).execute().body().toString();
+		case "GetSupply":
+			return ((GetSupply)q).execute().body().toString();
+		case "RegisterParticipationKeys":
+			return ((RegisterParticipationKeys)q).execute().body().toString();
+		case "ShutdownNode":
+			return ((ShutdownNode)q).execute().body().toString();
+		case "GetStatus":
+			return ((GetStatus)q).execute().body().toString();
+		case "WaitForBlock":
+			return ((WaitForBlock)q).execute().body().toString();
+		case "RawTransaction":
+			return ((RawTransaction)q).execute().body().toString();
+		case "TransactionParams":
+			return ((TransactionParams)q).execute().body().toString();
+		case "GetPendingTransactions":
+			return ((GetPendingTransactions)q).execute().body().toString();
+		case "PendingTransactionInformation":
+			return ((PendingTransactionInformation)q).execute().body().toString();
 		}
 		return null;
 	}
@@ -307,6 +435,16 @@ public class QueryMapper {
 			return Enums.AddressRole.RECEIVER;
 		case "FREEZETARGET":
 			return Enums.AddressRole.FREEZETARGET;
+		default:
+			throw new RuntimeException("Enum value not recognized: " + val +"!");
+		}
+	}
+	private static Enums.Format getFormat(String val) {
+		switch(val.toUpperCase()) {
+		case "JSON":
+			return Enums.Format.JSON;
+		case "MSGPACK":
+			return Enums.Format.MSGPACK;
 		default:
 			throw new RuntimeException("Enum value not recognized: " + val +"!");
 		}
