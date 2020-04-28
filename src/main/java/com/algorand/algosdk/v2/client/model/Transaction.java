@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -56,7 +57,14 @@ public class Transaction extends PathResponse {
 
 	/**
 	 * (gh) Hash of genesis block. 
-	 */	@JsonProperty("genesis-hash")
+	 */ @JsonProperty("genesis-hash")
+	public void genesisHash(String base64Encoded) {
+		 this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("genesis-hash")
+	 public String genesisHash() {
+		 return Encoder.encodeToBase64(this.genesisHash);
+	 }
 	public byte[] genesisHash;
 
 	/**
@@ -68,7 +76,14 @@ public class Transaction extends PathResponse {
 	 * (grp) Base64 encoded byte array of a sha512/256 digest. When present indicates 
 	 * that this transaction is part of a transaction group and the value is the 
 	 * sha512/256 hash of the transactions in that group. 
-	 */	@JsonProperty("group")
+	 */ @JsonProperty("group")
+	public void group(String base64Encoded) {
+		 this.group = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("group")
+	 public String group() {
+		 return Encoder.encodeToBase64(this.group);
+	 }
 	public byte[] group;
 
 	/**
@@ -95,12 +110,26 @@ public class Transaction extends PathResponse {
 	 * it acquires the lease identified by the (Sender, Lease) pair of the transaction 
 	 * until the LastValid round passes. While this transaction possesses the lease, no 
 	 * other transaction specifying this lease can be confirmed. 
-	 */	@JsonProperty("lease")
+	 */ @JsonProperty("lease")
+	public void lease(String base64Encoded) {
+		 this.lease = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("lease")
+	 public String lease() {
+		 return Encoder.encodeToBase64(this.lease);
+	 }
 	public byte[] lease;
 
 	/**
 	 * (note) Free form data. 
-	 */	@JsonProperty("note")
+	 */ @JsonProperty("note")
+	public void note(String base64Encoded) {
+		 this.note = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("note")
+	 public String note() {
+		 return Encoder.encodeToBase64(this.note);
+	 }
 	public byte[] note;
 
 	@JsonProperty("payment-transaction")
@@ -138,15 +167,8 @@ public class Transaction extends PathResponse {
 	 *   (acfg) asset-config-transaction 
 	 *   (axfer) asset-transfer-transaction 
 	 *   (afrz) asset-freeze-transaction 
-	 */	@JsonProperty("type")
-	public Type type;
-	public enum Type {
-		@JsonProperty("pay") PAY,
-		@JsonProperty("keyreg") KEYREG,
-		@JsonProperty("acfg") ACFG,
-		@JsonProperty("axfer") AXFER,
-		@JsonProperty("afrz") AFRZ
-	}
+	 */	@JsonProperty("tx-type")
+	public Enums.TxType txType;
 
 	@Override
 	public boolean equals(Object o) {
@@ -179,7 +201,7 @@ public class Transaction extends PathResponse {
 		if (!Objects.deepEquals(this.sender, other.sender)) return false;
 		if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;
 		if (!Objects.deepEquals(this.signature, other.signature)) return false;
-		if (!Objects.deepEquals(this.type, other.type)) return false;
+		if (!Objects.deepEquals(this.txType, other.txType)) return false;
 
 		return true;
 	}

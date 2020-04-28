@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,7 +17,14 @@ public class Block extends PathResponse {
 
 	/**
 	 * (gh) hash to which this block belongs. 
-	 */	@JsonProperty("genesis-hash")
+	 */ @JsonProperty("genesis-hash")
+	public void genesisHash(String base64Encoded) {
+		 this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("genesis-hash")
+	 public String genesisHash() {
+		 return Encoder.encodeToBase64(this.genesisHash);
+	 }
 	public byte[] genesisHash;
 
 	/**
@@ -26,7 +34,14 @@ public class Block extends PathResponse {
 
 	/**
 	 * (prev) Previous block hash. 
-	 */	@JsonProperty("previous-block-hash")
+	 */ @JsonProperty("previous-block-hash")
+	public void previousBlockHash(String base64Encoded) {
+		 this.previousBlockHash = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("previous-block-hash")
+	 public String previousBlockHash() {
+		 return Encoder.encodeToBase64(this.previousBlockHash);
+	 }
 	public byte[] previousBlockHash;
 
 	@JsonProperty("rewards")
@@ -39,7 +54,14 @@ public class Block extends PathResponse {
 
 	/**
 	 * (seed) Sortition seed. 
-	 */	@JsonProperty("seed")
+	 */ @JsonProperty("seed")
+	public void seed(String base64Encoded) {
+		 this.seed = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("seed")
+	 public String seed() {
+		 return Encoder.encodeToBase64(this.seed);
+	 }
 	public byte[] seed;
 
 	/**
@@ -59,7 +81,14 @@ public class Block extends PathResponse {
 	 * the TxnRoot does not authenticate the signatures on the transactions, only the 
 	 * transactions themselves. Two blocks with the same transactions but in a 
 	 * different order and with different signatures will have the same TxnRoot. 
-	 */	@JsonProperty("transactions-root")
+	 */ @JsonProperty("transactions-root")
+	public void transactionsRoot(String base64Encoded) {
+		 this.transactionsRoot = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("transactions-root")
+	 public String transactionsRoot() {
+		 return Encoder.encodeToBase64(this.transactionsRoot);
+	 }
 	public byte[] transactionsRoot;
 
 	/**

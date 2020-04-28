@@ -8,6 +8,7 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.common.Settings;
+import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -35,14 +36,9 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Combine with the address parameter to define what type of address to search for. 
 	 */
-	public LookupAssetTransactions addressRole(AddressRole addressRole) {
+	public LookupAssetTransactions addressRole(Enums.AddressRole addressRole) {
 		addQuery("address-role", String.valueOf(addressRole));
 		return this;
-	}
-	public enum AddressRole {
-		SENDER,
-		RECEIVER,
-		FREEZETARGET
 	}
 
 	/**
@@ -125,7 +121,7 @@ public class LookupAssetTransactions extends Query {
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public LookupAssetTransactions notePrefix(byte[] notePrefix) {
+	public LookupAssetTransactions notePrefix(String notePrefix) {
 		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}
@@ -144,34 +140,22 @@ public class LookupAssetTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public LookupAssetTransactions sigType(SigType sigType) {
+	public LookupAssetTransactions sigType(Enums.SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
 	}
-	public enum SigType {
-		SIG,
-		MSIG,
-		LSIG
+
+	public LookupAssetTransactions txType(Enums.TxType txType) {
+		addQuery("tx-type", String.valueOf(txType));
+		return this;
 	}
 
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public LookupAssetTransactions txId(String txId) {
-		addQuery("tx-id", String.valueOf(txId));
+	public LookupAssetTransactions txid(String txid) {
+		addQuery("txid", String.valueOf(txid));
 		return this;
-	}
-
-	public LookupAssetTransactions txType(TxType txType) {
-		addQuery("tx-type", String.valueOf(txType));
-		return this;
-	}
-	public enum TxType {
-		PAY,
-		KEYREG,
-		ACFG,
-		AXFER,
-		AFRZ
 	}
 
 	@Override

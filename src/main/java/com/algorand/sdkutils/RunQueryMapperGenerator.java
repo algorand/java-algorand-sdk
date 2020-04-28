@@ -13,16 +13,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class RunQueryMapperGenerator {
 	public static void main (String args[]) throws JsonProcessingException, IOException {
 
-		File f = new File("src/main/java/com/algorand/sdkutils/indexer.oas2.json");
-		FileInputStream fis = new FileInputStream(f);
+		File f1 = new File("src/main/java/com/algorand/sdkutils/indexer.oas2.json");
+		FileInputStream fis1 = new FileInputStream(f1);
+		JsonNode indexerRoot = Utils.getRoot(fis1);
 
-		JsonNode root = Utils.getRoot(fis);	
-		QueryMapperGenerator qmg = new QueryMapperGenerator(root);
+		File f2 = new File("src/main/java/com/algorand/sdkutils/algod.oas2.json");
+		FileInputStream fis2 = new FileInputStream(f2);
+		JsonNode algodRoot = Utils.getRoot(fis2);
+
 		
-		TemplateGenerator tg = new TemplateGenerator(root);
-
+		QueryMapperGenerator qmg = new QueryMapperGenerator(indexerRoot, algodRoot);
 		qmg.writeQueryMapper("src/main/java/com/algorand/sdkutils/generated/");
+		
+		TemplateGenerator tg = new TemplateGenerator(indexerRoot);
 		tg.writeTemplate("./src/main/java/com/algorand/sdkutils/template");
+		
+		tg = new TemplateGenerator(algodRoot);
+		tg.writeTemplate("./src/main/java/com/algorand/sdkutils/algodTemplate");
 	}
 
 }

@@ -17,10 +17,36 @@ import java.util.TreeSet;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
+class TypeDef {
+	public TypeDef(String typeName, String def, String type) {
+		this.typeName = typeName;
+		this.def = def;
+		this.type = type;
+	}
+	public TypeDef(String typeName) {
+		this.typeName = typeName;
+		this.def = null;
+		this.type = null;
+	}
+	public boolean isOfType(String type) {
+		if (this.type == null) {
+			return false;
+		}
+		return this.type.contentEquals(type);
+	}
 
-public class Generator {
+	@Override
+	public String toString() {
+		throw new RuntimeException("Should not get the string value of the object directly!");
+	}
+	public String typeName;
+	public String def;
+	
+	private String type;
+}
 
-	JsonNode root;
+public class Generator {	
+	protected JsonNode root;
 
 	static BufferedWriter getFileWriter(String className, String directory) throws IOException {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(directory + "/" + className + ".java")));
@@ -55,7 +81,77 @@ public class Generator {
 		return ans;
 	}
 
-	static String getEnum(JsonNode prop, String propName, boolean jsonParam) {
+	static TypeDef getAddress(String propName, Map<String, Set<String>> imports, boolean forModel) {
+
+		addImport(imports, "com.algorand.algosdk.crypto.Address");
+		if (forModel) {
+			addImport(imports, "java.security.NoSuchAlgorithmException");
+		}
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
+				"	public void " + propName + "(String "+ propName +") throws NoSuchAlgorithmException {\n" + 
+				"		 this."+ propName +" = new Address("+ propName +");\n" + 
+				"	 }\n" + 
+				"	 @JsonProperty(\""+ propName +"\")\n" + 
+				"	 public String "+ propName +"() throws NoSuchAlgorithmException {\n" + 
+				"		 return this."+ propName +".encodeAsString();\n" + 
+				"	 }\n" + 
+				"	public Address " + propName + ";\n");
+		return new TypeDef("Address", sb.toString(), "getterSetter");
+	}
+
+	static TypeDef getBase64Encoded(String propName, Map<String, Set<String>> imports, boolean forModel) {
+		if (forModel == true) {
+			addImport(imports, "com.algorand.algosdk.util.Encoder");
+		}
+		String javaName = getCamelCase(propName, false);
+		StringBuffer sb = new StringBuffer();
+		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
+				"	public void " + javaName + "(String base64Encoded) {\n" + 
+				"		 this."+ javaName +" = Encoder.decodeFromBase64(base64Encoded);\n" + 
+				"	 }\n" + 
+				"	 @JsonProperty(\""+ propName +"\")\n" + 
+				"	 public String "+ javaName +"() {\n" + 
+				"		 return Encoder.encodeToBase64(this."+ javaName +");\n" + 
+				"	 }\n" + 
+				"	public byte[] "+ javaName +";\n");
+		// getterSetter typeName is only used in path. 
+		return new TypeDef("String", sb.toString(), "getterSetter");
+	}
+	
+	static TypeDef getBase64EncodedArray(String propName, Map<String, Set<String>> imports, boolean forModel) {
+		if (forModel == false) {
+			throw new RuntimeException("array of byte[] cannot yet be used in a path or path query.");	
+		}
+		addImport(imports, "com.algorand.algosdk.util.Encoder");
+		addImport(imports, "java.util.ArrayList");
+		addImport(imports, "java.util.List");
+
+		String javaName = getCamelCase(propName, false);
+		StringBuffer sb = new StringBuffer();
+		
+		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
+				"	public void " + javaName + "(List<String> base64Encoded) {\n" + 
+				"		 this." + javaName + " = new ArrayList<byte[]>();\n" + 
+				"		 for (String val : base64Encoded) {\n" + 
+				"			 this." + javaName + ".add(Encoder.decodeFromBase64(val));\n" + 
+				"		 }\n" + 
+				"	 }\n" + 
+				"	 @JsonProperty(\"" + propName + "\")\n" + 
+				"	 public List<String> " + javaName + "() {\n" + 
+				"		 ArrayList<String> ret = new ArrayList<String>();\n" + 
+				"		 for (byte[] val : this." + javaName + ") {\n" + 
+				"			 ret.add(Encoder.encodeToBase64(val));\n" + 
+				"		 }\n" + 
+				"		 return ret; \n" + 
+				"	 }\n" + 
+				"	public List<byte[]> " + javaName + ";\n");
+		// getterSetter typeName is only used in path. 
+		return new TypeDef("", sb.toString(), "getterSetter");
+	}
+
+	static TypeDef getEnum(JsonNode prop, String propName, boolean jsonParam) {
 		JsonNode enumNode = prop.get("enum");
 		if (enumNode == null) {
 			throw new RuntimeException("Cannot find enum info in node: " + prop.toString());
@@ -63,6 +159,7 @@ public class Generator {
 		StringBuffer sb = new StringBuffer();
 		String enumClassName = getCamelCase(propName, true);
 		sb.append("\tpublic enum " + enumClassName + " {\n");
+		
 		Iterator<JsonNode> elmts = enumNode.elements();
 		while(elmts.hasNext()) {
 			String val = elmts.next().asText();
@@ -80,66 +177,74 @@ public class Generator {
 			}
 		}
 		sb.append("\t}\n");
-		return sb.toString();
+		enumClassName = "Enums." + enumClassName;
+		return new TypeDef(enumClassName, sb.toString(), "enum");
 	}
 	
-	static String getType(
+	static TypeDef getType(
 			JsonNode prop, 
 			boolean asObject,
 			Map<String, Set<String>> imports,
-			String propName, boolean jsonParam) {
+			String propName, boolean forModel) {
 
 		if (prop.get("$ref") != null) {
 			JsonNode typeNode = prop.get("$ref");
 			String type = getTypeNameFromRef(typeNode.asText());
-			return type;
+			return new TypeDef(type);
 		}
 
 		if (prop.get("enum") != null) {
-			return getEnum(prop, propName, jsonParam);
+			if (!forModel) {
+				addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
+			}
+			return getEnum(prop, propName, forModel);
 		}
 		
 		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
 		String type = typeNode.get("type").asText();
 		String format = getTypeFormat(typeNode);
+		if ((propName.equals("address") || propName.contentEquals("accountId")) && 
+				type.equals("string")) {
+			format = "Address";
+		}
 		if (!format.isEmpty() ) {
 			switch (format) {
 			case "uint64":
-				return "java.math.BigInteger";
+				return new TypeDef("java.math.BigInteger");
 			case "RFC3339 String":
 				addImport(imports, "com.algorand.algosdk.v2.client.common.Settings");
 				addImport(imports, "java.util.Date");
-				return "Date";
+				return new TypeDef("Date");
 			case "Address":
-				addImport(imports, "com.algorand.algosdk.crypto.Address"); 
-				return "Address";
+				return getAddress(propName, imports, forModel);
 			case "SignedTransaction":
 				addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
-				return "SignedTransaction";
+				return new TypeDef("SignedTransaction");
 			case "byte":
 				if (type.contentEquals("array")) {
-					return "List<byte[]>";
+					return getBase64EncodedArray(propName, imports, forModel);
+				} else {
+					return getBase64Encoded(propName, imports, forModel);
 				}
-				return "byte[]";
 			case "AccountID":
 				break;
 			case "digest":
 				addImport(imports, "com.algorand.algosdk.crypto.Digest");
-				return "Digest";
+				return new TypeDef("Digest");
 			}
 		}
 		switch (type) {
 		case "integer":
-			return asObject ? "Long" : "long";
+			return asObject ? new TypeDef("Long") : new TypeDef("long");
 		case "object":
 		case "string":
-			return "String";
+			return new TypeDef("String");
 		case "boolean":
-			return asObject ? "Boolean" : "boolean";			
+			return asObject ? new TypeDef("Boolean") : new TypeDef("boolean");			
 		case "array":
 			JsonNode arrayTypeNode = prop.get("items");
-			String typeName = getType(arrayTypeNode, asObject, imports, propName, jsonParam);
-			return "List<" + typeName + ">";
+			TypeDef typeName = getType(arrayTypeNode, asObject, imports, propName, forModel);
+			return new TypeDef("List<" + typeName.typeName + ">", typeName.def, "list");
 		default:
 			throw new RuntimeException("Unrecognized type: " + type);	
 		}
@@ -192,9 +297,14 @@ public class Generator {
 		return sb.toString();
 	}
 
-	static String getPropertyWithJsonSetter(String typeObj, String javaName, String jprop){
+	static String getPropertyWithJsonSetter(TypeDef typeObj, String javaName, String jprop){
 		StringBuffer buffer = new StringBuffer();
-		switch (typeObj) {
+		
+		if (typeObj.isOfType("getterSetter")) {
+			return typeObj.def.toString();
+		}
+
+		switch (typeObj.typeName) {
 		case "java.util.DateTime":
 			throw new RuntimeException("Parsing of time is not yet implemented!");
 		case "String":
@@ -203,21 +313,12 @@ public class Generator {
 		case "boolean":
 		case "java.math.BigInteger":
 		default: // List and Models with Json properties
-			String enumBody = null;
 			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
-			if (typeObj.contains("public enum")) {
-				enumBody = typeObj;
-				typeObj = typeObj.substring(13, typeObj.indexOf('{')).trim();
-			}
-			buffer.append("\n\tpublic " + typeObj + " " + javaName);
-			if (typeObj.contains("List<")) {
-				buffer.append(" = new Array" + typeObj + "()");
+			buffer.append("\n\tpublic " + typeObj.typeName + " " + javaName);
+			if (typeObj.isOfType("list")) {
+				buffer.append(" = new Array" + typeObj.typeName + "()");
 			}
 			buffer.append(";\n");
-			if (enumBody != null) {
-				buffer.append(enumBody);
-			}
-
 		}
 		return buffer.toString();
 	}
@@ -287,6 +388,10 @@ public class Generator {
 
 	Iterator<Entry<String, JsonNode>> getSortedParameters(JsonNode properties) {
 		TreeMap<String, JsonNode> tm = new TreeMap<String, JsonNode>();
+		if (properties == null) {
+			return tm.entrySet().iterator();
+		}
+
 		if (properties.isArray()) {
 			ArrayNode jsonArrayNode = (ArrayNode) properties;
 			for (int i = 0; i < jsonArrayNode.size(); i++) {
@@ -311,8 +416,8 @@ public class Generator {
 			Entry<String, JsonNode> prop = properties.next();
 			String jprop = prop.getKey();
 			String javaName = getCamelCase(jprop, false);
-			String typeObj = getType(prop.getValue(), true, imports, jprop, true);
-			if (typeObj.contains("List<")) {
+			TypeDef typeObj = getType(prop.getValue(), true, imports, jprop, true);
+			if (typeObj.isOfType("list")) {
 				addImport(imports, "java.util.ArrayList");
 				addImport(imports, "java.util.List");
 			}
@@ -445,37 +550,30 @@ public class Generator {
 			Entry<String, JsonNode> prop = properties.next();
 			String propName = Generator.getCamelCase(prop.getKey(), false);
 			String setterName = Generator.getCamelCase(prop.getKey(), false);
-			String propType = getType(prop.getValue(), true, imports, propName, false);
+			TypeDef propType = getType(prop.getValue(), true, imports, propName, false);
 			String propCode = prop.getKey();
 
 			if (inPath(prop.getValue())) {
-				if (propType.contains("public enum")) {
+				if (propType.isOfType("enum")) {
 					throw new RuntimeException("Enum in paths is not supported! " + propName);
 				}
-				decls.append("\tprivate " + propType + " " + propName + ";\n");
+				decls.append("\tprivate " + propType.typeName + " " + propName + ";\n");
 				if (prop.getValue().get("description") != null) {
 					String desc = prop.getValue().get("description").asText();
 					desc = formatComment("@param " + propName + " " + desc, "\t", false);
 					constructorComments.add(desc);
 				}
 
-				constructorHeader.append(", " + propType + " " + propName);
+				constructorHeader.append(", " + propType.typeName + " " + propName);
 				constructorBody.append("		this." + propName + " = " + propName + ";\n");
 
 				if (pAdded) {
 					generatedPathsEntry.append(",\n			");
 				}
-				generatedPathsEntry.append(propType + " " + propName);
+				generatedPathsEntry.append(propType.typeName + " " + propName);
 				generatedPathsEntryBody.append(", " + propName);
 				pAdded = true;
 				continue;
-			}
-
-			// handle enums
-			String enumBody = null;
-			if (propType.contains("public enum")) {
-				enumBody = propType;
-				propType = propType.substring(13, propType.indexOf('{')).trim();
 			}
 
 			if (prop.getValue().get("description") != null) {
@@ -483,14 +581,11 @@ public class Generator {
 				desc = formatComment(desc, "\t", true);
 				builders.append(desc + "\n");
 			}
-			builders.append("\tpublic " + className + " " + setterName + "(" + propType + " " + propName + ") {\n");
-			String valueOfString = getStringValueOfStatement(propType, propName);
+			builders.append("\tpublic " + className + " " + setterName + "(" + propType.typeName + " " + propName + ") {\n");
+			String valueOfString = getStringValueOfStatement(propType.typeName, propName);
 			builders.append("\t\taddQuery(\"" + propCode + "\", "+ valueOfString +");\n");
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
-			if (enumBody != null) {
-				builders.append(enumBody);
-			}
 			builders.append("\n");
 
 			if (isRequired(prop.getValue())) {
@@ -630,6 +725,32 @@ public class Generator {
 		sb.append("\n}");
 		bw.append(getImports(imports));
 		bw.append(sb);
+		bw.close();
+	}
+	
+	public static void generateEnumClasses (JsonNode root, String rootPath, String pkg) throws IOException {
+
+		BufferedWriter bw = getFileWriter("Enums", rootPath);
+		bw.append("package " + pkg + ";\n\n");
+		bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
+		bw.append("public class Enums {\n\n");
+		JsonNode parameters = root.get("parameters");
+		Iterator<Entry<String, JsonNode>> classes = parameters.fields();
+		while (classes.hasNext()) {
+			Entry<String, JsonNode> cls = classes.next();
+			if (cls.getValue().get("enum") != null) {				
+				if (cls.getValue().get("description") != null) {
+					String comment = null;
+					comment = cls.getValue().get("description").asText();
+					bw.append(Generator.formatComment(comment, "", true));
+					bw.append("\n");
+				}
+				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);				
+				bw.append(enumType.def);
+				bw.append("\n");
+			}
+		}
+		bw.append("}\n");
 		bw.close();
 	}
 

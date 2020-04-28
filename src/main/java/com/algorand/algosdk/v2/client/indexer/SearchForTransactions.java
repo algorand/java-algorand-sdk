@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.common.Settings;
+import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -33,14 +34,9 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Combine with the address parameter to define what type of address to search for. 
 	 */
-	public SearchForTransactions addressRole(AddressRole addressRole) {
+	public SearchForTransactions addressRole(Enums.AddressRole addressRole) {
 		addQuery("address-role", String.valueOf(addressRole));
 		return this;
-	}
-	public enum AddressRole {
-		SENDER,
-		RECEIVER,
-		FREEZETARGET
 	}
 
 	/**
@@ -131,8 +127,8 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public SearchForTransactions notePrefix(byte[] notePrefix) {
-		addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
+	public SearchForTransactions notePrefix(String notePrefix) {
+		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}
 
@@ -150,34 +146,22 @@ public class SearchForTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public SearchForTransactions sigType(SigType sigType) {
+	public SearchForTransactions sigType(Enums.SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
 	}
-	public enum SigType {
-		SIG,
-		MSIG,
-		LSIG
+
+	public SearchForTransactions txType(Enums.TxType txType) {
+		addQuery("tx-type", String.valueOf(txType));
+		return this;
 	}
 
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public SearchForTransactions txId(String txId) {
-		addQuery("txid", String.valueOf(txId));
+	public SearchForTransactions txid(String txid) {
+		addQuery("txid", String.valueOf(txid));
 		return this;
-	}
-
-	public SearchForTransactions txType(TxType txType) {
-		addQuery("tx-type", String.valueOf(txType));
-		return this;
-	}
-	public enum TxType {
-		PAY,
-		KEYREG,
-		ACFG,
-		AXFER,
-		AFRZ
 	}
 
 	@Override

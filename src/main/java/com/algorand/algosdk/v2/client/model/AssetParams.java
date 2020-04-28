@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -53,7 +54,14 @@ public class AssetParams extends PathResponse {
 	/**
 	 * (am) A commitment to some unspecified asset metadata. The format of this 
 	 * metadata is up to the application. 
-	 */	@JsonProperty("metadata-hash")
+	 */ @JsonProperty("metadata-hash")
+	public void metadataHash(String base64Encoded) {
+		 this.metadataHash = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("metadata-hash")
+	 public String metadataHash() {
+		 return Encoder.encodeToBase64(this.metadataHash);
+	 }
 	public byte[] metadataHash;
 
 	/**

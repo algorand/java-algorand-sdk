@@ -2,11 +2,13 @@ package com.algorand.algosdk.v2.client.indexer;
 
 import java.util.Date;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.common.Settings;
+import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -16,12 +18,12 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
  */
 public class LookupAccountTransactions extends Query {
 
-	private String accountId;
+	private Address accountId;
 
 	/**
 	 * @param accountId account string 
 	 */
-	public LookupAccountTransactions(Client client, String accountId) {
+	public LookupAccountTransactions(Client client, Address accountId) {
 		super(client, "get");
 		this.accountId = accountId;
 	}
@@ -104,7 +106,7 @@ public class LookupAccountTransactions extends Query {
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public LookupAccountTransactions notePrefix(byte[] notePrefix) {
+	public LookupAccountTransactions notePrefix(String notePrefix) {
 		addQuery("note-prefix", String.valueOf(notePrefix));
 		return this;
 	}
@@ -123,34 +125,22 @@ public class LookupAccountTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public LookupAccountTransactions sigType(SigType sigType) {
+	public LookupAccountTransactions sigType(Enums.SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
 	}
-	public enum SigType {
-		SIG,
-		MSIG,
-		LSIG
+
+	public LookupAccountTransactions txType(Enums.TxType txType) {
+		addQuery("tx-type", String.valueOf(txType));
+		return this;
 	}
 
 	/**
 	 * Lookup the specific transaction by ID. 
 	 */
-	public LookupAccountTransactions txId(String txId) {
-		addQuery("tx-id", String.valueOf(txId));
+	public LookupAccountTransactions txid(String txid) {
+		addQuery("txid", String.valueOf(txid));
 		return this;
-	}
-
-	public LookupAccountTransactions txType(TxType txType) {
-		addQuery("tx-type", String.valueOf(txType));
-		return this;
-	}
-	public enum TxType {
-		PAY,
-		KEYREG,
-		ACFG,
-		AXFER,
-		AFRZ
 	}
 
 	@Override

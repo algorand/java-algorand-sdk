@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -9,12 +10,26 @@ public class TransactionSignatureMultisigSubsignature extends PathResponse {
 
 	/**
 	 * (pk) 
-	 */	@JsonProperty("public-key")
+	 */ @JsonProperty("public-key")
+	public void publicKey(String base64Encoded) {
+		 this.publicKey = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("public-key")
+	 public String publicKey() {
+		 return Encoder.encodeToBase64(this.publicKey);
+	 }
 	public byte[] publicKey;
 
 	/**
 	 * (s) 
-	 */	@JsonProperty("signature")
+	 */ @JsonProperty("signature")
+	public void signature(String base64Encoded) {
+		 this.signature = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("signature")
+	 public String signature() {
+		 return Encoder.encodeToBase64(this.signature);
+	 }
 	public byte[] signature;
 
 	@Override

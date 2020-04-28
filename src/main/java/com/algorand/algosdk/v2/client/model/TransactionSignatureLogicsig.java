@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,13 +17,34 @@ public class TransactionSignatureLogicsig extends PathResponse {
 
 	/**
 	 * (arg) Logic arguments, base64 encoded. 
-	 */	@JsonProperty("args")
-	public List<byte[]> args = new ArrayList<byte[]>();
+	 */ @JsonProperty("args")
+	public void args(List<String> base64Encoded) {
+		 this.args = new ArrayList<byte[]>();
+		 for (String val : base64Encoded) {
+			 this.args.add(Encoder.decodeFromBase64(val));
+		 }
+	 }
+	 @JsonProperty("args")
+	 public List<String> args() {
+		 ArrayList<String> ret = new ArrayList<String>();
+		 for (byte[] val : this.args) {
+			 ret.add(Encoder.encodeToBase64(val));
+		 }
+		 return ret; 
+	 }
+	public List<byte[]> args;
 
 	/**
 	 * (l) Program signed by a signature or multi signature, or hashed to be the 
 	 * address of ana ccount. Base64 encoded TEAL program. 
-	 */	@JsonProperty("logic")
+	 */ @JsonProperty("logic")
+	public void logic(String base64Encoded) {
+		 this.logic = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("logic")
+	 public String logic() {
+		 return Encoder.encodeToBase64(this.logic);
+	 }
 	public byte[] logic;
 
 	@JsonProperty("multisig-signature")
@@ -30,7 +52,14 @@ public class TransactionSignatureLogicsig extends PathResponse {
 
 	/**
 	 * (sig) ed25519 signature. 
-	 */	@JsonProperty("signature")
+	 */ @JsonProperty("signature")
+	public void signature(String base64Encoded) {
+		 this.signature = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("signature")
+	 public String signature() {
+		 return Encoder.encodeToBase64(this.signature);
+	 }
 	public byte[] signature;
 
 	@Override

@@ -116,7 +116,7 @@
             "$ref": "#/parameters/sig-type"
           },
           {
-            "$ref": "#/parameters/tx-id"
+            "$ref": "#/parameters/txid"
           },
           {
             "$ref": "#/parameters/round"
@@ -303,7 +303,7 @@
             "$ref": "#/parameters/sig-type"
           },
           {
-            "$ref": "#/parameters/tx-id"
+            "$ref": "#/parameters/txid"
           },
           {
             "$ref": "#/parameters/round"
@@ -404,7 +404,7 @@
             "$ref": "#/parameters/sig-type"
           },
           {
-            "$ref": "#/parameters/tx-id"
+            "$ref": "#/parameters/txid"
           },
           {
             "$ref": "#/parameters/round"
@@ -467,8 +467,7 @@
       "properties": {
         "address": {
           "description": "the account public key",
-          "type": "string",
-          "x-algorand-format": "Address"
+          "type": "string"
         },
         "amount": {
           "description": "\\[algo\\] total number of MicroAlgos in the account",
@@ -515,7 +514,7 @@
           "description": "\\[onl\\] delegation status of the account's MicroAlgos\n* Offline - indicates that the associated account is delegated.\n*  Online  - indicates that the associated account used as part of the delegation pool.\n*   NotParticipating - indicates that the associated account is neither a delegator nor a delegate.",
           "type": "string"
         },
-        "type": {
+        "sig-type": {
           "description": "Indicates what type of signature is used by this account, must be one of:\n* sig\n* msig\n* lsig",
           "type": "string",
           "enum": [
@@ -850,8 +849,7 @@
       ],
       "properties": {
         "address": {
-          "type": "string",
-          "x-algorand-format": "Address"
+          "type": "string"
         },
         "amount": {
            "type": "integer",
@@ -969,7 +967,7 @@
         "signature": {
           "$ref": "#/definitions/TransactionSignature"
         },
-        "type": {
+        "tx-type": {
           "description": "\\[type\\] Indicates what type of transaction this is. Different types have different fields.\n\nValid types, and where their fields are stored:\n* \\[pay\\] payment-transaction\n* \\[keyreg\\] keyreg-transaction\n* \\[acfg\\] asset-config-transaction\n* \\[axfer\\] asset-transfer-transaction\n* \\[afrz\\] asset-freeze-transaction",
           "type": "string",
           "enum": [
@@ -1007,8 +1005,7 @@
       "properties": {
         "address": {
           "description": "\\[fadd\\] Address of the account whose asset is being frozen or thawed.",
-          "type": "string",
-          "x-algorand-format": "Address"
+          "type": "string"
         },
         "asset-id": {
           "description": "\\[faid\\] ID of the asset being frozen or thawed.",
@@ -1212,9 +1209,9 @@
     },
     "address": {
       "type": "string",
+      "x-algorand-format": "Address",
       "description": "Only include transactions with this address in one of the transaction fields.",
       "name": "address",
-      "x-algorand-format": "Address",
       "in": "query"
     },
     "address-role": {
@@ -1297,7 +1294,6 @@
       "type": "string",
       "description": "Specifies a prefix which must be contained in the note field.",
       "name": "note-prefix",
-      "format": "byte",
       "in": "query"
     },
     "round": {
@@ -1324,11 +1320,11 @@
       "name": "sig-type",
       "in": "query"
     },
-    "tx-id": {
+    "txid": {
       "type": "string",
       "x-go-name": "TxID",
       "description": "Lookup the specific transaction by ID.",
-      "name": "tx-id",
+      "name": "txid",
       "in": "query"
     },
     "tx-type": {
