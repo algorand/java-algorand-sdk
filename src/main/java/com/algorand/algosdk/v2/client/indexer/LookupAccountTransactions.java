@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.indexer;
 
 import java.util.Date;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -17,12 +18,12 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
  */
 public class LookupAccountTransactions extends Query {
 
-	private String accountId;
+	private Address accountId;
 
 	/**
 	 * @param accountId account string 
 	 */
-	public LookupAccountTransactions(Client client, String accountId) {
+	public LookupAccountTransactions(Client client, Address accountId) {
 		super(client, "get");
 		this.accountId = accountId;
 	}

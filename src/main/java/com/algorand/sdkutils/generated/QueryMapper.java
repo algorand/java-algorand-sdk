@@ -16,9 +16,9 @@ public class QueryMapper {
 		case "searchForAccounts":
 			return client.searchForAccounts();
 		case "lookupAccountByID":
-			return client.lookupAccountByID(args[0]);
+			return client.lookupAccountByID(new Address(args[0]));
 		case "lookupAccountTransactions":
-			return client.lookupAccountTransactions(args[0]);
+			return client.lookupAccountTransactions(new Address(args[0]));
 		case "searchForAssets":
 			return client.searchForAssets();
 		case "lookupAssetByID":

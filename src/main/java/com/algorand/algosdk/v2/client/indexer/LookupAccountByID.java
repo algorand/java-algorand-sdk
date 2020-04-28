@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
@@ -13,12 +14,12 @@ import com.algorand.algosdk.v2.client.model.AccountResponse;
  */
 public class LookupAccountByID extends Query {
 
-	private String accountId;
+	private Address accountId;
 
 	/**
 	 * @param accountId account string 
 	 */
-	public LookupAccountByID(Client client, String accountId) {
+	public LookupAccountByID(Client client, Address accountId) {
 		super(client, "get");
 		this.accountId = accountId;
 	}

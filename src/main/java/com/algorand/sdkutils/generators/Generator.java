@@ -203,7 +203,8 @@ public class Generator {
 		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
 		String type = typeNode.get("type").asText();
 		String format = getTypeFormat(typeNode);
-		if (propName.equals("address") && type.equals("string")) {
+		if ((propName.equals("address") || propName.contentEquals("accountId")) && 
+				type.equals("string")) {
 			format = "Address";
 		}
 		if (!format.isEmpty() ) {

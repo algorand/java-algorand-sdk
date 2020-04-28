@@ -114,7 +114,8 @@ public class QueryMapperGenerator extends Generator {
 														parameter.getValue().get("enum").elements();
 			String javaEnumName = Generator.getCamelCase(parameter.getKey(), true);
 			String format = Generator.getTypeFormat(parameter.getValue());
-			if (javaSetParamName.equals("address") && typeName.equals("string")) {
+			if ((javaSetParamName.equals("address") || javaSetParamName.equals("accountId")) && 
+					typeName.equals("string")) {
 				format = "Address";
 			}
 
