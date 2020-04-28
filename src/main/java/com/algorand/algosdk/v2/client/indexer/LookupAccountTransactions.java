@@ -129,16 +129,16 @@ public class LookupAccountTransactions extends Query {
 		return this;
 	}
 
-	/**
-	 * Lookup the specific transaction by ID. 
-	 */
-	public LookupAccountTransactions txId(String txId) {
-		addQuery("tx-id", String.valueOf(txId));
+	public LookupAccountTransactions txType(Enums.TxType txType) {
+		addQuery("tx-type", String.valueOf(txType));
 		return this;
 	}
 
-	public LookupAccountTransactions txType(Enums.TxType txType) {
-		addQuery("tx-type", String.valueOf(txType));
+	/**
+	 * Lookup the specific transaction by ID. 
+	 */
+	public LookupAccountTransactions txid(String txid) {
+		addQuery("txid", String.valueOf(txid));
 		return this;
 	}
 

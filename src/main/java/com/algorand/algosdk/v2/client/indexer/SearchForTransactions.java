@@ -150,16 +150,16 @@ public class SearchForTransactions extends Query {
 		return this;
 	}
 
-	/**
-	 * Lookup the specific transaction by ID. 
-	 */
-	public SearchForTransactions txId(String txId) {
-		addQuery("tx-id", String.valueOf(txId));
+	public SearchForTransactions txType(Enums.TxType txType) {
+		addQuery("tx-type", String.valueOf(txType));
 		return this;
 	}
 
-	public SearchForTransactions txType(Enums.TxType txType) {
-		addQuery("tx-type", String.valueOf(txType));
+	/**
+	 * Lookup the specific transaction by ID. 
+	 */
+	public SearchForTransactions txid(String txid) {
+		addQuery("txid", String.valueOf(txid));
 		return this;
 	}
 

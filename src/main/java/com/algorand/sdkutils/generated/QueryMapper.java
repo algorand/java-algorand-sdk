@@ -108,11 +108,11 @@ public class QueryMapper {
 			case "sig-type":
 				((LookupAccountTransactions)q).sigType(getSigType(value));
 				break;
-			case "tx-id":
-				((LookupAccountTransactions)q).txId(value);
-				break;
 			case "tx-type":
 				((LookupAccountTransactions)q).txType(getTxType(value));
+				break;
+			case "txid":
+				((LookupAccountTransactions)q).txid(value);
 				break;
 			}
 			break;
@@ -205,11 +205,11 @@ public class QueryMapper {
 			case "sig-type":
 				((LookupAssetTransactions)q).sigType(getSigType(value));
 				break;
-			case "tx-id":
-				((LookupAssetTransactions)q).txId(value);
-				break;
 			case "tx-type":
 				((LookupAssetTransactions)q).txType(getTxType(value));
+				break;
+			case "txid":
+				((LookupAssetTransactions)q).txid(value);
 				break;
 			}
 			break;
@@ -264,11 +264,11 @@ public class QueryMapper {
 			case "sig-type":
 				((SearchForTransactions)q).sigType(getSigType(value));
 				break;
-			case "tx-id":
-				((SearchForTransactions)q).txId(value);
-				break;
 			case "tx-type":
 				((SearchForTransactions)q).txType(getTxType(value));
+				break;
+			case "txid":
+				((SearchForTransactions)q).txid(value);
 				break;
 			}
 			break;

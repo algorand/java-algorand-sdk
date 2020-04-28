@@ -40,7 +40,6 @@
             "type": "string",
             "description": "An account public key",
             "name": "address",
-            "x-algorand-format": "Address",
             "in": "path",
             "required": true
           }
@@ -76,7 +75,6 @@
         {
           "type": "string",
           "name": "address",
-          "x-algorand-format": "Address",
           "in": "path",
           "required": true
         }
@@ -99,7 +97,6 @@
             "type": "string",
             "description": "An account public key",
             "name": "address",
-            "x-algorand-format": "Address",
             "in": "path",
             "required": true
           },
@@ -141,7 +138,6 @@
         {
           "type": "string",
           "name": "address",
-          "x-algorand-format": "Address",
           "in": "path",
           "required": true
         }
@@ -260,7 +256,6 @@
             "type": "string",
             "description": "The `account-id` to update, or `all` to update all accounts.",
             "name": "address",
-            "x-algorand-format": "Address",
             "in": "path",
             "required": true
           },
@@ -301,7 +296,6 @@
           "type": "string",
           "description": "Account address where keys will be registered.",
           "name": "address",
-          "x-algorand-format": "Address",
           "in": "path",
           "required": true
         }
@@ -619,8 +613,7 @@
       "properties": {
         "address": {
           "description": "the account public key",
-          "type": "string",
-          "x-algorand-format": "Address"
+          "type": "string"
         },
         "amount": {
           "description": "\\[algo\\] total number of MicroAlgos in the account",
@@ -710,7 +703,8 @@
         "vote-participation-key": {
           "description": "\\[vote\\] root participation public key (if any) currently registered for this round.",
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "x-algorand-format": "digest"
         }
       }
     },
@@ -915,7 +909,6 @@
       "type": "string",
       "description": "Only include transactions with this address in one of the transaction fields.",
       "name": "address",
-      "x-algorand-format": "Address",
       "in": "query"
     },
     "address-role": {
@@ -1014,7 +1007,6 @@
       "type": "string",
       "description": "Specifies a prefix which must be contained in the note field.",
       "name": "note-prefix",
-      "format": "byte",
       "in": "query"
     },
     "round": {
