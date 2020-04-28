@@ -667,7 +667,7 @@
           "description": "\\[onl\\] delegation status of the account's MicroAlgos\n* Offline - indicates that the associated account is delegated.\n*  Online  - indicates that the associated account used as part of the delegation pool.\n*   NotParticipating - indicates that the associated account is neither a delegator nor a delegate.",
           "type": "string"
         },
-        "type": {
+        "sig-type": {
           "description": "Indicates what type of signature is used by this account, must be one of:\n* sig\n* msig\n* lsig",
           "type": "string",
           "enum": [

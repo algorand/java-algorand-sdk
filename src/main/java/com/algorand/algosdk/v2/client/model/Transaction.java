@@ -167,15 +167,8 @@ public class Transaction extends PathResponse {
 	 *   (acfg) asset-config-transaction 
 	 *   (axfer) asset-transfer-transaction 
 	 *   (afrz) asset-freeze-transaction 
-	 */	@JsonProperty("type")
-	public Type type;
-	public enum Type {
-		@JsonProperty("pay") PAY,
-		@JsonProperty("keyreg") KEYREG,
-		@JsonProperty("acfg") ACFG,
-		@JsonProperty("axfer") AXFER,
-		@JsonProperty("afrz") AFRZ
-	}
+	 */	@JsonProperty("tx-type")
+	public Enums.TxType txType;
 
 	@Override
 	public boolean equals(Object o) {
@@ -208,7 +201,7 @@ public class Transaction extends PathResponse {
 		if (!Objects.deepEquals(this.sender, other.sender)) return false;
 		if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;
 		if (!Objects.deepEquals(this.signature, other.signature)) return false;
-		if (!Objects.deepEquals(this.type, other.type)) return false;
+		if (!Objects.deepEquals(this.txType, other.txType)) return false;
 
 		return true;
 	}

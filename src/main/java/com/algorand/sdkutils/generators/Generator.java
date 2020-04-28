@@ -159,6 +159,7 @@ public class Generator {
 		StringBuffer sb = new StringBuffer();
 		String enumClassName = getCamelCase(propName, true);
 		sb.append("\tpublic enum " + enumClassName + " {\n");
+		
 		Iterator<JsonNode> elmts = enumNode.elements();
 		while(elmts.hasNext()) {
 			String val = elmts.next().asText();
@@ -176,6 +177,7 @@ public class Generator {
 			}
 		}
 		sb.append("\t}\n");
+		enumClassName = "Enums." + enumClassName;
 		return new TypeDef(enumClassName, sb.toString(), "enum");
 	}
 	
@@ -192,6 +194,9 @@ public class Generator {
 		}
 
 		if (prop.get("enum") != null) {
+			if (!forModel) {
+				addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
+			}
 			return getEnum(prop, propName, forModel);
 		}
 		
@@ -304,20 +309,12 @@ public class Generator {
 		case "boolean":
 		case "java.math.BigInteger":
 		default: // List and Models with Json properties
-			String enumBody = null;
 			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
-			if (typeObj.isOfType("enum")) {
-				enumBody = typeObj.def;
-			}
 			buffer.append("\n\tpublic " + typeObj.typeName + " " + javaName);
 			if (typeObj.isOfType("list")) {
 				buffer.append(" = new Array" + typeObj.typeName + "()");
 			}
 			buffer.append(";\n");
-			if (enumBody != null) {
-				buffer.append(enumBody);
-			}
-
 		}
 		return buffer.toString();
 	}
@@ -571,12 +568,6 @@ public class Generator {
 				continue;
 			}
 
-			// handle enums
-			String enumBody = null;
-			if (propType.isOfType("enum")) {
-				enumBody = propType.def;
-			}
-
 			if (prop.getValue().get("description") != null) {
 				String desc = prop.getValue().get("description").asText();
 				desc = formatComment(desc, "\t", true);
@@ -587,9 +578,6 @@ public class Generator {
 			builders.append("\t\taddQuery(\"" + propCode + "\", "+ valueOfString +");\n");
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
-			if (enumBody != null) {
-				builders.append(enumBody);
-			}
 			builders.append("\n");
 
 			if (isRequired(prop.getValue())) {
@@ -729,6 +717,32 @@ public class Generator {
 		sb.append("\n}");
 		bw.append(getImports(imports));
 		bw.append(sb);
+		bw.close();
+	}
+	
+	public static void generateEnumClasses (JsonNode root, String rootPath, String pkg) throws IOException {
+
+		BufferedWriter bw = getFileWriter("Enums", rootPath);
+		bw.append("package " + pkg + ";\n\n");
+		bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
+		bw.append("public class Enums {\n\n");
+		JsonNode parameters = root.get("parameters");
+		Iterator<Entry<String, JsonNode>> classes = parameters.fields();
+		while (classes.hasNext()) {
+			Entry<String, JsonNode> cls = classes.next();
+			if (cls.getValue().get("enum") != null) {				
+				if (cls.getValue().get("description") != null) {
+					String comment = null;
+					comment = cls.getValue().get("description").asText();
+					bw.append(Generator.formatComment(comment, "", true));
+					bw.append("\n");
+				}
+				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);				
+				bw.append(enumType.def);
+				bw.append("\n");
+			}
+		}
+		bw.append("}\n");
 		bw.close();
 	}
 

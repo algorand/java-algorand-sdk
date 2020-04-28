@@ -8,6 +8,7 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.common.Settings;
+import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -32,14 +33,9 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Combine with the address parameter to define what type of address to search for. 
 	 */
-	public SearchForTransactions addressRole(AddressRole addressRole) {
+	public SearchForTransactions addressRole(Enums.AddressRole addressRole) {
 		addQuery("address-role", String.valueOf(addressRole));
 		return this;
-	}
-	public enum AddressRole {
-		SENDER,
-		RECEIVER,
-		FREEZETARGET
 	}
 
 	/**
@@ -149,14 +145,9 @@ public class SearchForTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public SearchForTransactions sigType(SigType sigType) {
+	public SearchForTransactions sigType(Enums.SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
-	}
-	public enum SigType {
-		SIG,
-		MSIG,
-		LSIG
 	}
 
 	/**
@@ -167,16 +158,9 @@ public class SearchForTransactions extends Query {
 		return this;
 	}
 
-	public SearchForTransactions txType(TxType txType) {
+	public SearchForTransactions txType(Enums.TxType txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
-	}
-	public enum TxType {
-		PAY,
-		KEYREG,
-		ACFG,
-		AXFER,
-		AFRZ
 	}
 
 	@Override

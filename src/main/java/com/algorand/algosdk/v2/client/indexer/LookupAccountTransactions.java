@@ -7,6 +7,7 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.common.Settings;
+import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
@@ -123,14 +124,9 @@ public class LookupAccountTransactions extends Query {
 	 *   msig - MultiSig 
 	 *   lsig - LogicSig 
 	 */
-	public LookupAccountTransactions sigType(SigType sigType) {
+	public LookupAccountTransactions sigType(Enums.SigType sigType) {
 		addQuery("sig-type", String.valueOf(sigType));
 		return this;
-	}
-	public enum SigType {
-		SIG,
-		MSIG,
-		LSIG
 	}
 
 	/**
@@ -141,16 +137,9 @@ public class LookupAccountTransactions extends Query {
 		return this;
 	}
 
-	public LookupAccountTransactions txType(TxType txType) {
+	public LookupAccountTransactions txType(Enums.TxType txType) {
 		addQuery("tx-type", String.valueOf(txType));
 		return this;
-	}
-	public enum TxType {
-		PAY,
-		KEYREG,
-		ACFG,
-		AXFER,
-		AFRZ
 	}
 
 	@Override

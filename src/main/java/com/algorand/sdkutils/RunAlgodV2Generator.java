@@ -28,7 +28,8 @@ public class RunAlgodV2Generator {
 		String pkg = "com.algorand.algosdk.v2.client.model";
 		System.out.println("Generating " + pkg + " to " + rootPath+"/v2/client/model");
 		Generator.generateAlgodIndexerObjects(root, rootPath+"/v2/client/model", pkg);
-
+		Generator.generateEnumClasses(root, rootPath+"/v2/client/model", pkg);
+		
 		// Generate classes from the return types which have more than one return element
 		// com.algorand.algosdk.v2.client.model		
 		System.out.println("Generating " + pkg + " to " + rootPath+"/v2/client/model");

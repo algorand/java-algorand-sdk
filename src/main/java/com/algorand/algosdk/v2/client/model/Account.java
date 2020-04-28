@@ -77,6 +77,14 @@ public class Account extends PathResponse {
 	public Long round;
 
 	/**
+	 * Indicates what type of signature is used by this account, must be one of: 
+	 *   sig 
+	 *   msig 
+	 *   lsig 
+	 */	@JsonProperty("sig-type")
+	public Enums.SigType sigType;
+
+	/**
 	 * (onl) delegation status of the account's MicroAlgos 
 	 *   Offline - indicates that the associated account is delegated. 
 	 *   Online - indicates that the associated account used as part of the delegation 
@@ -85,19 +93,6 @@ public class Account extends PathResponse {
 	 * delegator nor a delegate. 
 	 */	@JsonProperty("status")
 	public String status;
-
-	/**
-	 * Indicates what type of signature is used by this account, must be one of: 
-	 *   sig 
-	 *   msig 
-	 *   lsig 
-	 */	@JsonProperty("type")
-	public Type type;
-	public enum Type {
-		@JsonProperty("sig") SIG,
-		@JsonProperty("msig") MSIG,
-		@JsonProperty("lsig") LSIG
-	}
 
 	@Override
 	public boolean equals(Object o) {
@@ -116,8 +111,8 @@ public class Account extends PathResponse {
 		if (!Objects.deepEquals(this.rewardBase, other.rewardBase)) return false;
 		if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
 		if (!Objects.deepEquals(this.round, other.round)) return false;
+		if (!Objects.deepEquals(this.sigType, other.sigType)) return false;
 		if (!Objects.deepEquals(this.status, other.status)) return false;
-		if (!Objects.deepEquals(this.type, other.type)) return false;
 
 		return true;
 	}

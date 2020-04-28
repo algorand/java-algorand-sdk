@@ -4,6 +4,7 @@ import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 
 
@@ -32,13 +33,9 @@ public class PendingTransactionInformation extends Query {
 	/**
 	 * Configures whether the response object is JSON or MessagePack encoded. 
 	 */
-	public PendingTransactionInformation format(Format format) {
+	public PendingTransactionInformation format(Enums.Format format) {
 		addQuery("format", String.valueOf(format));
 		return this;
-	}
-	public enum Format {
-		JSON,
-		MSGPACK
 	}
 
 	@Override

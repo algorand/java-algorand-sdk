@@ -12,13 +12,14 @@ public class QueryMapperGenerator extends Generator {
 	public QueryMapperGenerator(JsonNode root) {
 		super(root);
 	}
-
+	
 	public void writeQueryMapper(String sdkutilsPath) throws IOException {
 		BufferedWriter bw = getFileWriter("QueryMapper", sdkutilsPath);
 		bw.append("package com.algorand.sdkutils.generated;\n" + 
 				"\n" + 
 				"import java.text.SimpleDateFormat;\n\n" +
-				"import java.text.ParseException;\n" + 
+				"import java.text.ParseException;\n" +
+				"import com.algorand.algosdk.v2.client.model.Enums;\n" + 
 				"import com.algorand.algosdk.v2.client.indexer.*;\n" + 
 				"import com.algorand.algosdk.crypto.Address;\n" +
 				"import com.algorand.algosdk.util.Encoder;\n" +
@@ -119,8 +120,7 @@ public class QueryMapperGenerator extends Generator {
 						break;
 					default:
 						if (enumVals != null) {
-							setValue.append("enum" + javaClassName + javaEnumName + "(value));\n");
-							enumMappers.append(getEnumMapper(javaClassName, javaEnumName, enumVals));
+							setValue.append("get" + javaEnumName + "(value));\n");
 						} else {
 							setValue.append("value);\n");
 						}						
@@ -146,6 +146,7 @@ public class QueryMapperGenerator extends Generator {
 				"		return null;\n" + 
 				"	}\n");
 		
+		generateEnumMapper(root, enumMappers);
 		bw.append(getClass);
 		bw.append(setValue);
 		bw.append(lookUp);
@@ -154,26 +155,29 @@ public class QueryMapperGenerator extends Generator {
 		bw.close();
 	}
 
-	private StringBuffer getEnumMapper(
-			String javaClassName, 
-			String javaEnumName, 
-			Iterator<JsonNode> enumVals) {
-		
-		StringBuffer sb = new StringBuffer();
-		sb.append("\tprivate static " + javaClassName + "." + javaEnumName + " ");
-		sb.append("enum" + javaClassName + javaEnumName + " (String value) { \n");
-		sb.append("\t\tvalue = Generator.getCamelCase(value, true).toUpperCase();\n");
-		sb.append("\t\tswitch(value) {\n");
-		while (enumVals.hasNext()) {
-			String enumV = Generator.getCamelCase(enumVals.next().asText(), true).toUpperCase();
-			sb.append("\t\tcase \"" + enumV + "\":\n");
-			sb.append("\t\t\treturn " + 
-					javaClassName + "." + javaEnumName + "." + enumV + ";\n"); 
+	private void generateEnumMapper (JsonNode root, StringBuffer enumMappers) throws IOException {
+
+		JsonNode parameters = root.get("parameters");
+		Iterator<Entry<String, JsonNode>> classes = parameters.fields();
+		while (classes.hasNext()) {
+			Entry<String, JsonNode> cls = classes.next();
+			if (cls.getValue().get("enum") != null) {
+				String enumName = Generator.getCamelCase(cls.getKey(), true);
+				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);
+				enumMappers.append("\tprivate static " + enumType.typeName + " get" + enumName + "(String val) {\n");
+				enumMappers.append("\t\tswitch(val.toUpperCase()) {\n");			
+				JsonNode enumNode = cls.getValue().get("enum");
+				Iterator<JsonNode> elmts = enumNode.elements();
+				while(elmts.hasNext()) {
+					String val = elmts.next().asText();
+					String javaEnum = getCamelCase(val, true).toUpperCase();
+					enumMappers.append("\t\tcase \"" + javaEnum + "\":\n");
+					enumMappers.append("\t\t\treturn " + enumType.typeName + "." + javaEnum + ";\n");
+				}
+				enumMappers.append("\t\tdefault:\n\t\t\tthrow new RuntimeException(\"Enum value not recognized: \" + val +\"!\");\n");
+				enumMappers.append("\t\t}\n\t}\n");
+			}
 		}
-		sb.append("\t\tdefault:\n");
-		sb.append("\t\t\tthrow new RuntimeException(\"Unknown enum value: \" + value);\n"); 
-		sb.append("\t\t}\n");
-		sb.append("\t}\n");
-		return sb;
 	}
+
 }
