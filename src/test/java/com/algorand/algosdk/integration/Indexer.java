@@ -64,7 +64,7 @@ public class Indexer {
 
     @When("I use {int} to lookup account {string} at round {long}")
     public void i_lookup_account_with(Integer indexer, String account, Long round) throws Exception {
-        LookupAccountByID query = indexerClients.get(indexer).lookupAccountByID(account);
+        LookupAccountByID query = indexerClients.get(indexer).lookupAccountByID(new Address(account));
         if (round != 0) {
             query.round(round);
         }
@@ -197,7 +197,7 @@ public class Indexer {
         assertThat(account.amountWithoutPendingRewards).isEqualTo(amountWithoutPendingRewards);
         assertThat(account.amount).isEqualTo(amount);
         assertThat(account.status).isEqualTo(status);
-        assertThat(account.type).isEqualTo(searchEnum(Account.Type.class, type));
+        assertThat(account.sigType).isEqualTo(searchEnum(Enums.SigType.class, type));
     }
 
     @Then("The first account is online and has {string}, {long}, {long}, {long}, {string}, {string}")
@@ -236,13 +236,13 @@ public class Indexer {
             query.notePrefix(Encoder.decodeFromBase64(notePrefix));
         }
         if (StringUtils.isNotEmpty(txType)) {
-            query.txType(searchEnum(SearchForTransactions.TxType.class, txType));
+            query.txType(searchEnum(Enums.TxType.class, txType));
         }
         if (StringUtils.isNotEmpty(sigType)) {
-            query.sigType(searchEnum(SearchForTransactions.SigType.class, sigType));
+            query.sigType(searchEnum(Enums.SigType.class, sigType));
         }
         if (StringUtils.isNotEmpty(txId)) {
-            query.txId(txId);
+            query.txid(txId);
         }
         if (round != 0) {
             query.round(round);
@@ -260,7 +260,7 @@ public class Indexer {
             query.beforeTime(Date.from(Instant.parse(beforeTime)));
         }
         if (StringUtils.isNotEmpty(afterTime)) {
-            query.beforeTime(Date.from(Instant.parse(beforeTime)));
+            query.afterTime(Date.from(Instant.parse(afterTime)));
         }
         if (currencyGT != 0) {
             query.currencyGreaterThan(currencyGT);
@@ -272,7 +272,7 @@ public class Indexer {
             query.address(new Address(address));
         }
         if (StringUtils.isNotEmpty(addressRole)) {
-            query.addressRole(SearchForTransactions.AddressRole.valueOf(addressRole.toUpperCase()));
+            query.addressRole(Enums.AddressRole.valueOf(addressRole.toUpperCase()));
         }
         if (StringUtils.isNotEmpty(excludeCloseTo)) {
             query.excludeCloseTo(Boolean.parseBoolean(excludeCloseTo));
@@ -303,7 +303,7 @@ public class Indexer {
         TransactionsResponse transactions = transactionsResponse.body();
 
         transactions.transactions.forEach(tx -> {
-            assertThat(tx.type).isEqualTo(Transaction.Type.valueOf(type.toUpperCase()));
+            assertThat(tx.txType).isEqualTo(Enums.TxType.valueOf(type.toUpperCase()));
         });
     }
 
@@ -387,7 +387,7 @@ public class Indexer {
         final BigInteger normalizedMax = (max.longValue() == 0) ? maxUnsignedLong : max;
 
         transactionsResponse.body().transactions.forEach(tx -> {
-            switch (tx.type) {
+            switch (tx.txType) {
                 case PAY:
                     assertThat(BigInteger.valueOf(tx.paymentTransaction.amount)).isBetween(min, normalizedMax);
                     break;
@@ -402,7 +402,7 @@ public class Indexer {
 
     @When("I use {int} to search for all {string} transactions")
     public void i_use_to_search_for_all_transactions(Integer indexer, String account) throws Exception {
-        LookupAccountTransactions query = indexerClients.get(indexer).lookupAccountTransactions(account);
+        LookupAccountTransactions query = indexerClients.get(indexer).lookupAccountTransactions(new Address(account));
         transactionsResponse = query.execute();
     }
 

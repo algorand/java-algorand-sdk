@@ -8,7 +8,6 @@ import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.common.Settings;
 import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
@@ -43,7 +42,7 @@ public class SearchForTransactions extends Query {
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
 	public SearchForTransactions afterTime(Date afterTime) {
-		addQuery("after-time", new java.text.SimpleDateFormat(Settings.DateFormat).format(afterTime));
+		addQuery("after-time", afterTime.toInstant().atZone(java.time.ZoneOffset.ofHours(0)).toString());
 		return this;
 	}
 
@@ -59,7 +58,7 @@ public class SearchForTransactions extends Query {
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
 	public SearchForTransactions beforeTime(Date beforeTime) {
-		addQuery("before-time", new java.text.SimpleDateFormat(Settings.DateFormat).format(beforeTime));
+		addQuery("before-time", beforeTime.toInstant().atZone(java.time.ZoneOffset.ofHours(0)).toString());
 		return this;
 	}
 
@@ -127,8 +126,8 @@ public class SearchForTransactions extends Query {
 	/**
 	 * Specifies a prefix which must be contained in the note field. 
 	 */
-	public SearchForTransactions notePrefix(String notePrefix) {
-		addQuery("note-prefix", String.valueOf(notePrefix));
+	public SearchForTransactions notePrefix(byte[] notePrefix) {
+		addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
 		return this;
 	}
 

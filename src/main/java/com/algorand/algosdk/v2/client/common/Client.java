@@ -64,14 +64,7 @@ public class Client {
 		this.port = port;
 		this.client = new OkHttpClient();
 	}
-	
-	public Client(String host, int port, String token) {
-		MediaType.parse("application/json; charset=utf-8");
-		this.host = host;
-		this.port = port;
-		this.client = new OkHttpClient();
-	}
-	
+
 	public Response executeCall(QueryData qData, String getOrPost) throws Exception {
 
 		HttpUrl httpUrl = getHttpUrl(qData, port, host);
@@ -218,7 +211,7 @@ public class Client {
 	 * Lookup account information. 
 	 * /accounts/{account-id} 
 	 */
-	public LookupAccountByID lookupAccountByID(String accountId) {
+	public LookupAccountByID lookupAccountByID(Address accountId) {
 		return new LookupAccountByID((Client) this, accountId);
 	}
 
@@ -226,7 +219,7 @@ public class Client {
 	 * Lookup account transactions. 
 	 * /accounts/{account-id}/transactions 
 	 */
-	public LookupAccountTransactions lookupAccountTransactions(String accountId) {
+	public LookupAccountTransactions lookupAccountTransactions(Address accountId) {
 		return new LookupAccountTransactions((Client) this, accountId);
 	}
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class QueryMapperGenerator extends Generator {
@@ -25,7 +26,8 @@ public class QueryMapperGenerator extends Generator {
 				"import java.text.SimpleDateFormat;\n" + 
 				"\n" + 
 				"import com.algorand.algosdk.crypto.Address;\n" + 
-				"import com.algorand.algosdk.v2.client.algod.*;\n" + 
+				"import com.algorand.algosdk.util.Encoder;\n" + 				
+				"import com.algorand.algosdk.v2.client.algod.*;\n" +
 				"import com.algorand.algosdk.v2.client.indexer.*;\n" + 
 				"import com.algorand.algosdk.v2.client.model.Enums;\n" + 
 				"import com.algorand.algosdk.v2.client.common.*;\n\n" + 
@@ -113,11 +115,8 @@ public class QueryMapperGenerator extends Generator {
 			Iterator<JsonNode> enumVals = parameter.getValue().get("enum") == null ? null : 
 														parameter.getValue().get("enum").elements();
 			String javaEnumName = Generator.getCamelCase(parameter.getKey(), true);
-			String format = Generator.getTypeFormat(parameter.getValue());
-			if ((javaSetParamName.equals("address") || javaSetParamName.equals("accountId")) && 
-					typeName.equals("string")) {
-				format = "Address";
-			}
+			String format = Generator.getTypeFormat(typeNode, javaSetParamName);
+
 
 			if (inPath(parameter.getValue())) {
 				if (argCounter > 0) {
@@ -160,7 +159,7 @@ public class QueryMapperGenerator extends Generator {
 					setValue.append("new Address(value));\n");
 					break;
 				case "byte":
-					setValue.append("value);\n");
+					setValue.append("Encoder.decodeFromBase64(value));\n");
 					break;
 				default:
 					if (enumVals != null) {

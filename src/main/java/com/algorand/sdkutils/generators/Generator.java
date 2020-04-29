@@ -14,6 +14,7 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -102,9 +103,7 @@ public class Generator {
 	}
 
 	static TypeDef getBase64Encoded(String propName, Map<String, Set<String>> imports, boolean forModel) {
-		if (forModel == true) {
-			addImport(imports, "com.algorand.algosdk.util.Encoder");
-		}
+		addImport(imports, "com.algorand.algosdk.util.Encoder");
 		String javaName = getCamelCase(propName, false);
 		StringBuffer sb = new StringBuffer();
 		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
@@ -117,7 +116,7 @@ public class Generator {
 				"	 }\n" + 
 				"	public byte[] "+ javaName +";\n");
 		// getterSetter typeName is only used in path. 
-		return new TypeDef("String", sb.toString(), "getterSetter");
+		return new TypeDef("byte[]", sb.toString(), "getterSetter");
 	}
 	
 	static TypeDef getBase64EncodedArray(String propName, Map<String, Set<String>> imports, boolean forModel) {
@@ -202,17 +201,12 @@ public class Generator {
 		
 		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
 		String type = typeNode.get("type").asText();
-		String format = getTypeFormat(typeNode);
-		if ((propName.equals("address") || propName.contentEquals("accountId")) && 
-				type.equals("string")) {
-			format = "Address";
-		}
+		String format = getTypeFormat(typeNode, propName);
 		if (!format.isEmpty() ) {
 			switch (format) {
 			case "uint64":
 				return new TypeDef("java.math.BigInteger");
 			case "RFC3339 String":
-				addImport(imports, "com.algorand.algosdk.v2.client.common.Settings");
 				addImport(imports, "java.util.Date");
 				return new TypeDef("Date");
 			case "Address":
@@ -221,6 +215,7 @@ public class Generator {
 				addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
 				return new TypeDef("SignedTransaction");
 			case "byte":
+			case "base64":
 				if (type.contentEquals("array")) {
 					return getBase64EncodedArray(propName, imports, forModel);
 				} else {
@@ -250,17 +245,27 @@ public class Generator {
 		}
 	}
 
-	public static String getTypeFormat(JsonNode typeNode) {
+	public static String getTypeFormat(JsonNode typeNode, String propName) {
 		String format = typeNode.get("x-algorand-format") != null ? typeNode.get("x-algorand-format").asText() : "";
+		String type = typeNode.get("type").asText();
 		format = typeNode.get("format") != null && format.isEmpty() ? typeNode.get("format").asText() : format;
 		format = typeNode.get("x-go-name") != null && format.isEmpty() ? typeNode.get("x-go-name").asText() : format;
+		if ((propName.equals("address") || propName.contentEquals("accountId")) && 
+				type.equals("string")) {
+			format = "Address";
+		}
+		if (format.equals("base64")) {
+			format = "byte";
+		}
 		return format;
 	}
 
 	static String getStringValueOfStatement(String propType, String propName) {
 		switch (propType) {
 		case "Date":
-			return "new java.text.SimpleDateFormat(Settings.DateFormat).format(" + propName + ")";
+			return propName + ".toInstant().atZone(java.time.ZoneOffset.ofHours(0)).toString()";
+		case "byte[]":
+			return "Encoder.encodeToBase64(" + propName + ")";
 		default:
 			return "String.valueOf("+propName+")";
 		}
