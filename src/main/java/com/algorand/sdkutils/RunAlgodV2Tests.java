@@ -28,7 +28,7 @@ public class RunAlgodV2Tests extends TestGenerator {
 		String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 		Client client = new Client(host, port, token);
 
-		File inFile = new File("./src/main/java/com/algorand/sdkutils/algodTests.csv");
+		File inFile = new File("./src/main/java/com/algorand/sdkutils/algodV2Tests.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));
 		boolean passed = testSamples(tg, br, client, false);
 		if (!passed) {
@@ -37,6 +37,6 @@ public class RunAlgodV2Tests extends TestGenerator {
 			System.out.println("[PASSED]");
 		}
 		br.close();
-		System.out.println("File tested: " + "./src/main/java/com/algorand/sdkutils/algodTests.csv");
+		System.out.println("File tested: " + "./src/main/java/com/algorand/sdkutils/algodV2Tests.csv");
 	}
 }

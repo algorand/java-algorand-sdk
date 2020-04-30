@@ -26,10 +26,10 @@ public class RunQueryMapperGenerator {
 		qmg.writeQueryMapper("src/main/java/com/algorand/sdkutils/generated/");
 		
 		TemplateGenerator tg = new TemplateGenerator(indexerRoot);
-		tg.writeTemplate("./src/main/java/com/algorand/sdkutils/template");
+		tg.writeTemplate("./src/main/java/com/algorand/sdkutils/indexerTemplate");
 		
 		tg = new TemplateGenerator(algodRoot);
-		tg.writeTemplate("./src/main/java/com/algorand/sdkutils/algodTemplate");
+		tg.writeTemplate("./src/main/java/com/algorand/sdkutils/algodV2Template");
 	}
 
 }

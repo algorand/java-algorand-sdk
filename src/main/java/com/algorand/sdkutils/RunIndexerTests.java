@@ -28,7 +28,7 @@ public class RunIndexerTests extends TestGenerator{
 		String host = "localhost";
 		Client client = new Client(host, port, null);
 
-		File inFile = new File("./src/main/java/com/algorand/sdkutils/test.csv");
+		File inFile = new File("./src/main/java/com/algorand/sdkutils/indexerTests.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));
 		boolean passed = testSamples(tg, br, client, false);
 		if (!passed) {
@@ -37,6 +37,6 @@ public class RunIndexerTests extends TestGenerator{
 			System.out.println("[PASSED]");
 		}
 		br.close();
-		System.out.println("File tested: " + "./src/main/java/com/algorand/sdkutils/test.csv");
+		System.out.println("File tested: " + "./src/main/java/com/algorand/sdkutils/indexerTests.csv");
 	}
 }

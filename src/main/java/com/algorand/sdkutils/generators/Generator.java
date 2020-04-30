@@ -219,6 +219,7 @@ public class Generator {
 				return getBase64Encoded(propName, null, forModel);
 			case "byte":
 			case "base64":
+			case "digest":
 				if (type.contentEquals("array")) {
 					return getBase64EncodedArray(propName, imports, forModel);
 				} else {
@@ -226,9 +227,6 @@ public class Generator {
 				}
 			case "AccountID":
 				break;
-			case "digest":
-				addImport(imports, "com.algorand.algosdk.crypto.Digest");
-				return new TypeDef("Digest");
 			}
 		}
 		switch (type) {

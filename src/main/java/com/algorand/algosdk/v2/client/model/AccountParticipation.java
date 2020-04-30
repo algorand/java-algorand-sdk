@@ -2,7 +2,7 @@ package com.algorand.algosdk.v2.client.model;
 
 import java.util.Objects;
 
-import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -14,8 +14,15 @@ public class AccountParticipation extends PathResponse {
 
 	/**
 	 * (sel) Selection public key (if any) currently registered for this round. 
-	 */	@JsonProperty("selection-participation-key")
-	public Digest selectionParticipationKey;
+	 */ @JsonProperty("selection-participation-key")
+	public void selectionParticipationKey(String base64Encoded) {
+		 this.selectionParticipationKey = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("selection-participation-key")
+	 public String selectionParticipationKey() {
+		 return Encoder.encodeToBase64(this.selectionParticipationKey);
+	 }
+	public byte[] selectionParticipationKey;
 
 	/**
 	 * (voteFst) First round for which this participation is valid. 
@@ -35,8 +42,15 @@ public class AccountParticipation extends PathResponse {
 	/**
 	 * (vote) root participation public key (if any) currently registered for this 
 	 * round. 
-	 */	@JsonProperty("vote-participation-key")
-	public Digest voteParticipationKey;
+	 */ @JsonProperty("vote-participation-key")
+	public void voteParticipationKey(String base64Encoded) {
+		 this.voteParticipationKey = Encoder.decodeFromBase64(base64Encoded);
+	 }
+	 @JsonProperty("vote-participation-key")
+	 public String voteParticipationKey() {
+		 return Encoder.encodeToBase64(this.voteParticipationKey);
+	 }
+	public byte[] voteParticipationKey;
 
 	@Override
 	public boolean equals(Object o) {

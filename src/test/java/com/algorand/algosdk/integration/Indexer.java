@@ -210,8 +210,8 @@ public class Indexer {
         assertThat(participation.voteKeyDilution).isEqualTo(keyDilution);
         assertThat(participation.voteFirstValid).isEqualTo(firstValid);
         assertThat(participation.voteLastValid).isEqualTo(lastValid);
-        assertThat(participation.voteParticipationKey.getBytes()).isEqualTo(Encoder.decodeFromBase64(voteKey));
-        assertThat(participation.selectionParticipationKey.getBytes()).isEqualTo(Encoder.decodeFromBase64(selectionKey));
+        assertThat(participation.voteParticipationKey).isEqualTo(Encoder.decodeFromBase64(voteKey));
+        assertThat(participation.selectionParticipationKey).isEqualTo(Encoder.decodeFromBase64(selectionKey));
     }
 
     @Then("I get the next page using {int} to search for an account with {long}, {long}, {long} and {long}")
