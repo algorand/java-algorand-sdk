@@ -45,7 +45,7 @@ public class Indexer {
 
     @Given("indexer client {int} at {string} port {int} with token {string}")
     public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
-        indexerClients.put(index, new Client(uri, port));
+        indexerClients.put(index, new Client(uri, port, ""));
     }
 
     @When("I use {int} to lookup block {long}")
