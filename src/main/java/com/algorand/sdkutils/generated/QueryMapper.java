@@ -382,52 +382,13 @@ public class QueryMapper {
 	}
 
 	public static String lookup(Query q, String className) throws Exception {
-		switch (className) {
-		case "searchForAccounts":
-			return ((SearchForAccounts)q).execute().body().toString();
-		case "lookupAccountByID":
-			return ((LookupAccountByID)q).execute().body().toString();
-		case "lookupAccountTransactions":
-			return ((LookupAccountTransactions)q).execute().body().toString();
-		case "searchForAssets":
-			return ((SearchForAssets)q).execute().body().toString();
-		case "lookupAssetByID":
-			return ((LookupAssetByID)q).execute().body().toString();
-		case "lookupAssetBalances":
-			return ((LookupAssetBalances)q).execute().body().toString();
-		case "lookupAssetTransactions":
-			return ((LookupAssetTransactions)q).execute().body().toString();
-		case "lookupBlock":
-			return ((LookupBlock)q).execute().body().toString();
-		case "searchForTransactions":
-			return ((SearchForTransactions)q).execute().body().toString();
-		case "AccountInformation":
-			return ((AccountInformation)q).execute().body().toString();
-		case "GetPendingTransactionsByAddress":
-			return ((GetPendingTransactionsByAddress)q).execute().body().toString();
-		case "GetBlock":
-			return ((GetBlock)q).execute().body().toString();
-		case "GetSupply":
-			return ((GetSupply)q).execute().body().toString();
-		case "RegisterParticipationKeys":
-			return ((RegisterParticipationKeys)q).execute().body().toString();
-		case "ShutdownNode":
-			return ((ShutdownNode)q).execute().body().toString();
-		case "GetStatus":
-			return ((GetStatus)q).execute().body().toString();
-		case "WaitForBlock":
-			return ((WaitForBlock)q).execute().body().toString();
-		case "RawTransaction":
-			return ((RawTransaction)q).execute().body().toString();
-		case "TransactionParams":
-			return ((TransactionParams)q).execute().body().toString();
-		case "GetPendingTransactions":
-			return ((GetPendingTransactions)q).execute().body().toString();
-		case "PendingTransactionInformation":
-			return ((PendingTransactionInformation)q).execute().body().toString();
+		Response<?> resp = q.execute();
+		if (resp.body() == null) {
+			throw new RuntimeException(resp.message());
 		}
-		return null;
+		return resp.body().toString();
 	}
+
 	private static Enums.AddressRole getAddressRole(String val) {
 		switch(val.toUpperCase()) {
 		case "SENDER":

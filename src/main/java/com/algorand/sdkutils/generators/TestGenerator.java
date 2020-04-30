@@ -69,6 +69,7 @@ public class TestGenerator extends Generator {
 			}
 			if (line.charAt(0) == '/') {
 				String pathString = getPathFromLine(line);
+				System.out.println("Test cases in:\t" + pathString);
 				pathNode = paths.get(pathString);
 				operationId = pathNode.findValue("operationId").asText();
 				caseCounter = 0;
@@ -127,8 +128,10 @@ public class TestGenerator extends Generator {
 					sdkResponse = QueryMapper.lookup(query, methodName);
 				} catch (Exception e) {
 					System.err.println(line);
-					System.err.println(
-							query.getRequestUrl(client.getPort(), client.getHost()));
+					try {
+						System.err.println(
+								query.getRequestUrl(client.getPort(), client.getHost()));
+					} catch (Exception ee) {}
 					throw e;
 				}
 

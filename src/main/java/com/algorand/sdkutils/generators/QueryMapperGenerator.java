@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class QueryMapperGenerator extends Generator {
@@ -44,20 +45,25 @@ public class QueryMapperGenerator extends Generator {
 		setValue.append("	public static void setValue(Query q, String className, String property, String value) throws ParseException, NoSuchAlgorithmException {\n" + 
 				"		switch (className) {\n");
 		lookUp.append("	public static String lookup(Query q, String className) throws Exception {\n" + 
-				"		switch (className) {\n");
+			"		Response<?> resp = q.execute();\n" + 
+			"		if (resp.body() == null) {\n" + 
+			"			throw new RuntimeException(resp.message());\n" + 
+			"		}\n" + 
+			"		return resp.body().toString();\n" + 
+			"	}\n\n");
 		
 		this.root = indexer;
 		JsonNode paths = this.root.get("paths");
 		Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
 		while (pathIter.hasNext()) {
-			getMappings(getClass, setValue, lookUp, pathIter);
+			getMappings(getClass, setValue, pathIter);
 		}
 
 		this.root = algod;
 		paths = this.root.get("paths");
 		pathIter = paths.fields();
 		while (pathIter.hasNext()) {
-			getMappings(getClass, setValue, lookUp, pathIter);
+			getMappings(getClass, setValue, pathIter);
 		}
 		
 		getClass.append("		}\n" + 
@@ -66,10 +72,7 @@ public class QueryMapperGenerator extends Generator {
 		setValue.append("\n" + 
 				"		}\n" + 
 				"	}\n\n");
-		lookUp.append("		}\n" + 
-				"		return null;\n" + 
-				"	}\n");
-		
+
 		generateEnumMapper(root, enumMappers);
 		bw.append(getClass);
 		bw.append(setValue);
@@ -79,7 +82,7 @@ public class QueryMapperGenerator extends Generator {
 		bw.close();
 	}
 
-	private void getMappings(StringBuffer getClass, StringBuffer setValue, StringBuffer lookUp,
+	private void getMappings(StringBuffer getClass, StringBuffer setValue,
 			Iterator<Entry<String, JsonNode>> pathIter) {
 		Entry<String, JsonNode> path = pathIter.next();
 		String className = path.getValue().findValue("operationId").asText();
@@ -93,11 +96,7 @@ public class QueryMapperGenerator extends Generator {
 		//setValue
 		setValue.append("		case \""+className+"\":\n" + 
 				"			switch (property) {\n");
-		
-		//lookUp
-		lookUp.append("		case \""+className+"\":\n" + 
-				"			return (("+javaClassName+")q).execute().body().toString();\n");
-		
+				
 		JsonNode paramNode = path.getValue().findValue("parameters");
 		Iterator<Entry<String, JsonNode>> properties = getSortedParameters(paramNode);
 		
