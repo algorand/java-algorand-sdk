@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
-import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.v2.client.common.Response;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class QueryMapperGenerator extends Generator {
