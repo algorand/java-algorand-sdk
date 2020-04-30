@@ -26,7 +26,7 @@ public class RunAlgodV2Tests extends TestGenerator {
 		int port = 60000;
 		String host = "localhost";
 		String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-		Client client = new Client(host, port);
+		Client client = new Client(host, port, token);
 
 		File inFile = new File("./src/main/java/com/algorand/sdkutils/algodTests.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));

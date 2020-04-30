@@ -40,5 +40,9 @@ public abstract class Query {
 		qd.addPathSegment(segment);
 	}
 	
+	protected void addToBody(byte[] content) {
+		qd.addToBody(content);
+	}
+	
 	public abstract Response<?> execute() throws Exception;
 }

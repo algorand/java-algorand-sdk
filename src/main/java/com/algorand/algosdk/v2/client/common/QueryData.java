@@ -7,10 +7,12 @@ public class QueryData {
 	
 	public HashMap<String, String> queries;
 	public ArrayList<String> pathSegments;
+	public ArrayList<byte[]> bodySegments;
 	
 	public QueryData () {
 		queries = new HashMap<String, String>();
 		pathSegments = new ArrayList<String>();
+		bodySegments = new ArrayList<byte[]>();
 	}
 	public void addPathSegment(String segment) {
 		pathSegments.add(segment);
@@ -19,4 +21,11 @@ public class QueryData {
 	public void addQuery(String key, String value) {
 		queries.put(key, value);
 	}
+	
+	public void addToBody(byte[] content) {
+		if (!bodySegments.isEmpty()) {
+			throw new RuntimeException("Only single body element content is supported.");
+		}
+		bodySegments.add(content);
+	}	
 }

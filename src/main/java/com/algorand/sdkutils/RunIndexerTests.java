@@ -26,7 +26,7 @@ public class RunIndexerTests extends TestGenerator{
 
 		int port = 8980;
 		String host = "localhost";
-		Client client = new Client(host, port);
+		Client client = new Client(host, port, null);
 
 		File inFile = new File("./src/main/java/com/algorand/sdkutils/test.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));

@@ -18,8 +18,8 @@ public class RawTransaction extends Query {
 	/**
 	 * The byte encoded signed transaction to broadcast to network 
 	 */
-	public RawTransaction rawtxn(String rawtxn) {
-		addQuery("rawtxn", String.valueOf(rawtxn));
+	public RawTransaction rawtxn(byte[] rawtxn) {
+		addToBody(rawtxn);
 		return this;
 	}
 

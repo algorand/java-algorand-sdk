@@ -19,7 +19,9 @@ public class TestGenerator extends Generator {
 	static String callExternalCurl(String request) {
 		StringBuffer bw = new StringBuffer();
 		ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command("curl", "-s", request);
+        processBuilder.command("curl", 
+        		"-H", "X-Algo-API-Token: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 
+        		"-s", request);
         try {
             Process process = processBuilder.start();
             BufferedReader reader =

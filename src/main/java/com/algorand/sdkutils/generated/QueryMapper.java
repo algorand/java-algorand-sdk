@@ -352,7 +352,7 @@ public class QueryMapper {
 		case "RawTransaction":
 			switch (property) {
 			case "rawtxn":
-				((RawTransaction)q).rawtxn(value);
+				((RawTransaction)q).rawtxn(Encoder.decodeFromBase64(value));
 				break;
 			}
 			break;

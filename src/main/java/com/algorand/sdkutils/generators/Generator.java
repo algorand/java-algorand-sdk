@@ -14,7 +14,6 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
@@ -103,7 +102,9 @@ public class Generator {
 	}
 
 	static TypeDef getBase64Encoded(String propName, Map<String, Set<String>> imports, boolean forModel) {
-		addImport(imports, "com.algorand.algosdk.util.Encoder");
+		if (imports != null) {
+			addImport(imports, "com.algorand.algosdk.util.Encoder");
+		}
 		String javaName = getCamelCase(propName, false);
 		StringBuffer sb = new StringBuffer();
 		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
@@ -214,6 +215,8 @@ public class Generator {
 			case "SignedTransaction":
 				addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
 				return new TypeDef("SignedTransaction");
+			case "binary":
+				return getBase64Encoded(propName, null, forModel);
 			case "byte":
 			case "base64":
 				if (type.contentEquals("array")) {
@@ -521,10 +524,15 @@ public class Generator {
 		}
 		return false;
 	}
-
 	static boolean inPath(JsonNode prop) {
 		if (prop.get("in") != null) {
 			return prop.get("in").asText().compareTo("path") == 0;
+		}
+		return false;
+	}
+	static boolean inBody(JsonNode prop) {
+		if (prop.get("in") != null) {
+			return prop.get("in").asText().compareTo("body") == 0;
 		}
 		return false;
 	}
@@ -588,7 +596,12 @@ public class Generator {
 			}
 			builders.append("\tpublic " + className + " " + setterName + "(" + propType.typeName + " " + propName + ") {\n");
 			String valueOfString = getStringValueOfStatement(propType.typeName, propName);
-			builders.append("\t\taddQuery(\"" + propCode + "\", "+ valueOfString +");\n");
+			
+			if (inBody(prop.getValue())) {
+				builders.append("\t\taddToBody("+ propName +");\n");
+			} else {
+				builders.append("\t\taddQuery(\"" + propCode + "\", "+ valueOfString +");\n");
+			}
 			builders.append("\t\treturn this;\n");
 			builders.append("\t}\n");
 			builders.append("\n");

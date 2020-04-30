@@ -6,16 +6,18 @@ import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Request.Builder;
+import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
 import com.algorand.algosdk.crypto.Address;
 
 IMPORTSGOHERE
-
 public class Client {
 
 	private OkHttpClient client;
 	private String host;
 	private int port;
+	private String token;
 
 	public int getPort() {
 		return port;
@@ -37,25 +39,32 @@ public class Client {
 		return httpUrl;
 	}
 
-	public Client(String host, int port) {
+	public Client(String host, int port, String token) {
 		MediaType.parse("application/json; charset=utf-8");
 		this.host = host;
 		this.port = port;
+		this.token = token;
 		this.client = new OkHttpClient();
 	}
 
 	public Response executeCall(QueryData qData, String getOrPost) throws Exception {
 
 		HttpUrl httpUrl = getHttpUrl(qData, port, host);
-		Request request = new Request.Builder()
-				.url(httpUrl)
-				.get()
-				.build();
-/*		RequestBody body = RequestBody.create(mediaType, requestString);
-		Request request = new Request.Builder()
-				.url(httpUrl)
-				.post(body)
-				.build();*/
+		Builder reqBuilder = new Request.Builder().url(httpUrl);
+		if (token != null) {
+			reqBuilder.addHeader("X-Algo-API-Token", token);
+		}
+		RequestBody rb = RequestBody.create(
+				MediaType.parse("Binary data"),
+				qData.bodySegments.isEmpty() ? new byte[0] : qData.bodySegments.get(0));
+
+		if (getOrPost.equals("get")) {
+			reqBuilder.get();
+		} else {
+			reqBuilder.post(rb);
+		}
+
+		Request request = reqBuilder.build();
 		Response response = null;
 		try {
 			response = client.newCall(request).execute();
@@ -63,14 +72,6 @@ public class Client {
 			throw e;
 		}
 		return response;
-		/*
-		String responseString = response.body().string();
-		if (response.code() != 200) {
-			throw new RuntimeException(responseString);
-		}
-		return responseString;
-        // String contentType = response.headers().get("Content-Type");
-*/
 	}
-
-	METHODSGOHERE}
+	
+METHODSGOHERE}
