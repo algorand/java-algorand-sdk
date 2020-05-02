@@ -4,6 +4,7 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.model.*;
 import io.cucumber.java.en.And;
@@ -12,6 +13,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -257,10 +260,10 @@ public class Indexer {
             query.assetId(assetId);
         }
         if (StringUtils.isNotEmpty(beforeTime)) {
-            query.beforeTime(Date.from(Instant.parse(beforeTime)));
+            query.beforeTime(Utils.parseDate(beforeTime));
         }
         if (StringUtils.isNotEmpty(afterTime)) {
-            query.afterTime(Date.from(Instant.parse(afterTime)));
+            query.beforeTime(Utils.parseDate(afterTime));
         }
         if (currencyGT != 0) {
             query.currencyGreaterThan(currencyGT);

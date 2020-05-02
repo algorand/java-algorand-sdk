@@ -1,7 +1,7 @@
 package com.algorand.sdkutils.generated;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import com.algorand.algosdk.v2.client.common.Utils;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
@@ -94,13 +94,13 @@ public class QueryMapper {
 		case "lookupAccountTransactions":
 			switch (property) {
 			case "after-time":
-				((LookupAccountTransactions)q).afterTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
+				((LookupAccountTransactions)q).afterTime(Utils.parseDate(value));
 				break;
 			case "asset-id":
 				((LookupAccountTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((LookupAccountTransactions)q).beforeTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
+				((LookupAccountTransactions)q).beforeTime(Utils.parseDate(value));
 				break;
 			case "currency-greater-than":
 				((LookupAccountTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -191,10 +191,10 @@ public class QueryMapper {
 				((LookupAssetTransactions)q).addressRole(getAddressRole(value));
 				break;
 			case "after-time":
-				((LookupAssetTransactions)q).afterTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
+				((LookupAssetTransactions)q).afterTime(Utils.parseDate(value));
 				break;
 			case "before-time":
-				((LookupAssetTransactions)q).beforeTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
+				((LookupAssetTransactions)q).beforeTime(Utils.parseDate(value));
 				break;
 			case "currency-greater-than":
 				((LookupAssetTransactions)q).currencyGreaterThan(Long.valueOf(value));
@@ -247,13 +247,13 @@ public class QueryMapper {
 				((SearchForTransactions)q).addressRole(getAddressRole(value));
 				break;
 			case "after-time":
-				((SearchForTransactions)q).afterTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
+				((SearchForTransactions)q).afterTime(Utils.parseDate(value));
 				break;
 			case "asset-id":
 				((SearchForTransactions)q).assetId(Long.valueOf(value));
 				break;
 			case "before-time":
-				((SearchForTransactions)q).beforeTime(new SimpleDateFormat(Settings.DateFormat).parse(value));
+				((SearchForTransactions)q).beforeTime(Utils.parseDate(value));
 				break;
 			case "currency-greater-than":
 				((SearchForTransactions)q).currencyGreaterThan(Long.valueOf(value));

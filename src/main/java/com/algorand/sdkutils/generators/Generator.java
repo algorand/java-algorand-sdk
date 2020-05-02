@@ -209,6 +209,7 @@ public class Generator {
 				return new TypeDef("java.math.BigInteger");
 			case "RFC3339 String":
 				addImport(imports, "java.util.Date");
+				addImport(imports, "com.algorand.algosdk.v2.client.common.Utils");
 				return new TypeDef("Date");
 			case "Address":
 				return getAddress(propName, imports, forModel);
@@ -264,7 +265,7 @@ public class Generator {
 	static String getStringValueOfStatement(String propType, String propName) {
 		switch (propType) {
 		case "Date":
-			return propName + ".toInstant().atZone(java.time.ZoneOffset.ofHours(0)).toString()";
+			return "Utils.getDateString(" + propName + ")";
 		case "byte[]":
 			return "Encoder.encodeToBase64(" + propName + ")";
 		default:

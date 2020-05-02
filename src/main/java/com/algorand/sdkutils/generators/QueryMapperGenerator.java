@@ -22,7 +22,7 @@ public class QueryMapperGenerator extends Generator {
 		bw.append("package com.algorand.sdkutils.generated;\n" + 
 				"import java.security.NoSuchAlgorithmException;\n" + 
 				"import java.text.ParseException;\n" + 
-				"import java.text.SimpleDateFormat;\n" + 
+				"import com.algorand.algosdk.v2.client.common.Utils;\n" + 
 				"\n" + 
 				"import com.algorand.algosdk.crypto.Address;\n" + 
 				"import com.algorand.algosdk.util.Encoder;\n" + 				
@@ -150,7 +150,7 @@ public class QueryMapperGenerator extends Generator {
 			case "string":
 				switch (format) {
 				case "RFC3339 String":
-					setValue.append("new SimpleDateFormat(Settings.DateFormat).parse(value));\n");
+					setValue.append("Utils.parseDate(value));\n");
 					break;
 				case "Address":
 					setValue.append("new Address(value));\n");

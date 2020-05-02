@@ -8,6 +8,7 @@ import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
@@ -32,7 +33,7 @@ public class LookupAccountTransactions extends Query {
 	 * Include results after the given time. Must be an RFC 3339 formatted string. 
 	 */
 	public LookupAccountTransactions afterTime(Date afterTime) {
-		addQuery("after-time", afterTime.toInstant().atZone(java.time.ZoneOffset.ofHours(0)).toString());
+		addQuery("after-time", Utils.getDateString(afterTime));
 		return this;
 	}
 
@@ -48,7 +49,7 @@ public class LookupAccountTransactions extends Query {
 	 * Include results before the given time. Must be an RFC 3339 formatted string. 
 	 */
 	public LookupAccountTransactions beforeTime(Date beforeTime) {
-		addQuery("before-time", beforeTime.toInstant().atZone(java.time.ZoneOffset.ofHours(0)).toString());
+		addQuery("before-time", Utils.getDateString(beforeTime));
 		return this;
 	}
 
