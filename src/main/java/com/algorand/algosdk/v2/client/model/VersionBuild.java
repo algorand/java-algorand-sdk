@@ -20,14 +20,14 @@ public class VersionBuild extends PathResponse {
 	@JsonProperty("channel")
 	public String channel;
 
- @JsonProperty("commit-hash")
+	@JsonProperty("commit-hash")
 	public void commitHash(String base64Encoded) {
-		 this.commitHash = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("commit-hash")
-	 public String commitHash() {
-		 return Encoder.encodeToBase64(this.commitHash);
-	 }
+		this.commitHash = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("commit-hash")
+	public String commitHash() {
+		return Encoder.encodeToBase64(this.commitHash);
+	}
 	public byte[] commitHash;
 
 	@JsonProperty("major")

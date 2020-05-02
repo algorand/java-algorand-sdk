@@ -20,14 +20,15 @@ public class TransactionSignature extends PathResponse {
 
 	/**
 	 * (sig) Standard ed25519 signature. 
-	 */ @JsonProperty("sig")
+	 */
+	@JsonProperty("sig")
 	public void sig(String base64Encoded) {
-		 this.sig = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("sig")
-	 public String sig() {
-		 return Encoder.encodeToBase64(this.sig);
-	 }
+		this.sig = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("sig")
+	public String sig() {
+		return Encoder.encodeToBase64(this.sig);
+	}
 	public byte[] sig;
 
 	@Override

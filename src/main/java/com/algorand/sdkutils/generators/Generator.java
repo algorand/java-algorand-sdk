@@ -89,14 +89,14 @@ public class Generator {
 		}
 		
 		StringBuffer sb = new StringBuffer();
-		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
+		sb.append("\t@JsonProperty(\"" + propName + "\")\n" + 
 				"	public void " + propName + "(String "+ propName +") throws NoSuchAlgorithmException {\n" + 
 				"		 this."+ propName +" = new Address("+ propName +");\n" + 
 				"	 }\n" + 
-				"	 @JsonProperty(\""+ propName +"\")\n" + 
-				"	 public String "+ propName +"() throws NoSuchAlgorithmException {\n" + 
-				"		 return this."+ propName +".encodeAsString();\n" + 
-				"	 }\n" + 
+				"	@JsonProperty(\""+ propName +"\")\n" + 
+				"	public String "+ propName +"() throws NoSuchAlgorithmException {\n" + 
+				"		return this."+ propName +".encodeAsString();\n" + 
+				"	}\n" + 
 				"	public Address " + propName + ";\n");
 		return new TypeDef("Address", sb.toString(), "getterSetter");
 	}
@@ -107,14 +107,14 @@ public class Generator {
 		}
 		String javaName = getCamelCase(propName, false);
 		StringBuffer sb = new StringBuffer();
-		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
+		sb.append("	@JsonProperty(\"" + propName + "\")\n" + 
 				"	public void " + javaName + "(String base64Encoded) {\n" + 
-				"		 this."+ javaName +" = Encoder.decodeFromBase64(base64Encoded);\n" + 
-				"	 }\n" + 
-				"	 @JsonProperty(\""+ propName +"\")\n" + 
-				"	 public String "+ javaName +"() {\n" + 
-				"		 return Encoder.encodeToBase64(this."+ javaName +");\n" + 
-				"	 }\n" + 
+				"		this."+ javaName +" = Encoder.decodeFromBase64(base64Encoded);\n" + 
+				"	}\n" + 
+				"	@JsonProperty(\""+ propName +"\")\n" + 
+				"	public String "+ javaName +"() {\n" + 
+				"		return Encoder.encodeToBase64(this."+ javaName +");\n" + 
+				"	}\n" + 
 				"	public byte[] "+ javaName +";\n");
 		// getterSetter typeName is only used in path. 
 		return new TypeDef("byte[]", sb.toString(), "getterSetter");
@@ -131,7 +131,7 @@ public class Generator {
 		String javaName = getCamelCase(propName, false);
 		StringBuffer sb = new StringBuffer();
 		
-		sb.append(" @JsonProperty(\"" + propName + "\")\n" + 
+		sb.append("	@JsonProperty(\"" + propName + "\")\n" + 
 				"	public void " + javaName + "(List<String> base64Encoded) {\n" + 
 				"		 this." + javaName + " = new ArrayList<byte[]>();\n" + 
 				"		 for (String val : base64Encoded) {\n" + 
@@ -320,8 +320,8 @@ public class Generator {
 		case "boolean":
 		case "java.math.BigInteger":
 		default: // List and Models with Json properties
-			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")");
-			buffer.append("\n\tpublic " + typeObj.typeName + " " + javaName);
+			buffer.append("\t" + "@JsonProperty(\"" + jprop + "\")\n");
+			buffer.append("\tpublic " + typeObj.typeName + " " + javaName);
 			if (typeObj.isOfType("list")) {
 				buffer.append(" = new Array" + typeObj.typeName + "()");
 			}
@@ -377,7 +377,7 @@ public class Generator {
 			line += token.length() + 1;
 		}
 		if (full) {
-			sb.append("\n"+tab+" */");
+			sb.append("\n"+tab+" */\n");
 		}
 		return sb.toString();
 	}
@@ -483,7 +483,6 @@ public class Generator {
 		bw.append(getImports(imports));
 		if (desc != null) {
 			bw.append(desc);
-			bw.append("\n");
 		}
 		bw.append("public class " + className + " extends PathResponse {\n\n");
 		bw.append(body);
@@ -591,7 +590,7 @@ public class Generator {
 			if (prop.getValue().get("description") != null) {
 				String desc = prop.getValue().get("description").asText();
 				desc = formatComment(desc, "\t", true);
-				builders.append(desc + "\n");
+				builders.append(desc);
 			}
 			builders.append("\tpublic " + className + " " + setterName + "(" + propType.typeName + " " + propName + ") {\n");
 			String valueOfString = getStringValueOfStatement(propType.typeName, propName);
@@ -728,8 +727,8 @@ public class Generator {
 		sb.append("\n");
 		sb.append(Generator.formatComment(desc, "", true));
 		generatedPathsEntry.append(Generator.formatComment(desc, "\t", true));
-		generatedPathsEntry.append("\n	public " + className + " " + methodName + "(");
-		sb.append("\npublic class " + className + " extends Query {\n\n");
+		generatedPathsEntry.append("	public " + className + " " + methodName + "(");
+		sb.append("public class " + className + " extends Query {\n\n");
 		sb.append(
 				processQueryParams(
 						generatedPathsEntry,
@@ -760,7 +759,6 @@ public class Generator {
 					String comment = null;
 					comment = cls.getValue().get("description").asText();
 					bw.append(Generator.formatComment(comment, "", true));
-					bw.append("\n");
 				}
 				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);				
 				bw.append(enumType.def);

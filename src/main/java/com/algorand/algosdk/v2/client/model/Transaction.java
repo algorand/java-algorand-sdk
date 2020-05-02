@@ -27,73 +27,84 @@ public class Transaction extends PathResponse {
 
 	/**
 	 * (rc) rewards applied to close-remainder-to account. 
-	 */	@JsonProperty("close-rewards")
+	 */
+	@JsonProperty("close-rewards")
 	public Long closeRewards;
 
 	/**
 	 * (ca) closing amount for transaction. 
-	 */	@JsonProperty("closing-amount")
+	 */
+	@JsonProperty("closing-amount")
 	public Long closingAmount;
 
 	/**
 	 * Round when the transaction was confirmed. 
-	 */	@JsonProperty("confirmed-round")
+	 */
+	@JsonProperty("confirmed-round")
 	public Long confirmedRound;
 
 	/**
 	 * Specifies an asset index (ID) if an asset was created with this transaction. 
-	 */	@JsonProperty("created-asset-index")
+	 */
+	@JsonProperty("created-asset-index")
 	public Long createdAssetIndex;
 
 	/**
 	 * (fee) Transaction fee. 
-	 */	@JsonProperty("fee")
+	 */
+	@JsonProperty("fee")
 	public Long fee;
 
 	/**
 	 * (fv) First valid round for this transaction. 
-	 */	@JsonProperty("first-valid")
+	 */
+	@JsonProperty("first-valid")
 	public Long firstValid;
 
 	/**
 	 * (gh) Hash of genesis block. 
-	 */ @JsonProperty("genesis-hash")
+	 */
+	@JsonProperty("genesis-hash")
 	public void genesisHash(String base64Encoded) {
-		 this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("genesis-hash")
-	 public String genesisHash() {
-		 return Encoder.encodeToBase64(this.genesisHash);
-	 }
+		this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("genesis-hash")
+	public String genesisHash() {
+		return Encoder.encodeToBase64(this.genesisHash);
+	}
 	public byte[] genesisHash;
 
 	/**
 	 * (gen) genesis block ID. 
-	 */	@JsonProperty("genesis-id")
+	 */
+	@JsonProperty("genesis-id")
 	public String genesisId;
 
 	/**
 	 * (grp) Base64 encoded byte array of a sha512/256 digest. When present indicates 
 	 * that this transaction is part of a transaction group and the value is the 
 	 * sha512/256 hash of the transactions in that group. 
-	 */ @JsonProperty("group")
+	 */
+	@JsonProperty("group")
 	public void group(String base64Encoded) {
-		 this.group = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("group")
-	 public String group() {
-		 return Encoder.encodeToBase64(this.group);
-	 }
+		this.group = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("group")
+	public String group() {
+		return Encoder.encodeToBase64(this.group);
+	}
 	public byte[] group;
 
 	/**
 	 * Transaction ID 
-	 */	@JsonProperty("id")
+	 */
+	@JsonProperty("id")
 	public String id;
 
 	/**
 	 * Offset into the round where this transaction was confirmed. 
-	 */	@JsonProperty("intra-round-offset")
+	 */
+	@JsonProperty("intra-round-offset")
 	public Long intraRoundOffset;
 
 	@JsonProperty("keyreg-transaction")
@@ -101,7 +112,8 @@ public class Transaction extends PathResponse {
 
 	/**
 	 * (lv) Last valid round for this transaction. 
-	 */	@JsonProperty("last-valid")
+	 */
+	@JsonProperty("last-valid")
 	public Long lastValid;
 
 	/**
@@ -110,26 +122,28 @@ public class Transaction extends PathResponse {
 	 * it acquires the lease identified by the (Sender, Lease) pair of the transaction 
 	 * until the LastValid round passes. While this transaction possesses the lease, no 
 	 * other transaction specifying this lease can be confirmed. 
-	 */ @JsonProperty("lease")
+	 */
+	@JsonProperty("lease")
 	public void lease(String base64Encoded) {
-		 this.lease = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("lease")
-	 public String lease() {
-		 return Encoder.encodeToBase64(this.lease);
-	 }
+		this.lease = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("lease")
+	public String lease() {
+		return Encoder.encodeToBase64(this.lease);
+	}
 	public byte[] lease;
 
 	/**
 	 * (note) Free form data. 
-	 */ @JsonProperty("note")
+	 */
+	@JsonProperty("note")
 	public void note(String base64Encoded) {
-		 this.note = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("note")
-	 public String note() {
-		 return Encoder.encodeToBase64(this.note);
-	 }
+		this.note = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("note")
+	public String note() {
+		return Encoder.encodeToBase64(this.note);
+	}
 	public byte[] note;
 
 	@JsonProperty("payment-transaction")
@@ -137,22 +151,26 @@ public class Transaction extends PathResponse {
 
 	/**
 	 * (rr) rewards applied to receiver account. 
-	 */	@JsonProperty("receiver-rewards")
+	 */
+	@JsonProperty("receiver-rewards")
 	public Long receiverRewards;
 
 	/**
 	 * Time when the block this transaction is in was confirmed. 
-	 */	@JsonProperty("round-time")
+	 */
+	@JsonProperty("round-time")
 	public Long roundTime;
 
 	/**
 	 * (snd) Sender's address. 
-	 */	@JsonProperty("sender")
+	 */
+	@JsonProperty("sender")
 	public String sender;
 
 	/**
 	 * (rs) rewards applied to sender account. 
-	 */	@JsonProperty("sender-rewards")
+	 */
+	@JsonProperty("sender-rewards")
 	public Long senderRewards;
 
 	@JsonProperty("signature")
@@ -167,7 +185,8 @@ public class Transaction extends PathResponse {
 	 *   (acfg) asset-config-transaction 
 	 *   (axfer) asset-transfer-transaction 
 	 *   (afrz) asset-freeze-transaction 
-	 */	@JsonProperty("tx-type")
+	 */
+	@JsonProperty("tx-type")
 	public Enums.TxType txType;
 
 	@Override

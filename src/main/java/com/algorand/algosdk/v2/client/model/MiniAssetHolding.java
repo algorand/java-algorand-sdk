@@ -12,14 +12,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class MiniAssetHolding extends PathResponse {
 
- @JsonProperty("address")
+	@JsonProperty("address")
 	public void address(String address) throws NoSuchAlgorithmException {
 		 this.address = new Address(address);
 	 }
-	 @JsonProperty("address")
-	 public String address() throws NoSuchAlgorithmException {
-		 return this.address.encodeAsString();
-	 }
+	@JsonProperty("address")
+	public String address() throws NoSuchAlgorithmException {
+		return this.address.encodeAsString();
+	}
 	public Address address;
 
 	@JsonProperty("amount")

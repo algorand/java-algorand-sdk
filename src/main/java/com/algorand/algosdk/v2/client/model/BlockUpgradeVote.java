@@ -12,17 +12,20 @@ public class BlockUpgradeVote extends PathResponse {
 
 	/**
 	 * (upgradeyes) Indicates a yes vote for the current proposal. 
-	 */	@JsonProperty("upgrade-approve")
+	 */
+	@JsonProperty("upgrade-approve")
 	public Boolean upgradeApprove;
 
 	/**
 	 * (upgradedelay) Indicates the time between acceptance and execution. 
-	 */	@JsonProperty("upgrade-delay")
+	 */
+	@JsonProperty("upgrade-delay")
 	public Long upgradeDelay;
 
 	/**
 	 * (upgradeprop) Indicates a proposed upgrade. 
-	 */	@JsonProperty("upgrade-propose")
+	 */
+	@JsonProperty("upgrade-propose")
 	public String upgradePropose;
 
 	@Override

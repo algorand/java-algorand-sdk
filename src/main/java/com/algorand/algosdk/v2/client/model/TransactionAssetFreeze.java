@@ -16,24 +16,27 @@ public class TransactionAssetFreeze extends PathResponse {
 
 	/**
 	 * (fadd) Address of the account whose asset is being frozen or thawed. 
-	 */ @JsonProperty("address")
+	 */
+	@JsonProperty("address")
 	public void address(String address) throws NoSuchAlgorithmException {
 		 this.address = new Address(address);
 	 }
-	 @JsonProperty("address")
-	 public String address() throws NoSuchAlgorithmException {
-		 return this.address.encodeAsString();
-	 }
+	@JsonProperty("address")
+	public String address() throws NoSuchAlgorithmException {
+		return this.address.encodeAsString();
+	}
 	public Address address;
 
 	/**
 	 * (faid) ID of the asset being frozen or thawed. 
-	 */	@JsonProperty("asset-id")
+	 */
+	@JsonProperty("asset-id")
 	public Long assetId;
 
 	/**
 	 * (afrz) The new freeze status. 
-	 */	@JsonProperty("new-freeze-status")
+	 */
+	@JsonProperty("new-freeze-status")
 	public Boolean newFreezeStatus;
 
 	@Override

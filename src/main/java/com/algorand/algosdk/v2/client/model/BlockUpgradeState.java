@@ -12,28 +12,33 @@ public class BlockUpgradeState extends PathResponse {
 
 	/**
 	 * (proto) The current protocol version. 
-	 */	@JsonProperty("current-protocol")
+	 */
+	@JsonProperty("current-protocol")
 	public String currentProtocol;
 
 	/**
 	 * (nextproto) The next proposed protocol version. 
-	 */	@JsonProperty("next-protocol")
+	 */
+	@JsonProperty("next-protocol")
 	public String nextProtocol;
 
 	/**
 	 * (nextyes) Number of blocks which approved the protocol upgrade. 
-	 */	@JsonProperty("next-protocol-approvals")
+	 */
+	@JsonProperty("next-protocol-approvals")
 	public Long nextProtocolApprovals;
 
 	/**
 	 * (nextswitch) Round on which the protocol upgrade will take effect. 
-	 */	@JsonProperty("next-protocol-switch-on")
+	 */
+	@JsonProperty("next-protocol-switch-on")
 	public Long nextProtocolSwitchOn;
 
 	/**
 	 * (nextbefore) Deadline round for this protocol upgrade (No votes will be consider 
 	 * after this round). 
-	 */	@JsonProperty("next-protocol-vote-before")
+	 */
+	@JsonProperty("next-protocol-vote-before")
 	public Long nextProtocolVoteBefore;
 
 	@Override

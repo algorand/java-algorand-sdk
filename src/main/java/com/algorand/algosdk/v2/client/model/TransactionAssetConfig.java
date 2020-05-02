@@ -16,7 +16,8 @@ public class TransactionAssetConfig extends PathResponse {
 
 	/**
 	 * (xaid) ID of the asset being configured or empty if creating. 
-	 */	@JsonProperty("asset-id")
+	 */
+	@JsonProperty("asset-id")
 	public Long assetId;
 
 	@JsonProperty("params")

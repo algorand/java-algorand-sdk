@@ -12,7 +12,8 @@ public class Asset extends PathResponse {
 
 	/**
 	 * unique asset identifier 
-	 */	@JsonProperty("index")
+	 */
+	@JsonProperty("index")
 	public Long index;
 
 	@JsonProperty("params")

@@ -19,36 +19,41 @@ public class Account extends PathResponse {
 
 	/**
 	 * the account public key 
-	 */ @JsonProperty("address")
+	 */
+	@JsonProperty("address")
 	public void address(String address) throws NoSuchAlgorithmException {
 		 this.address = new Address(address);
 	 }
-	 @JsonProperty("address")
-	 public String address() throws NoSuchAlgorithmException {
-		 return this.address.encodeAsString();
-	 }
+	@JsonProperty("address")
+	public String address() throws NoSuchAlgorithmException {
+		return this.address.encodeAsString();
+	}
 	public Address address;
 
 	/**
 	 * (algo) total number of MicroAlgos in the account 
-	 */	@JsonProperty("amount")
+	 */
+	@JsonProperty("amount")
 	public Long amount;
 
 	/**
 	 * specifies the amount of MicroAlgos in the account, without the pending rewards. 
-	 */	@JsonProperty("amount-without-pending-rewards")
+	 */
+	@JsonProperty("amount-without-pending-rewards")
 	public Long amountWithoutPendingRewards;
 
 	/**
 	 * (asset) assets held by this account. 
 	 * Note the raw object uses `map[int] -> AssetHolding` for this type. 
-	 */	@JsonProperty("assets")
+	 */
+	@JsonProperty("assets")
 	public List<AssetHolding> assets = new ArrayList<AssetHolding>();
 
 	/**
 	 * (apar) parameters of assets created by this account. 
 	 * Note: the raw account uses `map[int] -> Asset` for this type. 
-	 */	@JsonProperty("created-assets")
+	 */
+	@JsonProperty("created-assets")
 	public List<Asset> createdAssets = new ArrayList<Asset>();
 
 	@JsonProperty("participation")
@@ -56,24 +61,28 @@ public class Account extends PathResponse {
 
 	/**
 	 * amount of MicroAlgos of pending rewards in this account. 
-	 */	@JsonProperty("pending-rewards")
+	 */
+	@JsonProperty("pending-rewards")
 	public Long pendingRewards;
 
 	/**
 	 * (ebase) used as part of the rewards computation. Only applicable to accounts 
 	 * which are participating. 
-	 */	@JsonProperty("reward-base")
+	 */
+	@JsonProperty("reward-base")
 	public Long rewardBase;
 
 	/**
 	 * (ern) total rewards of MicroAlgos the account has received, including pending 
 	 * rewards. 
-	 */	@JsonProperty("rewards")
+	 */
+	@JsonProperty("rewards")
 	public Long rewards;
 
 	/**
 	 * The round for which this information is relevant. 
-	 */	@JsonProperty("round")
+	 */
+	@JsonProperty("round")
 	public Long round;
 
 	/**
@@ -81,7 +90,8 @@ public class Account extends PathResponse {
 	 *   sig 
 	 *   msig 
 	 *   lsig 
-	 */	@JsonProperty("sig-type")
+	 */
+	@JsonProperty("sig-type")
 	public Enums.SigType sigType;
 
 	/**
@@ -91,7 +101,8 @@ public class Account extends PathResponse {
 	 * pool. 
 	 *   NotParticipating - indicates that the associated account is neither a 
 	 * delegator nor a delegate. 
-	 */	@JsonProperty("status")
+	 */
+	@JsonProperty("status")
 	public String status;
 
 	@Override

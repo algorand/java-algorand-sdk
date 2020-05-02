@@ -9,17 +9,20 @@ public class SupplyResponse extends PathResponse {
 
 	/**
 	 * Round 
-	 */	@JsonProperty("current_round")
+	 */
+	@JsonProperty("current_round")
 	public Long current_round;
 
 	/**
 	 * OnlineMoney 
-	 */	@JsonProperty("online-money")
+	 */
+	@JsonProperty("online-money")
 	public Long onlineMoney;
 
 	/**
 	 * TotalMoney 
-	 */	@JsonProperty("total-money")
+	 */
+	@JsonProperty("total-money")
 	public Long totalMoney;
 
 	@Override

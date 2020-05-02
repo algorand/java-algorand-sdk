@@ -17,14 +17,16 @@ public class AssetParams extends PathResponse {
 	/**
 	 * (c) Address of account used to clawback holdings of this asset. If empty, 
 	 * clawback is not permitted. 
-	 */	@JsonProperty("clawback")
+	 */
+	@JsonProperty("clawback")
 	public String clawback;
 
 	/**
 	 * The address that created this asset. This is the address where the parameters 
 	 * for this asset can be found, and also the address where unwanted asset units can 
 	 * be sent in the worst case. 
-	 */	@JsonProperty("creator")
+	 */
+	@JsonProperty("creator")
 	public String creator;
 
 	/**
@@ -32,61 +34,71 @@ public class AssetParams extends PathResponse {
 	 * asset. If 0, the asset is not divisible. If 1, the base unit of the asset is in 
 	 * tenths. If 2, the base unit of the asset is in hundredths, and so on. This value 
 	 * must be between 0 and 19 (inclusive). 
-	 */	@JsonProperty("decimals")
+	 */
+	@JsonProperty("decimals")
 	public Long decimals;
 
 	/**
 	 * (df) Whether holdings of this asset are frozen by default. 
-	 */	@JsonProperty("default-frozen")
+	 */
+	@JsonProperty("default-frozen")
 	public Boolean defaultFrozen;
 
 	/**
 	 * (f) Address of account used to freeze holdings of this asset. If empty, freezing 
 	 * is not permitted. 
-	 */	@JsonProperty("freeze")
+	 */
+	@JsonProperty("freeze")
 	public String freeze;
 
 	/**
 	 * (m) Address of account used to manage the keys of this asset and to destroy it. 
-	 */	@JsonProperty("manager")
+	 */
+	@JsonProperty("manager")
 	public String manager;
 
 	/**
 	 * (am) A commitment to some unspecified asset metadata. The format of this 
 	 * metadata is up to the application. 
-	 */ @JsonProperty("metadata-hash")
+	 */
+	@JsonProperty("metadata-hash")
 	public void metadataHash(String base64Encoded) {
-		 this.metadataHash = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("metadata-hash")
-	 public String metadataHash() {
-		 return Encoder.encodeToBase64(this.metadataHash);
-	 }
+		this.metadataHash = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("metadata-hash")
+	public String metadataHash() {
+		return Encoder.encodeToBase64(this.metadataHash);
+	}
 	public byte[] metadataHash;
 
 	/**
 	 * (an) Name of this asset, as supplied by the creator. 
-	 */	@JsonProperty("name")
+	 */
+	@JsonProperty("name")
 	public String name;
 
 	/**
 	 * (r) Address of account holding reserve (non-minted) units of this asset. 
-	 */	@JsonProperty("reserve")
+	 */
+	@JsonProperty("reserve")
 	public String reserve;
 
 	/**
 	 * (t) The total number of units of this asset. 
-	 */	@JsonProperty("total")
+	 */
+	@JsonProperty("total")
 	public java.math.BigInteger total;
 
 	/**
 	 * (un) Name of a unit of this asset, as supplied by the creator. 
-	 */	@JsonProperty("unit-name")
+	 */
+	@JsonProperty("unit-name")
 	public String unitName;
 
 	/**
 	 * (au) URL where more information about the asset can be retrieved. 
-	 */	@JsonProperty("url")
+	 */
+	@JsonProperty("url")
 	public String url;
 
 	@Override

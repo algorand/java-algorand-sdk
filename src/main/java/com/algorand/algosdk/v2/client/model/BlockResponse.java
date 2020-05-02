@@ -9,13 +9,15 @@ public class BlockResponse extends PathResponse {
 
 	/**
 	 * Block header data. 
-	 */	@JsonProperty("block")
+	 */
+	@JsonProperty("block")
 	public String block;
 
 	/**
 	 * Optional certificate object. This is only included when the format is set to 
 	 * message pack. 
-	 */	@JsonProperty("cert")
+	 */
+	@JsonProperty("cert")
 	public String cert;
 
 	@Override

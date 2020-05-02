@@ -14,24 +14,28 @@ public class TransactionPayment extends PathResponse {
 
 	/**
 	 * (amt) number of MicroAlgos intended to be transferred. 
-	 */	@JsonProperty("amount")
+	 */
+	@JsonProperty("amount")
 	public Long amount;
 
 	/**
 	 * Number of MicroAlgos that were sent to the close-remainder-to address when 
 	 * closing the sender account. 
-	 */	@JsonProperty("close-amount")
+	 */
+	@JsonProperty("close-amount")
 	public Long closeAmount;
 
 	/**
 	 * (close) when set, indicates that the sending account should be closed and all 
 	 * remaining funds be transferred to this address. 
-	 */	@JsonProperty("close-remainder-to")
+	 */
+	@JsonProperty("close-remainder-to")
 	public String closeRemainderTo;
 
 	/**
 	 * (rcv) receiver's address. 
-	 */	@JsonProperty("receiver")
+	 */
+	@JsonProperty("receiver")
 	public String receiver;
 
 	@Override

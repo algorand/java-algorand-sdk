@@ -17,31 +17,34 @@ public class Block extends PathResponse {
 
 	/**
 	 * (gh) hash to which this block belongs. 
-	 */ @JsonProperty("genesis-hash")
+	 */
+	@JsonProperty("genesis-hash")
 	public void genesisHash(String base64Encoded) {
-		 this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("genesis-hash")
-	 public String genesisHash() {
-		 return Encoder.encodeToBase64(this.genesisHash);
-	 }
+		this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("genesis-hash")
+	public String genesisHash() {
+		return Encoder.encodeToBase64(this.genesisHash);
+	}
 	public byte[] genesisHash;
 
 	/**
 	 * (gen) ID to which this block belongs. 
-	 */	@JsonProperty("genesis-id")
+	 */
+	@JsonProperty("genesis-id")
 	public String genesisId;
 
 	/**
 	 * (prev) Previous block hash. 
-	 */ @JsonProperty("previous-block-hash")
+	 */
+	@JsonProperty("previous-block-hash")
 	public void previousBlockHash(String base64Encoded) {
-		 this.previousBlockHash = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("previous-block-hash")
-	 public String previousBlockHash() {
-		 return Encoder.encodeToBase64(this.previousBlockHash);
-	 }
+		this.previousBlockHash = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("previous-block-hash")
+	public String previousBlockHash() {
+		return Encoder.encodeToBase64(this.previousBlockHash);
+	}
 	public byte[] previousBlockHash;
 
 	@JsonProperty("rewards")
@@ -49,29 +52,33 @@ public class Block extends PathResponse {
 
 	/**
 	 * (rnd) Current round on which this block was appended to the chain. 
-	 */	@JsonProperty("round")
+	 */
+	@JsonProperty("round")
 	public Long round;
 
 	/**
 	 * (seed) Sortition seed. 
-	 */ @JsonProperty("seed")
+	 */
+	@JsonProperty("seed")
 	public void seed(String base64Encoded) {
-		 this.seed = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("seed")
-	 public String seed() {
-		 return Encoder.encodeToBase64(this.seed);
-	 }
+		this.seed = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("seed")
+	public String seed() {
+		return Encoder.encodeToBase64(this.seed);
+	}
 	public byte[] seed;
 
 	/**
 	 * (ts) Block creation timestamp in seconds since eposh 
-	 */	@JsonProperty("timestamp")
+	 */
+	@JsonProperty("timestamp")
 	public Long timestamp;
 
 	/**
 	 * (txns) list of transactions corresponding to a given round. 
-	 */	@JsonProperty("transactions")
+	 */
+	@JsonProperty("transactions")
 	public List<Transaction> transactions = new ArrayList<Transaction>();
 
 	/**
@@ -81,14 +88,15 @@ public class Block extends PathResponse {
 	 * the TxnRoot does not authenticate the signatures on the transactions, only the 
 	 * transactions themselves. Two blocks with the same transactions but in a 
 	 * different order and with different signatures will have the same TxnRoot. 
-	 */ @JsonProperty("transactions-root")
+	 */
+	@JsonProperty("transactions-root")
 	public void transactionsRoot(String base64Encoded) {
-		 this.transactionsRoot = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("transactions-root")
-	 public String transactionsRoot() {
-		 return Encoder.encodeToBase64(this.transactionsRoot);
-	 }
+		this.transactionsRoot = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("transactions-root")
+	public String transactionsRoot() {
+		return Encoder.encodeToBase64(this.transactionsRoot);
+	}
 	public byte[] transactionsRoot;
 
 	/**
@@ -97,7 +105,8 @@ public class Block extends PathResponse {
 	 * Specifically, TxnCounter is the number of the next transaction that will be 
 	 * committed after this block. It is 0 when no transactions have ever been 
 	 * committed (since TxnCounter started being supported). 
-	 */	@JsonProperty("txn-counter")
+	 */
+	@JsonProperty("txn-counter")
 	public Long txnCounter;
 
 	@JsonProperty("upgrade-state")

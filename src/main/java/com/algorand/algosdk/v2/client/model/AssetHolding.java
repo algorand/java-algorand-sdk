@@ -14,24 +14,28 @@ public class AssetHolding extends PathResponse {
 
 	/**
 	 * (a) number of units held. 
-	 */	@JsonProperty("amount")
+	 */
+	@JsonProperty("amount")
 	public java.math.BigInteger amount;
 
 	/**
 	 * Asset ID of the holding. 
-	 */	@JsonProperty("asset-id")
+	 */
+	@JsonProperty("asset-id")
 	public Long assetId;
 
 	/**
 	 * Address that created this asset. This is the address where the parameters for 
 	 * this asset can be found, and also the address where unwanted asset units can be 
 	 * sent in the worst case. 
-	 */	@JsonProperty("creator")
+	 */
+	@JsonProperty("creator")
 	public String creator;
 
 	/**
 	 * (f) whether or not the holding is frozen. 
-	 */	@JsonProperty("is-frozen")
+	 */
+	@JsonProperty("is-frozen")
 	public Boolean isFrozen;
 
 	@Override

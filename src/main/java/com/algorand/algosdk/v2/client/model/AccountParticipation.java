@@ -14,42 +14,47 @@ public class AccountParticipation extends PathResponse {
 
 	/**
 	 * (sel) Selection public key (if any) currently registered for this round. 
-	 */ @JsonProperty("selection-participation-key")
+	 */
+	@JsonProperty("selection-participation-key")
 	public void selectionParticipationKey(String base64Encoded) {
-		 this.selectionParticipationKey = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("selection-participation-key")
-	 public String selectionParticipationKey() {
-		 return Encoder.encodeToBase64(this.selectionParticipationKey);
-	 }
+		this.selectionParticipationKey = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("selection-participation-key")
+	public String selectionParticipationKey() {
+		return Encoder.encodeToBase64(this.selectionParticipationKey);
+	}
 	public byte[] selectionParticipationKey;
 
 	/**
 	 * (voteFst) First round for which this participation is valid. 
-	 */	@JsonProperty("vote-first-valid")
+	 */
+	@JsonProperty("vote-first-valid")
 	public Long voteFirstValid;
 
 	/**
 	 * (voteKD) Number of subkeys in each batch of participation keys. 
-	 */	@JsonProperty("vote-key-dilution")
+	 */
+	@JsonProperty("vote-key-dilution")
 	public Long voteKeyDilution;
 
 	/**
 	 * (voteLst) Last round for which this participation is valid. 
-	 */	@JsonProperty("vote-last-valid")
+	 */
+	@JsonProperty("vote-last-valid")
 	public Long voteLastValid;
 
 	/**
 	 * (vote) root participation public key (if any) currently registered for this 
 	 * round. 
-	 */ @JsonProperty("vote-participation-key")
+	 */
+	@JsonProperty("vote-participation-key")
 	public void voteParticipationKey(String base64Encoded) {
-		 this.voteParticipationKey = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("vote-participation-key")
-	 public String voteParticipationKey() {
-		 return Encoder.encodeToBase64(this.voteParticipationKey);
-	 }
+		this.voteParticipationKey = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("vote-participation-key")
+	public String voteParticipationKey() {
+		return Encoder.encodeToBase64(this.voteParticipationKey);
+	}
 	public byte[] voteParticipationKey;
 
 	@Override

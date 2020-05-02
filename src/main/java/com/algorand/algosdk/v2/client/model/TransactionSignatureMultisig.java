@@ -16,17 +16,20 @@ public class TransactionSignatureMultisig extends PathResponse {
 
 	/**
 	 * (subsig) holds pairs of public key and signatures. 
-	 */	@JsonProperty("subsignature")
+	 */
+	@JsonProperty("subsignature")
 	public List<TransactionSignatureMultisigSubsignature> subsignature = new ArrayList<TransactionSignatureMultisigSubsignature>();
 
 	/**
 	 * (thr) 
-	 */	@JsonProperty("threshold")
+	 */
+	@JsonProperty("threshold")
 	public Long threshold;
 
 	/**
 	 * (v) 
-	 */	@JsonProperty("version")
+	 */
+	@JsonProperty("version")
 	public Long version;
 
 	@Override

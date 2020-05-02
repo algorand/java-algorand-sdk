@@ -12,37 +12,43 @@ public class BlockRewards extends PathResponse {
 
 	/**
 	 * (fees) accepts transaction fees, it can only spend to the incentive pool. 
-	 */	@JsonProperty("fee-sink")
+	 */
+	@JsonProperty("fee-sink")
 	public String feeSink;
 
 	/**
 	 * (rwcalr) number of leftover MicroAlgos after the distribution of rewards-rate 
 	 * MicroAlgos for every reward unit in the next round. 
-	 */	@JsonProperty("rewards-calculation-round")
+	 */
+	@JsonProperty("rewards-calculation-round")
 	public Long rewardsCalculationRound;
 
 	/**
 	 * (earn) How many rewards, in MicroAlgos, have been distributed to each RewardUnit 
 	 * of MicroAlgos since genesis. 
-	 */	@JsonProperty("rewards-level")
+	 */
+	@JsonProperty("rewards-level")
 	public Long rewardsLevel;
 
 	/**
 	 * (rwd) accepts periodic injections from the fee-sink and continually 
 	 * redistributes them as rewards. 
-	 */	@JsonProperty("rewards-pool")
+	 */
+	@JsonProperty("rewards-pool")
 	public String rewardsPool;
 
 	/**
 	 * (rate) Number of new MicroAlgos added to the participation stake from rewards at 
 	 * the next round. 
-	 */	@JsonProperty("rewards-rate")
+	 */
+	@JsonProperty("rewards-rate")
 	public Long rewardsRate;
 
 	/**
 	 * (frac) Number of leftover MicroAlgos after the distribution of 
 	 * RewardsRate/rewardUnits MicroAlgos for every reward unit in the next round. 
-	 */	@JsonProperty("rewards-residue")
+	 */
+	@JsonProperty("rewards-residue")
 	public Long rewardsResidue;
 
 	@Override

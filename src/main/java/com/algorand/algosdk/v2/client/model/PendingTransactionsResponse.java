@@ -12,12 +12,14 @@ public class PendingTransactionsResponse extends PathResponse {
 
 	/**
 	 * An array of signed transaction objects. 
-	 */	@JsonProperty("top-transactions")
+	 */
+	@JsonProperty("top-transactions")
 	public List<SignedTransaction> topTransactions = new ArrayList<SignedTransaction>();
 
 	/**
 	 * Total number of transactions in the pool. 
-	 */	@JsonProperty("total-transactions")
+	 */
+	@JsonProperty("total-transactions")
 	public Long totalTransactions;
 
 	@Override

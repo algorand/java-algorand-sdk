@@ -10,22 +10,26 @@ public class PendingTransactionResponse extends PathResponse {
 
 	/**
 	 * The asset index if the transaction was found and it created an asset. 
-	 */	@JsonProperty("asset-index")
+	 */
+	@JsonProperty("asset-index")
 	public Long assetIndex;
 
 	/**
 	 * Rewards in microalgos applied to the close remainder to account. 
-	 */	@JsonProperty("close-rewards")
+	 */
+	@JsonProperty("close-rewards")
 	public Long closeRewards;
 
 	/**
 	 * Closing amount for the transaction. 
-	 */	@JsonProperty("closing-amount")
+	 */
+	@JsonProperty("closing-amount")
 	public Long closingAmount;
 
 	/**
 	 * The round where this transaction was confirmed, if present. 
-	 */	@JsonProperty("confirmed-round")
+	 */
+	@JsonProperty("confirmed-round")
 	public Long confirmedRound;
 
 	/**
@@ -33,22 +37,26 @@ public class PendingTransactionResponse extends PathResponse {
 	 * (and specifies why that happened). An empty string indicates the transaction 
 	 * wasn't kicked out of this node's txpool due to an error. 
 	 * 
-	 */	@JsonProperty("pool-error")
+	 */
+	@JsonProperty("pool-error")
 	public String poolError;
 
 	/**
 	 * Rewards in microalgos applied to the receiver account. 
-	 */	@JsonProperty("receiver-rewards")
+	 */
+	@JsonProperty("receiver-rewards")
 	public Long receiverRewards;
 
 	/**
 	 * Rewards in microalgos applied to the sender account. 
-	 */	@JsonProperty("sender-rewards")
+	 */
+	@JsonProperty("sender-rewards")
 	public Long senderRewards;
 
 	/**
 	 * The raw signed transaction. 
-	 */	@JsonProperty("txn")
+	 */
+	@JsonProperty("txn")
 	public SignedTransaction txn;
 
 	@Override

@@ -11,7 +11,8 @@ public class TransactionParametersResponse extends PathResponse {
 	/**
 	 * ConsensusVersion indicates the consensus protocol version 
 	 * as of LastRound. 
-	 */	@JsonProperty("consensus-version")
+	 */
+	@JsonProperty("consensus-version")
 	public String consensusVersion;
 
 	/**
@@ -19,35 +20,40 @@ public class TransactionParametersResponse extends PathResponse {
 	 * Fee is in units of micro-Algos per byte. 
 	 * Fee may fall to zero but transactions must still have a fee of 
 	 * at least MinTxnFee for the current network protocol. 
-	 */	@JsonProperty("fee")
+	 */
+	@JsonProperty("fee")
 	public Long fee;
 
 	/**
 	 * GenesisHash is the hash of the genesis block. 
-	 */ @JsonProperty("genesis-hash")
+	 */
+	@JsonProperty("genesis-hash")
 	public void genesisHash(String base64Encoded) {
-		 this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
-	 }
-	 @JsonProperty("genesis-hash")
-	 public String genesisHash() {
-		 return Encoder.encodeToBase64(this.genesisHash);
-	 }
+		this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
+	}
+	@JsonProperty("genesis-hash")
+	public String genesisHash() {
+		return Encoder.encodeToBase64(this.genesisHash);
+	}
 	public byte[] genesisHash;
 
 	/**
 	 * GenesisID is an ID listed in the genesis block. 
-	 */	@JsonProperty("genesis-id")
+	 */
+	@JsonProperty("genesis-id")
 	public String genesisId;
 
 	/**
 	 * LastRound indicates the last round seen 
-	 */	@JsonProperty("last-round")
+	 */
+	@JsonProperty("last-round")
 	public Long lastRound;
 
 	/**
 	 * The minimum transaction fee (not per byte) required for the 
 	 * txn to validate for the current network protocol. 
-	 */	@JsonProperty("min-fee")
+	 */
+	@JsonProperty("min-fee")
 	public Long minFee;
 
 	@Override
