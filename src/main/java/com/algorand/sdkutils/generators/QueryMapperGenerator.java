@@ -38,8 +38,6 @@ public class QueryMapperGenerator extends Generator {
 		StringBuffer lookUp = new StringBuffer();
 		StringBuffer enumMappers = new StringBuffer();
 		
-		getClass.append("	public static Query getClass(String name, Client client, String args[]) throws NoSuchAlgorithmException {\n" + 
-				"		switch (name) {\n");
 		setValue.append("	public static void setValue(Query q, String className, String property, String value) throws ParseException, NoSuchAlgorithmException {\n" + 
 				"		switch (className) {\n");
 		lookUp.append("	public static String lookup(Query q, String className) throws Exception {\n" + 
@@ -51,13 +49,20 @@ public class QueryMapperGenerator extends Generator {
 			"	}\n\n");
 		
 		this.root = indexer;
+		getClass.append("	public static Query getClass(String name, IndexerClient client, String args[]) throws NoSuchAlgorithmException {\n" + 
+				"		switch (name) {\n");
 		JsonNode paths = this.root.get("paths");
 		Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
 		while (pathIter.hasNext()) {
 			getMappings(getClass, setValue, pathIter);
 		}
-
+		getClass.append("		}\n" + 
+				"		return null;\n" + 
+				"	}\n\n");
+		
 		this.root = algod;
+		getClass.append("	public static Query getClass(String name, AlgodClient client, String args[]) throws NoSuchAlgorithmException {\n" + 
+				"		switch (name) {\n");
 		paths = this.root.get("paths");
 		pathIter = paths.fields();
 		while (pathIter.hasNext()) {

@@ -12,7 +12,7 @@ import com.algorand.algosdk.v2.client.common.*;
 
 public class QueryMapper {
 
-	public static Query getClass(String name, Client client, String args[]) throws NoSuchAlgorithmException {
+	public static Query getClass(String name, IndexerClient client, String args[]) throws NoSuchAlgorithmException {
 		switch (name) {
 		case "searchForAccounts":
 			return client.searchForAccounts();
@@ -32,6 +32,12 @@ public class QueryMapper {
 			return client.lookupBlock(Long.valueOf(args[0]));
 		case "searchForTransactions":
 			return client.searchForTransactions();
+		}
+		return null;
+	}
+
+	public static Query getClass(String name, AlgodClient client, String args[]) throws NoSuchAlgorithmException {
+		switch (name) {
 		case "AccountInformation":
 			return client.AccountInformation(new Address(args[0]));
 		case "GetPendingTransactionsByAddress":

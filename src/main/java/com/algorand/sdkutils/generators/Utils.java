@@ -10,6 +10,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.StringTokenizer;
 
+import com.algorand.algosdk.v2.client.common.Client;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -124,15 +125,44 @@ public class Utils {
 		bw.close();
 	}
 
-	public static void generateClientFile(String genRoot) throws IOException {
-		// Generate the client file
-		String clientTemplate = Utils.readFile("src/main/java/com/algorand/sdkutils/generators/Client.java.template");
-		String imports = Utils.readFile(genRoot+"algodV2Imports.txt") +  
-				Utils.readFile(genRoot+"indexerImports.txt");
-		String methods = Utils.readFile(genRoot+"algodV2Paths.txt") +  
-				Utils.readFile(genRoot+"indexerPaths.txt");
-		clientTemplate = clientTemplate.replace("IMPORTSGOHERE", imports);
-		clientTemplate = clientTemplate.replace("METHODSGOHERE", methods);
-		Utils.writeFile("src/main/java/com/algorand/algosdk/v2/client/common/Client.java", clientTemplate);
+	public static void generateIndexerClientFile(String genRoot) throws IOException {
+		// Generate the client files
+		// Indexer
+		String imports = Utils.readFile(genRoot+"indexerImports.txt");
+		imports = "import com.algorand.algosdk.crypto.Address;\n" + imports;		
+		String methods = Utils.readFile(genRoot+"indexerPaths.txt"); 
+		
+		StringBuffer sb = new StringBuffer();
+		sb.append("package com.algorand.algosdk.v2.client.common;\n\n");
+		sb.append(imports);
+		sb.append("\n");
+		sb.append("public class IndexerClient extends Client {\n" + 
+				"\n" + 
+				"	public IndexerClient(String host, int port, String token) {\n" + 
+				"		super(host, port, token, \"X-Indexer-API-Token\");\n" + 
+				"	}\n");
+		sb.append(methods);
+		sb.append("}\n");
+		Utils.writeFile("src/main/java/com/algorand/algosdk/v2/client/common/IndexerClient.java", sb.toString());
+	}
+	
+	public static void generateAlgodClientFile(String genRoot) throws IOException {
+		// Algod
+		String imports = Utils.readFile(genRoot+"algodV2Imports.txt");
+		imports = "import com.algorand.algosdk.crypto.Address;\n" + imports;
+		String methods = Utils.readFile(genRoot+"algodV2Paths.txt");  
+
+		StringBuffer sb = new StringBuffer();
+		sb.append("package com.algorand.algosdk.v2.client.common;\n\n");
+		sb.append(imports);
+		sb.append("\n");
+		sb.append("public class AlgodClient extends Client {\n" + 
+				"\n" + 
+				"	public AlgodClient(String host, int port, String token) {\n" + 
+				"		super(host, port, token, \"X-Algo-API-Token\");\n" + 
+				"	}\n");
+		sb.append(methods);
+		sb.append("}\n");
+		Utils.writeFile("src/main/java/com/algorand/algosdk/v2/client/common/AlgodClient.java", sb.toString());
 	}
 }

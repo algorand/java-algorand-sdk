@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 
+import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.sdkutils.generators.TestGenerator;
 import com.algorand.sdkutils.generators.Utils;
@@ -26,7 +27,7 @@ public class RunAlgodV2Tests extends TestGenerator {
 		int port = 60000;
 		String host = "localhost";
 		String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-		Client client = new Client(host, port, token);
+		Client client = new AlgodClient(host, port, token);
 
 		File inFile = new File("./src/main/java/com/algorand/sdkutils/algodV2Tests.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));

@@ -43,6 +43,6 @@ public class RunIndexerGenerator {
 				genRoot+"indexerImports.txt", 
 				genRoot+"indexerPaths.txt");
 		
-		Utils.generateClientFile(genRoot);
+		Utils.generateIndexerClientFile(genRoot);
 	}
 }

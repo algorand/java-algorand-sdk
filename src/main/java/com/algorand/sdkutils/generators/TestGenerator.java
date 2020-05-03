@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.sdkutils.generated.QueryMapper;
@@ -101,7 +103,13 @@ public class TestGenerator extends Generator {
 				// SDK query setup
 				String methodName = pathNode.findValue("operationId").asText();
 
-				Query query = QueryMapper.getClass(methodName, client, args);
+				Query query = null;
+				if (client.getClass() == AlgodClient.class) {
+					query = QueryMapper.getClass(methodName, (AlgodClient)client, args);
+				} else {
+					query = QueryMapper.getClass(methodName, (IndexerClient)client, args);
+				}
+				
 				
 				while (properties.hasNext()) {
 					// sample source setup

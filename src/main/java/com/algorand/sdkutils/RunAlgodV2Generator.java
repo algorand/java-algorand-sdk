@@ -44,7 +44,7 @@ public class RunAlgodV2Generator {
 				genRoot+"algodV2Imports.txt", 
 				genRoot+"algodV2Paths.txt");
 		
-		Utils.generateClientFile(genRoot);
+		Utils.generateAlgodClientFile(genRoot);
 
 	}
 }

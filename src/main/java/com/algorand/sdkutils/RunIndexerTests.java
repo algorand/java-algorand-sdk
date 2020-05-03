@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.sdkutils.generators.TestGenerator;
 import com.algorand.sdkutils.generators.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -26,7 +27,7 @@ public class RunIndexerTests extends TestGenerator{
 
 		int port = 8980;
 		String host = "localhost";
-		Client client = new Client(host, port, null);
+		Client client = new IndexerClient(host, port, null);
 
 		File inFile = new File("./src/main/java/com/algorand/sdkutils/indexerTests.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));

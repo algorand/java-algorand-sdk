@@ -2,9 +2,7 @@ package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.v2.client.common.Client;
-import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.common.Utils;
+import com.algorand.algosdk.v2.client.common.*;
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.model.*;
 import io.cucumber.java.en.And;
@@ -13,20 +11,16 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.threeten.bp.LocalDate;
-import org.threeten.bp.format.DateTimeFormatter;
-
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Indexer {
-    Map<Integer, Client> indexerClients = new HashMap<>();
+    Map<Integer, IndexerClient> indexerClients = new HashMap<>();
 
     Response<Block> blockResponse;
     Response<AccountResponse> accountResponse;
@@ -48,7 +42,7 @@ public class Indexer {
 
     @Given("indexer client {int} at {string} port {int} with token {string}")
     public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
-        indexerClients.put(index, new Client(uri, port, ""));
+        indexerClients.put(index, new IndexerClient(uri, port, ""));
     }
 
     @When("I use {int} to lookup block {long}")
