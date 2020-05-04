@@ -13,8 +13,13 @@ public class RunIndexerGenerator {
 
 	public static void main (String args[]) throws JsonProcessingException, IOException {
 
-		///Users/shantkarakashian/go/src/github.com/algorand/openapi-server-generator/scripts/indexer.oas2.yml ./src/main/java/com/algorand/algosdk/
-		File f = new File("src/main/java/com/algorand/sdkutils/indexer.oas2.json");
+		File f = null;
+		try {
+			f = new File(args[0]);
+		} catch (Exception e){
+			System.err.println("Couldn't read the indexer.oas2.json file. The path should be passed as an argument.");
+			System.exit(1);
+		}
 		FileInputStream fis = new FileInputStream(f);
 
 		JsonNode root = Utils.getRoot(fis);	

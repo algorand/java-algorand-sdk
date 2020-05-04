@@ -17,7 +17,13 @@ public class RunAlgodV2Tests extends TestGenerator {
 	}
 
 	public static void main (String args[]) throws Exception {
-		File f = new File("src/main/java/com/algorand/sdkutils/algod.oas2.json");
+		File f = null;
+		try {
+			f = new File(args[0]);
+		} catch (Exception e){
+			System.err.println("Couldn't read the algod.oas2.json file. The path should be passed as an argument.");
+			System.exit(1);
+		}
 		FileInputStream fis = new FileInputStream(f);
 
 		JsonNode root = Utils.getRoot(fis);	

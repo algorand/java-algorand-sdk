@@ -13,11 +13,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 public class RunQueryMapperGenerator {
 	public static void main (String args[]) throws JsonProcessingException, IOException {
 
-		File f1 = new File("src/main/java/com/algorand/sdkutils/indexer.oas2.json");
+		File f1 = null;
+		try {
+			f1 = new File(args[0]);
+		} catch (Exception e){
+			System.err.println("Couldn't read the indexer.oas2.json file. The path should be passed as the first argument.");
+			System.exit(1);
+		}
 		FileInputStream fis1 = new FileInputStream(f1);
 		JsonNode indexerRoot = Utils.getRoot(fis1);
 
-		File f2 = new File("src/main/java/com/algorand/sdkutils/algod.oas2.json");
+		File f2 = null;
+		try {
+			f2 = new File(args[1]);
+		} catch (Exception e){
+			System.err.println("Couldn't read the algod.oas2.json file. The path should be passed as the second argument.");
+			System.exit(1);
+		}
 		FileInputStream fis2 = new FileInputStream(f2);
 		JsonNode algodRoot = Utils.getRoot(fis2);
 
