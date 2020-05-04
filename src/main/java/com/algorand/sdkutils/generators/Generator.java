@@ -821,6 +821,10 @@ public class Generator {
 		Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
 		while (pathIter.hasNext()) {
 			Entry<String, JsonNode> path = pathIter.next();
+			JsonNode privateTag = path.getValue().get("post") != null ? path.getValue().get("post").get("tags") : null;
+			if (privateTag != null && privateTag.elements().next().asText().equals("private")) {
+				continue;
+			}
 			writeQueryClass(gpBody, path.getValue(), path.getKey(), rootPath, pkg, modelPkg);
 
 			// Fill GeneratedPaths class

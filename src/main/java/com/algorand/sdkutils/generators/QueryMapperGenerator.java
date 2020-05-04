@@ -88,6 +88,10 @@ public class QueryMapperGenerator extends Generator {
 	private void getMappings(StringBuffer getClass, StringBuffer setValue,
 			Iterator<Entry<String, JsonNode>> pathIter) {
 		Entry<String, JsonNode> path = pathIter.next();
+		JsonNode privateTag = path.getValue().get("post") != null ? path.getValue().get("post").get("tags") : null;
+		if (privateTag != null && privateTag.elements().next().asText().equals("private")) {
+			return;
+		}
 		String className = path.getValue().findValue("operationId").asText();
 		String javaClassName = Generator.getCamelCase(className, true);
 		String methodName = Generator.getCamelCase(className, false);

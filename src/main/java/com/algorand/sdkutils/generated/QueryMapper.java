@@ -46,10 +46,6 @@ public class QueryMapper {
 			return client.GetBlock(Long.valueOf(args[0]));
 		case "GetSupply":
 			return client.GetSupply();
-		case "RegisterParticipationKeys":
-			return client.RegisterParticipationKeys(new Address(args[0]));
-		case "ShutdownNode":
-			return client.ShutdownNode();
 		case "GetStatus":
 			return client.GetStatus();
 		case "WaitForBlock":
@@ -322,29 +318,6 @@ public class QueryMapper {
 			break;
 		case "GetSupply":
 			switch (property) {
-			}
-			break;
-		case "RegisterParticipationKeys":
-			switch (property) {
-			case "fee":
-				((RegisterParticipationKeys)q).fee(Long.valueOf(value));
-				break;
-			case "key-dilution":
-				((RegisterParticipationKeys)q).keyDilution(Long.valueOf(value));
-				break;
-			case "no-wait":
-				((RegisterParticipationKeys)q).noWait(Boolean.valueOf(value));
-				break;
-			case "round-last-valid":
-				((RegisterParticipationKeys)q).roundLastValid(Long.valueOf(value));
-				break;
-			}
-			break;
-		case "ShutdownNode":
-			switch (property) {
-			case "timeout":
-				((ShutdownNode)q).timeout(Long.valueOf(value));
-				break;
 			}
 			break;
 		case "GetStatus":

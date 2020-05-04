@@ -5,8 +5,6 @@ import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
-import com.algorand.algosdk.v2.client.algod.RegisterParticipationKeys;
-import com.algorand.algosdk.v2.client.algod.ShutdownNode;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
 import com.algorand.algosdk.v2.client.algod.RawTransaction;
@@ -50,25 +48,6 @@ public class AlgodClient extends Client {
 	 */
 	public GetSupply GetSupply() {
 		return new GetSupply((Client) this);
-	}
-
-	/**
-	 * Generate (or renew) and register participation keys on the node for a given 
-	 * account address. 
-	 * /v2/register-participation-keys/{address} 
-	 */
-	public RegisterParticipationKeys RegisterParticipationKeys(Address address) {
-		return new RegisterParticipationKeys((Client) this, address);
-	}
-
-	/**
-	 * Special management endpoint to shutdown the node. Optionally provide a timeout 
-	 * parameter to indicate that the node should begin shutting down after a number of 
-	 * seconds. 
-	 * /v2/shutdown 
-	 */
-	public ShutdownNode ShutdownNode() {
-		return new ShutdownNode((Client) this);
 	}
 
 	/**
