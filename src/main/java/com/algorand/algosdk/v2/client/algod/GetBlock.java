@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.algod;
 
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -19,7 +20,7 @@ public class GetBlock extends Query {
 	 * @param round The round from which to fetch block information. 
 	 */
 	public GetBlock(Client client, Long round) {
-		super(client, "get");
+		super(client, new HttpMethod("get"));
 		this.round = round;
 	}
 

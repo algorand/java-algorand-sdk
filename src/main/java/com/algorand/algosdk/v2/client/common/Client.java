@@ -47,7 +47,7 @@ public class Client {
 		this.tokenKey = tokenKey;
 	}
 
-	public Response executeCall(QueryData qData, String getOrPost) throws Exception {
+	public Response executeCall(QueryData qData, HttpMethod httpMethod) throws Exception {
 
 		HttpUrl httpUrl = getHttpUrl(qData, port, host);
 		Builder reqBuilder = new Request.Builder().url(httpUrl);
@@ -58,10 +58,13 @@ public class Client {
 				MediaType.parse("Binary data"),
 				qData.bodySegments.isEmpty() ? new byte[0] : qData.bodySegments.get(0));
 
-		if (getOrPost.equals("get")) {
+		switch (httpMethod.method()) {
+		case HttpMethod.GET:
 			reqBuilder.get();
-		} else {
+			break;
+		case HttpMethod.POST:
 			reqBuilder.post(rb);
+			break;
 		}
 
 		Request request = reqBuilder.build();

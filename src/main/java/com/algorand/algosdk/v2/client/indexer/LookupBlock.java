@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.indexer;
 
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -19,7 +20,7 @@ public class LookupBlock extends Query {
 	 * @param roundNumber Round number 
 	 */
 	public LookupBlock(Client client, Long roundNumber) {
-		super(client, "get");
+		super(client, new HttpMethod("get"));
 		this.roundNumber = roundNumber;
 	}
 

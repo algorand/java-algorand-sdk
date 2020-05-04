@@ -505,7 +505,7 @@ public class Generator {
 		return nPath;
 	}
 
-	static String getQueryResponseMethod(String returnType, String getOrPost) {
+	static String getQueryResponseMethod(String returnType) {
 		String ret = 
 				"	@Override\n" + 
 						"	public Response<" + returnType + "> execute() throws Exception {\n" + 
@@ -541,7 +541,7 @@ public class Generator {
 			String className, 			
 			String path,
 			String returnType,
-			String getOrPost,
+			String httpMethod,
 			Map<String, Set<String>> imports) {
 
 		StringBuffer decls = new StringBuffer();
@@ -553,7 +553,7 @@ public class Generator {
 
 		StringBuffer generatedPathsEntryBody = new StringBuffer();
 
-		requestMethod.append(Generator.getQueryResponseMethod(returnType, getOrPost));
+		requestMethod.append(Generator.getQueryResponseMethod(returnType));
 		requestMethod.append("	protected QueryData getRequestString() {\n");
 		boolean pAdded = false;
 
@@ -645,7 +645,7 @@ public class Generator {
 		}
 		ans.append("	public "+className+"(Client client");
 		ans.append(constructorHeader);
-		ans.append(") {\n		super(client, \""+getOrPost+"\");\n");
+		ans.append(") {\n		super(client, new HttpMethod(\""+httpMethod+"\"));\n");
 		ans.append(constructorBody);
 		ans.append("	}\n\n");
 
@@ -675,13 +675,13 @@ public class Generator {
 			String pkg,
 			String modelPkg) throws IOException { 
 
-		String getOrPost;
+		String httpMethod;
 		if (spec.get("post") != null) {
 			spec = spec.get("post");
-			getOrPost = "post";
+			httpMethod = "post";
 		} else {
 			spec = spec.get("get");
-			getOrPost = "get";
+			httpMethod = "get";
 		}
 
 		String className = spec.get("operationId").asText();
@@ -716,6 +716,7 @@ public class Generator {
 
 		Map<String, Set<String>> imports = new HashMap<String, Set<String>>();
 		addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
+		addImport(imports, "com.algorand.algosdk.v2.client.common.HttpMethod");
 		addImport(imports, "com.algorand.algosdk.v2.client.common.Query"); 
 		addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
 		addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
@@ -736,7 +737,7 @@ public class Generator {
 						className, 
 						path,
 						returnType, 
-						getOrPost, 
+						httpMethod, 
 						imports));
 		sb.append("\n}");
 		bw.append(getImports(imports));

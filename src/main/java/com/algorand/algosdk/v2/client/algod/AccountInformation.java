@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.algod;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -21,7 +22,7 @@ public class AccountInformation extends Query {
 	 * @param address An account public key 
 	 */
 	public AccountInformation(Client client, Address address) {
-		super(client, "get");
+		super(client, new HttpMethod("get"));
 		this.address = address;
 	}
 

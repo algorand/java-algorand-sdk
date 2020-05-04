@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.indexer;
 
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -16,7 +17,7 @@ public class LookupAssetByID extends Query {
 	private Long assetId;
 
 	public LookupAssetByID(Client client, Long assetId) {
-		super(client, "get");
+		super(client, new HttpMethod("get"));
 		this.assetId = assetId;
 	}
 

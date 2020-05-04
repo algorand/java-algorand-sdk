@@ -3,12 +3,12 @@ package com.algorand.algosdk.v2.client.common;
 public abstract class Query {
 
 	private Client client;
-	private String getOrPost;
+	private HttpMethod httpMethod;
 	protected QueryData qd;
 	
-	protected Query(Client client, String getOrPost) {
+	protected Query(Client client, HttpMethod httpMethod) {
 		this.client = client;
-		this.getOrPost = getOrPost;
+		this.httpMethod = httpMethod;
 		this.qd = new QueryData();
 	}
 
@@ -17,7 +17,7 @@ public abstract class Query {
 	protected <T>Response<T> baseExecute() throws Exception {
 
 		QueryData qData = this.getRequestString();
-		com.squareup.okhttp.Response resp = this.client.executeCall(qData, getOrPost);
+		com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod);
 		if (resp.isSuccessful()) {
 			return new Response<T>(resp.code(), null, resp.body().string());
 		} else {

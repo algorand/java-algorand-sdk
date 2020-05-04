@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.algod;
 
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -26,7 +27,7 @@ public class PendingTransactionInformation extends Query {
 	 * @param txid A transaction id 
 	 */
 	public PendingTransactionInformation(Client client, String txid) {
-		super(client, "get");
+		super(client, new HttpMethod("get"));
 		this.txid = txid;
 	}
 

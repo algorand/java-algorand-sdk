@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.algod;
 
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -15,7 +16,7 @@ import com.algorand.algosdk.v2.client.common.Response;
 public class ShutdownNode extends Query {
 
 	public ShutdownNode(Client client) {
-		super(client, "post");
+		super(client, new HttpMethod("post"));
 	}
 
 	public ShutdownNode timeout(Long timeout) {

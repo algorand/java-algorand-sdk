@@ -5,6 +5,7 @@ import java.util.Date;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -22,7 +23,7 @@ public class LookupAssetTransactions extends Query {
 	private Long assetId;
 
 	public LookupAssetTransactions(Client client, Long assetId) {
-		super(client, "get");
+		super(client, new HttpMethod("get"));
 		this.assetId = assetId;
 	}
 
