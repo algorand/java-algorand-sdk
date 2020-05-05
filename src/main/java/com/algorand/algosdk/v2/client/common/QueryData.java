@@ -14,6 +14,9 @@ public class QueryData {
 		pathSegments = new ArrayList<String>();
 		bodySegments = new ArrayList<byte[]>();
 	}
+	public void resetPathSegments() {
+		pathSegments = new ArrayList<String>();
+	}
 	public void addPathSegment(String segment) {
 		pathSegments.add(segment);
 	}

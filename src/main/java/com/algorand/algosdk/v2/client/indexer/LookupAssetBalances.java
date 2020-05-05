@@ -72,6 +72,7 @@ public class LookupAssetBalances extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		resetPathSegment();
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));
 		addPathSegment(String.valueOf("balances"));

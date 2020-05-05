@@ -368,7 +368,7 @@ public class QueryMapper {
 		return resp.body().toString();
 	}
 
-	private static Enums.AddressRole getAddressRole(String val) {
+	public static Enums.AddressRole getAddressRole(String val) {
 		switch(val.toUpperCase()) {
 		case "SENDER":
 			return Enums.AddressRole.SENDER;
@@ -380,7 +380,7 @@ public class QueryMapper {
 			throw new RuntimeException("Enum value not recognized: " + val +"!");
 		}
 	}
-	private static Enums.Format getFormat(String val) {
+	public static Enums.Format getFormat(String val) {
 		switch(val.toUpperCase()) {
 		case "JSON":
 			return Enums.Format.JSON;
@@ -390,7 +390,7 @@ public class QueryMapper {
 			throw new RuntimeException("Enum value not recognized: " + val +"!");
 		}
 	}
-	private static Enums.SigType getSigType(String val) {
+	public static Enums.SigType getSigType(String val) {
 		switch(val.toUpperCase()) {
 		case "SIG":
 			return Enums.SigType.SIG;
@@ -402,7 +402,7 @@ public class QueryMapper {
 			throw new RuntimeException("Enum value not recognized: " + val +"!");
 		}
 	}
-	private static Enums.TxType getTxType(String val) {
+	public static Enums.TxType getTxType(String val) {
 		switch(val.toUpperCase()) {
 		case "PAY":
 			return Enums.TxType.PAY;

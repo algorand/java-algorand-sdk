@@ -27,13 +27,17 @@ public abstract class Query {
 
 	public String getRequestUrl(int port, String host) {
 		if (qd.pathSegments.size() == 0) {
-			throw new RuntimeException("getRequestUrl can be called only after calling execute()");
+			this.getRequestString();
 		}
 		return Client.getHttpUrl(this.qd, port, host).toString();
 	}
 	
 	protected void addQuery(String key, String value) {
 		qd.addQuery(key, value);
+	}
+	
+	protected void resetPathSegment() {
+		qd.resetPathSegments();
 	}
 	
 	protected void addPathSegment(String segment) {
