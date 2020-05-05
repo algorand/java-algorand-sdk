@@ -171,20 +171,7 @@ public class Logic {
         List<byte[]> bytes = new ArrayList<>();
 
         if (langSpec == null) {
-            Reader reader;
-            try {
-                reader = new InputStreamReader(
-                    Logic.class.getResourceAsStream("/langspec.json"),
-                    "UTF-8"
-                );
-            } catch (UnsupportedEncodingException ex) {
-                throw new IllegalStateException("langspec opening error");
-            }
-
-            Gson g = new GsonBuilder().create();
-
-            langSpec = g.fromJson(reader, LangSpec.class);
-            reader.close();
+            loadLangSpec();
         }
 
         VarintResult result = getUVarint(program, 0);
@@ -254,6 +241,51 @@ public class Logic {
         }
 
         return new ProgramData(true, ints, bytes);
+    }
+
+    /**
+     * Retrieves TEAL supported version
+     * @return int
+     * @throws IOException
+     */
+    public static int getLogicSigVersion() throws IOException {
+        if (langSpec == null) {
+            loadLangSpec();
+        }
+        return langSpec.LogicSigVersion;
+    }
+
+    /**
+     * Retrieves max supported version of TEAL evaluator
+     * @return int
+     * @throws IOException
+     */
+    public static int getEvalMaxVersion() throws IOException {
+        if (langSpec == null) {
+            loadLangSpec();
+        }
+        return langSpec.EvalMaxVersion;
+    }
+
+    private static void loadLangSpec() throws IOException {
+        if (langSpec != null) {
+            return;
+        }
+
+        Reader reader;
+        try {
+            reader = new InputStreamReader(
+                Logic.class.getResourceAsStream("/langspec.json"),
+                "UTF-8"
+            );
+        } catch (UnsupportedEncodingException ex) {
+            throw new IllegalStateException("langspec opening error");
+        }
+
+        Gson g = new GsonBuilder().create();
+
+        langSpec = g.fromJson(reader, LangSpec.class);
+        reader.close();
     }
 
     protected static IntConstBlock readIntConstBlock(byte[] program, int pc) {
