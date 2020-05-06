@@ -15,6 +15,9 @@ public class Utils {
 	 */
 	public static Date parseDate(String dateString) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+		if (dateString.indexOf('.') > 0) {
+			sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSX");
+		}
 		if (dateString.indexOf('Z') == -1) {
 			throw new RuntimeException("The time should end with the time-zone Z");
 		}
