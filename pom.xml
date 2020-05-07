@@ -215,6 +215,9 @@
                   <includes>
                     <include>**/*Test*.*</include>
                   </includes>
+                  <excludes>
+                    <exclude>**/*Cucumber*.*</exclude>
+                  </excludes>
                 </configuration>
               </execution>
               <execution>
