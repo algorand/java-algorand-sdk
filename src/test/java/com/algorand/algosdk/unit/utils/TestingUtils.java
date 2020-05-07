@@ -1,4 +1,4 @@
-package com.algorand.algosdk.unittest;
+package com.algorand.algosdk.unit.utils;
 
 import java.util.Arrays;
 import java.util.Comparator;
