@@ -34,6 +34,10 @@ done
 rm -rf test-harness
 git clone --single-branch --branch will/indexer-tweaks https://github.com/algorand/algorand-sdk-testing.git test-harness
 
+# TODO: Remove these two lines once we have the indexer tests implemented
+rm test-harness/features/integration/indexer.feature
+rm test-harness/features/unit/v2*feature
+
 ## Copy feature files into the project resources
 rm -rf src/test/resources/com/algorand/algosdk/integration
 rm -rf src/test/resources/com/algorand/algosdk/unit
