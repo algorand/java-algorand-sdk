@@ -1,11 +1,12 @@
-package com.algorand.algosdk.unittest.indexer;
+package com.algorand.algosdk.unit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.security.NoSuchAlgorithmException;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.unittest.TestingUtils;
+import com.algorand.algosdk.unit.utils.TestIndexerClient;
+import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
@@ -21,6 +22,8 @@ import com.algorand.sdkutils.generated.QueryMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 
 public class Indexer {
 
@@ -46,9 +49,10 @@ public class Indexer {
 
 	@Then("expect error string to contain {string}")
 	public void expect_error_string_to_contain(String string) {
-	    //TODO: what are we doing here?
-//		throw new io.cucumber.java.PendingException();
-
+		if (StringUtils.isNotEmpty(string) && !string.equals("nil")) {
+			// Why do no error cases test an error?
+			Assertions.fail("No tests were implementing this so neither did I");
+		}
 	}
 
 	@Then("the parsed LookupAssetBalances response should be valid on round {long}, "
