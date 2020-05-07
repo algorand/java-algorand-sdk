@@ -49,7 +49,9 @@ public class Generator {
 	protected JsonNode root;
 
 	static BufferedWriter getFileWriter(String className, String directory) throws IOException {
-		BufferedWriter bw = new BufferedWriter(new FileWriter(new File(directory + "/" + className + ".java")));
+		File f = new File(directory + "/" + className + ".java");
+		f.getParentFile().mkdirs();
+		BufferedWriter bw = new BufferedWriter(new FileWriter(f));
 		return bw;
 	}
 
@@ -810,30 +812,28 @@ public class Generator {
 				}
 	}
 
-	public void generateQueryMethods(String rootPath, String pkg, String modelPkg, String gpImpDirFile, String gpMethodsDirFile) throws IOException {
+	public void generateQueryMethods(String rootPath, String pkg, String modelPkg, File gpImpDirFile, File gpMethodsDirFile) throws IOException {
 		// GeneratedPaths file
-		BufferedWriter gpImports = new BufferedWriter(new FileWriter(new File(gpImpDirFile)));
-		BufferedWriter gpMethods = new BufferedWriter(new FileWriter(new File(gpMethodsDirFile)));
+        try (   BufferedWriter gpImports = new BufferedWriter(new FileWriter(gpImpDirFile));
+        		BufferedWriter gpMethods = new BufferedWriter(new FileWriter(gpMethodsDirFile))) {
+			StringBuffer gpBody = new StringBuffer();
 
-		StringBuffer gpBody = new StringBuffer();
+			JsonNode paths = this.root.get("paths");
+			Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
+			while (pathIter.hasNext()) {
+				Entry<String, JsonNode> path = pathIter.next();
+				JsonNode privateTag = path.getValue().get("post") != null ? path.getValue().get("post").get("tags") : null;
+				if (privateTag != null && privateTag.elements().next().asText().equals("private")) {
+					continue;
+				}
+				writeQueryClass(gpBody, path.getValue(), path.getKey(), rootPath, pkg, modelPkg);
 
-		JsonNode paths = this.root.get("paths");
-		Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
-		while (pathIter.hasNext()) {
-			Entry<String, JsonNode> path = pathIter.next();
-			JsonNode privateTag = path.getValue().get("post") != null ? path.getValue().get("post").get("tags") : null;
-			if (privateTag != null && privateTag.elements().next().asText().equals("private")) {
-				continue;
+				// Fill GeneratedPaths class
+				String className = getCamelCase(path.getValue().findPath("operationId").asText(), true);
+				gpImports.append("import " + pkg + "." + className + ";\n");
 			}
-			writeQueryClass(gpBody, path.getValue(), path.getKey(), rootPath, pkg, modelPkg);
-
-			// Fill GeneratedPaths class
-			String className = getCamelCase(path.getValue().findPath("operationId").asText(), true);
-			gpImports.append("import " + pkg + "." + className + ";\n");
+			gpMethods.append(gpBody);
 		}
-		gpMethods.append(gpBody);
-		gpMethods.close();
-		gpImports.close();
 	}
 
 	public Generator (JsonNode root) {

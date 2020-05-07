@@ -1,56 +1,22 @@
 package com.algorand.sdkutils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
-import com.algorand.sdkutils.generators.Generator;
-import com.algorand.sdkutils.generators.Utils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class RunAlgodV2Generator {
+	public static void main (String args[]) throws Exception {
+		File specfile = new File("../../../go/src/github.com/algorand/go-algorand/daemon/algod/api/algod.oas2.json");
 
-	public static void main (String args[]) throws JsonProcessingException, IOException {
-
-		File f = null;
-		try {
-			f = new File(args[0]);
-		} catch (Exception e){
-			System.err.println("Couldn't read the algod.oas2.json file. The path should be passed as an argument.");
-			System.exit(1);
-		}
-		FileInputStream fis = new FileInputStream(f);
-
-		JsonNode root = Utils.getRoot(fis);	
-		String rootPath = "src/main/java/com/algorand/algosdk/";
-		String genRoot = "src/main/java/com/algorand/sdkutils/generated/";
-		
-		Generator g = new Generator(root);
-
-		// Generate classes from the schemas
-		// com.algorand.algosdk.v2.client.model
-		String pkg = "com.algorand.algosdk.v2.client.model";
-		System.out.println("Generating " + pkg + " to " + rootPath+"/v2/client/model");
-		Generator.generateAlgodIndexerObjects(root, rootPath+"/v2/client/model", pkg);
-		Generator.generateEnumClasses(root, rootPath+"/v2/client/model", pkg);
-		
-		// Generate classes from the return types which have more than one return element
-		// com.algorand.algosdk.v2.client.model		
-		System.out.println("Generating " + pkg + " to " + rootPath+"/v2/client/model");
-		Generator.generateReturnTypes(root, rootPath+"/v2/client/model", pkg);
-
-		// Generate the algod methods
-		// com.algorand.algosdk.v2.client.indexer
-		String apkg = "com.algorand.algosdk.v2.client.algod";
-		System.out.println("Generating " + apkg + " to " + rootPath+"/v2/client/algod");
-		g.generateQueryMethods(rootPath+"/v2/client/algod", 
-				apkg, pkg, 
-				genRoot+"algodV2Imports.txt", 
-				genRoot+"algodV2Paths.txt");
-		
-		Utils.generateAlgodClientFile(genRoot);
-
+		Main.Generate(
+				"AlgodClient",
+				specfile,
+				"../src/main/java/com/algorand/algosdk/v2/client/model",
+				"com.algorand.algosdk.v2.client.model",
+				"../src/main/java/com/algorand/algosdk/v2/client/algod",
+				"com.algorand.algosdk.v2.client.algod",
+				"../src/main/java/com/algorand/algosdk/v2/client/common",
+				"com.algorand.algosdk.v2.client.common",
+				"X-Algo-API-Token",
+				false);
 	}
 }
 

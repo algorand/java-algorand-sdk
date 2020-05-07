@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 
-import com.algorand.algosdk.v2.client.common.AlgodClient;
-import com.algorand.algosdk.v2.client.common.Client;
+//import com.algorand.algosdk.v2.client.common.AlgodClient;
+//import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.sdkutils.generators.TestGenerator;
 import com.algorand.sdkutils.generators.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -17,6 +17,7 @@ public class RunAlgodV2Tests extends TestGenerator {
 	}
 
 	public static void main (String args[]) throws Exception {
+		/*
 		File f = null;
 		try {
 			f = new File(args[0]);
@@ -45,5 +46,6 @@ public class RunAlgodV2Tests extends TestGenerator {
 		}
 		br.close();
 		System.out.println("File tested: " + "./src/main/java/com/algorand/sdkutils/algodV2Tests.csv");
+		*/
 	}
 }

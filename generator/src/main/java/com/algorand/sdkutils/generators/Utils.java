@@ -8,9 +8,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.StringTokenizer;
 
-import com.algorand.algosdk.v2.client.common.Client;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.apache.commons.lang3.StringUtils;
 
 public class Utils {
 	
@@ -100,12 +101,11 @@ public class Utils {
 		root = objectMapper.readTree(fileIs);
 		return root;
 	}
-	
-	public static String readFile(String filename) throws IOException  {
-		
+
+	public static String readFile(File file) throws IOException  {
 		FileReader fileReader;
 		try {
-			fileReader = new FileReader(new File (filename));
+			fileReader = new FileReader(file);
 		} catch (FileNotFoundException e) {
 			return "";
 		}
@@ -120,49 +120,61 @@ public class Utils {
 
 	public static void writeFile(String filename, String content) throws IOException {
 		File file = new File(filename);
+		file.getParentFile().mkdirs();
 		BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 		bw.append(content);
 		bw.close();
 	}
 
-	public static void generateIndexerClientFile(String genRoot) throws IOException {
-		// Generate the client files
-		// Indexer
-		String imports = Utils.readFile(genRoot+"indexerImports.txt");
-		imports = "import com.algorand.algosdk.crypto.Address;\n" + imports;		
-		String methods = Utils.readFile(genRoot+"indexerPaths.txt"); 
-		
-		StringBuffer sb = new StringBuffer();
-		sb.append("package com.algorand.algosdk.v2.client.common;\n\n");
-		sb.append(imports);
-		sb.append("\n");
-		sb.append("public class IndexerClient extends Client {\n" + 
-				"\n" + 
-				"	public IndexerClient(String host, int port, String token) {\n" + 
-				"		super(host, port, token, \"X-Indexer-API-Token\");\n" + 
-				"	}\n");
-		sb.append(methods);
-		sb.append("}\n");
-		Utils.writeFile("src/main/java/com/algorand/algosdk/v2/client/common/IndexerClient.java", sb.toString());
-	}
-	
-	public static void generateAlgodClientFile(String genRoot) throws IOException {
-		// Algod
-		String imports = Utils.readFile(genRoot+"algodV2Imports.txt");
+
+	/**
+	 * Generate the client which wraps up all the builders, accepts the host/port/token, etc.
+     *
+	 * clientName    - IndexerClient
+	 * importLines   - The contents of xxxxxImports.txt
+	 * paths         - The file at genRoot + xxxxxPaths.txt
+	 * packageName   - "com.algorand.algosdk.v2.client.common"
+	 * packagePath   - "src/main/java/com/algorand/algosdk/v2/client/common"
+	 * tokenName     - "X-Indexer-API-Token"
+	 * tokenOptional - Indicates that the token is optional and two constructors should be created.
+     *
+	 * @param clientName Name of the client class. i.e. IndexerClient
+	 * @param importLines Lines to be added to the import section of the template. Generated from a previous step.
+	 * @param paths The generated methods for accessing the paths. Generated from a previous step.
+	 * @param packageName Name of the package containing the client.
+	 * @param packagePath Path where the client will go.
+	 * @param tokenName Name of the token used for this application. i.e. X-Algo-API-Token
+	 * @param tokenOptional Whether or not a no-token version of the constructor should be created.
+	 */
+	public static void generateClientFile(String clientName, Collection<String> importLines, File paths, String packageName, String packagePath, String tokenName, Boolean tokenOptional) throws Exception {
+
+		if (packagePath.endsWith("/")) {
+		    throw new Exception("Path shouldn't have a trailing slash.");
+		}
+
+		String imports = StringUtils.join(importLines, "\n");
 		imports = "import com.algorand.algosdk.crypto.Address;\n" + imports;
-		String methods = Utils.readFile(genRoot+"algodV2Paths.txt");  
+
+		String methods = Utils.readFile(paths);
 
 		StringBuffer sb = new StringBuffer();
-		sb.append("package com.algorand.algosdk.v2.client.common;\n\n");
+		sb.append("package " + packageName + ";\n\n");
 		sb.append(imports);
 		sb.append("\n");
-		sb.append("public class AlgodClient extends Client {\n" + 
-				"\n" + 
-				"	public AlgodClient(String host, int port, String token) {\n" + 
-				"		super(host, port, token, \"X-Algo-API-Token\");\n" + 
+		sb.append("public class " + clientName + " extends Client {\n\n");
+
+		sb.append("	public " + clientName + "(String host, int port, String token) {\n" +
+				"		super(host, port, token, \"" + tokenName + "\");\n" +
 				"	}\n");
+
+		if (tokenOptional) {
+			sb.append("	public " + clientName + "(String host, int port) {\n" +
+					"		super(host, port, \"\", \"" + tokenName + "\");\n" +
+					"	}\n");
+		}
+
 		sb.append(methods);
 		sb.append("}\n");
-		Utils.writeFile("src/main/java/com/algorand/algosdk/v2/client/common/AlgodClient.java", sb.toString());
+		Utils.writeFile(packagePath + "/" + clientName + ".java", sb.toString());
 	}
 }
