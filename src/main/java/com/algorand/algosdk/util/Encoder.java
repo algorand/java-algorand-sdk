@@ -12,6 +12,7 @@ import org.apache.commons.codec.binary.Hex;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Encoder {
     private static final char BASE32_PAD_CHAR = '=';
@@ -123,6 +124,19 @@ public class Encoder {
             }
         }
         return paddedStr.substring(0, i);
+    }
+
+    public static byte[] decodeFromBase32StripPad(String bytes) {
+        Base32 codec = new Base32((byte)BASE32_PAD_CHAR);
+        byte[] paddedStr =  codec.decode(bytes);
+        // strip padding
+        int i = 0;
+        for (; i < paddedStr.length; i++) {
+            if (paddedStr[i] == BASE32_PAD_CHAR) {
+                break;
+            }
+        }
+        return Arrays.copyOf(paddedStr, i);
     }
 
     /**

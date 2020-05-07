@@ -185,3 +185,16 @@ Note that msgpack-java is good at using the minimal representation.
 
 Significant work has been taken to ensure Android compatibility (in particular for `minSdkVersion` 16). Note that the
 default crypto provider on Android does not provide `ed25519` signatures, so you will need to provide your own (e.g. `BouncyCastle`).
+
+# Algod V2 and Indexer Code Generation
+The classes com.algorand.algosdk.v2.client.algod.\*, com.algorand.algosdk.v2.client.indexer.\*, com.algorand.algosdk.v2.client.common.AlgodClient, and com.algorand.algosdk.v2.client.common.IndexerClient are generated from the specifications in: algod.oas2.json and indexer.oas2.json.
+
+The specification files can be obtained from:
+- algod.oas2.json: https://github.com/algorand/go-algorand/blob/master/daemon/algod/api/algod.oas2.json
+- indexer.oas2.json: https://github.com/algorand/indexer/blob/master/api/indexer.oas2.json
+
+The following classes run the generators: 
+- com.algorand.sdkutils.RunAlgodV2Generator to generate com.algorand.algosdk.v2.client.algod.\* and com.algorand.algosdk.v2.client.common.AlgodClient
+- com.algorand.sdkutils.RunIndexerGenerator to generate com.algorand.algosdk.v2.client.indexer.\* and com.algorand.algosdk.v2.client.common.IndexerClient
+
+A testing framework can also be generated with: com.algorand.sdkutils.RunQueryMapperGenerator and the tests run from com.algorand.sdkutils.RunAlgodV2Tests and com.algorand.sdkutils.RunIndexerTests.
