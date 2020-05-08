@@ -17,7 +17,7 @@ public class TestIndexerClient extends IndexerClient {
 	/**
 	 * Add a response to the client.
 	 */
-	public void addResponss(int code, String contentType, File bodyFile) throws IOException {
+	public void addResponse(int code, String contentType, File bodyFile) throws IOException {
 	    // Read file
 		byte[] bodyBytes = Files.readAllBytes(bodyFile.toPath());
 
