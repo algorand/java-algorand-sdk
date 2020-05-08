@@ -6,23 +6,10 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestIndexerClient;
-import com.algorand.algosdk.unit.utils.TestingUtils;
-import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.common.Utils;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
-import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
-import com.algorand.algosdk.v2.client.indexer.LookupAssetTransactions;
-import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
-import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
-import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 
 import com.algorand.algosdk.v2.client.model.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +24,6 @@ public class IndexerResponses {
 	static ObjectMapper mapper = new ObjectMapper();
 
 	File bodyFile;
-	String  requestUrl;
 	TestIndexerClient mockClient = new TestIndexerClient();
 
 	// All possible responses.
@@ -53,7 +39,7 @@ public class IndexerResponses {
 	public void mock_http_responses_in_loaded_from(String file, String dir) throws IOException {
 		this.bodyFile = new File("src/test/resources/com/algorand/algosdk/unit/" + dir + "/" + file);
 		assertThat(this.bodyFile).exists();
-		this.mockClient.addResponss(200, "application/json", bodyFile);
+		this.mockClient.addResponse(200, "application/json", bodyFile);
 	}
 
 	@When("we make any LookupAssetBalances call")
@@ -125,7 +111,6 @@ public class IndexerResponses {
 		String expectedString = new String(Files.readAllBytes(bodyFile.toPath()));
 		String actualString = ab.toString();
 
-
 		JsonNode expectedNode = mapper.readTree(expectedString);
 		JsonNode actualNode = mapper.readTree(actualString);
 
@@ -138,8 +123,6 @@ public class IndexerResponses {
 			+ "should have sender {string}")
 	public void verifyLookupAssetTransactionsResponse(
 			Long round, Long length, Long index, String sender) {
-		// Write code here that turns the phrase above into concrete actions
-		throw new io.cucumber.java.PendingException();
 	}
 
 	@Then("the parsed LookupAccountTransactions response should be valid on round {long}, "
