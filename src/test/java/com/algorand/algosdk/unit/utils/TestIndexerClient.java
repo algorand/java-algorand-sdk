@@ -1,48 +1,45 @@
 package com.algorand.algosdk.unit.utils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
 import com.algorand.algosdk.v2.client.common.IndexerClient;
-import com.algorand.algosdk.v2.client.common.Response;
+import com.squareup.okhttp.*;
+import org.mockito.Mockito;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 public class TestIndexerClient extends IndexerClient {
-
-	private String filename;
-	
-	public TestIndexerClient(String host, int port, String token) {
-		super(host, port, token);
+	public TestIndexerClient() {
+		super("localhost", 1234, "");
+		this.client = Mockito.mock(OkHttpClient.class);
 	}
 
-	public void setFileName(String filename) {
-		this.filename = filename;
-	}
-	
-	public <T>Response<T> testExecute (Class<?> valueType) throws Exception {
-		String responseStr = readFile(filename);
-		Response<T> resp = new Response<T>(200, null, responseStr);
-		resp.setValueType(valueType);
-		return resp;
-	}
-	
-	public static String readFile(String filename) throws IOException  {
-		
-		FileReader fileReader;
-		try {
-			fileReader = new FileReader(new File (filename));
-		} catch (FileNotFoundException e) {
-			return "";
-		}
-		StringBuffer sb = new StringBuffer();
-		BufferedReader br = new BufferedReader(fileReader);
-		for (String line = br.readLine(); line != null; line = br.readLine()) {
-			sb.append(line + "\n");
-		}
-		br.close();
-		return sb.toString();
-	}
+	/**
+	 * Add a response to the client.
+	 */
+	public void addResponss(int code, String contentType, File bodyFile) throws IOException {
+	    // Read file
+		byte[] bodyBytes = Files.readAllBytes(bodyFile.toPath());
 
+		// Return a mock "Call" which returns a mock "Response" loaded with the mock body data and return code.
+		Mockito.when(this.client.newCall(Mockito.any())).thenAnswer(i -> {
+			Request r = i.getArgument(0);
+
+			ResponseBody body = ResponseBody.create(
+					MediaType.parse(contentType),
+					bodyBytes);
+
+			Response mockResponse = (new Response.Builder())
+					.code(code)
+					.body(body)
+                    .request(r)
+					.protocol(Protocol.HTTP_2)
+					.build();
+
+			Call c = Mockito.mock(Call.class);
+			Mockito.when(c.execute()).thenReturn(mockResponse);
+
+			return c;
+		});
+	}
 }
