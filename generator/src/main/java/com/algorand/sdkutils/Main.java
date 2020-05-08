@@ -18,19 +18,6 @@ public class Main {
             CommandLineParser parser = new DefaultParser();
             CommandLine line = parser.parse(o, args);
 
-            /*
-            "AlgodClient"
-            specfile
-            "src/main/java/com/algorand/algosdk/v2/client/model"
-            "com.algorand.algosdk.v2.client.model"
-            "src/main/java/com/algorand/algosdk/v2/client/algod"
-            "com.algorand.algosdk.v2.client.algod"
-            "src/main/java/com/algorand/algosdk/v2/client/common"
-            "com.algorand.algosdk.v2.client.common"
-            "X-Algo-API-Token"
-            false
-             */
-
             if (line.hasOption("help")) {
                 HelpFormatter formatter = new HelpFormatter();
                 formatter.printHelp("generator", o);
