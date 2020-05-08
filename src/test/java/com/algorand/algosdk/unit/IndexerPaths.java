@@ -2,9 +2,9 @@ package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.QueryMapper;
-import com.algorand.algosdk.unit.utils.TestIndexerClient;
 import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.indexer.*;
 import io.cucumber.java.en.Given;
@@ -17,11 +17,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class IndexerPaths {
     String requestUrl;
-    TestIndexerClient indexerClient;
+    IndexerClient indexerClient;
 
     @Given("mock server recording request paths")
     public void mock_server_recording_request_paths() {
-        indexerClient = new TestIndexerClient();
+        indexerClient = new IndexerClient("localhost", 1234, "");
     }
 
     @When("we make a Lookup Asset Balances call against asset index {long} "
