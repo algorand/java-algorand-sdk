@@ -5,11 +5,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public abstract class PathResponse {
+	private final static ObjectMapper mapper = new ObjectMapper();
+
+	static {
+		mapper.setSerializationInclusion(Include.NON_NULL);
+	}
 	
 	@Override
 	public String toString() {
 		try {
-			return new ObjectMapper().setSerializationInclusion(Include.NON_NULL).writeValueAsString(this);
+			return mapper.writeValueAsString(this);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 			return null;

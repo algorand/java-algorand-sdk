@@ -20,18 +20,15 @@ public class Response<T> {
 		msgpMapper = new ObjectMapper(new MessagePackFactory());
 		msgpMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
 		msgpMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		msgpMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 		// There's some odd bug in Jackson < 2.8.? where null values are not excluded. See:
 		// https://github.com/FasterXML/jackson-databind/issues/1351. So we will
 		// also annotate all fields manually
-		msgpMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+		msgpMapper.setSerializationInclusion(Include.NON_NULL);
 
 		jsonMapper = new ObjectMapper();
 		jsonMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-		jsonMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 		jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		jsonMapper.setSerializationInclusion(Include.NON_NULL);
-		jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
 	}
 
 	private int code;

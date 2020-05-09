@@ -2,10 +2,8 @@ package com.algorand.algosdk.unit.utils;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flipkart.zjsonpatch.JsonDiff;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,7 +14,6 @@ import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

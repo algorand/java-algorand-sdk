@@ -3,18 +3,15 @@ package com.algorand.algosdk.unit;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.ClientMocker;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
-import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.*;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AlgodResponses {
     AlgodClient client;
