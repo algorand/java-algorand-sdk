@@ -138,6 +138,13 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.flipkart.zjsonpatch</groupId>
+            <artifactId>zjsonpatch</artifactId>
+            <version>0.4.10</version>
+        </dependency>
+
+
         <!-- junit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

@@ -19,9 +19,9 @@ public abstract class Query {
 		QueryData qData = this.getRequestString();
 		com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod);
 		if (resp.isSuccessful()) {
-			return new Response<T>(resp.code(), null, resp.body().string());
+			return new Response<T>(resp.code(), null, resp.body().contentType().toString(), resp.body().string());
 		} else {
-			return new Response<T>(resp.code(), resp.body().string(), null);
+			return new Response<T>(resp.code(), resp.body().string(), null, null);
 		}
 	}
 

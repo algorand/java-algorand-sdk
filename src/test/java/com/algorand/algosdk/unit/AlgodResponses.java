@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AlgodResponses {
     AlgodClient client;
@@ -47,7 +48,7 @@ public class AlgodResponses {
     @When("we make any Send Raw Transaction call")
     public void we_make_any_Send_Raw_Transaction_call() throws Exception {
         ClientMocker.infect(client);
-        stringResponse = client.RawTransaction().execute();
+        stringResponse = client.RawTransaction().rawtxn("boop".getBytes()).execute();
     }
 
     @When("we make any Pending Transactions By Address call")
@@ -135,5 +136,10 @@ public class AlgodResponses {
     @Then("the parsed Suggested Transaction Parameters response should have first round valid of {int}")
     public void the_parsed_Suggested_Transaction_Parameters_response_should_have_first_round_valid_of(Integer int1) throws IOException {
         verifyResponse(transactionParametersResponse, shared.bodyFile);
+    }
+
+    @Then("the parsed Send Raw Transaction response should have txid {string}")
+    public void the_parsed_Send_Raw_Transaction_response_should_have_txid(String txid) throws IOException {
+        verifyResponse(stringResponse, shared.bodyFile);
     }
 }
