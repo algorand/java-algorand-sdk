@@ -153,14 +153,13 @@ public class Utils {
 		}
 
 		String imports = StringUtils.join(importLines, "\n");
-		imports = "import com.algorand.algosdk.crypto.Address;\n" + imports;
 
 		String methods = Utils.readFile(paths);
 
 		StringBuffer sb = new StringBuffer();
 		sb.append("package " + packageName + ";\n\n");
 		sb.append(imports);
-		sb.append("\n");
+		sb.append("\n\n");
 		sb.append("public class " + clientName + " extends Client {\n\n");
 
 		sb.append("	public " + clientName + "(String host, int port, String token) {\n" +

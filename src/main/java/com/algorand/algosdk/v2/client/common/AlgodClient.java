@@ -1,6 +1,5 @@
 package com.algorand.algosdk.v2.client.common;
 
-import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
@@ -11,6 +10,8 @@ import com.algorand.algosdk.v2.client.algod.RawTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
+import com.algorand.algosdk.v2.client.algod.StartCatchup;
+import com.algorand.algosdk.crypto.Address;
 
 public class AlgodClient extends Client {
 
@@ -60,7 +61,7 @@ public class AlgodClient extends Client {
 	/**
 	 * Waits for a block to appear after round {round} and returns the node's status at 
 	 * the time. 
-	 * /v2/status/wait-for-block-after/{round}/ 
+	 * /v2/status/wait-for-block-after/{round} 
 	 */
 	public WaitForBlock WaitForBlock(Long round) {
 		return new WaitForBlock((Client) this, round);
@@ -101,6 +102,14 @@ public class AlgodClient extends Client {
 	 */
 	public PendingTransactionInformation PendingTransactionInformation(String txid) {
 		return new PendingTransactionInformation((Client) this, txid);
+	}
+
+	/**
+	 * Given a catchpoint, it starts catching up to this catchpoint 
+	 * /v2/catchup/{catchpoint} 
+	 */
+	public StartCatchup StartCatchup(String catchpoint) {
+		return new StartCatchup((Client) this, catchpoint);
 	}
 
 }

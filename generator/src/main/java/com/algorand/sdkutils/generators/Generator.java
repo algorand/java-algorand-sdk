@@ -678,13 +678,9 @@ public class Generator {
 			String modelPkg) throws IOException { 
 
 		String httpMethod;
-		if (spec.get("post") != null) {
-			spec = spec.get("post");
-			httpMethod = "post";
-		} else {
-			spec = spec.get("get");
-			httpMethod = "get";
-		}
+		Iterator<String> fields = spec.fieldNames();
+		httpMethod = fields.next();
+		spec = spec.get(httpMethod);
 
 		String className = spec.get("operationId").asText();
 		String methodName = Generator.getCamelCase(className, false);
