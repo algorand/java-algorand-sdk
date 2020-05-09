@@ -23,7 +23,7 @@ public class AlgodResponses {
     Response<NodeStatusResponse> nodeStatusResponse;
     Response<PendingTransactionResponse> pendingTransactionResponse;
     Response<PendingTransactionsResponse> pendingTransactionsResponse;
-    Response<String> stringResponse;
+    Response<PostTransactionsResponse> postTransactionsResponse;
     Response<SupplyResponse> supplyResponse;
     Response<TransactionParametersResponse> transactionParametersResponse;
 
@@ -47,7 +47,7 @@ public class AlgodResponses {
     @When("we make any Send Raw Transaction call")
     public void we_make_any_Send_Raw_Transaction_call() throws Exception {
         ClientMocker.infect(client);
-        stringResponse = client.RawTransaction().execute();
+        postTransactionsResponse = client.RawTransaction().execute();
     }
 
     @When("we make any Pending Transactions By Address call")
