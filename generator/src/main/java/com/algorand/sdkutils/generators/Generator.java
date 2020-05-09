@@ -693,9 +693,6 @@ public class Generator {
 			JsonNode returnTypeNode = this.getFromRef(returnType);
 			if (returnTypeNode.get("schema").get("$ref") != null) {
 				returnType = Generator.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
-			} else if (returnTypeNode.get("schema").get("properties").size() == 1) {
-				returnType = returnTypeNode.get("schema").get("properties").findValue("type").asText();
-				returnType = Generator.getCamelCase(returnType, true);
 			} else {
 				returnType = Generator.getTypeNameFromRef(returnType);
 				returnType = Generator.getCamelCase(returnType, true);
@@ -799,9 +796,6 @@ public class Generator {
 
 							if (rSchema.get("$ref") != null ) {
 								// It refers to a defined class
-								continue;
-							}
-							if (rSchema.get("properties").size() == 1) {
 								continue;
 							}
 							writeClass(rtype.getKey(), rSchema.get("properties"), null, rootPath, pkg);
