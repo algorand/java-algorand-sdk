@@ -19,7 +19,7 @@ public class QueryMapperGenerator extends Generator {
 	
 	public void writeQueryMapper(String sdkutilsPath) throws IOException {
 		BufferedWriter bw = getFileWriter("QueryMapper", sdkutilsPath);
-		bw.append("package com.algorand.sdkutils.generated;\n" + 
+		bw.append("package com.algorand.algosdk.unit.utils;\n\n" + 
 				"import java.security.NoSuchAlgorithmException;\n" + 
 				"import java.text.ParseException;\n" + 
 				"import com.algorand.algosdk.v2.client.common.Utils;\n" + 

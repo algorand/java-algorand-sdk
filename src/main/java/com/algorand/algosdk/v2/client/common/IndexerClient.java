@@ -1,6 +1,5 @@
 package com.algorand.algosdk.v2.client.common;
 
-import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
@@ -10,11 +9,15 @@ import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetTransactions;
 import com.algorand.algosdk.v2.client.indexer.LookupBlock;
 import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
+import com.algorand.algosdk.crypto.Address;
 
 public class IndexerClient extends Client {
 
 	public IndexerClient(String host, int port, String token) {
 		super(host, port, token, "X-Indexer-API-Token");
+	}
+	public IndexerClient(String host, int port) {
+		super(host, port, "", "X-Indexer-API-Token");
 	}
 	/**
 	 * Search for accounts. 

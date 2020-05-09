@@ -11,7 +11,7 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
 /**
  * Waits for a block to appear after round {round} and returns the node's status at 
  * the time. 
- * /v2/status/wait-for-block-after/{round}/ 
+ * /v2/status/wait-for-block-after/{round} 
  */
 public class WaitForBlock extends Query {
 

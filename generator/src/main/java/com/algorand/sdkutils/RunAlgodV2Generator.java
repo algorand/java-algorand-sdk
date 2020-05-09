@@ -4,7 +4,11 @@ import java.io.File;
 
 public class RunAlgodV2Generator {
 	public static void main (String args[]) throws Exception {
-		File specfile = new File("../../../go/src/github.com/algorand/go-algorand/daemon/algod/api/algod.oas2.json");
+		String specFilePath = "../../../go/src/github.com/algorand/go-algorand/daemon/algod/api/algod.oas2.json";
+		if (args.length == 1) {
+			specFilePath = args[0];
+		}
+		File specfile = new File(specFilePath);
 
 		Main.Generate(
 				"AlgodClient",
