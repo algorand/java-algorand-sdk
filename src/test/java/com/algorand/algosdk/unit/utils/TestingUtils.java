@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestingUtils {
 	static ObjectMapper mapper = new ObjectMapper();
+
 	public static void verifyResponse(Response r, File body) throws IOException {
 		assertThat(r).isNotNull();
 		assertThat(r.isSuccessful()).isTrue();
