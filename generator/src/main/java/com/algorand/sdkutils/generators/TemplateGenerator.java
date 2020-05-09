@@ -30,14 +30,12 @@ public class TemplateGenerator extends Generator{
 			
 			// Get the description
 			String desc = null;
-			if (path.getValue().get("post") != null) {
-				if (path.getValue().get("post").get("description") != null) {
-					desc = path.getValue().get("post").get("description").asText();
-				}
-			} else {
-				if (path.getValue().get("get").get("description") != null) {
-					desc = path.getValue().get("get").get("description").asText();
-				}
+			String httpMethod;
+			Iterator<String> fields = path.getValue().fieldNames();
+			httpMethod = fields.next();
+
+			if (path.getValue().get(httpMethod).get("description") != null) {
+				desc = path.getValue().get(httpMethod).get("description").asText();
 			}
 			
 			if (desc != null) {

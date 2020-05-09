@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+/*
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.sdkutils.generated.QueryMapper;
+ */
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class TestGenerator extends Generator {
@@ -49,6 +51,7 @@ public class TestGenerator extends Generator {
 		return line.substring(0, line.indexOf(","));
 	}
 
+	/*
 	public static boolean testSamples(TestGenerator tg, BufferedReader br, Client client, boolean verbose) throws Exception {
 		// create the directory golden if it does not exist
 		File goldenDir = new File("golden");
@@ -185,6 +188,7 @@ public class TestGenerator extends Generator {
 		}
 		return !failed;
 	}
+	 */
 
 	public TestGenerator (JsonNode root) {
 		super(root);

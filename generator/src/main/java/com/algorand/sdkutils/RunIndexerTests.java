@@ -5,23 +5,25 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 
-import com.algorand.algosdk.v2.client.common.AlgodClient;
-import com.algorand.algosdk.v2.client.common.Client;
+//import com.algorand.algosdk.v2.client.common.Client;
+//import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.sdkutils.generators.TestGenerator;
 import com.algorand.sdkutils.generators.Utils;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class RunAlgodV2Tests extends TestGenerator {
-	RunAlgodV2Tests(JsonNode root) {
+public class RunIndexerTests extends TestGenerator{
+
+	RunIndexerTests(JsonNode root) {
 		super(root);
 	}
 
 	public static void main (String args[]) throws Exception {
+		/*
 		File f = null;
 		try {
 			f = new File(args[0]);
 		} catch (Exception e){
-			System.err.println("Couldn't read the algod.oas2.json file. The path should be passed as an argument.");
+			System.err.println("Couldn't read the indexer.oas2.json file. The path should be passed as an argument.");
 			System.exit(1);
 		}
 		FileInputStream fis = new FileInputStream(f);
@@ -30,12 +32,11 @@ public class RunAlgodV2Tests extends TestGenerator {
 		TestGenerator tg = new TestGenerator(root);
 
 
-		int port = 60000;
+		int port = 8980;
 		String host = "localhost";
-		String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-		Client client = new AlgodClient(host, port, token);
+		Client client = new IndexerClient(host, port, null);
 
-		File inFile = new File("./src/main/java/com/algorand/sdkutils/algodV2Tests.csv");
+		File inFile = new File("./src/main/java/com/algorand/sdkutils/indexerTests.csv");
 		BufferedReader br = new BufferedReader(new FileReader(inFile));
 		boolean passed = testSamples(tg, br, client, false);
 		if (!passed) {
@@ -44,6 +45,7 @@ public class RunAlgodV2Tests extends TestGenerator {
 			System.out.println("[PASSED]");
 		}
 		br.close();
-		System.out.println("File tested: " + "./src/main/java/com/algorand/sdkutils/algodV2Tests.csv");
+		System.out.println("File tested: " + "./src/main/java/com/algorand/sdkutils/indexerTests.csv");
+		 */
 	}
 }

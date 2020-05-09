@@ -1,4 +1,5 @@
-package com.algorand.sdkutils.generated;
+package com.algorand.algosdk.unit.utils;
+
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import com.algorand.algosdk.v2.client.common.Utils;

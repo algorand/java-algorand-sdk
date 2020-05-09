@@ -35,7 +35,7 @@ public class RunQueryMapperGenerator {
 
 		
 		QueryMapperGenerator qmg = new QueryMapperGenerator(indexerRoot, algodRoot);
-		qmg.writeQueryMapper("src/main/java/com/algorand/sdkutils/generated/");
+		qmg.writeQueryMapper("../src/test/java/com/algorand/algosdk/unit/utils");
 		
 		TemplateGenerator tg = new TemplateGenerator(indexerRoot);
 		tg.writeTemplate("./src/main/java/com/algorand/sdkutils/indexerTemplate");

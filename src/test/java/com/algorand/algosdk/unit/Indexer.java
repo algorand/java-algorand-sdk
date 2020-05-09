@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.security.NoSuchAlgorithmException;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestIndexerClient;
 import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.util.Encoder;
@@ -17,7 +18,6 @@ import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
 import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
 import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
-import com.algorand.sdkutils.generated.QueryMapper;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
