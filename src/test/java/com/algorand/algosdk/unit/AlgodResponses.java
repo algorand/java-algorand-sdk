@@ -11,6 +11,7 @@ import io.cucumber.java.en.When;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -113,8 +114,8 @@ public class AlgodResponses {
         verifyResponse(nodeStatusResponse, shared.bodyFile);
     }
 
-    @Then("the parsed Ledger Supply response should have totalMoney {int} onlineMoney {int} on round {int}")
-    public void the_parsed_Ledger_Supply_response_should_have_totalMoney_onlineMoney_on_round(Integer int1, Integer int2, Integer int3) throws IOException {
+    @Then("the parsed Ledger Supply response should have totalMoney {biginteger} onlineMoney {biginteger} on round {int}")
+    public void the_parsed_Ledger_Supply_response_should_have_totalMoney_onlineMoney_on_round(BigInteger int1, BigInteger int2, Integer int3) throws IOException {
         verifyResponse(supplyResponse, shared.bodyFile);
     }
 
