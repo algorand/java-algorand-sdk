@@ -1,14 +1,20 @@
 package com.algorand.algosdk.v2.client.common;
 
 import java.io.IOException;
-import java.util.Map;
 
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 public class Response<T> {
+	private static ObjectMapper mapper = new ObjectMapper();
+
+	static {
+		mapper.setSerializationInclusion(Include.NON_NULL);
+		mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+	}
 
 	private int code;
 	private String failureMessage;
@@ -32,17 +38,11 @@ public class Response<T> {
 	
 	@Override
 	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
 		String jsonStr;
 		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this.body());
+			jsonStr = mapper.writeValueAsString(this.body());
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());
-			/*
-		} catch (IOException e) {
-			throw new RuntimeException(e.getMessage());
-
-			 */
 		}
 		return jsonStr;
 	}
@@ -53,21 +53,28 @@ public class Response<T> {
 		if (!this.isSuccessful()) {
 			return null;
 		}
-		ObjectMapper mapper = new ObjectMapper();
-		T resp;
+
 		try {
-		    // Assume JSON response.
-			resp = (T) mapper.readValue(body, valueType);
-		} catch (IOException e) {
-		    try {
-		    	// If that doesn't work give message pack a shot.
-				resp = (T) Encoder.decodeFromMsgPack(body, valueType);
-			} catch (IOException ioException) {
-				ioException.printStackTrace();
-				return null;
+		    switch (contentType) {
+				case "application/json":
+				    return convertJson();
+				case "application/messagepack":
+				case "application/msgpack":
+					return convertMessagePack();
 			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		return resp;
+
+		return null;
+	}
+
+	private T convertJson() throws IOException {
+		return (T) mapper.readValue(body, valueType);
+	}
+
+	private T convertMessagePack() throws IOException {
+		return (T) Encoder.decodeFromMsgPack(body, valueType);
 	}
 
 	/** Returns the status message. Describes the failure cause.  */

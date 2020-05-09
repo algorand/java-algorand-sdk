@@ -140,6 +140,6 @@ public class AlgodResponses {
 
     @Then("the parsed Send Raw Transaction response should have txid {string}")
     public void the_parsed_Send_Raw_Transaction_response_should_have_txid(String txid) throws IOException {
-        verifyResponse(stringResponse, shared.bodyFile);
+        verifyResponse(postTransactionsResponse, shared.bodyFile);
     }
 }
