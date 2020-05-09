@@ -42,7 +42,7 @@ public class AlgodResponses {
     @When("we make any Pending Transactions Information call")
     public void we_make_any_Pending_Transactions_Information_call() throws Exception {
         ClientMocker.infect(client);
-        pendingTransactionResponse = client.PendingTransactionInformation("monopoly").execute();
+        pendingTransactionsResponse = client.GetPendingTransactions().execute();
     }
 
     @When("we make any Send Raw Transaction call")
@@ -100,7 +100,7 @@ public class AlgodResponses {
 
     @Then("the parsed Pending Transactions Information response should contain an array of len {int} and element number {int} should have sender {string}")
     public void the_parsed_Pending_Transactions_Information_response_should_contain_an_array_of_len_and_element_number_should_have_sender(Integer int1, Integer int2, String string) throws IOException {
-        verifyResponse(pendingTransactionResponse, shared.bodyFile);
+        verifyResponse(pendingTransactionsResponse, shared.bodyFile);
     }
 
     @Then("the parsed Pending Transactions By Address response should contain an array of len {int} and element number {int} should have sender {string}")

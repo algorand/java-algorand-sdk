@@ -39,7 +39,7 @@ public class Signature implements Serializable {
 
     @JsonValue
     public byte[] getBytes() {
-        return this.bytes;
+        return Arrays.copyOf(bytes, bytes.length);
     }
 
     @Override

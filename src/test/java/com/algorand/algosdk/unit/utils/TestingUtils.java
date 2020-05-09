@@ -31,34 +31,57 @@ public class TestingUtils {
 		assertThat(r).isNotNull();
 		assertThat(r.isSuccessful()).isTrue();
 
+		switch (r.getContentType()) {
+			case "application/json":
+				verifyJsonResponse(r, body);
+				break;
+			case "application/msgpack":
+				verifyMsgpResponse(r, body);
+				break;
+			default:
+				Assertions.fail("Unknown content type, cannot verify: " + r.getContentType());
+		}
+	}
+
+	private static void verifyJsonResponse(Response r, File body) throws IOException {
 		String expectedString = new String(Files.readAllBytes(body.toPath()));
 		String actualString = r.toString();
 
-		JsonNode expectedNode;
-		try {
-			expectedNode = mapper.readTree(expectedString);
-			JsonNode actualNode = mapper.readTree(actualString);
-			assertThat(expectedNode).isEqualTo(actualNode);
+		JsonNode expectedNode = mapper.readTree(expectedString);
+		JsonNode actualNode = mapper.readTree(actualString);
+		assertThat(expectedNode).isEqualTo(actualNode);
+	}
 
-			// DONE!
-			return;
-		} catch (JsonProcessingException e) {
-		    // Ignore....
-		}
+	private static void verifyMsgpResponse(Response r, File body) throws IOException {
+		String expectedString = new String(Files.readAllBytes(body.toPath()));
 
-		/*
-		// Get both as maps. This doesn't work because messagepack converts them to byte arrays and java uses strings.
+	    /*
+		// Convert the POJO back into messagepack, this is the most valid approach.
+
+	    // These are different and I'm not sure why.
+	    // There may be an issue with the source 'msgpacktool' displays it incorrectly as well.
+		String actualString = r.toString();
+
+		Object o = r.body();
+		String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(o));
+
+		assertThat(encoded).isEqualTo(expectedString);
+	     */
+
+		// Get both as maps and compare the maps.
+		// Somehow the "type" field is turned into a String in the actual value, but is byte[] in the expected.
 		// Is the source wrong?
+        /*
 		Map<String,Object> exp = Encoder.decodeFromMsgPack(expectedString, Map.class);
-		Map<String,Object> act = Encoder.decodeFromMsgPack(
-				Encoder.encodeToBase64(Encoder.encodeToMsgPack(r.body())),
-				Map.class);
-		 */
+		Map<String,Object> act = Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(r.body()), Map.class);
+		assertThat(act).isEqualTo(exp);
+         */
 
 		// This isn't totally valid because it is comparing the two objects after being serialized by the same
 		// serializer...
 
-		// Manually decode the thing with reflection to get the value type.
+		// Manually decode the thing into a POJO and compare the POJOs.
+		// This requires reflection to extract the POJO type.
 		Field f = FieldUtils.getField(r.getClass(), "valueType", true);
 		Class value = null;
 		try {
@@ -67,12 +90,14 @@ public class TestingUtils {
 		    Assertions.fail("No good.");
 		}
 
-		Object expectedObject = Encoder.decodeFromMsgPack(expectedString, value);
+		Object act = r.body();
+		Object exp = Encoder.decodeFromMsgPack(expectedString, value);
 
-		assertThat(r.body()).isEqualTo(expectedObject);
-		//byte[] bytes = Encoder.encodeToMsgPack(r.body());
-		//String actualEncodedString = Encoder.encodeToBase64(bytes);
-		//assertThat(actualEncodedString).isEqualTo(expectedString);
+		// This didn't seem to work for deeply nested objects
+		//assertThat(act).isEqualTo(exp);
+
+		// This did
+		assertThat(Encoder.encodeToJson(act)).isEqualTo(Encoder.encodeToJson(exp));
 	}
 
 	public static boolean comparePathUrls(String url1, String url2, String skip) {
