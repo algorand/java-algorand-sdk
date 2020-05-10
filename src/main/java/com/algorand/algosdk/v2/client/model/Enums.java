@@ -14,14 +14,6 @@ public class Enums {
 	}
 
 /**
- * Configures whether the response object is JSON or MessagePack encoded. 
- */
-	public enum Format {
-		@JsonProperty("json") JSON,
-		@JsonProperty("msgpack") MSGPACK
-	}
-
-/**
  * SigType filters just results using the specified type of signature: 
  *   sig - Standard 
  *   msig - MultiSig 

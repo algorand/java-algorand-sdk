@@ -196,7 +196,7 @@ public class Generator {
 		}
 
 		if (prop.get("enum") != null) {
-			if (!forModel) {
+			if (!forModel && !propName.equals("format")) {
 				addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
 			}
 			return getEnum(prop, propName, forModel);
@@ -230,6 +230,10 @@ public class Generator {
 				}
 			case "AccountID":
 				break;
+			case "BlockCertificate":
+			case "BlockHeader":
+				addImport(imports, "java.util.HashMap");
+				return new TypeDef("HashMap<String,Object>");
 			}
 		}
 		switch (type) {
@@ -564,6 +568,11 @@ public class Generator {
 			String propName = Generator.getCamelCase(prop.getKey(), false);
 			String setterName = Generator.getCamelCase(prop.getKey(), false);
 			TypeDef propType = getType(prop.getValue(), true, imports, propName, false);
+			
+			// Do not expose format property
+			if (propType.typeName.equals("Enums.Format")) {
+				continue;
+			}
 			String propCode = prop.getKey();
 
 			if (inPath(prop.getValue())) {
@@ -607,7 +616,11 @@ public class Generator {
 			builders.append("\n");
 
 			if (isRequired(prop.getValue())) {
-				requestMethod.append("		if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
+				if (inBody(prop.getValue())) {
+					requestMethod.append("		if (qd.bodySegments.isEmpty()) {\n");
+				} else {
+					requestMethod.append("		if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
+				}
 				requestMethod.append("			throw new RuntimeException(\"" +
 						propCode + " is not set. It is a required parameter.\");\n		}\n");
 			}
@@ -750,7 +763,13 @@ public class Generator {
 		Iterator<Entry<String, JsonNode>> classes = parameters.fields();
 		while (classes.hasNext()) {
 			Entry<String, JsonNode> cls = classes.next();
-			if (cls.getValue().get("enum") != null) {				
+			if (cls.getValue().get("enum") != null) {
+				
+				// Do not expose format property
+				if (cls.getKey().equals("format")) {
+					continue;
+				}
+
 				if (cls.getValue().get("description") != null) {
 					String comment = null;
 					comment = cls.getValue().get("description").asText();

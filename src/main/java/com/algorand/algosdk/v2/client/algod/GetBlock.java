@@ -6,7 +6,6 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.BlockResponse;
-import com.algorand.algosdk.v2.client.model.Enums;
 
 
 /**
@@ -22,14 +21,6 @@ public class GetBlock extends Query {
 	public GetBlock(Client client, Long round) {
 		super(client, new HttpMethod("get"));
 		this.round = round;
-	}
-
-	/**
-	 * Configures whether the response object is JSON or MessagePack encoded. 
-	 */
-	public GetBlock format(Enums.Format format) {
-		addQuery("format", String.valueOf(format));
-		return this;
 	}
 
 	@Override

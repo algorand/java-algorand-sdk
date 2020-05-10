@@ -5,13 +5,13 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PostTransactionsResponse extends PathResponse {
+public class CatchpointAbortResponse extends PathResponse {
 
 	/**
-	 * encoding of the transaction hash. 
+	 * Catchup abort response string 
 	 */
-	@JsonProperty("txId")
-	public String txId;
+	@JsonProperty("catchup-message")
+	public String catchupMessage;
 
 	@Override
 	public boolean equals(Object o) {
@@ -19,8 +19,8 @@ public class PostTransactionsResponse extends PathResponse {
 		if (this == o) return true;
 		if (o == null) return false;
 
-		PostTransactionsResponse other = (PostTransactionsResponse) o;
-		if (!Objects.deepEquals(this.txId, other.txId)) return false;
+		CatchpointAbortResponse other = (CatchpointAbortResponse) o;
+		if (!Objects.deepEquals(this.catchupMessage, other.catchupMessage)) return false;
 
 		return true;
 	}
