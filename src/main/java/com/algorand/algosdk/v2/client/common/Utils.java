@@ -60,6 +60,10 @@ public class Utils {
 	 */
 	public static String getDateString(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+		// Include milliseconds if there are any.
+		if ( date.getTime() % 1000 != 0) {
+			sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSX");
+		}
 		sdf.setTimeZone(TimeZone.getTimeZone("Z"));
 		return sdf.format(date);
 	}

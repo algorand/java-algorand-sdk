@@ -1,5 +1,8 @@
 package com.algorand.algosdk.v2.client.common;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
 
 import com.squareup.okhttp.HttpUrl;
@@ -32,7 +35,14 @@ public class Client {
 			httpUrlBuilder.addPathSegment(ps);
 		}
 		for (Entry<String, String> kvp : qData.queries.entrySet()) {
-			httpUrlBuilder.addQueryParameter(kvp.getKey(), kvp.getValue());
+			try {
+				// Try using a different URLEncoder because OkHttp does not encode ':' characters.
+				String encodedKey = URLEncoder.encode(kvp.getKey(), StandardCharsets.UTF_8.toString());
+				String encodedValue = URLEncoder.encode(kvp.getValue(), StandardCharsets.UTF_8.toString());
+				httpUrlBuilder.addEncodedQueryParameter(encodedKey, encodedValue);
+			} catch (UnsupportedEncodingException e) {
+				httpUrlBuilder.addQueryParameter(kvp.getKey(), kvp.getValue());
+			}
 		}
 		HttpUrl httpUrl = httpUrlBuilder.build();
 		return httpUrl;
