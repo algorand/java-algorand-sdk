@@ -20,10 +20,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TestingUtils {
 	static ObjectMapper mapper = new ObjectMapper();
 
-	@Test
-	public void serializeTxType() {
-		//Encoder.encodeToMsgPack(Type)
+	public static <T extends Enum<?>> T searchEnum(Class<T> enumeration, String search) {
+		for (T each : enumeration.getEnumConstants()) {
+			if (each.name().compareToIgnoreCase(search) == 0) {
+				return each;
+			}
+		}
+
+		Assertions.fail("Unable to find (" + search + ") in enum " + enumeration.getName());
+		return null;
 	}
+
+	/**
+	 * Used by response tests to compare a response to the input file.
+	 */
 	public static void verifyResponse(Response r, File body) throws IOException {
 		assertThat(r).isNotNull();
 		assertThat(r.isSuccessful()).isTrue();
@@ -97,28 +107,33 @@ public class TestingUtils {
 		assertThat(Encoder.encodeToJson(act)).isEqualTo(Encoder.encodeToJson(exp));
 	}
 
-	public static boolean comparePathUrls(String url1, String url2, String skip) {
+	/**
+	 * Used by path tests to verify that two urls are the same.
+	 */
+	public static void verifyPathUrls(String url1, String url2, String skip) {
 		url1 = url1.replace(skip, "");
 		url2 = url2.replace(skip, "");
 		
 		String[] segments1 = url1.split("[&?]");
 		String[] segments2 = url2.split("[&?]");
-		
+
+		//assertThat(segments1).containsExactlyInAnyOrder(segments2);
+		///*
 		Arrays.sort(segments1, Comparator.naturalOrder());
 		Arrays.sort(segments2, Comparator.naturalOrder());
-		
+
+
 		if (segments1.length != segments2.length) {
-			return false;
+			Assertions.fail("wrong lenght");
 		}
 		
 		int s2 = 0;
 		for (String seg1 : segments1) {
-			if (!seg1.equals(segments2[s2])) {
-				return false;
-			}
+			assertThat(seg1).isEqualTo(segments2[s2]);
 			s2++;
 		}
-		return true;
+		//return true;
+		 //*/
 	}
 	
 	public static boolean notEmpty(String str) {

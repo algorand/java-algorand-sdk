@@ -7,21 +7,16 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.indexer.*;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.security.NoSuchAlgorithmException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class IndexerPaths {
-    String requestUrl;
-    IndexerClient indexerClient;
+    IndexerClient indexerClient = new IndexerClient("localhost", 1234, "");;
+    PathsShared ps;
 
-    @Given("mock server recording request paths")
-    public void mock_server_recording_request_paths() {
-        indexerClient = new IndexerClient("localhost", 1234, "");
+    public IndexerPaths(PathsShared ps) {
+        this.ps = ps;
     }
 
     @When("we make a Lookup Asset Balances call against asset index {long} "
@@ -46,16 +41,10 @@ public class IndexerPaths {
             if (TestingUtils.notEmpty(int5)) {
                 lab.currencyLessThan(int5);
             }
-            requestUrl = lab.getRequestUrl(9999, "localhost");
+            ps.requestUrl = lab.getRequestUrl(9999, "localhost");
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
-    }
-
-    @Then("expect the path used to be {string}")
-    public void expect_the_path_used_to_be(String string) {
-        boolean same = TestingUtils.comparePathUrls(this.requestUrl, string, "http://localhost:9999");
-        assertThat(same);
     }
 
     @When("we make a Lookup Asset Transactions call against asset index {long} "
@@ -75,30 +64,31 @@ public class IndexerPaths {
             + "addressRole {string} "
             + "ExcluseCloseTo {string}")
     public void we_make_a_Lookup_Asset_Transactions_call_against_asset_index_with_NotePrefix_TxType_SigType_txid_round_minRound_maxRound_limit_beforeTime_afterTime_currencyGreaterThan_currencyLessThan_address_addressRole_ExcluseCloseTo(
-            Long int1, String string, String string2, String string3, String string4,
-            Long int2, Long int3, Long int4, Long int5, String string5, String string6,
-            Long int6, Long int7, String string7, String string8, String string9) {
-        LookupAssetTransactions lat = indexerClient.lookupAssetTransactions(int1);
-        if (TestingUtils.notEmpty(string)) lat.notePrefix(Encoder.decodeFromBase64(string));
-        if (TestingUtils.notEmpty(string2)) lat.txType(QueryMapper.getTxType(string2));
-        if (TestingUtils.notEmpty(string3)) lat.sigType(QueryMapper.getSigType(string3));
-        if (TestingUtils.notEmpty(string4)) lat.txid(string4);
-        if (TestingUtils.notEmpty(int2)) lat.round(int2);
-        if (TestingUtils.notEmpty(int3)) lat.minRound(int3);
-        if (TestingUtils.notEmpty(int4)) lat.maxRound(int4);
-        if (TestingUtils.notEmpty(int5)) lat.limit(int5);
+            Long assetId, String notePrefix, String txType, String sigType, String txid,
+            Long round, Long minRound, Long maxRound, Long limit, String beforeTime, String afterTime,
+            Long currencyGreaterThan, Long currencyLessThan, String address, String addressRole, String excludeCloseTo) {
+        LookupAssetTransactions lat = indexerClient.lookupAssetTransactions(assetId);
+        if (TestingUtils.notEmpty(notePrefix)) lat.notePrefix(Encoder.decodeFromBase64(notePrefix));
+        if (TestingUtils.notEmpty(txType)) lat.txType(QueryMapper.getTxType(txType));
+        if (TestingUtils.notEmpty(sigType)) lat.sigType(QueryMapper.getSigType(sigType));
+        if (TestingUtils.notEmpty(txid)) lat.txid(txid);
+        if (TestingUtils.notEmpty(round)) lat.round(round);
+        if (TestingUtils.notEmpty(minRound)) lat.minRound(minRound);
+        if (TestingUtils.notEmpty(maxRound)) lat.maxRound(maxRound);
+        if (TestingUtils.notEmpty(limit)) lat.limit(limit);
         try {
-            if (TestingUtils.notEmpty(string5)) lat.beforeTime(Utils.parseDate(string5));
-            if (TestingUtils.notEmpty(string6)) lat.afterTime(Utils.parseDate(string6));
-            if (TestingUtils.notEmpty(int6)) lat.currencyLessThan(int6);
-            if (TestingUtils.notEmpty(int7)) lat.currencyGreaterThan(int7);
-            if (TestingUtils.notEmpty(string7)) lat.address(new Address(string7));
-            if (TestingUtils.notEmpty(string8)) lat.addressRole(QueryMapper.getAddressRole(string8));
-            if (TestingUtils.notEmpty(string9)) lat.excludeCloseTo(string9.equals("true"));
+            if (TestingUtils.notEmpty(beforeTime)) lat.beforeTime(Utils.parseDate(beforeTime));
+            if (TestingUtils.notEmpty(afterTime)) lat.afterTime(Utils.parseDate(afterTime));
+            if (TestingUtils.notEmpty(currencyLessThan)) lat.currencyLessThan(currencyLessThan);
+            if (TestingUtils.notEmpty(currencyGreaterThan)) lat.currencyGreaterThan(currencyGreaterThan);
+            if (TestingUtils.notEmpty(address)) lat.address(new Address(address));
+            if (TestingUtils.notEmpty(addressRole)) lat.addressRole(QueryMapper.getAddressRole(addressRole));
+            if (TestingUtils.notEmpty(excludeCloseTo)) {
+                lat.excludeCloseTo(excludeCloseTo.equals("true")); }
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
-        this.requestUrl = lat.getRequestUrl(9999, "localhost");
+        ps.requestUrl = lat.getRequestUrl(9999, "localhost");
     }
 
     @When("we make a Lookup Account Transactions call against account {string} "
@@ -114,32 +104,28 @@ public class IndexerPaths {
             + "afterTime {string} "
             + "currencyGreaterThan {long} "
             + "currencyLessThan {long} "
-            + "assetIndex {long} "
-            + "addressRole {string} "
-            + "ExcluseCloseTo {string}")
+            + "assetIndex {long}")
     public void we_make_a_Lookup_Account_Transactions_call_against_account_with_NotePrefix_TxType_SigType_txid_round_minRound_maxRound_limit_beforeTime_afterTime_currencyGreaterThan_currencyLessThan_assetIndex_addressRole_ExcluseCloseTo(
-            String string, String string2, String string3, String string4,
-            String string5, Long int1, Long int2, Long int3, Long int4,
-            String string6, String string7, Long int5, Long int6, Long int7,
-            String string8, String string9) {
+            String account, String notePrefix, String txType, String sigType,
+            String txid, Long round, Long minRound, Long maxRound, Long limit,
+            String beforeTime, String afterTime, Long currencyGT, Long currencyLT, Long assetId) {
         try {
-            LookupAccountTransactions lat = indexerClient.lookupAccountTransactions(new Address(string));
-            if (TestingUtils.notEmpty(string2)) lat.notePrefix(Encoder.decodeFromBase64(string2));
-            if (TestingUtils.notEmpty(string3)) lat.txType(QueryMapper.getTxType(string3));
-            if (TestingUtils.notEmpty(string4)) lat.sigType(QueryMapper.getSigType(string4));
-            if (TestingUtils.notEmpty(string5)) lat.txid(string5);
-            if (TestingUtils.notEmpty(int1)) lat.round(int1);
-            if (TestingUtils.notEmpty(int2)) lat.minRound(int2);
-            if (TestingUtils.notEmpty(int3)) lat.maxRound(int3);
-            if (TestingUtils.notEmpty(int4)) lat.limit(int4);
-            if (TestingUtils.notEmpty(string6)) lat.beforeTime(Utils.parseDate(string6));
-            if (TestingUtils.notEmpty(string7)) lat.afterTime(Utils.parseDate(string7));
-            if (TestingUtils.notEmpty(int5)) lat.currencyGreaterThan(int5);
-            if (TestingUtils.notEmpty(int6)) lat.currencyLessThan(int6);
-            if (TestingUtils.notEmpty(int7)) lat.assetId(int7);
-            // TODO what the are addressRol and ExcluseCloseTo
+            LookupAccountTransactions lat = indexerClient.lookupAccountTransactions(new Address(account));
+            if (TestingUtils.notEmpty(notePrefix)) lat.notePrefix(Encoder.decodeFromBase64(notePrefix));
+            if (TestingUtils.notEmpty(txType)) lat.txType(QueryMapper.getTxType(txType));
+            if (TestingUtils.notEmpty(sigType)) lat.sigType(QueryMapper.getSigType(sigType));
+            if (TestingUtils.notEmpty(txid)) lat.txid(txid);
+            if (TestingUtils.notEmpty(round)) lat.round(round);
+            if (TestingUtils.notEmpty(minRound)) lat.minRound(minRound);
+            if (TestingUtils.notEmpty(maxRound)) lat.maxRound(maxRound);
+            if (TestingUtils.notEmpty(limit)) lat.limit(limit);
+            if (TestingUtils.notEmpty(beforeTime)) lat.beforeTime(Utils.parseDate(beforeTime));
+            if (TestingUtils.notEmpty(afterTime)) lat.afterTime(Utils.parseDate(afterTime));
+            if (TestingUtils.notEmpty(currencyGT)) lat.currencyGreaterThan(currencyGT);
+            if (TestingUtils.notEmpty(currencyLT)) lat.currencyLessThan(currencyLT);
+            if (TestingUtils.notEmpty(assetId)) lat.assetId(assetId);
 
-            this.requestUrl = lat.getRequestUrl(9999, "localhost");
+            ps.requestUrl = lat.getRequestUrl(9999, "localhost");
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
@@ -148,7 +134,7 @@ public class IndexerPaths {
 
     @When("we make a Lookup Block call against round {long}")
     public void we_make_a_Lookup_Block_call_against_round(Long int1) {
-        this.requestUrl = this.indexerClient.lookupBlock(int1).getRequestUrl(9999, "localhost");
+        ps.requestUrl = this.indexerClient.lookupBlock(int1).getRequestUrl(9999, "localhost");
     }
 
     @When("we make a Lookup Account by ID call against account {string} with round {long}")
@@ -156,7 +142,7 @@ public class IndexerPaths {
         try {
             LookupAccountByID ans = this.indexerClient.lookupAccountByID(new Address(string));
             if (TestingUtils.notEmpty(int1)) ans.round(int1);
-            this.requestUrl = ans.getRequestUrl(9999, "localhost");
+            ps.requestUrl = ans.getRequestUrl(9999, "localhost");
         } catch (NoSuchAlgorithmException e) {
             System.err.println(e.getMessage());
         }
@@ -164,7 +150,7 @@ public class IndexerPaths {
 
     @When("we make a Lookup Asset by ID call against asset index {long}")
     public void we_make_a_Lookup_Asset_by_ID_call_against_asset_index(Long int1) {
-        this.requestUrl = this.indexerClient.lookupAssetByID(int1).getRequestUrl(9999, "localhost");
+        ps.requestUrl = this.indexerClient.lookupAssetByID(int1).getRequestUrl(9999, "localhost");
     }
 
     @When("we make a Search Accounts call with assetID {long} "
@@ -180,7 +166,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(int3)) sfa.currencyGreaterThan(int3);
         if (TestingUtils.notEmpty(int4)) sfa.currencyLessThan(int4);
         if (TestingUtils.notEmpty(int5)) sfa.round(int5);
-        this.requestUrl = sfa.getRequestUrl(9999, "localhost");
+        ps.requestUrl = sfa.getRequestUrl(9999, "localhost");
     }
 
     @When("we make a Search For Transactions call with account {string} "
@@ -221,11 +207,13 @@ public class IndexerPaths {
             if (TestingUtils.notEmpty(int6)) sft.currencyLessThan(int6);
             if (TestingUtils.notEmpty(int7)) sft.assetId(int7);
             if (TestingUtils.notEmpty(string8)) sft.addressRole(QueryMapper.getAddressRole(string8));
-            if (TestingUtils.notEmpty(string9)) sft.excludeCloseTo(string9.equals("true"));
+            if (TestingUtils.notEmpty(string9)) {
+                sft.excludeCloseTo(string9.equals("true"));
+            }
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
-        this.requestUrl = sft.getRequestUrl(9999, "localhost");
+        ps.requestUrl = sft.getRequestUrl(9999, "localhost");
     }
 
     @When("we make a SearchForAssets call with limit {long} "
@@ -241,7 +229,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(string2)) sfs.name(string2);
         if (TestingUtils.notEmpty(string3)) sfs.unit(string3);
         if (TestingUtils.notEmpty(int2)) sfs.assetId(int2);
-        this.requestUrl = sfs.getRequestUrl(9999, "localhost");
+        ps.requestUrl = sfs.getRequestUrl(9999, "localhost");
     }
 
 

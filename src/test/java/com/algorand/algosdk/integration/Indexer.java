@@ -17,6 +17,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.algorand.algosdk.unit.utils.TestingUtils.searchEnum;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Indexer {
@@ -29,16 +30,6 @@ public class Indexer {
     Response<AssetBalancesResponse> assetBalancesResponse;
     Response<TransactionsResponse> transactionsResponse;
     Response<AssetsResponse> assetsResponse;
-
-    public static <T extends Enum<?>> T searchEnum(Class<T> enumeration, String search) {
-        for (T each : enumeration.getEnumConstants()) {
-            if (each.name().compareToIgnoreCase(search) == 0) {
-                return each;
-            }
-        }
-        return null;
-    }
-
 
     @Given("indexer client {int} at {string} port {int} with token {string}")
     public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
