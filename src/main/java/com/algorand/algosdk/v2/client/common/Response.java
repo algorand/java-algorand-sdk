@@ -13,24 +13,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 public class Response<T> {
-	private static ObjectMapper jsonMapper;
-	private static ObjectMapper msgpMapper;
-
-	static {
-		msgpMapper = new ObjectMapper(new MessagePackFactory());
-		msgpMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-		msgpMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		// There's some odd bug in Jackson < 2.8.? where null values are not excluded. See:
-		// https://github.com/FasterXML/jackson-databind/issues/1351. So we will
-		// also annotate all fields manually
-		msgpMapper.setSerializationInclusion(Include.NON_NULL);
-
-		jsonMapper = new ObjectMapper();
-		jsonMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-		jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		jsonMapper.setSerializationInclusion(Include.NON_NULL);
-	}
-
 	private int code;
 	private String failureMessage;
 	private String body;
@@ -59,7 +41,7 @@ public class Response<T> {
 	public String toString() {
 		String jsonStr;
 		try {
-			jsonStr = jsonMapper.writeValueAsString(this.body());
+			jsonStr = Utils.jsonWriter.writeValueAsString(this.body());
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -74,9 +56,9 @@ public class Response<T> {
 		}
 
 		try {
-		    switch (contentType) {
+			switch (contentType) {
 				case "application/json":
-				    return convertJson();
+					return convertJson();
 				case "application/messagepack":
 				case "application/msgpack":
 					return convertMessagePack();
@@ -89,14 +71,12 @@ public class Response<T> {
 	}
 
 	private T convertJson() throws IOException {
-		return (T) jsonMapper.readValue(body, valueType);
+		return Utils.jsonReader.forType(valueType).readValue(body);
 	}
 
 	private T convertMessagePack() throws IOException {
 		byte[] bytes = Encoder.decodeFromBase64(body);
-		T resp = (T) msgpMapper.readValue(bytes, valueType);
-		Object o = Encoder.decodeFromMsgPack(body, valueType);
-		return resp;
+		return Utils.msgpReader.forType(valueType).readValue(bytes);
 	}
 
 	/** Returns the status message. Describes the failure cause.  */
