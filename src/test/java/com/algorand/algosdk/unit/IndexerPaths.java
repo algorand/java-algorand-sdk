@@ -83,8 +83,7 @@ public class IndexerPaths {
             if (TestingUtils.notEmpty(currencyGreaterThan)) lat.currencyGreaterThan(currencyGreaterThan);
             if (TestingUtils.notEmpty(address)) lat.address(new Address(address));
             if (TestingUtils.notEmpty(addressRole)) lat.addressRole(QueryMapper.getAddressRole(addressRole));
-            if (TestingUtils.notEmpty(excludeCloseTo)) {
-                lat.excludeCloseTo(excludeCloseTo.equals("true")); }
+            if (TestingUtils.notEmpty(excludeCloseTo)) lat.excludeCloseTo(excludeCloseTo.equals("true"));
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }

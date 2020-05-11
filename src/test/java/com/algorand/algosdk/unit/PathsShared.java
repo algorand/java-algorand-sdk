@@ -14,6 +14,6 @@ public class PathsShared {
 
     @Then("expect the path used to be {string}")
     public void expect_the_path_used_to_be(String string) {
-        TestingUtils.verifyPathUrls(this.requestUrl, string, "http://localhost:9999");
+        TestingUtils.verifyPathUrls(this.requestUrl, string);
     }
 }
