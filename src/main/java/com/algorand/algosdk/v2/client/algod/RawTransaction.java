@@ -33,7 +33,7 @@ public class RawTransaction extends Query {
 	}
 
 	protected QueryData getRequestString() {
-		if (!qd.queries.containsKey("rawtxn")) {
+		if (qd.bodySegments.isEmpty()) {
 			throw new RuntimeException("rawtxn is not set. It is a required parameter.");
 		}
 		addPathSegment(String.valueOf("v2"));

@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
@@ -11,14 +12,14 @@ public class BlockResponse extends PathResponse {
 	 * Block header data. 
 	 */
 	@JsonProperty("block")
-	public String block;
+	public HashMap<String,Object> block;
 
 	/**
 	 * Optional certificate object. This is only included when the format is set to 
 	 * message pack. 
 	 */
 	@JsonProperty("cert")
-	public String cert;
+	public HashMap<String,Object> cert;
 
 	@Override
 	public boolean equals(Object o) {

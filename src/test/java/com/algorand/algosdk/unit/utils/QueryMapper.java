@@ -59,6 +59,8 @@ public class QueryMapper {
 			return client.GetPendingTransactions();
 		case "PendingTransactionInformation":
 			return client.PendingTransactionInformation(args[0]);
+		case "StartCatchup":
+			return client.StartCatchup(args[0]);
 		}
 		return null;
 	}
@@ -302,9 +304,6 @@ public class QueryMapper {
 			break;
 		case "GetPendingTransactionsByAddress":
 			switch (property) {
-			case "format":
-				((GetPendingTransactionsByAddress)q).format(getFormat(value));
-				break;
 			case "max":
 				((GetPendingTransactionsByAddress)q).max(Long.valueOf(value));
 				break;
@@ -312,9 +311,6 @@ public class QueryMapper {
 			break;
 		case "GetBlock":
 			switch (property) {
-			case "format":
-				((GetBlock)q).format(getFormat(value));
-				break;
 			}
 			break;
 		case "GetSupply":
@@ -342,9 +338,6 @@ public class QueryMapper {
 			break;
 		case "GetPendingTransactions":
 			switch (property) {
-			case "format":
-				((GetPendingTransactions)q).format(getFormat(value));
-				break;
 			case "max":
 				((GetPendingTransactions)q).max(Long.valueOf(value));
 				break;
@@ -352,9 +345,10 @@ public class QueryMapper {
 			break;
 		case "PendingTransactionInformation":
 			switch (property) {
-			case "format":
-				((PendingTransactionInformation)q).format(getFormat(value));
-				break;
+			}
+			break;
+		case "StartCatchup":
+			switch (property) {
 			}
 			break;
 
@@ -377,16 +371,6 @@ public class QueryMapper {
 			return Enums.AddressRole.RECEIVER;
 		case "FREEZETARGET":
 			return Enums.AddressRole.FREEZETARGET;
-		default:
-			throw new RuntimeException("Enum value not recognized: " + val +"!");
-		}
-	}
-	public static Enums.Format getFormat(String val) {
-		switch(val.toUpperCase()) {
-		case "JSON":
-			return Enums.Format.JSON;
-		case "MSGPACK":
-			return Enums.Format.MSGPACK;
 		default:
 			throw new RuntimeException("Enum value not recognized: " + val +"!");
 		}
