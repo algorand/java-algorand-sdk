@@ -1,22 +1,27 @@
 package com.algorand.algosdk.unit;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
-import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Assertions;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.ClientMocker;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.AccountResponse;
+import com.algorand.algosdk.v2.client.model.AccountsResponse;
+import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
+import com.algorand.algosdk.v2.client.model.AssetResponse;
+import com.algorand.algosdk.v2.client.model.AssetsResponse;
+import com.algorand.algosdk.v2.client.model.Block;
+import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
-import com.algorand.algosdk.v2.client.model.*;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
 
 public class IndexerResponses {
 	IndexerClient client;

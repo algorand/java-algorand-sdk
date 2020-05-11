@@ -3,14 +3,7 @@ package com.algorand.algosdk.v2.client.common;
 import java.io.IOException;
 
 import com.algorand.algosdk.util.Encoder;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 public class Response<T> {
 	private int code;
@@ -49,7 +42,6 @@ public class Response<T> {
 	}
 
 	/** The response object in case of a successful request. */
-	@SuppressWarnings("unchecked")
 	public T body() {
 		if (!this.isSuccessful()) {
 			return null;
