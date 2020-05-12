@@ -201,7 +201,7 @@ public class QueryMapperGenerator extends Generator {
 					continue;
 				}
 				String enumName = Generator.getCamelCase(cls.getKey(), true);
-				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);
+				TypeDef enumType = getEnum(cls.getValue(), cls.getKey());
 				enumMappers.append("\tpublic static " + enumType.typeName + " get" + enumName + "(String val) {\n");
 				enumMappers.append("\t\tswitch(val.toUpperCase()) {\n");			
 				JsonNode enumNode = cls.getValue().get("enum");

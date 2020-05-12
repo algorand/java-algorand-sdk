@@ -27,6 +27,7 @@ public class PendingTransactionInformation extends Query {
 	 */
 	public PendingTransactionInformation(Client client, String txid) {
 		super(client, new HttpMethod("get"));
+		addQuery("format", "msgpack");
 		this.txid = txid;
 	}
 
