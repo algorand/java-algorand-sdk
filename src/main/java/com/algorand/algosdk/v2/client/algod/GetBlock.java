@@ -20,6 +20,7 @@ public class GetBlock extends Query {
 	 */
 	public GetBlock(Client client, Long round) {
 		super(client, new HttpMethod("get"));
+		addQuery("format", "msgpack");
 		this.round = round;
 	}
 

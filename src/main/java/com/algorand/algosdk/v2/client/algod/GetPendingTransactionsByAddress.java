@@ -24,6 +24,7 @@ public class GetPendingTransactionsByAddress extends Query {
 	 */
 	public GetPendingTransactionsByAddress(Client client, Address address) {
 		super(client, new HttpMethod("get"));
+		addQuery("format", "msgpack");
 		this.address = address;
 	}
 

@@ -17,6 +17,7 @@ public class GetPendingTransactions extends Query {
 
 	public GetPendingTransactions(Client client) {
 		super(client, new HttpMethod("get"));
+		addQuery("format", "msgpack");
 	}
 
 	/**

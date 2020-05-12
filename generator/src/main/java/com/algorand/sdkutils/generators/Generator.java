@@ -153,7 +153,7 @@ public class Generator {
 		return new TypeDef("", sb.toString(), "getterSetter");
 	}
 
-	static TypeDef getEnum(JsonNode prop, String propName, boolean jsonParam) {
+	static TypeDef getEnum(JsonNode prop, String propName) {
 		JsonNode enumNode = prop.get("enum");
 		if (enumNode == null) {
 			throw new RuntimeException("Cannot find enum info in node: " + prop.toString());
@@ -165,19 +165,25 @@ public class Generator {
 		Iterator<JsonNode> elmts = enumNode.elements();
 		while(elmts.hasNext()) {
 			String val = elmts.next().asText();
-			if (jsonParam) {
-				sb.append("\t\t@JsonProperty(\"" + val + "\") ");
-			} else {
-				sb.append("\t\t");
-			}
+			sb.append("\t\t@JsonProperty(\"" + val + "\") ");
 			String javaEnum = getCamelCase(val, true).toUpperCase();
 			sb.append(javaEnum);
+			sb.append("(\"" + val + "\")");
 			if (elmts.hasNext()) {
 				sb.append(",\n");
 			} else {
-				sb.append("\n");
+				sb.append(";\n\n");
 			}
 		}
+		sb.append("\t\tfinal String serializedName;\n");
+		sb.append("\t\t" + enumClassName + "(String name) {\n");
+		sb.append("\t\t\tthis.serializedName = name;\n");
+		sb.append("\t\t}\n\n");
+		sb.append("\t\t@Override\n");
+		sb.append("\t\tpublic String toString() {\n");
+		sb.append("\t\t\treturn this.serializedName;\n");
+		sb.append("\t\t}\n");
+
 		sb.append("\t}\n");
 		enumClassName = "Enums." + enumClassName;
 		return new TypeDef(enumClassName, sb.toString(), "enum");
@@ -199,7 +205,7 @@ public class Generator {
 			if (!forModel && !propName.equals("format")) {
 				addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
 			}
-			return getEnum(prop, propName, forModel);
+			return getEnum(prop, propName);
 		}
 		
 		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
@@ -562,6 +568,7 @@ public class Generator {
 		requestMethod.append(Generator.getQueryResponseMethod(returnType));
 		requestMethod.append("	protected QueryData getRequestString() {\n");
 		boolean pAdded = false;
+		boolean addFormatMsgpack = false;
 
 		while (properties != null && properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
@@ -571,6 +578,7 @@ public class Generator {
 			
 			// Do not expose format property
 			if (propType.typeName.equals("Enums.Format")) {
+				addFormatMsgpack = true;
 				continue;
 			}
 			String propCode = prop.getKey();
@@ -661,6 +669,10 @@ public class Generator {
 		ans.append("	public "+className+"(Client client");
 		ans.append(constructorHeader);
 		ans.append(") {\n		super(client, new HttpMethod(\""+httpMethod+"\"));\n");
+		if (addFormatMsgpack) {
+			ans.append("		addQuery(\"format\", \"msgpack\");\n");
+		}
+
 		ans.append(constructorBody);
 		ans.append("	}\n\n");
 
@@ -775,7 +787,7 @@ public class Generator {
 					comment = cls.getValue().get("description").asText();
 					bw.append(Generator.formatComment(comment, "", true));
 				}
-				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);				
+				TypeDef enumType = getEnum(cls.getValue(), cls.getKey());				
 				bw.append(enumType.def);
 				bw.append("\n");
 			}
