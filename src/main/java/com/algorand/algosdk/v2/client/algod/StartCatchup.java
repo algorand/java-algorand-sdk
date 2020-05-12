@@ -5,6 +5,7 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.CatchpointStartResponse;
 
 
 /**
@@ -24,9 +25,9 @@ public class StartCatchup extends Query {
 	}
 
 	@Override
-	public Response<String> execute() throws Exception {
-		Response<String> resp = baseExecute();
-		resp.setValueType(String.class);
+	public Response<CatchpointStartResponse> execute() throws Exception {
+		Response<CatchpointStartResponse> resp = baseExecute();
+		resp.setValueType(CatchpointStartResponse.class);
 		return resp;
 	}
 

@@ -153,7 +153,7 @@ public class Generator {
 		return new TypeDef("", sb.toString(), "getterSetter");
 	}
 
-	static TypeDef getEnum(JsonNode prop, String propName, boolean jsonParam) {
+	static TypeDef getEnum(JsonNode prop, String propName) {
 		JsonNode enumNode = prop.get("enum");
 		if (enumNode == null) {
 			throw new RuntimeException("Cannot find enum info in node: " + prop.toString());
@@ -165,19 +165,25 @@ public class Generator {
 		Iterator<JsonNode> elmts = enumNode.elements();
 		while(elmts.hasNext()) {
 			String val = elmts.next().asText();
-			if (jsonParam) {
-				sb.append("\t\t@JsonProperty(\"" + val + "\") ");
-			} else {
-				sb.append("\t\t");
-			}
+			sb.append("\t\t@JsonProperty(\"" + val + "\") ");
 			String javaEnum = getCamelCase(val, true).toUpperCase();
 			sb.append(javaEnum);
+			sb.append("(\"" + val + "\")");
 			if (elmts.hasNext()) {
 				sb.append(",\n");
 			} else {
-				sb.append("\n");
+				sb.append(";\n\n");
 			}
 		}
+		sb.append("\t\tfinal String serializedName;\n");
+		sb.append("\t\t" + enumClassName + "(String name) {\n");
+		sb.append("\t\t\tthis.serializedName = name;\n");
+		sb.append("\t\t}\n\n");
+		sb.append("\t\t@Override\n");
+		sb.append("\t\tpublic String toString() {\n");
+		sb.append("\t\t\treturn this.serializedName;\n");
+		sb.append("\t\t}\n");
+
 		sb.append("\t}\n");
 		enumClassName = "Enums." + enumClassName;
 		return new TypeDef(enumClassName, sb.toString(), "enum");
@@ -196,10 +202,10 @@ public class Generator {
 		}
 
 		if (prop.get("enum") != null) {
-			if (!forModel) {
+			if (!forModel && !propName.equals("format")) {
 				addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
 			}
-			return getEnum(prop, propName, forModel);
+			return getEnum(prop, propName);
 		}
 		
 		JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
@@ -230,6 +236,10 @@ public class Generator {
 				}
 			case "AccountID":
 				break;
+			case "BlockCertificate":
+			case "BlockHeader":
+				addImport(imports, "java.util.HashMap");
+				return new TypeDef("HashMap<String,Object>");
 			}
 		}
 		switch (type) {
@@ -558,12 +568,19 @@ public class Generator {
 		requestMethod.append(Generator.getQueryResponseMethod(returnType));
 		requestMethod.append("	protected QueryData getRequestString() {\n");
 		boolean pAdded = false;
+		boolean addFormatMsgpack = false;
 
 		while (properties != null && properties.hasNext()) {
 			Entry<String, JsonNode> prop = properties.next();
 			String propName = Generator.getCamelCase(prop.getKey(), false);
 			String setterName = Generator.getCamelCase(prop.getKey(), false);
 			TypeDef propType = getType(prop.getValue(), true, imports, propName, false);
+			
+			// Do not expose format property
+			if (propType.typeName.equals("Enums.Format")) {
+				addFormatMsgpack = true;
+				continue;
+			}
 			String propCode = prop.getKey();
 
 			if (inPath(prop.getValue())) {
@@ -607,7 +624,11 @@ public class Generator {
 			builders.append("\n");
 
 			if (isRequired(prop.getValue())) {
-				requestMethod.append("		if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
+				if (inBody(prop.getValue())) {
+					requestMethod.append("		if (qd.bodySegments.isEmpty()) {\n");
+				} else {
+					requestMethod.append("		if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
+				}
 				requestMethod.append("			throw new RuntimeException(\"" +
 						propCode + " is not set. It is a required parameter.\");\n		}\n");
 			}
@@ -648,6 +669,10 @@ public class Generator {
 		ans.append("	public "+className+"(Client client");
 		ans.append(constructorHeader);
 		ans.append(") {\n		super(client, new HttpMethod(\""+httpMethod+"\"));\n");
+		if (addFormatMsgpack) {
+			ans.append("		addQuery(\"format\", \"msgpack\");\n");
+		}
+
 		ans.append(constructorBody);
 		ans.append("	}\n\n");
 
@@ -693,9 +718,6 @@ public class Generator {
 			JsonNode returnTypeNode = this.getFromRef(returnType);
 			if (returnTypeNode.get("schema").get("$ref") != null) {
 				returnType = Generator.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
-			} else if (returnTypeNode.get("schema").get("properties").size() == 1) {
-				returnType = returnTypeNode.get("schema").get("properties").findValue("type").asText();
-				returnType = Generator.getCamelCase(returnType, true);
 			} else {
 				returnType = Generator.getTypeNameFromRef(returnType);
 				returnType = Generator.getCamelCase(returnType, true);
@@ -753,13 +775,19 @@ public class Generator {
 		Iterator<Entry<String, JsonNode>> classes = parameters.fields();
 		while (classes.hasNext()) {
 			Entry<String, JsonNode> cls = classes.next();
-			if (cls.getValue().get("enum") != null) {				
+			if (cls.getValue().get("enum") != null) {
+				
+				// Do not expose format property
+				if (cls.getKey().equals("format")) {
+					continue;
+				}
+
 				if (cls.getValue().get("description") != null) {
 					String comment = null;
 					comment = cls.getValue().get("description").asText();
 					bw.append(Generator.formatComment(comment, "", true));
 				}
-				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);				
+				TypeDef enumType = getEnum(cls.getValue(), cls.getKey());				
 				bw.append(enumType.def);
 				bw.append("\n");
 			}
@@ -799,9 +827,6 @@ public class Generator {
 
 							if (rSchema.get("$ref") != null ) {
 								// It refers to a defined class
-								continue;
-							}
-							if (rSchema.get("properties").size() == 1) {
 								continue;
 							}
 							writeClass(rtype.getKey(), rSchema.get("properties"), null, rootPath, pkg);

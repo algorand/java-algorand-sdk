@@ -5,7 +5,6 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 
 
@@ -28,15 +27,8 @@ public class PendingTransactionInformation extends Query {
 	 */
 	public PendingTransactionInformation(Client client, String txid) {
 		super(client, new HttpMethod("get"));
+		addQuery("format", "msgpack");
 		this.txid = txid;
-	}
-
-	/**
-	 * Configures whether the response object is JSON or MessagePack encoded. 
-	 */
-	public PendingTransactionInformation format(Enums.Format format) {
-		addQuery("format", String.valueOf(format));
-		return this;
 	}
 
 	@Override

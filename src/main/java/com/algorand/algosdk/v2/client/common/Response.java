@@ -2,24 +2,29 @@ package com.algorand.algosdk.v2.client.common;
 
 import java.io.IOException;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Response<T> {
-
 	private int code;
 	private String failureMessage;
 	private String body;
+	private String contentType;
+
 	@SuppressWarnings("rawtypes")
 	private Class valueType;
 	
-	public Response(int code, String failureMessage, String body) {
+	public Response(int code, String failureMessage, String contentType, String body) {
 		this.code = code;
 		this.failureMessage = failureMessage;
 		this.body = body;
+		this.contentType = contentType;
 	}
-	
+
+	public String getContentType() {
+		return contentType;
+	}
+
 	@SuppressWarnings("rawtypes")
 	public void setValueType(Class valueType) {
 		this.valueType = valueType;
@@ -27,11 +32,9 @@ public class Response<T> {
 	
 	@Override
 	public String toString() {
-		ObjectMapper om = new ObjectMapper(); 
 		String jsonStr;
 		try {
-			jsonStr = om.setSerializationInclusion(Include.NON_NULL).writeValueAsString(this.body());
-
+			jsonStr = Utils.jsonWriter.writeValueAsString(this.body());
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e.getMessage());
 		}
@@ -39,20 +42,33 @@ public class Response<T> {
 	}
 
 	/** The response object in case of a successful request. */
-	@SuppressWarnings("unchecked")
 	public T body() {
 		if (!this.isSuccessful()) {
 			return null;
 		}
-		ObjectMapper mapper = new ObjectMapper();
-		T resp;
+
 		try {
-			resp = (T) mapper.readValue(body, valueType);
+			switch (contentType) {
+				case "application/json":
+					return convertJson();
+				case "application/messagepack":
+				case "application/msgpack":
+					return convertMessagePack();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
-			return null;
 		}
-		return resp;
+
+		return null;
+	}
+
+	private T convertJson() throws IOException {
+		return Utils.jsonReader.forType(valueType).readValue(body);
+	}
+
+	private T convertMessagePack() throws IOException {
+		byte[] bytes = Encoder.decodeFromBase64(body);
+		return Utils.msgpReader.forType(valueType).readValue(bytes);
 	}
 
 	/** Returns the status message. Describes the failure cause.  */

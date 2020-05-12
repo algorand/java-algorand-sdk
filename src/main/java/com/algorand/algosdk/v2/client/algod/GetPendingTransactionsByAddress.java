@@ -6,7 +6,6 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
 
@@ -25,15 +24,8 @@ public class GetPendingTransactionsByAddress extends Query {
 	 */
 	public GetPendingTransactionsByAddress(Client client, Address address) {
 		super(client, new HttpMethod("get"));
+		addQuery("format", "msgpack");
 		this.address = address;
-	}
-
-	/**
-	 * Configures whether the response object is JSON or MessagePack encoded. 
-	 */
-	public GetPendingTransactionsByAddress format(Enums.Format format) {
-		addQuery("format", String.valueOf(format));
-		return this;
 	}
 
 	/**

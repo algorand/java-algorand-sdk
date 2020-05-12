@@ -149,7 +149,10 @@ public class QueryMapperGenerator extends Generator {
 				argCounter++;
 				continue;
 			}
-			
+			// Do not expose format property
+			if (javaEnumName.equals("Format")) {
+				continue;
+			}
 			setValue.append("			case \""+parameter.getKey()+"\":\n" + 
 					"				(("+javaClassName+")q)."+javaSetParamName+"(");
 			switch (typeName) {
@@ -193,8 +196,12 @@ public class QueryMapperGenerator extends Generator {
 		while (classes.hasNext()) {
 			Entry<String, JsonNode> cls = classes.next();
 			if (cls.getValue().get("enum") != null) {
+				// Do not expose format property
+				if (cls.getKey().equals("format")) {
+					continue;
+				}
 				String enumName = Generator.getCamelCase(cls.getKey(), true);
-				TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), true);
+				TypeDef enumType = getEnum(cls.getValue(), cls.getKey());
 				enumMappers.append("\tpublic static " + enumType.typeName + " get" + enumName + "(String val) {\n");
 				enumMappers.append("\t\tswitch(val.toUpperCase()) {\n");			
 				JsonNode enumNode = cls.getValue().get("enum");
