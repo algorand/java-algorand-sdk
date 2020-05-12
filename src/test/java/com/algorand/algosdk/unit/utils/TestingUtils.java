@@ -1,10 +1,17 @@
 package com.algorand.algosdk.unit.utils;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.common.Response;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.reflect.FieldUtils;
+import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -107,33 +114,46 @@ public class TestingUtils {
 		assertThat(Encoder.encodeToJson(act)).isEqualTo(Encoder.encodeToJson(exp));
 	}
 
+	private static URL verifyAndGetURL(String url) {
+		try {
+			return new URL(url);
+		} catch (MalformedURLException e) {
+		    Assertions.fail("Malformed URL: " + e.getMessage());
+		}
+		return null;
+	}
+
 	/**
 	 * Used by path tests to verify that two urls are the same.
 	 */
-	public static void verifyPathUrls(String url1, String url2, String skip) {
-		url1 = url1.replace(skip, "");
-		url2 = url2.replace(skip, "");
-		
-		String[] segments1 = url1.split("[&?]");
+	public static void verifyPathUrls(String url1, String url2) {
+		URL parsedURL1 = verifyAndGetURL(url1);
+		String url1NoProtocol = parsedURL1.getPath();
+		if (parsedURL1.getQuery() != null) {
+			url1NoProtocol += '?' + parsedURL1.getQuery();
+		}
+
+		String[] segments1 = url1NoProtocol.split("[&?]");
 		String[] segments2 = url2.split("[&?]");
 
-		//assertThat(segments1).containsExactlyInAnyOrder(segments2);
-		///*
 		Arrays.sort(segments1, Comparator.naturalOrder());
 		Arrays.sort(segments2, Comparator.naturalOrder());
 
-
 		if (segments1.length != segments2.length) {
-			Assertions.fail("wrong lenght");
+			Assertions.fail("Different number of parameters, "
+					+ url1NoProtocol
+					+ " != "
+					+ url2);
 		}
 		
 		int s2 = 0;
 		for (String seg1 : segments1) {
-			assertThat(seg1).isEqualTo(segments2[s2]);
+			assertThat(seg1).isEqualTo(segments2[s2]).describedAs("Parameter mismatch, "
+					+ url1NoProtocol
+					+ " != "
+					+ url2);
 			s2++;
 		}
-		//return true;
-		 //*/
 	}
 	
 	public static boolean notEmpty(String str) {
