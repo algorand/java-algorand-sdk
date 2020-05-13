@@ -13,6 +13,11 @@ function help {
   echo "   -feature-only   don't bring up test environment or launch test container."
 }
 
+function my_exit {
+  popd
+  exit $1
+}
+
 while [ "$1" != "" ]; do
     case "$1" in
         -local)
@@ -24,7 +29,7 @@ while [ "$1" != "" ]; do
         *)
             echo "Unknown option $1"
             help
-            exit 0
+            my_exit 0
             ;;
     esac
     shift
@@ -47,14 +52,14 @@ cp -r test-harness/features/integration/* src/test/resources/com/algorand/algosd
 cp -r test-harness/features/unit/* src/test/resources/com/algorand/algosdk/unit
 
 if [ "${UPDATE_FEATURE_FILES_ONLY}" == "1" ]; then
-    exit 1
+    my_exit 1
 fi
 
 # Start test harness environment
 ./test-harness/scripts/up.sh
 
 if [ "${SKIP_TEST_CONTAINER}" == "1" ]; then
-    exit 1
+    my_exit 1
 fi
 
 # Build SDK testing environment
@@ -64,3 +69,5 @@ docker build -t java-sdk-testing -f Dockerfile "$(pwd)"
 docker run -it \
      --network host \
      java-sdk-testing:latest 
+
+my_exit 0

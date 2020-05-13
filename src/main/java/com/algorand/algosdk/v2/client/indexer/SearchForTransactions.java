@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.indexer;
 import java.util.Date;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
@@ -16,7 +15,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 /**
  * Search for transactions. 
- * /transactions 
+ * /v2/transactions 
  */
 public class SearchForTransactions extends Query {
 
@@ -173,6 +172,7 @@ public class SearchForTransactions extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("transactions"));
 
 		return qd;

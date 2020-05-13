@@ -1,5 +1,8 @@
 package com.algorand.algosdk.v2.client.common;
 
+import com.algorand.algosdk.v2.client.algod.HealthCheck;
+import com.algorand.algosdk.v2.client.algod.Metrics;
+import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
@@ -10,7 +13,6 @@ import com.algorand.algosdk.v2.client.algod.RawTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
-import com.algorand.algosdk.v2.client.algod.StartCatchup;
 import com.algorand.algosdk.crypto.Address;
 
 public class AlgodClient extends Client {
@@ -18,6 +20,28 @@ public class AlgodClient extends Client {
 	public AlgodClient(String host, int port, String token) {
 		super(host, port, token, "X-Algo-API-Token");
 	}
+	/**
+	 * /health 
+	 */
+	public HealthCheck HealthCheck() {
+		return new HealthCheck((Client) this);
+	}
+
+	/**
+	 * /metrics 
+	 */
+	public Metrics Metrics() {
+		return new Metrics((Client) this);
+	}
+
+	/**
+	 * Returns the entire swagger spec in json. 
+	 * /swagger.json 
+	 */
+	public SwaggerJSON SwaggerJSON() {
+		return new SwaggerJSON((Client) this);
+	}
+
 	/**
 	 * Given a specific account public key, this call returns the accounts status, 
 	 * balance and spendable amounts 
@@ -102,14 +126,6 @@ public class AlgodClient extends Client {
 	 */
 	public PendingTransactionInformation PendingTransactionInformation(String txid) {
 		return new PendingTransactionInformation((Client) this, txid);
-	}
-
-	/**
-	 * Given a catchpoint, it starts catching up to this catchpoint 
-	 * /v2/catchup/{catchpoint} 
-	 */
-	public StartCatchup StartCatchup(String catchpoint) {
-		return new StartCatchup((Client) this, catchpoint);
 	}
 
 }

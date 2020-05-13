@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.indexer;
 import java.util.Date;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
@@ -16,7 +15,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 /**
  * Lookup transactions for an asset. 
- * /assets/{asset-id}/transactions 
+ * /v2/assets/{asset-id}/transactions 
  */
 public class LookupAssetTransactions extends Query {
 
@@ -168,6 +167,7 @@ public class LookupAssetTransactions extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));
 		addPathSegment(String.valueOf("transactions"));

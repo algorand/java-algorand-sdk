@@ -34,9 +34,11 @@ public class Main {
                     line.getOptionValue("c"),
                     line.getOptionValue("cp"),
                     line.getOptionValue("t"),
-                    line.hasOption("tr"));
+                    !line.hasOption("tr"));
         } catch (ParseException e) {
             System.out.println("Problem processing arguments: " + e.getMessage());
+            System.out.println("\n\n");
+            e.printStackTrace();
             System.out.println("\n\n");
 
             HelpFormatter formatter = new HelpFormatter();
@@ -44,6 +46,8 @@ public class Main {
             System.exit(0);
         } catch (Exception e) {
             System.out.println("Problem generating code:" + e.getMessage());
+            System.out.println("\n\n");
+            e.printStackTrace();
             System.out.println("\n\n");
 
             HelpFormatter formatter = new HelpFormatter();

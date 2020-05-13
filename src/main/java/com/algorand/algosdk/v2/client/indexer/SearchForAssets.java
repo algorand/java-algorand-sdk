@@ -10,7 +10,7 @@ import com.algorand.algosdk.v2.client.model.AssetsResponse;
 
 /**
  * Search for assets. 
- * /assets 
+ * /v2/assets 
  */
 public class SearchForAssets extends Query {
 
@@ -74,6 +74,7 @@ public class SearchForAssets extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("assets"));
 
 		return qd;
