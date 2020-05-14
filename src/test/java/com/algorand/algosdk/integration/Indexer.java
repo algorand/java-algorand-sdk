@@ -14,7 +14,6 @@ import org.assertj.core.api.Assertions;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class Indexer {
     Map<Integer, IndexerClient> indexerClients = new HashMap<>();
 
+    Response<HealthCheck> healthResponse;
     Response<Block> blockResponse;
     Response<AccountResponse> accountResponse;
     Response<AccountsResponse> accountsResponse;
@@ -35,6 +35,16 @@ public class Indexer {
     @Given("indexer client {int} at {string} port {int} with token {string}")
     public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
         indexerClients.put(index, new IndexerClient(uri, port, ""));
+    }
+
+    @When("I use {int} to check the services health")
+    public void i_use_to_check_the_services_health(Integer index) throws Exception {
+        healthResponse = indexerClients.get(index).makeHealthCheck().execute();
+    }
+
+    @Then("I receive status code {int}")
+    public void i_receive_status_code(Integer code) {
+        assertThat(healthResponse.code()).isEqualTo(code);
     }
 
     @When("I use {int} to lookup block {long}")
@@ -251,7 +261,7 @@ public class Indexer {
             query.beforeTime(Utils.parseDate(beforeTime));
         }
         if (StringUtils.isNotEmpty(afterTime)) {
-            query.beforeTime(Utils.parseDate(afterTime));
+            query.afterTime(Utils.parseDate(afterTime));
         }
         if (currencyGT != 0) {
             query.currencyGreaterThan(currencyGT);

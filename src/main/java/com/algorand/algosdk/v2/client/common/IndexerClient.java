@@ -1,6 +1,6 @@
 package com.algorand.algosdk.v2.client.common;
 
-import com.algorand.algosdk.v2.client.indexer.HealthCheck;
+import com.algorand.algosdk.v2.client.indexer.MakeHealthCheck;
 import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
@@ -23,8 +23,8 @@ public class IndexerClient extends Client {
 	/**
 	 * /health 
 	 */
-	public HealthCheck HealthCheck() {
-		return new HealthCheck((Client) this);
+	public MakeHealthCheck makeHealthCheck() {
+		return new MakeHealthCheck((Client) this);
 	}
 
 	/**
