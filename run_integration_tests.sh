@@ -6,6 +6,7 @@ pushd $rootdir
 
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
+TEST_BRANCH=develop
 
 function help {
   echo "Options:"
@@ -26,6 +27,10 @@ while [ "$1" != "" ]; do
         -feature-only)
             UPDATE_FEATURE_FILES_ONLY=1
             ;;
+        -test-branch)
+            shift
+            TEST_BRANCH=$1
+            ;;
         *)
             echo "Unknown option $1"
             help
@@ -37,7 +42,7 @@ done
 
 # Reset test harness
 rm -rf test-harness
-git clone --single-branch --branch develop https://github.com/algorand/algorand-sdk-testing.git test-harness
+git clone --single-branch --branch ${TEST_BRANCH} https://github.com/algorand/algorand-sdk-testing.git test-harness
 
 ## Copy feature files into the project resources
 rm -rf src/test/resources/com/algorand/algosdk/integration

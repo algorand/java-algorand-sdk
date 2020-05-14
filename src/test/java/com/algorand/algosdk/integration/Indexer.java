@@ -14,6 +14,7 @@ import org.assertj.core.api.Assertions;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -185,7 +186,9 @@ public class Indexer {
         assertThat(account.amountWithoutPendingRewards).isEqualTo(amountWithoutPendingRewards);
         assertThat(account.amount).isEqualTo(amount);
         assertThat(account.status).isEqualTo(status);
-        assertThat(account.sigType).isEqualTo(searchEnum(Enums.SigType.class, type));
+        if (account.sigType != null) {
+            assertThat(account.sigType).isEqualTo(searchEnum(Enums.SigType.class, type));
+        }
     }
 
     @Then("The first account is online and has {string}, {long}, {long}, {long}, {string}, {string}")
@@ -354,8 +357,7 @@ public class Indexer {
     public void every_transaction_is_newer_than(String dateString) {
         Instant i = Instant.parse(dateString);
         transactionsResponse.body().transactions.forEach(tx -> {
-            //assertThat(tx.c)
-            System.out.println("TODO");
+            assertThat(tx.roundTime).isGreaterThan(i.getEpochSecond());
         });
     }
 
@@ -363,8 +365,7 @@ public class Indexer {
     public void every_transaction_is_older_than(String dateString) {
         Instant i = Instant.parse(dateString);
         transactionsResponse.body().transactions.forEach(tx -> {
-            //assertThat(tx.c)
-            System.out.println("TODO");
+            assertThat(tx.roundTime).isLessThan(i.getEpochSecond());
         });
     }
 
