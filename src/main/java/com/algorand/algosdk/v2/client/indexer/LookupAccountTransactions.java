@@ -16,7 +16,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 /**
  * Lookup account transactions. 
- * /accounts/{account-id}/transactions 
+ * /v2/accounts/{account-id}/transactions 
  */
 public class LookupAccountTransactions extends Query {
 
@@ -153,6 +153,7 @@ public class LookupAccountTransactions extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("accounts"));
 		addPathSegment(String.valueOf(accountId));
 		addPathSegment(String.valueOf("transactions"));

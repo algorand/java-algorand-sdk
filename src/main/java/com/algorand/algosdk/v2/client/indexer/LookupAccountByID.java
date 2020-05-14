@@ -11,7 +11,7 @@ import com.algorand.algosdk.v2.client.model.AccountResponse;
 
 /**
  * Lookup account information. 
- * /accounts/{account-id} 
+ * /v2/accounts/{account-id} 
  */
 public class LookupAccountByID extends Query {
 
@@ -41,6 +41,7 @@ public class LookupAccountByID extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("accounts"));
 		addPathSegment(String.valueOf(accountId));
 

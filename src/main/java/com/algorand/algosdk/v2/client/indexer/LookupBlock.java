@@ -10,7 +10,7 @@ import com.algorand.algosdk.v2.client.model.Block;
 
 /**
  * Lookup block. 
- * /blocks/{round-number} 
+ * /v2/blocks/{round-number} 
  */
 public class LookupBlock extends Query {
 
@@ -32,6 +32,7 @@ public class LookupBlock extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("blocks"));
 		addPathSegment(String.valueOf(roundNumber));
 

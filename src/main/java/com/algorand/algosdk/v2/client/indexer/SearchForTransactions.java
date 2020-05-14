@@ -16,7 +16,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 /**
  * Search for transactions. 
- * /transactions 
+ * /v2/transactions 
  */
 public class SearchForTransactions extends Query {
 
@@ -173,6 +173,7 @@ public class SearchForTransactions extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("transactions"));
 
 		return qd;

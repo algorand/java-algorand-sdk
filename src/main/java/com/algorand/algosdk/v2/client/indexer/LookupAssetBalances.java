@@ -10,7 +10,7 @@ import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
 
 /**
  * Lookup the list of accounts who hold this asset 
- * /assets/{asset-id}/balances 
+ * /v2/assets/{asset-id}/balances 
  */
 public class LookupAssetBalances extends Query {
 
@@ -72,6 +72,7 @@ public class LookupAssetBalances extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));
 		addPathSegment(String.valueOf("balances"));

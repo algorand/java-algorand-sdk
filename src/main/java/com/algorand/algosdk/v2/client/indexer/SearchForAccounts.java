@@ -10,7 +10,7 @@ import com.algorand.algosdk.v2.client.model.AccountsResponse;
 
 /**
  * Search for accounts. 
- * /accounts 
+ * /v2/accounts 
  */
 public class SearchForAccounts extends Query {
 
@@ -78,6 +78,7 @@ public class SearchForAccounts extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("accounts"));
 
 		return qd;

@@ -10,7 +10,7 @@ import com.algorand.algosdk.v2.client.model.AssetResponse;
 
 /**
  * Lookup asset information. 
- * /assets/{asset-id} 
+ * /v2/assets/{asset-id} 
  */
 public class LookupAssetByID extends Query {
 
@@ -29,6 +29,7 @@ public class LookupAssetByID extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));
 

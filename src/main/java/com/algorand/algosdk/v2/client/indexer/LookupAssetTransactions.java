@@ -16,7 +16,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 /**
  * Lookup transactions for an asset. 
- * /assets/{asset-id}/transactions 
+ * /v2/assets/{asset-id}/transactions 
  */
 public class LookupAssetTransactions extends Query {
 
@@ -168,6 +168,7 @@ public class LookupAssetTransactions extends Query {
 	}
 
 	protected QueryData getRequestString() {
+		addPathSegment(String.valueOf("v2"));
 		addPathSegment(String.valueOf("assets"));
 		addPathSegment(String.valueOf(assetId));
 		addPathSegment(String.valueOf("transactions"));
