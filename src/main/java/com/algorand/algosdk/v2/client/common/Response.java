@@ -47,19 +47,19 @@ public class Response<T> {
 			return null;
 		}
 
+		T response = null;
 		try {
-			switch (contentType) {
-				case "application/json":
-					return convertJson();
-				case "application/messagepack":
-				case "application/msgpack":
-					return convertMessagePack();
+			if (contentType.contains("application/json")) {
+				response = convertJson();
+			}
+			if (contentType.contains("application/messagepack") || contentType.contains("application/msgpack")) {
+				response = convertMessagePack();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		return null;
+		return response;
 	}
 
 	private T convertJson() throws IOException {

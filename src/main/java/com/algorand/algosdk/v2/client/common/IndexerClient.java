@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.common;
 
+import com.algorand.algosdk.v2.client.indexer.MakeHealthCheck;
 import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
@@ -19,6 +20,13 @@ public class IndexerClient extends Client {
 	public IndexerClient(String host, int port) {
 		super(host, port, "", "X-Indexer-API-Token");
 	}
+	/**
+	 * /health 
+	 */
+	public MakeHealthCheck makeHealthCheck() {
+		return new MakeHealthCheck((Client) this);
+	}
+
 	/**
 	 * Search for accounts. 
 	 * /v2/accounts 

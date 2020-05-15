@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class Indexer {
     Map<Integer, IndexerClient> indexerClients = new HashMap<>();
 
+    Response<HealthCheck> healthResponse;
     Response<Block> blockResponse;
     Response<AccountResponse> accountResponse;
     Response<AccountsResponse> accountsResponse;
@@ -34,6 +35,16 @@ public class Indexer {
     @Given("indexer client {int} at {string} port {int} with token {string}")
     public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
         indexerClients.put(index, new IndexerClient(uri, port, ""));
+    }
+
+    @When("I use {int} to check the services health")
+    public void i_use_to_check_the_services_health(Integer index) throws Exception {
+        healthResponse = indexerClients.get(index).makeHealthCheck().execute();
+    }
+
+    @Then("I receive status code {int}")
+    public void i_receive_status_code(Integer code) {
+        assertThat(healthResponse.code()).isEqualTo(code);
     }
 
     @When("I use {int} to lookup block {long}")
@@ -185,7 +196,9 @@ public class Indexer {
         assertThat(account.amountWithoutPendingRewards).isEqualTo(amountWithoutPendingRewards);
         assertThat(account.amount).isEqualTo(amount);
         assertThat(account.status).isEqualTo(status);
-        assertThat(account.sigType).isEqualTo(searchEnum(Enums.SigType.class, type));
+        if (account.sigType != null) {
+            assertThat(account.sigType).isEqualTo(searchEnum(Enums.SigType.class, type));
+        }
     }
 
     @Then("The first account is online and has {string}, {long}, {long}, {long}, {string}, {string}")
@@ -248,7 +261,7 @@ public class Indexer {
             query.beforeTime(Utils.parseDate(beforeTime));
         }
         if (StringUtils.isNotEmpty(afterTime)) {
-            query.beforeTime(Utils.parseDate(afterTime));
+            query.afterTime(Utils.parseDate(afterTime));
         }
         if (currencyGT != 0) {
             query.currencyGreaterThan(currencyGT);
@@ -354,8 +367,7 @@ public class Indexer {
     public void every_transaction_is_newer_than(String dateString) {
         Instant i = Instant.parse(dateString);
         transactionsResponse.body().transactions.forEach(tx -> {
-            //assertThat(tx.c)
-            System.out.println("TODO");
+            assertThat(tx.roundTime).isGreaterThan(i.getEpochSecond());
         });
     }
 
@@ -363,8 +375,7 @@ public class Indexer {
     public void every_transaction_is_older_than(String dateString) {
         Instant i = Instant.parse(dateString);
         transactionsResponse.body().transactions.forEach(tx -> {
-            //assertThat(tx.c)
-            System.out.println("TODO");
+            assertThat(tx.roundTime).isLessThan(i.getEpochSecond());
         });
     }
 
