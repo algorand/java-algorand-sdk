@@ -27,6 +27,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     protected BigInteger lastValid = null;
     protected byte[] note = null;
     protected byte[] lease = null;
+    protected Address rekeyTo = null;
     protected String genesisID = null;
     protected Digest genesisHash = null;
     protected Digest group = null;
@@ -343,6 +344,37 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      */
     public T leaseB64(String lease) {
         this.lease = Encoder.decodeFromBase64(lease);
+        return (T) this;
+    }
+
+    /**
+     * Rekey to the sender account.
+     * @return This builder.
+     */
+    public T rekey(Address rekeyTo) {
+        this.rekeyTo = rekeyTo;
+        return (T) this;
+    }
+
+    /**
+     * Rekey to the account in the human-readable address format.
+     * @return This builder.
+     */
+    public T rekey(String rekeyTo) {
+        try {
+            this.rekeyTo = new Address(rekeyTo);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return (T) this;
+    }
+
+    /**
+     * Rekey to the account in the raw 32 byte format.
+     * @return This builder.
+     */
+    public T rekey(byte[] rekeyTo) {
+        this.rekeyTo = new Address(rekeyTo);
         return (T) this;
     }
 

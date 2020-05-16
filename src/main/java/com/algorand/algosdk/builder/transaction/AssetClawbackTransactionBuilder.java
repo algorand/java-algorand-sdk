@@ -70,6 +70,7 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
                 genesisHash,
                 null,
                 null,
+                null,
                 // payment fields
                 null,
                 null,

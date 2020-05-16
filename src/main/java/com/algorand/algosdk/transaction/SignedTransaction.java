@@ -1,5 +1,6 @@
 package com.algorand.algosdk.transaction;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.Signature;
@@ -24,6 +25,9 @@ public class SignedTransaction implements Serializable {
     public MultisigSignature mSig = new MultisigSignature();
     @JsonProperty("lsig")
     public LogicsigSignature lSig = new LogicsigSignature();
+    @JsonProperty("sgnr")
+    public Address authAddr;
+    
 
     @JsonIgnore
     public String transactionID = "";
@@ -61,8 +65,10 @@ public class SignedTransaction implements Serializable {
     public SignedTransaction(Transaction tx, LogicsigSignature lSig, String txId) {
         this(tx, new Signature(), new MultisigSignature(), lSig, txId);
     }
-
-    private SignedTransaction() {
+    
+    public SignedTransaction authAddr(Address authAddr) {
+    	this.authAddr = authAddr;
+    	return this;
     }
 
     @JsonCreator
@@ -86,6 +92,7 @@ public class SignedTransaction implements Serializable {
             if (!tx.equals(actual.tx)) return false;
             if (!sig.equals(actual.sig)) return false;
             if (!lSig.equals(actual.lSig)) return false;
+            if (!authAddr.equals(actual.authAddr)) return false;
             return this.mSig.equals(actual.mSig);
         } else {
             return false;

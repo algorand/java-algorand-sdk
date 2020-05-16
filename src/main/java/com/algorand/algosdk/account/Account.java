@@ -136,7 +136,11 @@ public class Account {
         try {
             byte[] prefixEncodedTx = tx.bytesToSign();
             Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
-            return new SignedTransaction(tx, txSig, tx.txID());
+            SignedTransaction stx = new SignedTransaction(tx, txSig, tx.txID());
+            if (!tx.sender.equals(this.address)) {
+            	stx.authAddr(this.address);	
+            }
+            return stx;
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
@@ -325,7 +329,11 @@ public class Account {
                 mSig.subsigs.add(new MultisigSubsig(from.publicKeys.get(i)));
             }
         }
-        return new SignedTransaction(tx, mSig, txSig.transactionID);
+        SignedTransaction stx = new SignedTransaction(tx, mSig, txSig.transactionID);
+        if (!tx.sender.equals(this.address)) {
+        	stx.authAddr(this.address);	
+        }
+        return stx;
     }
 
     /**
