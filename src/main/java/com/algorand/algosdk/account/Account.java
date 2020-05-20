@@ -259,12 +259,17 @@ public class Account {
      * @return an estimated byte size for the transaction.
      */
     public static BigInteger estimatedEncodedSize(Transaction tx) throws NoSuchAlgorithmException {
-        Account acc = new Account();
-        try {
-            return BigInteger.valueOf(Encoder.encodeToMsgPack(acc.signTransaction(tx)).length);
-        } catch (IOException e) {
-            throw new RuntimeException("unexpected behavior", e);
-        }
+    	try {
+    		long length = Encoder.encodeToMsgPack(
+    				new SignedTransaction(
+    						tx, 
+    						new Account().rawSignBytes(
+    								Arrays.copyOf(tx.bytesToSign(), tx.bytesToSign().length)),
+    						tx.txID())).length;
+    		return BigInteger.valueOf(length);
+    	} catch (IOException e) {
+    		throw new RuntimeException("unexpected behavior", e);
+    	}
     }
 
     /**
@@ -329,11 +334,7 @@ public class Account {
                 mSig.subsigs.add(new MultisigSubsig(from.publicKeys.get(i)));
             }
         }
-        SignedTransaction stx = new SignedTransaction(tx, mSig, txSig.transactionID);
-        if (!tx.sender.equals(this.address)) {
-        	stx.authAddr(this.address);	
-        }
-        return stx;
+        return new SignedTransaction(tx, mSig, txSig.transactionID);
     }
 
     /**

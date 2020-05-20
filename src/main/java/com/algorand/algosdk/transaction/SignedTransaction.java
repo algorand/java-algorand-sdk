@@ -26,8 +26,7 @@ public class SignedTransaction implements Serializable {
     @JsonProperty("lsig")
     public LogicsigSignature lSig = new LogicsigSignature();
     @JsonProperty("sgnr")
-    public Address authAddr;
-    
+    public Address authAddr = new Address();
 
     @JsonIgnore
     public String transactionID = "";
@@ -65,7 +64,10 @@ public class SignedTransaction implements Serializable {
     public SignedTransaction(Transaction tx, LogicsigSignature lSig, String txId) {
         this(tx, new Signature(), new MultisigSignature(), lSig, txId);
     }
-    
+
+    private SignedTransaction() {
+    }
+
     public SignedTransaction authAddr(Address authAddr) {
     	this.authAddr = authAddr;
     	return this;
