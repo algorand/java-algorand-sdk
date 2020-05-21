@@ -2,5 +2,4 @@ dist: bionic
 language: java
 
 script:
-  - mvn test
   - make docker-test
