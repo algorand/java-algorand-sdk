@@ -3,4 +3,4 @@ language: java
 
 script:
   - mvn test
-  - ./run_integration_tests.sh
+  - make docker-test
