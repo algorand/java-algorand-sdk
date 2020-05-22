@@ -12,6 +12,7 @@ function help {
   echo "Options:"
   echo "   -local          skip launching the test container."
   echo "   -feature-only   don't bring up test environment or launch test container."
+  echo "   -test-branch    install feature files from this branch instead of the default branch."
 }
 
 function my_exit {

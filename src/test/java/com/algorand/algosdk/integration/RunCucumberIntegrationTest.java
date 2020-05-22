@@ -5,6 +5,6 @@ import io.cucumber.junit.CucumberOptions;
 import org.junit.runner.RunWith;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(plugin = {"progress"}, tags = "@indexer", strict = true)
-public class RunCucumberIndexer {
+@CucumberOptions(plugin = {"progress"}, tags = "@disabled.by.default", strict = true)
+public class RunCucumberIntegrationTest {
 }

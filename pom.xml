@@ -33,7 +33,6 @@
     </developers>
 
     <properties>
-        <skip.integration.tests>true</skip.integration.tests>
         <junit5.vintage.version>4.13.3</junit5.vintage.version>
         <junit5.version>5.6.0</junit5.version>
         <junit5.platform.version>1.5.2</junit5.platform.version>
@@ -220,25 +219,7 @@
                 <configuration>
                   <skipTests>false</skipTests>
                   <includes>
-                    <include>**/*Test*.*</include>
-                  </includes>
-                  <!--
-                  <excludes>
-                    <exclude>**/*Cucumber*.*</exclude>
-                  </excludes>
-                  -->
-                </configuration>
-              </execution>
-              <execution>
-                <id>integration-tests</id>
-                <phase>test</phase>
-                <goals>
-                  <goal>test</goal>
-                </goals>
-                <configuration>
-                    <skipTests>${skip.integration.tests}</skipTests>
-                  <includes>
-                    <include>**/*IT.*</include>
+                    <include>**/*.*</include>
                   </includes>
                 </configuration>
               </execution>
