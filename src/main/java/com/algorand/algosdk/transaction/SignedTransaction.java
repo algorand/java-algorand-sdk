@@ -69,8 +69,8 @@ public class SignedTransaction implements Serializable {
     }
 
     public SignedTransaction authAddr(Address authAddr) {
-    	this.authAddr = authAddr;
-    	return this;
+        this.authAddr = authAddr;
+        return this;
     }
 
     @JsonCreator
