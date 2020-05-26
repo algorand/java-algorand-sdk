@@ -17,6 +17,7 @@ import com.algorand.algosdk.util.AlgoConverter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
+import com.algorand.algosdk.builder.transaction.TransactionBuilder;
 import com.algorand.algosdk.algod.client.AlgodClient;
 import com.algorand.algosdk.algod.client.api.AlgodApi;
 import com.algorand.algosdk.algod.client.ApiException;
@@ -61,6 +62,7 @@ public class Stepdefs {
     SignedTransaction[] stxs;
     byte[] stxBytes;
     Transaction txn;
+    TransactionBuilder txnBuilder;
     String txid;
     Account account;
     Address pk;
@@ -609,13 +611,13 @@ public class Stepdefs {
         } else{
             this.note = Encoder.decodeFromBase64(note);
         }
-        txn = Transaction.PaymentTransactionBuilder()
+        txnBuilder = Transaction.PaymentTransactionBuilder()
                 .sender(getAddress(0))
                 .suggestedParams(params)
                 .note(this.note)
                 .amount(amt)
-                .receiver(getAddress(1))
-                .build();
+                .receiver(getAddress(1));
+        txn = txnBuilder.build();
         pk = getAddress(0);
     }
 
@@ -659,10 +661,11 @@ public class Stepdefs {
     @Then("the transaction should go through")
     public void checkTxn() throws ApiException, InterruptedException{
         String ans = acl.pendingTransactionInformation(txid).getFrom();
-        assertThat(pk.toString()).isEqualTo(ans);
+        assertThat(this.txn.sender.toString()).isEqualTo(ans);
         acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
-        assertThat(acl.transactionInformation(pk.toString(), txid).getFrom()).isEqualTo(pk.toString());
-        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
+        String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
+        assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
+        assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
     }
 
     @Then("I can get the transaction by ID")
@@ -1207,5 +1210,15 @@ public class Stepdefs {
                 .build();
         this.txn = tx;
         this.pk = getAddress(0);
+    }
+    
+    @When("I add a rekeyTo field with address {string}")
+    public void i_add_a_rekeyTo_field_with_address(String string) {
+        txnBuilder.rekey(string);
+        txn = txnBuilder.build();
+    }
+
+    @When("I add a rekeyTo field with the private key algorand address")
+    public void i_add_a_rekeyTo_field_with_the_private_key_algorand_address() {
     }
 }
