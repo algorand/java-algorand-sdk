@@ -138,7 +138,7 @@ public class Account {
             Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
             SignedTransaction stx = new SignedTransaction(tx, txSig, tx.txID());
             if (!tx.sender.equals(this.address)) {
-            stx.authAddr(this.address);
+                stx.authAddr(this.address);
             }
             return stx;
         } catch (IOException e) {

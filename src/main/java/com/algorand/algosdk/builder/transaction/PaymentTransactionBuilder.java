@@ -2,9 +2,11 @@ package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Build a payment transaction.
@@ -25,6 +27,7 @@ import java.security.NoSuchAlgorithmException;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger amount = null;
     protected Address receiver = null;
@@ -42,9 +45,23 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createPaymentTransaction(sender, fee, firstValid, lastValid, note, genesisID, genesisHash, amount,
-                receiver, closeRemainderTo);
+    protected void buildInternal() {
+        if (sender == null && closeRemainderTo == null) {
+            throw new IllegalArgumentException("Must set at least one of 'receiver' or 'closeRemainderTo'");
+        }
+        Objects.requireNonNull(sender, "sender is required.");
+        Objects.requireNonNull(firstValid, "firstValid is required.");
+        Objects.requireNonNull(lastValid, "lastValid is required.");
+        Objects.requireNonNull(genesisHash, "genesisHash is required.");
+
+        if (this.txn == null) {
+            this.txn = new Transaction();
+            this.txn.type = Type.Payment;
+        }
+
+        if (amount != null) txn.amount = amount;
+        if (receiver != null) txn.receiver = receiver;
+        if (closeRemainderTo != null) txn.closeRemainderTo = closeRemainderTo;
     }
 
     /**

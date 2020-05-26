@@ -1,6 +1,7 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 
@@ -18,6 +19,7 @@ import java.math.BigInteger;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger assetIndex = null;
 
@@ -33,15 +35,14 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
     }
 
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createAssetDestroyTransaction(
-                sender,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisHash,
-                assetIndex);
+    protected void buildInternal() {
+        if (this.txn == null) {
+            this.txn = new Transaction();
+            this.txn.type = Type.AssetConfig;
+        }
+        if (assetIndex != null) {
+            txn.assetIndex = assetIndex;
+        }
     }
 
     /**

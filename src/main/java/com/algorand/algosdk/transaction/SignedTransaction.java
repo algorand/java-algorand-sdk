@@ -26,6 +26,9 @@ public class SignedTransaction implements Serializable {
     @JsonProperty("lsig")
     public LogicsigSignature lSig = new LogicsigSignature();
     @JsonProperty("sgnr")
+    public void authAddr(byte[] sigAddr) throws NoSuchAlgorithmException {
+        this.authAddr = new Address(sigAddr);
+    }
     public Address authAddr = new Address();
 
     @JsonIgnore
@@ -78,12 +81,14 @@ public class SignedTransaction implements Serializable {
             @JsonProperty("txn") Transaction tx,
             @JsonProperty("sig") byte[] sig,
             @JsonProperty("msig") MultisigSignature mSig,
-            @JsonProperty("lsig") LogicsigSignature lSig
+            @JsonProperty("lsig") LogicsigSignature lSig,
+            @JsonProperty("sgnr") byte[] authAddr
     ) {
         if (tx != null) this.tx = tx;
         if (sig != null) this.sig = new Signature(sig);
         if (mSig != null) this.mSig = mSig;
         if (lSig != null) this.lSig = lSig;
+        if (authAddr != null) this.authAddr = new Address(authAddr);
         // don't recover the txid yet
     }
 

@@ -505,7 +505,7 @@ public class Transaction implements Serializable {
     		Address freeze, 
     		Address clawback,
     		boolean strictEmptyAddressChecking) {
-    	Address defaultAddr = new Address();
+        Address defaultAddr = new Address();
     	if (strictEmptyAddressChecking && ( 
     			(manager == null || manager.equals(defaultAddr)) ||
     			(reserve == null || reserve.equals(defaultAddr)) ||	
@@ -677,7 +677,7 @@ public class Transaction implements Serializable {
     }
 
     // Used by Jackson to determine "default" values.
-    protected Transaction() {
+    public Transaction() {
         // Override the default to 0 so that it will be serialized
         this.fee = BigInteger.valueOf(0);
     }
@@ -1126,6 +1126,7 @@ public class Transaction implements Serializable {
                 freezeTarget.equals(that.freezeTarget) &&
                 assetFreezeID.equals(that.assetFreezeID) &&
                 freezeState == that.freezeState &&
+                rekeyTo.equals(that.rekeyTo) &&
                 Arrays.equals(lease, ((Transaction) o).lease);
     }
 

@@ -2,6 +2,7 @@ package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -27,6 +28,7 @@ import java.security.NoSuchAlgorithmException;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected Address assetReceiver = null;
     protected Address assetCloseTo = null;
@@ -45,19 +47,15 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
     }
 
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createAssetTransferTransaction(
-                sender,
-                assetReceiver,
-                assetCloseTo,
-                assetAmount,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisID,
-                genesisHash,
-                assetIndex);
+    protected void buildInternal() {
+        if (this.txn == null) {
+            this.txn = new Transaction();
+            this.txn.type = Type.AssetTransfer;
+        }
+        if (assetReceiver != null) txn.assetReceiver = assetReceiver;
+        if (assetCloseTo != null) txn.assetCloseTo = assetCloseTo;
+        if (assetAmount != null) txn.assetAmount = assetAmount;
+        if (assetIndex != null) txn.xferAsset = assetIndex;
     }
 
     /**

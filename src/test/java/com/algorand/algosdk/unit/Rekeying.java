@@ -1,5 +1,8 @@
 package com.algorand.algosdk.unit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 
@@ -7,6 +10,7 @@ import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.TransactionBuilder;
 import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.util.Encoder;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -14,7 +18,8 @@ import io.cucumber.java.en.When;
 
 public class Rekeying {
 	
-	private TransactionBuilder transactionBuilder;
+	@SuppressWarnings("rawtypes")
+    private TransactionBuilder transactionBuilder;
 	private Account account;
 	private SignedTransaction signedTransaction;
 	
@@ -24,7 +29,7 @@ public class Rekeying {
 			String to, String close, Integer amt, String gen, String note) {
 		
 		transactionBuilder = PaymentTransactionBuilder.Builder()
-				.fee(fee)
+				.flatFee(fee)
 				.firstValid(fv)
 				.lastValid(lv)
 				.genesisHashB64(gh)
@@ -32,16 +37,12 @@ public class Rekeying {
 				.closeRemainderTo(close)
 				.amount(amt)
 				.genesisID(gen)
-				.noteUTF8(note);
+				.noteB64(note);
 	}
 
 	@Given("mnemonic for private key {string}")
-	public void mnemonic_for_private_key(String mn) {
-		try {
-			account = new Account(mn);
-		} catch (GeneralSecurityException e) {
-			e.printStackTrace();
-		}
+	public void mnemonic_for_private_key(String mn) throws GeneralSecurityException {
+	    account = new Account(mn);
 	}
 
 	@When("I create the flat fee payment transaction")
@@ -55,17 +56,14 @@ public class Rekeying {
 	}
 
 	@When("I sign the transaction with the private key")
-	public void i_sign_the_transaction_with_the_private_key() {
-		try {
-			signedTransaction = account.signTransaction(transactionBuilder.build());
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
+	public void i_sign_the_transaction_with_the_private_key() throws NoSuchAlgorithmException {
+	    signedTransaction = account.signTransaction(transactionBuilder.build());
 	}
 
 	@Then("the signed transaction should equal the golden {string}")
-	public void the_signed_transaction_should_equal_the_golden(String golden) {
-		signedTransaction.toString().equals(golden);
+	public void the_signed_transaction_should_equal_the_golden(String golden) throws IOException {        
+	    byte[] signedTxBytes = Encoder.encodeToMsgPack(signedTransaction);
+	    assertThat(Encoder.encodeToBase64(signedTxBytes)).isEqualTo(golden);
 	}
 
 	@When("I set the from address to {string}")
