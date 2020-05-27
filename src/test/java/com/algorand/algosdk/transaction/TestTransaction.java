@@ -345,6 +345,44 @@ public class TestTransaction {
         assertThat(encodedOutBytes).isEqualTo(goldenString);
         TestUtil.serializeDeserializeCheck(stx);
     }
+    
+    @Test
+    public void testTransactionGroupLimit() throws IOException, NoSuchAlgorithmException {
+        Address from = new Address("UPYAFLHSIPMJOHVXU2MPLQ46GXJKSDCEMZ6RLCQ7GWB5PRDKJUWKKXECXI");
+        Address to = new Address("UPYAFLHSIPMJOHVXU2MPLQ46GXJKSDCEMZ6RLCQ7GWB5PRDKJUWKKXECXI");
+        BigInteger fee = BigInteger.valueOf(1000);
+        BigInteger amount = BigInteger.valueOf(2000);
+        String genesisID = "devnet-v1.0";
+        Digest genesisHash = new Digest(Encoder.decodeFromBase64("sC3P7e2SdbqKJK0tbiCdK9tdSpbe6XeCGKdoNzmlj0E"));
+        BigInteger firstRound1 = BigInteger.valueOf(710399);
+        byte[] note1 = Encoder.decodeFromBase64("wRKw5cJ0CMo=");
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .flatFee(fee)
+                .firstValid(firstRound1)
+                .lastValid(firstRound1.longValue() + 1000)
+                .note(note1)
+                .genesisID(genesisID)
+                .genesisHash(genesisHash)
+                .amount(amount)
+                .receiver(to)
+                .build();
+
+        Transaction [] txs = new Transaction[17];
+        for (int i = 0; i < 17; i++) {
+            txs[i] = tx;
+        }
+        Digest gid = null;
+        try {
+            gid = TxGroup.computeGroupID(txs);
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage()).isEqualTo("max group size is " + TxGroup.MAX_TX_GROUP_SIZE);
+        } catch (IOException e) {
+            throw e;
+        }
+        assertThat(gid == null);
+   
+    }
 
     @Test
     public void testTransactionGroup() throws Exception {
