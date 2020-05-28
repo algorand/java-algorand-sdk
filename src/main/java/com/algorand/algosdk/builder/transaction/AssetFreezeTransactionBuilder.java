@@ -42,10 +42,9 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     }
 
     @Override
-    protected void buildInternal() {
-        if (this.txn == null) {
-            this.txn = new Transaction();
-            this.txn.type = Type.AssetFreeze;
+    protected void applyTo(Transaction txn) {
+        if (this.getClass() == AssetFreezeTransactionBuilder.class) {
+            txn.type = Type.AssetFreeze;
         }
         if (freezeTarget != null) txn.freezeTarget = freezeTarget;
         if (assetIndex != null) txn.assetFreezeID = assetIndex;

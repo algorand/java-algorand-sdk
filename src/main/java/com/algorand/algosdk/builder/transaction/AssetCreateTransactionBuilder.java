@@ -63,11 +63,10 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
     }
 
     @Override
-    protected void buildInternal() {
+    protected void applyTo(Transaction txn) {
 
-        if (this.txn == null) {
-            this.txn = new Transaction();
-            this.txn.type = Type.AssetConfig;
+        if (this.getClass() == AssetCreateTransactionBuilder.class) {
+            txn.type = Type.AssetConfig;
             
             Objects.requireNonNull(sender, "sender is required.");
             Objects.requireNonNull(firstValid, "firstValid is required.");

@@ -42,7 +42,7 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
     }
 
     @Override
-    protected void buildInternal() {
+    protected void applyTo(Transaction txn) {
         if (this.assetUnitName != null) {
             throw new IllegalArgumentException("Must not set assetUnitName.");
         }
@@ -76,12 +76,11 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
                     + "empty or default address supplied to one or more manager addresses");
         }
         
-        if (this.txn == null) {
-            this.txn = new Transaction();
-            this.txn.type = Type.AssetConfig;
+        if (this.getClass() == AssetConfigureTransactionBuilder.class) {
+            txn.type = Type.AssetConfig;
         }
         if (assetIndex != null) txn.assetIndex = assetIndex;
-        super.buildInternal();
+        super.applyTo(txn);
     }
 
     /**

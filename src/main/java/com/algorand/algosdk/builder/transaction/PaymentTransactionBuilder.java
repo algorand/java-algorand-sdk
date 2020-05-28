@@ -45,7 +45,7 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
     }
 
     @Override
-    protected void buildInternal() {
+    protected void applyTo(Transaction txn) {
         if (sender == null && closeRemainderTo == null) {
             throw new IllegalArgumentException("Must set at least one of 'receiver' or 'closeRemainderTo'");
         }
@@ -54,9 +54,8 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
-        if (this.txn == null) {
-            this.txn = new Transaction();
-            this.txn.type = Type.Payment;
+        if (this.getClass() == PaymentTransactionBuilder.class) {
+            txn.type = Type.Payment;
         }
 
         if (amount != null) txn.amount = amount;

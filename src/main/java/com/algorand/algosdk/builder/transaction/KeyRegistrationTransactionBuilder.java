@@ -54,16 +54,15 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     @Override
-    protected void buildInternal() {
+    protected void applyTo(Transaction txn) {
         
         Objects.requireNonNull(sender, "sender is required");
         Objects.requireNonNull(firstValid, "firstValid is required");
         Objects.requireNonNull(lastValid, "lastValid is required");
         Objects.requireNonNull(genesisHash, "genesisHash is required");
         
-        if (this.txn == null) {
-            this.txn = new Transaction();
-            this.txn.type = Type.KeyRegistration;
+        if (this.getClass() == KeyRegistrationTransactionBuilder.class) {
+            txn.type = Type.KeyRegistration;
         }
 
         if (votePK != null) txn.votePK = votePK;

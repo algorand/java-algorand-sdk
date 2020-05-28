@@ -50,7 +50,7 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
     }
 
     @Override
-    protected void buildInternal() {
+    protected void applyTo(Transaction txn) {
         Objects.requireNonNull(sender, "sender is required.");
         Objects.requireNonNull(assetClawbackFrom, "assetClawbackFrom is required.");
         Objects.requireNonNull(assetReceiver, "assetReceiver is required.");
@@ -59,9 +59,8 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
-        if (this.txn == null) {
-            this.txn = new Transaction();
-            this.txn.type = Type.AssetTransfer;
+        if (this.getClass() == AssetClawbackTransactionBuilder.class) {
+            txn.type = Type.AssetTransfer;
         }
         if (this.assetClawbackFrom != null) txn.assetSender = assetClawbackFrom;
         if (this.assetReceiver != null) txn.assetReceiver = assetReceiver;

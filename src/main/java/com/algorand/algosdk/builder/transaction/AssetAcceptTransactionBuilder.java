@@ -41,9 +41,8 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
     }
 
     @Override
-    protected void buildInternal() {
-        if (this.txn == null) {
-            txn = new Transaction();
+    protected void applyTo(Transaction txn) {
+        if (this.getClass() == AssetAcceptTransactionBuilder.class) {  
             txn.type = Type.AssetTransfer;
         }
 

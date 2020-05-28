@@ -33,13 +33,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     protected Digest genesisHash = null;
     protected Digest group = null;
 
-    protected Transaction txn = null;
-    
     protected TransactionBuilder(Transaction.Type type) {
         this.type = type;
     }
 
-    protected abstract void buildInternal();
+    protected abstract void applyTo(Transaction txn);
     
     /**
      * Build the Transaction object. An exception is thrown if a valid transaction cannot be created with the provided
@@ -52,7 +50,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
             lastValid = firstValid.add(BigInteger.valueOf(1000));
         }
 
-        buildInternal();
+        Transaction txn = new Transaction();
+        applyTo(txn);
 
         if (sender != null) txn.sender = sender;
         if (firstValid != null) txn.firstValid = firstValid;

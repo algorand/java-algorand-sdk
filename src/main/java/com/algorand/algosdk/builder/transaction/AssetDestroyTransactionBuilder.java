@@ -35,10 +35,9 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
     }
 
     @Override
-    protected void buildInternal() {
-        if (this.txn == null) {
-            this.txn = new Transaction();
-            this.txn.type = Type.AssetConfig;
+    protected void applyTo(Transaction txn) {
+        if (this.getClass() == AssetDestroyTransactionBuilder.class) {
+            txn.type = Type.AssetConfig;
         }
         if (assetIndex != null) {
             txn.assetIndex = assetIndex;
