@@ -53,6 +53,8 @@ public class Transaction implements Serializable {
     public Digest group = new Digest();
     @JsonProperty("lx")
     public byte[] lease;
+    @JsonProperty("rekey")
+    public Address rekeyTo = new Address();
 
     /* payment fields  *********************************************************/
     @JsonProperty("amt")
@@ -210,6 +212,7 @@ public class Transaction implements Serializable {
                 genesisHash,
                 null,
                 null,
+                null,
                 // payment fields
                 amount,
                 receiver,
@@ -300,6 +303,7 @@ public class Transaction implements Serializable {
                 note,
                 genesisID,
                 genesisHash,
+                null,
                 null,
                 null,
                 // payment fields
@@ -413,6 +417,7 @@ public class Transaction implements Serializable {
                 genesisHash,
                 null,
                 null,
+                null,
                 // payment fields
                 null,
                 null,
@@ -500,7 +505,7 @@ public class Transaction implements Serializable {
     		Address freeze, 
     		Address clawback,
     		boolean strictEmptyAddressChecking) {
-    	Address defaultAddr = new Address();
+        Address defaultAddr = new Address();
     	if (strictEmptyAddressChecking && ( 
     			(manager == null || manager.equals(defaultAddr)) ||
     			(reserve == null || reserve.equals(defaultAddr)) ||	
@@ -537,6 +542,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("gen") String genesisID,
                         @JsonProperty("gh") byte[] genesisHash,
                         @JsonProperty("lx") byte[] lease,
+                        @JsonProperty("rekey") byte[] rekeyTo,
                         @JsonProperty("grp") byte[] group,			
                         // payment fields
                         @JsonProperty("amt") BigInteger amount,
@@ -572,6 +578,7 @@ public class Transaction implements Serializable {
              genesisID,
              new Digest(genesisHash),
              lease,
+             new Address(rekeyTo),
              new Digest(group),
              // payment fields
              amount,
@@ -613,6 +620,7 @@ public class Transaction implements Serializable {
                         String genesisID,
                         Digest genesisHash,
                         byte[] lease, 
+                        Address rekeyTo,
                         Digest group,
                         // payment fields
                         BigInteger amount,
@@ -646,6 +654,7 @@ public class Transaction implements Serializable {
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
         setLease(lease);
+        if (rekeyTo != null) this.rekeyTo = rekeyTo;
         if (group != null) this.group = group;
         if (amount != null) this.amount = amount;
         if (receiver != null) this.receiver = receiver;
@@ -668,7 +677,7 @@ public class Transaction implements Serializable {
     }
 
     // Used by Jackson to determine "default" values.
-    protected Transaction() {
+    public Transaction() {
         // Override the default to 0 so that it will be serialized
         this.fee = BigInteger.valueOf(0);
     }
@@ -1117,6 +1126,7 @@ public class Transaction implements Serializable {
                 freezeTarget.equals(that.freezeTarget) &&
                 assetFreezeID.equals(that.assetFreezeID) &&
                 freezeState == that.freezeState &&
+                rekeyTo.equals(that.rekeyTo) &&
                 Arrays.equals(lease, ((Transaction) o).lease);
     }
 

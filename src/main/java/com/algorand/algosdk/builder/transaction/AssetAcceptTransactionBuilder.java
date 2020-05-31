@@ -1,10 +1,11 @@
 package com.algorand.algosdk.builder.transaction;
 
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.Transaction;
-
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 
 /**
  * Build an asset accept transaction, which is used to mark an acount as willing to accept an asset.
@@ -24,6 +25,7 @@ import java.security.NoSuchAlgorithmException;
  *
  *  Note: The acceptingAccount setters map to the 'sender' field internally. Using both will override each other.
  */
+@SuppressWarnings("unchecked")
 public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger assetIndex = null;
 
@@ -39,16 +41,14 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
     }
 
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createAssetAcceptTransaction(
-                sender,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisID,
-                genesisHash,
-                assetIndex);
+    protected void applyTo(Transaction txn) {
+        if (this.getClass() == AssetAcceptTransactionBuilder.class) {  
+            txn.type = Type.AssetTransfer;
+        }
+
+        if (assetIndex != null) txn.xferAsset = assetIndex; 
+        if (sender != null) txn.assetReceiver = sender;
+        txn.amount = BigInteger.valueOf(0);
     }
 
     /**

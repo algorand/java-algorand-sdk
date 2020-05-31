@@ -2,6 +2,7 @@ package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -29,6 +30,7 @@ import java.util.Objects;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected Address assetClawbackFrom = null;
     protected Address assetReceiver = null;
@@ -48,7 +50,7 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
     }
 
     @Override
-    protected Transaction buildInternal() {
+    protected void applyTo(Transaction txn) {
         Objects.requireNonNull(sender, "sender is required.");
         Objects.requireNonNull(assetClawbackFrom, "assetClawbackFrom is required.");
         Objects.requireNonNull(assetReceiver, "assetReceiver is required.");
@@ -57,43 +59,14 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
-
-        return new Transaction(
-                Transaction.Type.AssetTransfer,
-                //header fields
-                sender,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisID,
-                genesisHash,
-                null,
-                null,
-                // payment fields
-                null,
-                null,
-                null,
-                // keyreg fields
-                null,
-                null,
-                null,
-                null,
-                // voteKeyDilution
-                null,
-                // asset creation and configuration
-                null,
-                null,
-                // asset transfer fields
-                assetIndex,
-                assetAmount,
-                assetClawbackFrom,
-                assetReceiver,
-                assetCloseTo,
-                // asset freeze fields
-                null,
-                null,
-                false); // default value which wont be included in the serialized object.
+        if (this.getClass() == AssetClawbackTransactionBuilder.class) {
+            txn.type = Type.AssetTransfer;
+        }
+        if (this.assetClawbackFrom != null) txn.assetSender = assetClawbackFrom;
+        if (this.assetReceiver != null) txn.assetReceiver = assetReceiver;
+        if (this.assetCloseTo != null) txn.assetCloseTo = assetCloseTo;
+        if (this.assetAmount != null) txn.assetAmount = assetAmount;
+        if (this.assetIndex != null) txn.xferAsset = assetIndex;
     }
 
     /**

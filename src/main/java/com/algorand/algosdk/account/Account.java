@@ -136,7 +136,11 @@ public class Account {
         try {
             byte[] prefixEncodedTx = tx.bytesToSign();
             Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
-            return new SignedTransaction(tx, txSig, tx.txID());
+            SignedTransaction stx = new SignedTransaction(tx, txSig, tx.txID());
+            if (!tx.sender.equals(this.address)) {
+                stx.authAddr(this.address);
+            }
+            return stx;
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
@@ -255,9 +259,16 @@ public class Account {
      * @return an estimated byte size for the transaction.
      */
     public static BigInteger estimatedEncodedSize(Transaction tx) throws NoSuchAlgorithmException {
-        Account acc = new Account();
         try {
-            return BigInteger.valueOf(Encoder.encodeToMsgPack(acc.signTransaction(tx)).length);
+            // The transaction is signed with a random account to get the size of the signed transaction.
+            // SignTransaction does the signing, but also sets authAddr which is not desired here. 
+            long length = Encoder.encodeToMsgPack(
+                    new SignedTransaction(
+                            tx, 
+                            new Account().rawSignBytes(
+                                    Arrays.copyOf(tx.bytesToSign(), tx.bytesToSign().length)),
+                            tx.txID())).length;
+            return BigInteger.valueOf(length);
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
         }

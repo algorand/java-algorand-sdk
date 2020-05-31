@@ -2,6 +2,7 @@ package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +23,7 @@ import java.security.NoSuchAlgorithmException;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuilder<T>> extends TransactionBuilder<T> {
     // asset freeze fields
     protected Address freezeTarget = null;
@@ -40,17 +42,13 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
     }
 
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createAssetFreezeTransaction(
-                sender,
-                freezeTarget,
-                freezeState,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisHash,
-                assetIndex);
+    protected void applyTo(Transaction txn) {
+        if (this.getClass() == AssetFreezeTransactionBuilder.class) {
+            txn.type = Type.AssetFreeze;
+        }
+        if (freezeTarget != null) txn.freezeTarget = freezeTarget;
+        if (assetIndex != null) txn.assetFreezeID = assetIndex;
+        txn.freezeState = freezeState;
     }
 
     /**

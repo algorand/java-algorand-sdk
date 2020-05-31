@@ -3,9 +3,11 @@ package com.algorand.algosdk.builder.transaction;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * Build a keyreg transaction.
@@ -27,6 +29,7 @@ import java.math.BigInteger;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransactionBuilder<T>> extends TransactionBuilder<T> {
     // votePK is the participation public key used in key registration transactions
     protected ParticipationPublicKey votePK = new ParticipationPublicKey();
@@ -51,20 +54,22 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     }
 
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createKeyRegistrationTransaction(
-                sender,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisID,
-                genesisHash,
-                votePK,
-                selectionPK,
-                voteFirst,
-                voteLast,
-                voteKeyDilution);
+    protected void applyTo(Transaction txn) {
+        
+        Objects.requireNonNull(sender, "sender is required");
+        Objects.requireNonNull(firstValid, "firstValid is required");
+        Objects.requireNonNull(lastValid, "lastValid is required");
+        Objects.requireNonNull(genesisHash, "genesisHash is required");
+        
+        if (this.getClass() == KeyRegistrationTransactionBuilder.class) {
+            txn.type = Type.KeyRegistration;
+        }
+
+        if (votePK != null) txn.votePK = votePK;
+        if (selectionPK != null) txn.selectionPK = selectionPK;
+        if (voteFirst != null) txn.voteFirst = voteFirst;
+        if (voteLast != null) txn.voteLast = voteLast;
+        if (voteKeyDilution != null) txn.voteKeyDilution = voteKeyDilution;
     }
 
     /**
