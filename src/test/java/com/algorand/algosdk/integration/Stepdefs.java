@@ -114,7 +114,7 @@ public class Stepdefs {
     BigInteger assetID = BigInteger.valueOf(1);
     String assetName = "testcoin";
     String assetUnitName = "coins";
-    Transaction.AssetParams expectedParams = null;
+    AssetParams expectedParams = null;
     AssetParams queriedParams = new AssetParams();
 
     protected Address getAddress(int i) {

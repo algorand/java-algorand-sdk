@@ -116,7 +116,7 @@ public class TestTransaction {
                 .clawback(clawback)
                 .build();
 
-        Transaction.AssetParams expectedParams = new Transaction.AssetParams(
+        AssetParams expectedParams = new AssetParams(
                 BigInteger.valueOf(100),
                 numDecimal,
                 false,
@@ -154,7 +154,7 @@ public class TestTransaction {
         String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
         String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
 
-        assertThatThrownBy(() -> new Transaction.AssetParams(
+        assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
                 3,
                 false,
@@ -169,7 +169,7 @@ public class TestTransaction {
             .isInstanceOf(RuntimeException.class)
             .hasMessageContaining("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded");
 
-        assertThatThrownBy(() -> new Transaction.AssetParams(
+        assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
                 3,
                 false,
