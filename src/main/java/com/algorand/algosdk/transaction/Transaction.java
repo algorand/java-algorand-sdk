@@ -9,7 +9,6 @@ import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.*;
-import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,6 +30,9 @@ public class Transaction implements Serializable {
     private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
     @JsonProperty("type")
     public Type type = Type.Default;
+
+    @JsonUnwrapped
+    public ApplicationTransactionParams appParams;
 
     // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields. This circumvents our encoders'
     // inability to sort child fields.
@@ -1000,7 +1002,8 @@ public class Transaction implements Serializable {
         KeyRegistration("keyreg"),
         AssetConfig("acfg"),
         AssetTransfer("axfer"),
-        AssetFreeze("afrz");
+        AssetFreeze("afrz"),
+        ApplicaitonCall("appl");
 
         private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
 
