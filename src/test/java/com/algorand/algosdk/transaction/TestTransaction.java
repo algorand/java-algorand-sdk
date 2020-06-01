@@ -345,6 +345,26 @@ public class TestTransaction {
         assertThat(encodedOutBytes).isEqualTo(goldenString);
         TestUtil.serializeDeserializeCheck(stx);
     }
+    
+    @Test
+    public void testTransactionGroupLimit() throws IOException, NoSuchAlgorithmException {
+
+        Transaction [] txs = new Transaction[TxGroup.MAX_TX_GROUP_SIZE+1];        
+
+        boolean gotExpectedException = false;
+        Digest gid = null;
+        try {
+            gid = TxGroup.computeGroupID(txs);
+        } catch (IllegalArgumentException e) {
+            gotExpectedException = true;
+            assertThat(e.getMessage()).isEqualTo("max group size is " + TxGroup.MAX_TX_GROUP_SIZE);
+        } catch (IOException e) {
+            throw e;
+        }
+        assertThat(gotExpectedException).isEqualTo(true);
+        assertThat(gid == null);
+   
+    }
 
     @Test
     public void testTransactionGroup() throws Exception {
