@@ -1220,5 +1220,7 @@ public class Stepdefs {
 
     @When("I add a rekeyTo field with the private key algorand address")
     public void i_add_a_rekeyTo_field_with_the_private_key_algorand_address() {
+        txnBuilder.rekey(this.pk.toString());
+        txn = txnBuilder.build();
     }
 }
