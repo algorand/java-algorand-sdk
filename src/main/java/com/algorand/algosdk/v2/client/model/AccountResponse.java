@@ -7,25 +7,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AccountResponse extends PathResponse {
 
-	@JsonProperty("account")
-	public Account account;
+    @JsonProperty("account")
+    public Account account;
 
-	/**
-	 * Round at which the results were computed. 
-	 */
-	@JsonProperty("current-round")
-	public Long currentRound;
+    /**
+     * Round at which the results were computed. 
+     */
+    @JsonProperty("current-round")
+    public Long currentRound;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		AccountResponse other = (AccountResponse) o;
-		if (!Objects.deepEquals(this.account, other.account)) return false;
-		if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
+        AccountResponse other = (AccountResponse) o;
+        if (!Objects.deepEquals(this.account, other.account)) return false;
+        if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

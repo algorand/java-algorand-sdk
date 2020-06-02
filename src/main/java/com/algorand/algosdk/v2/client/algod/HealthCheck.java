@@ -12,20 +12,20 @@ import com.algorand.algosdk.v2.client.common.Response;
  */
 public class HealthCheck extends Query {
 
-	public HealthCheck(Client client) {
-		super(client, new HttpMethod("get"));
-	}
+    public HealthCheck(Client client) {
+        super(client, new HttpMethod("get"));
+    }
 
-	@Override
-	public Response<String> execute() throws Exception {
-		Response<String> resp = baseExecute();
-		resp.setValueType(String.class);
-		return resp;
-	}
+    @Override
+    public Response<String> execute() throws Exception {
+        Response<String> resp = baseExecute();
+        resp.setValueType(String.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("health"));
+    protected QueryData getRequestString() {
+        addPathSegment(String.valueOf("health"));
 
-		return qd;
-	}
+        return qd;
+    }
 }

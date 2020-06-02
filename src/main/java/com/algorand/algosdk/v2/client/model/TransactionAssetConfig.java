@@ -14,25 +14,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TransactionAssetConfig extends PathResponse {
 
-	/**
-	 * (xaid) ID of the asset being configured or empty if creating. 
-	 */
-	@JsonProperty("asset-id")
-	public Long assetId;
+    /**
+     * (xaid) ID of the asset being configured or empty if creating. 
+     */
+    @JsonProperty("asset-id")
+    public Long assetId;
 
-	@JsonProperty("params")
-	public AssetParams params;
+    @JsonProperty("params")
+    public AssetParams params;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		TransactionAssetConfig other = (TransactionAssetConfig) o;
-		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
-		if (!Objects.deepEquals(this.params, other.params)) return false;
+        TransactionAssetConfig other = (TransactionAssetConfig) o;
+        if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
+        if (!Objects.deepEquals(this.params, other.params)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

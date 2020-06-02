@@ -14,25 +14,25 @@ import com.algorand.algosdk.v2.client.model.AssetResponse;
  */
 public class LookupAssetByID extends Query {
 
-	private Long assetId;
+    private Long assetId;
 
-	public LookupAssetByID(Client client, Long assetId) {
-		super(client, new HttpMethod("get"));
-		this.assetId = assetId;
-	}
+    public LookupAssetByID(Client client, Long assetId) {
+        super(client, new HttpMethod("get"));
+        this.assetId = assetId;
+    }
 
-	@Override
-	public Response<AssetResponse> execute() throws Exception {
-		Response<AssetResponse> resp = baseExecute();
-		resp.setValueType(AssetResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<AssetResponse> execute() throws Exception {
+        Response<AssetResponse> resp = baseExecute();
+        resp.setValueType(AssetResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("assets"));
-		addPathSegment(String.valueOf(assetId));
+    protected QueryData getRequestString() {
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("assets"));
+        addPathSegment(String.valueOf(assetId));
 
-		return qd;
-	}
+        return qd;
+    }
 }

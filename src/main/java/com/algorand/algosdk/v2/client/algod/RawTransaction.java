@@ -13,32 +13,32 @@ import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
  */
 public class RawTransaction extends Query {
 
-	public RawTransaction(Client client) {
-		super(client, new HttpMethod("post"));
-	}
+    public RawTransaction(Client client) {
+        super(client, new HttpMethod("post"));
+    }
 
-	/**
-	 * The byte encoded signed transaction to broadcast to network 
-	 */
-	public RawTransaction rawtxn(byte[] rawtxn) {
-		addToBody(rawtxn);
-		return this;
-	}
+    /**
+     * The byte encoded signed transaction to broadcast to network 
+     */
+    public RawTransaction rawtxn(byte[] rawtxn) {
+        addToBody(rawtxn);
+        return this;
+    }
 
-	@Override
-	public Response<PostTransactionsResponse> execute() throws Exception {
-		Response<PostTransactionsResponse> resp = baseExecute();
-		resp.setValueType(PostTransactionsResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<PostTransactionsResponse> execute() throws Exception {
+        Response<PostTransactionsResponse> resp = baseExecute();
+        resp.setValueType(PostTransactionsResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		if (qd.bodySegments.isEmpty()) {
-			throw new RuntimeException("rawtxn is not set. It is a required parameter.");
-		}
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("transactions"));
+    protected QueryData getRequestString() {
+        if (qd.bodySegments.isEmpty()) {
+            throw new RuntimeException("rawtxn is not set. It is a required parameter.");
+        }
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("transactions"));
 
-		return qd;
-	}
+        return qd;
+    }
 }

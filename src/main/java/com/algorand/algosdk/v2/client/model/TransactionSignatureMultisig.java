@@ -14,35 +14,35 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TransactionSignatureMultisig extends PathResponse {
 
-	/**
-	 * (subsig) holds pairs of public key and signatures. 
-	 */
-	@JsonProperty("subsignature")
-	public List<TransactionSignatureMultisigSubsignature> subsignature = new ArrayList<TransactionSignatureMultisigSubsignature>();
+    /**
+     * (subsig) holds pairs of public key and signatures. 
+     */
+    @JsonProperty("subsignature")
+    public List<TransactionSignatureMultisigSubsignature> subsignature = new ArrayList<TransactionSignatureMultisigSubsignature>();
 
-	/**
-	 * (thr) 
-	 */
-	@JsonProperty("threshold")
-	public Long threshold;
+    /**
+     * (thr) 
+     */
+    @JsonProperty("threshold")
+    public Long threshold;
 
-	/**
-	 * (v) 
-	 */
-	@JsonProperty("version")
-	public Long version;
+    /**
+     * (v) 
+     */
+    @JsonProperty("version")
+    public Long version;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		TransactionSignatureMultisig other = (TransactionSignatureMultisig) o;
-		if (!Objects.deepEquals(this.subsignature, other.subsignature)) return false;
-		if (!Objects.deepEquals(this.threshold, other.threshold)) return false;
-		if (!Objects.deepEquals(this.version, other.version)) return false;
+        TransactionSignatureMultisig other = (TransactionSignatureMultisig) o;
+        if (!Objects.deepEquals(this.subsignature, other.subsignature)) return false;
+        if (!Objects.deepEquals(this.threshold, other.threshold)) return false;
+        if (!Objects.deepEquals(this.version, other.version)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -14,12 +14,12 @@ import com.algorand.sdkutils.generated.QueryMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class TestGenerator extends Generator {
-	static String callExternalCurl(String request) {
-		StringBuffer bw = new StringBuffer();
-		ProcessBuilder processBuilder = new ProcessBuilder();
+    static String callExternalCurl(String request) {
+        StringBuffer bw = new StringBuffer();
+        ProcessBuilder processBuilder = new ProcessBuilder();
         processBuilder.command("curl", 
-        		"-H", "X-Algo-API-Token: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 
-        		"-s", request);
+                "-H", "X-Algo-API-Token: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", 
+                "-s", request);
         try {
             Process process = processBuilder.start();
             BufferedReader reader =
@@ -38,21 +38,21 @@ public class TestGenerator extends Generator {
             e.printStackTrace();
         }
         return null;
-	}
-	
+    }
 
-	static String getPathFromLine(String line) {
-		return line.substring(0, line.indexOf(","));
-	}
 
-	/*
+    static String getPathFromLine(String line) {
+        return line.substring(0, line.indexOf(","));
+    }
+
+    /*
 	public static boolean testSamples(TestGenerator tg, BufferedReader br, Client client, boolean verbose) throws Exception {
 		// create the directory golden if it does not exist
 		File goldenDir = new File("golden");
 		if (!goldenDir.exists()) {
 			goldenDir.mkdir();
 		}
-		
+
 		JsonNode paths = tg.root.get("paths");
 		JsonNode pathNode = null;
 		boolean failed = false;
@@ -74,10 +74,10 @@ public class TestGenerator extends Generator {
 				caseCounter = 0;
 			} else {
 				// this is a test sample
-				
+
 				String[] columns = line.split(",");
 				JsonNode paramNode = pathNode.findValue("parameters");
-				
+
 				// Get the constructor params
 				ArrayList<String> al = new ArrayList<String>();
 				{
@@ -93,7 +93,7 @@ public class TestGenerator extends Generator {
 					}
 				}
 				String args[] = al.toArray(new String[al.size()]);
-				
+
 				// sample source setup
 				Iterator<Entry<String, JsonNode>> properties = tg.getSortedParameters(paramNode);
 				int colIdx = 1;
@@ -106,8 +106,8 @@ public class TestGenerator extends Generator {
 				} else {
 					query = QueryMapper.getClass(methodName, (IndexerClient)client, args);
 				}
-				
-				
+
+
 				while (properties.hasNext()) {
 					// sample source setup
 					String value = "";
@@ -126,7 +126,7 @@ public class TestGenerator extends Generator {
 					}
 					QueryMapper.setValue(query, methodName, parameter.getKey(), value);
 				}
-				
+
 				// Call the SDK
 				String sdkResponse = null;
 				try {
@@ -147,24 +147,24 @@ public class TestGenerator extends Generator {
 				} else {
 					httpUrl = httpUrl + columns[0].substring(1);
 				}
-				
+
 				// Prepare the file: 
 				File file = new File("golden/" + operationId + "_" + String.valueOf(caseCounter) + ".json");
 				BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-				
+
 				// Call the node directly using curl
 				System.out.println("\n******************************************\n" + httpUrl);
 				bw.append(httpUrl + "\n");
-				
+
 				//callExternalCurl
 				String curlResponse = callExternalCurl(httpUrl);
 				bw.append(Utils.formatJson(curlResponse));
-				
+
 				// compare the results
 				String filter = "round\"";
 				DiffResult dr = Utils.showDifferentces(curlResponse, sdkResponse, "curl", "sdk", filter);
 
-				
+
 				if (!verbose) {
 					System.out.print(dr.justDiff);
 				} else {
@@ -182,9 +182,9 @@ public class TestGenerator extends Generator {
 		}
 		return !failed;
 	}
-	 */
+     */
 
-	public TestGenerator (JsonNode root) {
-		super(root);
-	}
+    public TestGenerator (JsonNode root) {
+        super(root);
+    }
 }
