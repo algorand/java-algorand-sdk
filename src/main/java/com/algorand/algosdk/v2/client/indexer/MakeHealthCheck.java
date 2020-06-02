@@ -13,20 +13,20 @@ import com.algorand.algosdk.v2.client.model.HealthCheck;
  */
 public class MakeHealthCheck extends Query {
 
-	public MakeHealthCheck(Client client) {
-		super(client, new HttpMethod("get"));
-	}
+    public MakeHealthCheck(Client client) {
+        super(client, new HttpMethod("get"));
+    }
 
-	@Override
-	public Response<HealthCheck> execute() throws Exception {
-		Response<HealthCheck> resp = baseExecute();
-		resp.setValueType(HealthCheck.class);
-		return resp;
-	}
+    @Override
+    public Response<HealthCheck> execute() throws Exception {
+        Response<HealthCheck> resp = baseExecute();
+        resp.setValueType(HealthCheck.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("health"));
+    protected QueryData getRequestString() {
+        addPathSegment(String.valueOf("health"));
 
-		return qd;
-	}
+        return qd;
+    }
 }

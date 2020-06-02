@@ -7,21 +7,21 @@ public class Enums {
 /**
  * Combine with the address parameter to define what type of address to search for. 
  */
-	public enum AddressRole {
-		@JsonProperty("sender") SENDER("sender"),
-		@JsonProperty("receiver") RECEIVER("receiver"),
-		@JsonProperty("freeze-target") FREEZETARGET("freeze-target");
+    public enum AddressRole {
+        @JsonProperty("sender") SENDER("sender"),
+        @JsonProperty("receiver") RECEIVER("receiver"),
+        @JsonProperty("freeze-target") FREEZETARGET("freeze-target");
 
-		final String serializedName;
-		AddressRole(String name) {
-			this.serializedName = name;
-		}
+        final String serializedName;
+        AddressRole(String name) {
+            this.serializedName = name;
+        }
 
-		@Override
-		public String toString() {
-			return this.serializedName;
-		}
-	}
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
 
 /**
  * SigType filters just results using the specified type of signature: 
@@ -29,38 +29,38 @@ public class Enums {
  *   msig - MultiSig 
  *   lsig - LogicSig 
  */
-	public enum SigType {
-		@JsonProperty("sig") SIG("sig"),
-		@JsonProperty("msig") MSIG("msig"),
-		@JsonProperty("lsig") LSIG("lsig");
+    public enum SigType {
+        @JsonProperty("sig") SIG("sig"),
+        @JsonProperty("msig") MSIG("msig"),
+        @JsonProperty("lsig") LSIG("lsig");
 
-		final String serializedName;
-		SigType(String name) {
-			this.serializedName = name;
-		}
+        final String serializedName;
+        SigType(String name) {
+            this.serializedName = name;
+        }
 
-		@Override
-		public String toString() {
-			return this.serializedName;
-		}
-	}
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
 
-	public enum TxType {
-		@JsonProperty("pay") PAY("pay"),
-		@JsonProperty("keyreg") KEYREG("keyreg"),
-		@JsonProperty("acfg") ACFG("acfg"),
-		@JsonProperty("axfer") AXFER("axfer"),
-		@JsonProperty("afrz") AFRZ("afrz");
+    public enum TxType {
+        @JsonProperty("pay") PAY("pay"),
+        @JsonProperty("keyreg") KEYREG("keyreg"),
+        @JsonProperty("acfg") ACFG("acfg"),
+        @JsonProperty("axfer") AXFER("axfer"),
+        @JsonProperty("afrz") AFRZ("afrz");
 
-		final String serializedName;
-		TxType(String name) {
-			this.serializedName = name;
-		}
+        final String serializedName;
+        TxType(String name) {
+            this.serializedName = name;
+        }
 
-		@Override
-		public String toString() {
-			return this.serializedName;
-		}
-	}
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
 
 }

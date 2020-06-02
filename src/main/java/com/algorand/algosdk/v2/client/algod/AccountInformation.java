@@ -16,28 +16,28 @@ import com.algorand.algosdk.v2.client.model.Account;
  */
 public class AccountInformation extends Query {
 
-	private Address address;
+    private Address address;
 
-	/**
-	 * @param address An account public key 
-	 */
-	public AccountInformation(Client client, Address address) {
-		super(client, new HttpMethod("get"));
-		this.address = address;
-	}
+    /**
+     * @param address An account public key 
+     */
+    public AccountInformation(Client client, Address address) {
+        super(client, new HttpMethod("get"));
+        this.address = address;
+    }
 
-	@Override
-	public Response<Account> execute() throws Exception {
-		Response<Account> resp = baseExecute();
-		resp.setValueType(Account.class);
-		return resp;
-	}
+    @Override
+    public Response<Account> execute() throws Exception {
+        Response<Account> resp = baseExecute();
+        resp.setValueType(Account.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("accounts"));
-		addPathSegment(String.valueOf(address));
+    protected QueryData getRequestString() {
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("accounts"));
+        addPathSegment(String.valueOf(address));
 
-		return qd;
-	}
+        return qd;
+    }
 }

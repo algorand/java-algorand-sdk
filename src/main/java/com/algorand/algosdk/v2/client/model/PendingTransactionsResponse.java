@@ -10,28 +10,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class PendingTransactionsResponse extends PathResponse {
 
-	/**
-	 * An array of signed transaction objects. 
-	 */
-	@JsonProperty("top-transactions")
-	public List<SignedTransaction> topTransactions = new ArrayList<SignedTransaction>();
+    /**
+     * An array of signed transaction objects. 
+     */
+    @JsonProperty("top-transactions")
+    public List<SignedTransaction> topTransactions = new ArrayList<SignedTransaction>();
 
-	/**
-	 * Total number of transactions in the pool. 
-	 */
-	@JsonProperty("total-transactions")
-	public Long totalTransactions;
+    /**
+     * Total number of transactions in the pool. 
+     */
+    @JsonProperty("total-transactions")
+    public Long totalTransactions;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		PendingTransactionsResponse other = (PendingTransactionsResponse) o;
-		if (!Objects.deepEquals(this.topTransactions, other.topTransactions)) return false;
-		if (!Objects.deepEquals(this.totalTransactions, other.totalTransactions)) return false;
+        PendingTransactionsResponse other = (PendingTransactionsResponse) o;
+        if (!Objects.deepEquals(this.topTransactions, other.topTransactions)) return false;
+        if (!Objects.deepEquals(this.totalTransactions, other.totalTransactions)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

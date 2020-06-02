@@ -8,42 +8,42 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TransactionSignatureMultisigSubsignature extends PathResponse {
 
-	/**
-	 * (pk) 
-	 */
-	@JsonProperty("public-key")
-	public void publicKey(String base64Encoded) {
-		this.publicKey = Encoder.decodeFromBase64(base64Encoded);
-	}
-	@JsonProperty("public-key")
-	public String publicKey() {
-		return Encoder.encodeToBase64(this.publicKey);
-	}
-	public byte[] publicKey;
+    /**
+     * (pk) 
+     */
+    @JsonProperty("public-key")
+    public void publicKey(String base64Encoded) {
+        this.publicKey = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("public-key")
+    public String publicKey() {
+        return Encoder.encodeToBase64(this.publicKey);
+    }
+    public byte[] publicKey;
 
-	/**
-	 * (s) 
-	 */
-	@JsonProperty("signature")
-	public void signature(String base64Encoded) {
-		this.signature = Encoder.decodeFromBase64(base64Encoded);
-	}
-	@JsonProperty("signature")
-	public String signature() {
-		return Encoder.encodeToBase64(this.signature);
-	}
-	public byte[] signature;
+    /**
+     * (s) 
+     */
+    @JsonProperty("signature")
+    public void signature(String base64Encoded) {
+        this.signature = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("signature")
+    public String signature() {
+        return Encoder.encodeToBase64(this.signature);
+    }
+    public byte[] signature;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		TransactionSignatureMultisigSubsignature other = (TransactionSignatureMultisigSubsignature) o;
-		if (!Objects.deepEquals(this.publicKey, other.publicKey)) return false;
-		if (!Objects.deepEquals(this.signature, other.signature)) return false;
+        TransactionSignatureMultisigSubsignature other = (TransactionSignatureMultisigSubsignature) o;
+        if (!Objects.deepEquals(this.publicKey, other.publicKey)) return false;
+        if (!Objects.deepEquals(this.signature, other.signature)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

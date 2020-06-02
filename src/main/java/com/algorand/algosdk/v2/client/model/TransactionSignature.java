@@ -12,36 +12,36 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TransactionSignature extends PathResponse {
 
-	@JsonProperty("logicsig")
-	public TransactionSignatureLogicsig logicsig;
+    @JsonProperty("logicsig")
+    public TransactionSignatureLogicsig logicsig;
 
-	@JsonProperty("multisig")
-	public TransactionSignatureMultisig multisig;
+    @JsonProperty("multisig")
+    public TransactionSignatureMultisig multisig;
 
-	/**
-	 * (sig) Standard ed25519 signature. 
-	 */
-	@JsonProperty("sig")
-	public void sig(String base64Encoded) {
-		this.sig = Encoder.decodeFromBase64(base64Encoded);
-	}
-	@JsonProperty("sig")
-	public String sig() {
-		return Encoder.encodeToBase64(this.sig);
-	}
-	public byte[] sig;
+    /**
+     * (sig) Standard ed25519 signature. 
+     */
+    @JsonProperty("sig")
+    public void sig(String base64Encoded) {
+        this.sig = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("sig")
+    public String sig() {
+        return Encoder.encodeToBase64(this.sig);
+    }
+    public byte[] sig;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		TransactionSignature other = (TransactionSignature) o;
-		if (!Objects.deepEquals(this.logicsig, other.logicsig)) return false;
-		if (!Objects.deepEquals(this.multisig, other.multisig)) return false;
-		if (!Objects.deepEquals(this.sig, other.sig)) return false;
+        TransactionSignature other = (TransactionSignature) o;
+        if (!Objects.deepEquals(this.logicsig, other.logicsig)) return false;
+        if (!Objects.deepEquals(this.multisig, other.multisig)) return false;
+        if (!Objects.deepEquals(this.sig, other.sig)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -10,22 +10,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class ErrorResponse extends PathResponse {
 
-	@JsonProperty("data")
-	public String data;
+    @JsonProperty("data")
+    public String data;
 
-	@JsonProperty("message")
-	public String message;
+    @JsonProperty("message")
+    public String message;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		ErrorResponse other = (ErrorResponse) o;
-		if (!Objects.deepEquals(this.data, other.data)) return false;
-		if (!Objects.deepEquals(this.message, other.message)) return false;
+        ErrorResponse other = (ErrorResponse) o;
+        if (!Objects.deepEquals(this.data, other.data)) return false;
+        if (!Objects.deepEquals(this.message, other.message)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

@@ -20,30 +20,30 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
  */
 public class PendingTransactionInformation extends Query {
 
-	private String txid;
+    private String txid;
 
-	/**
-	 * @param txid A transaction id 
-	 */
-	public PendingTransactionInformation(Client client, String txid) {
-		super(client, new HttpMethod("get"));
-		addQuery("format", "msgpack");
-		this.txid = txid;
-	}
+    /**
+     * @param txid A transaction id 
+     */
+    public PendingTransactionInformation(Client client, String txid) {
+        super(client, new HttpMethod("get"));
+        addQuery("format", "msgpack");
+        this.txid = txid;
+    }
 
-	@Override
-	public Response<PendingTransactionResponse> execute() throws Exception {
-		Response<PendingTransactionResponse> resp = baseExecute();
-		resp.setValueType(PendingTransactionResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<PendingTransactionResponse> execute() throws Exception {
+        Response<PendingTransactionResponse> resp = baseExecute();
+        resp.setValueType(PendingTransactionResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("transactions"));
-		addPathSegment(String.valueOf("pending"));
-		addPathSegment(String.valueOf(txid));
+    protected QueryData getRequestString() {
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("transactions"));
+        addPathSegment(String.valueOf("pending"));
+        addPathSegment(String.valueOf(txid));
 
-		return qd;
-	}
+        return qd;
+    }
 }

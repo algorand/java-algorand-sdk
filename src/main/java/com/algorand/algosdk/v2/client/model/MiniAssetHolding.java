@@ -12,33 +12,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class MiniAssetHolding extends PathResponse {
 
-	@JsonProperty("address")
-	public void address(String address) throws NoSuchAlgorithmException {
-		 this.address = new Address(address);
-	 }
-	@JsonProperty("address")
-	public String address() throws NoSuchAlgorithmException {
-		return this.address.encodeAsString();
-	}
-	public Address address;
+    @JsonProperty("address")
+    public void address(String address) throws NoSuchAlgorithmException {
+         this.address = new Address(address);
+     }
+    @JsonProperty("address")
+    public String address() throws NoSuchAlgorithmException {
+        return this.address.encodeAsString();
+    }
+    public Address address;
 
-	@JsonProperty("amount")
-	public java.math.BigInteger amount;
+    @JsonProperty("amount")
+    public java.math.BigInteger amount;
 
-	@JsonProperty("is-frozen")
-	public Boolean isFrozen;
+    @JsonProperty("is-frozen")
+    public Boolean isFrozen;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		MiniAssetHolding other = (MiniAssetHolding) o;
-		if (!Objects.deepEquals(this.address, other.address)) return false;
-		if (!Objects.deepEquals(this.amount, other.amount)) return false;
-		if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
+        MiniAssetHolding other = (MiniAssetHolding) o;
+        if (!Objects.deepEquals(this.address, other.address)) return false;
+        if (!Objects.deepEquals(this.amount, other.amount)) return false;
+        if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }
