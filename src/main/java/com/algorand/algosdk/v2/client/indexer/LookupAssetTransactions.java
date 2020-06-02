@@ -52,6 +52,14 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
+     * Application ID 
+     */
+    public LookupAssetTransactions applicationId(Long applicationId) {
+        addQuery("application-id", String.valueOf(applicationId));
+        return this;
+    }
+
+    /**
      * Include results before the given time. Must be an RFC 3339 formatted string. 
      */
     public LookupAssetTransactions beforeTime(Date beforeTime) {
@@ -125,6 +133,14 @@ public class LookupAssetTransactions extends Query {
      */
     public LookupAssetTransactions notePrefix(byte[] notePrefix) {
         addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
+        return this;
+    }
+
+    /**
+     * Include results which include the rekey-to field. 
+     */
+    public LookupAssetTransactions rekeyTo(Boolean rekeyTo) {
+        addQuery("rekey-to", String.valueOf(rekeyTo));
         return this;
     }
 

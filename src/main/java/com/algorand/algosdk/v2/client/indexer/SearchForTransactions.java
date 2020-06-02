@@ -49,6 +49,14 @@ public class SearchForTransactions extends Query {
     }
 
     /**
+     * Application ID 
+     */
+    public SearchForTransactions applicationId(Long applicationId) {
+        addQuery("application-id", String.valueOf(applicationId));
+        return this;
+    }
+
+    /**
      * Asset ID 
      */
     public SearchForTransactions assetId(Long assetId) {
@@ -130,6 +138,14 @@ public class SearchForTransactions extends Query {
      */
     public SearchForTransactions notePrefix(byte[] notePrefix) {
         addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
+        return this;
+    }
+
+    /**
+     * Include results which include the rekey-to field. 
+     */
+    public SearchForTransactions rekeyTo(Boolean rekeyTo) {
+        addQuery("rekey-to", String.valueOf(rekeyTo));
         return this;
     }
 

@@ -14,8 +14,8 @@ public class MiniAssetHolding extends PathResponse {
 
     @JsonProperty("address")
     public void address(String address) throws NoSuchAlgorithmException {
-         this.address = new Address(address);
-     }
+        this.address = new Address(address);
+    }
     @JsonProperty("address")
     public String address() throws NoSuchAlgorithmException {
         return this.address.encodeAsString();

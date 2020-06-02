@@ -39,6 +39,14 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
+     * Application ID 
+     */
+    public LookupAccountTransactions applicationId(Long applicationId) {
+        addQuery("application-id", String.valueOf(applicationId));
+        return this;
+    }
+
+    /**
      * Asset ID 
      */
     public LookupAccountTransactions assetId(Long assetId) {
@@ -110,6 +118,14 @@ public class LookupAccountTransactions extends Query {
      */
     public LookupAccountTransactions notePrefix(byte[] notePrefix) {
         addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
+        return this;
+    }
+
+    /**
+     * Include results which include the rekey-to field. 
+     */
+    public LookupAccountTransactions rekeyTo(Boolean rekeyTo) {
+        addQuery("rekey-to", String.valueOf(rekeyTo));
         return this;
     }
 

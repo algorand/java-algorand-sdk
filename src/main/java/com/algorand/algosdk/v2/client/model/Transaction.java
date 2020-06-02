@@ -1,7 +1,9 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,6 +28,20 @@ public class Transaction extends PathResponse {
     public TransactionAssetTransfer assetTransferTransaction;
 
     /**
+     * (sgnr) The address used to sign the transaction. This is used for rekeyed 
+     * accounts to indicate that the sender address did not sign the transaction. 
+     */
+    @JsonProperty("auth-addr")
+    public void authAddr(String authAddr) throws NoSuchAlgorithmException {
+        this.authAddr = new Address(authAddr);
+    }
+    @JsonProperty("auth-addr")
+    public String authAddr() throws NoSuchAlgorithmException {
+        return this.authAddr.encodeAsString();
+    }
+    public Address authAddr;
+
+    /**
      * (rc) rewards applied to close-remainder-to account. 
      */
     @JsonProperty("close-rewards")
@@ -42,6 +58,13 @@ public class Transaction extends PathResponse {
      */
     @JsonProperty("confirmed-round")
     public Long confirmedRound;
+
+    /**
+     * Specifies an application index (ID) if an application was created with this 
+     * transaction. 
+     */
+    @JsonProperty("created-application-index")
+    public Long createdApplicationIndex;
 
     /**
      * Specifies an asset index (ID) if an asset was created with this transaction. 
@@ -156,6 +179,21 @@ public class Transaction extends PathResponse {
     public Long receiverRewards;
 
     /**
+     * (rekey) when included in a valid transaction, the accounts auth addr will be 
+     * updated with this value and future signatures must be signed with the key 
+     * represented by this address. 
+     */
+    @JsonProperty("rekey-to")
+    public void rekeyTo(String rekeyTo) throws NoSuchAlgorithmException {
+        this.rekeyTo = new Address(rekeyTo);
+    }
+    @JsonProperty("rekey-to")
+    public String rekeyTo() throws NoSuchAlgorithmException {
+        return this.rekeyTo.encodeAsString();
+    }
+    public Address rekeyTo;
+
+    /**
      * Time when the block this transaction is in was confirmed. 
      */
     @JsonProperty("round-time")
@@ -199,9 +237,11 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.assetConfigTransaction, other.assetConfigTransaction)) return false;
         if (!Objects.deepEquals(this.assetFreezeTransaction, other.assetFreezeTransaction)) return false;
         if (!Objects.deepEquals(this.assetTransferTransaction, other.assetTransferTransaction)) return false;
+        if (!Objects.deepEquals(this.authAddr, other.authAddr)) return false;
         if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;
         if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
+        if (!Objects.deepEquals(this.createdApplicationIndex, other.createdApplicationIndex)) return false;
         if (!Objects.deepEquals(this.createdAssetIndex, other.createdAssetIndex)) return false;
         if (!Objects.deepEquals(this.fee, other.fee)) return false;
         if (!Objects.deepEquals(this.firstValid, other.firstValid)) return false;
@@ -216,6 +256,7 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.note, other.note)) return false;
         if (!Objects.deepEquals(this.paymentTransaction, other.paymentTransaction)) return false;
         if (!Objects.deepEquals(this.receiverRewards, other.receiverRewards)) return false;
+        if (!Objects.deepEquals(this.rekeyTo, other.rekeyTo)) return false;
         if (!Objects.deepEquals(this.roundTime, other.roundTime)) return false;
         if (!Objects.deepEquals(this.sender, other.sender)) return false;
         if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;
