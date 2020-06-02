@@ -36,9 +36,6 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
 
     @Override
     protected void applyTo(Transaction txn) {
-        if (this.getClass() == AssetDestroyTransactionBuilder.class) {
-            txn.type = Type.AssetConfig;
-        }
         if (assetIndex != null) {
             txn.assetIndex = assetIndex;
         }

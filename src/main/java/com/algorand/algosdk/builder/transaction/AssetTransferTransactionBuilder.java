@@ -48,9 +48,6 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
 
     @Override
     protected void applyTo(Transaction txn) {
-        if (this.getClass() == AssetTransferTransactionBuilder.class) {
-            txn.type = Type.AssetTransfer;
-        }
         if (assetReceiver != null) txn.assetReceiver = assetReceiver;
         if (assetCloseTo != null) txn.assetCloseTo = assetCloseTo;
         if (assetAmount != null) txn.assetAmount = assetAmount;

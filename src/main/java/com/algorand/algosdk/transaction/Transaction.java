@@ -1003,7 +1003,7 @@ public class Transaction implements Serializable {
         AssetConfig("acfg"),
         AssetTransfer("axfer"),
         AssetFreeze("afrz"),
-        ApplicaitonCall("appl");
+        ApplicationCall("appl");
 
         private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
 

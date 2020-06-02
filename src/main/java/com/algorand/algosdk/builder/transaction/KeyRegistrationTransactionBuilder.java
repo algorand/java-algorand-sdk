@@ -61,10 +61,6 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
         Objects.requireNonNull(lastValid, "lastValid is required");
         Objects.requireNonNull(genesisHash, "genesisHash is required");
         
-        if (this.getClass() == KeyRegistrationTransactionBuilder.class) {
-            txn.type = Type.KeyRegistration;
-        }
-
         if (votePK != null) txn.votePK = votePK;
         if (selectionPK != null) txn.selectionPK = selectionPK;
         if (voteFirst != null) txn.voteFirst = voteFirst;

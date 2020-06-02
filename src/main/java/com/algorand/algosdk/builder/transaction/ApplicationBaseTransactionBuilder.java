@@ -25,8 +25,11 @@ public class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransact
         return new ApplicationCreateTransactionBuilder<>();
     }
 
+    /**
+     * All application calls use this type, so no need to make this private. This constructor should always be called.
+     */
     protected ApplicationBaseTransactionBuilder() {
-        super(Transaction.Type.ApplicaitonCall);
+        super(Transaction.Type.ApplicationCall);
     }
 
     /**

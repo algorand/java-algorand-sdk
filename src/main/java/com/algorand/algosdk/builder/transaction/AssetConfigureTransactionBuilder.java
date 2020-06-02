@@ -41,6 +41,10 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
         return new AssetConfigureTransactionBuilder<>();
     }
 
+    private AssetConfigureTransactionBuilder() {
+        super(Type.AssetConfig);
+    }
+
     @Override
     protected void applyTo(Transaction txn) {
         if (this.assetUnitName != null) {
@@ -76,9 +80,6 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
                     + "empty or default address supplied to one or more manager addresses");
         }
         
-        if (this.getClass() == AssetConfigureTransactionBuilder.class) {
-            txn.type = Type.AssetConfig;
-        }
         if (assetIndex != null) txn.assetIndex = assetIndex;
         super.applyTo(txn);
     }

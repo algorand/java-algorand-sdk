@@ -42,11 +42,7 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     @Override
     protected void applyTo(Transaction txn) {
-        if (this.getClass() == AssetAcceptTransactionBuilder.class) {  
-            txn.type = Type.AssetTransfer;
-        }
-
-        if (assetIndex != null) txn.xferAsset = assetIndex; 
+        if (assetIndex != null) txn.xferAsset = assetIndex;
         if (sender != null) txn.assetReceiver = sender;
         txn.amount = BigInteger.valueOf(0);
     }

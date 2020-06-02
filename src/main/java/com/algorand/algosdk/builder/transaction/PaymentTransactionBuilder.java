@@ -54,10 +54,6 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
-        if (this.getClass() == PaymentTransactionBuilder.class) {
-            txn.type = Type.Payment;
-        }
-
         if (amount != null) txn.amount = amount;
         if (receiver != null) txn.receiver = receiver;
         if (closeRemainderTo != null) txn.closeRemainderTo = closeRemainderTo;

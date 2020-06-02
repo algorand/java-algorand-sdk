@@ -59,9 +59,6 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
-        if (this.getClass() == AssetClawbackTransactionBuilder.class) {
-            txn.type = Type.AssetTransfer;
-        }
         if (this.assetClawbackFrom != null) txn.assetSender = assetClawbackFrom;
         if (this.assetReceiver != null) txn.assetReceiver = assetReceiver;
         if (this.assetCloseTo != null) txn.assetCloseTo = assetCloseTo;
