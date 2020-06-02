@@ -17,3 +17,7 @@ com.algorand.algosdk.mnemonic
 com.algorand.algosdk.templates
 com.algorand.algosdk.transaction
 com.algorand.algosdk.util
+com.algorand.algosdk.v2.client.algod
+com.algorand.algosdk.v2.client.common
+com.algorand.algosdk.v2.client.indexer
+com.algorand.algosdk.v2.client.model
