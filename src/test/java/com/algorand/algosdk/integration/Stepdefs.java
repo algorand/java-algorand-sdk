@@ -37,9 +37,7 @@ import org.threeten.bp.LocalDate;
 
 import java.util.List;
 import java.util.Set;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
@@ -54,6 +52,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class Stepdefs {
+    public static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    public static Integer algodPort = 60000;
+    public static Integer kmdPort = 60001;
+
     TransactionParams params;
     SignedTransaction stx;
     SignedTransaction[] stxs;
@@ -559,39 +561,24 @@ public class Stepdefs {
 
     @Given("a kmd client")
     public void kClient() throws FileNotFoundException, IOException, NoSuchAlgorithmException{
-        String data_dir_path = System.getenv("NODE_DIR") + "/";
-        data_dir_path += System.getenv("KMD_DIR") + "/";
-        BufferedReader reader = new BufferedReader(new FileReader(data_dir_path + "kmd.token"));
-        String kmdToken = reader.readLine();
-        reader.close();
-        reader = new BufferedReader(new FileReader(data_dir_path + "kmd.net"));
-        String kmdAddress = reader.readLine();
         kmdClient = new KmdClient();
         kmdClient.setConnectTimeout(30000);
         kmdClient.setReadTimeout(30000);
         kmdClient.setWriteTimeout(30000);
-        kmdClient.setApiKey(kmdToken);
-        kmdClient.setBasePath("http://" + kmdAddress);
+        kmdClient.setApiKey(token);
+        kmdClient.setBasePath("http://localhost:" + kmdPort);
         kcl = new KmdApi(kmdClient);
-
     }
 
     @Given("an algod client")
     public void aClient() throws FileNotFoundException, IOException{
-        String data_dir_path = System.getenv("NODE_DIR") + "/";
-        BufferedReader reader = new BufferedReader(new FileReader(data_dir_path + "algod.token"));
-        String algodToken = reader.readLine();
-        reader.close();
-        reader = new BufferedReader(new FileReader(data_dir_path + "algod.net"));
-        String algodAddress = reader.readLine();
         algodClient = new AlgodClient();
         algodClient.setConnectTimeout(30000);
         algodClient.setReadTimeout(30000);
         algodClient.setWriteTimeout(30000);
-        algodClient.setApiKey(algodToken);
-        algodClient.setBasePath("http://" + algodAddress);
+        algodClient.setApiKey(token);
+        algodClient.setBasePath("http://localhost:" + algodPort);
         acl = new AlgodApi(algodClient);
-
     }
 
     @Given("wallet information")

@@ -12,24 +12,40 @@ import org.apache.commons.codec.binary.Hex;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class Encoder {
     private static final char BASE32_PAD_CHAR = '=';
+
+    private final static ObjectMapper jsonMapper;
+    private final static ObjectMapper msgpMapper;
+    private final static ObjectMapper basicMapper = new ObjectMapper();
+
+    static {
+        // It is important to sort fields alphabetically to match the Algorand canonical encoding
+
+        // MessagePack
+        msgpMapper = new ObjectMapper(new MessagePackFactory());
+        msgpMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        msgpMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        // There's some odd bug in Jackson < 2.8.? where null values are not excluded. See:
+        // https://github.com/FasterXML/jackson-databind/issues/1351. So we will
+        // also annotate all fields manually
+        msgpMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+
+        // JSON
+        jsonMapper = new ObjectMapper();
+        jsonMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        jsonMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+    }
     /**
      * Convenience method for serializing arbitrary objects.
      * @return serialized object
      * @throws JsonProcessingException if serialization failed
      */
     public static byte[] encodeToMsgPack(Object o) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());
-        // It is important to sort fields alphabetically to match the Algorand canonical encoding
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-        // There's some odd bug in Jackson < 2.8.? where null values are not excluded. See:
-        // https://github.com/FasterXML/jackson-databind/issues/1351. So we will
-        // also annotate all fields manually
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
-        return objectMapper.writeValueAsBytes(o);
+        return msgpMapper.writeValueAsBytes(o);
     }
 
     /**
@@ -53,12 +69,7 @@ public class Encoder {
      * @throws IOException if decoding failed
      */
     public static <T> T decodeFromMsgPack(byte[] input, Class<T> tClass) throws IOException {
-        // See encodedToMsgPack for explanation of settings, and how this makes msgpack canonical
-        ObjectMapper objectMapper = new ObjectMapper(new MessagePackFactory());
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
-        return objectMapper.readValue(input, tClass);
+        return msgpMapper.readValue(input, tClass);
     }
 
     /**
@@ -68,12 +79,7 @@ public class Encoder {
      * @throws JsonProcessingException error
      */
     public static String encodeToJson(Object o) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-        // It is important to sort fields alphabetically to match the Algorand canonical encoding
-        objectMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
-        return objectMapper.writeValueAsString(o);
+        return jsonMapper.writeValueAsString(o);
     }
 
     /**
@@ -84,8 +90,7 @@ public class Encoder {
      * @throws JsonProcessingException error
      */
     public static <T> T decodeFromJson(String input, Class<T> tClass) throws IOException {
-        ObjectMapper om = new ObjectMapper();
-        return om.readerFor(tClass).readValue(input);
+        return basicMapper.readerFor(tClass).readValue(input);
     }
 
     /**
@@ -123,6 +128,19 @@ public class Encoder {
             }
         }
         return paddedStr.substring(0, i);
+    }
+
+    public static byte[] decodeFromBase32StripPad(String bytes) {
+        Base32 codec = new Base32((byte)BASE32_PAD_CHAR);
+        byte[] paddedStr =  codec.decode(bytes);
+        // strip padding
+        int i = 0;
+        for (; i < paddedStr.length; i++) {
+            if (paddedStr[i] == BASE32_PAD_CHAR) {
+                break;
+            }
+        }
+        return Arrays.copyOf(paddedStr, i);
     }
 
     /**

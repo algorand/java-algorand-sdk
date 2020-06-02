@@ -1,3 +1,6 @@
+# 1.4.0
+- Clients for Indexer V2 and algod API V2
+
 # 1.3.1
 - Fix javadoc and build pom.xml.
 
