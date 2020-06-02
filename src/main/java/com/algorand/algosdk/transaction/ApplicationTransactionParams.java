@@ -58,10 +58,8 @@ public class ApplicationTransactionParams {
     public StateSchema globalStateSchema;
 
     @JsonProperty("apap")
-    //public byte[] approvalProgram;
     public TEALProgram approvalProgram;
 
     @JsonProperty("apsu")
-    //public byte[] clearStateProgram;
     public TEALProgram clearStateProgram;
 }

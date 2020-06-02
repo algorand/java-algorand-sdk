@@ -1,14 +1,13 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.Signature;
-import com.algorand.algosdk.crypto.MultisigSignature;
-import com.algorand.algosdk.crypto.LogicsigSignature;
+import com.algorand.algosdk.builder.transaction.ApplicationCreateTransactionBuilder;
+import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
+import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -711,5 +710,32 @@ public class TestTransaction {
 
         assertThat(tx.note).isNull();
         assertThat(tx.lease).isNull();
+    }
+
+    @Test
+    public void ApplicationCreateTransactionTest() throws Exception {
+        Address fromAddr = new Address("I3345FUQQ2GRBHFZQPLYQQX5HJMMRZMABCHRLWV6RCJYC6OO4MOLEUBEGU");
+        String approveProg = "AiACAAEmBQVoZWxsbwV3cml0ZQVjaGVjawNmb28DYmFyNhoAKBJAACg2GgApEkAAFzYaACoSIiIrYyISQAAXNhoBEhAjQAATIisnBGYjQAAAIyNAAAUiI0AAAA==";
+        String clearProg = "AiABASI=";
+        Transaction tx = Transaction.ApplicationCreateTransactionBuilder()
+                .approvalProgram(new TEALProgram(approveProg))
+                .clearStateProgram(new TEALProgram(clearProg))
+                .globalStateSchema(new StateSchema(0L, 1L))
+                .localStateSchema(new StateSchema(0L, 1L))
+                .args(ImmutableList.of("hello".getBytes()))
+                .sender(fromAddr)
+                .genesisHashB64("PrEGS2xNeU1JlgaR82J5/Aytgc7airbaE0MG3+RtDfE=")
+                .flatFee(1234)
+                .firstValid(9000)
+                .lastValid(9010)
+                .build();
+
+        String actual = Encoder.encodeToBase64(Encoder.encodeToMsgPack(tx));
+        String golden = "gaN0eG6MpGFwYWGRxAVoZWxsb6RhcGFwxFsCIAIAASYFBWhlbGxvBXdyaXRlBWNoZWNrA2ZvbwNiYXI2GgAoEkAAKDYaACkSQAAXNhoAKhIiIitjIhJAABc2GgESECNAABMiKycEZiNAAAAjI0AABSIjQAAApGFwZ3OBo25icwGkYXBsc4GjbmJzAaRhcHN1xAUCIAEBIqNmZWXNBNKiZnbNIyiiZ2jEID6xBktsTXlNSZYGkfNiefwMrYHO2oq22hNDBt/kbQ3xomx2zSMypG5vdGXECMN0KJNAvZZSo3NuZMQgRvfOlpCGjRCcuYPXiEL9OljI5YAIjxXavoiTgXnO4xykdHlwZaRhcHBs";
+
+        System.out.println(actual);
+        assertThat(actual).isEqualTo(golden);
+
+
     }
 }

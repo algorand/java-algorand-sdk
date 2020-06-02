@@ -1196,4 +1196,8 @@ public class Transaction implements Serializable {
     public static AssetFreezeTransactionBuilder<?> AssetFreezeTransactionBuilder() {
         return AssetFreezeTransactionBuilder.Builder();
     }
+
+    public static ApplicationCreateTransactionBuilder<?> ApplicationCreateTransactionBuilder() {
+        return ApplicationCreateTransactionBuilder.Builder();
+    }
 }
