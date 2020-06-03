@@ -1007,15 +1007,6 @@ public class Transaction implements Serializable {
 
         private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
 
-        static {
-            namesMap.put(Default.value, Default);
-            namesMap.put(Payment.value, Payment);
-            namesMap.put(KeyRegistration.value, KeyRegistration);
-            namesMap.put(AssetConfig.value, AssetConfig);
-            namesMap.put(AssetTransfer.value, AssetTransfer);
-            namesMap.put(AssetFreeze.value, AssetFreeze);
-        }
-
         private final String value;
         Type(String value) {
             this.value = value;
@@ -1028,7 +1019,12 @@ public class Transaction implements Serializable {
          */
         @JsonCreator
         public static Type forValue(String value) {
-            return namesMap.get(value);
+            for (Type t :  values()) {
+                if(t.value.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return null;
         }
 
         /**
@@ -1037,11 +1033,7 @@ public class Transaction implements Serializable {
          */
         @JsonValue
         public String toValue() {
-            for (Map.Entry<String, Type> entry : namesMap.entrySet()) {
-                if (entry.getValue() == this)
-                    return entry.getKey();
-            }
-            return null;
+            return value;
         }
     }
 

@@ -218,6 +218,7 @@ public class TestTransaction {
                 .build();
 
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
+        System.out.println(DEFAULT_ACCOUNT.getAddress().toString());
 
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
         String goldenString = "gqNzaWfEQBBkfw5n6UevuIMDo2lHyU4dS80JCCQ/vTRUcTx5m0ivX68zTKyuVRrHaTbxbRRc3YpJ4zeVEnC9Fiw3Wf4REwejdHhuiKRhcGFyhKFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRjYWlkzQTSo2ZlZc0NSKJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn";
@@ -291,7 +292,6 @@ public class TestTransaction {
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
         SignedTransaction o = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
-        String sss = Encoder.encodeToJson(stx);
         String goldenString = "gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==";
 
         assertThat(encodedOutBytes).isEqualTo(goldenString);
@@ -609,7 +609,6 @@ public class TestTransaction {
         assertThat(o).isEqualTo(tx);
 
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
-        String sss = Encoder.encodeToJson(stx);
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
         String goldenString = "gqNzaWfEQHsgfEAmEHUxLLLR9s+Y/yq5WeoGo/jAArCbany+7ZYwExMySzAhmV7M7S8+LBtJalB4EhzEUMKmt3kNKk6+vAWjdHhuiqRhYW10AaRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRhc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCqqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=";
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
@@ -714,7 +713,7 @@ public class TestTransaction {
 
     @Test
     public void ApplicationCreateTransactionTest() throws Exception {
-        Address fromAddr = new Address("I3345FUQQ2GRBHFZQPLYQQX5HJMMRZMABCHRLWV6RCJYC6OO4MOLEUBEGU");
+        Address fromAddr = DEFAULT_ACCOUNT.getAddress();
         String approveProg = "AiACAAEmBQVoZWxsbwV3cml0ZQVjaGVjawNmb28DYmFyNhoAKBJAACg2GgApEkAAFzYaACoSIiIrYyISQAAXNhoBEhAjQAATIisnBGYjQAAAIyNAAAUiI0AAAA==";
         String clearProg = "AiABASI=";
         Transaction tx = Transaction.ApplicationCreateTransactionBuilder()
@@ -730,10 +729,14 @@ public class TestTransaction {
                 .lastValid(9010)
                 .build();
 
-        String actual = Encoder.encodeToBase64(Encoder.encodeToMsgPack(tx));
-        String golden = "gaN0eG6MpGFwYWGRxAVoZWxsb6RhcGFwxFsCIAIAASYFBWhlbGxvBXdyaXRlBWNoZWNrA2ZvbwNiYXI2GgAoEkAAKDYaACkSQAAXNhoAKhIiIitjIhJAABc2GgESECNAABMiKycEZiNAAAAjI0AABSIjQAAApGFwZ3OBo25icwGkYXBsc4GjbmJzAaRhcHN1xAUCIAEBIqNmZWXNBNKiZnbNIyiiZ2jEID6xBktsTXlNSZYGkfNiefwMrYHO2oq22hNDBt/kbQ3xomx2zSMypG5vdGXECMN0KJNAvZZSo3NuZMQgRvfOlpCGjRCcuYPXiEL9OljI5YAIjxXavoiTgXnO4xykdHlwZaRhcHBs";
+        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
+        String actual = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        String golden = "gqNzaWfEQE3ZzDcSEZ97iSNB4W6eEtEl5G1Sn1ThHSDMSeaDWtZeDOdZDmhaLBMnQ8uYakYCUrJDHH1DzAOFMVuc3zWP2ASjdHhui6RhcGFhkcQFaGVsbG+kYXBhcMRbAiACAAEmBQVoZWxsbwV3cml0ZQVjaGVjawNmb28DYmFyNhoAKBJAACg2GgApEkAAFzYaACoSIiIrYyISQAAXNhoBEhAjQAATIisnBGYjQAAAIyNAAAUiI0AAAKRhcGdzgaNuYnMBpGFwbHOBo25icwGkYXBzdcQFAiABASKjZmVlzQTSomZ2zSMoomdoxCA+sQZLbE15TUmWBpHzYnn8DK2BztqKttoTQwbf5G0N8aJsds0jMqNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYXBwbA==";
 
-        System.out.println(actual);
+        //SignedTransaction o = Encoder.decodeFromMsgPack(golden, SignedTransaction.class);
+        //assertThat(stx).isEqualTo(o);
+
+        //System.out.println(actual);
         assertThat(actual).isEqualTo(golden);
 
 

@@ -3,11 +3,12 @@ package com.algorand.algosdk.transaction;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+import com.fasterxml.jackson.annotation.*;
 
 import java.util.List;
 
+@JsonPropertyOrder(alphabetic=true)
+@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ApplicationTransactionParams {
     public enum OnCompletion {
         NoOpOC(0, "noop"),
@@ -23,6 +24,26 @@ public class ApplicationTransactionParams {
         OnCompletion(int serializeValue, String serializedName) {
             this.serializedValue = serializeValue;
             this.serializedName = serializedName;
+        }
+
+        @JsonCreator
+        public OnCompletion String(String name) {
+            for(OnCompletion oc : values()) {
+                if (oc.serializedName.equalsIgnoreCase(name)) {
+                    return oc;
+                }
+            }
+            return null;
+        }
+
+        @JsonCreator
+        public OnCompletion String(int value) {
+            for(OnCompletion oc : values()) {
+                if (oc.serializedValue == value) {
+                    return oc;
+                }
+            }
+            return null;
         }
 
         @JsonValue
