@@ -23,7 +23,11 @@ public class TransactionAssetFreeze extends PathResponse {
     }
     @JsonProperty("address")
     public String address() throws NoSuchAlgorithmException {
-        return this.address.encodeAsString();
+        if (this.address != null) {
+            return this.address.encodeAsString();
+        } else {
+            return null;
+        }
     }
     public Address address;
 

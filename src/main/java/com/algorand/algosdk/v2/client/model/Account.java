@@ -26,7 +26,11 @@ public class Account extends PathResponse {
     }
     @JsonProperty("address")
     public String address() throws NoSuchAlgorithmException {
-        return this.address.encodeAsString();
+        if (this.address != null) {
+            return this.address.encodeAsString();
+        } else {
+            return null;
+        }
     }
     public Address address;
 
@@ -48,6 +52,25 @@ public class Account extends PathResponse {
      */
     @JsonProperty("assets")
     public List<AssetHolding> assets = new ArrayList<AssetHolding>();
+
+    /**
+     * (spend) the address against which signing should be checked. If empty, the 
+     * address of the current account is used. This field can be updated in any 
+     * transaction by setting the RekeyTo field. 
+     */
+    @JsonProperty("auth-addr")
+    public void authAddr(String authAddr) throws NoSuchAlgorithmException {
+        this.authAddr = new Address(authAddr);
+    }
+    @JsonProperty("auth-addr")
+    public String authAddr() throws NoSuchAlgorithmException {
+        if (this.authAddr != null) {
+            return this.authAddr.encodeAsString();
+        } else {
+            return null;
+        }
+    }
+    public Address authAddr;
 
     /**
      * (apar) parameters of assets created by this account. 
@@ -116,6 +139,7 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.amount, other.amount)) return false;
         if (!Objects.deepEquals(this.amountWithoutPendingRewards, other.amountWithoutPendingRewards)) return false;
         if (!Objects.deepEquals(this.assets, other.assets)) return false;
+        if (!Objects.deepEquals(this.authAddr, other.authAddr)) return false;
         if (!Objects.deepEquals(this.createdAssets, other.createdAssets)) return false;
         if (!Objects.deepEquals(this.participation, other.participation)) return false;
         if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;

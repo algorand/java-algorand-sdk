@@ -10,10 +10,10 @@ import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
 import com.algorand.algosdk.v2.client.algod.RawTransaction;
+import com.algorand.algosdk.v2.client.algod.TransactionDryRun;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
-import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.crypto.Address;
 
 public class AlgodClient extends Client {
@@ -100,6 +100,13 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * /v2/transactions/dryrun 
+     */
+    public TransactionDryRun TransactionDryRun() {
+        return new TransactionDryRun((Client) this);
+    }
+
+    /**
      * /v2/transactions/params 
      */
     public TransactionParams TransactionParams() {
@@ -127,15 +134,6 @@ public class AlgodClient extends Client {
      */
     public PendingTransactionInformation PendingTransactionInformation(String txid) {
         return new PendingTransactionInformation((Client) this, txid);
-    }
-
-    /**
-     * Given TEAL source code in plain text, return base64 encoded program bytes and 
-     * base32 SHA512_256 hash of program bytes (Address style). 
-     * /v2/teal/compile 
-     */
-    public TealCompile TealCompile() {
-        return new TealCompile((Client) this);
     }
 
 }

@@ -37,7 +37,11 @@ public class Transaction extends PathResponse {
     }
     @JsonProperty("auth-addr")
     public String authAddr() throws NoSuchAlgorithmException {
-        return this.authAddr.encodeAsString();
+        if (this.authAddr != null) {
+            return this.authAddr.encodeAsString();
+        } else {
+            return null;
+        }
     }
     public Address authAddr;
 
@@ -189,7 +193,11 @@ public class Transaction extends PathResponse {
     }
     @JsonProperty("rekey-to")
     public String rekeyTo() throws NoSuchAlgorithmException {
-        return this.rekeyTo.encodeAsString();
+        if (this.rekeyTo != null) {
+            return this.rekeyTo.encodeAsString();
+        } else {
+            return null;
+        }
     }
     public Address rekeyTo;
 

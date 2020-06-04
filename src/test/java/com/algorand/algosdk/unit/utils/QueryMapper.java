@@ -65,14 +65,14 @@ public class QueryMapper {
             return client.WaitForBlock(Long.valueOf(args[0]));
         case "RawTransaction":
             return client.RawTransaction();
+        case "TransactionDryRun":
+            return client.TransactionDryRun();
         case "TransactionParams":
             return client.TransactionParams();
         case "GetPendingTransactions":
             return client.GetPendingTransactions();
         case "PendingTransactionInformation":
             return client.PendingTransactionInformation(args[0]);
-        case "TealCompile":
-            return client.TealCompile();
         }
         return null;
     }
@@ -401,6 +401,13 @@ public class QueryMapper {
                 break;
             }
             break;
+        case "TransactionDryRun":
+            switch (property) {
+            case "rawtxn":
+                ((TransactionDryRun)q).rawtxn(Encoder.decodeFromBase64(value));
+                break;
+            }
+            break;
         case "TransactionParams":
             switch (property) {
             }
@@ -414,13 +421,6 @@ public class QueryMapper {
             break;
         case "PendingTransactionInformation":
             switch (property) {
-            }
-            break;
-        case "TealCompile":
-            switch (property) {
-            case "source":
-                ((TealCompile)q).source(Encoder.decodeFromBase64(value));
-                break;
             }
             break;
 
