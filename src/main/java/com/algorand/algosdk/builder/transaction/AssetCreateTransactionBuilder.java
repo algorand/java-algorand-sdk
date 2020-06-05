@@ -68,7 +68,6 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
 
     @Override
     protected void applyTo(Transaction txn) {
-
         if (this.getClass() == AssetCreateTransactionBuilder.class) {
             Objects.requireNonNull(sender, "sender is required.");
             Objects.requireNonNull(firstValid, "firstValid is required.");
@@ -77,6 +76,7 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
             Objects.requireNonNull(assetTotal, "assetTotal is required.");
             Objects.requireNonNull(assetDecimals, "assetDecimals is required.");
         }
+
         AssetParams params = new AssetParams(
                 assetTotal,
                 assetDecimals,

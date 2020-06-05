@@ -6,6 +6,7 @@ import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Build an asset freeze transaction.
@@ -43,6 +44,9 @@ public class AssetFreezeTransactionBuilder<T extends AssetFreezeTransactionBuild
 
     @Override
     protected void applyTo(Transaction txn) {
+        Objects.requireNonNull(assetIndex, "assetIndex is required.");
+        Objects.requireNonNull(freezeState, "freezeState is required.");
+
         if (freezeTarget != null) txn.freezeTarget = freezeTarget;
         if (assetIndex != null) txn.assetFreezeID = assetIndex;
         txn.freezeState = freezeState;

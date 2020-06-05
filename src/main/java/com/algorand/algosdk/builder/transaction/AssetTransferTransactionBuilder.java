@@ -6,6 +6,7 @@ import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Build an asset transfer transaction for sending some asset from an asset holder to another user.
@@ -48,6 +49,10 @@ public class AssetTransferTransactionBuilder<T extends AssetTransferTransactionB
 
     @Override
     protected void applyTo(Transaction txn) {
+        Objects.requireNonNull(assetIndex, "assetIndex is required.");
+        Objects.requireNonNull(assetReceiver, "assetReceiver is required.");
+        Objects.requireNonNull(assetAmount, "assetAmount is required.");
+
         if (assetReceiver != null) txn.assetReceiver = assetReceiver;
         if (assetCloseTo != null) txn.assetCloseTo = assetCloseTo;
         if (assetAmount != null) txn.assetAmount = assetAmount;

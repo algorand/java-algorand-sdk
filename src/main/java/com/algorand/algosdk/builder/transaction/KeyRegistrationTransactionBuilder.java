@@ -55,12 +55,11 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
 
     @Override
     protected void applyTo(Transaction txn) {
-        
         Objects.requireNonNull(sender, "sender is required");
         Objects.requireNonNull(firstValid, "firstValid is required");
         Objects.requireNonNull(lastValid, "lastValid is required");
         Objects.requireNonNull(genesisHash, "genesisHash is required");
-        
+
         if (votePK != null) txn.votePK = votePK;
         if (selectionPK != null) txn.selectionPK = selectionPK;
         if (voteFirst != null) txn.voteFirst = voteFirst;

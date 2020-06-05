@@ -2,6 +2,7 @@ package com.algorand.algosdk.builder.transaction;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
@@ -42,6 +43,9 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     @Override
     protected void applyTo(Transaction txn) {
+        Objects.requireNonNull(assetIndex, "assetIndex is required");
+        Objects.requireNonNull(sender, "acceptingAccount is required");
+
         if (assetIndex != null) txn.xferAsset = assetIndex;
         if (sender != null) txn.assetReceiver = sender;
         txn.amount = BigInteger.valueOf(0);
