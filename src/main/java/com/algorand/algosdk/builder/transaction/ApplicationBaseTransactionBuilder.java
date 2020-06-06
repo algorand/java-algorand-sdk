@@ -1,35 +1,39 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.logic.StateSchema;
-import com.algorand.algosdk.transaction.ApplicationTransactionParams;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransactionBuilder<T>> extends TransactionBuilder<T> {
-    public Long applicationId;
-    public ApplicationTransactionParams.OnCompletion onCompletion;
-    public List<byte[]> applicationArgs;
-    public List<Address> accounts;
-    public List<Long> foreignApps;
-    public StateSchema localStateSchema;
-    public StateSchema globalStateSchema;
-
-    /**
-     * Initialize a {@link ApplicationCreateTransactionBuilder}.
-     */
-    public static ApplicationCreateTransactionBuilder<?> Builder() {
-        return new ApplicationCreateTransactionBuilder<>();
-    }
+@SuppressWarnings("unchecked")
+public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransactionBuilder<T>> extends TransactionBuilder<T> {
+    private Transaction.OnCompletion onCompletion;
+    private List<byte[]> applicationArgs;
+    private List<Address> accounts;
+    private List<Long> foreignApps;
+    private Long applicationId;
 
     /**
      * All application calls use this type, so no need to make this private. This constructor should always be called.
      */
     protected ApplicationBaseTransactionBuilder() {
         super(Transaction.Type.ApplicationCall);
+    }
+
+    @Override
+    protected void applyTo(Transaction txn) {
+        // Global requirements
+        Objects.requireNonNull(onCompletion, "OnCompletion is required, please file a bug report.");
+        Objects.requireNonNull(applicationId);
+
+        if (applicationId != null) txn.applicationId = applicationId;
+        if (onCompletion != null) txn.onCompletion = onCompletion;
+        if (applicationArgs != null) txn.applicationArgs = applicationArgs;
+        if (accounts != null) txn.accounts = accounts;
+        if (foreignApps != null) txn.foreignApps = foreignApps;
     }
 
     /**
@@ -44,7 +48,7 @@ public class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransact
      * This is the faux application type used to distinguish different application actions. Specifically, OnCompletion
      * specifies what side effects this transaction will have if it successfully makes it into a block.
      */
-    public T onCompletion(ApplicationTransactionParams.OnCompletion onCompletion) {
+    protected T onCompletion(Transaction.OnCompletion onCompletion) {
         this.onCompletion = onCompletion;
         return (T) this;
     }
@@ -84,43 +88,5 @@ public class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransact
     public T foreignApps(List<Long> foreignApps) {
         this.foreignApps = foreignApps;
         return (T) this;
-    }
-
-    //public StateSchema localStateSchema;
-
-    /**
-     * LocalStateSchema sets limits on the number of strings and integers that may be stored in an account's LocalState.
-     * for this application. The larger these limits are, the larger minimum balance must be maintained inside the
-     * account of any users who opt into this application. The LocalStateSchema is immutable.
-     */
-    public T localStateSchema(StateSchema localStateSchema) {
-        this.localStateSchema = localStateSchema;
-        return (T) this;
-    }
-
-    /**
-     * GlobalStateSchema sets limits on the number of strings and integers that may be stored in the GlobalState. The
-     * larger these limits are, the larger minimum balance must be maintained inside the creator's account (in order to
-     * 'pay' for the state that can be used). The GlobalStateSchema is immutable.
-     */
-    public T globalStateSchema(StateSchema globalStateSchema) {
-        this.globalStateSchema = globalStateSchema;
-        return (T) this;
-    }
-
-    @Override
-    protected void applyTo(Transaction txn) {
-        ApplicationTransactionParams atp = txn.appParams;
-        if (txn.appParams == null) {
-            txn.appParams = new ApplicationTransactionParams();
-        }
-
-        txn.appParams.applicationId = applicationId;
-        txn.appParams.onCompletion = onCompletion;
-        txn.appParams.applicationArgs = applicationArgs;
-        txn.appParams.accounts = accounts;
-        txn.appParams.foreignApps = foreignApps;
-        txn.appParams.localStateSchema = localStateSchema;
-        txn.appParams.globalStateSchema = globalStateSchema;
     }
 }

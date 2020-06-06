@@ -6,7 +6,6 @@ import com.algorand.algosdk.algod.client.api.AlgodApi;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.transaction.ApplicationTransactionParams;
 import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;

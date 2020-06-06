@@ -2,10 +2,8 @@ package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.*;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.ParticipationPublicKey;
-import com.algorand.algosdk.crypto.VRFPublicKey;
+import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.*;
@@ -15,10 +13,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A raw serializable transaction class, used to generate transactions to broadcast to the network.
@@ -31,11 +26,8 @@ public class Transaction implements Serializable {
     @JsonProperty("type")
     public Type type = Type.Default;
 
-    @JsonUnwrapped
-    public ApplicationTransactionParams appParams;
-
-    // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields. This circumvents our encoders'
-    // inability to sort child fields.
+    // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields.
+    // This circumvents our encoders' inability to sort child fields.
     /* header fields ***********************************************************/
     @JsonProperty("snd")
     public Address sender = new Address();
@@ -120,11 +112,41 @@ public class Transaction implements Serializable {
     /* asset freeze fields */
     @JsonProperty("fadd")
     public Address freezeTarget = new Address();
+
     @JsonProperty("faid")
     public BigInteger assetFreezeID = BigInteger.valueOf(0);
+
     @JsonProperty("afrz")
     public boolean freezeState = false;
-    
+
+    /* application fields */
+    @JsonProperty("apaa")
+    public List<byte[]> applicationArgs = new ArrayList<>();
+
+    @JsonProperty("apan")
+    public OnCompletion onCompletion = OnCompletion.NoOpOC;
+
+    @JsonProperty("apap")
+    public TEALProgram approvalProgram = null;
+
+    @JsonProperty("apat")
+    public List<Address> accounts = new ArrayList<>();
+
+    @JsonProperty("apfa")
+    public List<Long> foreignApps = new ArrayList<>();
+
+    @JsonProperty("apgs")
+    public StateSchema globalStateSchema = null;
+
+    @JsonProperty("apid")
+    public Long applicationId = 0L;
+
+    @JsonProperty("apls")
+    public StateSchema localStateSchema = null;
+
+    @JsonProperty("apsu")
+    public TEALProgram clearStateProgram = null;
+
     /**
      * Create a payment transaction
      * @param fromAddr source address
@@ -237,7 +259,16 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
-                false); // default value which wont be included in the serialized object.
+                false, // default value which wont be included in the serialized object.
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     /**
@@ -258,8 +289,7 @@ public class Transaction implements Serializable {
                        String genesisID, Digest genesisHash,
                        ParticipationPublicKey votePK, VRFPublicKey vrfPK,
                        BigInteger voteFirst, BigInteger voteLast, BigInteger voteKeyDilution) {
-        // populate with default values which will be ignored...
-        this.type = Type.KeyRegistration;        
+        this.type = Type.KeyRegistration;
         if (sender != null) this.sender = sender;
         setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
@@ -330,7 +360,16 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
-                false); // default value which wont be included in the serialized object.
+                false, // default value which wont be included in the serialized object.
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     /**
@@ -442,7 +481,16 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
-                false); // default value which wont be included in the serialized object.
+                false, // default value which wont be included in the serialized object.
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
     
     /**
@@ -531,7 +579,19 @@ public class Transaction implements Serializable {
     			freeze, 
     			clawback);
     }
-   
+
+    /**
+     * Helper for Jackson conversion.
+     */
+    private static List<Address> convertToAddressList(List<byte[]> addressBytes) {
+        if (addressBytes == null) return null;
+        List<Address> result = new ArrayList<>();
+        for (byte[] addr : addressBytes) {
+            result.add(new Address(addr));
+        }
+        return result;
+    }
+
     // workaround for nested JsonValue classes
     @JsonCreator
     private Transaction(@JsonProperty("type") Type type,
@@ -568,7 +628,18 @@ public class Transaction implements Serializable {
                         // asset freeze fields
                         @JsonProperty("fadd") byte[] freezeTarget,
                         @JsonProperty("faid") BigInteger assetFreezeID,
-                        @JsonProperty("afrz") boolean freezeState) {
+                        @JsonProperty("afrz") boolean freezeState,
+                        // application fields
+                        @JsonProperty("apaa") List<byte[]> applicationArgs,
+                        @JsonProperty("apan") OnCompletion onCompletion,
+                        @JsonProperty("apap") byte[] approvalProgram,
+                        @JsonProperty("apat") List<byte[]> accounts,
+                        @JsonProperty("apfa") List<Long> foreignApps,
+                        @JsonProperty("apgs") StateSchema globalStateSchema,
+                        @JsonProperty("apid") Long applicationId,
+                        @JsonProperty("apls") StateSchema localStateSchema,
+                        @JsonProperty("apsu") byte[] clearStateProgram
+                        ) throws IOException {
         this(
              type,
              //header fields
@@ -603,7 +674,18 @@ public class Transaction implements Serializable {
              new Address(assetCloseTo),
              new Address(freezeTarget),
              assetFreezeID,
-             freezeState);
+             freezeState,
+             // application fields
+             applicationArgs,
+             onCompletion,
+             approvalProgram == null ? null : new TEALProgram(approvalProgram),
+             convertToAddressList(accounts),
+             foreignApps,
+             globalStateSchema,
+             applicationId,
+             localStateSchema,
+             clearStateProgram == null ? null : new TEALProgram(clearStateProgram)
+        );
     }
 
     /**
@@ -621,7 +703,7 @@ public class Transaction implements Serializable {
                         byte[] note,
                         String genesisID,
                         Digest genesisHash,
-                        byte[] lease, 
+                        byte[] lease,
                         Address rekeyTo,
                         Digest group,
                         // payment fields
@@ -646,7 +728,18 @@ public class Transaction implements Serializable {
                         Address assetCloseTo,
                         Address freezeTarget,
                         BigInteger assetFreezeID,
-                        boolean freezeState) {
+                        boolean freezeState,
+                        // application fields
+                        List<byte[]> applicationArgs,
+                        OnCompletion onCompletion,
+                        TEALProgram approvalProgram,
+                        List<Address> accounts,
+                        List<Long> foreignApps,
+                        StateSchema globalStateSchema,
+                        Long applicationId,
+                        StateSchema localStateSchema,
+                        TEALProgram clearStateProgram
+                        ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
         setFee(fee);
@@ -676,6 +769,15 @@ public class Transaction implements Serializable {
         if (freezeTarget != null) this.freezeTarget = freezeTarget;
         if (assetFreezeID != null) this.assetFreezeID = assetFreezeID;
         this.freezeState = freezeState;
+        if (applicationArgs != null) this.applicationArgs = applicationArgs;
+        if (onCompletion != null) this.onCompletion = onCompletion;
+        if (approvalProgram != null) this.approvalProgram = approvalProgram;
+        if (accounts != null) this.accounts = accounts;
+        if (foreignApps != null) this.foreignApps = foreignApps;
+        if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
+        if (applicationId != null) this.applicationId = applicationId;
+        if (localStateSchema != null) this.localStateSchema = globalStateSchema;
+        if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
     }
 
     // Used by Jackson to determine "default" values.
@@ -1037,6 +1139,53 @@ public class Transaction implements Serializable {
         }
     }
 
+    public enum OnCompletion {
+        NoOpOC(0, "noop"),
+        OptInOC(1, "optin"),
+        CloseOutOC(2, "closeout"),
+        ClearStateOC(3, "clearstate"),
+        UpdateApplicationOC(4, "update"),
+        DeleteApplicationOC(5, "delete");
+
+        private final int serializedValue;
+        private final String serializedName;
+
+        OnCompletion(int serializeValue, String serializedName) {
+            this.serializedValue = serializeValue;
+            this.serializedName = serializedName;
+        }
+
+        @JsonCreator
+        public OnCompletion String(String name) {
+            for(OnCompletion oc : values()) {
+                if (oc.serializedName.equalsIgnoreCase(name)) {
+                    return oc;
+                }
+            }
+            return null;
+        }
+
+        @JsonCreator
+        public OnCompletion String(int value) {
+            for(OnCompletion oc : values()) {
+                if (oc.serializedValue == value) {
+                    return oc;
+                }
+            }
+            return null;
+        }
+
+        @JsonValue
+        public int toValue() {
+            return serializedValue;
+        }
+
+        @Override
+        public String toString() {
+            return serializedName;
+        }
+    }
+
     /**
      * Return encoded representation of the transaction
      */
@@ -1060,7 +1209,7 @@ public class Transaction implements Serializable {
             System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
             return prefixEncodedTx;
         } catch (IOException e) {
-            throw new RuntimeException("serialization failed", e);
+            throw new RuntimeException("serialization failed: " + e.getMessage(), e);
         }
     }
 
@@ -1189,7 +1338,52 @@ public class Transaction implements Serializable {
         return AssetFreezeTransactionBuilder.Builder();
     }
 
+    /**
+     * Create a {@link ApplicationCreateTransactionBuilder}.
+     */
     public static ApplicationCreateTransactionBuilder<?> ApplicationCreateTransactionBuilder() {
         return ApplicationCreateTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationUpdateTransactionBuilder}.
+     */
+    public static ApplicationUpdateTransactionBuilder<?> ApplicationUpdateTransactionBuilder() {
+        return ApplicationUpdateTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationDeleteTransactionBuilder}.
+     */
+    public static ApplicationDeleteTransactionBuilder<?> ApplicationDeleteTransactionBuilder() {
+        return ApplicationDeleteTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationOptInTransactionBuilder}.
+     */
+    public static ApplicationOptInTransactionBuilder<?> ApplicationOptInTransactionBuilder() {
+        return ApplicationOptInTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationCloseTransactionBuilder}.
+     */
+    public static ApplicationCloseTransactionBuilder<?> ApplicationCloseTransactionBuilder() {
+        return ApplicationCloseTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationCallTransactionBuilder}.
+     */
+    public static ApplicationCallTransactionBuilder<?> ApplicationCallTransactionBuilder() {
+        return ApplicationCallTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationClearTransactionBuilder}.
+     */
+    public static ApplicationClearTransactionBuilder<?> ApplicationClearTransactionBuilder() {
+        return ApplicationClearTransactionBuilder.Builder();
     }
 }
