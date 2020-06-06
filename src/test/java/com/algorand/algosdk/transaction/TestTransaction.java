@@ -1,12 +1,14 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.builder.transaction.ApplicationCreateTransactionBuilder;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
@@ -736,9 +738,34 @@ public class TestTransaction {
         //SignedTransaction o = Encoder.decodeFromMsgPack(golden, SignedTransaction.class);
         //assertThat(stx).isEqualTo(o);
 
-        //System.out.println(actual);
         assertThat(actual).isEqualTo(golden);
+        TestUtil.serializeDeserializeCheck(stx);
+    }
 
+    @Test
+    public void ApplicationCallTransactionTest() throws Exception {
+        Address fromAddr = DEFAULT_ACCOUNT.getAddress();
+        String approveProg = "AiACAAEmBQVoZWxsbwV3cml0ZQVjaGVjawNmb28DYmFyNhoAKBJAACg2GgApEkAAFzYaACoSIiIrYyISQAAXNhoBEhAjQAATIisnBGYjQAAAIyNAAAUiI0AAAA==";
+        String clearProg = "AiABASI=";
+        Transaction tx = Transaction.ApplicationCallTransactionBuilder()
+                //.approvalProgram(new TEALProgram(approveProg))
+                //.clearStateProgram(new TEALProgram(clearProg))
+                //.globalStateSchema(new StateSchema(0L, 1L))
+                //.localStateSchema(new StateSchema(0L, 1L))
+                .args(ImmutableList.of("hello".getBytes()))
+                .sender(fromAddr)
+                .genesisHashB64("PrEGS2xNeU1JlgaR82J5/Aytgc7airbaE0MG3+RtDfE=")
+                .flatFee(1234)
+                .firstValid(9000)
+                .lastValid(9010)
+                .build();
 
+        SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
+        String actual = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+        String golden = "gqNzaWfEQE3ZzDcSEZ97iSNB4W6eEtEl5G1Sn1ThHSDMSeaDWtZeDOdZDmhaLBMnQ8uYakYCUrJDHH1DzAOFMVuc3zWP2ASjdHhui6RhcGFhkcQFaGVsbG+kYXBhcMRbAiACAAEmBQVoZWxsbwV3cml0ZQVjaGVjawNmb28DYmFyNhoAKBJAACg2GgApEkAAFzYaACoSIiIrYyISQAAXNhoBEhAjQAATIisnBGYjQAAAIyNAAAUiI0AAAKRhcGdzgaNuYnMBpGFwbHOBo25icwGkYXBzdcQFAiABASKjZmVlzQTSomZ2zSMoomdoxCA+sQZLbE15TUmWBpHzYnn8DK2BztqKttoTQwbf5G0N8aJsds0jMqNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYXBwbA==";
+
+        SignedTransaction o = Encoder.decodeFromMsgPack(golden, SignedTransaction.class);
+        assertThat(stx).isEqualTo(o);
+        assertThat(actual).isEqualTo(golden);
     }
 }
