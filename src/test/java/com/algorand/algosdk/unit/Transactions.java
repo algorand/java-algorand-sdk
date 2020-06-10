@@ -35,7 +35,7 @@ public class Transactions {
     }
 
     private TEALProgram loadTEALProgramFromFile(String file) {
-        InputStream fis = getClass().getClassLoader().getResourceAsStream("com/algorand/algosdk/unit/" + file);
+        InputStream fis = getClass().getClassLoader().getResourceAsStream(file);
         try {
             byte[] data = new byte[fis.available()];
             fis.read(data);
