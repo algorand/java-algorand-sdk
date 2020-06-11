@@ -145,6 +145,19 @@ public class Stepdefs {
     }
 
     /**
+     * Convenience method to lookup a secret key and sign a transaction with the key.
+     */
+    public SignedTransaction signWithAddress(Transaction tx, Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+        ExportKeyRequest req = new ExportKeyRequest();
+        req.setAddress(addr.toString());
+        req.setWalletHandleToken(handle);
+        req.setWalletPassword(walletPswd);
+        byte[] secretKey = kcl.exportKey(req).getPrivateKey();
+        Account acct = new Account(Arrays.copyOfRange(secretKey, 0, 32));
+        return acct.signTransaction(tx);
+    }
+
+    /**
      * Convenience method to export a key and initialize an account to use for signing.
      */
     public void exportKeyAndSetAccount(Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {

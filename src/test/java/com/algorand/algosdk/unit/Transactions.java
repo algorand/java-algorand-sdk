@@ -1,28 +1,21 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
-import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.ResourceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import net.bytebuddy.pool.TypePool;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.bouncycastle.util.Strings;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
+import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Transactions {
@@ -35,61 +28,13 @@ public class Transactions {
     }
 
     private TEALProgram loadTEALProgramFromFile(String file) {
-        InputStream fis = getClass().getClassLoader().getResourceAsStream(file);
         try {
-            byte[] data = new byte[fis.available()];
-            fis.read(data);
-            return new TEALProgram(data);
+            return new TEALProgram(ResourceUtils.readResource(file));
         } catch (Exception e) {
             Assertions.fail("Unable to read file ('"+file+"') required by test: " + e.getMessage(), e);
         }
 
         throw new RuntimeException("Unknown error.");
-    }
-
-    /**
-     * Convert an array of arguments like "str:arg1,str:arg2" into a properly converted byte array.
-     */
-    private List<byte[]> convertArgs(String args) {
-        // Hell yeah, I missed this unreadable Java streams functional magic!
-        return Arrays.stream(Strings.split(args, ','))
-                .map(s -> {
-                    String[] parts = Strings.split(s, ':');
-                    byte[] converted = null;
-                    switch(parts[0]) {
-                        case "str":
-                            converted = parts[1].getBytes();
-                            break;
-                        default:
-                            Assertions.fail("Doesn't currently support '" + parts[0] + "' convertion.");
-                    }
-                    return converted;
-                })
-                .collect(Collectors.toList());
-    }
-
-    /**
-     * Convert list of numbers to list of longs.
-     */
-    private List<Long> convertForeignApps(String foreignApps) {
-        return Arrays.stream(Strings.split(foreignApps, ','))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-    }
-
-    private Address convertOrFailTest(String addrString) {
-        try {
-            return new Address(addrString);
-        } catch (NoSuchAlgorithmException e) {
-            Assertions.fail("Failed to parse address: " + e.getMessage(), e);
-        }
-        return null;
-    }
-
-    private List<Address> convertAccounts(String accounts) {
-        return Arrays.stream(Strings.split(accounts, ','))
-                .map(this::convertOrFailTest)
-                .collect(Collectors.toList());
     }
 
     @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}")
@@ -160,6 +105,7 @@ public class Transactions {
 
         applicationTransaction = builder.build();
     }
+
     @When("sign the transaction")
     public void sign_the_transaction() throws NoSuchAlgorithmException {
         signedTransaction = base.signTransaction(applicationTransaction);

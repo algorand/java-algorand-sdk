@@ -2,14 +2,9 @@ package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.*;
-import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;

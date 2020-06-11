@@ -2,11 +2,13 @@ package com.algorand.algosdk.logic;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.math.BigInteger;
 
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonPropertyOrder(alphabetic = true)
 public class StateSchema {
     @JsonProperty("nui")
     BigInteger numUint = BigInteger.ZERO;
@@ -23,6 +25,10 @@ public class StateSchema {
     }
 
     public StateSchema(Long numUint, Long numByteSlice) {
+        this(BigInteger.valueOf(numUint), BigInteger.valueOf(numByteSlice));
+    }
+
+    public StateSchema(Integer numUint, Integer numByteSlice) {
         this(BigInteger.valueOf(numUint), BigInteger.valueOf(numByteSlice));
     }
 }
