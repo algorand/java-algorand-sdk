@@ -8,13 +8,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class Response<T> {
     private int code;
     private String failureMessage;
-    private String body;
+    private byte[] body;
     private String contentType;
 
     @SuppressWarnings("rawtypes")
     private Class valueType;
 
-    public Response(int code, String failureMessage, String contentType, String body) {
+    public Response(int code, String failureMessage, String contentType, byte[] body) {
         this.code = code;
         this.failureMessage = failureMessage;
         this.body = body;
@@ -67,8 +67,13 @@ public class Response<T> {
     }
 
     private T convertMessagePack() throws IOException {
-        byte[] bytes = Encoder.decodeFromBase64(body);
-        return Utils.msgpReader.forType(valueType).readValue(bytes);
+        try {
+            return Utils.msgpReader.forType(valueType).readValue(body);
+        } catch (Exception e) {
+            // Check if the data was base64 encoded.
+            byte[] bytes = Encoder.decodeFromBase64(new String(body));
+            return Utils.msgpReader.forType(valueType).readValue(bytes);
+        }
     }
 
     /** Returns the status message. Describes the failure cause.  */

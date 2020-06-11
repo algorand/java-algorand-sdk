@@ -1,5 +1,6 @@
 package com.algorand.algosdk.unit.utils;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.squareup.okhttp.*;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -22,8 +23,13 @@ public class ClientMocker {
     public static void oneResponse(int code, String contentType, File bodyFile) throws Exception {
         Mockito.reset(mockClient);
 
-        // Read file
-        byte[] bodyBytes = Files.readAllBytes(bodyFile.toPath());
+        byte[] bytes = Files.readAllBytes(bodyFile.toPath());
+        if (bodyFile.getName().endsWith("base64")) {
+            bytes = Encoder.decodeFromBase64(new String(bytes));
+        }
+
+        // Give the lambda a final variable.
+        final byte[] bodyBytes = bytes;
 
         // Return a mock "Call" which returns a mock "Response" loaded with the mock body data and return code.
         Mockito.when(mockClient.newCall(Mockito.any())).thenAnswer(i -> {

@@ -1,7 +1,6 @@
 package com.algorand.algosdk.v2.client.common;
 
 public abstract class Query {
-
     private Client client;
     private HttpMethod httpMethod;
     protected QueryData qd;
@@ -19,7 +18,7 @@ public abstract class Query {
         QueryData qData = this.getRequestString();
         com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod);
         if (resp.isSuccessful()) {
-            return new Response<T>(resp.code(), null, resp.body().contentType().toString(), resp.body().string());
+            return new Response<T>(resp.code(), null, resp.body().contentType().toString(), resp.body());
         } else {
             return new Response<T>(resp.code(), resp.body().string(), null, null);
         }
