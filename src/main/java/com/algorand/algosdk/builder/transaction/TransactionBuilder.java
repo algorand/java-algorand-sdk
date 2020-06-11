@@ -74,8 +74,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Query the Algorand REST endpoint for Transaction Parameters:
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using TransactionParameters.
+     * Query the V1 REST API with {@link AlgodApi} for Transaction Parameters:
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParams}.
      * @param client The backend client connection.
      * @return This builder.
      * @throws ApiException When the client fails to retrieve {@link TransactionParams} from the backend.
@@ -100,11 +100,11 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Query the Algorand REST endpoint for Transaction Parameters:
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using TransactionParameters.
+     * Query the V2 REST API with {@link com.algorand.algosdk.v2.client.common.AlgodClient} for Transaction Parameters:
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParametersResponse}.
      * @param client The backend client connection.
      * @return This builder.
-     * @throws ApiException When the client fails to retrieve {@link TransactionParams} from the backend.
+     * @throws ApiException When the client fails to retrieve {@link TransactionParametersResponse} from the backend.
      */
     public T lookupParams(com.algorand.algosdk.v2.client.common.AlgodClient client) throws Exception {
         Response<TransactionParametersResponse> params = client.TransactionParams().execute();
@@ -112,7 +112,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Initialize fee, genesisID, genesisHash, firstValid and lastValid using {@link TransactionParams}.
+     * Initialize fee, genesisID, genesisHash, firstValid and lastValid using {@link TransactionParametersResponse}.
      * @param params The suggested transaction parameters.
      * @return This builder.
      */
