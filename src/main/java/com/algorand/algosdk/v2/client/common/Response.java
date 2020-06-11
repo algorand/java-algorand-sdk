@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class Response<T> {
 	private int code;
 	private String failureMessage;
-	private String body;
 	private byte[] body;
 	private String contentType;
 
