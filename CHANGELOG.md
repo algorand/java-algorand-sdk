@@ -1,3 +1,7 @@
+# 1.4.1
+- Fix Algod V2 Client encoding issue.
+- Add missing TransactionBuilder helper for working with suggested parameters.
+
 # 1.4.0
 - Clients for Indexer V2 and algod API V2
 
