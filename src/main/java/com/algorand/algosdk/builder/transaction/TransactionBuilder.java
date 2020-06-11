@@ -9,6 +9,8 @@ import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -94,6 +96,32 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         genesisHash(params.getGenesishashb64());
         firstValid(params.getLastRound());
         lastValid(params.getLastRound().add(BigInteger.valueOf(1000L)));
+        return (T) this;
+    }
+
+    /**
+     * Query the Algorand REST endpoint for Transaction Parameters:
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using TransactionParameters.
+     * @param client The backend client connection.
+     * @return This builder.
+     * @throws ApiException When the client fails to retrieve {@link TransactionParams} from the backend.
+     */
+    public T lookupParams(com.algorand.algosdk.v2.client.common.AlgodClient client) throws Exception {
+        Response<TransactionParametersResponse> params = client.TransactionParams().execute();
+        return suggestedParams(params.body());
+    }
+
+    /**
+     * Initialize fee, genesisID, genesisHash, firstValid and lastValid using {@link TransactionParams}.
+     * @param params The suggested transaction parameters.
+     * @return This builder.
+     */
+    public T suggestedParams(TransactionParametersResponse params) {
+        fee(params.fee);
+        genesisID(params.genesisId);
+        genesisHash(params.genesisHash);
+        firstValid(params.lastRound);
+        lastValid(params.lastRound + 1000);
         return (T) this;
     }
 
