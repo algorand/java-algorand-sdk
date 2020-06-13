@@ -73,6 +73,8 @@ public class QueryMapper {
             return client.GetPendingTransactions();
         case "PendingTransactionInformation":
             return client.PendingTransactionInformation(args[0]);
+        case "TealCompile":
+            return client.TealCompile();
         }
         return null;
     }
@@ -421,6 +423,13 @@ public class QueryMapper {
             break;
         case "PendingTransactionInformation":
             switch (property) {
+            }
+            break;
+        case "TealCompile":
+            switch (property) {
+            case "source":
+                ((TealCompile)q).source(Encoder.decodeFromBase64(value));
+                break;
             }
             break;
 

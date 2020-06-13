@@ -9,8 +9,8 @@ import com.algorand.algosdk.v2.client.model.ApplicationsResponse;
 
 
 /**
- * Search for applications 
- * /v2/applications 
+ * Search for applications
+ * /v2/applications
  */
 public class SearchForApplications extends Query {
 
@@ -19,7 +19,7 @@ public class SearchForApplications extends Query {
     }
 
     /**
-     * Application ID 
+     * Application ID
      */
     public SearchForApplications applicationId(Long applicationId) {
         addQuery("application-id", String.valueOf(applicationId));
@@ -27,7 +27,7 @@ public class SearchForApplications extends Query {
     }
 
     /**
-     * Include results for the specified round. 
+     * Include results for the specified round.
      */
     public SearchForApplications round(Long round) {
         addQuery("round", String.valueOf(round));

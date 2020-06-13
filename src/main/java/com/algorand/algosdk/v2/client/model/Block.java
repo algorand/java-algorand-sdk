@@ -9,14 +9,14 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Block information. 
- * Definition: 
- * data/bookkeeping/block.go : Block 
+ * Block information.
+ * Definition:
+ * data/bookkeeping/block.go : Block
  */
 public class Block extends PathResponse {
 
     /**
-     * (gh) hash to which this block belongs. 
+     * (gh) hash to which this block belongs.
      */
     @JsonProperty("genesis-hash")
     public void genesisHash(String base64Encoded) {
@@ -29,13 +29,13 @@ public class Block extends PathResponse {
     public byte[] genesisHash;
 
     /**
-     * (gen) ID to which this block belongs. 
+     * (gen) ID to which this block belongs.
      */
     @JsonProperty("genesis-id")
     public String genesisId;
 
     /**
-     * (prev) Previous block hash. 
+     * (prev) Previous block hash.
      */
     @JsonProperty("previous-block-hash")
     public void previousBlockHash(String base64Encoded) {
@@ -51,13 +51,13 @@ public class Block extends PathResponse {
     public BlockRewards rewards;
 
     /**
-     * (rnd) Current round on which this block was appended to the chain. 
+     * (rnd) Current round on which this block was appended to the chain.
      */
     @JsonProperty("round")
     public Long round;
 
     /**
-     * (seed) Sortition seed. 
+     * (seed) Sortition seed.
      */
     @JsonProperty("seed")
     public void seed(String base64Encoded) {
@@ -70,24 +70,24 @@ public class Block extends PathResponse {
     public byte[] seed;
 
     /**
-     * (ts) Block creation timestamp in seconds since eposh 
+     * (ts) Block creation timestamp in seconds since eposh
      */
     @JsonProperty("timestamp")
     public Long timestamp;
 
     /**
-     * (txns) list of transactions corresponding to a given round. 
+     * (txns) list of transactions corresponding to a given round.
      */
     @JsonProperty("transactions")
     public List<Transaction> transactions = new ArrayList<Transaction>();
 
     /**
-     * (txn) TransactionsRoot authenticates the set of transactions appearing in the 
-     * block. More specifically, it's the root of a merkle tree whose leaves are the 
-     * block's Txids, in lexicographic order. For the empty block, it's 0. Note that 
-     * the TxnRoot does not authenticate the signatures on the transactions, only the 
-     * transactions themselves. Two blocks with the same transactions but in a 
-     * different order and with different signatures will have the same TxnRoot. 
+     * (txn) TransactionsRoot authenticates the set of transactions appearing in the
+     * block. More specifically, it's the root of a merkle tree whose leaves are the
+     * block's Txids, in lexicographic order. For the empty block, it's 0. Note that
+     * the TxnRoot does not authenticate the signatures on the transactions, only the
+     * transactions themselves. Two blocks with the same transactions but in a
+     * different order and with different signatures will have the same TxnRoot.
      */
     @JsonProperty("transactions-root")
     public void transactionsRoot(String base64Encoded) {
@@ -100,11 +100,11 @@ public class Block extends PathResponse {
     public byte[] transactionsRoot;
 
     /**
-     * (tc) TxnCounter counts the number of transactions committed in the ledger, from 
-     * the time at which support for this feature was introduced. 
-     * Specifically, TxnCounter is the number of the next transaction that will be 
-     * committed after this block. It is 0 when no transactions have ever been 
-     * committed (since TxnCounter started being supported). 
+     * (tc) TxnCounter counts the number of transactions committed in the ledger, from
+     * the time at which support for this feature was introduced.
+     * Specifically, TxnCounter is the number of the next transaction that will be
+     * committed after this block. It is 0 when no transactions have ever been
+     * committed (since TxnCounter started being supported).
      */
     @JsonProperty("txn-counter")
     public Long txnCounter;

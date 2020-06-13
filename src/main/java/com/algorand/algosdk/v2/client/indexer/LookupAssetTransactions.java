@@ -15,8 +15,8 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Lookup transactions for an asset. 
- * /v2/assets/{asset-id}/transactions 
+ * Lookup transactions for an asset.
+ * /v2/assets/{asset-id}/transactions
  */
 public class LookupAssetTransactions extends Query {
 
@@ -28,7 +28,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Only include transactions with this address in one of the transaction fields. 
+     * Only include transactions with this address in one of the transaction fields.
      */
     public LookupAssetTransactions address(Address address) {
         addQuery("address", String.valueOf(address));
@@ -36,7 +36,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Combine with the address parameter to define what type of address to search for. 
+     * Combine with the address parameter to define what type of address to search for.
      */
     public LookupAssetTransactions addressRole(Enums.AddressRole addressRole) {
         addQuery("address-role", String.valueOf(addressRole));
@@ -44,7 +44,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Include results after the given time. Must be an RFC 3339 formatted string. 
+     * Include results after the given time. Must be an RFC 3339 formatted string.
      */
     public LookupAssetTransactions afterTime(Date afterTime) {
         addQuery("after-time", Utils.getDateString(afterTime));
@@ -52,7 +52,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Application ID 
+     * Application ID
      */
     public LookupAssetTransactions applicationId(Long applicationId) {
         addQuery("application-id", String.valueOf(applicationId));
@@ -60,7 +60,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Include results before the given time. Must be an RFC 3339 formatted string. 
+     * Include results before the given time. Must be an RFC 3339 formatted string.
      */
     public LookupAssetTransactions beforeTime(Date beforeTime) {
         addQuery("before-time", Utils.getDateString(beforeTime));
@@ -68,9 +68,9 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Results should have an amount greater than this value. MicroAlgos are the 
-     * default currency unless an asset-id is provided, in which case the asset will be 
-     * used. 
+     * Results should have an amount greater than this value. MicroAlgos are the
+     * default currency unless an asset-id is provided, in which case the asset will be
+     * used.
      */
     public LookupAssetTransactions currencyGreaterThan(Long currencyGreaterThan) {
         addQuery("currency-greater-than", String.valueOf(currencyGreaterThan));
@@ -78,8 +78,8 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Results should have an amount less than this value. MicroAlgos are the default 
-     * currency unless an asset-id is provided, in which case the asset will be used. 
+     * Results should have an amount less than this value. MicroAlgos are the default
+     * currency unless an asset-id is provided, in which case the asset will be used.
      */
     public LookupAssetTransactions currencyLessThan(Long currencyLessThan) {
         addQuery("currency-less-than", String.valueOf(currencyLessThan));
@@ -87,9 +87,9 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Combine with address and address-role parameters to define what type of address 
-     * to search for. The close to fields are normally treated as a receiver, if you 
-     * would like to exclude them set this parameter to true. 
+     * Combine with address and address-role parameters to define what type of address
+     * to search for. The close to fields are normally treated as a receiver, if you
+     * would like to exclude them set this parameter to true.
      */
     public LookupAssetTransactions excludeCloseTo(Boolean excludeCloseTo) {
         addQuery("exclude-close-to", String.valueOf(excludeCloseTo));
@@ -97,7 +97,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Maximum number of results to return. 
+     * Maximum number of results to return.
      */
     public LookupAssetTransactions limit(Long limit) {
         addQuery("limit", String.valueOf(limit));
@@ -105,7 +105,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Include results at or before the specified max-round. 
+     * Include results at or before the specified max-round.
      */
     public LookupAssetTransactions maxRound(Long maxRound) {
         addQuery("max-round", String.valueOf(maxRound));
@@ -113,7 +113,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Include results at or after the specified min-round. 
+     * Include results at or after the specified min-round.
      */
     public LookupAssetTransactions minRound(Long minRound) {
         addQuery("min-round", String.valueOf(minRound));
@@ -121,7 +121,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * The next page of results. Use the next token provided by the previous results. 
+     * The next page of results. Use the next token provided by the previous results.
      */
     public LookupAssetTransactions next(String next) {
         addQuery("next", String.valueOf(next));
@@ -129,7 +129,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Specifies a prefix which must be contained in the note field. 
+     * Specifies a prefix which must be contained in the note field.
      */
     public LookupAssetTransactions notePrefix(byte[] notePrefix) {
         addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
@@ -137,7 +137,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Include results which include the rekey-to field. 
+     * Include results which include the rekey-to field.
      */
     public LookupAssetTransactions rekeyTo(Boolean rekeyTo) {
         addQuery("rekey-to", String.valueOf(rekeyTo));
@@ -145,7 +145,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Include results for the specified round. 
+     * Include results for the specified round.
      */
     public LookupAssetTransactions round(Long round) {
         addQuery("round", String.valueOf(round));
@@ -153,10 +153,10 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * SigType filters just results using the specified type of signature: 
-     *   sig - Standard 
-     *   msig - MultiSig 
-     *   lsig - LogicSig 
+     * SigType filters just results using the specified type of signature:
+     *   sig - Standard
+     *   msig - MultiSig
+     *   lsig - LogicSig
      */
     public LookupAssetTransactions sigType(Enums.SigType sigType) {
         addQuery("sig-type", String.valueOf(sigType));
@@ -169,7 +169,7 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Lookup the specific transaction by ID. 
+     * Lookup the specific transaction by ID.
      */
     public LookupAssetTransactions txid(String txid) {
         addQuery("txid", String.valueOf(txid));

@@ -8,18 +8,18 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Stores local state associated with an application. 
+ * Stores local state associated with an application.
  */
 public class ApplicationLocalState extends PathResponse {
 
     /**
-     * (tkv) storage. 
+     * (tkv) storage.
      */
     @JsonProperty("key-value")
     public List<TealKeyValue> keyValue = new ArrayList<TealKeyValue>();
 
     /**
-     * (hsch) schema. 
+     * (hsch) schema.
      */
     @JsonProperty("schema")
     public ApplicationStateSchema schema;

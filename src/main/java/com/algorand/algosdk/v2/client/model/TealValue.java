@@ -6,24 +6,24 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents a TEAL value. 
+ * Represents a TEAL value.
  */
 public class TealValue extends PathResponse {
 
     /**
-     * (tb) bytes value. 
+     * (tb) bytes value.
      */
     @JsonProperty("bytes")
     public String bytes;
 
     /**
-     * (tt) value type. 
+     * (tt) value type.
      */
     @JsonProperty("type")
     public Long type;
 
     /**
-     * (ui) uint value. 
+     * (ui) uint value.
      */
     @JsonProperty("uint")
     public java.math.BigInteger uint;

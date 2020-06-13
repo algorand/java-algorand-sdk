@@ -7,7 +7,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * the current algod build version information. 
+ * the current algod build version information.
  */
 public class VersionBuild extends PathResponse {
 

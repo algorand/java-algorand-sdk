@@ -8,19 +8,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SupplyResponse extends PathResponse {
 
     /**
-     * Round 
+     * Round
      */
     @JsonProperty("current_round")
     public Long current_round;
 
     /**
-     * OnlineMoney 
+     * OnlineMoney
      */
     @JsonProperty("online-money")
     public Long onlineMoney;
 
     /**
-     * TotalMoney 
+     * TotalMoney
      */
     @JsonProperty("total-money")
     public Long totalMoney;

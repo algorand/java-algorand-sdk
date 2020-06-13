@@ -6,7 +6,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A health check response. 
+ * A health check response.
  */
 public class HealthCheck extends PathResponse {
 

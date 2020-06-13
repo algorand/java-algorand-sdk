@@ -6,49 +6,49 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Fields for an asset transfer transaction. 
- * Definition: 
- * data/transactions/asset.go : AssetTransferTxnFields 
+ * Fields for an asset transfer transaction.
+ * Definition:
+ * data/transactions/asset.go : AssetTransferTxnFields
  */
 public class TransactionAssetTransfer extends PathResponse {
 
     /**
-     * (aamt) Amount of asset to transfer. A zero amount transferred to self allocates 
-     * that asset in the account's Assets map. 
+     * (aamt) Amount of asset to transfer. A zero amount transferred to self allocates
+     * that asset in the account's Assets map.
      */
     @JsonProperty("amount")
     public java.math.BigInteger amount;
 
     /**
-     * (xaid) ID of the asset being transferred. 
+     * (xaid) ID of the asset being transferred.
      */
     @JsonProperty("asset-id")
     public Long assetId;
 
     /**
-     * Number of assets transfered to the close-to account as part of the transaction. 
+     * Number of assets transfered to the close-to account as part of the transaction.
      */
     @JsonProperty("close-amount")
     public java.math.BigInteger closeAmount;
 
     /**
-     * (aclose) Indicates that the asset should be removed from the account's Assets 
-     * map, and specifies where the remaining asset holdings should be transferred. 
-     * It's always valid to transfer remaining asset holdings to the creator account. 
+     * (aclose) Indicates that the asset should be removed from the account's Assets
+     * map, and specifies where the remaining asset holdings should be transferred.
+     * It's always valid to transfer remaining asset holdings to the creator account.
      */
     @JsonProperty("close-to")
     public String closeTo;
 
     /**
-     * (arcv) Recipient address of the transfer. 
+     * (arcv) Recipient address of the transfer.
      */
     @JsonProperty("receiver")
     public String receiver;
 
     /**
-     * (asnd) The effective sender during a clawback transactions. If this is not a 
-     * zero value, the real transaction sender must be the Clawback address from the 
-     * AssetParams. 
+     * (asnd) The effective sender during a clawback transactions. If this is not a
+     * zero value, the real transaction sender must be the Clawback address from the
+     * AssetParams.
      */
     @JsonProperty("sender")
     public String sender;

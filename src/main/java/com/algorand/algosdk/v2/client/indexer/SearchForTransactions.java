@@ -15,8 +15,8 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Search for transactions. 
- * /v2/transactions 
+ * Search for transactions.
+ * /v2/transactions
  */
 public class SearchForTransactions extends Query {
 
@@ -25,7 +25,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Only include transactions with this address in one of the transaction fields. 
+     * Only include transactions with this address in one of the transaction fields.
      */
     public SearchForTransactions address(Address address) {
         addQuery("address", String.valueOf(address));
@@ -33,7 +33,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Combine with the address parameter to define what type of address to search for. 
+     * Combine with the address parameter to define what type of address to search for.
      */
     public SearchForTransactions addressRole(Enums.AddressRole addressRole) {
         addQuery("address-role", String.valueOf(addressRole));
@@ -41,7 +41,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Include results after the given time. Must be an RFC 3339 formatted string. 
+     * Include results after the given time. Must be an RFC 3339 formatted string.
      */
     public SearchForTransactions afterTime(Date afterTime) {
         addQuery("after-time", Utils.getDateString(afterTime));
@@ -49,7 +49,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Application ID 
+     * Application ID
      */
     public SearchForTransactions applicationId(Long applicationId) {
         addQuery("application-id", String.valueOf(applicationId));
@@ -57,7 +57,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Asset ID 
+     * Asset ID
      */
     public SearchForTransactions assetId(Long assetId) {
         addQuery("asset-id", String.valueOf(assetId));
@@ -65,7 +65,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Include results before the given time. Must be an RFC 3339 formatted string. 
+     * Include results before the given time. Must be an RFC 3339 formatted string.
      */
     public SearchForTransactions beforeTime(Date beforeTime) {
         addQuery("before-time", Utils.getDateString(beforeTime));
@@ -73,9 +73,9 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Results should have an amount greater than this value. MicroAlgos are the 
-     * default currency unless an asset-id is provided, in which case the asset will be 
-     * used. 
+     * Results should have an amount greater than this value. MicroAlgos are the
+     * default currency unless an asset-id is provided, in which case the asset will be
+     * used.
      */
     public SearchForTransactions currencyGreaterThan(Long currencyGreaterThan) {
         addQuery("currency-greater-than", String.valueOf(currencyGreaterThan));
@@ -83,8 +83,8 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Results should have an amount less than this value. MicroAlgos are the default 
-     * currency unless an asset-id is provided, in which case the asset will be used. 
+     * Results should have an amount less than this value. MicroAlgos are the default
+     * currency unless an asset-id is provided, in which case the asset will be used.
      */
     public SearchForTransactions currencyLessThan(Long currencyLessThan) {
         addQuery("currency-less-than", String.valueOf(currencyLessThan));
@@ -92,9 +92,9 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Combine with address and address-role parameters to define what type of address 
-     * to search for. The close to fields are normally treated as a receiver, if you 
-     * would like to exclude them set this parameter to true. 
+     * Combine with address and address-role parameters to define what type of address
+     * to search for. The close to fields are normally treated as a receiver, if you
+     * would like to exclude them set this parameter to true.
      */
     public SearchForTransactions excludeCloseTo(Boolean excludeCloseTo) {
         addQuery("exclude-close-to", String.valueOf(excludeCloseTo));
@@ -102,7 +102,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Maximum number of results to return. 
+     * Maximum number of results to return.
      */
     public SearchForTransactions limit(Long limit) {
         addQuery("limit", String.valueOf(limit));
@@ -110,7 +110,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Include results at or before the specified max-round. 
+     * Include results at or before the specified max-round.
      */
     public SearchForTransactions maxRound(Long maxRound) {
         addQuery("max-round", String.valueOf(maxRound));
@@ -118,7 +118,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Include results at or after the specified min-round. 
+     * Include results at or after the specified min-round.
      */
     public SearchForTransactions minRound(Long minRound) {
         addQuery("min-round", String.valueOf(minRound));
@@ -126,7 +126,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * The next page of results. Use the next token provided by the previous results. 
+     * The next page of results. Use the next token provided by the previous results.
      */
     public SearchForTransactions next(String next) {
         addQuery("next", String.valueOf(next));
@@ -134,7 +134,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Specifies a prefix which must be contained in the note field. 
+     * Specifies a prefix which must be contained in the note field.
      */
     public SearchForTransactions notePrefix(byte[] notePrefix) {
         addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
@@ -142,7 +142,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Include results which include the rekey-to field. 
+     * Include results which include the rekey-to field.
      */
     public SearchForTransactions rekeyTo(Boolean rekeyTo) {
         addQuery("rekey-to", String.valueOf(rekeyTo));
@@ -150,7 +150,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Include results for the specified round. 
+     * Include results for the specified round.
      */
     public SearchForTransactions round(Long round) {
         addQuery("round", String.valueOf(round));
@@ -158,10 +158,10 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * SigType filters just results using the specified type of signature: 
-     *   sig - Standard 
-     *   msig - MultiSig 
-     *   lsig - LogicSig 
+     * SigType filters just results using the specified type of signature:
+     *   sig - Standard
+     *   msig - MultiSig
+     *   lsig - LogicSig
      */
     public SearchForTransactions sigType(Enums.SigType sigType) {
         addQuery("sig-type", String.valueOf(sigType));
@@ -174,7 +174,7 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Lookup the specific transaction by ID. 
+     * Lookup the specific transaction by ID.
      */
     public SearchForTransactions txid(String txid) {
         addQuery("txid", String.valueOf(txid));

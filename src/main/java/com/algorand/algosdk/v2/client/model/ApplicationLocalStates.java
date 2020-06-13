@@ -6,7 +6,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Pair of application index and application local state 
+ * Pair of application index and application local state
  */
 public class ApplicationLocalStates extends PathResponse {
 

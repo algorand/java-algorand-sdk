@@ -8,13 +8,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PostCompileResponse extends PathResponse {
 
     /**
-     * base32 SHA512_256 of program bytes (Address style) 
+     * base32 SHA512_256 of program bytes (Address style)
      */
     @JsonProperty("hash")
     public String hash;
 
     /**
-     * base64 encoded program bytes 
+     * base64 encoded program bytes
      */
     @JsonProperty("result")
     public String result;

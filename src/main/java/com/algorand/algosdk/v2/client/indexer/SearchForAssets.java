@@ -9,8 +9,8 @@ import com.algorand.algosdk.v2.client.model.AssetsResponse;
 
 
 /**
- * Search for assets. 
- * /v2/assets 
+ * Search for assets.
+ * /v2/assets
  */
 public class SearchForAssets extends Query {
 
@@ -19,7 +19,7 @@ public class SearchForAssets extends Query {
     }
 
     /**
-     * Asset ID 
+     * Asset ID
      */
     public SearchForAssets assetId(Long assetId) {
         addQuery("asset-id", String.valueOf(assetId));
@@ -27,7 +27,7 @@ public class SearchForAssets extends Query {
     }
 
     /**
-     * Filter just assets with the given creator address. 
+     * Filter just assets with the given creator address.
      */
     public SearchForAssets creator(String creator) {
         addQuery("creator", String.valueOf(creator));
@@ -35,7 +35,7 @@ public class SearchForAssets extends Query {
     }
 
     /**
-     * Maximum number of results to return. 
+     * Maximum number of results to return.
      */
     public SearchForAssets limit(Long limit) {
         addQuery("limit", String.valueOf(limit));
@@ -43,7 +43,7 @@ public class SearchForAssets extends Query {
     }
 
     /**
-     * Filter just assets with the given name. 
+     * Filter just assets with the given name.
      */
     public SearchForAssets name(String name) {
         addQuery("name", String.valueOf(name));
@@ -51,7 +51,7 @@ public class SearchForAssets extends Query {
     }
 
     /**
-     * The next page of results. Use the next token provided by the previous results. 
+     * The next page of results. Use the next token provided by the previous results.
      */
     public SearchForAssets next(String next) {
         addQuery("next", String.valueOf(next));
@@ -59,7 +59,7 @@ public class SearchForAssets extends Query {
     }
 
     /**
-     * Filter just assets with the given unit. 
+     * Filter just assets with the given unit.
      */
     public SearchForAssets unit(String unit) {
         addQuery("unit", String.valueOf(unit));

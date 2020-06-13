@@ -6,18 +6,18 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Application index and its parameters 
+ * Application index and its parameters
  */
 public class Application extends PathResponse {
 
     /**
-     * (appidx) application index. 
+     * (appidx) application index.
      */
     @JsonProperty("app-index")
     public Long appIndex;
 
     /**
-     * (appparams) application parameters. 
+     * (appparams) application parameters.
      */
     @JsonProperty("app-params")
     public ApplicationParams appParams;

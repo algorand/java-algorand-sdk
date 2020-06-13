@@ -8,7 +8,7 @@ import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
- * /health 
+ * /health
  */
 public class HealthCheck extends Query {
 

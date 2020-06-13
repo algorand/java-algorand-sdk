@@ -9,12 +9,12 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Contains all fields common to all transactions and serves as an envelope to all 
- * transactions type. 
- * Definition: 
- * data/transactions/signedtxn.go : SignedTxn 
- * data/transactions/transaction.go : Transaction 
- * 
+ * Contains all fields common to all transactions and serves as an envelope to all
+ * transactions type.
+ * Definition:
+ * data/transactions/signedtxn.go : SignedTxn
+ * data/transactions/transaction.go : Transaction
+ *
  */
 public class Transaction extends PathResponse {
 
@@ -28,8 +28,8 @@ public class Transaction extends PathResponse {
     public TransactionAssetTransfer assetTransferTransaction;
 
     /**
-     * (sgnr) The address used to sign the transaction. This is used for rekeyed 
-     * accounts to indicate that the sender address did not sign the transaction. 
+     * (sgnr) The address used to sign the transaction. This is used for rekeyed
+     * accounts to indicate that the sender address did not sign the transaction.
      */
     @JsonProperty("auth-addr")
     public void authAddr(String authAddr) throws NoSuchAlgorithmException {
@@ -46,50 +46,50 @@ public class Transaction extends PathResponse {
     public Address authAddr;
 
     /**
-     * (rc) rewards applied to close-remainder-to account. 
+     * (rc) rewards applied to close-remainder-to account.
      */
     @JsonProperty("close-rewards")
     public Long closeRewards;
 
     /**
-     * (ca) closing amount for transaction. 
+     * (ca) closing amount for transaction.
      */
     @JsonProperty("closing-amount")
     public Long closingAmount;
 
     /**
-     * Round when the transaction was confirmed. 
+     * Round when the transaction was confirmed.
      */
     @JsonProperty("confirmed-round")
     public Long confirmedRound;
 
     /**
-     * Specifies an application index (ID) if an application was created with this 
-     * transaction. 
+     * Specifies an application index (ID) if an application was created with this
+     * transaction.
      */
     @JsonProperty("created-application-index")
     public Long createdApplicationIndex;
 
     /**
-     * Specifies an asset index (ID) if an asset was created with this transaction. 
+     * Specifies an asset index (ID) if an asset was created with this transaction.
      */
     @JsonProperty("created-asset-index")
     public Long createdAssetIndex;
 
     /**
-     * (fee) Transaction fee. 
+     * (fee) Transaction fee.
      */
     @JsonProperty("fee")
     public Long fee;
 
     /**
-     * (fv) First valid round for this transaction. 
+     * (fv) First valid round for this transaction.
      */
     @JsonProperty("first-valid")
     public Long firstValid;
 
     /**
-     * (gh) Hash of genesis block. 
+     * (gh) Hash of genesis block.
      */
     @JsonProperty("genesis-hash")
     public void genesisHash(String base64Encoded) {
@@ -102,15 +102,15 @@ public class Transaction extends PathResponse {
     public byte[] genesisHash;
 
     /**
-     * (gen) genesis block ID. 
+     * (gen) genesis block ID.
      */
     @JsonProperty("genesis-id")
     public String genesisId;
 
     /**
-     * (grp) Base64 encoded byte array of a sha512/256 digest. When present indicates 
-     * that this transaction is part of a transaction group and the value is the 
-     * sha512/256 hash of the transactions in that group. 
+     * (grp) Base64 encoded byte array of a sha512/256 digest. When present indicates
+     * that this transaction is part of a transaction group and the value is the
+     * sha512/256 hash of the transactions in that group.
      */
     @JsonProperty("group")
     public void group(String base64Encoded) {
@@ -123,13 +123,13 @@ public class Transaction extends PathResponse {
     public byte[] group;
 
     /**
-     * Transaction ID 
+     * Transaction ID
      */
     @JsonProperty("id")
     public String id;
 
     /**
-     * Offset into the round where this transaction was confirmed. 
+     * Offset into the round where this transaction was confirmed.
      */
     @JsonProperty("intra-round-offset")
     public Long intraRoundOffset;
@@ -138,17 +138,17 @@ public class Transaction extends PathResponse {
     public TransactionKeyreg keyregTransaction;
 
     /**
-     * (lv) Last valid round for this transaction. 
+     * (lv) Last valid round for this transaction.
      */
     @JsonProperty("last-valid")
     public Long lastValid;
 
     /**
-     * (lx) Base64 encoded 32-byte array. Lease enforces mutual exclusion of 
-     * transactions. If this field is nonzero, then once the transaction is confirmed, 
-     * it acquires the lease identified by the (Sender, Lease) pair of the transaction 
-     * until the LastValid round passes. While this transaction possesses the lease, no 
-     * other transaction specifying this lease can be confirmed. 
+     * (lx) Base64 encoded 32-byte array. Lease enforces mutual exclusion of
+     * transactions. If this field is nonzero, then once the transaction is confirmed,
+     * it acquires the lease identified by the (Sender, Lease) pair of the transaction
+     * until the LastValid round passes. While this transaction possesses the lease, no
+     * other transaction specifying this lease can be confirmed.
      */
     @JsonProperty("lease")
     public void lease(String base64Encoded) {
@@ -161,7 +161,7 @@ public class Transaction extends PathResponse {
     public byte[] lease;
 
     /**
-     * (note) Free form data. 
+     * (note) Free form data.
      */
     @JsonProperty("note")
     public void note(String base64Encoded) {
@@ -177,15 +177,15 @@ public class Transaction extends PathResponse {
     public TransactionPayment paymentTransaction;
 
     /**
-     * (rr) rewards applied to receiver account. 
+     * (rr) rewards applied to receiver account.
      */
     @JsonProperty("receiver-rewards")
     public Long receiverRewards;
 
     /**
-     * (rekey) when included in a valid transaction, the accounts auth addr will be 
-     * updated with this value and future signatures must be signed with the key 
-     * represented by this address. 
+     * (rekey) when included in a valid transaction, the accounts auth addr will be
+     * updated with this value and future signatures must be signed with the key
+     * represented by this address.
      */
     @JsonProperty("rekey-to")
     public void rekeyTo(String rekeyTo) throws NoSuchAlgorithmException {
@@ -202,19 +202,19 @@ public class Transaction extends PathResponse {
     public Address rekeyTo;
 
     /**
-     * Time when the block this transaction is in was confirmed. 
+     * Time when the block this transaction is in was confirmed.
      */
     @JsonProperty("round-time")
     public Long roundTime;
 
     /**
-     * (snd) Sender's address. 
+     * (snd) Sender's address.
      */
     @JsonProperty("sender")
     public String sender;
 
     /**
-     * (rs) rewards applied to sender account. 
+     * (rs) rewards applied to sender account.
      */
     @JsonProperty("sender-rewards")
     public Long senderRewards;
@@ -223,14 +223,14 @@ public class Transaction extends PathResponse {
     public TransactionSignature signature;
 
     /**
-     * (type) Indicates what type of transaction this is. Different types have 
-     * different fields. 
-     * Valid types, and where their fields are stored: 
-     *   (pay) payment-transaction 
-     *   (keyreg) keyreg-transaction 
-     *   (acfg) asset-config-transaction 
-     *   (axfer) asset-transfer-transaction 
-     *   (afrz) asset-freeze-transaction 
+     * (type) Indicates what type of transaction this is. Different types have
+     * different fields.
+     * Valid types, and where their fields are stored:
+     *   (pay) payment-transaction
+     *   (keyreg) keyreg-transaction
+     *   (acfg) asset-config-transaction
+     *   (axfer) asset-transfer-transaction
+     *   (afrz) asset-freeze-transaction
      */
     @JsonProperty("tx-type")
     public Enums.TxType txType;

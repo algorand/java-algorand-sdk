@@ -8,8 +8,8 @@ import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
- * Returns the entire swagger spec in json. 
- * /swagger.json 
+ * Returns the entire swagger spec in json.
+ * /swagger.json
  */
 public class SwaggerJSON extends Query {
 

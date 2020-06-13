@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class CatchpointAbortResponse extends PathResponse {
 
     /**
-     * Catchup abort response string 
+     * Catchup abort response string
      */
     @JsonProperty("catchup-message")
     public String catchupMessage;

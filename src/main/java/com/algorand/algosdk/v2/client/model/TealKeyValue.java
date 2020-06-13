@@ -6,7 +6,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Represents a key-value pair in an application store. 
+ * Represents a key-value pair in an application store.
  */
 public class TealKeyValue extends PathResponse {
 

@@ -9,8 +9,8 @@ import com.algorand.algosdk.v2.client.model.ApplicationResponse;
 
 
 /**
- * Lookup application. 
- * /v2/applications/{application-id} 
+ * Lookup application.
+ * /v2/applications/{application-id}
  */
 public class LookupApplication extends Query {
 
@@ -22,7 +22,7 @@ public class LookupApplication extends Query {
     }
 
     /**
-     * Include results for the specified round. 
+     * Include results for the specified round.
      */
     public LookupApplication round(Long round) {
         addQuery("round", String.valueOf(round));

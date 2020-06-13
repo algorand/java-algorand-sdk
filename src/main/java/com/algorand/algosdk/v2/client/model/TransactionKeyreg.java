@@ -7,21 +7,21 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Fields for a keyreg transaction. 
- * Definition: 
- * data/transactions/keyreg.go : KeyregTxnFields 
+ * Fields for a keyreg transaction.
+ * Definition:
+ * data/transactions/keyreg.go : KeyregTxnFields
  */
 public class TransactionKeyreg extends PathResponse {
 
     /**
-     * (nonpart) Mark the account as participating or non-participating. 
+     * (nonpart) Mark the account as participating or non-participating.
      */
     @JsonProperty("non-participation")
     public Boolean nonParticipation;
 
     /**
-     * (selkey) Public key used with the Verified Random Function (VRF) result during 
-     * committee selection. 
+     * (selkey) Public key used with the Verified Random Function (VRF) result during
+     * committee selection.
      */
     @JsonProperty("selection-participation-key")
     public void selectionParticipationKey(String base64Encoded) {
@@ -34,25 +34,25 @@ public class TransactionKeyreg extends PathResponse {
     public byte[] selectionParticipationKey;
 
     /**
-     * (votefst) First round this participation key is valid. 
+     * (votefst) First round this participation key is valid.
      */
     @JsonProperty("vote-first-valid")
     public Long voteFirstValid;
 
     /**
-     * (votekd) Number of subkeys in each batch of participation keys. 
+     * (votekd) Number of subkeys in each batch of participation keys.
      */
     @JsonProperty("vote-key-dilution")
     public Long voteKeyDilution;
 
     /**
-     * (votelst) Last round this participation key is valid. 
+     * (votelst) Last round this participation key is valid.
      */
     @JsonProperty("vote-last-valid")
     public Long voteLastValid;
 
     /**
-     * (votekey) Participation public key used in key registration transactions. 
+     * (votekey) Participation public key used in key registration transactions.
      */
     @JsonProperty("vote-participation-key")
     public void voteParticipationKey(String base64Encoded) {

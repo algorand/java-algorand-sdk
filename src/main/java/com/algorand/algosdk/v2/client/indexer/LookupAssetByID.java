@@ -9,8 +9,8 @@ import com.algorand.algosdk.v2.client.model.AssetResponse;
 
 
 /**
- * Lookup asset information. 
- * /v2/assets/{asset-id} 
+ * Lookup asset information.
+ * /v2/assets/{asset-id}
  */
 public class LookupAssetByID extends Query {
 

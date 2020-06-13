@@ -9,9 +9,9 @@ import com.algorand.algosdk.v2.client.model.PostCompileResponse;
 
 
 /**
- * Given TEAL source code in plain text, return base64 encoded program bytes and 
- * base32 SHA512_256 hash of program bytes (Address style). 
- * /v2/teal/compile 
+ * Given TEAL source code in plain text, return base64 encoded program bytes and
+ * base32 SHA512_256 hash of program bytes (Address style).
+ * /v2/teal/compile
  */
 public class TealCompile extends Query {
 
@@ -20,7 +20,7 @@ public class TealCompile extends Query {
     }
 
     /**
-     * TEAL source code to be compiled 
+     * TEAL source code to be compiled
      */
     public TealCompile source(byte[] source) {
         addToBody(source);

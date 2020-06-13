@@ -8,7 +8,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A simplified version of AssetHolding 
+ * A simplified version of AssetHolding
  */
 public class MiniAssetHolding extends PathResponse {
 

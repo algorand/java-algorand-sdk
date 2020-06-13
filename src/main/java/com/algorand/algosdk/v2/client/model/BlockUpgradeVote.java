@@ -6,24 +6,24 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Fields relating to voting for a protocol upgrade. 
+ * Fields relating to voting for a protocol upgrade.
  */
 public class BlockUpgradeVote extends PathResponse {
 
     /**
-     * (upgradeyes) Indicates a yes vote for the current proposal. 
+     * (upgradeyes) Indicates a yes vote for the current proposal.
      */
     @JsonProperty("upgrade-approve")
     public Boolean upgradeApprove;
 
     /**
-     * (upgradedelay) Indicates the time between acceptance and execution. 
+     * (upgradedelay) Indicates the time between acceptance and execution.
      */
     @JsonProperty("upgrade-delay")
     public Long upgradeDelay;
 
     /**
-     * (upgradeprop) Indicates a proposed upgrade. 
+     * (upgradeprop) Indicates a proposed upgrade.
      */
     @JsonProperty("upgrade-propose")
     public String upgradePropose;

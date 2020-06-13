@@ -23,95 +23,95 @@ public class IndexerClient extends Client {
         super(host, port, "", "X-Indexer-API-Token");
     }
     /**
-     * /health 
+     * /health
      */
     public MakeHealthCheck makeHealthCheck() {
         return new MakeHealthCheck((Client) this);
     }
 
     /**
-     * Search for accounts. 
-     * /v2/accounts 
+     * Search for accounts.
+     * /v2/accounts
      */
     public SearchForAccounts searchForAccounts() {
         return new SearchForAccounts((Client) this);
     }
 
     /**
-     * Lookup account information. 
-     * /v2/accounts/{account-id} 
+     * Lookup account information.
+     * /v2/accounts/{account-id}
      */
     public LookupAccountByID lookupAccountByID(Address accountId) {
         return new LookupAccountByID((Client) this, accountId);
     }
 
     /**
-     * Lookup account transactions. 
-     * /v2/accounts/{account-id}/transactions 
+     * Lookup account transactions.
+     * /v2/accounts/{account-id}/transactions
      */
     public LookupAccountTransactions lookupAccountTransactions(Address accountId) {
         return new LookupAccountTransactions((Client) this, accountId);
     }
 
     /**
-     * Search for applications 
-     * /v2/applications 
+     * Search for applications
+     * /v2/applications
      */
     public SearchForApplications searchForApplications() {
         return new SearchForApplications((Client) this);
     }
 
     /**
-     * Lookup application. 
-     * /v2/applications/{application-id} 
+     * Lookup application.
+     * /v2/applications/{application-id}
      */
     public LookupApplication lookupApplication(Long applicationId) {
         return new LookupApplication((Client) this, applicationId);
     }
 
     /**
-     * Search for assets. 
-     * /v2/assets 
+     * Search for assets.
+     * /v2/assets
      */
     public SearchForAssets searchForAssets() {
         return new SearchForAssets((Client) this);
     }
 
     /**
-     * Lookup asset information. 
-     * /v2/assets/{asset-id} 
+     * Lookup asset information.
+     * /v2/assets/{asset-id}
      */
     public LookupAssetByID lookupAssetByID(Long assetId) {
         return new LookupAssetByID((Client) this, assetId);
     }
 
     /**
-     * Lookup the list of accounts who hold this asset 
-     * /v2/assets/{asset-id}/balances 
+     * Lookup the list of accounts who hold this asset
+     * /v2/assets/{asset-id}/balances
      */
     public LookupAssetBalances lookupAssetBalances(Long assetId) {
         return new LookupAssetBalances((Client) this, assetId);
     }
 
     /**
-     * Lookup transactions for an asset. 
-     * /v2/assets/{asset-id}/transactions 
+     * Lookup transactions for an asset.
+     * /v2/assets/{asset-id}/transactions
      */
     public LookupAssetTransactions lookupAssetTransactions(Long assetId) {
         return new LookupAssetTransactions((Client) this, assetId);
     }
 
     /**
-     * Lookup block. 
-     * /v2/blocks/{round-number} 
+     * Lookup block.
+     * /v2/blocks/{round-number}
      */
     public LookupBlock lookupBlock(Long roundNumber) {
         return new LookupBlock((Client) this, roundNumber);
     }
 
     /**
-     * Search for transactions. 
-     * /v2/transactions 
+     * Search for transactions.
+     * /v2/transactions
      */
     public SearchForTransactions searchForTransactions() {
         return new SearchForTransactions((Client) this);

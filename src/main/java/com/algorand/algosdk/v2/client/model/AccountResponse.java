@@ -11,7 +11,7 @@ public class AccountResponse extends PathResponse {
     public Account account;
 
     /**
-     * Round at which the results were computed. 
+     * Round at which the results were computed.
      */
     @JsonProperty("current-round")
     public Long currentRound;

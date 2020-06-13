@@ -9,12 +9,12 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Stores the global information associated with an application. 
+ * Stores the global information associated with an application.
  */
 public class ApplicationParams extends PathResponse {
 
     /**
-     * (approv) approval program. 
+     * (approv) approval program.
      */
     @JsonProperty("approval-program")
     public void approvalProgram(String base64Encoded) {
@@ -27,7 +27,7 @@ public class ApplicationParams extends PathResponse {
     public byte[] approvalProgram;
 
     /**
-     * (clearp) approval program. 
+     * (clearp) approval program.
      */
     @JsonProperty("clear-state-program")
     public void clearStateProgram(String base64Encoded) {
@@ -40,19 +40,19 @@ public class ApplicationParams extends PathResponse {
     public byte[] clearStateProgram;
 
     /**
-     * [\gs) global schema 
+     * [\gs) global schema
      */
     @JsonProperty("global-state")
     public List<TealKeyValue> globalState = new ArrayList<TealKeyValue>();
 
     /**
-     * [\lsch) global schema 
+     * [\lsch) global schema
      */
     @JsonProperty("global-state-schema")
     public ApplicationStateSchema globalStateSchema;
 
     /**
-     * [\lsch) local schema 
+     * [\lsch) local schema
      */
     @JsonProperty("local-state-schema")
     public ApplicationStateSchema localStateSchema;

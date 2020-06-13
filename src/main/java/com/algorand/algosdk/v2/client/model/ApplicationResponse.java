@@ -11,7 +11,7 @@ public class ApplicationResponse extends PathResponse {
     public Application application;
 
     /**
-     * Round at which the results were computed. 
+     * Round at which the results were computed.
      */
     @JsonProperty("current-round")
     public Long currentRound;

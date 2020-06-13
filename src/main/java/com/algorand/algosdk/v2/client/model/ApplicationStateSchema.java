@@ -6,18 +6,18 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Specifies maximums on the number of each type that may be stored. 
+ * Specifies maximums on the number of each type that may be stored.
  */
 public class ApplicationStateSchema extends PathResponse {
 
     /**
-     * (nbs) num of byte slices. 
+     * (nbs) num of byte slices.
      */
     @JsonProperty("num-byte-slice")
     public Long numByteSlice;
 
     /**
-     * (nui) num of uints. 
+     * (nui) num of uints.
      */
     @JsonProperty("num-uint")
     public Long numUint;
