@@ -564,22 +564,11 @@ public class Generator {
             TypeDef propType = getType(prop.getValue(), true, imports, goName, false);
 
             // Do not expose format property
-<<<<<<< variant A
             if (propType.javaTypeName.equals("Enums.Format")) {
                 if (!className.equals("AccountInformation")) {
                     // Don't set format to msgpack for AccountInformation
                     addFormatMsgpack = true;
                 }
->>>>>>> variant B
-            if (propType.typeName.equals("Enums.Format")) {
-                if (!className.equals("AccountInformation")) {
-                    // Don't set format to msgpack for AccountInformation
-                    addFormatMsgpack = true;
-                }
-####### Ancestor
-            if (propType.typeName.equals("Enums.Format")) {
-                addFormatMsgpack = true;
-======= end
                 continue;
             }
             String propCode = prop.getKey();
