@@ -1,10 +1,11 @@
-package com.algorand.algosdk.unit;
+package com.algorand.algosdk.cucumber.shared;
 
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.unit.Base;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -18,16 +19,16 @@ import java.security.NoSuchAlgorithmException;
 import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class Transactions {
+public class TransactionSteps {
     private final Base base;
-    private Transaction applicationTransaction = null;
-    private SignedTransaction signedTransaction = null;
+    public Transaction applicationTransaction = null;
+    public SignedTransaction signedTransaction = null;
 
-    public Transactions(Base b) {
+    public TransactionSteps(Base b) {
         this.base = b;
     }
 
-    private TEALProgram loadTEALProgramFromFile(String file) {
+    public static TEALProgram loadTEALProgramFromFile(String file) {
         try {
             return new TEALProgram(ResourceUtils.readResource(file));
         } catch (Exception e) {

@@ -136,13 +136,13 @@ public class Transaction implements Serializable {
     public List<Long> foreignApps = new ArrayList<>();
 
     @JsonProperty("apgs")
-    public StateSchema globalStateSchema = null;
+    public StateSchema globalStateSchema = new StateSchema();
 
     @JsonProperty("apid")
     public Long applicationId = 0L;
 
     @JsonProperty("apls")
-    public StateSchema localStateSchema = null;
+    public StateSchema localStateSchema = new StateSchema();
 
     @JsonProperty("apsu")
     public TEALProgram clearStateProgram = null;
