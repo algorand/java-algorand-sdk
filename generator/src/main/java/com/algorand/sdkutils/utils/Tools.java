@@ -65,7 +65,11 @@ public class Tools {
                 newName[n++] = Character.toUpperCase(name.charAt(i));
                 capNext = false;
             } else {
-                newName[n++] = name.charAt(i);
+                if (!firstCap && n == 0 && i == 0) {
+                    newName[n++] = name.substring(0,1).toLowerCase().charAt(0);
+                } else {
+                    newName[n++] = name.charAt(i);
+                }
             }
         }
         return new String(newName, 0, n);

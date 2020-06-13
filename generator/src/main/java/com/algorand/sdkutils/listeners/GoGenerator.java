@@ -5,12 +5,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -37,7 +36,6 @@ public class GoGenerator extends Subscriber {
     // ModelWriter is a manager of the model file writer
     // It is limited to only one file at a time.
     private ModelWriter modelWriter;
-
     
     // Query files
 
@@ -288,7 +286,9 @@ public class GoGenerator extends Subscriber {
 
     private void addPathParameter(TypeDef type) {
         String gotype = goType(type.rawTypeName, type.isOfType("array"));
-        String propName = Tools.getCamelCase(type.propertyName, false);
+        String propName = Tools.getCamelCase(
+                type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName, 
+                        false);
         pathParameters.put(propName, gotype);
 
         // client functions
@@ -302,12 +302,12 @@ public class GoGenerator extends Subscriber {
 
         // Also need to add this to the path struct (model)
         modelWriter.newProperty(type, Annotation.URL);
-
-        String funcName = Tools.getCamelCase(type.propertyName, true);
-        String paramName = Tools.getCamelCase(type.propertyName, false);
+        String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
+        String funcName = Tools.getCamelCase(propName, true);
+        String paramName = Tools.getCamelCase(propName, false);
         String desc = Tools.formatComment(type.doc, "", true);
         TypeConverter typeConv = goType(type.rawTypeName, type.isOfType("array"), 
-                true, paramName);
+                true, propName);
 
 
         append(queryFunctions, desc);
@@ -638,14 +638,15 @@ final class ModelWriter {
 
     public void newProperty(TypeDef type, GoGenerator.Annotation annType) {
         modelPropertyAdded = true;
+        String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
         GoGenerator.append(currentModelBuffer, "\n");
         GoGenerator.append(currentModelBuffer, Tools.formatComment(type.doc, GoGenerator.TAB, true));
-        GoGenerator.append(currentModelBuffer, GoGenerator.TAB + Tools.getCamelCase(type.propertyName, true) + " ");
+        GoGenerator.append(currentModelBuffer, GoGenerator.TAB + Tools.getCamelCase(propName, true) + " ");
         GoGenerator.append(currentModelBuffer, gogen.goType(type.rawTypeName, type.isOfType("array")) + " ");
         GoGenerator.append(currentModelBuffer, GoGenerator.goAnnotation(type.propertyName, annType, type.required));
-if( type.propertyName.equals("excludeCloseTo")) {
-        System.out.println("xxxxxxxxxxxxxxxxxxxx   " + type.propertyName);
-}
+        if (type.propertyName.charAt(0) == 'A') {
+            return;
+        }
     }
     
     // newModel can write into one file at a time.

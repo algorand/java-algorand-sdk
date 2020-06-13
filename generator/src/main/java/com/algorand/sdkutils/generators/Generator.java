@@ -44,7 +44,7 @@ public class Generator {
 
     // Get TypeDef for Address type. 
     // It provides the special getter/setter needed for this type.
-    static TypeDef getAddress(String propName,
+    static TypeDef getAddress(String propName, String goPropertyName,
             Map<String, Set<String>> imports, boolean forModel, String desc, boolean required) {
         addImport(imports, "com.algorand.algosdk.crypto.Address");
         if (forModel) {
@@ -67,12 +67,13 @@ public class Generator {
                 "        }\n" +
                 "    }\n" + 
                 "    public Address " + javaName + ";\n");
-        return new TypeDef("Address", "address", sb.toString(), "getterSetter", propName, desc, required);
+        return new TypeDef("Address", "address", sb.toString(), "getterSetter", propName, 
+                goPropertyName, desc, required);
     }
 
     // Get base64 encoded byte[] type.
     // It provides the special getter/setter needed for this type
-    static TypeDef getBase64Encoded(String propName, String rawType,
+    static TypeDef getBase64Encoded(String propName, String goPropertyName, String rawType,
             Map<String, Set<String>> imports, boolean forModel, String desc, boolean required) {
         if (imports != null) {
             addImport(imports, "com.algorand.algosdk.util.Encoder");
@@ -89,12 +90,13 @@ public class Generator {
                 "    }\n" +
                 "    public byte[] "+ javaName +";\n");
         // getterSetter typeName is only used in path.
-        return new TypeDef("byte[]", "byteArray", sb.toString(), "getterSetter", propName, desc, required);
+        return new TypeDef("byte[]", "byteArray", sb.toString(), "getterSetter", 
+                propName, goPropertyName, desc, required);
     }
 
     // Get array type of base64 encoded bytes.
     // It provides the special getter/setter needed for this type
-    static TypeDef getBase64EncodedArray(String propName, String rawType,
+    static TypeDef getBase64EncodedArray(String propName, String goPropertyName, String rawType,
             Map<String, Set<String>> imports, boolean forModel, String desc, boolean required) {
         if (forModel == false) {
             throw new RuntimeException("array of byte[] cannot yet be used in a path or path query.");
@@ -123,12 +125,13 @@ public class Generator {
                 "     }\n" +
                 "    public List<byte[]> " + javaName + ";\n");
         // getterSetter typeName is only used in path.
-        return new TypeDef("", rawType, sb.toString(), "getterSetter,array", propName, desc, required);
+        return new TypeDef("", rawType, sb.toString(), "getterSetter,array", 
+                propName, goPropertyName, desc, required);
     }
 
     // Get array type of base64 encoded bytes.
     // It provides the special getter/setter needed for this type
-    static TypeDef getEnum(JsonNode prop, String propName) {
+    static TypeDef getEnum(JsonNode prop, String propName, String goPropertyName) {
         JsonNode enumNode = prop.get("enum");
         if (enumNode == null) {
             throw new RuntimeException("Cannot find enum info in node: " + prop.toString());
@@ -163,7 +166,7 @@ public class Generator {
         enumClassName = "Enums." + enumClassName;
         String desc = prop.get("description") == null ? "" : prop.get("description").asText();
         return new TypeDef(enumClassName, prop.get("type").asText(), 
-                sb.toString(), "enum", propName, desc, isRequired(prop));
+                sb.toString(), "enum", propName, goPropertyName, desc, isRequired(prop));
     }
 
     // getType returns the type fron the JsonNode
@@ -172,7 +175,9 @@ public class Generator {
             boolean asObject,
             Map<String, Set<String>> imports,
             String propName, boolean forModel) {        
-        String desc = prop.get("description") == null ? "" : prop.get("description").asText();  
+        String desc = prop.get("description") == null ? "" : prop.get("description").asText();
+        String goName = prop.get("x-go-name") != null ? 
+                prop.get("x-go-name").asText() : "";
         if (prop.get("$ref") != null) {
             JsonNode typeNode = prop.get("$ref");
             String type = getTypeNameFromRef(typeNode.asText());
@@ -183,7 +188,7 @@ public class Generator {
                 desc = prop.get("description") == null ? "" : prop.get("description").asText(); 
             }
             if (hasProperties(prop)) {
-                return new TypeDef(type, type, propName, desc, isRequired(prop));
+                return new TypeDef(type, type, propName, goName, desc, isRequired(prop));
             }
         }
 
@@ -191,7 +196,7 @@ public class Generator {
             if (!forModel && !propName.equals("format")) {
                 addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
             }
-            return getEnum(prop, propName);
+            return getEnum(prop, propName, goName);
         }
 
         JsonNode typeNode = prop.get("type") != null ? prop : prop.get("schema");
@@ -200,50 +205,50 @@ public class Generator {
         if (!format.isEmpty() ) {
             switch (format) {
             case "uint64":
-                return new TypeDef("java.math.BigInteger", type, propName, desc, isRequired(prop));
+                return new TypeDef("java.math.BigInteger", type, propName, goName, desc, isRequired(prop));
             case "RFC3339 String":
                 addImport(imports, "java.util.Date");
                 addImport(imports, "com.algorand.algosdk.v2.client.common.Utils");
-                return new TypeDef("Date", "time", propName, desc, isRequired(prop));
+                return new TypeDef("Date", "time", propName, goName, desc, isRequired(prop));
             case "Address":
-                return getAddress(propName, imports, forModel, desc, isRequired(prop));
+                return getAddress(propName, goName, imports, forModel, desc, isRequired(prop));
             case "SignedTransaction":
                 addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
-                return new TypeDef("SignedTransaction", type, propName, desc, isRequired(prop));
+                return new TypeDef("SignedTransaction", type, propName, goName, desc, isRequired(prop));
             case "binary":
-                return getBase64Encoded(propName, type, null, forModel, desc, isRequired(prop));
+                return getBase64Encoded(propName, goName, type, null, forModel, desc, isRequired(prop));
             case "byte":
             case "base64":
             case "digest":
                 if (type.contentEquals("array")) {
                     type = prop.get("items").get("type").asText(); 
-                    return getBase64EncodedArray(propName, type, imports, forModel, desc, isRequired(prop));
+                    return getBase64EncodedArray(propName, goName, type, imports, forModel, desc, isRequired(prop));
                 } else {
-                    return getBase64Encoded(propName, type, imports, forModel, desc, isRequired(prop));
+                    return getBase64Encoded(propName, goName, type, imports, forModel, desc, isRequired(prop));
                 }
             case "AccountID":
                 break;
             case "BlockCertificate":
             case "BlockHeader":
                 addImport(imports, "java.util.HashMap");
-                return new TypeDef("HashMap<String,Object>", type, propName, desc, isRequired(prop));
+                return new TypeDef("HashMap<String,Object>", type, propName, goName, desc, isRequired(prop));
             }
         }
         switch (type) {
         case "integer":
             String longName = asObject ? "Long" : "long"; 
-            return new TypeDef(longName, type, propName, desc, isRequired(prop));
+            return new TypeDef(longName, type, propName, goName, desc, isRequired(prop));
         case "object":
         case "string":
-            return new TypeDef("String", type, propName, desc, isRequired(prop));
+            return new TypeDef("String", type, propName, goName, desc, isRequired(prop));
         case "boolean":
             String boolName = asObject ? "Boolean" : "boolean"; 
-            return new TypeDef(boolName, type, propName, desc, isRequired(prop));
+            return new TypeDef(boolName, type, propName, goName, desc, isRequired(prop));
         case "array":
             JsonNode arrayTypeNode = prop.get("items");
             TypeDef typeName = getType(arrayTypeNode, asObject, imports, propName, forModel);
             return new TypeDef("List<" + typeName.javaTypeName + ">", typeName.rawTypeName,
-                    typeName.def, type, propName, desc, isRequired(prop));
+                    typeName.def, type, propName, goName, desc, isRequired(prop));
         default:
             throw new RuntimeException("Unrecognized type: " + type);
         }
@@ -256,7 +261,6 @@ public class Generator {
         String format = typeNode.get("x-algorand-format") != null ? typeNode.get("x-algorand-format").asText() : "";
         String type = typeNode.get("type").asText();
         format = typeNode.get("format") != null && format.isEmpty() ? typeNode.get("format").asText() : format;
-        format = typeNode.get("x-go-name") != null && format.isEmpty() ? typeNode.get("x-go-name").asText() : format;
         if ((propName.equals("address") || 
                 propName.contentEquals("account-id") || 
                 propName.contentEquals("AccountID")) &&
@@ -399,8 +403,7 @@ public class Generator {
             Entry<String, JsonNode> prop = properties.next();
             String jprop = prop.getKey();
             String javaName = Tools.getCamelCase(jprop, false);
-            String goName = prop.getValue().get("x-go-name") == null ? jprop : prop.getValue().get("x-go-name").asText();
-            TypeDef typeObj = getType(prop.getValue(), true, imports, goName, true);
+            TypeDef typeObj = getType(prop.getValue(), true, imports, jprop, true);
             publisher.publish(Events.NEW_PROPERTY, typeObj);
             if (typeObj.isOfType("array")) {
                 addImport(imports, "java.util.ArrayList");
@@ -560,8 +563,7 @@ public class Generator {
             Entry<String, JsonNode> prop = properties.next();
             String propName = Tools.getCamelCase(prop.getKey(), false);
             String setterName = Tools.getCamelCase(prop.getKey(), false);
-            String goName = prop.getValue().get("x-go-name") == null ? prop.getKey() : prop.getValue().get("x-go-name").asText();
-            TypeDef propType = getType(prop.getValue(), true, imports, goName, false);
+            TypeDef propType = getType(prop.getValue(), true, imports, prop.getKey(), false);
 
             // Do not expose format property
             if (propType.javaTypeName.equals("Enums.Format")) {
@@ -796,7 +798,7 @@ public class Generator {
                     comment = cls.getValue().get("description").asText();
                     bw.append(Tools.formatComment(comment, "", true));
                 }
-                TypeDef enumType = getEnum(cls.getValue(), cls.getKey());
+                TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), "");
                 bw.append(enumType.def);
                 bw.append("\n");
             }
