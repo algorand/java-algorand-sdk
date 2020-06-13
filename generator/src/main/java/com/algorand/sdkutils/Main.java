@@ -4,7 +4,6 @@ import com.algorand.sdkutils.generators.Generator;
 import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.listeners.GoGenerator;
 import com.algorand.sdkutils.listeners.Publisher;
-import com.algorand.sdkutils.listeners.TestcaseGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.cli.*;
 
