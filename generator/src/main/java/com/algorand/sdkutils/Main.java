@@ -2,6 +2,9 @@ package com.algorand.sdkutils;
 
 import com.algorand.sdkutils.generators.Generator;
 import com.algorand.sdkutils.generators.Utils;
+import com.algorand.sdkutils.listeners.GoGenerator;
+import com.algorand.sdkutils.listeners.Publisher;
+import com.algorand.sdkutils.listeners.TestcaseGenerator;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.cli.*;
 
@@ -34,7 +37,8 @@ public class Main {
                     line.getOptionValue("c"),
                     line.getOptionValue("cp"),
                     line.getOptionValue("t"),
-                    !line.hasOption("tr"));
+                    !line.hasOption("tr"),
+                    null);
         } catch (ParseException e) {
             System.out.println("Problem processing arguments: " + e.getMessage());
             System.out.println("\n\n");
@@ -67,6 +71,7 @@ public class Main {
      * @param commonPackage  Package name to put at the top of generated client class.
      * @param tokenName      Name of the token used for this application. i.e. X-Algo-API-Token
      * @param tokenOptional  Whether or not a no-token version of the constructor should be created.
+     * @param goDirectory    When specified, will generate go code.
      */
     public static void Generate(
             String clientName,
@@ -78,23 +83,33 @@ public class Main {
             String commonPath,
             String commonPackage,
             String tokenName,
-            Boolean tokenOptional) throws Exception {
+            Boolean tokenOptional,
+            String goDirectory) throws Exception {
 
         JsonNode root;
         try (FileInputStream fis = new FileInputStream(specfile)) {
             root = Utils.getRoot(fis);
         }
 
-        Generator g = new Generator(root);
+        Generator g = null;
+        Publisher publisher = new Publisher();
+
+        if (goDirectory != null && !goDirectory.isEmpty()) {
+            g = new Generator(root, publisher);
+            new GoGenerator(goDirectory, "indexer", publisher); 
+        } else {
+            g = new Generator(root);
+        }
 
         // Generate classes from the schemas
+        // These are the non-premetive types for which classes are needed
         System.out.println("Generating " + modelPackage + " to " + modelPath);
-        Generator.generateAlgodIndexerObjects(root, modelPath, modelPackage);
-        Generator.generateEnumClasses(root, modelPath, modelPackage);
+        g.generateAlgodIndexerObjects(root, modelPath, modelPackage);
+        g.generateEnumClasses(root, modelPath, modelPackage);
 
         // Generate classes from the return types which have more than one return element
         System.out.println("Generating " + modelPackage + " to " + modelPath);
-        Generator.generateReturnTypes(root, modelPath, modelPackage);
+        g.generateReturnTypes(root, modelPath, modelPackage);
 
         // Generate the algod methods
         File imports = Files.createTempFile("imports_file", "txt").toFile();
@@ -119,6 +134,7 @@ public class Main {
                 commonPath,
                 tokenName,
                 tokenOptional);
+        publisher.terminate();
     }
 
     private static Options generateOptions() {

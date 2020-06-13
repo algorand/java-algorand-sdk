@@ -40,7 +40,6 @@ public class TestGenerator extends Generator {
         return null;
     }
 
-
     static String getPathFromLine(String line) {
         return line.substring(0, line.indexOf(","));
     }

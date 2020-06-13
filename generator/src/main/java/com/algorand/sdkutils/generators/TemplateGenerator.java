@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import com.algorand.sdkutils.utils.Tools;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class TemplateGenerator extends Generator{
@@ -39,7 +40,7 @@ public class TemplateGenerator extends Generator{
             }
 
             if (desc != null) {
-                notes.append(Generator.formatComment(desc, "", true)+"\n");
+                notes.append(Tools.formatComment(desc, "", true)+"\n");
             }
             notes.append(pathString+"\n");
 
@@ -57,7 +58,7 @@ public class TemplateGenerator extends Generator{
                 }
                 bw.append(", ");
                 if (parameter.getValue().get("description") != null) {
-                    notes.append(Generator.formatComment(parameter.getValue().get("description").asText(), "\t", true)+"\n");
+                    notes.append(Tools.formatComment(parameter.getValue().get("description").asText(), "\t", true)+"\n");
                     notes.append("\t"+parameter.getKey()+"\n");
                 }
             }

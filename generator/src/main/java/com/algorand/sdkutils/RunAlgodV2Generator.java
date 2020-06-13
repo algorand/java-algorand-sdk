@@ -20,7 +20,8 @@ public class RunAlgodV2Generator {
                 "../src/main/java/com/algorand/algosdk/v2/client/common",
                 "com.algorand.algosdk.v2.client.common",
                 "X-Algo-API-Token",
-                false);
+                false, 
+                "");
     }
 }
 
