@@ -108,7 +108,7 @@ public class TestLogic {
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isEmpty();
 
-        // ???
+        // Repeated int constants parsing
         byte[] int1 = new byte[10];
         Arrays.fill(int1, (byte)0x22);
         byte[] program2 = new byte[program.length + int1.length];
@@ -166,31 +166,35 @@ public class TestLogic {
     }
 
     @Test
-    public void testCheckProgramCostly() throws Exception {
-        byte[] program = {
-            0x01, 0x26, 0x01, 0x01, 0x01, 0x01, 0x28, 0x02  // byte 0x01 + keccak256
-        };
-        ArrayList<byte[]> args = new ArrayList<byte[]>();
+    public void testCheckProgramTealV2() throws Exception {
+        assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(2);
+        assertThat(getLogicSigVersion()).isGreaterThanOrEqualTo(2);
 
-        boolean valid = checkProgram(program, args);
-        assertThat(valid).isTrue();
+        {
+            // balance
+            byte[] program = {
+                0x02, 0x20, 0x01, 0x00, 0x22, 0x60  // int 0; balance
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
 
-        byte[] keccak25610 = new byte[10];
-        Arrays.fill(keccak25610, (byte)0x02);
+        // app_opted_in
+        {
+            byte[] program = {
+                0x02, 0x20, 0x01, 0x00, 0x22, 0x22, 0x61  // int 0; int 0; app_opted_in
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
 
-        byte[] program2 = new byte[program.length + keccak25610.length];
-        System.arraycopy(program, 0, program2, 0, program.length);
-        System.arraycopy(keccak25610, 0, program2, program.length, keccak25610.length);
-        valid = checkProgram(program2, args);
-        assertThat(valid).isTrue();
-
-        byte[] keccak256800 = new byte[800];
-        Arrays.fill(keccak256800, (byte)0x02);
-        byte[] program3 = new byte[program.length + keccak256800.length];
-        System.arraycopy(program, 0, program3, 0, program.length);
-        System.arraycopy(keccak256800, 0, program3, program.length, keccak256800.length);
-        assertThatThrownBy(() -> checkProgram(program3, args))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("program too costly to run");
+        {
+            // asset_holding_get
+            byte[] program = {
+                0x02, 0x20, 0x01, 0x00, 0x22, 0x70, 0x00  // int 0; int 0; asset_holding_get Balance
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
     }
 }
