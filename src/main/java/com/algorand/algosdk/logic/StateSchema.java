@@ -5,13 +5,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
 
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 @JsonPropertyOrder(alphabetic = true)
-public class StateSchema {
+public class StateSchema implements Serializable {
     @JsonProperty("nui")
     BigInteger numUint = BigInteger.ZERO;
 

@@ -98,7 +98,7 @@ public class Applications {
         this.transaction = builder.build();
     }
 
-    @Given("I create and fund a transient new account with {long} microalgos.")
+    @Given("I create a new transient account and fund it with {long} microalgos.")
     public void createAndFundTransientAccount(Long amount) throws Exception {
         // Create a new account.
         this.transientAccount = new Account();
