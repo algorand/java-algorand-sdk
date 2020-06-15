@@ -30,8 +30,11 @@ public class TEALProgram {
     @JsonCreator
     public TEALProgram(byte[] program) {
         if (program == null) return;
-        // TODO: Turn the check back on, convert exception into a runtime exception.
-        //Logic.readProgram(program, null);
+        try {
+            Logic.readProgram(program, null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         this.program = Arrays.copyOf(program, program.length);
     }
 
