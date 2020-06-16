@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import com.algorand.sdkutils.utils.Tools;
+import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class QueryMapperGenerator extends Generator {
@@ -93,8 +95,8 @@ public class QueryMapperGenerator extends Generator {
             return;
         }
         String className = path.getValue().findValue("operationId").asText();
-        String javaClassName = Generator.getCamelCase(className, true);
-        String methodName = Generator.getCamelCase(className, false);
+        String javaClassName = Tools.getCamelCase(className, true);
+        String methodName = Tools.getCamelCase(className, false);
 
         // getClass
         getClass.append("        case \""+className+"\":\n" + 
@@ -113,15 +115,15 @@ public class QueryMapperGenerator extends Generator {
 
         while (properties.hasNext()) {
             Entry<String, JsonNode> parameter = properties.next();
-            String javaSetParamName = Generator.getCamelCase(parameter.getKey(), false);
+            String javaSetParamName = Tools.getCamelCase(parameter.getKey(), false);
 
             JsonNode typeNode = parameter.getValue().get("type") != null ? parameter.getValue() : parameter.getValue().get("schema");
 
             String typeName = typeNode.get("type").asText();
             Iterator<JsonNode> enumVals = parameter.getValue().get("enum") == null ? null : 
                 parameter.getValue().get("enum").elements();
-            String javaEnumName = Generator.getCamelCase(parameter.getKey(), true);
-            String format = Generator.getTypeFormat(typeNode, javaSetParamName);
+            String javaEnumName = Tools.getCamelCase(parameter.getKey(), true);
+            String format = Generator.getTypeFormat(typeNode, parameter.getKey());
 
             if (inPath(parameter.getValue())) {
                 if (argCounter > 0) {
@@ -199,17 +201,17 @@ public class QueryMapperGenerator extends Generator {
                 if (cls.getKey().equals("format")) {
                     continue;
                 }
-                String enumName = Generator.getCamelCase(cls.getKey(), true);
+                String enumName = Tools.getCamelCase(cls.getKey(), true);
                 TypeDef enumType = getEnum(cls.getValue(), cls.getKey());
-                enumMappers.append("    public static " + enumType.typeName + " get" + enumName + "(String val) {\n");
+                enumMappers.append("    public static " + enumType.javaTypeName + " get" + enumName + "(String val) {\n");
                 enumMappers.append("        switch(val.toUpperCase()) {\n");
                 JsonNode enumNode = cls.getValue().get("enum");
                 Iterator<JsonNode> elmts = enumNode.elements();
                 while(elmts.hasNext()) {
                     String val = elmts.next().asText();
-                    String javaEnum = getCamelCase(val, true).toUpperCase();
+                    String javaEnum = Tools.getCamelCase(val, true).toUpperCase();
                     enumMappers.append("        case \"" + javaEnum + "\":\n");
-                    enumMappers.append("            return " + enumType.typeName + "." + javaEnum + ";\n");
+                    enumMappers.append("            return " + enumType.javaTypeName + "." + javaEnum + ";\n");
                 }
                 enumMappers.append("        default:\n            throw new RuntimeException(\"Enum value not recognized: \" + val +\"!\");\n");
                 enumMappers.append("        }\n    }\n");

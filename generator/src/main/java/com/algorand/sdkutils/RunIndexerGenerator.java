@@ -21,6 +21,7 @@ public class RunIndexerGenerator {
                 "../src/main/java/com/algorand/algosdk/v2/client/common",
                 "com.algorand.algosdk.v2.client.common",
                 "X-Indexer-API-Token",
-                true);
+                true,
+                "./go-sdk");
     }
 }
