@@ -1274,6 +1274,14 @@ public class Transaction implements Serializable {
                 Arrays.equals(lease, ((Transaction) o).lease);
     }
 
+    /**
+     * Helper to retrieve the address used for signing. Useful for rekeyTo transactions.
+     */
+    public Address getSigningAddress() {
+        if (rekeyTo != null) return rekeyTo;
+        return sender;
+    }
+
 
     /**
      * Create a {@link PaymentTransactionBuilder}.

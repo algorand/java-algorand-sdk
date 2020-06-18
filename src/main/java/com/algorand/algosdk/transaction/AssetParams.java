@@ -147,15 +147,4 @@ public class AssetParams implements Serializable {
                         @JsonProperty("c") byte[] assetClawback) {
         this(assetTotal, assetDecimals, assetDefaultFrozen, assetUnitName, assetName, url, metadataHash, new Address(assetManager), new Address(assetReserve), new Address(assetFreeze), new Address(assetClawback));
     }
-
-    /**
-     * Convert the given object to string with each line indented by 4 spaces
-     * (except the first line).
-     */
-    private String toIndentedString(Object o) {
-      if (o == null) {
-        return "null";
-      }
-      return o.toString().replace("\n", "\n    ");
-    }
 }
