@@ -1,8 +1,8 @@
 package com.algorand.algosdk.example;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.api.AlgodApi;
 import com.algorand.algosdk.algod.client.ApiException;
+import com.algorand.algosdk.algod.client.api.AlgodApi;
 import com.algorand.algosdk.algod.client.auth.ApiKeyAuth;
 import com.algorand.algosdk.algod.client.model.NodeStatus;
 import com.algorand.algosdk.algod.client.model.Supply;
@@ -26,9 +26,7 @@ import com.algorand.algosdk.v2.client.model.SupplyResponse;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 

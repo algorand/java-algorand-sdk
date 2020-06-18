@@ -1,13 +1,11 @@
 package com.algorand.algosdk.logic;
 
-import com.algorand.algosdk.crypto.Address;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.util.Arrays;
 
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)

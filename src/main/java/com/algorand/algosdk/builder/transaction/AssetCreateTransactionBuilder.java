@@ -3,7 +3,6 @@ package com.algorand.algosdk.builder.transaction;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.AssetParams;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
 import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;

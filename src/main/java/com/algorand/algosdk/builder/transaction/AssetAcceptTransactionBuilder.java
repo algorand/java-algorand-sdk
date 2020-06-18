@@ -1,12 +1,11 @@
 package com.algorand.algosdk.builder.transaction;
 
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.Transaction;
+
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
-
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
 
 /**
  * Build an asset accept transaction, which is used to mark an acount as willing to accept an asset.

@@ -1,7 +1,6 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.util.Objects;

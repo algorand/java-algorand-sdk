@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)

@@ -1,7 +1,6 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.TEALProgram;
-import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.Transaction;
 
 @SuppressWarnings("unchecked")
