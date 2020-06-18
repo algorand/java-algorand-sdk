@@ -1275,16 +1275,6 @@ public class Transaction implements Serializable {
     }
 
     /**
-     * Helper to retrieve the address used for signing. Useful for rekeyTo transactions.
-     */
-    public Address getSigningAddress() {
-        // If rekeyTo is non-zero, that overrides the sender.
-        if (rekeyTo != null && ! rekeyTo.equals(new Address())) return rekeyTo;
-        return sender;
-    }
-
-
-    /**
      * Create a {@link PaymentTransactionBuilder}.
      */
     public static PaymentTransactionBuilder<?> PaymentTransactionBuilder() {

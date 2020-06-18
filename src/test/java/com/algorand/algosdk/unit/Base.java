@@ -19,7 +19,10 @@ public class Base {
      * Helper to sign a transaction with the correct account, or fail the test if the correct account isn't available.
      */
     public SignedTransaction signTransaction(Transaction tx) throws NoSuchAlgorithmException {
-        String signingAddress = tx.getSigningAddress().toString();
+        String signingAddress = tx.sender.toString();
+        if (tx.rekeyTo != null && !tx.rekeyTo.equals(new Address())) {
+            signingAddress = tx.rekeyTo.toString();
+        }
 
         if (!signingAccounts.containsKey(signingAddress)) {
             Assertions.fail("We don't have a signing account for '" + signingAddress + "'");
