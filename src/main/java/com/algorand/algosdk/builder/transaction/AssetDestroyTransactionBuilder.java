@@ -1,9 +1,9 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * Build an asset destroy transaction.
@@ -36,9 +36,8 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
 
     @Override
     protected void applyTo(Transaction txn) {
-        if (this.getClass() == AssetDestroyTransactionBuilder.class) {
-            txn.type = Type.AssetConfig;
-        }
+        Objects.requireNonNull(assetIndex, "assetIndex is required.");
+
         if (assetIndex != null) {
             txn.assetIndex = assetIndex;
         }

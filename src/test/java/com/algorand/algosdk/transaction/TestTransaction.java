@@ -1,11 +1,7 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.Signature;
-import com.algorand.algosdk.crypto.MultisigSignature;
-import com.algorand.algosdk.crypto.LogicsigSignature;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
@@ -116,7 +112,7 @@ public class TestTransaction {
                 .clawback(clawback)
                 .build();
 
-        Transaction.AssetParams expectedParams = new Transaction.AssetParams(
+        AssetParams expectedParams = new AssetParams(
                 BigInteger.valueOf(100),
                 numDecimal,
                 false,
@@ -154,7 +150,7 @@ public class TestTransaction {
         String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
         String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
 
-        assertThatThrownBy(() -> new Transaction.AssetParams(
+        assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
                 3,
                 false,
@@ -169,7 +165,7 @@ public class TestTransaction {
             .isInstanceOf(RuntimeException.class)
             .hasMessageContaining("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded");
 
-        assertThatThrownBy(() -> new Transaction.AssetParams(
+        assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
                 3,
                 false,
@@ -238,7 +234,6 @@ public class TestTransaction {
         Address manager = addr;
         Address reserve = addr;
         Address freeze = addr;
-        Address clawback = addr;
 
         assertThatThrownBy(() -> Transaction.AssetConfigureTransactionBuilder()
                 .sender(sender)
@@ -292,7 +287,6 @@ public class TestTransaction {
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
         SignedTransaction o = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);
-        String sss = Encoder.encodeToJson(stx);
         String goldenString = "gqNzaWfEQAhru5V2Xvr19s4pGnI0aslqwY4lA2skzpYtDTAN9DKSH5+qsfQQhm4oq+9VHVj7e1rQC49S28vQZmzDTVnYDQGjdHhuiaRhZnJ6w6RmYWRkxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRmYWlkAaNmZWXNCRqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv+KNzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWkYWZyeg==";
 
         assertThat(encodedOutBytes).isEqualTo(goldenString);
@@ -311,8 +305,6 @@ public class TestTransaction {
         Address closeTo = new Address("IDUTJEUIEVSMXTU4LGTJWZ2UE2E6TIODUKU6UW3FU3UKIQQ77RLUBBBFLA");
         String goldenString = "gqNzaWfEQPhUAZ3xkDDcc8FvOVo6UinzmKBCqs0woYSfodlmBMfQvGbeUx3Srxy3dyJDzv7rLm26BRv9FnL2/AuT7NYfiAWjdHhui6NhbXTNA+ilY2xvc2XEIEDpNJKIJWTLzpxZpptnVCaJ6aHDoqnqW2Wm6KRCH/xXo2ZlZc0EmKJmds0wsqNnZW6sZGV2bmV0LXYzMy4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds00mqRub3RlxAjqABVHQ2y/lqNyY3bEIHts4k/rW6zAsWTinCIsV/X2PcOH1DkEglhBHF/hD3wCo3NuZMQg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGkdHlwZaNwYXk=";
 
-        String mn = "advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor";
-        byte[] gh = Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=");
         BigInteger firstValidRound = BigInteger.valueOf(12466);
         BigInteger lastValidRound = BigInteger.valueOf(13466);
         BigInteger amountToSend = BigInteger.valueOf(1000);
@@ -610,7 +602,6 @@ public class TestTransaction {
         assertThat(o).isEqualTo(tx);
 
         SignedTransaction stx = DEFAULT_ACCOUNT.signTransaction(tx);
-        String sss = Encoder.encodeToJson(stx);
         String encodedOutBytes = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
         String goldenString = "gqNzaWfEQHsgfEAmEHUxLLLR9s+Y/yq5WeoGo/jAArCbany+7ZYwExMySzAhmV7M7S8+LBtJalB4EhzEUMKmt3kNKk6+vAWjdHhuiqRhYW10AaRhcmN2xCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aRhc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aNmZWXNCqqiZnbOAATsD6JnaMQgSGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiKibHbOAATv96NzbmTEIAn70nYsCPhsWua/bdenqQHeZnXXUOB+jFx2mGR9tuH9pHR5cGWlYXhmZXKkeGFpZAE=";
         SignedTransaction stxDecoded = Encoder.decodeFromMsgPack(encodedOutBytes, SignedTransaction.class);

@@ -3,7 +3,6 @@ package com.algorand.algosdk.builder.transaction;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
 import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;
@@ -55,15 +54,10 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
 
     @Override
     protected void applyTo(Transaction txn) {
-        
         Objects.requireNonNull(sender, "sender is required");
         Objects.requireNonNull(firstValid, "firstValid is required");
         Objects.requireNonNull(lastValid, "lastValid is required");
         Objects.requireNonNull(genesisHash, "genesisHash is required");
-        
-        if (this.getClass() == KeyRegistrationTransactionBuilder.class) {
-            txn.type = Type.KeyRegistration;
-        }
 
         if (votePK != null) txn.votePK = votePK;
         if (selectionPK != null) txn.selectionPK = selectionPK;

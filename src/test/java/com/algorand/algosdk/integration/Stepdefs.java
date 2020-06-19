@@ -1,53 +1,40 @@
 package com.algorand.algosdk.integration;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
-import com.algorand.algosdk.crypto.MultisigAddress;
-import com.algorand.algosdk.crypto.MultisigSignature;
-import com.algorand.algosdk.transaction.SignedTransaction;
-import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.AlgoConverter;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.algorand.algosdk.algod.client.AlgodClient;
+import com.algorand.algosdk.algod.client.ApiException;
+import com.algorand.algosdk.algod.client.api.AlgodApi;
+import com.algorand.algosdk.algod.client.model.*;
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
 import com.algorand.algosdk.builder.transaction.TransactionBuilder;
-import com.algorand.algosdk.algod.client.AlgodClient;
-import com.algorand.algosdk.algod.client.api.AlgodApi;
-import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.algod.client.model.*;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
 import com.algorand.algosdk.kmd.client.model.*;
 import com.algorand.algosdk.mnemonic.Mnemonic;
-import com.algorand.algosdk.crypto.ParticipationPublicKey;
-import com.algorand.algosdk.crypto.VRFPublicKey;
-
-import java.math.BigInteger;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.AlgoConverter;
+import com.algorand.algosdk.util.Encoder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.threeten.bp.LocalDate;
 
-import java.util.List;
-import java.util.Set;
-import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -114,7 +101,7 @@ public class Stepdefs {
     BigInteger assetID = BigInteger.valueOf(1);
     String assetName = "testcoin";
     String assetUnitName = "coins";
-    Transaction.AssetParams expectedParams = null;
+    com.algorand.algosdk.transaction.AssetParams expectedParams = null;
     AssetParams queriedParams = new AssetParams();
 
     protected Address getAddress(int i) {
@@ -142,6 +129,19 @@ public class Stepdefs {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Convenience method to lookup a secret key and sign a transaction with the key.
+     */
+    public SignedTransaction signWithAddress(Transaction tx, Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+        ExportKeyRequest req = new ExportKeyRequest();
+        req.setAddress(addr.toString());
+        req.setWalletHandleToken(handle);
+        req.setWalletPassword(walletPswd);
+        byte[] secretKey = kcl.exportKey(req).getPrivateKey();
+        Account acct = new Account(Arrays.copyOfRange(secretKey, 0, 32));
+        return acct.signTransaction(tx);
     }
 
     /**

@@ -1,35 +1,24 @@
 package com.algorand.algosdk.account;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.SignatureException;
-import java.util.Arrays;
-
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
-import com.algorand.algosdk.crypto.LogicsigSignature;
-import com.algorand.algosdk.crypto.MultisigAddress;
-import com.algorand.algosdk.crypto.MultisigSignature;
-import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.crypto.Signature;
+import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Encoder;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.util.Arrays;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.

@@ -2,7 +2,6 @@ package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -53,10 +52,6 @@ public class PaymentTransactionBuilder<T extends PaymentTransactionBuilder<T>> e
         Objects.requireNonNull(firstValid, "firstValid is required.");
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
-
-        if (this.getClass() == PaymentTransactionBuilder.class) {
-            txn.type = Type.Payment;
-        }
 
         if (amount != null) txn.amount = amount;
         if (receiver != null) txn.receiver = receiver;

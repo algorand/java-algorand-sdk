@@ -1,11 +1,11 @@
 package com.algorand.algosdk.builder.transaction;
 
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
+
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Build an asset accept transaction, which is used to mark an acount as willing to accept an asset.
@@ -42,11 +42,10 @@ public class AssetAcceptTransactionBuilder<T extends AssetAcceptTransactionBuild
 
     @Override
     protected void applyTo(Transaction txn) {
-        if (this.getClass() == AssetAcceptTransactionBuilder.class) {  
-            txn.type = Type.AssetTransfer;
-        }
+        Objects.requireNonNull(assetIndex, "assetIndex is required");
+        Objects.requireNonNull(sender, "acceptingAccount is required");
 
-        if (assetIndex != null) txn.xferAsset = assetIndex; 
+        if (assetIndex != null) txn.xferAsset = assetIndex;
         if (sender != null) txn.assetReceiver = sender;
         txn.amount = BigInteger.valueOf(0);
     }

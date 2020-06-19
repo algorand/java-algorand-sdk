@@ -1,9 +1,7 @@
 package com.algorand.algosdk.unit;
 
-import com.algorand.algosdk.algod.client.model.PendingTransactions;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.TestingUtils;
-import com.algorand.algosdk.util.TestUtil;
 import com.algorand.algosdk.v2.client.algod.*;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.When;

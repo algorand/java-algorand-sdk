@@ -2,7 +2,6 @@ package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
@@ -59,9 +58,6 @@ public class AssetClawbackTransactionBuilder<T extends AssetClawbackTransactionB
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
-        if (this.getClass() == AssetClawbackTransactionBuilder.class) {
-            txn.type = Type.AssetTransfer;
-        }
         if (this.assetClawbackFrom != null) txn.assetSender = assetClawbackFrom;
         if (this.assetReceiver != null) txn.assetReceiver = assetReceiver;
         if (this.assetCloseTo != null) txn.assetCloseTo = assetCloseTo;

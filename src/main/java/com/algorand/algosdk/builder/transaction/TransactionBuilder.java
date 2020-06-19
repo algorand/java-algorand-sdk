@@ -53,6 +53,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         }
 
         Transaction txn = new Transaction();
+        txn.type = type;
         applyTo(txn);
 
         if (sender != null) txn.sender = sender;
