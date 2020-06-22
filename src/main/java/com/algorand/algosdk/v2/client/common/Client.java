@@ -30,7 +30,21 @@ public class Client {
     }
 
     public static HttpUrl getHttpUrl(QueryData qData, int port, String host) {
-        HttpUrl.Builder httpUrlBuilder = (new HttpUrl.Builder()).scheme("http").port(port).host(host);
+        HttpUrl.Builder httpUrlBuilder = null;
+        HttpUrl parsedHttpUrl = HttpUrl.parse(host);
+
+        if (parsedHttpUrl != null) {
+            httpUrlBuilder = parsedHttpUrl.newBuilder();
+
+            // If the default port is being used, override it with the port provided to our constructor.
+            if (HttpUrl.defaultPort(parsedHttpUrl.scheme()) == parsedHttpUrl.port()) {
+                httpUrlBuilder.port(port);
+            }
+        } else {
+            httpUrlBuilder = new HttpUrl.Builder();
+            httpUrlBuilder.scheme("http").port(port).host(host);
+        }
+
         for (String ps : qData.pathSegments) {
             httpUrlBuilder.addPathSegment(ps);
         }
