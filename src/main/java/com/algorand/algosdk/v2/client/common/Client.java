@@ -36,14 +36,16 @@ public class Client {
         if (parsedHttpUrl != null) {
             httpUrlBuilder = parsedHttpUrl.newBuilder();
 
-            // If the default port is being used, override it with the port provided to our constructor.
-            if (HttpUrl.defaultPort(parsedHttpUrl.scheme()) == parsedHttpUrl.port()) {
-                httpUrlBuilder.port(port);
+            // Don't allow shenanigans, they aren't always intentional.
+            if (parsedHttpUrl.port() != port) {
+                throw new RuntimeException("Different ports were specified in the host URI and the port");
             }
         } else {
-            httpUrlBuilder = new HttpUrl.Builder();
-            httpUrlBuilder.scheme("http").port(port).host(host);
+            httpUrlBuilder = new HttpUrl.Builder().scheme("http").host(host);
         }
+
+        // Set the port with URI and host formats.
+        httpUrlBuilder.port(port);
 
         for (String ps : qData.pathSegments) {
             httpUrlBuilder.addPathSegment(ps);

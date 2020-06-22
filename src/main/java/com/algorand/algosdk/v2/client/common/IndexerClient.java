@@ -16,7 +16,7 @@ public class IndexerClient extends Client {
 
     /**
      * Construct a IndexerClient for communicating with the REST API.
-     * @param host host in a plain "localhost" format or a URI format like "https://localhost".
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
      * @param port REST server port.
      * @param token authentication token.
      */
@@ -26,7 +26,7 @@ public class IndexerClient extends Client {
 
     /**
      * Construct a IndexerClient for communicating with the REST API.
-     * @param host host in a plain "localhost" format or a URI format like "https://localhost".
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
      * @param port REST server port.
      */
     public IndexerClient(String host, int port) {
