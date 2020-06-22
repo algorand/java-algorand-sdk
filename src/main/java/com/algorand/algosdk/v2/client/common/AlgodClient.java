@@ -17,6 +17,12 @@ import com.algorand.algosdk.crypto.Address;
 
 public class AlgodClient extends Client {
 
+    /**
+     * Construct a AlgodClient for communicating with the REST API.
+     * @param host host in a plain "localhost" format or a URI format like "https://localhost".
+     * @param port REST server port.
+     * @param token authentication token.
+     */
     public AlgodClient(String host, int port, String token) {
         super(host, port, token, "X-Algo-API-Token");
     }
