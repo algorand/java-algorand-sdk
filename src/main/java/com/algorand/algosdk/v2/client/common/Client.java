@@ -37,7 +37,7 @@ public class Client {
             httpUrlBuilder = parsedHttpUrl.newBuilder();
 
             // Don't allow shenanigans, they aren't always intentional.
-            if (parsedHttpUrl.port() != port) {
+            if (HttpUrl.defaultPort(parsedHttpUrl.scheme()) != parsedHttpUrl.port() && parsedHttpUrl.port() != port) {
                 throw new RuntimeException("Different ports were specified in the host URI and the port");
             }
         } else {
