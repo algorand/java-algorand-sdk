@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.common;
 
 public abstract class Query {
+<<<<<<< HEAD
 	private Client client;
 	private HttpMethod httpMethod;
 	protected QueryData qd;
@@ -22,6 +23,10 @@ public abstract class Query {
 		} else {
 			return new Response<T>(resp.code(), resp.body().string(), null, null);
 		}
+	}
+
+	public String getRequestUrl() {
+		return getRequestUrl(client.port, client.host);
 	}
 
 	public String getRequestUrl(int port, String host) {
