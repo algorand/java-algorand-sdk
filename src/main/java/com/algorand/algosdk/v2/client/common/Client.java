@@ -30,7 +30,23 @@ public class Client {
 	}
 
 	public static HttpUrl getHttpUrl(QueryData qData, int port, String host) {
-		HttpUrl.Builder httpUrlBuilder = (new HttpUrl.Builder()).scheme("http").port(port).host(host);
+		HttpUrl.Builder httpUrlBuilder = null;
+		HttpUrl parsedHttpUrl = HttpUrl.parse(host);
+
+		if (parsedHttpUrl != null) {
+			httpUrlBuilder = parsedHttpUrl.newBuilder();
+
+			// Don't allow shenanigans, they aren't always intentional.
+			if (HttpUrl.defaultPort(parsedHttpUrl.scheme()) != parsedHttpUrl.port() && parsedHttpUrl.port() != port) {
+				throw new RuntimeException("Different ports were specified in the host URI and the port");
+			}
+		} else {
+			httpUrlBuilder = new HttpUrl.Builder().scheme("http").host(host);
+		}
+
+		// Set the port with URI and host formats.
+		httpUrlBuilder.port(port);
+
 		for (String ps : qData.pathSegments) {
 			httpUrlBuilder.addPathSegment(ps);
 		}
