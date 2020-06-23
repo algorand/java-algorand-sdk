@@ -1,7 +1,6 @@
 package com.algorand.algosdk.v2.client.common;
 
 public abstract class Query {
-<<<<<<< HEAD
 	private Client client;
 	private HttpMethod httpMethod;
 	protected QueryData qd;
