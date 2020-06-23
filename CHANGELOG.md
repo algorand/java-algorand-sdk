@@ -1,3 +1,6 @@
+# 1.4.2
+- Accept URI formatting in AlgodClient and IndexerClient to specify connection scheme.
+
 # 1.4.1
 - Fix Algod V2 Client encoding issue.
 - Add missing TransactionBuilder helper for working with suggested parameters.

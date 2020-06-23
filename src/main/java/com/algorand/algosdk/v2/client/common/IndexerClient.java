@@ -14,12 +14,25 @@ import com.algorand.algosdk.crypto.Address;
 
 public class IndexerClient extends Client {
 
+    /**
+     * Construct a IndexerClient for communicating with the REST API.
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port REST server port.
+     * @param token authentication token.
+     */
     public IndexerClient(String host, int port, String token) {
         super(host, port, token, "X-Indexer-API-Token");
     }
+
+    /**
+     * Construct a IndexerClient for communicating with the REST API.
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port REST server port.
+     */
     public IndexerClient(String host, int port) {
         super(host, port, "", "X-Indexer-API-Token");
     }
+
     /**
      * /health 
      */
