@@ -8,7 +8,7 @@ import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
- * /metrics 
+ * /metrics
  */
 public class Metrics extends Query {
 

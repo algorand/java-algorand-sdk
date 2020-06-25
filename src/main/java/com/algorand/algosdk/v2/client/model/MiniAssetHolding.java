@@ -8,17 +8,21 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * A simplified version of AssetHolding 
+ * A simplified version of AssetHolding
  */
 public class MiniAssetHolding extends PathResponse {
 
     @JsonProperty("address")
     public void address(String address) throws NoSuchAlgorithmException {
-         this.address = new Address(address);
-     }
+        this.address = new Address(address);
+    }
     @JsonProperty("address")
     public String address() throws NoSuchAlgorithmException {
-        return this.address.encodeAsString();
+        if (this.address != null) {
+            return this.address.encodeAsString();
+        } else {
+            return null;
+        }
     }
     public Address address;
 

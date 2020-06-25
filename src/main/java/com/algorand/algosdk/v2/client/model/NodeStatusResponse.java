@@ -8,51 +8,51 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class NodeStatusResponse extends PathResponse {
 
     /**
-     * CatchupTime in nanoseconds 
+     * CatchupTime in nanoseconds
      */
     @JsonProperty("catchup-time")
     public Long catchupTime;
 
     /**
-     * LastRound indicates the last round seen 
+     * LastRound indicates the last round seen
      */
     @JsonProperty("last-round")
     public Long lastRound;
 
     /**
-     * LastVersion indicates the last consensus version supported 
+     * LastVersion indicates the last consensus version supported
      */
     @JsonProperty("last-version")
     public String lastVersion;
 
     /**
-     * NextVersion of consensus protocol to use 
+     * NextVersion of consensus protocol to use
      */
     @JsonProperty("next-version")
     public String nextVersion;
 
     /**
-     * NextVersionRound is the round at which the next consensus version will apply 
+     * NextVersionRound is the round at which the next consensus version will apply
      */
     @JsonProperty("next-version-round")
     public Long nextVersionRound;
 
     /**
-     * NextVersionSupported indicates whether the next consensus version is supported 
-     * by this node 
+     * NextVersionSupported indicates whether the next consensus version is supported
+     * by this node
      */
     @JsonProperty("next-version-supported")
     public Boolean nextVersionSupported;
 
     /**
-     * StoppedAtUnsupportedRound indicates that the node does not support the new 
-     * rounds and has stopped making progress 
+     * StoppedAtUnsupportedRound indicates that the node does not support the new
+     * rounds and has stopped making progress
      */
     @JsonProperty("stopped-at-unsupported-round")
     public Boolean stoppedAtUnsupportedRound;
 
     /**
-     * TimeSinceLastRound in nanoseconds 
+     * TimeSinceLastRound in nanoseconds
      */
     @JsonProperty("time-since-last-round")
     public Long timeSinceLastRound;

@@ -178,12 +178,15 @@ public class Generator {
         String desc = prop.get("description") == null ? "" : prop.get("description").asText();
         String goName = prop.get("x-go-name") != null ? 
                 prop.get("x-go-name").asText() : "";
-        if (prop.get("$ref") != null) {
-            JsonNode typeNode = prop.get("$ref");
-            String type = getTypeNameFromRef(typeNode.asText());
+        JsonNode refNode = prop.get("$ref");
+        if (refNode == null && prop.get("schema") != null) {
+            refNode = prop.get("schema").get("$ref");
+        }
+        if (refNode != null) {
+            String type = getTypeNameFromRef(refNode.asText());
             // Need to check here if this type does not have a class of its own 
             // No C/C++ style typedef in java, and this type could be a class with no properties
-            prop = getFromRef(typeNode.asText());
+            prop = getFromRef(refNode.asText());
             if (desc.isEmpty()) {
                 desc = prop.get("description") == null ? "" : prop.get("description").asText(); 
             }
@@ -597,6 +600,7 @@ public class Generator {
                 if (pAdded) {
                     generatedPathsEntry.append(",\n            ");
                 }
+                
                 generatedPathsEntry.append(propType.javaTypeName + " " + propName);
                 generatedPathsEntryBody.append(", " + propName);
                 pAdded = true;
@@ -713,7 +717,15 @@ public class Generator {
         spec = spec.get(httpMethod);
 
         String className = spec.get("operationId").asText();
-        String methodName = Tools.getCamelCase(className, false);
+        
+        /*
+         * TODO: this is a bug: function name should start with a small letter.
+         * However, v2 was released with function names first letter cap. 
+         * Will be good to fix in the future. 
+         * 
+         * Should use:  getCamelCase(className, false);
+         */
+        String methodName = Tools.getCamelCase(className, Character.isUpperCase(className.charAt(0)));
         className = Tools.getCamelCase(className, true);
 
         JsonNode paramNode = spec.get("parameters");
@@ -753,10 +765,11 @@ public class Generator {
         sb.append("\n");
         sb.append(Tools.formatComment(discAndPath, "", true));
         generatedPathsEntry.append(Tools.formatComment(discAndPath, TAB, true));
+        
         generatedPathsEntry.append("    public " + className + " " + methodName + "(");
         String [] strarray = {className, returnType, path, desc};
         this.publisher.publish(Events.NEW_QUERY, strarray);
-        
+   
         sb.append("public class " + className + " extends Query {\n\n");
         sb.append(
                 processQueryParams(

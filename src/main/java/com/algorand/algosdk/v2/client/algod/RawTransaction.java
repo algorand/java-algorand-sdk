@@ -9,7 +9,7 @@ import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 
 
 /**
- * /v2/transactions 
+ * /v2/transactions
  */
 public class RawTransaction extends Query {
 
@@ -18,7 +18,7 @@ public class RawTransaction extends Query {
     }
 
     /**
-     * The byte encoded signed transaction to broadcast to network 
+     * The byte encoded signed transaction to broadcast to network
      */
     public RawTransaction rawtxn(byte[] rawtxn) {
         addToBody(rawtxn);

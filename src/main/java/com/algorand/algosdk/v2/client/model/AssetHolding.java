@@ -6,34 +6,34 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Describes an asset held by an account. 
- * Definition: 
- * data/basics/userBalance.go : AssetHolding 
+ * Describes an asset held by an account.
+ * Definition:
+ * data/basics/userBalance.go : AssetHolding
  */
 public class AssetHolding extends PathResponse {
 
     /**
-     * (a) number of units held. 
+     * (a) number of units held.
      */
     @JsonProperty("amount")
     public java.math.BigInteger amount;
 
     /**
-     * Asset ID of the holding. 
+     * Asset ID of the holding.
      */
     @JsonProperty("asset-id")
     public Long assetId;
 
     /**
-     * Address that created this asset. This is the address where the parameters for 
-     * this asset can be found, and also the address where unwanted asset units can be 
-     * sent in the worst case. 
+     * Address that created this asset. This is the address where the parameters for
+     * this asset can be found, and also the address where unwanted asset units can be
+     * sent in the worst case.
      */
     @JsonProperty("creator")
     public String creator;
 
     /**
-     * (f) whether or not the holding is frozen. 
+     * (f) whether or not the holding is frozen.
      */
     @JsonProperty("is-frozen")
     public Boolean isFrozen;

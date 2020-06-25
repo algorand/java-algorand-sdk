@@ -179,6 +179,7 @@ public class GoGenerator extends Subscriber {
             addPathParameter(type);
             break;
         case BODY_CONTENT:
+            break;
         default:
             throw new RuntimeException("Unemplemented event for TypeDef! " + event);
         }

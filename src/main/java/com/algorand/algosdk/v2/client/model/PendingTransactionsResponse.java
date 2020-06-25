@@ -11,13 +11,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PendingTransactionsResponse extends PathResponse {
 
     /**
-     * An array of signed transaction objects. 
+     * An array of signed transaction objects.
      */
     @JsonProperty("top-transactions")
     public List<SignedTransaction> topTransactions = new ArrayList<SignedTransaction>();
 
     /**
-     * Total number of transactions in the pool. 
+     * Total number of transactions in the pool.
      */
     @JsonProperty("total-transactions")
     public Long totalTransactions;

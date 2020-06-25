@@ -11,7 +11,7 @@ public class AssetResponse extends PathResponse {
     public Asset asset;
 
     /**
-     * Round at which the results were computed. 
+     * Round at which the results were computed.
      */
     @JsonProperty("current-round")
     public Long currentRound;

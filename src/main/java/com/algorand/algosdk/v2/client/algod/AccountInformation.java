@@ -10,16 +10,16 @@ import com.algorand.algosdk.v2.client.model.Account;
 
 
 /**
- * Given a specific account public key, this call returns the accounts status, 
- * balance and spendable amounts 
- * /v2/accounts/{address} 
+ * Given a specific account public key, this call returns the accounts status,
+ * balance and spendable amounts
+ * /v2/accounts/{address}
  */
 public class AccountInformation extends Query {
 
     private Address address;
 
     /**
-     * @param address An account public key 
+     * @param address An account public key
      */
     public AccountInformation(Client client, Address address) {
         super(client, new HttpMethod("get"));

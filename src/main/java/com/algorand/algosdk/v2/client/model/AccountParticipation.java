@@ -7,13 +7,13 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * AccountParticipation describes the parameters used by this account in consensus 
- * protocol. 
+ * AccountParticipation describes the parameters used by this account in consensus
+ * protocol.
  */
 public class AccountParticipation extends PathResponse {
 
     /**
-     * (sel) Selection public key (if any) currently registered for this round. 
+     * (sel) Selection public key (if any) currently registered for this round.
      */
     @JsonProperty("selection-participation-key")
     public void selectionParticipationKey(String base64Encoded) {
@@ -26,26 +26,26 @@ public class AccountParticipation extends PathResponse {
     public byte[] selectionParticipationKey;
 
     /**
-     * (voteFst) First round for which this participation is valid. 
+     * (voteFst) First round for which this participation is valid.
      */
     @JsonProperty("vote-first-valid")
     public Long voteFirstValid;
 
     /**
-     * (voteKD) Number of subkeys in each batch of participation keys. 
+     * (voteKD) Number of subkeys in each batch of participation keys.
      */
     @JsonProperty("vote-key-dilution")
     public Long voteKeyDilution;
 
     /**
-     * (voteLst) Last round for which this participation is valid. 
+     * (voteLst) Last round for which this participation is valid.
      */
     @JsonProperty("vote-last-valid")
     public Long voteLastValid;
 
     /**
-     * (vote) root participation public key (if any) currently registered for this 
-     * round. 
+     * (vote) root participation public key (if any) currently registered for this
+     * round.
      */
     @JsonProperty("vote-participation-key")
     public void voteParticipationKey(String base64Encoded) {

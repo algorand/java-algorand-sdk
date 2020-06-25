@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Enums {
 
 /**
- * Combine with the address parameter to define what type of address to search for. 
+ * Combine with the address parameter to define what type of address to search for.
  */
     public enum AddressRole {
         @JsonProperty("sender") SENDER("sender"),
@@ -24,10 +24,10 @@ public class Enums {
     }
 
 /**
- * SigType filters just results using the specified type of signature: 
- *   sig - Standard 
- *   msig - MultiSig 
- *   lsig - LogicSig 
+ * SigType filters just results using the specified type of signature:
+ *   sig - Standard
+ *   msig - MultiSig
+ *   lsig - LogicSig
  */
     public enum SigType {
         @JsonProperty("sig") SIG("sig"),
