@@ -23,8 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 public class Utils {
 
     public static DiffResult showDifferentces(
-            String jsonA, String jsonB, 
-            String nameA, String nameB, 
+            String jsonA, String jsonB,
+            String nameA, String nameB,
             String filterSubstring) throws JsonParseException, JsonMappingException, IOException {
 
         StringBuffer full = new StringBuffer();
@@ -159,7 +159,7 @@ public class Utils {
         StringBuffer sb = new StringBuffer();
         sb.append("package " + packageName + ";\n\n");
         sb.append(imports);
-        sb.append("\n\n");        
+        sb.append("\n\n");
         sb.append("public class " + clientName + " extends Client {\n\n");
 
         sb.append("    /**\n");
@@ -167,7 +167,7 @@ public class Utils {
         sb.append("     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.\n");
         sb.append("     * @param port REST server port.\n");
         sb.append("     * @param token authentication token.\n");
-        sb.append("     */\n");        
+        sb.append("     */\n");
         sb.append("    public " + clientName + "(String host, int port, String token) {\n" +
                 "        super(host, port, token, \"" + tokenName + "\");\n" +
                 "    }\n");
@@ -177,7 +177,7 @@ public class Utils {
             sb.append("     * Construct an " + clientName + " for communicating with the REST API.\n");
             sb.append("     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.\n");
             sb.append("     * @param port REST server port.\n");
-            sb.append("     */\n");        
+            sb.append("     */\n");
             sb.append("    public " + clientName + "(String host, int port) {\n" +
                     "        super(host, port, \"\", \"" + tokenName + "\");\n" +
                     "    }\n\n");
