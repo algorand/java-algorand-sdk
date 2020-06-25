@@ -15,15 +15,15 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Lookup account transactions. 
- * /v2/accounts/{account-id}/transactions 
+ * Lookup account transactions.
+ * /v2/accounts/{account-id}/transactions
  */
 public class LookupAccountTransactions extends Query {
 
     private Address accountId;
 
     /**
-     * @param accountId account string 
+     * @param accountId account string
      */
     public LookupAccountTransactions(Client client, Address accountId) {
         super(client, new HttpMethod("get"));
@@ -31,7 +31,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Include results after the given time. Must be an RFC 3339 formatted string. 
+     * Include results after the given time. Must be an RFC 3339 formatted string.
      */
     public LookupAccountTransactions afterTime(Date afterTime) {
         addQuery("after-time", Utils.getDateString(afterTime));
@@ -39,7 +39,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Asset ID 
+     * Asset ID
      */
     public LookupAccountTransactions assetId(Long assetId) {
         addQuery("asset-id", String.valueOf(assetId));
@@ -47,7 +47,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Include results before the given time. Must be an RFC 3339 formatted string. 
+     * Include results before the given time. Must be an RFC 3339 formatted string.
      */
     public LookupAccountTransactions beforeTime(Date beforeTime) {
         addQuery("before-time", Utils.getDateString(beforeTime));
@@ -55,9 +55,9 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Results should have an amount greater than this value. MicroAlgos are the 
-     * default currency unless an asset-id is provided, in which case the asset will be 
-     * used. 
+     * Results should have an amount greater than this value. MicroAlgos are the
+     * default currency unless an asset-id is provided, in which case the asset will be
+     * used.
      */
     public LookupAccountTransactions currencyGreaterThan(Long currencyGreaterThan) {
         addQuery("currency-greater-than", String.valueOf(currencyGreaterThan));
@@ -65,8 +65,8 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Results should have an amount less than this value. MicroAlgos are the default 
-     * currency unless an asset-id is provided, in which case the asset will be used. 
+     * Results should have an amount less than this value. MicroAlgos are the default
+     * currency unless an asset-id is provided, in which case the asset will be used.
      */
     public LookupAccountTransactions currencyLessThan(Long currencyLessThan) {
         addQuery("currency-less-than", String.valueOf(currencyLessThan));
@@ -74,7 +74,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Maximum number of results to return. 
+     * Maximum number of results to return.
      */
     public LookupAccountTransactions limit(Long limit) {
         addQuery("limit", String.valueOf(limit));
@@ -82,7 +82,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Include results at or before the specified max-round. 
+     * Include results at or before the specified max-round.
      */
     public LookupAccountTransactions maxRound(Long maxRound) {
         addQuery("max-round", String.valueOf(maxRound));
@@ -90,7 +90,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Include results at or after the specified min-round. 
+     * Include results at or after the specified min-round.
      */
     public LookupAccountTransactions minRound(Long minRound) {
         addQuery("min-round", String.valueOf(minRound));
@@ -98,7 +98,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * The next page of results. Use the next token provided by the previous results. 
+     * The next page of results. Use the next token provided by the previous results.
      */
     public LookupAccountTransactions next(String next) {
         addQuery("next", String.valueOf(next));
@@ -106,7 +106,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Specifies a prefix which must be contained in the note field. 
+     * Specifies a prefix which must be contained in the note field.
      */
     public LookupAccountTransactions notePrefix(byte[] notePrefix) {
         addQuery("note-prefix", Encoder.encodeToBase64(notePrefix));
@@ -114,7 +114,15 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Include results for the specified round. 
+     * Include results which include the rekey-to field.
+     */
+    public LookupAccountTransactions rekeyTo(Boolean rekeyTo) {
+        addQuery("rekey-to", String.valueOf(rekeyTo));
+        return this;
+    }
+
+    /**
+     * Include results for the specified round.
      */
     public LookupAccountTransactions round(Long round) {
         addQuery("round", String.valueOf(round));
@@ -122,10 +130,10 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * SigType filters just results using the specified type of signature: 
-     *   sig - Standard 
-     *   msig - MultiSig 
-     *   lsig - LogicSig 
+     * SigType filters just results using the specified type of signature:
+     *   sig - Standard
+     *   msig - MultiSig
+     *   lsig - LogicSig
      */
     public LookupAccountTransactions sigType(Enums.SigType sigType) {
         addQuery("sig-type", String.valueOf(sigType));
@@ -138,7 +146,7 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Lookup the specific transaction by ID. 
+     * Lookup the specific transaction by ID.
      */
     public LookupAccountTransactions txid(String txid) {
         addQuery("txid", String.valueOf(txid));

@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
@@ -9,8 +10,8 @@ import com.algorand.algosdk.v2.client.model.AccountsResponse;
 
 
 /**
- * Search for accounts. 
- * /v2/accounts 
+ * Search for accounts.
+ * /v2/accounts
  */
 public class SearchForAccounts extends Query {
 
@@ -19,7 +20,7 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * Asset ID 
+     * Asset ID
      */
     public SearchForAccounts assetId(Long assetId) {
         addQuery("asset-id", String.valueOf(assetId));
@@ -27,9 +28,17 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * Results should have an amount greater than this value. MicroAlgos are the 
-     * default currency unless an asset-id is provided, in which case the asset will be 
-     * used. 
+     * Include accounts configured to use this spending key.
+     */
+    public SearchForAccounts authAddr(Address authAddr) {
+        addQuery("auth-addr", String.valueOf(authAddr));
+        return this;
+    }
+
+    /**
+     * Results should have an amount greater than this value. MicroAlgos are the
+     * default currency unless an asset-id is provided, in which case the asset will be
+     * used.
      */
     public SearchForAccounts currencyGreaterThan(Long currencyGreaterThan) {
         addQuery("currency-greater-than", String.valueOf(currencyGreaterThan));
@@ -37,8 +46,8 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * Results should have an amount less than this value. MicroAlgos are the default 
-     * currency unless an asset-id is provided, in which case the asset will be used. 
+     * Results should have an amount less than this value. MicroAlgos are the default
+     * currency unless an asset-id is provided, in which case the asset will be used.
      */
     public SearchForAccounts currencyLessThan(Long currencyLessThan) {
         addQuery("currency-less-than", String.valueOf(currencyLessThan));
@@ -46,7 +55,7 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * Maximum number of results to return. 
+     * Maximum number of results to return.
      */
     public SearchForAccounts limit(Long limit) {
         addQuery("limit", String.valueOf(limit));
@@ -54,7 +63,7 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * The next page of results. Use the next token provided by the previous results. 
+     * The next page of results. Use the next token provided by the previous results.
      */
     public SearchForAccounts next(String next) {
         addQuery("next", String.valueOf(next));
@@ -62,8 +71,8 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * Include results for the specified round. For performance reasons, this parameter 
-     * may be disabled on some configurations. 
+     * Include results for the specified round. For performance reasons, this parameter
+     * may be disabled on some configurations.
      */
     public SearchForAccounts round(Long round) {
         addQuery("round", String.valueOf(round));

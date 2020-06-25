@@ -9,16 +9,16 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
 
 
 /**
- * Waits for a block to appear after round {round} and returns the node's status at 
- * the time. 
- * /v2/status/wait-for-block-after/{round} 
+ * Waits for a block to appear after round {round} and returns the node's status at
+ * the time.
+ * /v2/status/wait-for-block-after/{round}
  */
 public class WaitForBlock extends Query {
 
     private Long round;
 
     /**
-     * @param round The round to wait until returning status 
+     * @param round The round to wait until returning status
      */
     public WaitForBlock(Client client, Long round) {
         super(client, new HttpMethod("get"));

@@ -10,15 +10,15 @@ import com.algorand.algosdk.v2.client.model.AccountResponse;
 
 
 /**
- * Lookup account information. 
- * /v2/accounts/{account-id} 
+ * Lookup account information.
+ * /v2/accounts/{account-id}
  */
 public class LookupAccountByID extends Query {
 
     private Address accountId;
 
     /**
-     * @param accountId account string 
+     * @param accountId account string
      */
     public LookupAccountByID(Client client, Address accountId) {
         super(client, new HttpMethod("get"));
@@ -26,7 +26,7 @@ public class LookupAccountByID extends Query {
     }
 
     /**
-     * Include results for the specified round. 
+     * Include results for the specified round.
      */
     public LookupAccountByID round(Long round) {
         addQuery("round", String.valueOf(round));

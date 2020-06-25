@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TransactionSignatureMultisigSubsignature extends PathResponse {
 
     /**
-     * (pk) 
+     * (pk)
      */
     @JsonProperty("public-key")
     public void publicKey(String base64Encoded) {
@@ -22,7 +22,7 @@ public class TransactionSignatureMultisigSubsignature extends PathResponse {
     public byte[] publicKey;
 
     /**
-     * (s) 
+     * (s)
      */
     @JsonProperty("signature")
     public void signature(String base64Encoded) {

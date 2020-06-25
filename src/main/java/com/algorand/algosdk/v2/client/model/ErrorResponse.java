@@ -6,7 +6,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * An error response with optional data field. 
+ * An error response with optional data field.
  */
 public class ErrorResponse extends PathResponse {
 

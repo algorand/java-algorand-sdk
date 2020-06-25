@@ -6,12 +6,12 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Specifies both the unique identifier and the parameters for an asset 
+ * Specifies both the unique identifier and the parameters for an asset
  */
 public class Asset extends PathResponse {
 
     /**
-     * unique asset identifier 
+     * unique asset identifier
      */
     @JsonProperty("index")
     public Long index;

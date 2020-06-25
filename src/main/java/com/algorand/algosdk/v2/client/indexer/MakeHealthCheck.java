@@ -9,7 +9,7 @@ import com.algorand.algosdk.v2.client.model.HealthCheck;
 
 
 /**
- * /health 
+ * /health
  */
 public class MakeHealthCheck extends Query {
 

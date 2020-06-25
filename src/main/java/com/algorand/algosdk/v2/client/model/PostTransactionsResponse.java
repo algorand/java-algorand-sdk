@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PostTransactionsResponse extends PathResponse {
 
     /**
-     * encoding of the transaction hash. 
+     * encoding of the transaction hash.
      */
     @JsonProperty("txId")
     public String txId;

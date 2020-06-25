@@ -7,8 +7,8 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Validation signature associated with some data. Only one of the signatures 
- * should be provided. 
+ * Validation signature associated with some data. Only one of the signatures
+ * should be provided.
  */
 public class TransactionSignature extends PathResponse {
 
@@ -19,7 +19,7 @@ public class TransactionSignature extends PathResponse {
     public TransactionSignatureMultisig multisig;
 
     /**
-     * (sig) Standard ed25519 signature. 
+     * (sig) Standard ed25519 signature.
      */
     @JsonProperty("sig")
     public void sig(String base64Encoded) {

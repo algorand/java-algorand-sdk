@@ -10,17 +10,17 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
 
 /**
- * Get the list of pending transactions by address, sorted by priority, in 
- * decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending 
- * transactions. 
- * /v2/accounts/{address}/transactions/pending 
+ * Get the list of pending transactions by address, sorted by priority, in
+ * decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending
+ * transactions.
+ * /v2/accounts/{address}/transactions/pending
  */
 public class GetPendingTransactionsByAddress extends Query {
 
     private Address address;
 
     /**
-     * @param address An account public key 
+     * @param address An account public key
      */
     public GetPendingTransactionsByAddress(Client client, Address address) {
         super(client, new HttpMethod("get"));
@@ -29,7 +29,7 @@ public class GetPendingTransactionsByAddress extends Query {
     }
 
     /**
-     * Truncated number of transactions to display. If max=0, returns all pending txns. 
+     * Truncated number of transactions to display. If max=0, returns all pending txns.
      */
     public GetPendingTransactionsByAddress max(Long max) {
         addQuery("max", String.valueOf(max));

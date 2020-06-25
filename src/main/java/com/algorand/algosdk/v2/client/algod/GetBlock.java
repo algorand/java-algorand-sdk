@@ -9,14 +9,14 @@ import com.algorand.algosdk.v2.client.model.BlockResponse;
 
 
 /**
- * /v2/blocks/{round} 
+ * /v2/blocks/{round}
  */
 public class GetBlock extends Query {
 
     private Long round;
 
     /**
-     * @param round The round from which to fetch block information. 
+     * @param round The round from which to fetch block information.
      */
     public GetBlock(Client client, Long round) {
         super(client, new HttpMethod("get"));

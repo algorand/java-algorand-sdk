@@ -9,15 +9,15 @@ import com.algorand.algosdk.v2.client.model.Block;
 
 
 /**
- * Lookup block. 
- * /v2/blocks/{round-number} 
+ * Lookup block.
+ * /v2/blocks/{round-number}
  */
 public class LookupBlock extends Query {
 
     private Long roundNumber;
 
     /**
-     * @param roundNumber Round number 
+     * @param roundNumber Round number
      */
     public LookupBlock(Client client, Long roundNumber) {
         super(client, new HttpMethod("get"));

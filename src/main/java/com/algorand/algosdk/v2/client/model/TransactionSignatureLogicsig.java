@@ -9,14 +9,14 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * (lsig) Programatic transaction signature. 
- * Definition: 
- * data/transactions/logicsig.go 
+ * (lsig) Programatic transaction signature.
+ * Definition:
+ * data/transactions/logicsig.go
  */
 public class TransactionSignatureLogicsig extends PathResponse {
 
     /**
-     * (arg) Logic arguments, base64 encoded. 
+     * (arg) Logic arguments, base64 encoded.
      */
     @JsonProperty("args")
     public void args(List<String> base64Encoded) {
@@ -36,8 +36,8 @@ public class TransactionSignatureLogicsig extends PathResponse {
     public List<byte[]> args;
 
     /**
-     * (l) Program signed by a signature or multi signature, or hashed to be the 
-     * address of ana ccount. Base64 encoded TEAL program. 
+     * (l) Program signed by a signature or multi signature, or hashed to be the
+     * address of ana ccount. Base64 encoded TEAL program.
      */
     @JsonProperty("logic")
     public void logic(String base64Encoded) {
@@ -53,7 +53,7 @@ public class TransactionSignatureLogicsig extends PathResponse {
     public TransactionSignatureMultisig multisigSignature;
 
     /**
-     * (sig) ed25519 signature. 
+     * (sig) ed25519 signature.
      */
     @JsonProperty("signature")
     public void signature(String base64Encoded) {

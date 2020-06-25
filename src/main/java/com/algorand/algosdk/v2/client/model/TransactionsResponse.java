@@ -10,14 +10,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TransactionsResponse extends PathResponse {
 
     /**
-     * Round at which the results were computed. 
+     * Round at which the results were computed.
      */
     @JsonProperty("current-round")
     public Long currentRound;
 
     /**
-     * Used for pagination, when making another request provide this token with the 
-     * next parameter. 
+     * Used for pagination, when making another request provide this token with the
+     * next parameter.
      */
     @JsonProperty("next-token")
     public String nextToken;

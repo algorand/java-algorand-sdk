@@ -9,52 +9,52 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PendingTransactionResponse extends PathResponse {
 
     /**
-     * The asset index if the transaction was found and it created an asset. 
+     * The asset index if the transaction was found and it created an asset.
      */
     @JsonProperty("asset-index")
     public Long assetIndex;
 
     /**
-     * Rewards in microalgos applied to the close remainder to account. 
+     * Rewards in microalgos applied to the close remainder to account.
      */
     @JsonProperty("close-rewards")
     public Long closeRewards;
 
     /**
-     * Closing amount for the transaction. 
+     * Closing amount for the transaction.
      */
     @JsonProperty("closing-amount")
     public Long closingAmount;
 
     /**
-     * The round where this transaction was confirmed, if present. 
+     * The round where this transaction was confirmed, if present.
      */
     @JsonProperty("confirmed-round")
     public Long confirmedRound;
 
     /**
-     * Indicates that the transaction was kicked out of this node's transaction pool 
-     * (and specifies why that happened). An empty string indicates the transaction 
-     * wasn't kicked out of this node's txpool due to an error. 
-     * 
+     * Indicates that the transaction was kicked out of this node's transaction pool
+     * (and specifies why that happened). An empty string indicates the transaction
+     * wasn't kicked out of this node's txpool due to an error.
+     *
      */
     @JsonProperty("pool-error")
     public String poolError;
 
     /**
-     * Rewards in microalgos applied to the receiver account. 
+     * Rewards in microalgos applied to the receiver account.
      */
     @JsonProperty("receiver-rewards")
     public Long receiverRewards;
 
     /**
-     * Rewards in microalgos applied to the sender account. 
+     * Rewards in microalgos applied to the sender account.
      */
     @JsonProperty("sender-rewards")
     public Long senderRewards;
 
     /**
-     * The raw signed transaction. 
+     * The raw signed transaction.
      */
     @JsonProperty("txn")
     public SignedTransaction txn;

@@ -9,9 +9,9 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
 
 /**
- * Get the list of pending transactions, sorted by priority, in decreasing order, 
- * truncated at the end at MAX. If MAX = 0, returns all pending transactions. 
- * /v2/transactions/pending 
+ * Get the list of pending transactions, sorted by priority, in decreasing order,
+ * truncated at the end at MAX. If MAX = 0, returns all pending transactions.
+ * /v2/transactions/pending
  */
 public class GetPendingTransactions extends Query {
 
@@ -21,7 +21,7 @@ public class GetPendingTransactions extends Query {
     }
 
     /**
-     * Truncated number of transactions to display. If max=0, returns all pending txns. 
+     * Truncated number of transactions to display. If max=0, returns all pending txns.
      */
     public GetPendingTransactions max(Long max) {
         addQuery("max", String.valueOf(max));

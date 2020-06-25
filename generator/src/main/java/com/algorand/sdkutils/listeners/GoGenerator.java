@@ -179,6 +179,7 @@ public class GoGenerator extends Subscriber {
             addPathParameter(type);
             break;
         case BODY_CONTENT:
+            break;
         default:
             throw new RuntimeException("Unemplemented event for TypeDef! " + event);
         }
@@ -482,11 +483,13 @@ public class GoGenerator extends Subscriber {
             }
             break;
         case "object":
-            goType =  "*map[string]interface{}";
+        case "SignedTransaction":
+            if (array) {
+                goType =  "map[string]interface{}";
+            } else {
+                goType =  "*map[string]interface{}";
+            }
             break;
-            
-        //case "array":
-          //  goType = 
 
         case "Asset":
         case "AssetHolding":
@@ -512,10 +515,20 @@ public class GoGenerator extends Subscriber {
         case "TransactionSignatureLogicsig":
         case "TransactionSignatureMultisig":
         case "TransactionSignatureMultisigSubsignature":
+        case "ApplicationLocalStates":
+        case "EvalDelta":
+        case "DryrunState":
+        case "AccountStateDelta":
+        case "VersionBuild":
+        case "DryrunApp":
+        case "DryrunSource":
+        case "DryrunTxnResult":
+        case "EvalDeltaKeyValue":
+        case "StaleDelta":            
             goType = type;
             break;
         default:
-            goType = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx";            
+            goType = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";            
         }
         if (array) {
             return new TypeConverter("[]" + goType, converter);
