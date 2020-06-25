@@ -513,10 +513,20 @@ public class GoGenerator extends Subscriber {
         case "TransactionSignatureLogicsig":
         case "TransactionSignatureMultisig":
         case "TransactionSignatureMultisigSubsignature":
+        case "ApplicationLocalStates":
+        case "EvalDelta":
+        case "DryrunState":
+        case "AccountStateDelta":
+        case "VersionBuild":
+        case "DryrunApp":
+        case "DryrunSource":
+        case "DryrunTxnResult":
+        case "EvalDeltaKeyValue":
+        case "StaleDelta":            
             goType = type;
             break;
         default:
-            goType = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx";            
+            goType = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";            
         }
         if (array) {
             return new TypeConverter("[]" + goType, converter);
