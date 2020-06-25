@@ -21,7 +21,7 @@ public class RunAlgodV2Generator {
                 "com.algorand.algosdk.v2.client.common",
                 "X-Algo-API-Token",
                 false, 
-                "./go-sdk-algodv2");
+                "");
     }
 }
 
