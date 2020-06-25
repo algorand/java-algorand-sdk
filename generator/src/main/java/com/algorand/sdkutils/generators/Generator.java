@@ -217,7 +217,7 @@ public class Generator {
                 return getAddress(propName, goName, imports, forModel, desc, isRequired(prop));
             case "SignedTransaction":
                 addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
-                return new TypeDef("SignedTransaction", type, propName, goName, desc, isRequired(prop));
+                return new TypeDef("SignedTransaction", format, propName, goName, desc, isRequired(prop));
             case "binary":
                 return getBase64Encoded(propName, goName, type, null, forModel, desc, isRequired(prop));
             case "byte":

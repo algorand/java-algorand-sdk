@@ -483,11 +483,13 @@ public class GoGenerator extends Subscriber {
             }
             break;
         case "object":
-            goType =  "*map[string]interface{}";
+        case "SignedTransaction":
+            if (array) {
+                goType =  "map[string]interface{}";
+            } else {
+                goType =  "*map[string]interface{}";
+            }
             break;
-            
-        //case "array":
-          //  goType = 
 
         case "Asset":
         case "AssetHolding":
