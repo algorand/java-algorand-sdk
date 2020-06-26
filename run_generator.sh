@@ -67,6 +67,7 @@ fi
 mvn package
 
 java -jar target/generator-*-jar-with-dependencies.jar \
+       java \
        -c  "../src/main/java/com/algorand/algosdk/v2/client/common" \
        -cp "com.algorand.algosdk.v2.client.common" \
        -m  "../src/main/java/com/algorand/algosdk/v2/client/model" \
@@ -78,6 +79,7 @@ java -jar target/generator-*-jar-with-dependencies.jar \
        -s  "$INDEXER_SPEC"
 
 java -jar target/generator-*-jar-with-dependencies.jar \
+       java \
        -c  "../src/main/java/com/algorand/algosdk/v2/client/common" \
        -cp "com.algorand.algosdk.v2.client.common" \
        -m  "../src/main/java/com/algorand/algosdk/v2/client/model" \
