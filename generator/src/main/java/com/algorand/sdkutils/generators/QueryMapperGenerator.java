@@ -9,7 +9,7 @@ import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class QueryMapperGenerator extends Generator {
+public class QueryMapperGenerator extends OpenApiParser {
 
     JsonNode indexer;
     JsonNode algod;
@@ -130,7 +130,7 @@ public class QueryMapperGenerator extends Generator {
             Iterator<JsonNode> enumVals = parameter.getValue().get("enum") == null ? null : 
                 parameter.getValue().get("enum").elements();
             String javaEnumName = Tools.getCamelCase(parameter.getKey(), true);
-            String format = Generator.getTypeFormat(typeNode, parameter.getKey());
+            String format = OpenApiParser.getTypeFormat(typeNode, parameter.getKey());
 
             if (inPath(parameter.getValue())) {
                 if (argCounter > 0) {

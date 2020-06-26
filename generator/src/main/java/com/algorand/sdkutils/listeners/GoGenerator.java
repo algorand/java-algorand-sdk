@@ -75,14 +75,7 @@ public class GoGenerator extends Subscriber {
 
 
     public GoGenerator(String rootFolder, String packageName, Publisher publisher) throws IOException {
-        publisher.subscribe(Events.NEW_MODEL, this);
-        publisher.subscribe(Events.NEW_PROPERTY, this);
-        publisher.subscribe(Events.NEW_RETURN_TYPE, this);
-        publisher.subscribe(Events.NEW_QUERY, this);
-        publisher.subscribe(Events.QUERY_PARAMETER, this);
-        publisher.subscribe(Events.PATH_PARAMETER, this);
-        publisher.subscribe(Events.BODY_CONTENT, this);
-        publisher.subscribe(Events.END_QUERY, this);
+        publisher.subscribeAll(this);
 
         modelWriter = null;
         clientFunctions = new TreeMap<String, String>();

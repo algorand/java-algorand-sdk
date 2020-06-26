@@ -13,7 +13,7 @@ import com.algorand.sdkutils.generated.QueryMapper;
  */
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class TestGenerator extends Generator {
+public class TestGenerator extends OpenApiParser {
     static String callExternalCurl(String request) {
         StringBuffer bw = new StringBuffer();
         ProcessBuilder processBuilder = new ProcessBuilder();

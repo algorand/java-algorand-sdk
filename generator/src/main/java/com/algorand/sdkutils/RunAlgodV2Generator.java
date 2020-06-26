@@ -10,7 +10,7 @@ public class RunAlgodV2Generator {
         }
         File specfile = new File(specFilePath);
 
-        Main.Generate(
+        Generate.Generate(
                 "AlgodClient",
                 specfile,
                 "../src/main/java/com/algorand/algosdk/v2/client/model",

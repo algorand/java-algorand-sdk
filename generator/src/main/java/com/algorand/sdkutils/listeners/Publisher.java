@@ -37,7 +37,18 @@ public class Publisher {
             subscriber.terminate();
         }
     }
-    
+
+    public void subscribeAll(Subscriber sub) {
+        subscribe(Events.NEW_MODEL, sub);
+        subscribe(Events.NEW_PROPERTY, sub);
+        subscribe(Events.NEW_RETURN_TYPE, sub);
+        subscribe(Events.NEW_QUERY, sub);
+        subscribe(Events.QUERY_PARAMETER, sub);
+        subscribe(Events.PATH_PARAMETER, sub);
+        subscribe(Events.BODY_CONTENT, sub);
+        subscribe(Events.END_QUERY, sub);
+    }
+
     public void subscribe(Events event, Subscriber subscriber) {
         if (subscribers.get(event) == null) {
             subscribers.put(event, new ArrayList<Subscriber>());

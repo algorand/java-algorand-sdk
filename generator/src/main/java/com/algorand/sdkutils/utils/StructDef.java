@@ -9,4 +9,9 @@ public class StructDef {
         this.name = name;
         this.doc = doc;
     }
+
+    @Override
+    public String toString() {
+        return "name: '" + name + "', " + "doc: '" + doc + "'";
+    }
 }
