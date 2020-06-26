@@ -2,15 +2,8 @@ package com.algorand.sdkutils.generators;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 import com.algorand.sdkutils.listeners.Publisher;
 import com.algorand.sdkutils.listeners.Publisher.Events;
@@ -168,8 +161,10 @@ public class OpenApiParser {
         sb.append(TAB + "public enum " + enumClassName + " {\n");
 
         Iterator<JsonNode> elmts = enumNode.elements();
+        List<String> enumValues = new ArrayList<>();
         while(elmts.hasNext()) {
             String val = elmts.next().asText();
+            enumValues.add(val);
             sb.append(TAB + TAB + "@JsonProperty(\"" + val + "\") ");
             String javaEnum = Tools.getCamelCase(val, true).toUpperCase();
             sb.append(javaEnum);
@@ -192,8 +187,11 @@ public class OpenApiParser {
         sb.append(TAB + "}\n");
         enumClassName = "Enums." + enumClassName;
         String desc = prop.get("description") == null ? "" : prop.get("description").asText();
-        return new TypeDef(enumClassName, prop.get("type").asText(), 
+
+        TypeDef td = new TypeDef(enumClassName, prop.get("type").asText(),
                 sb.toString(), "enum", propName, goPropertyName, desc, isRequired(prop));
+        td.enumValues = enumValues;
+        return td;
     }
 
     // getType returns the type fron the JsonNode

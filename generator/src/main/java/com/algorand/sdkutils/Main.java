@@ -66,6 +66,7 @@ public class Main {
 
         JCommander root = JCommander.newBuilder()
                 .addObject(common)
+                //.addCommand("go", go)
                 .addCommand("java", java)
                 .addCommand("responses", responses)
                 .build();
@@ -126,7 +127,7 @@ public class Main {
         }
 
         Publisher pub = new Publisher();
-        ResponseGenerator generator = new ResponseGenerator(pub);
+        ResponseGenerator subscriber = new ResponseGenerator(pub);
         OpenApiParser parser = new OpenApiParser(root, pub);
         parser.parse();
     }
