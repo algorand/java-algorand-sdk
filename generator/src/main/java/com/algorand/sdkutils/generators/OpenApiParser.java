@@ -427,31 +427,6 @@ public class OpenApiParser {
         return null;
     }
 
-    /*
-     *  {
-     *      int field1 = rand();
-     *      int field2 = rand();
-     *      Schema schema1 = new Schema(rand(), rand());
-     *      Schema schema2 = new Schema(rand(), rand());
-     *   }
-     *
-     *   {
-     *       "field1": { "type": integer },
-     *       "field2": { "type": integer },
-     *       "schema1": { "type": $ref:Schema },
-     *       "schema2": { "type": $ref:Schema },
-     *       "program": {
-     *           "type": "object",
-     *           "properties" : {
-                     "field1": { "type": integer },
-                     "field2": { "type": integer },
-     *           }
-     *       }
-     *   }
-     *
-     *
-     */
-
     // Write the properties of the Model class.
     void writeProperties(StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties, Map<String, Set<String>> imports) {
         while (properties.hasNext()) {
