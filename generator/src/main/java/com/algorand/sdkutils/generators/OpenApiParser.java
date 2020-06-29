@@ -789,9 +789,9 @@ public class OpenApiParser {
         }
 
         generatedPathsEntry.append(Tools.formatComment(discAndPath, TAB, true));
-        
+
         generatedPathsEntry.append("    public " + className + " " + methodName + "(");
-        String [] strarray = {className, returnType, path, desc};
+        String [] strarray = {className, returnType, path, desc, httpMethod};
         this.publisher.publish(Events.NEW_QUERY, strarray);
 
         if (legacyMode) {

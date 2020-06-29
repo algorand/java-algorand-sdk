@@ -61,6 +61,8 @@ public class GoGenerator extends Subscriber {
     private String pathDesc;
     // path encoded with place-holders from the spec
     private String path;
+    // request method
+    private String httpMethod;
 
     // client functions
 
@@ -122,15 +124,17 @@ public class GoGenerator extends Subscriber {
     // Constructs the Do function, which returns the response object 
     private StringBuffer getDoFunction() {
         StringBuffer sb = new StringBuffer();
+        String desc = Tools.formatCommentGo("Do performs HTTP request", "", "");
+        sb.append(desc);
         sb.append("func (s *" + currentQueryName + ") Do(ctx context.Context,\n" + 
                 TAB + "headers ...*common.Header) (response models." + currentQueryReturn + ", err error) {\n");
 
-        sb.append(TAB + "err = s.c.get(ctx, &response,\n");
+        sb.append(TAB + "err = s.c." + this.httpMethod + "(ctx, &response,\n");
         sb.append(TAB + TAB + processPath());
         if (queryFunctions.length() == 0) {
             sb.append(", nil, headers)\n");
         } else {
-            sb.append(", s.p, headers)\n");   
+            sb.append(", s.p, headers)\n");
         }
 
         sb.append(TAB + "return\n}\n");
@@ -144,7 +148,7 @@ public class GoGenerator extends Subscriber {
             endQuery();
             break;
         default:
-            throw new RuntimeException("Unemplemented event! " + event);
+            throw new RuntimeException("Unimplemented event! " + event);
         }
     }
 
@@ -152,10 +156,10 @@ public class GoGenerator extends Subscriber {
     public void onEvent(Events event, String [] notes) {
         switch(event) {
         case NEW_QUERY:
-            newQuery(notes[0], notes[1], notes[2], notes[3]);
+            newQuery(notes[0], notes[1], notes[2], notes[3], notes[4]);
             break;
         default:
-            throw new RuntimeException("Unemplemented event for note! " + event);
+            throw new RuntimeException("Unimplemented event for note! " + event);
         }
     }
 
@@ -174,7 +178,7 @@ public class GoGenerator extends Subscriber {
         case BODY_CONTENT:
             break;
         default:
-            throw new RuntimeException("Unemplemented event for TypeDef! " + event);
+            throw new RuntimeException("Unimplemented event for TypeDef! " + event);
         }
     }
 
@@ -243,7 +247,7 @@ public class GoGenerator extends Subscriber {
         if (pathParameters.size() > 0) {
             pathSB.append(")");
         }
-        
+
         return pathSB;
     }
 
@@ -253,10 +257,12 @@ public class GoGenerator extends Subscriber {
             String className,
             String returnTypeName,
             String path,
-            String desc) {
+            String desc,
+            String httpMethod) {
 
-        pathDesc = path + "\n" + desc;
+        this.pathDesc = path + "\n" + desc;
         this.path = path;
+        this.httpMethod = httpMethod;
         currentQueryName = Tools.getCamelCase(className, true);
         currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
 
@@ -287,7 +293,7 @@ public class GoGenerator extends Subscriber {
 
         // client functions
         if (pathParameters.size() > 1) {
-            clientFunction.append(", ");   
+            clientFunction.append(", ");
         }
         clientFunction.append(propName + " " + gotype);
     }
@@ -299,7 +305,7 @@ public class GoGenerator extends Subscriber {
         String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
         String funcName = Tools.getCamelCase(propName, true);
         String paramName = Tools.getCamelCase(propName, false);
-        String desc = Tools.formatComment(type.doc, "", true);
+        String desc = Tools.formatCommentGo(type.doc, funcName, "");
         TypeConverter typeConv = goType(type.rawTypeName, type.isOfType("array"), 
                 true, propName);
 
@@ -340,7 +346,7 @@ public class GoGenerator extends Subscriber {
         append(queryWriter, getImports());
         append(queryWriter, ")\n\n");
 
-        append(queryWriter, Tools.formatComment(pathDesc, "", true));
+        append(queryWriter, Tools.formatCommentGo(pathDesc, currentQueryName, ""));
         append(queryWriter, "type " + currentQueryName + " struct {\n");
 
         int formattingWidth = 1;
@@ -370,7 +376,7 @@ public class GoGenerator extends Subscriber {
         clientFunction.append("}\n}\n\n");
 
         clientFunctions.put(currentQueryName, 
-                Tools.formatComment(pathDesc, "", true) + clientFunction.toString());
+                Tools.formatCommentGo(pathDesc, "", "") + clientFunction.toString());
 
         append(queryWriter, queryFunctions.toString());
         append(queryWriter, getDoFunction());
@@ -645,9 +651,10 @@ final class ModelWriter {
     public void newProperty(TypeDef type, GoGenerator.Annotation annType) {
         modelPropertyAdded = true;
         String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
+        propName = Tools.getCamelCase(propName, true);
         GoGenerator.append(currentModelBuffer, "\n");
-        GoGenerator.append(currentModelBuffer, Tools.formatComment(type.doc, GoGenerator.TAB, true));
-        GoGenerator.append(currentModelBuffer, GoGenerator.TAB + Tools.getCamelCase(propName, true) + " ");
+        GoGenerator.append(currentModelBuffer, Tools.formatCommentGo(type.doc, propName, GoGenerator.TAB));
+        GoGenerator.append(currentModelBuffer, GoGenerator.TAB + propName + " ");
         GoGenerator.append(currentModelBuffer, gogen.goType(type.rawTypeName, type.isOfType("array")) + " ");
         GoGenerator.append(currentModelBuffer, GoGenerator.goAnnotation(type.propertyName, annType, type.required));
         if (type.propertyName.charAt(0) == 'A') {
@@ -675,7 +682,7 @@ final class ModelWriter {
         }
         currentModelBuffer = new StringBuffer();
         if (sDef.doc != null) {
-            GoGenerator.append(currentModelBuffer, Tools.formatComment(sDef.doc, "", true));
+            GoGenerator.append(currentModelBuffer, Tools.formatCommentGo(sDef.doc, sDef.name, ""));
         }
         GoGenerator.append(currentModelBuffer, "type " + sDef.name + " struct {");
         pendingOpenStruct = true;
