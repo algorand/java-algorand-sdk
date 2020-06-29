@@ -18,7 +18,7 @@ import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
 
-public class GoGenerator extends Subscriber {
+public class GoGenerator implements Subscriber {
 
     enum Annotation {
         JSON,

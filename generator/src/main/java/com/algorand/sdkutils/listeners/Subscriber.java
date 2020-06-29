@@ -4,11 +4,11 @@ import com.algorand.sdkutils.listeners.Publisher.Events;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
 
-public abstract class Subscriber {
+public interface Subscriber {
     
-    public abstract void terminate();
+    void terminate();
     
-    public abstract void onEvent(Events event);
+    void onEvent(Events event);
     
     /**
      * Used for:
@@ -16,7 +16,7 @@ public abstract class Subscriber {
      * @param event
      * @param note
      */
-    public abstract void onEvent(Events event, String [] notes);
+    void onEvent(Events event, String [] notes);
     
     /**
      * Used for: 
@@ -24,7 +24,7 @@ public abstract class Subscriber {
      * @param event
      * @param type
      */
-    public abstract void onEvent(Events event, TypeDef type);
+    void onEvent(Events event, TypeDef type);
     
     /**
      * Used for:
@@ -32,6 +32,6 @@ public abstract class Subscriber {
      * @param event
      * @param sDef
      */
-    public abstract void onEvent(Events event, StructDef sDef);
+    void onEvent(Events event, StructDef sDef);
 }
  

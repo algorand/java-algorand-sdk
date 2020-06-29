@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class ResponseGenerator extends Subscriber {
+public class ResponseGenerator implements Subscriber {
 
     @Parameters(commandDescription = "Generate response test file(s).")
     public static class ResponseGeneratorArgs extends Main.CommonArgs {
