@@ -11,6 +11,44 @@ import java.io.File;
 import java.io.FileInputStream;
 
 public class Main {
+
+    /**
+     * Main function. Setup argument parser and direct results to the appropriate handler.
+     */
+    public static void main (String argv[]) throws Exception {
+        // Empty argument objects.
+        CommonArgs common = new CommonArgs();
+        JavaGeneratorArgs java = new JavaGeneratorArgs();
+        ResponseGeneratorArgs responses = new ResponseGeneratorArgs();
+
+        // Collect configuration and parse arguments.
+        JCommander root = JCommander.newBuilder()
+                .addObject(common)
+                //.addCommand("go", go)
+                .addCommand("java", java)
+                .addCommand("responses", responses)
+                .build();
+        root.parse(argv);
+
+        // Root level help generated from parameter annotations.
+        if (common.help) {
+            root.usage();
+            return;
+        }
+
+        // Route to command handler.
+        String commandName = root.getParsedCommand();
+        JCommander command = root.getCommands().get(commandName);
+        switch(commandName) {
+            case "java":
+                javaGenerator(java, command);
+                return;
+            case "responses":
+                responseGenerator(responses, command);
+                return;
+        }
+    }
+
     public static class CommonArgs {
         @Parameter(names = {"-h", "--help"}, help = true)
         boolean help = false;
@@ -53,48 +91,6 @@ public class Main {
     public static class ResponseGeneratorArgs extends CommonArgs {
         @Parameter(names = {"-f", "--filter"}, description = "Only generate response files for types matching this filter regex.")
         String filter;
-    }
-
-    private static void OptionRouter(String argv[]) throws Exception {
-        CommonArgs common = new CommonArgs();
-
-        // Java command
-        JavaGeneratorArgs java = new JavaGeneratorArgs();
-
-        // Response generator
-        ResponseGeneratorArgs responses = new ResponseGeneratorArgs();
-
-        JCommander root = JCommander.newBuilder()
-                .addObject(common)
-                //.addCommand("go", go)
-                .addCommand("java", java)
-                .addCommand("responses", responses)
-                .build();
-
-        root.parse(argv);
-
-        if (common.help) {
-            root.usage();
-            return;
-        }
-
-        String commandName = root.getParsedCommand();
-        JCommander command = root.getCommands().get(commandName);
-
-        switch(commandName) {
-            case "java":
-                javaGenerator(java, command);
-                return;
-            case "responses":
-                responseGenerator(responses, command);
-                return;
-
-        }
-
-    }
-
-    public static void main (String argv[]) throws Exception {
-        OptionRouter(argv);
     }
 
     /**

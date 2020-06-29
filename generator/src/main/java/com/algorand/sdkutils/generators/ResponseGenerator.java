@@ -5,6 +5,10 @@ import com.algorand.sdkutils.listeners.Subscriber;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 public class ResponseGenerator extends Subscriber {
 
     public ResponseGenerator(Publisher publisher) {
@@ -13,7 +17,8 @@ public class ResponseGenerator extends Subscriber {
 
     @Override
     public void terminate() {
-        System.out.println("TERMINATE");
+        //System.out.println("TERMINATE");
+
     }
 
     @Override
@@ -26,13 +31,30 @@ public class ResponseGenerator extends Subscriber {
         System.out.println("(event, []notes) - " + String.join(",", notes));
     }
 
+    HashMap<StructDef, List<TypeDef>> responses = new HashMap<>();
+    HashMap<StructDef, List<TypeDef>> models = new HashMap<>();
+    List<TypeDef> activeList = null;
+    //StructDef activeDef;
+
     @Override
     public void onEvent(Publisher.Events event, TypeDef type) {
-        System.out.println("(event, TypeDef) - " + type.toString());
+        if (event == Publisher.Events.NEW_PROPERTY) {
+            activeList.add(type);
+            //System.out.println("(event, TypeDef) - " + type.toString());
+        } else {
+            System.out.println(event);
+        }
     }
 
     @Override
     public void onEvent(Publisher.Events event, StructDef sDef) {
-        System.out.println("(event, TypeDef) - " + sDef.toString());
+        activeList = new ArrayList<>();
+        if (event == Publisher.Events.NEW_MODEL) {
+            models.put(sDef, activeList);
+            System.out.println("(event, TypeDef) - " + sDef.toString());
+        } else {
+            responses.put(sDef, activeList);
+            System.out.println(event);
+        }
     }
 }
