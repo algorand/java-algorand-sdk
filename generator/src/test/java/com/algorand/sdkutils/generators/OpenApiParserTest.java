@@ -3,6 +3,7 @@ package com.algorand.sdkutils.generators;
 import com.algorand.sdkutils.listeners.Publisher;
 import com.algorand.sdkutils.listeners.Subscriber;
 import com.algorand.sdkutils.utils.StructDef;
+import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableList;
 import net.bytebuddy.asm.Advice;
@@ -41,8 +42,9 @@ class OpenApiParserTest {
         parser.parse();
 
         // Then - verify that some of the expected events
-        List<String> expectedStructs = ImmutableList.of("ApiResponse", "Category", "Pet", "Tag", "Order", "User");
 
+        // 'onEvent(evt, StructDef)` is called as expected
+        List<String> expectedStructs = ImmutableList.of("ApiResponse", "Category", "Pet", "Tag", "Order", "User");
         ArgumentCaptor<StructDef> structDefArgumentCaptor = ArgumentCaptor.forClass(StructDef.class);
         verify(subscriber, times(expectedStructs.size()))
                 .onEvent(any(), structDefArgumentCaptor.capture());
@@ -50,5 +52,17 @@ class OpenApiParserTest {
         assertThat(structDefArgumentCaptor.getAllValues())
                 .extracting("name")
                 .containsAll(expectedStructs);
+
+        // 'onEvent(evt)' - called 14 times, once for each END_QUERY.
+        verify(subscriber, times(14))
+                .onEvent(any());
+
+        // 'onEvent(evt, []String)` - called 14 times, once for each NEW_QUERY.
+        verify(subscriber, times(14))
+                .onEvent(any(), any(String[].class));
+
+        // Property, Path param, Query param, Body
+        verify(subscriber, times(27))
+                .onEvent(any(), any(TypeDef.class));
     }
 }
