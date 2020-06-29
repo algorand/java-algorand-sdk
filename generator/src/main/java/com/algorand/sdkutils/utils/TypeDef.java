@@ -56,7 +56,14 @@ public class TypeDef {
 
     @Override
     public String toString() {
-        throw new RuntimeException("Should not get the string value of the object directly!");
+        return
+                "javaTypeName: '" + javaTypeName + "', " +
+                "rawTypeName: '" + rawTypeName + "', " +
+                "def: '" + def + "', " +
+                "propertyName: '" + propertyName + "', " +
+                "goPropertyName: '" + goPropertyName + "', " +
+                "doc: '" + doc + "', " +
+                "required: '" + required + "'";
     }
 
     public String javaTypeName;

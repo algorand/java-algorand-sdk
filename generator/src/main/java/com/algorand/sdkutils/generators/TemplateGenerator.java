@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import com.algorand.sdkutils.utils.Tools;
 import com.fasterxml.jackson.databind.JsonNode;
 
-public class TemplateGenerator extends Generator{
+public class TemplateGenerator extends OpenApiParser {
 
     public TemplateGenerator(JsonNode root) {
         super(root);

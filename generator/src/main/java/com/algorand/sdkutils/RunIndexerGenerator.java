@@ -11,7 +11,7 @@ public class RunIndexerGenerator {
         }
         File specfile = new File(specFilePath);
 
-        Main.Generate(
+        Generate.Generate(
                 "IndexerClient",
                 specfile,
                 "../src/main/java/com/algorand/algosdk/v2/client/model",

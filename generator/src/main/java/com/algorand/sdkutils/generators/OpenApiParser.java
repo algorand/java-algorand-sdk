@@ -1,9 +1,7 @@
 package com.algorand.sdkutils.generators;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,11 +18,40 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.algorand.sdkutils.utils.*;
 
-public class Generator {
+public class OpenApiParser {
     public static final String TAB = "    ";
 
     protected JsonNode root;
     protected Publisher publisher;
+    protected final boolean legacyMode;
+
+    /**
+     * Parse the file and drive the publisher.
+     */
+    public void parse() throws Exception {
+        // TODO: Verify compatible OpenAPI version.
+
+        System.out.println("Parsing definitions.");
+        this.generateAlgodIndexerObjects(root, null, null);
+
+        // Generate classes from the return types which have more than one return element
+        System.out.println("Parsing responses.");
+        this.generateReturnTypes(root, null, null);
+
+        // Generate the algod methods
+        File imports = Files.createTempFile("imports_file", "txt").toFile();
+        File paths = Files.createTempFile("paths_file", "txt").toFile();
+
+        System.out.println("Parsing paths.");
+        this.generateQueryMethods(
+                null,
+                null,
+                null,
+                imports,
+                paths);
+
+        publisher.terminate();
+    }
 
     static BufferedWriter getFileWriter(String className, String directory) throws IOException {
         File f = new File(directory + "/" + className + ".java");
@@ -457,8 +484,6 @@ public class Generator {
 
         Iterator<Entry<String, JsonNode>> properties = getSortedProperties(propertiesNode);
         className = Tools.getCamelCase(className, true);
-        BufferedWriter bw = getFileWriter(className, directory);
-        bw.append("package " + pkg + ";\n\n");
 
         HashMap<String, Set<String>> imports = new HashMap<String, Set<String>>();
         StringBuffer body = new StringBuffer();
@@ -473,14 +498,19 @@ public class Generator {
         addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
         addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
 
-        bw.append(getImports(imports));
-        if (desc != null) {
-            bw.append(Tools.formatComment(desc, "", true));
+        if (legacyMode) {
+            BufferedWriter bw = getFileWriter(className, directory);
+            bw.append("package " + pkg + ";\n\n");
+
+            bw.append(getImports(imports));
+            if (desc != null) {
+                bw.append(Tools.formatComment(desc, "", true));
+            }
+            bw.append("public class " + className + " extends PathResponse {\n\n");
+            bw.append(body);
+            bw.append("}\n");
+            bw.close();
         }
-        bw.append("public class " + className + " extends PathResponse {\n\n");
-        bw.append(body);
-        bw.append("}\n");
-        bw.close();
     }
 
     // getPathInserts converts the path string into individual tokens which correspond
@@ -557,7 +587,7 @@ public class Generator {
 
         StringBuffer generatedPathsEntryBody = new StringBuffer();
 
-        requestMethod.append(Generator.getQueryResponseMethod(returnType));
+        requestMethod.append(OpenApiParser.getQueryResponseMethod(returnType));
         requestMethod.append("    protected QueryData getRequestString() {\n");
         boolean pAdded = false;
         boolean addFormatMsgpack = false;
@@ -734,9 +764,9 @@ public class Generator {
             returnType = spec.get("responses").get("200").get("$ref").asText();
             JsonNode returnTypeNode = this.getFromRef(returnType);
             if (returnTypeNode.get("schema").get("$ref") != null) {
-                returnType = Generator.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
+                returnType = OpenApiParser.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
             } else {
-                returnType = Generator.getTypeNameFromRef(returnType);
+                returnType = OpenApiParser.getTypeNameFromRef(returnType);
                 returnType = Tools.getCamelCase(returnType, true);
             }
         }
@@ -748,9 +778,6 @@ public class Generator {
             properties = getSortedParameters(paramNode);
         }
 
-        BufferedWriter bw = getFileWriter(className, directory);
-        bw.append("package " + pkg + ";\n\n");
-
         Map<String, Set<String>> imports = new HashMap<String, Set<String>>();
         addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
         addImport(imports, "com.algorand.algosdk.v2.client.common.HttpMethod");
@@ -761,69 +788,75 @@ public class Generator {
             addImport(imports, modelPkg + "." + returnType);
         }
 
-        StringBuffer sb = new StringBuffer();
-        sb.append("\n");
-        sb.append(Tools.formatComment(discAndPath, "", true));
         generatedPathsEntry.append(Tools.formatComment(discAndPath, TAB, true));
 
         generatedPathsEntry.append("    public " + className + " " + methodName + "(");
         String [] strarray = {className, returnType, path, desc, httpMethod};
         this.publisher.publish(Events.NEW_QUERY, strarray);
 
-        sb.append("public class " + className + " extends Query {\n\n");
-        sb.append(
-                processQueryParams(
-                        generatedPathsEntry,
-                        properties,
-                        className,
-                        path,
-                        returnType,
-                        httpMethod,
-                        imports));
-        sb.append("\n}");
-        bw.append(getImports(imports));
-        bw.append(sb);
-        bw.close();
+        if (legacyMode) {
+            StringBuffer sb = new StringBuffer();
+            sb.append("\n");
+            sb.append(Tools.formatComment(discAndPath, "", true));
+            sb.append("public class " + className + " extends Query {\n\n");
+            sb.append(
+                    processQueryParams(
+                            generatedPathsEntry,
+                            properties,
+                            className,
+                            path,
+                            returnType,
+                            httpMethod,
+                            imports));
+            sb.append("\n}");
 
+            BufferedWriter bw = getFileWriter(className, directory);
+            bw.append("package " + pkg + ";\n\n");
+            bw.append(getImports(imports));
+            bw.append(sb);
+            bw.close();
+        }
+        
         publisher.publish(Events.END_QUERY);
     }
 
     // Generate all the enum classes in the spec file. 
     public void generateEnumClasses (JsonNode root, String rootPath, String pkg) throws IOException {
+        if (legacyMode) {
+            BufferedWriter bw = getFileWriter("Enums", rootPath);
+            bw.append("package " + pkg + ";\n\n");
+            bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
+            bw.append("public class Enums {\n\n");
+            JsonNode parameters = root.get("parameters");
+            Iterator<Entry<String, JsonNode>> classes = parameters.fields();
+            while (classes.hasNext()) {
+                Entry<String, JsonNode> cls = classes.next();
+                if (cls.getValue().get("enum") != null) {
 
-        BufferedWriter bw = getFileWriter("Enums", rootPath);
-        bw.append("package " + pkg + ";\n\n");
-        bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
-        bw.append("public class Enums {\n\n");
-        JsonNode parameters = root.get("parameters");
-        Iterator<Entry<String, JsonNode>> classes = parameters.fields();
-        while (classes.hasNext()) {
-            Entry<String, JsonNode> cls = classes.next();
-            if (cls.getValue().get("enum") != null) {
+                    // Do not expose format property
+                    if (cls.getKey().equals("format")) {
+                        continue;
+                    }
 
-                // Do not expose format property
-                if (cls.getKey().equals("format")) {
-                    continue;
+                    if (cls.getValue().get("description") != null) {
+                        String comment = null;
+                        comment = cls.getValue().get("description").asText();
+                        bw.append(Tools.formatComment(comment, "", true));
+                    }
+                    TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), "");
+                    bw.append(enumType.def);
+                    bw.append("\n");
                 }
-
-                if (cls.getValue().get("description") != null) {
-                    String comment = null;
-                    comment = cls.getValue().get("description").asText();
-                    bw.append(Tools.formatComment(comment, "", true));
-                }
-                TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), "");
-                bw.append(enumType.def);
-                bw.append("\n");
             }
+            bw.append("}\n");
+            bw.close();
         }
-        bw.append("}\n");
-        bw.close();
     }
 
     // Generate all the Indexer or algod model classes 
     public void generateAlgodIndexerObjects (JsonNode root, String rootPath, String pkg) throws IOException {
-        JsonNode schemas = root.get("components") != null ? 
-                root.get("components").get("schemas") : 
+        JsonNode schemas = root.get("components") != null ?
+                root.get("components").get("schemas") :
                     root.get("definitions");
                 Iterator<Entry<String, JsonNode>> classes = schemas.fields();
                 while (classes.hasNext()) {
@@ -885,21 +918,25 @@ public class Generator {
                 }
                 writeQueryClass(gpBody, path.getValue(), path.getKey(), rootPath, pkg, modelPkg);
 
-                // Fill GeneratedPaths class
-                String className = Tools.getCamelCase(path.getValue().findPath("operationId").asText(), true);
-                gpImports.append("import " + pkg + "." + className + ";\n");
+                if (legacyMode) {
+                    // Fill GeneratedPaths class
+                    String className = Tools.getCamelCase(path.getValue().findPath("operationId").asText(), true);
+                    gpImports.append("import " + pkg + "." + className + ";\n");
+                }
             }
             gpMethods.append(gpBody);
         }
     }
 
 
-    public Generator (JsonNode root) {
+    public OpenApiParser(JsonNode root) {
+        this.legacyMode = true;
         this.root = root;
         this.publisher = new Publisher();
     }
 
-    public Generator (JsonNode root, Publisher publisher) {
+    public OpenApiParser(JsonNode root, Publisher publisher) {
+        this.legacyMode = false;
         this.root = root;
         this.publisher = publisher;
     }
