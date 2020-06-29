@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class TypeDef {
     public TypeDef(
-            String javaTypeName, 
+            String javaTypeName,
             String rawTypeName,
             String def, 
             String type, 
@@ -83,6 +83,8 @@ public class TypeDef {
     public String doc;
     public List<String> enumValues;
     public boolean required;
-    
+
+    // This field is private because it is sometimes (but usually not) a CSV and it's too easy to accidentally
+    // use it the wrong way. Use 'isOfType' to compare against specific types.
     private String type;
 }

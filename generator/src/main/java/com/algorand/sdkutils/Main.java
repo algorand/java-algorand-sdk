@@ -120,7 +120,7 @@ public class Main {
         }
 
         Publisher pub = new Publisher();
-        ResponseGenerator subscriber = new ResponseGenerator(pub);
+        ResponseGenerator subscriber = new ResponseGenerator(args, pub);
         OpenApiParser parser = new OpenApiParser(root, pub);
         parser.parse();
     }
