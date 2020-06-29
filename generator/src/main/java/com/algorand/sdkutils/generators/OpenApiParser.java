@@ -758,7 +758,8 @@ public class OpenApiParser {
 
         JsonNode paramNode = spec.get("parameters");
         String returnType = "String";
-        if (spec.get("responses").get("200").get("$ref") != null) {
+        if (spec.has("responses") && spec.get("responses").has("200") &&
+                spec.get("responses").get("200").get("$ref") != null) {
             returnType = spec.get("responses").get("200").get("$ref").asText();
             JsonNode returnTypeNode = this.getFromRef(returnType);
             if (returnTypeNode.get("schema").get("$ref") != null) {
@@ -877,6 +878,8 @@ public class OpenApiParser {
         JsonNode returns = root.get("components") != null ? 
                 root.get("components").get("responses") : 
                     root.get("responses");
+        // If they are defined inline, there will not be a return types section.
+        if (returns == null) return;
                 Iterator<Entry<String, JsonNode>> returnTypes = returns.fields();
                 while (returnTypes.hasNext()) {
                     Entry<String, JsonNode> rtype = returnTypes.next();

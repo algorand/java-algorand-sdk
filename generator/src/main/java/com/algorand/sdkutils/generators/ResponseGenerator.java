@@ -1,15 +1,24 @@
 package com.algorand.sdkutils.generators;
 
+import com.algorand.sdkutils.Main;
 import com.algorand.sdkutils.listeners.Publisher;
 import com.algorand.sdkutils.listeners.Subscriber;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class ResponseGenerator extends Subscriber {
+
+    @Parameters(commandDescription = "Generate response test file(s).")
+    public static class ResponseGeneratorArgs extends Main.CommonArgs {
+        @Parameter(names = {"-f", "--filter"}, description = "Only generate response files for types matching this filter regex.")
+        public String filter;
+    }
 
     public ResponseGenerator(Publisher publisher) {
         publisher.subscribeAll(this);

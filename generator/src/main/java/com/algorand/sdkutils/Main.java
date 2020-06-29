@@ -19,7 +19,7 @@ public class Main {
         // Empty argument objects.
         CommonArgs common = new CommonArgs();
         JavaGeneratorArgs java = new JavaGeneratorArgs();
-        ResponseGeneratorArgs responses = new ResponseGeneratorArgs();
+        ResponseGenerator.ResponseGeneratorArgs responses = new ResponseGenerator.ResponseGeneratorArgs();
 
         // Collect configuration and parse arguments.
         JCommander root = JCommander.newBuilder()
@@ -32,7 +32,7 @@ public class Main {
 
         // Root level help generated from parameter annotations.
         if (common.help) {
-            root.usage();
+            common.validate(root);
             return;
         }
 
@@ -41,82 +41,79 @@ public class Main {
         JCommander command = root.getCommands().get(commandName);
         switch(commandName) {
             case "java":
+                java.validate(command);
                 javaGenerator(java, command);
                 return;
             case "responses":
+                responses.validate(command);
                 responseGenerator(responses, command);
                 return;
         }
     }
 
+    /**
+     * Arguments shared by all commands.
+     */
     public static class CommonArgs {
         @Parameter(names = {"-h", "--help"}, help = true)
-        boolean help = false;
+        public boolean help = false;
 
-        @Parameter(names = {"-s", "--specfile"}, description = "Name of the client class. i.e. IndexerClient.")
-        File specfile;
+        @Parameter(names = {"-s", "--specfile"}, description = "Path to specfile used by generator.")
+        public File specfile;
+
+        /**
+         * Override this to add any custom validation for other command arguments.
+         */
+        public void validate(JCommander command) {
+            if (this.help) {
+                command.usage();
+                System.exit(0);
+            }
+
+            if (this.specfile == null) {
+                throw new RuntimeException("Specfile must be provided with -s or --specfile");
+            }
+
+            if (!this.specfile.canRead()) {
+                throw new RuntimeException("Cannot read file: " + this.specfile.getAbsolutePath());
+            }
+        }
     }
 
     @Parameters(commandDescription = "Generate the Java Client SDK.")
     public static class JavaGeneratorArgs extends CommonArgs {
         @Parameter(required = true, names = {"-n", "--client-name"}, description = "Full path to the OpenAPI v2 spec file.")
-        String clientName;
+        public String clientName;
 
         @Parameter(required = true, names = {"-m", "--model-path"}, description = "Path where generated model files will be placed.")
-        String modelPath;
+        public String modelPath;
 
         @Parameter(required = true, names = {"-mp", "--model-package"}, description = "Package name to put at the top of generated model files.")
-        String modelPackage;
+        public String modelPackage;
 
         @Parameter(required = true, names = {"-p", "--paths-path"}, description = "Path where generated paths files will be placed.")
-        String pathsPath;
+        public String pathsPath;
 
         @Parameter(required = true, names = {"-pp", "--paths-package"}, description = "Package name to put at the top of generated paths files.")
-        String pathsPackage;
+        public String pathsPackage;
 
         @Parameter(required = true, names = {"-c", "--common-path"}, description = "Path where generated client files will be placed.")
-        String commonPath;
+        public String commonPath;
 
         @Parameter(required = true, names = {"-cp", "--common-package"}, description = "Package name to put at the top of generated client files.")
-        String commonPackage;
+        public String commonPackage;
 
         @Parameter(required = true, names = {"-t", "--token-name"}, description = "Name of the token used for this application. i.e. X-Algo-API-Token.")
-        String tokenName;
+        public String tokenName;
 
         @Parameter(names = {"-tr", "--token-required"}, description = "Whether or not a no-token version of the constructor should be created.")
-        Boolean tokenRequired = false;
-    }
-
-    @Parameters(commandDescription = "Generate response test file(s).")
-    public static class ResponseGeneratorArgs extends CommonArgs {
-        @Parameter(names = {"-f", "--filter"}, description = "Only generate response files for types matching this filter regex.")
-        String filter;
-    }
-
-    /**
-     * Validate common arguments.
-     */
-    private static void commonValidations(CommonArgs args, JCommander command) {
-        if (args.help) {
-            command.usage();
-            System.exit(0);
-        }
-
-        if (args.specfile == null) {
-            throw new RuntimeException("Specfile must be provided with -s or --specfile");
-        }
-
-        if (!args.specfile.canRead()) {
-            throw new RuntimeException("Cannot read file: " + args.specfile.getAbsolutePath());
-        }
+        public Boolean tokenRequired = false;
     }
 
     /**
      * Route command to response generator.
      */
-    private static void responseGenerator(ResponseGeneratorArgs args, JCommander command) throws Exception {
-        commonValidations(args, command);
-
+    private static void responseGenerator(ResponseGenerator.ResponseGeneratorArgs args, JCommander command) throws Exception {
         JsonNode root;
         try (FileInputStream fis = new FileInputStream(args.specfile)) {
             root = Utils.getRoot(fis);
@@ -132,8 +129,6 @@ public class Main {
      * Route command to java generator.
      */
     private static void javaGenerator(JavaGeneratorArgs args, JCommander command) {
-        commonValidations(args, command);
-
         try {
             Generate.Generate(
                     args.clientName,

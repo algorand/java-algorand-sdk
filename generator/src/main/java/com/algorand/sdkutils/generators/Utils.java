@@ -1,13 +1,6 @@
 package com.algorand.sdkutils.generators;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collection;
 import java.util.StringTokenizer;
 
@@ -87,7 +80,7 @@ public class Utils {
 
     }
 
-    public static String formatJson(String json) throws JsonParseException, JsonMappingException, IOException {
+    public static String formatJson(String json) throws IOException {
         ObjectMapper mapper = new ObjectMapper()
                 .configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true)
                 .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
@@ -95,7 +88,7 @@ public class Utils {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
     }
 
-    public static JsonNode getRoot(FileInputStream fileIs) throws JsonProcessingException, IOException {
+    public static JsonNode getRoot(InputStream fileIs) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode root;
         root = objectMapper.readTree(fileIs);
