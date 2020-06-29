@@ -16,7 +16,7 @@ public class OpenApiParser {
 
     protected JsonNode root;
     protected Publisher publisher;
-    protected final boolean legacyMode;
+    protected final boolean javaMode;
 
     /**
      * Parse the file and drive the publisher.
@@ -496,7 +496,7 @@ public class OpenApiParser {
         addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
         addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
 
-        if (legacyMode) {
+        if (javaMode) {
             BufferedWriter bw = getFileWriter(className, directory);
             bw.append("package " + pkg + ";\n\n");
 
@@ -793,7 +793,7 @@ public class OpenApiParser {
         String [] strarray = {className, returnType, path, desc, httpMethod};
         this.publisher.publish(Events.NEW_QUERY, strarray);
 
-        if (legacyMode) {
+        if (javaMode) {
             StringBuffer sb = new StringBuffer();
             sb.append("\n");
             sb.append(Tools.formatComment(discAndPath, "", true));
@@ -821,7 +821,7 @@ public class OpenApiParser {
 
     // Generate all the enum classes in the spec file. 
     public void generateEnumClasses (JsonNode root, String rootPath, String pkg) throws IOException {
-        if (legacyMode) {
+        if (javaMode) {
             BufferedWriter bw = getFileWriter("Enums", rootPath);
             bw.append("package " + pkg + ";\n\n");
             bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
@@ -919,7 +919,7 @@ public class OpenApiParser {
                 }
                 writeQueryClass(gpBody, path.getValue(), path.getKey(), rootPath, pkg, modelPkg);
 
-                if (legacyMode) {
+                if (javaMode) {
                     // Fill GeneratedPaths class
                     String className = Tools.getCamelCase(path.getValue().findPath("operationId").asText(), true);
                     gpImports.append("import " + pkg + "." + className + ";\n");
@@ -929,15 +929,18 @@ public class OpenApiParser {
         }
     }
 
-
+    /**
+     * This is used for Java mode. Deprecated because the Java specific code should be removed from the parser.
+     */
+    @Deprecated
     public OpenApiParser(JsonNode root) {
-        this.legacyMode = true;
+        this.javaMode = true;
         this.root = root;
         this.publisher = new Publisher();
     }
 
     public OpenApiParser(JsonNode root, Publisher publisher) {
-        this.legacyMode = false;
+        this.javaMode = false;
         this.root = root;
         this.publisher = publisher;
     }
