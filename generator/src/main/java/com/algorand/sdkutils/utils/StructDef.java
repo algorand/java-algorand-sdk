@@ -1,17 +1,31 @@
 package com.algorand.sdkutils.utils;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public class StructDef {
 
     public String name;
     public String doc;
-    
-    public StructDef(String name, String doc) {
+    public Set requiredProperties = new HashSet<>();
+    public Set mutuallyExclusiveProperties = new HashSet<>();
+
+    public StructDef(String name, String doc, Set<String> requiredProperties, Set<String> mutuallyExclusiveProperties) {
         this.name = name;
         this.doc = doc;
+        if (requiredProperties != null) {
+            this.requiredProperties = requiredProperties;
+        }
+        if (mutuallyExclusiveProperties != null) {
+            this.mutuallyExclusiveProperties = mutuallyExclusiveProperties;
+        }
     }
 
     @Override
     public String toString() {
-        return "name: '" + name + "', " + "doc: '" + doc + "'";
+        return "name: '" + name + "', " +
+                "doc: '" + doc + "', " +
+                "required: ['" + String.join("', '", requiredProperties) + "'], " +
+                "mutuallyExclusive: ['" + String.join("', '", mutuallyExclusiveProperties) + "']";
     }
 }

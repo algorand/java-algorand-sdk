@@ -4,10 +4,14 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.algorand.sdkutils.listeners.Publisher;
 import com.algorand.sdkutils.listeners.Publisher.Events;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.algorand.sdkutils.utils.*;
 
@@ -17,6 +21,8 @@ public class OpenApiParser {
     protected JsonNode root;
     protected Publisher publisher;
     protected final boolean javaMode;
+
+    protected ObjectMapper mapper = new ObjectMapper();
 
     /**
      * Parse the file and drive the publisher.
@@ -71,7 +77,7 @@ public class OpenApiParser {
             addImport(imports, "java.security.NoSuchAlgorithmException");
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String javaName = Tools.getCamelCase(propName, false);
 
         sb.append(TAB + "@JsonProperty(\"" + propName + "\")\n" + 
@@ -99,7 +105,7 @@ public class OpenApiParser {
             addImport(imports, "com.algorand.algosdk.util.Encoder");
         }
         String javaName = Tools.getCamelCase(propName, false);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("    @JsonProperty(\"" + propName + "\")\n" +
                 "    public void " + javaName + "(String base64Encoded) {\n" +
                 "        this."+ javaName +" = Encoder.decodeFromBase64(base64Encoded);\n" +
@@ -110,7 +116,7 @@ public class OpenApiParser {
                 "    }\n" +
                 "    public byte[] "+ javaName +";\n");
         // getterSetter typeName is only used in path.
-        return new TypeDef("byte[]", "byteArray", sb.toString(), "getterSetter", 
+        return new TypeDef("byte[]", "binary", sb.toString(), "getterSetter",
                 propName, goPropertyName, desc, required);
     }
 
@@ -126,7 +132,7 @@ public class OpenApiParser {
         addImport(imports, "java.util.List");
 
         String javaName = Tools.getCamelCase(propName, false);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("    @JsonProperty(\"" + propName + "\")\n" +
                 "    public void " + javaName + "(List<String> base64Encoded) {\n" +
@@ -145,7 +151,7 @@ public class OpenApiParser {
                 "     }\n" +
                 "    public List<byte[]> " + javaName + ";\n");
         // getterSetter typeName is only used in path.
-        return new TypeDef("", rawType, sb.toString(), "getterSetter,array", 
+        return new TypeDef("", "binary", sb.toString(), "getterSetter,array",
                 propName, goPropertyName, desc, required);
     }
 
@@ -156,7 +162,7 @@ public class OpenApiParser {
         if (enumNode == null) {
             throw new RuntimeException("Cannot find enum info in node: " + prop.toString());
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String enumClassName = Tools.getCamelCase(propName, true);
         sb.append(TAB + "public enum " + enumClassName + " {\n");
 
@@ -199,7 +205,7 @@ public class OpenApiParser {
             JsonNode prop, 
             boolean asObject,
             Map<String, Set<String>> imports,
-            String propName, boolean forModel) {        
+            String propName, boolean forModel) {
         String desc = prop.get("description") == null ? "" : prop.get("description").asText();
         String goName = prop.get("x-go-name") != null ? 
                 prop.get("x-go-name").asText() : "";
@@ -244,7 +250,6 @@ public class OpenApiParser {
                 addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
                 return new TypeDef("SignedTransaction", format, propName, goName, desc, isRequired(prop));
             case "binary":
-                return getBase64Encoded(propName, goName, type, null, forModel, desc, isRequired(prop));
             case "byte":
             case "base64":
             case "digest":
@@ -325,7 +330,7 @@ public class OpenApiParser {
     // getImports organizes the imports and returns the block of import statements
     // The statements are unique, and organized. 
     static String getImports(Map<String, Set<String>> imports) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         Set<String> java = imports.get("java");
         if (java != null) {
@@ -350,7 +355,7 @@ public class OpenApiParser {
     // getPropertyWithJsonSetter formats the property into java declaration type with 
     // the appropriate json annotation.
     static String getPropertyWithJsonSetter(TypeDef typeObj, String javaName, String jprop){
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
 
         if (typeObj.isOfType("getterSetter")) {
             return typeObj.def.toString();
@@ -426,7 +431,7 @@ public class OpenApiParser {
     }
 
     // Write the properties of the Model class.
-    void writeProperties(StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties, Map<String, Set<String>> imports) {
+    void writeProperties(StringBuilder buffer, Iterator<Entry<String, JsonNode>> properties, Map<String, Set<String>> imports) {
         while (properties.hasNext()) {
             Entry<String, JsonNode> prop = properties.next();
             String jprop = prop.getKey();
@@ -452,7 +457,7 @@ public class OpenApiParser {
     }
 
     // Writes the compare methods by adding a comparator for each class member. 
-    static void writeCompareMethod(String className, StringBuffer buffer, Iterator<Entry<String, JsonNode>> properties) {
+    static void writeCompareMethod(String className, StringBuilder buffer, Iterator<Entry<String, JsonNode>> properties) {
         buffer.append("    @Override\n" +
                 "    public boolean equals(Object o) {\n" +
                 "\n" +
@@ -471,32 +476,54 @@ public class OpenApiParser {
 
     // writeClass writes the Model class. 
     // This is the root method for writing the complete class. 
-    void writeClass(String className, 
+    void writeClass(String className,
+            JsonNode parentNode,
             JsonNode propertiesNode, 
             String desc, 
             String directory, 
             String pkg,
             Events event) throws IOException {
         System.out.println("Generating ... " + className);
-        publisher.publish(event, new StructDef(className, desc));
+
+        // Collect any required fields for this definition.
+        Set<String> requiredProperties = new HashSet<>();
+        if (parentNode.has("required") && parentNode.get("required").isArray()) {
+            Iterator<JsonNode> required = parentNode.get("required").elements();
+            while (required.hasNext()) {
+                JsonNode r = required.next();
+                requiredProperties.add(r.asText());
+            }
+        }
+
+        // Collect any mutually exclusive fields for this definition.
+        Set<String> mutuallyExclusiveProperties = new HashSet<>();
+        if (parentNode.has("mutually-exclusive") && parentNode.get("mutually-exclusive").isArray()) {
+            Iterator<JsonNode> exclusive = parentNode.get("mutually-exclusive").elements();
+            while (exclusive.hasNext()) {
+                JsonNode r = exclusive.next();
+                mutuallyExclusiveProperties.add(r.asText());
+            }
+        }
+
+        publisher.publish(event, new StructDef(className, desc, requiredProperties, mutuallyExclusiveProperties));
 
         Iterator<Entry<String, JsonNode>> properties = getSortedProperties(propertiesNode);
         className = Tools.getCamelCase(className, true);
 
-        HashMap<String, Set<String>> imports = new HashMap<String, Set<String>>();
-        StringBuffer body = new StringBuffer();
+        HashMap<String, Set<String>> imports = new HashMap<>();
+        StringBuilder body = new StringBuilder();
 
-        writeProperties(body, properties, imports);
-
-        properties = getSortedProperties(propertiesNode);
-        writeCompareMethod(className, body, properties);
-
-        addImport(imports, "java.util.Objects"); // used by Objects.deepEquals
-
-        addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
-        addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
+        writeProperties(body, properties, imports);//, requiredProperties);
 
         if (javaMode) {
+            properties = getSortedProperties(propertiesNode);
+            writeCompareMethod(className, body, properties);
+
+            addImport(imports, "java.util.Objects"); // used by Objects.deepEquals
+
+            addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
+            addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
+
             BufferedWriter bw = getFileWriter(className, directory);
             bw.append("package " + pkg + ";\n\n");
 
@@ -542,7 +569,11 @@ public class OpenApiParser {
 
     static boolean isRequired(JsonNode prop) {
         if (prop.get("required") != null) {
-            return prop.get("required").asBoolean();
+            if (prop.get("required").isBoolean()) {
+                return prop.get("required").asBoolean();
+            } else {
+                System.out.println("???");
+            }
         }
         return false;
     }
@@ -568,7 +599,7 @@ public class OpenApiParser {
     // Query parameters need be in builder methods.
     // processQueryParameters do all the processing of the parameters. 
     String processQueryParams(
-            StringBuffer generatedPathsEntry,
+            StringBuilder generatedPathsEntry,
             Iterator<Entry<String, JsonNode>> properties,
             String className,
             String path,
@@ -576,14 +607,14 @@ public class OpenApiParser {
             String httpMethod,
             Map<String, Set<String>> imports) {
 
-        StringBuffer decls = new StringBuffer();
-        StringBuffer builders = new StringBuffer();
-        StringBuffer constructorHeader = new StringBuffer();
-        StringBuffer constructorBody = new StringBuffer();
-        StringBuffer requestMethod = new StringBuffer();
+        StringBuilder decls = new StringBuilder();
+        StringBuilder builders = new StringBuilder();
+        StringBuilder constructorHeader = new StringBuilder();
+        StringBuilder constructorBody = new StringBuilder();
+        StringBuilder requestMethod = new StringBuilder();
         ArrayList<String> constructorComments = new ArrayList<String>();
 
-        StringBuffer generatedPathsEntryBody = new StringBuffer();
+        StringBuilder generatedPathsEntryBody = new StringBuilder();
 
         requestMethod.append(OpenApiParser.getQueryResponseMethod(returnType));
         requestMethod.append("    protected QueryData getRequestString() {\n");
@@ -687,7 +718,7 @@ public class OpenApiParser {
                 "        return qd;\n" +
                 "    }");
 
-        StringBuffer ans = new StringBuffer();
+        StringBuilder ans = new StringBuilder();
         ans.append(decls);
         if (!decls.toString().isEmpty()) {
             ans.append("\n");
@@ -732,7 +763,7 @@ public class OpenApiParser {
     // Write the class of a path expression
     // This is the root method for preparing the complete class
     void writeQueryClass(
-            StringBuffer generatedPathsEntry,
+            StringBuilder generatedPathsEntry,
             JsonNode spec,
             String path,
             String directory,
@@ -794,7 +825,7 @@ public class OpenApiParser {
         this.publisher.publish(Events.NEW_QUERY, strarray);
 
         if (javaMode) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append("\n");
             sb.append(Tools.formatComment(discAndPath, "", true));
             sb.append("public class " + className + " extends Query {\n\n");
@@ -868,7 +899,7 @@ public class OpenApiParser {
                     if (cls.getValue().get("description") != null) {
                         desc = cls.getValue().get("description").asText();
                     }
-                    writeClass(cls.getKey(), cls.getValue().get("properties"), 
+                    writeClass(cls.getKey(), cls.getValue(), cls.getValue().get("properties"),
                             desc, rootPath, pkg, Events.NEW_MODEL);
                 }
     }
@@ -892,7 +923,7 @@ public class OpenApiParser {
                                 // It refers to a defined class
                                 continue;
                             }
-                            writeClass(rtype.getKey(), rSchema.get("properties"), 
+                            writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
                                     null, rootPath, pkg, Events.NEW_RETURN_TYPE);
                 }
     }
@@ -907,7 +938,7 @@ public class OpenApiParser {
         // GeneratedPaths file
         try (   BufferedWriter gpImports = new BufferedWriter(new FileWriter(gpImpDirFile));
                 BufferedWriter gpMethods = new BufferedWriter(new FileWriter(gpMethodsDirFile))) {
-            StringBuffer gpBody = new StringBuffer();
+            StringBuilder gpBody = new StringBuilder();
 
             JsonNode paths = this.root.get("paths");
             Iterator<Entry<String, JsonNode>> pathIter = paths.fields();

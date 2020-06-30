@@ -91,6 +91,12 @@
           <version>1.6.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.reprezen.kaizen</groupId>
+            <artifactId>openapi-parser</artifactId>
+            <version>4.0.4</version>
+        </dependency>
+
         <!-- ??? -->
         <dependency>
           <groupId>commons-codec</groupId>

@@ -46,7 +46,7 @@ public class Main {
                 return;
             case "responses":
                 responses.validate(command);
-                responseGenerator(responses, command);
+                ResponseGenerator.main(responses, command);
                 return;
         }
     }
@@ -108,21 +108,6 @@ public class Main {
 
         @Parameter(names = {"-tr", "--token-required"}, description = "Whether or not a no-token version of the constructor should be created.")
         public Boolean tokenRequired = false;
-    }
-
-    /**
-     * Route command to response generator.
-     */
-    private static void responseGenerator(ResponseGenerator.ResponseGeneratorArgs args, JCommander command) throws Exception {
-        JsonNode root;
-        try (FileInputStream fis = new FileInputStream(args.specfile)) {
-            root = Utils.getRoot(fis);
-        }
-
-        Publisher pub = new Publisher();
-        ResponseGenerator subscriber = new ResponseGenerator(args, pub);
-        OpenApiParser parser = new OpenApiParser(root, pub);
-        parser.parse();
     }
 
     /**

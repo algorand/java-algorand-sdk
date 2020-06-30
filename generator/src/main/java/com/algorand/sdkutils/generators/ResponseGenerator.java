@@ -7,28 +7,42 @@ import com.algorand.sdkutils.listeners.Subscriber;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.Parameters;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
-import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ResponseGenerator implements Subscriber {
-    @Parameters(commandDescription = "Generate response test file(s).")
+    public static void main(ResponseGeneratorArgs args, JCommander command) throws Exception {
+        // kaizen parser test
+        //OpenApi3 model = new OpenApi3Parser().parse(args.specfile, true);
+        //describeResponses(model);
+
+        JsonNode root;
+        try (FileInputStream fis = new FileInputStream(args.specfile)) {
+            root = Utils.getRoot(fis);
+        }
+
+        Publisher pub = new Publisher();
+        ResponseGenerator subscriber = new ResponseGenerator(args, pub);
+        OpenApiParser parser = new OpenApiParser(root, pub);
+        parser.parse();
+    }
+
+    @com.beust.jcommander.Parameters(commandDescription = "Generate response test file(s).")
     public static class ResponseGeneratorArgs extends Main.CommonArgs {
-        @Parameter(names = {"-f", "--filter"}, description = "Only generate response files for objects which contain the given value as a substring.")
+        @com.beust.jcommander.Parameter(names = {"-f", "--filter"}, description = "Only generate response files for objects which contain the given value as a substring.")
         public String filter;
 
-        @Parameter(required = true, names = {"-o", "--output-dir"}, description = "Location to place response objects.")
+        @com.beust.jcommander.Parameter(required = true, names = {"-o", "--output-dir"}, description = "Location to place response objects.")
         File outputDirectory;
 
         @Override
@@ -85,21 +99,23 @@ public class ResponseGenerator implements Subscriber {
                 int num = random.nextInt(10) + 1;
                 ArrayNode arr = mapper.createArrayNode();
                 for (int i = 0; i < num; i++) {
-                    arr.add(getData(prop));
+                    arr.add(getData(def, prop));
                 }
                 node.set(prop.propertyName, arr);
             } else {
-                node.set(prop.propertyName, getData(prop));
+                node.set(prop.propertyName, getData(def, prop));
             }
         }
         return node;
     }
 
-    private final static List<String> binaryTypes = ImmutableList.of("binary", "byteArray");
-    public JsonNode getData(TypeDef prop) {
-        if (prop.doc.contains("transaction signature")) {
+    public JsonNode getData(StructDef parent, TypeDef prop) {
+        // Hook into an interesting spot...
+        /*
+        if (!parent.mutuallyExclusiveProperties.isEmpty()) {
             System.out.println("here");
         }
+         */
         if (prop.enumValues != null) {
             int idx = random.nextInt(prop.enumValues.size());
             return new TextNode(prop.enumValues.get(idx));
@@ -115,7 +131,7 @@ public class ResponseGenerator implements Subscriber {
         if (prop.rawTypeName.equals("boolean")) {
             return BooleanNode.valueOf(random.nextBoolean());
         }
-        if (binaryTypes.contains(prop.rawTypeName)) {
+        if (prop.rawTypeName.equals("binary")) {
             // TODO: Binary data limits from spec.
             byte[] data = new byte[random.nextInt(500) + 1];
             random.nextBytes(data);
@@ -132,7 +148,9 @@ public class ResponseGenerator implements Subscriber {
         if (prop.rawTypeName.equals("object")) {
             //throw new RuntimeException("Not supported, nested objects must be handled with $ref types.");
             // TODO: proper object handling? There could be nested properties but our parser isn't currently handling that.
-            return new TextNode("today, 'object' is a string!");
+            ObjectNode node = mapper.createObjectNode();
+            node.put("today", "today, 'object' is a string!");
+            return node;
         }
 
         System.out.println("Looking up reference for: " + prop.rawTypeName);
@@ -166,7 +184,7 @@ public class ResponseGenerator implements Subscriber {
     /**
      *
      * @param name
-     *re @param strict when in strict mode the name must be an exact case sensitive match.
+     * @param strict when in strict mode the name must be an exact case sensitive match.
      * @return
      */
     private List<Map.Entry<StructDef, List<TypeDef>>> findEntry(String name, boolean strict) {
@@ -222,5 +240,29 @@ public class ResponseGenerator implements Subscriber {
     public void onEvent(Publisher.Events event, String[] notes) {
         //System.out.println("(event, []notes) - " + String.join(",", notes));
     }
+
+    /*
+    // This prints out the path and all of its parameters
+    private static void describeModel(OpenApi3 model) {
+        System.out.printf("Title: %s\n", model.getInfo().getTitle());
+        for (Path path : model.getPaths().values()) {
+            System.out.printf("Path %s:\n", Overlay.of(path).getPathInParent());
+            for (Operation op : path.getOperations().values()) {
+                System.out.printf("  %s: [%s] %s\n", Overlay.of(op).getPathInParent().toUpperCase(),
+                        op.getOperationId(), op.getSummary());
+                for (Parameter param : op.getParameters()) {
+                    System.out.printf("    %s[%s]:, %s - %s\n", param.getName(), param.getIn(), getParameterType(param),
+                            param.getDescription());
+                }
+            }
+        }
+    }
+
+    private static String getParameterType(Parameter param) {
+        Schema schema = param.getSchema();
+        return schema != null ? schema.getType() : "unknown";
+    }
+    */
+
 
 }
