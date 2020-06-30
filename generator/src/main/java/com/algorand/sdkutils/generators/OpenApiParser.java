@@ -572,7 +572,7 @@ public class OpenApiParser {
             if (prop.get("required").isBoolean()) {
                 return prop.get("required").asBoolean();
             } else {
-                System.out.println("???");
+                System.out.println("*** isRequired unknown");
             }
         }
         return false;

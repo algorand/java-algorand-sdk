@@ -16,6 +16,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,6 +48,9 @@ public class ResponseGenerator implements Subscriber {
 
         @com.beust.jcommander.Parameter(required = true, names = {"-o", "--output-dir"}, description = "Location to place response objects.")
         File outputDirectory;
+
+        @com.beust.jcommander.Parameter(required = true, names = {"-p", "--prefix"}, description = "Prefix to resulting response files.")
+        String prefix;
 
         @Override
         public void validate(JCommander command) {
@@ -76,17 +82,32 @@ public class ResponseGenerator implements Subscriber {
 
     private void export(StructDef def, List<TypeDef> properties) {
         // Export the object.
-        System.out.println("Print out a generated " + def.name);
-
         List<ObjectNode> nodes = getObject(def, properties);
 
-        try {
+        try (Stream<Path> existing = Files.list(args.outputDirectory.toPath())){
+            String prefix = args.prefix + "_" + def.name + "_";
+
+            // See how many files are already there to initialize the count.
+            long num = existing
+                    .filter(p -> p.getFileName().toString().startsWith(prefix))
+                    .count();
+
+            // Write the files.
             for (ObjectNode node : nodes) {
                 String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-                System.out.println(json);
+                // TODO: support messagepack as well?
+                Path output = new File(args.outputDirectory, prefix + (num++) + ".json").toPath();
+
+                System.out.println("Exporting example of " + def.name + " to: " + output.getFileName());
+                Files.write(output, json.getBytes());
             }
         } catch (JsonProcessingException e) {
             System.err.println("An exception occurred parsing JSON object for: " + def.name + "\n\n\n\n");
+
+            e.printStackTrace();
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("An exception occurred checking output directory: " + def.name + "\n\n\n\n");
 
             e.printStackTrace();
             System.exit(1);
@@ -98,7 +119,7 @@ public class ResponseGenerator implements Subscriber {
      *
      * If the object has mutually exclusive fields, multiple objects will be generated. One with each of the options.
      */
-    public List<ObjectNode> getObject(StructDef def, List<TypeDef> properties) {
+    private List<ObjectNode> getObject(StructDef def, List<TypeDef> properties) {
         List<ObjectNode> nodes = new ArrayList<>();
 
         // No exclusions
@@ -161,7 +182,7 @@ public class ResponseGenerator implements Subscriber {
      * Generate a node containing randomized property data. If the node is a nested object there may be multiple
      * representations of the data.
      */
-    public List<JsonNode> getData(StructDef parent, TypeDef prop) {
+    private List<JsonNode> getData(StructDef parent, TypeDef prop) {
         // Hook into an interesting spot...
         /*
         if (!parent.mutuallyExclusiveProperties.isEmpty()) {
@@ -205,7 +226,6 @@ public class ResponseGenerator implements Subscriber {
             return ImmutableList.of(node);
         }
 
-        System.out.println("Looking up reference for: " + prop.rawTypeName);
         List<Map.Entry<StructDef, List<TypeDef>>> matches = findEntry(prop.rawTypeName, true);
 
         if (matches.size() == 0) {
@@ -219,7 +239,6 @@ public class ResponseGenerator implements Subscriber {
         }
 
         Map.Entry<StructDef, List<TypeDef>> lookup = matches.iterator().next();
-        System.out.println("Found one reference for: " + lookup.getKey().name);
 
         // Generate objects and cast to JsonNode.
         return getObject(lookup.getKey(), lookup.getValue()).stream()
