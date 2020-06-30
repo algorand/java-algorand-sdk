@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -77,11 +78,13 @@ public class ResponseGenerator implements Subscriber {
         // Export the object.
         System.out.println("Print out a generated " + def.name);
 
-        ObjectNode node = getObject(def, properties);
+        List<ObjectNode> nodes = getObject(def, properties);
 
         try {
-            String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
-            System.out.println(json);
+            for (ObjectNode node : nodes) {
+                String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(node);
+                System.out.println(json);
+            }
         } catch (JsonProcessingException e) {
             System.err.println("An exception occurred parsing JSON object for: " + def.name + "\n\n\n\n");
 
@@ -90,26 +93,75 @@ public class ResponseGenerator implements Subscriber {
         }
     }
 
-    public ObjectNode getObject(StructDef def, List<TypeDef> properties) {
-        ObjectNode node = mapper.createObjectNode();
-        for (TypeDef prop : properties) {
-            boolean isArray = prop.isOfType("array");
-            if (isArray) {
-                // TODO: Array size as part of format.
-                int num = random.nextInt(10) + 1;
-                ArrayNode arr = mapper.createArrayNode();
-                for (int i = 0; i < num; i++) {
-                    arr.add(getData(def, prop));
-                }
-                node.set(prop.propertyName, arr);
-            } else {
-                node.set(prop.propertyName, getData(def, prop));
-            }
+    /**
+     * Generate one or more fully defined ObjectNode's for the provided object.
+     *
+     * If the object has mutually exclusive fields, multiple objects will be generated. One with each of the options.
+     */
+    public List<ObjectNode> getObject(StructDef def, List<TypeDef> properties) {
+        List<ObjectNode> nodes = new ArrayList<>();
+
+        // No exclusions
+        if (def.mutuallyExclusiveProperties.isEmpty()) {
+            nodes.addAll(getObjectWithExclusions(def, properties, ImmutableList.of()));
+            return nodes;
         }
-        return node;
+
+        // Each exclusion combination
+        for (String field : def.mutuallyExclusiveProperties) {
+            List exclusions = def.mutuallyExclusiveProperties.stream()
+                    .filter(f -> !f.equals(field))
+                    .collect(Collectors.toList());
+            nodes.addAll(getObjectWithExclusions(def, properties, exclusions));
+        }
+        return nodes;
     }
 
-    public JsonNode getData(StructDef parent, TypeDef prop) {
+    private List<ObjectNode> getObjectWithExclusions(StructDef def, List<TypeDef> properties, List<String> exclusions) {
+        List<ObjectNode> nodes = new ArrayList<>();
+        nodes.add(mapper.createObjectNode());
+        for (TypeDef prop : properties) {
+            // Skip properties in the exclusion list
+            if (!exclusions.contains(prop.propertyName)) {
+                List<JsonNode> propertyNodes = new ArrayList<>();
+
+                boolean isArray = prop.isOfType("array");
+                if (isArray) {
+                    // TODO: Array size as part of format.
+                    int num = random.nextInt(10) + 1;
+                    ArrayNode arr = mapper.createArrayNode();
+                    while (arr.size() < num) {
+                        // Add all because 'getData' may return more than one value.
+                        arr.addAll(getData(def, prop));
+                    }
+                    propertyNodes.add(arr);
+                    //node.set(prop.propertyName, arr);
+                } else {
+                    propertyNodes.addAll(getData(def, prop));
+                    //node.set(prop.propertyName, getData(def, prop));
+                }
+
+                // If there are multiple properties, fan out the result object.
+                while (nodes.size() < propertyNodes.size()) {
+                    ObjectNode object = nodes.get(0);
+                    nodes.add(object.deepCopy());
+                }
+
+                // Copy the propertyNodes into the results. In some cases there will just be one new property node,
+                // it should be copied into each of the result nodes.
+                for (int i = 0; i < nodes.size(); i++) {
+                    nodes.get(i).set(prop.propertyName, propertyNodes.get(i % propertyNodes.size()));
+                }
+            }
+        }
+        return nodes;
+    }
+
+    /**
+     * Generate a node containing randomized property data. If the node is a nested object there may be multiple
+     * representations of the data.
+     */
+    public List<JsonNode> getData(StructDef parent, TypeDef prop) {
         // Hook into an interesting spot...
         /*
         if (!parent.mutuallyExclusiveProperties.isEmpty()) {
@@ -118,29 +170,29 @@ public class ResponseGenerator implements Subscriber {
          */
         if (prop.enumValues != null) {
             int idx = random.nextInt(prop.enumValues.size());
-            return new TextNode(prop.enumValues.get(idx));
+            return ImmutableList.of(new TextNode(prop.enumValues.get(idx)));
         }
         if (prop.rawTypeName.equals("string")) {
             // TODO: String format from spec.
-            return new TextNode(randomString);
+            return ImmutableList.of(new TextNode(randomString));
         }
         if (prop.rawTypeName.equals("integer")) {
             // TODO: Int range from spec.
-            return new IntNode(random.nextInt(1000000) + 1);
+            return ImmutableList.of(new IntNode(random.nextInt(1000000) + 1));
         }
         if (prop.rawTypeName.equals("boolean")) {
-            return BooleanNode.valueOf(random.nextBoolean());
+            return ImmutableList.of(BooleanNode.valueOf(random.nextBoolean()));
         }
         if (prop.rawTypeName.equals("binary")) {
             // TODO: Binary data limits from spec.
             byte[] data = new byte[random.nextInt(500) + 1];
             random.nextBytes(data);
-            return new BinaryNode(data);
+            return ImmutableList.of(new BinaryNode(data));
         }
         if (prop.rawTypeName.equals("address")) {
             try {
                 String account = new Account().getAddress().toString();
-                return new TextNode(account);
+                return ImmutableList.of(new TextNode(account));
             } catch (NoSuchAlgorithmException e) {
                 throw new RuntimeException("Failed to generate account.");
             }
@@ -150,7 +202,7 @@ public class ResponseGenerator implements Subscriber {
             // TODO: proper object handling? There could be nested properties but our parser isn't currently handling that.
             ObjectNode node = mapper.createObjectNode();
             node.put("today", "today, 'object' is a string!");
-            return node;
+            return ImmutableList.of(node);
         }
 
         System.out.println("Looking up reference for: " + prop.rawTypeName);
@@ -166,10 +218,13 @@ public class ResponseGenerator implements Subscriber {
                             .collect(Collectors.joining(", ")));
         }
 
-
         Map.Entry<StructDef, List<TypeDef>> lookup = matches.iterator().next();
         System.out.println("Found one reference for: " + lookup.getKey().name);
-        return getObject(lookup.getKey(), lookup.getValue());
+
+        // Generate objects and cast to JsonNode.
+        return getObject(lookup.getKey(), lookup.getValue()).stream()
+                .map(node -> (JsonNode)node)
+                .collect(Collectors.toList());
     }
 
     /**
