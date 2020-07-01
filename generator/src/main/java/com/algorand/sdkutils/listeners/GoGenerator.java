@@ -18,7 +18,7 @@ import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
 
-public class GoGenerator extends Subscriber {
+public class GoGenerator implements Subscriber {
 
     enum Annotation {
         JSON,
@@ -277,7 +277,7 @@ public class GoGenerator extends Subscriber {
         pathParameters = new TreeMap<String, String>();
 
         // Also need to create the struct for the parameters
-        modelWriter.newModel(new StructDef(currentQueryName + "Params", ""), "filtermodels", "models");
+        modelWriter.newModel(new StructDef(currentQueryName + "Params", "", null, null), "filtermodels", "models");
 
         // Add the entry into the applicationClient file
         clientFunction = new StringBuffer();
@@ -474,7 +474,7 @@ public class GoGenerator extends Subscriber {
             }
             break;
 
-        case "byteArray":
+        case "binary":
             goType = asType ? "[]byte" : "string";
             if (asType) {
                 addImport("A", "encoding/base64");

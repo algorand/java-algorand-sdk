@@ -1,5 +1,7 @@
 package com.algorand.sdkutils.utils;
 
+import java.util.List;
+
 /**
  * 
  * TypeDef hold together information about a type
@@ -15,7 +17,7 @@ package com.algorand.sdkutils.utils;
  */
 public class TypeDef {
     public TypeDef(
-            String javaTypeName, 
+            String javaTypeName,
             String rawTypeName,
             String def, 
             String type, 
@@ -30,6 +32,7 @@ public class TypeDef {
         this.propertyName = propertyName;
         this.goPropertyName = goPropertyName;
         this.doc = doc;
+        this.enumValues = null;
         this.required = required;
     }
     public TypeDef(String typeName,
@@ -45,6 +48,7 @@ public class TypeDef {
         this.propertyName = propertyName;
         this.goPropertyName = goPropertyName;
         this.doc = doc;
+        this.enumValues = null;
         this.required = required;
     }
     public boolean isOfType(String type) {
@@ -56,6 +60,10 @@ public class TypeDef {
 
     @Override
     public String toString() {
+        String enums = "[]";
+        if (enumValues != null) {
+            enums = "[" + String.join(", ", enumValues) + "]";
+        }
         return
                 "javaTypeName: '" + javaTypeName + "', " +
                 "rawTypeName: '" + rawTypeName + "', " +
@@ -63,6 +71,7 @@ public class TypeDef {
                 "propertyName: '" + propertyName + "', " +
                 "goPropertyName: '" + goPropertyName + "', " +
                 "doc: '" + doc + "', " +
+                "enumValues: " + enums + ", " +
                 "required: '" + required + "'";
     }
 
@@ -72,7 +81,10 @@ public class TypeDef {
     public String propertyName;
     public String goPropertyName;
     public String doc;
+    public List<String> enumValues;
     public boolean required;
-    
+
+    // This field is private because it is sometimes (but usually not) a CSV and it's too easy to accidentally
+    // use it the wrong way. Use 'isOfType' to compare against specific types.
     private String type;
 }
