@@ -8,12 +8,12 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Specifies both the unique identifier and the parameters for an asset
+ * Application index and its parameters
  */
-public class Asset extends PathResponse {
+public class Application extends PathResponse {
 
     /**
-     * Asset creator
+     * Application creator
      */
     @JsonProperty("creator")
     public void creator(String creator) throws NoSuchAlgorithmException {
@@ -30,13 +30,16 @@ public class Asset extends PathResponse {
     public Address creator;
 
     /**
-     * unique asset identifier
+     * (appidx) application index.
      */
-    @JsonProperty("index")
-    public Long index;
+    @JsonProperty("id")
+    public Long id;
 
+    /**
+     * (appparams) application parameters.
+     */
     @JsonProperty("params")
-    public AssetParams params;
+    public ApplicationParams params;
 
     @Override
     public boolean equals(Object o) {
@@ -44,9 +47,9 @@ public class Asset extends PathResponse {
         if (this == o) return true;
         if (o == null) return false;
 
-        Asset other = (Asset) o;
+        Application other = (Application) o;
         if (!Objects.deepEquals(this.creator, other.creator)) return false;
-        if (!Objects.deepEquals(this.index, other.index)) return false;
+        if (!Objects.deepEquals(this.id, other.id)) return false;
         if (!Objects.deepEquals(this.params, other.params)) return false;
 
         return true;

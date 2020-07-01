@@ -18,6 +18,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Transaction extends PathResponse {
 
+    @JsonProperty("application-transaction")
+    public TransactionApplication applicationTransaction;
+
     @JsonProperty("asset-config-transaction")
     public TransactionAssetConfig assetConfigTransaction;
 
@@ -62,6 +65,13 @@ public class Transaction extends PathResponse {
      */
     @JsonProperty("confirmed-round")
     public Long confirmedRound;
+
+    /**
+     * Specifies an application index (ID) if an application was created with this
+     * transaction.
+     */
+    @JsonProperty("created-application-index")
+    public Long createdApplicationIndex;
 
     /**
      * Specifies an asset index (ID) if an asset was created with this transaction.
@@ -224,6 +234,7 @@ public class Transaction extends PathResponse {
      *   (acfg) asset-config-transaction
      *   (axfer) asset-transfer-transaction
      *   (afrz) asset-freeze-transaction
+     *   (appl) application-transaction
      */
     @JsonProperty("tx-type")
     public Enums.TxType txType;
@@ -235,6 +246,7 @@ public class Transaction extends PathResponse {
         if (o == null) return false;
 
         Transaction other = (Transaction) o;
+        if (!Objects.deepEquals(this.applicationTransaction, other.applicationTransaction)) return false;
         if (!Objects.deepEquals(this.assetConfigTransaction, other.assetConfigTransaction)) return false;
         if (!Objects.deepEquals(this.assetFreezeTransaction, other.assetFreezeTransaction)) return false;
         if (!Objects.deepEquals(this.assetTransferTransaction, other.assetTransferTransaction)) return false;
@@ -242,6 +254,7 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;
         if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
+        if (!Objects.deepEquals(this.createdApplicationIndex, other.createdApplicationIndex)) return false;
         if (!Objects.deepEquals(this.createdAssetIndex, other.createdAssetIndex)) return false;
         if (!Objects.deepEquals(this.fee, other.fee)) return false;
         if (!Objects.deepEquals(this.firstValid, other.firstValid)) return false;
