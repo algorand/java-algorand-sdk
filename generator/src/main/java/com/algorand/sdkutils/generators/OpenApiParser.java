@@ -215,7 +215,8 @@ public class OpenApiParser {
         }
         if (refNode != null) {
             String type = getTypeNameFromRef(refNode.asText());
-            // Need to check here if this type does not have a class of its own 
+            addImport(imports, "com.algorand.algosdk.v2.client.model." + type);
+            // Need to check here if this type does not have a class of its own
             // No C/C++ style typedef in java, and this type could be a class with no properties
             prop = getFromRef(refNode.asText());
             if (desc.isEmpty()) {
@@ -857,6 +858,7 @@ public class OpenApiParser {
             bw.append("package " + pkg + ";\n\n");
             bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
             bw.append("public class Enums {\n\n");
+            // TODO: This is only searching parameter references. Inline parameters are ignored.
             JsonNode parameters = root.get("parameters");
             Iterator<Entry<String, JsonNode>> classes = parameters.fields();
             while (classes.hasNext()) {
@@ -871,7 +873,7 @@ public class OpenApiParser {
                     if (cls.getValue().get("description") != null) {
                         String comment = null;
                         comment = cls.getValue().get("description").asText();
-                        bw.append(Tools.formatComment(comment, "", true));
+                        bw.append(Tools.formatComment(comment, TAB, true));
                     }
                     TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), "");
                     bw.append(enumType.def);
