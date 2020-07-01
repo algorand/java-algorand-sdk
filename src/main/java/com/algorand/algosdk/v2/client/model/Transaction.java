@@ -6,6 +6,13 @@ import java.util.Objects;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.algorand.algosdk.v2.client.model.TransactionApplication;
+import com.algorand.algosdk.v2.client.model.TransactionAssetConfig;
+import com.algorand.algosdk.v2.client.model.TransactionAssetFreeze;
+import com.algorand.algosdk.v2.client.model.TransactionAssetTransfer;
+import com.algorand.algosdk.v2.client.model.TransactionKeyreg;
+import com.algorand.algosdk.v2.client.model.TransactionPayment;
+import com.algorand.algosdk.v2.client.model.TransactionSignature;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

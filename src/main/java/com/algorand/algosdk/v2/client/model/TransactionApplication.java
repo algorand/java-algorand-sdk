@@ -8,6 +8,8 @@ import java.util.Objects;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.algorand.algosdk.v2.client.model.StateSchema;
+import com.algorand.algosdk.v2.client.model.on-completion;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -83,17 +85,6 @@ public class TransactionApplication extends PathResponse {
     @JsonProperty("local-state-schema")
     public StateSchema localStateSchema;
 
-    /**
-     * (apan) defines the what additional actions occur with the transaction.
-     * Valid types:
-     *   noop
-     *   optin
-     *   closeout
-     *   clear
-     *   update
-     *   update
-     *   delete
-     */
     @JsonProperty("on-completion")
     public Enums.OnCompletion onCompletion;
 

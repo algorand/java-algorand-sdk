@@ -6,6 +6,10 @@ import java.util.Objects;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.algorand.algosdk.v2.client.model.BlockRewards;
+import com.algorand.algosdk.v2.client.model.BlockUpgradeState;
+import com.algorand.algosdk.v2.client.model.BlockUpgradeVote;
+import com.algorand.algosdk.v2.client.model.Transaction;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

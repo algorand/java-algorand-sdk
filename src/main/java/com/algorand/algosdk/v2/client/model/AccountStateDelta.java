@@ -7,6 +7,8 @@ import java.util.Objects;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.algorand.algosdk.v2.client.model.EvalDeltaKeyValue;
+import com.algorand.algosdk.v2.client.model.StateDelta;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

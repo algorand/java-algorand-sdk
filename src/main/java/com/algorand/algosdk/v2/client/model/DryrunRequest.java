@@ -6,6 +6,9 @@ import java.util.Objects;
 
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.algorand.algosdk.v2.client.model.Account;
+import com.algorand.algosdk.v2.client.model.DryrunApp;
+import com.algorand.algosdk.v2.client.model.DryrunSource;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

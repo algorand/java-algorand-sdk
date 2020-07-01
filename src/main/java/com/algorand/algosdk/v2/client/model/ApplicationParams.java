@@ -6,6 +6,9 @@ import java.util.Objects;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.algorand.algosdk.v2.client.model.ApplicationStateSchema;
+import com.algorand.algosdk.v2.client.model.TealKeyValue;
+import com.algorand.algosdk.v2.client.model.TealKeyValueStore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

@@ -7,6 +7,12 @@ import java.util.Objects;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.algorand.algosdk.v2.client.model.AccountParticipation;
+import com.algorand.algosdk.v2.client.model.Application;
+import com.algorand.algosdk.v2.client.model.ApplicationLocalStates;
+import com.algorand.algosdk.v2.client.model.ApplicationStateSchema;
+import com.algorand.algosdk.v2.client.model.Asset;
+import com.algorand.algosdk.v2.client.model.AssetHolding;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
