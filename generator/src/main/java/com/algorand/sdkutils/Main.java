@@ -1,21 +1,16 @@
 package com.algorand.sdkutils;
 
-import com.algorand.sdkutils.generators.OpenApiParser;
-import com.algorand.sdkutils.generators.ResponseGenerator;
-import com.algorand.sdkutils.generators.Utils;
-import com.algorand.sdkutils.listeners.Publisher;
+import com.algorand.sdkutils.listeners.ResponseGenerator;
 import com.beust.jcommander.*;
-import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 public class Main {
 
     /**
      * Main function. Setup argument parser and direct results to the appropriate handler.
      */
-    public static void main (String argv[]) throws Exception {
+    public static void main(String argv[]) throws Exception {
         // Empty argument objects.
         CommonArgs common = new CommonArgs();
         JavaGeneratorArgs java = new JavaGeneratorArgs();

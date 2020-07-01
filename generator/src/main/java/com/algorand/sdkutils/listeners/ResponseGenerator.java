@@ -1,9 +1,9 @@
-package com.algorand.sdkutils.generators;
+package com.algorand.sdkutils.listeners;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.sdkutils.Main;
-import com.algorand.sdkutils.listeners.Publisher;
-import com.algorand.sdkutils.listeners.Subscriber;
+import com.algorand.sdkutils.generators.OpenApiParser;
+import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
 import com.beust.jcommander.JCommander;
