@@ -8,8 +8,6 @@ import java.util.Objects;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.algorand.algosdk.v2.client.model.StateSchema;
-import com.algorand.algosdk.v2.client.model.on-completion;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -24,6 +22,21 @@ public class TransactionApplication extends PathResponse {
      * application's approval-program and clear-state-program.
      */
     @JsonProperty("accounts")
+    public void accounts(List<String> accounts) throws NoSuchAlgorithmException {
+        this.accounts = new ArrayList<Address>();
+        for (String val : accounts) {
+            this.accounts.add(new Address(val));
+        }
+    }
+    @JsonProperty("accounts")
+    public List<String> accounts() throws NoSuchAlgorithmException {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (Address val : this.accounts) {
+            ret.add(val.encodeAsString());
+        }
+        return ret;
+    }
+
     public List<Address> accounts = new ArrayList<Address>();
 
     /**

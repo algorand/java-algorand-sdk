@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.algorand.algosdk.v2.client.model.TealValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**

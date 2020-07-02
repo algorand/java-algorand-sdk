@@ -1,14 +1,12 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.algorand.algosdk.v2.client.model.ApplicationStateSchema;
-import com.algorand.algosdk.v2.client.model.TealKeyValue;
-import com.algorand.algosdk.v2.client.model.TealKeyValueStore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -20,27 +18,31 @@ public class ApplicationParams extends PathResponse {
      * (approv) approval program.
      */
     @JsonProperty("approval-program")
-    public void approvalProgram(String base64Encoded) {
-        this.approvalProgram = Encoder.decodeFromBase64(base64Encoded);
-    }
-    @JsonProperty("approval-program")
-    public String approvalProgram() {
-        return Encoder.encodeToBase64(this.approvalProgram);
-    }
-    public byte[] approvalProgram;
+    public String approvalProgram;
 
     /**
      * (clearp) approval program.
      */
     @JsonProperty("clear-state-program")
-    public void clearStateProgram(String base64Encoded) {
-        this.clearStateProgram = Encoder.decodeFromBase64(base64Encoded);
+    public String clearStateProgram;
+
+    /**
+     * The address that created this application. This is the address where the
+     * parameters and global state for this application can be found.
+     */
+    @JsonProperty("creator")
+    public void creator(String creator) throws NoSuchAlgorithmException {
+        this.creator = new Address(creator);
     }
-    @JsonProperty("clear-state-program")
-    public String clearStateProgram() {
-        return Encoder.encodeToBase64(this.clearStateProgram);
+    @JsonProperty("creator")
+    public String creator() throws NoSuchAlgorithmException {
+        if (this.creator != null) {
+            return this.creator.encodeAsString();
+        } else {
+            return null;
+        }
     }
-    public byte[] clearStateProgram;
+    public Address creator;
 
     /**
      * [\gs) global schema
@@ -69,6 +71,7 @@ public class ApplicationParams extends PathResponse {
         ApplicationParams other = (ApplicationParams) o;
         if (!Objects.deepEquals(this.approvalProgram, other.approvalProgram)) return false;
         if (!Objects.deepEquals(this.clearStateProgram, other.clearStateProgram)) return false;
+        if (!Objects.deepEquals(this.creator, other.creator)) return false;
         if (!Objects.deepEquals(this.globalState, other.globalState)) return false;
         if (!Objects.deepEquals(this.globalStateSchema, other.globalStateSchema)) return false;
         if (!Objects.deepEquals(this.localStateSchema, other.localStateSchema)) return false;

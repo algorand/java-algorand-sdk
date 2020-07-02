@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client.model;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.algorand.algosdk.v2.client.model.Application;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ApplicationResponse extends PathResponse {

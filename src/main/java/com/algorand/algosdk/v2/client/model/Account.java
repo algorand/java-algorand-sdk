@@ -7,12 +7,6 @@ import java.util.Objects;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.algorand.algosdk.v2.client.model.AccountParticipation;
-import com.algorand.algosdk.v2.client.model.Application;
-import com.algorand.algosdk.v2.client.model.ApplicationLocalStates;
-import com.algorand.algosdk.v2.client.model.ApplicationStateSchema;
-import com.algorand.algosdk.v2.client.model.Asset;
-import com.algorand.algosdk.v2.client.model.AssetHolding;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -53,21 +47,6 @@ public class Account extends PathResponse {
     public Long amountWithoutPendingRewards;
 
     /**
-     * (appl) applications local data stored in this account.
-     * Note the raw object uses `map[int] -> AppLocalState` for this type.
-     */
-    @JsonProperty("apps-local-state")
-    public List<ApplicationLocalStates> appsLocalState = new ArrayList<ApplicationLocalStates>();
-
-    /**
-     * (tsch) stores the sum of all of the local schemas and global schemas in this
-     * account.
-     * Note: the raw account uses `StateSchema` for this type.
-     */
-    @JsonProperty("apps-total-schema")
-    public ApplicationStateSchema appsTotalSchema;
-
-    /**
      * (asset) assets held by this account.
      * Note the raw object uses `map[int] -> AssetHolding` for this type.
      */
@@ -92,14 +71,6 @@ public class Account extends PathResponse {
         }
     }
     public Address authAddr;
-
-    /**
-     * (appp) parameters of applications created by this account including app global
-     * data.
-     * Note: the raw account uses `map[int] -> AppParams` for this type.
-     */
-    @JsonProperty("created-apps")
-    public List<Application> createdApps = new ArrayList<Application>();
 
     /**
      * (apar) parameters of assets created by this account.
@@ -167,11 +138,8 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.address, other.address)) return false;
         if (!Objects.deepEquals(this.amount, other.amount)) return false;
         if (!Objects.deepEquals(this.amountWithoutPendingRewards, other.amountWithoutPendingRewards)) return false;
-        if (!Objects.deepEquals(this.appsLocalState, other.appsLocalState)) return false;
-        if (!Objects.deepEquals(this.appsTotalSchema, other.appsTotalSchema)) return false;
         if (!Objects.deepEquals(this.assets, other.assets)) return false;
         if (!Objects.deepEquals(this.authAddr, other.authAddr)) return false;
-        if (!Objects.deepEquals(this.createdApps, other.createdApps)) return false;
         if (!Objects.deepEquals(this.createdAssets, other.createdAssets)) return false;
         if (!Objects.deepEquals(this.participation, other.participation)) return false;
         if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;

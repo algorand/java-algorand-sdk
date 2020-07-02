@@ -1,5 +1,8 @@
 package com.algorand.algosdk.v2.client.common;
 
+import com.algorand.algosdk.util.Encoder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 public abstract class Query {
     private Client client;
     private HttpMethod httpMethod;
@@ -50,6 +53,14 @@ public abstract class Query {
 
     protected void addToBody(byte[] content) {
         qd.addToBody(content);
+    }
+
+    protected void addToBody(Object content) {
+        try {
+            qd.addToBody(Encoder.encodeToMsgPack(content));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Failed to encode object.", e);
+        }
     }
 
     public abstract Response<?> execute() throws Exception;
