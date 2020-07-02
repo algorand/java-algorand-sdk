@@ -215,7 +215,6 @@ public class OpenApiParser {
         }
         if (refNode != null) {
             String type = getTypeNameFromRef(refNode.asText());
-            addImport(imports, "com.algorand.algosdk.v2.client.model." + type);
             // Need to check here if this type does not have a class of its own
             // No C/C++ style typedef in java, and this type could be a class with no properties
             prop = getFromRef(refNode.asText());

@@ -252,7 +252,14 @@ public class ResponseGenerator implements Subscriber {
     @Override
     public void terminate() {
         findEntry(args.filter, false)
-                .forEach(entry -> export(entry.getKey(), entry.getValue()));
+                .forEach(entry -> {
+                    try {
+                        export(entry.getKey(), entry.getValue());
+                    } catch (Exception e) {
+                        System.out.println("Unable to generate: " + entry.getKey());
+                        e.printStackTrace();
+                    }
+                });
     }
 
     /**
