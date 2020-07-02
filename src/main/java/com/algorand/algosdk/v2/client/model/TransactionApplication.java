@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TransactionApplication extends PathResponse {
 
+    // TODO: Generator needs to be updated to setup the Address like this.
     /**
      * (apat) List of accounts in addition to the sender that may be accessed from the
      * application's approval-program and clear-state-program.
@@ -36,7 +37,6 @@ public class TransactionApplication extends PathResponse {
         }
         return ret;
     }
-
     public List<Address> accounts = new ArrayList<Address>();
 
     /**
