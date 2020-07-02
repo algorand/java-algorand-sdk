@@ -36,23 +36,27 @@ public class TestingUtils {
      * Used by response tests to compare a response to the input file.
      */
     public static void verifyResponse(Response r, File body) throws IOException {
-        assertThat(r).isNotNull();
-        assertThat(r.isSuccessful()).isTrue();
+        String expected = new String(Files.readAllBytes(body.toPath()));
 
-        switch (r.getContentType()) {
-        case "application/json":
-            verifyJsonResponse(r, body);
-            break;
-        case "application/msgpack":
-            verifyMsgpResponse(r, body);
-            break;
-        default:
-            Assertions.fail("Unknown content type, cannot verify: " + r.getContentType());
+        assertThat(r).isNotNull();
+        if (!r.isSuccessful()) {
+            assertThat(r.message()).isEqualTo(expected);
+        } else {
+            switch (r.getContentType()) {
+                case "application/json":
+                    verifyJsonResponse(r, expected);
+                    break;
+                case "application/msgpack":
+                    verifyMsgpResponse(r, expected);
+                    break;
+                default:
+                    Assertions.fail("Unknown content type, cannot verify: " + r.getContentType());
+            }
         }
     }
 
-    private static void verifyJsonResponse(Response r, File body) throws IOException {
-        String expectedString = new String(Files.readAllBytes(body.toPath()));
+    private static void verifyJsonResponse(Response r, String expected) throws IOException {
+        String expectedString = expected;
         String actualString = r.toString();
 
         JsonNode expectedNode = mapper.readTree(expectedString);
@@ -60,8 +64,8 @@ public class TestingUtils {
         assertThat(expectedNode).isEqualTo(actualNode);
     }
 
-    private static void verifyMsgpResponse(Response r, File body) throws IOException {
-        String expectedString = new String(Files.readAllBytes(body.toPath()));
+    private static void verifyMsgpResponse(Response r, String expected) throws IOException {
+        String expectedString = expected;
 
         /*
         // Convert the POJO back into messagepack, this is the most valid approach.
