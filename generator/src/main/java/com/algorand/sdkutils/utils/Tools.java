@@ -1,7 +1,11 @@
 package com.algorand.sdkutils.utils;
 
 import java.lang.Character;
+import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+
+import com.algorand.sdkutils.listeners.TreeSet;
 
 public class Tools {
 
@@ -109,4 +113,39 @@ public class Tools {
         }
         return new String(newName, 0, n);
     }
+
+    // Imports are collected and organized before printed as import statements.
+    // addImports adds a needed import class. 
+    public static void addImport(Map<String, Set<String>> imports, String imp) {
+        String key = imp.substring(0, imp.indexOf('.'));
+        if (imports.get(key) == null) {
+            imports.put(key, new TreeSet<String>());
+        }
+        imports.get(key).add(imp);
+    }
+
+    // getImports organizes the imports and returns the block of import statements
+    // The statements are unique, and organized. 
+    public static String getImports(Map<String, Set<String>> imports) {
+        StringBuilder sb = new StringBuilder();
+
+        Set<String> java = imports.get("java");
+        if (java != null) {
+            for (String imp : java) {
+                sb.append("import " + imp + ";\n");
+            }
+            if (imports.get("com") != null) {
+                sb.append("\n");
+            }
+        }
+
+        Set<String> com = imports.get("com");
+        if (com != null) {
+            for (String imp : com) {
+                sb.append("import " + imp + ";\n");
+            }
+        }
+        sb.append("\n");
+        return sb.toString();
+    }   
 }

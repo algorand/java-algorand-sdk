@@ -59,24 +59,18 @@ public class Generate {
         // Generate classes from the schemas
         // These are the non-premetive types for which classes are needed
         System.out.println("Generating " + modelPackage + " to " + modelPath);
-        g.generateAlgodIndexerObjects(root, modelPath, modelPackage);
-        g.generateEnumClasses(root, modelPath, modelPackage);
+        g.generateAlgodIndexerObjects(root);
 
         // Generate classes from the return types which have more than one return element
         System.out.println("Generating " + modelPackage + " to " + modelPath);
-        g.generateReturnTypes(root, modelPath, modelPackage);
+        g.generateReturnTypes(root);
 
         // Generate the algod methods
         File imports = Files.createTempFile("imports_file", "txt").toFile();
         File paths = Files.createTempFile("pathss_file", "txt").toFile();
 
         System.out.println("Generating " + pathsPackage + " to " + pathsPath);
-        g.generateQueryMethods(
-                pathsPath,
-                pathsPackage,
-                modelPackage,
-                imports,
-                paths);
+        g.generateQueryMethods();
 
         Collection<String> lines = Files.readAllLines(imports.toPath());
         lines.add("import com.algorand.algosdk.crypto.Address;");

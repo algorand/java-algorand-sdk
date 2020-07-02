@@ -176,6 +176,8 @@ public class GoGenerator implements Subscriber {
             addPathParameter(type);
             break;
         case BODY_CONTENT:
+            // This is not really a path parameter, but will behave like one in most situation of code generation
+            addPathParameter(type);
             break;
         default:
             throw new RuntimeException("Unimplemented event for TypeDef! " + event);
@@ -326,6 +328,7 @@ public class GoGenerator implements Subscriber {
         }
         return sb;
     }
+    
     private void endQuery() {
 
         // client functions
@@ -523,7 +526,8 @@ public class GoGenerator implements Subscriber {
         case "DryrunSource":
         case "DryrunTxnResult":
         case "EvalDeltaKeyValue":
-        case "StaleDelta":            
+        case "StaleDelta":
+        case "DryrunRequest":
             goType = type;
             break;
         default:
