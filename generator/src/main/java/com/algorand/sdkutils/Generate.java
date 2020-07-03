@@ -3,6 +3,7 @@ package com.algorand.sdkutils;
 import com.algorand.sdkutils.generators.OpenApiParser;
 import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.listeners.GoGenerator;
+import com.algorand.sdkutils.listeners.JavaGenerator;
 import com.algorand.sdkutils.listeners.Publisher;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -46,16 +47,23 @@ public class Generate {
             root = Utils.getRoot(fis);
         }
 
-        OpenApiParser g = null;
         Publisher publisher = new Publisher();
+        OpenApiParser g = new OpenApiParser(root, publisher);
 
         if (goDirectory != null && !goDirectory.isEmpty()) {
-            g = new OpenApiParser(root, publisher);
             new GoGenerator(goDirectory, "indexer", publisher);
-        } else {
-            g = new OpenApiParser(root);
-        }
+        } 
 
+        new JavaGenerator(
+                clientName,
+                modelPath,
+                modelPackage,
+                pathsPath,
+                pathsPackage,
+                commonPath,
+                commonPackage,
+                publisher);
+        
         // Generate classes from the schemas
         // These are the non-premetive types for which classes are needed
         System.out.println("Generating " + modelPackage + " to " + modelPath);

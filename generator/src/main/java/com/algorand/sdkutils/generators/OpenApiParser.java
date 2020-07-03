@@ -138,7 +138,6 @@ public class OpenApiParser {
                         goName, desc, isRequired(prop));
 
             case "SignedTransaction":
-              //XXX                addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
                 return new TypeDef("SignedTransaction", format, "", propName, goName, desc, isRequired(prop));
             case "binary":
             case "byte":

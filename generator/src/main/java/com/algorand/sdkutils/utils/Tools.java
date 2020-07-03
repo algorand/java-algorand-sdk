@@ -2,10 +2,9 @@ package com.algorand.sdkutils.utils;
 
 import java.lang.Character;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.Set;
 import java.util.StringTokenizer;
-
-import com.algorand.sdkutils.listeners.TreeSet;
 
 public class Tools {
 

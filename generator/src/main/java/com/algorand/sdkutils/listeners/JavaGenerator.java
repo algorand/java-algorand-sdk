@@ -16,7 +16,6 @@ import java.util.StringTokenizer;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
-import com.algorand.sdkutils.generators.OpenApiParser;
 import com.algorand.sdkutils.listeners.Publisher.Events;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
@@ -24,16 +23,27 @@ import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 
 public class JavaGenerator implements Subscriber {
-    static final String TAB = "    ";
+
+    public static final String TAB = "    ";
+
+    String clientName;
+    String modelPath;
+    String modelPackage;
+    String pathsPath;
+    String pathsPackage;
+    String commonPath;
+    String commonPackage;
+
+
 
     // packageName is also the folder where the files sit
     private String packageName;
     // filesFolder is rootFolder/packageName
     private String filesFolder;
 
-    // ModelWriter is a manager of the model file writer
+    // JavaModelWriter is a manager of the model file writer
     // It is limited to only one file at a time.
-    private ModelWriter modelWriter;
+    private JavaModelWriter JavaModelWriter;
 
     // Query files
 
@@ -43,7 +53,7 @@ public class JavaGenerator implements Subscriber {
     // path parameters are collected and stored here
     // this is useful when all the path parameters should be available for 
     // constructing some functions.  
-    private TreeMap<String, String> pathParameters;
+    private TreeMap<String, TypeDef> pathParameters;
 
     // queryFunctions hold all the query functions which go to one file 
     // written by queryWriter
@@ -73,19 +83,32 @@ public class JavaGenerator implements Subscriber {
     // If is reset at each new query 
     private StringBuffer clientFunction;
 
-    public JavaGenerator(String rootFolder, String packageName, Publisher publisher) throws IOException {
+    public JavaGenerator(
+            String clientName,
+            String modelPath,
+            String modelPackage,
+            String pathsPath,
+            String pathsPackage,
+            String commonPath,
+            String commonPackage,
+            Publisher publisher) throws IOException {
         publisher.subscribeAll(this);
 
-        modelWriter = null;
+        this.clientName = clientName;
+        this.modelPath = modelPath;
+        this.modelPackage = modelPackage;
+        this.pathsPath = pathsPath;
+        this.pathsPackage = pathsPackage;
+        this.commonPath = commonPath;
+        this.commonPackage = commonPackage;
+
+        JavaModelWriter = new JavaModelWriter(this, modelPath);
         clientFunctions = new TreeMap<String, String>();
-        filesFolder = rootFolder + File.separatorChar + packageName;
-        modelWriter = new ModelWriter(this, filesFolder);
-        this.packageName = packageName;
     }
 
     public void terminate() {
-        modelWriter.close();
-        modelWriter = null;
+        JavaModelWriter.close();
+        JavaModelWriter = null;
 
         writeClientFunctions();
     }
@@ -144,7 +167,7 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event, TypeDef type) {
         switch(event) {
         case NEW_PROPERTY:
-            modelWriter.newProperty(type);
+            JavaModelWriter.newProperty(type);
             break;
         case QUERY_PARAMETER:
             addQueryParameter(type);
@@ -154,7 +177,7 @@ public class JavaGenerator implements Subscriber {
             break;
         case BODY_CONTENT:
             // This is not really a path parameter, but will behave like one in most situation of code generation
-            addPathParameter(type);
+            //            addPathParameter(type);
             break;
         default:
             throw new RuntimeException("Unimplemented event for TypeDef! " + event);
@@ -164,11 +187,11 @@ public class JavaGenerator implements Subscriber {
     @Override
     public void onEvent(Events event, StructDef sDef) {
         switch(event) {
-        case NEW_MODEL:
-            modelWriter.newModel(sDef, "responsemodels", "models");
+        case NEW_MODEL:            
+            JavaModelWriter.newModel(sDef, this.modelPackage);
             break;
         case NEW_RETURN_TYPE:
-            modelWriter.newModel(sDef, "responsemodels", "models");
+            JavaModelWriter.newModel(sDef, this.modelPackage);
             break;
         default:
             throw new RuntimeException("Unemplemented event for StructDef! " + event);
@@ -207,7 +230,7 @@ public class JavaGenerator implements Subscriber {
                     }
                 }
 
-                switch(pathParameters.get(propName)) {
+                switch(pathParameters.get(propName).javaTypeName) {
                 case "string":
                     pathSB.append("%s");
                     break;
@@ -246,7 +269,7 @@ public class JavaGenerator implements Subscriber {
         currentQueryName = Tools.getCamelCase(className, true);
         currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
 
-        pathParameters = new TreeMap<String, String>();
+        pathParameters = new TreeMap<String, TypeDef>();
         queryFunctions = new StringBuffer();
         imports = new TreeMap<String, Set<String>>();
 
@@ -254,49 +277,34 @@ public class JavaGenerator implements Subscriber {
             throw new RuntimeException("Query writer should be closed!");
         }
 
-        pathParameters = new TreeMap<String, String>();
-
-        // Also need to create the struct for the parameters
-        modelWriter.newModel(new StructDef(currentQueryName + "Params", "", null, null), "filtermodels", "models");
-
         // Add the entry into the applicationClient file
         clientFunction = new StringBuffer();
         clientFunction.append("func (c *Client) " + currentQueryName + "(");
     }
 
     private void addPathParameter(TypeDef type) {
-        String gotype = goType(type.rawTypeName, type.isOfType("array"));
         String propName = Tools.getCamelCase(
                 type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName, 
                         false);
-        pathParameters.put(propName, gotype);
+        pathParameters.put(propName, type);
 
         // client functions
         if (pathParameters.size() > 1) {
             clientFunction.append(", ");
         }
-        clientFunction.append(propName + " " + gotype);
+        clientFunction.append(propName + " " + type);
     }
 
     private void addQueryParameter(TypeDef type) {
 
         // Also need to add this to the path struct (model)
-        modelWriter.newProperty(type, Annotation.URL);
+        JavaModelWriter.newProperty(type);
         String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
         String funcName = Tools.getCamelCase(propName, true);
         String paramName = Tools.getCamelCase(propName, false);
         String desc = Tools.formatCommentGo(type.doc, funcName, "");
-        TypeConverter typeConv = goType(type.rawTypeName, type.isOfType("array"), 
-                true, propName);
 
 
-        append(queryFunctions, desc);
-        append(queryFunctions, 
-                "func (s *" + currentQueryName + ") " + 
-                        funcName + "(" + paramName + " " + typeConv.type + ") " + 
-                        "*" + currentQueryName + " {\n");
-        append(queryFunctions, TAB + "s.p." + funcName + " = " + typeConv.converter + "\n");
-        append(queryFunctions, TAB + "return s\n}\n\n");
     }
     private void endQuery() {
 
@@ -304,18 +312,11 @@ public class JavaGenerator implements Subscriber {
         clientFunction.append(") *" + currentQueryName + " {\n");
         clientFunction.append(TAB + "return &" + currentQueryName + "{");
 
-        Tools.addImport("A", "context");
-        if (pathParameters.size() > 0) {
-            Tools.addImport("A", "fmt");
-        }
-        Tools.addImport("C", "github.com/algorand/go-algorand-sdk/client/v2/common");
-        Tools.addImport("C", "github.com/algorand/go-algorand-sdk/client/v2/common/models");
-
         queryWriter = newFile(currentQueryName, filesFolder);
         append(queryWriter, 
                 "package " + packageName + "\n\n" +
                 "import (\n");
-        append(queryWriter, Tools.getImports());
+
         append(queryWriter, ")\n\n");
 
         append(queryWriter, Tools.formatCommentGo(pathDesc, currentQueryName, ""));
@@ -328,18 +329,14 @@ public class JavaGenerator implements Subscriber {
             }
         }
         formattingWidth += 1;
-        append(queryWriter, TAB + "c" + spaces(formattingWidth - 1) + "*Client\n");
-        if (modelWriter.modelPropertyAdded()) {
-            append(queryWriter, TAB + "p" + spaces(formattingWidth - 1) + "models." + currentQueryName + "Params\n");
+        if (JavaModelWriter.modelPropertyAdded()) {
         }
 
         clientFunction.append("c: c");
 
-        Iterator<Entry<String, String>> pps = pathParameters.entrySet().iterator();
+        Iterator<Entry<String, TypeDef>> pps = pathParameters.entrySet().iterator();
         while(pps.hasNext()) {
-            Entry<String, String> pp = pps.next();
-            append(queryWriter, TAB + pp.getKey() + 
-                    spaces(formattingWidth - pp.getKey().length()) + pp.getValue() + "\n");
+            Entry<String, TypeDef> pp = pps.next();
             clientFunction.append(", " + pp.getKey() + ": " + pp.getKey());
         }
         append(queryWriter, "}\n\n");
@@ -351,7 +348,6 @@ public class JavaGenerator implements Subscriber {
                 Tools.formatCommentGo(pathDesc, "", "") + clientFunction.toString());
 
         append(queryWriter, queryFunctions.toString());
-        append(queryWriter, getDoFunction());
         closeFile(queryWriter);
         queryWriter = null;
     }
@@ -377,11 +373,11 @@ public class JavaGenerator implements Subscriber {
         }
     }
 
-    public static void append(StringBuffer sb, String text) {
+    public static void append(StringBuilder sb, String text) {
         sb.append(text);
     }
 
-    public static void append(BufferedWriter sb, StringBuffer text) {
+    public static void append(BufferedWriter sb, StringBuilder text) {
         try {
             sb.append(text);
         } catch (IOException e) {
@@ -396,22 +392,24 @@ public class JavaGenerator implements Subscriber {
             e.printStackTrace();
         }
     }
-
 }
 
-final class ModelWriter {
-    // modelWriter writes all the response and other structures into a single file
-    private BufferedWriter modelWriter;
+final class JavaModelWriter {
+
+    public static final String TAB = JavaGenerator.TAB;
+
+    // JavaModelWriter writes all the response and other structures into a single file
+    private BufferedWriter modelFileWriter;
 
     // currentModelBuffer holds the model code as it is constructed
     // used for skipping models with no parameters. 
-    private StringBuffer currentModelBuffer;
+    private StringBuilder currentModelBuffer;
 
     // pendingOpenStruct indicates if a struct is not closed yet, 
     // expecting more parameters. This is useful to do away with the 
     // end call. The end call is implicit at the time of a new struct or 
     // at the time of terminate. 
-    private boolean pendingOpenStruct;
+    private boolean pendingOpenFile;
 
 
     // Indicates if any property is added to this model
@@ -428,40 +426,31 @@ final class ModelWriter {
 
     private JavaGenerator javagen;
     private String folder;
-    private String filename;
 
-    public ModelWriter(JavaGenerator javagen, String folder) {
+    public JavaModelWriter(JavaGenerator javagen, String folder) {
         currentModelBuffer = null;
-        pendingOpenStruct = false;
+        pendingOpenFile = false;
         this.javagen = javagen;
         this.folder = folder;
-        this.filename = "";
     }
 
     public void close () {
-        if (pendingOpenStruct) {
-            currentModelBuffer.append("}\n");
-        }
-        pendingOpenStruct = false;
 
-        JavaGenerator.append(modelWriter, Tools.getImports(imports));
+        writeProperties(currentModelBuffer);
+        writeCompareMethod(className, currentModelBuffer, getSortedProperties());
 
-        writeCompareMethod(className, body, properties);
+        JavaGenerator.append(currentModelBuffer, "}\n");
 
-        bw.append(body);
-        bw.append("}\n");
-        bw.close();
-
-
+        JavaGenerator.append(modelFileWriter, Tools.getImports(imports));
         if (modelPropertyAdded) {
-            JavaGenerator.append(modelWriter, currentModelBuffer);
+            JavaGenerator.append(modelFileWriter, currentModelBuffer);
         }
         modelPropertyAdded = false;
 
-        if (modelWriter != null) {
-            JavaGenerator.closeFile(modelWriter);
+        if (modelFileWriter != null) {
+            JavaGenerator.closeFile(modelFileWriter);
         }
-        modelWriter = null;
+        modelFileWriter = null;
     }
 
     public boolean modelPropertyAdded() {
@@ -470,27 +459,26 @@ final class ModelWriter {
 
     public void newProperty(TypeDef type) {
         modelPropertyAdded = true;
-        properties.put(Tools.getCamelCase(type.propertyName, true), type);
+        properties.put(Tools.getCamelCase(type.propertyName, false), type);
     }
 
     // newModel can write into one file at a time.
     // This is a limitation, but there is no need for more.
-    // At any time, there can be one currentModelBuffer, and one modelWriter
-    public void newModel(StructDef sDef, String filename, String packageName) {
-        if (filename.compareTo(this.filename) != 0) {
+    // At any time, there can be one currentModelBuffer, and one JavaModelWriter
+    public void newModel(StructDef sDef, String packageName) {
+
+        if (pendingOpenFile) {
             this.close();
+            pendingOpenFile = false;            
         }
-        if (pendingOpenStruct) {
-            JavaGenerator.append(currentModelBuffer, "}\n\n");
-        }
-        if (modelPropertyAdded) {
-            JavaGenerator.append(modelWriter, currentModelBuffer);
-        }
-        if (modelWriter == null) {
-            this.filename = filename;
-            String className = Tools.getCamelCase(filename, true);
-            modelWriter = JavaGenerator.newFile(className, folder);
-            JavaGenerator.append(modelWriter, "package " + packageName + ";\n\n");
+        this.imports = new HashMap<String, Set<String>>();
+        this.properties = new TreeMap<String, TypeDef>();
+
+        if (modelFileWriter == null) {
+
+            className = Tools.getCamelCase(sDef.name, true);
+            modelFileWriter = JavaGenerator.newFile(className, folder);
+            JavaGenerator.append(modelFileWriter, "package " + packageName + ";\n\n");
 
             imports = new HashMap<>();
 
@@ -499,14 +487,14 @@ final class ModelWriter {
             Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
             Tools.addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
 
-            currentModelBuffer = new StringBuffer();
+            currentModelBuffer = new StringBuilder();
             if (sDef.doc != null) {
                 JavaGenerator.append(currentModelBuffer, Tools.formatComment(sDef.doc, "", true));
             }
             JavaGenerator.append(currentModelBuffer, "public class " + className + " extends PathResponse {\n\n");
         }
 
-        pendingOpenStruct = true;
+        pendingOpenFile = true;
         modelPropertyAdded = false;
     }
 
@@ -536,26 +524,55 @@ final class ModelWriter {
             String desc = null;
             if (typeObj.doc != null) {
                 desc = typeObj.doc;
-                desc = Tools.formatComment(desc, JavaGenerator.TAB + "", true);
+                desc = Tools.formatComment(desc, TAB + "", true);
             }
 
             // public type
             if (desc != null) buffer.append(desc);
-            buffer.append(getPropertyWithJsonSetter(typeObj, javaName));
+            getPropertyWithJsonSetter(typeObj, buffer, imports);
             buffer.append("\n");
         }
     }
 
+    static void writeExpandedDefinitions(TypeDef typeObj, StringBuilder buffer,
+            HashMap<String, Set<String>> imports, boolean forModel){
+        if (typeObj.javaTypeName.equalsIgnoreCase("Address")) {
+            getAddress(typeObj, buffer, imports, forModel);
+        }
+        if (typeObj.isOfType("enum")) {
+            getEnum(typeObj, buffer);
+        }
+        if (typeObj.rawTypeName.equals("binary")) {
+            if (typeObj.javaTypeName.equals("byte[]")) {
+                getBase64Encoded(typeObj, buffer, imports);    
+                return;
+            }
+            getBase64EncodedArray(typeObj, buffer, imports, forModel);
+
+        }
+
+    }
 
     // getPropertyWithJsonSetter formats the property into java declaration type with 
     // the appropriate json annotation.
-    static String getPropertyWithJsonSetter(TypeDef typeObj, String javaName){
-        StringBuilder buffer = new StringBuilder();
+    static void getPropertyWithJsonSetter(TypeDef typeObj, StringBuilder buffer, 
+            HashMap<String, Set<String>> imports){
         String jprop = typeObj.propertyName;
-
+        String javaName = Tools.getCamelCase(jprop, false);
         if (typeObj.isOfType("getterSetter")) {
-            return typeObj.def.toString();
+            writeExpandedDefinitions(typeObj, buffer, imports, true);
+            return;
         }
+
+        switch (typeObj.javaTypeName) {
+        case "HashMap<String,Object>":
+            Tools.addImport(imports, "java.util.HashMap");
+            break;
+        case "SignedTransaction":
+            Tools.addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
+            break;
+        }
+
 
         switch (typeObj.javaTypeName) {
         case "java.util.DateTime":
@@ -566,33 +583,25 @@ final class ModelWriter {
         case "boolean":
         case "java.math.BigInteger":
         default: // List and Models with Json properties
-            buffer.append(JavaGenerator.TAB + "@JsonProperty(\"" + jprop + "\")\n");
-            buffer.append(JavaGenerator.TAB + "public " + typeObj.javaTypeName + " " + javaName);
+            buffer.append(TAB + "@JsonProperty(\"" + jprop + "\")\n");
+            buffer.append(TAB + "public " + typeObj.javaTypeName + " " + javaName);
             if (typeObj.isOfType("array")) {
                 buffer.append(" = new Array" + typeObj.javaTypeName + "()");
             }
             buffer.append(";\n");
         }
-        return buffer.toString();
     }
 
 
     // Get array type of base64 encoded bytes.
     // It provides the special getter/setter needed for this type
-    static TypeDef getEnum(JsonNode prop, String propName, String goPropertyName) {
-        JsonNode enumNode = prop.get("enum");
-        if (enumNode == null) {
-            throw new RuntimeException("Cannot find enum info in node: " + prop.toString());
-        }
-        StringBuilder sb = new StringBuilder();
-        String enumClassName = Tools.getCamelCase(propName, true);
-        sb.append(TAB + "public enum " + enumClassName + " {\n");
+    static void getEnum(TypeDef typeObj, StringBuilder sb) {
+        String javaTypeName = Tools.getCamelCase(typeObj.goPropertyName, true);
+        sb.append(TAB + "public enum " + javaTypeName + " {\n");
 
-        Iterator<JsonNode> elmts = enumNode.elements();
-        List<String> enumValues = new ArrayList<>();
+        Iterator<String> elmts = typeObj.enumValues.iterator();
         while(elmts.hasNext()) {
-            String val = elmts.next().asText();
-            enumValues.add(val);
+            String val = elmts.next();
             sb.append(TAB + TAB + "@JsonProperty(\"" + val + "\") ");
             String javaEnum = Tools.getCamelCase(val, true).toUpperCase();
             sb.append(javaEnum);
@@ -604,7 +613,7 @@ final class ModelWriter {
             }
         }
         sb.append(TAB + TAB + "final String serializedName;\n");
-        sb.append(TAB + TAB + "" + enumClassName + "(String name) {\n");
+        sb.append(TAB + TAB + "" + javaTypeName + "(String name) {\n");
         sb.append(TAB + TAB + TAB + "this.serializedName = name;\n");
         sb.append(TAB + TAB + "}\n\n");
         sb.append(TAB + TAB + "@Override\n");
@@ -613,26 +622,24 @@ final class ModelWriter {
         sb.append(TAB + TAB + "}\n");
 
         sb.append(TAB + "}\n");
-        enumClassName = "Enums." + enumClassName;
-        String desc = prop.get("description") == null ? "" : prop.get("description").asText();
-
-        TypeDef td = new TypeDef(enumClassName, prop.get("type").asText(),
-                sb.toString(), "enum", propName, goPropertyName, desc, isRequired(prop));
-        td.enumValues = enumValues;
-        return td;
+        javaTypeName = "Enums." + javaTypeName;
     }
 
 
     // Get array type of base64 encoded bytes.
     // It provides the special getter/setter needed for this type
-    static TypeDef getBase64EncodedArray(String propName, String goPropertyName, String rawType,
-            boolean forModel, String desc, boolean required) {
+    static void getBase64EncodedArray(TypeDef typeObj, StringBuilder sb,
+            HashMap<String, Set<String>> imports, boolean forModel) {
         if (forModel == false) {
             throw new RuntimeException("array of byte[] cannot yet be used in a path or path query.");
         }
 
+        if (imports != null) {
+            Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
+        }
+
+        String propName = typeObj.propertyName;
         String javaName = Tools.getCamelCase(propName, false);
-        StringBuilder sb = new StringBuilder();
 
         sb.append("    @JsonProperty(\"" + propName + "\")\n" +
                 "    public void " + javaName + "(List<String> base64Encoded) {\n" +
@@ -650,17 +657,19 @@ final class ModelWriter {
                 "         return ret; \n" +
                 "     }\n" +
                 "    public List<byte[]> " + javaName + ";\n");
-        // getterSetter typeName is only used in path.
-        return new TypeDef("", "binary", sb.toString(), "getterSetter,array", 
-                propName, goPropertyName, desc, required);
     }
 
     // Get base64 encoded byte[] type.
     // It provides the special getter/setter needed for this type
-    static TypeDef getBase64Encoded(String propName, String goPropertyName, String rawType,
-            boolean forModel, String desc, boolean required) {
+    static void getBase64Encoded(TypeDef typeObj, StringBuilder sb,
+            HashMap<String, Set<String>> imports) {
+
+        if (imports != null) {
+            Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
+        }
+
+        String propName = typeObj.propertyName;
         String javaName = Tools.getCamelCase(propName, false);
-        StringBuilder sb = new StringBuilder();
         sb.append("    @JsonProperty(\"" + propName + "\")\n" +
                 "    public void " + javaName + "(String base64Encoded) {\n" +
                 "        this."+ javaName +" = Encoder.decodeFromBase64(base64Encoded);\n" +
@@ -671,19 +680,22 @@ final class ModelWriter {
                 "    }\n" +
                 "    public byte[] "+ javaName +";\n");
         // getterSetter typeName is only used in path.
-        return new TypeDef("byte[]", "binary", "getterSetter", 
-                propName, goPropertyName, desc, required);
     }
 
     // Get TypeDef for Address type. 
     // It provides the special getter/setter needed for this type.
-    static TypeDef getAddress(String propName, String goPropertyName,
-            boolean forModel, String desc, boolean required) {
+    static void getAddress(TypeDef typeObj, StringBuilder buffer,
+            HashMap<String, Set<String>> imports, boolean forModel){
 
-        StringBuilder sb = new StringBuilder();
+        if (forModel) {
+            Tools.addImport(imports, "java.security.NoSuchAlgorithmException");
+        }
+        Tools.addImport(imports, "com.algorand.algosdk.crypto.Address");
+
+        String propName = typeObj.propertyName;
         String javaName = Tools.getCamelCase(propName, false);
 
-        sb.append(TAB + "@JsonProperty(\"" + propName + "\")\n" + 
+        buffer.append(TAB + "@JsonProperty(\"" + propName + "\")\n" + 
                 "    public void " + javaName + "(String "+ javaName +") throws NoSuchAlgorithmException {\n" + 
                 "        this."+ javaName +" = new Address("+ javaName +");\n" + 
                 "    }\n" + 
@@ -696,8 +708,6 @@ final class ModelWriter {
                 "        }\n" +
                 "    }\n" + 
                 "    public Address " + javaName + ";\n");
-        return new TypeDef("Address", "address", sb.toString(), "getterSetter", propName, 
-                goPropertyName, desc, required);
     }
 
 
@@ -721,7 +731,7 @@ final class ModelWriter {
 
         StringBuilder generatedPathsEntryBody = new StringBuilder();
 
-        requestMethod.append(OpenApiParser.getQueryResponseMethod(returnType));
+        requestMethod.append(getQueryResponseMethod(returnType));
         requestMethod.append("    protected QueryData getRequestString() {\n");
         boolean pAdded = false;
         boolean addFormatMsgpack = false;
@@ -730,7 +740,7 @@ final class ModelWriter {
             Entry<String, JsonNode> prop = properties.next();
             String propName = Tools.getCamelCase(prop.getKey(), false);
             String setterName = Tools.getCamelCase(prop.getKey(), false);
-            TypeDef propType = getType(prop.getValue(), true, prop.getKey(), false);
+            TypeDef propType = null;// = getType(prop.getValue(), true, prop.getKey(), false);
 
             // Do not expose format property
             if (propType.javaTypeName.equals("Enums.Format")) {
@@ -745,7 +755,7 @@ final class ModelWriter {
             // The parameters are either in the path or in the query
 
             // Populate generator structures for the in path parameters
-            if (inPath(prop.getValue())) {
+            if (true){//inPath(prop.getValue())) {
                 if (propType.isOfType("enum")) {
                     throw new RuntimeException("Enum in paths is not supported! " + propName);
                 }
@@ -769,7 +779,7 @@ final class ModelWriter {
                 generatedPathsEntryBody.append(", " + propName);
                 pAdded = true;
 
-                publisher.publish(Events.PATH_PARAMETER, propType);
+                //publisher.publish(Events.PATH_PARAMETER, propType);
 
                 continue;
             }
@@ -783,19 +793,19 @@ final class ModelWriter {
             builders.append(TAB + "public " + className + " " + setterName + "(" + propType.javaTypeName + " " + propName + ") {\n");
             String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
 
-            if (inBody(prop.getValue())) {
+            if (true) {//inBody(prop.getValue())) {
                 builders.append(TAB + TAB + "addToBody("+ propName +");\n");
-                publisher.publish(Events.BODY_CONTENT, propType);
+                ///publisher.publish(Events.BODY_CONTENT, propType);
             } else {
                 builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
-                publisher.publish(Events.QUERY_PARAMETER, propType);
+                ///publisher.publish(Events.QUERY_PARAMETER, propType);
             }
             builders.append(TAB + TAB + "return this;\n");
             builders.append(TAB + "}\n");
             builders.append("\n");
 
-            if (isRequired(prop.getValue())) {
-                if (inBody(prop.getValue())) {
+            if (true) {//isRequired(prop.getValue())) {
+                if (true) {//inBody(prop.getValue())) {
                     requestMethod.append("        if (qd.bodySegments.isEmpty()) {\n");
                 } else {
                     requestMethod.append("        if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
@@ -813,7 +823,7 @@ final class ModelWriter {
 
         // Add the path construction code.
         // The path is constructed in the end, while the query params are added as the
-        ArrayList<String> al = getPathInserts(path);
+        ArrayList<String> al = null;//getPathInserts(path);
         for (String str : al) {
             requestMethod.append(
                     "        addPathSegment(String.valueOf(" + str + "));\n");
@@ -886,11 +896,11 @@ final class ModelWriter {
         if (spec.has("responses") && spec.get("responses").has("200") &&
                 spec.get("responses").get("200").get("$ref") != null) {
             returnType = spec.get("responses").get("200").get("$ref").asText();
-            JsonNode returnTypeNode = this.getFromRef(returnType);
+            JsonNode returnTypeNode = null;//this.getFromRef(returnType);
             if (returnTypeNode.get("schema").get("$ref") != null) {
-                returnType = OpenApiParser.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
+                returnType = null;// OpenApiParser.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
             } else {
-                returnType = OpenApiParser.getTypeNameFromRef(returnType);
+                returnType = null;//OpenApiParser.getTypeNameFromRef(returnType);
                 returnType = Tools.getCamelCase(returnType, true);
             }
         }
@@ -899,7 +909,7 @@ final class ModelWriter {
         System.out.println("Generating ... " + className);
         Iterator<Entry<String, JsonNode>> properties = null;
         if ( paramNode != null) {
-            properties = getSortedParameters(paramNode);
+            properties = null;//getSortedParameters(paramNode);
         }
 
         Map<String, Set<String>> imports = new HashMap<String, Set<String>>();
@@ -908,7 +918,7 @@ final class ModelWriter {
         Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Query");
         Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
         Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
-        if (needsClassImport(returnType.toLowerCase())) {
+        if (true){//needsClassImport(returnType.toLowerCase())) {
             Tools.addImport(imports, modelPkg + "." + returnType);
         }
 
@@ -916,7 +926,7 @@ final class ModelWriter {
 
         generatedPathsEntry.append("    public " + className + " " + methodName + "(");
         String [] strarray = {className, returnType, path, desc, httpMethod};
-        this.publisher.publish(Events.NEW_QUERY, strarray);
+        //this.publisher.publish(Events.NEW_QUERY, strarray);
 
         String queryParamsCode = processQueryParams(
                 generatedPathsEntry,
@@ -927,7 +937,7 @@ final class ModelWriter {
                 httpMethod,
                 imports);
 
-        if (legacyMode) {
+        if (true) {
             StringBuilder sb = new StringBuilder();
             sb.append("\n");
             sb.append(Tools.formatComment(discAndPath, "", true));
@@ -935,19 +945,20 @@ final class ModelWriter {
             sb.append(queryParamsCode);
             sb.append("\n}");
 
-            BufferedWriter bw = getFileWriter(className, directory);
+            BufferedWriter bw = null;//getFileWriter(className, directory);
             bw.append("package " + pkg + ";\n\n");
             bw.append(Tools.getImports(imports));
             bw.append(sb);
             bw.close();
         }
 
-        publisher.publish(Events.END_QUERY);
+        //publisher.publish(Events.END_QUERY);
     }
 
 
     // Writes the compare methods by adding a comparator for each class member. 
-    static void writeCompareMethod(String className, StringBuilder buffer, Iterator<Entry<String, JsonNode>> properties) {
+    static void writeCompareMethod(String className, 
+            StringBuilder buffer, Iterator<Entry<String, TypeDef>> properties) {
         buffer.append("    @Override\n" +
                 "    public boolean equals(Object o) {\n" +
                 "\n" +
@@ -956,7 +967,7 @@ final class ModelWriter {
         buffer.append("\n");
         buffer.append("        " + className + " other = (" + className + ") o;\n");
         while (properties.hasNext()) {
-            Entry<String, JsonNode> prop = properties.next();
+            Entry<String, TypeDef> prop = properties.next();
             String jprop = prop.getKey();
             String javaName = Tools.getCamelCase(jprop, false);
             buffer.append("        if (!Objects.deepEquals(this." + javaName + ", other." + javaName + ")) return false;\n");
@@ -967,8 +978,8 @@ final class ModelWriter {
 
     // Generate all the enum classes in the spec file. 
     public void generateEnumClasses (JsonNode root, String rootPath, String pkg) throws IOException {
-        if (javaMode) {
-            BufferedWriter bw = getFileWriter("Enums", rootPath);
+        if (true) {
+            BufferedWriter bw = null;//getFileWriter("Enums", rootPath);
             bw.append("package " + pkg + ";\n\n");
             bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
             bw.append("public class Enums {\n\n");
@@ -988,8 +999,8 @@ final class ModelWriter {
                         comment = cls.getValue().get("description").asText();
                         bw.append(Tools.formatComment(comment, "", true));
                     }
-                    TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), "");
-                    bw.append(enumType.def);
+                    //TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), "");
+                    //bw.append(enumType.def);
                     bw.append("\n");
                 }
             }
