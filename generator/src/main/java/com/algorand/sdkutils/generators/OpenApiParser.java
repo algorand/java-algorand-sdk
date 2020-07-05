@@ -88,7 +88,6 @@ public class OpenApiParser {
     TypeDef getType(
             JsonNode prop, 
             boolean asObject,
-//XXX            Map<String, Set<String>> imports,
             String propName, boolean forModel) {        
         String desc = prop.get("description") == null ? "" : prop.get("description").asText();
         String goName = prop.get("x-go-name") != null ? 
@@ -111,9 +110,6 @@ public class OpenApiParser {
         }
 
         if (prop.get("enum") != null) {
-            if (!forModel && !propName.equals("format")) {
-//XXX                addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
-            }
             return getEnum(prop, propName, goName);
         }
 
@@ -392,7 +388,7 @@ public class OpenApiParser {
             Entry<String, JsonNode> prop = properties.next();
             String propName = Tools.getCamelCase(prop.getKey(), false);
             TypeDef propType = getType(prop.getValue(), true, prop.getKey(), false);
-
+            
             // Do not expose format property
             if (propType.javaTypeName.equals("Enums.Format")) {
                 continue;

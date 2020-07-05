@@ -29,8 +29,8 @@ public class JavaGenerator implements Subscriber {
     String clientName;
     String modelPath;
     String modelPackage;
-    String pathsPath;
-    String pathsPackage;
+    String queryFilesDirectory;
+    String queryPackage;
     String commonPath;
     String commonPackage;
 
@@ -43,7 +43,11 @@ public class JavaGenerator implements Subscriber {
 
     // JavaModelWriter is a manager of the model file writer
     // It is limited to only one file at a time.
-    private JavaModelWriter JavaModelWriter;
+    private JavaModelWriter javaModelWriter;
+
+
+    JavaQueryWriter javaQueryWriter;
+
 
     // Query files
 
@@ -87,8 +91,8 @@ public class JavaGenerator implements Subscriber {
             String clientName,
             String modelPath,
             String modelPackage,
-            String pathsPath,
-            String pathsPackage,
+            String queryFilesDirectory,
+            String queryPackage,
             String commonPath,
             String commonPackage,
             Publisher publisher) throws IOException {
@@ -97,18 +101,18 @@ public class JavaGenerator implements Subscriber {
         this.clientName = clientName;
         this.modelPath = modelPath;
         this.modelPackage = modelPackage;
-        this.pathsPath = pathsPath;
-        this.pathsPackage = pathsPackage;
+        this.queryFilesDirectory = queryFilesDirectory;
+        this.queryPackage = queryPackage;
         this.commonPath = commonPath;
         this.commonPackage = commonPackage;
 
-        JavaModelWriter = new JavaModelWriter(this, modelPath);
+        javaModelWriter = new JavaModelWriter(this, modelPath);
         clientFunctions = new TreeMap<String, String>();
     }
 
     public void terminate() {
-        JavaModelWriter.close();
-        JavaModelWriter = null;
+        javaModelWriter.close();
+        javaModelWriter = null;
 
         writeClientFunctions();
     }
@@ -145,7 +149,7 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event) {
         switch(event) {
         case END_QUERY:
-            endQuery();
+            javaQueryWriter.finalize();
             break;
         default:
             throw new RuntimeException("Unimplemented event! " + event);
@@ -156,7 +160,8 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event, String [] notes) {
         switch(event) {
         case NEW_QUERY:
-            newQuery(notes[0], notes[1], notes[2], notes[3], notes[4]);
+            javaQueryWriter = new JavaQueryWriter(notes[0], notes[1], notes[2],
+						  notes[3], notes[4], queryFilesDirectory, queryPackage);
             break;
         default:
             throw new RuntimeException("Unimplemented event for note! " + event);
@@ -167,17 +172,16 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event, TypeDef type) {
         switch(event) {
         case NEW_PROPERTY:
-            JavaModelWriter.newProperty(type);
+            javaModelWriter.newProperty(type);
             break;
         case QUERY_PARAMETER:
-            addQueryParameter(type);
+            javaQueryWriter.addQueryProperty(type, true, false, false);
             break;
         case PATH_PARAMETER:
-            addPathParameter(type);
+            javaQueryWriter.addQueryProperty(type, false, true, false);
             break;
         case BODY_CONTENT:
-            // This is not really a path parameter, but will behave like one in most situation of code generation
-            //            addPathParameter(type);
+            javaQueryWriter.addQueryProperty(type, false, false, true);
             break;
         default:
             throw new RuntimeException("Unimplemented event for TypeDef! " + event);
@@ -188,10 +192,10 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event, StructDef sDef) {
         switch(event) {
         case NEW_MODEL:            
-            JavaModelWriter.newModel(sDef, this.modelPackage);
+            javaModelWriter.newModel(sDef, this.modelPackage);
             break;
         case NEW_RETURN_TYPE:
-            JavaModelWriter.newModel(sDef, this.modelPackage);
+            javaModelWriter.newModel(sDef, this.modelPackage);
             break;
         default:
             throw new RuntimeException("Unemplemented event for StructDef! " + event);
@@ -256,6 +260,8 @@ public class JavaGenerator implements Subscriber {
 
 
 
+
+
     private void newQuery(
             String className,
             String returnTypeName,
@@ -298,7 +304,7 @@ public class JavaGenerator implements Subscriber {
     private void addQueryParameter(TypeDef type) {
 
         // Also need to add this to the path struct (model)
-        JavaModelWriter.newProperty(type);
+        javaModelWriter.newProperty(type);
         String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
         String funcName = Tools.getCamelCase(propName, true);
         String paramName = Tools.getCamelCase(propName, false);
@@ -329,7 +335,7 @@ public class JavaGenerator implements Subscriber {
             }
         }
         formattingWidth += 1;
-        if (JavaModelWriter.modelPropertyAdded()) {
+        if (javaModelWriter.modelPropertyAdded()) {
         }
 
         clientFunction.append("c: c");
@@ -392,6 +398,211 @@ public class JavaGenerator implements Subscriber {
             e.printStackTrace();
         }
     }
+}
+
+final class JavaQueryWriter {
+    
+    public static final String TAB = JavaGenerator.TAB;
+
+    StringBuilder decls;
+    StringBuilder builders;
+    StringBuilder constructorHeader;
+    StringBuilder constructorBody;
+    StringBuilder requestMethod;
+    ArrayList<String> constructorComments;
+    
+    String className;
+    String httpMethod;
+    String discAndPath;
+
+    StringBuilder generatedPathsEntryBody;
+    StringBuilder generatedPathsEntry;
+
+    boolean pAdded = false;
+    boolean addFormatMsgpack = false;
+
+    String queryFilesDirectory;
+    String queryPackage;
+
+    TreeMap<String, Set<String>> imports;
+    
+    public JavaQueryWriter(
+            String className,
+            String returnType,
+            String path,
+            String desc,	    
+            String httpMethod,
+	    String queryFilesDirectory,
+	    String queryPackage) {
+        this.className = className;
+        decls = new StringBuilder();
+        builders = new StringBuilder();
+        constructorHeader = new StringBuilder();
+        constructorBody = new StringBuilder();
+        requestMethod = new StringBuilder();
+        constructorComments = new ArrayList<String>();
+
+        generatedPathsEntryBody = new StringBuilder();
+	this.httpMethod = httpMethod;
+        this.generatedPathsEntry = new StringBuilder();
+	this.queryFilesDirectory = queryFilesDirectory;
+	this.queryPackage = queryPackage;
+	
+        requestMethod.append(getQueryResponseMethod(returnType));
+        requestMethod.append("    protected QueryData getRequestString() {\n");
+        pAdded = false;
+        addFormatMsgpack = false;
+
+	discAndPath = desc + "\n" + path;
+
+	imports = new TreeMap<String, Set<String>>();
+    }
+
+    public void addQueryProperty(TypeDef propType, boolean inQuery, boolean inPath, boolean inBody) {
+
+        String propName = Tools.getCamelCase(propType.goPropertyName, false);
+        String setterName = Tools.getCamelCase(propType.goPropertyName, false);
+
+        String propCode = propType.propertyName;
+
+        // The parameters are either in the path or in the query
+
+        // Populate generator structures for the in path parameters
+        if (inPath){
+            if (propType.isOfType("enum")) {
+                throw new RuntimeException("Enum in paths is not supported! " + propName);
+            }
+            decls.append(TAB + "private " + propType.javaTypeName + " " + propName + ";\n");
+            String desc = "";
+            if (propType.doc != null) {
+                desc = propType.doc;
+                desc = Tools.formatComment("@param " + propName + " " + desc, TAB, false);
+                constructorComments.add(desc);
+            }
+
+            constructorHeader.append(", " + propType.javaTypeName + " " + propName);
+            constructorBody.append("        this." + propName + " = " + propName + ";\n");
+
+            if (pAdded) {
+                generatedPathsEntry.append(",\n            ");
+            }
+
+            generatedPathsEntry.append(propType.javaTypeName + " " + propName);
+            generatedPathsEntryBody.append(", " + propName);
+            pAdded = true;
+        }
+
+        if (propType.doc != null) {
+            String desc = propType.doc;
+            desc = Tools.formatComment(desc, TAB, true);
+            builders.append(desc);
+        }
+        builders.append(TAB + "public " + className + " " + setterName + "(" + propType.javaTypeName + " " + propName + ") {\n");
+        String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
+
+        if (inBody) {
+            builders.append(TAB + TAB + "addToBody("+ propName +");\n");
+        } else {
+            builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
+        }
+        builders.append(TAB + TAB + "return this;\n");
+        builders.append(TAB + "}\n");
+        builders.append("\n");
+
+        if (propType.required) {
+            if (inBody) {
+                requestMethod.append("        if (qd.bodySegments.isEmpty()) {\n");
+            } else {
+                requestMethod.append("        if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
+            }
+            requestMethod.append("            throw new RuntimeException(\"" +
+                    propCode + " is not set. It is a required parameter.\");\n        }\n");
+        }
+    }
+
+    public void finalize() {
+
+        generatedPathsEntry.append(") {\n");
+        generatedPathsEntry.append("        return new "+className+"((Client) this");
+        generatedPathsEntry.append(generatedPathsEntryBody);
+        generatedPathsEntry.append(");\n    }\n\n");
+
+        // Add the path construction code.
+        // The path is constructed in the end, while the query params are added as the
+        ArrayList<String> al = null;//getPathInserts(path);
+        for (String str : al) {
+            requestMethod.append(
+                    "        addPathSegment(String.valueOf(" + str + "));\n");
+        }
+
+        requestMethod.append("\n" +
+                "        return qd;\n" +
+                "    }");
+
+        StringBuilder queryParamsCode = new StringBuilder();
+        queryParamsCode.append(decls);
+        if (!decls.toString().isEmpty()) {
+            queryParamsCode.append("\n");
+        }
+
+        // constructor
+        if (constructorComments.size() > 0) {
+            queryParamsCode.append("    /**");
+            for (String elt : constructorComments) {
+                queryParamsCode.append("\n" + elt);
+            }
+            queryParamsCode.append("\n     */\n");
+        }
+        queryParamsCode.append("    public "+className+"(Client client");
+        queryParamsCode.append(constructorHeader);
+        queryParamsCode.append(") {\n        super(client, new HttpMethod(\""+httpMethod+"\"));\n");
+        if (addFormatMsgpack) {
+            queryParamsCode.append("        addQuery(\"format\", \"msgpack\");\n");
+        }
+
+        queryParamsCode.append(constructorBody);
+        queryParamsCode.append("    }\n\n");
+
+        queryParamsCode.append(builders);
+        queryParamsCode.append(requestMethod);
+		
+	StringBuilder sb = new StringBuilder();
+            sb.append("\n");
+            sb.append(Tools.formatComment(discAndPath, "", true));
+            sb.append("public class " + className + " extends Query {\n\n");
+            sb.append(queryParamsCode);
+            sb.append("\n}");
+
+            BufferedWriter bw = JavaGenerator.newFile(className, queryFilesDirectory);
+            JavaGenerator.append(bw, "package " + queryPackage + ";\n\n");
+            JavaGenerator.append(bw, Tools.getImports(imports));
+            JavaGenerator.append(bw, sb);
+            JavaGenerator.closeFile(bw);
+ 
+    }
+
+    static String getQueryResponseMethod(String returnType) {
+        String ret =
+                "    @Override\n" +
+                        "    public Response<" + returnType + "> execute() throws Exception {\n" +
+                        "        Response<" + returnType + "> resp = baseExecute();\n" +
+                        "        resp.setValueType(" + returnType + ".class);\n" +
+                        "        return resp;\n" +
+                        "    }\n\n";
+        return ret;
+    }
+
+    static String getStringValueOfStatement(String propType, String propName) {
+        switch (propType) {
+        case "Date":
+            return "Utils.getDateString(" + propName + ")";
+        case "byte[]":
+            return "Encoder.encodeToBase64(" + propName + ")";
+        default:
+            return "String.valueOf("+propName+")";
+        }
+    }
+
 }
 
 final class JavaModelWriter {
@@ -564,9 +775,11 @@ final class JavaModelWriter {
             return;
         }
 
-        switch (typeObj.javaTypeName) {
-        case "HashMap<String,Object>":
-            Tools.addImport(imports, "java.util.HashMap");
+        switch (typeObj.rawTypeName) {
+        case "object":
+            if (typeObj.javaTypeName.equals("HashMap<String,Object>")) {
+                Tools.addImport(imports, "java.util.HashMap");
+            }
             break;
         case "SignedTransaction":
             Tools.addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
@@ -731,7 +944,7 @@ final class JavaModelWriter {
 
         StringBuilder generatedPathsEntryBody = new StringBuilder();
 
-        requestMethod.append(getQueryResponseMethod(returnType));
+	//        requestMethod.append(getQueryResponseMethod(returnType));
         requestMethod.append("    protected QueryData getRequestString() {\n");
         boolean pAdded = false;
         boolean addFormatMsgpack = false;
@@ -791,13 +1004,13 @@ final class JavaModelWriter {
                 builders.append(desc);
             }
             builders.append(TAB + "public " + className + " " + setterName + "(" + propType.javaTypeName + " " + propName + ") {\n");
-            String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
+	    //            String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
 
             if (true) {//inBody(prop.getValue())) {
                 builders.append(TAB + TAB + "addToBody("+ propName +");\n");
                 ///publisher.publish(Events.BODY_CONTENT, propType);
             } else {
-                builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
+		//                builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
                 ///publisher.publish(Events.QUERY_PARAMETER, propType);
             }
             builders.append(TAB + TAB + "return this;\n");
@@ -815,7 +1028,7 @@ final class JavaModelWriter {
             }
 
         }
-
+ 
         generatedPathsEntry.append(") {\n");
         generatedPathsEntry.append("        return new "+className+"((Client) this");
         generatedPathsEntry.append(generatedPathsEntryBody);
@@ -1009,25 +1222,4 @@ final class JavaModelWriter {
         }
     }
 
-    static String getQueryResponseMethod(String returnType) {
-        String ret =
-                "    @Override\n" +
-                        "    public Response<" + returnType + "> execute() throws Exception {\n" +
-                        "        Response<" + returnType + "> resp = baseExecute();\n" +
-                        "        resp.setValueType(" + returnType + ".class);\n" +
-                        "        return resp;\n" +
-                        "    }\n\n";
-        return ret;
-    }
-
-    static String getStringValueOfStatement(String propType, String propName) {
-        switch (propType) {
-        case "Date":
-            return "Utils.getDateString(" + propName + ")";
-        case "byte[]":
-            return "Encoder.encodeToBase64(" + propName + ")";
-        default:
-            return "String.valueOf("+propName+")";
-        }
-    }
 }
