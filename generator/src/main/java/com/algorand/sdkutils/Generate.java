@@ -62,6 +62,8 @@ public class Generate {
                 pathsPackage,
                 commonPath,
                 commonPackage,
+                tokenName,
+                tokenOptional,
                 publisher);
         
         // Generate classes from the schemas
@@ -83,14 +85,6 @@ public class Generate {
         Collection<String> lines = Files.readAllLines(imports.toPath());
         lines.add("import com.algorand.algosdk.crypto.Address;");
 
-        Utils.generateClientFile(
-                clientName,
-                lines,
-                paths,
-                commonPackage,
-                commonPath,
-                tokenName,
-                tokenOptional);
-        publisher.terminate();
+        publisher.terminate();       
     }
 }

@@ -29,6 +29,14 @@ public class GetPendingTransactionsByAddress extends Query {
     }
 
     /**
+     * An account public key
+     */
+    public GetPendingTransactionsByAddress address(Address address) {
+        addQuery("address", String.valueOf(address));
+        return this;
+    }
+
+    /**
      * Truncated number of transactions to display. If max=0, returns all pending txns.
      */
     public GetPendingTransactionsByAddress max(Long max) {
@@ -44,6 +52,9 @@ public class GetPendingTransactionsByAddress extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (!qd.queries.containsKey("address")) {
+            throw new RuntimeException("address is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(address));

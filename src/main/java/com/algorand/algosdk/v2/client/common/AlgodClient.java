@@ -13,7 +13,9 @@ import com.algorand.algosdk.v2.client.algod.RawTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
+import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.crypto.Address;
+
 
 public class AlgodClient extends Client {
 
@@ -133,4 +135,14 @@ public class AlgodClient extends Client {
     public PendingTransactionInformation PendingTransactionInformation(String txid) {
         return new PendingTransactionInformation((Client) this, txid);
     }
+
+    /**
+     * Given TEAL source code in plain text, return base64 encoded program bytes and
+     * base32 SHA512_256 hash of program bytes (Address style).
+     * /v2/teal/compile
+     */
+    public TealCompile TealCompile() {
+        return new TealCompile((Client) this);
+    }
+
 }

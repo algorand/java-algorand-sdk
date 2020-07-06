@@ -26,6 +26,14 @@ public class AccountInformation extends Query {
         this.address = address;
     }
 
+    /**
+     * An account public key
+     */
+    public AccountInformation address(Address address) {
+        addQuery("address", String.valueOf(address));
+        return this;
+    }
+
     @Override
     public Response<Account> execute() throws Exception {
         Response<Account> resp = baseExecute();
@@ -34,6 +42,9 @@ public class AccountInformation extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (!qd.queries.containsKey("address")) {
+            throw new RuntimeException("address is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(address));

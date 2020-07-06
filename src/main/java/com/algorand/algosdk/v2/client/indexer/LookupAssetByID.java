@@ -16,9 +16,17 @@ public class LookupAssetByID extends Query {
 
     private Long assetId;
 
+    /**
+     * @param assetId
+     */
     public LookupAssetByID(Client client, Long assetId) {
         super(client, new HttpMethod("get"));
         this.assetId = assetId;
+    }
+
+    public LookupAssetByID assetId(Long assetId) {
+        addQuery("asset-id", String.valueOf(assetId));
+        return this;
     }
 
     @Override
@@ -29,6 +37,9 @@ public class LookupAssetByID extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (!qd.queries.containsKey("assetId")) {
+            throw new RuntimeException("asset-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("assets"));
         addPathSegment(String.valueOf(assetId));

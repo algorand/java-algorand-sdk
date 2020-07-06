@@ -20,8 +20,7 @@ public class Publisher {
         QUERY_PARAMETER,
         PATH_PARAMETER,
         BODY_CONTENT,
-        END_QUERY, 
-        
+        END_QUERY,        
     }
 
     private HashMap<Events, ArrayList<Subscriber>> subscribers;

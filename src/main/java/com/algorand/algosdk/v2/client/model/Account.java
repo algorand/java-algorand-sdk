@@ -54,31 +54,16 @@ public class Account extends PathResponse {
     public List<AssetHolding> assets = new ArrayList<AssetHolding>();
 
     /**
-     * (spend) the address against which signing should be checked. If empty, the
-     * address of the current account is used. This field can be updated in any
-     * transaction by setting the RekeyTo field.
-     */
-    @JsonProperty("auth-addr")
-    public void authAddr(String authAddr) throws NoSuchAlgorithmException {
-        this.authAddr = new Address(authAddr);
-    }
-    @JsonProperty("auth-addr")
-    public String authAddr() throws NoSuchAlgorithmException {
-        if (this.authAddr != null) {
-            return this.authAddr.encodeAsString();
-        } else {
-            return null;
-        }
-    }
-    public Address authAddr;
-
-    /**
      * (apar) parameters of assets created by this account.
      * Note: the raw account uses `map[int] -> Asset` for this type.
      */
     @JsonProperty("created-assets")
     public List<Asset> createdAssets = new ArrayList<Asset>();
 
+    /**
+     * AccountParticipation describes the parameters used by this account in consensus
+     * protocol.
+     */
     @JsonProperty("participation")
     public AccountParticipation participation;
 
@@ -139,7 +124,6 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.amount, other.amount)) return false;
         if (!Objects.deepEquals(this.amountWithoutPendingRewards, other.amountWithoutPendingRewards)) return false;
         if (!Objects.deepEquals(this.assets, other.assets)) return false;
-        if (!Objects.deepEquals(this.authAddr, other.authAddr)) return false;
         if (!Objects.deepEquals(this.createdAssets, other.createdAssets)) return false;
         if (!Objects.deepEquals(this.participation, other.participation)) return false;
         if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;

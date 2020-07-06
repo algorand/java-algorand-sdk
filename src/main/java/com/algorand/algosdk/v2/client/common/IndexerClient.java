@@ -12,6 +12,7 @@ import com.algorand.algosdk.v2.client.indexer.LookupBlock;
 import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 import com.algorand.algosdk.crypto.Address;
 
+
 public class IndexerClient extends Client {
 
     /**
@@ -36,7 +37,7 @@ public class IndexerClient extends Client {
     /**
      * /health
      */
-    public MakeHealthCheck makeHealthCheck() {
+    public MakeHealthCheck MakeHealthCheck() {
         return new MakeHealthCheck((Client) this);
     }
 
@@ -44,7 +45,7 @@ public class IndexerClient extends Client {
      * Search for accounts.
      * /v2/accounts
      */
-    public SearchForAccounts searchForAccounts() {
+    public SearchForAccounts SearchForAccounts() {
         return new SearchForAccounts((Client) this);
     }
 
@@ -52,7 +53,7 @@ public class IndexerClient extends Client {
      * Lookup account information.
      * /v2/accounts/{account-id}
      */
-    public LookupAccountByID lookupAccountByID(Address accountId) {
+    public LookupAccountByID LookupAccountByID(Address accountId) {
         return new LookupAccountByID((Client) this, accountId);
     }
 
@@ -60,7 +61,7 @@ public class IndexerClient extends Client {
      * Lookup account transactions.
      * /v2/accounts/{account-id}/transactions
      */
-    public LookupAccountTransactions lookupAccountTransactions(Address accountId) {
+    public LookupAccountTransactions LookupAccountTransactions(Address accountId) {
         return new LookupAccountTransactions((Client) this, accountId);
     }
 
@@ -68,7 +69,7 @@ public class IndexerClient extends Client {
      * Search for assets.
      * /v2/assets
      */
-    public SearchForAssets searchForAssets() {
+    public SearchForAssets SearchForAssets() {
         return new SearchForAssets((Client) this);
     }
 
@@ -76,7 +77,7 @@ public class IndexerClient extends Client {
      * Lookup asset information.
      * /v2/assets/{asset-id}
      */
-    public LookupAssetByID lookupAssetByID(Long assetId) {
+    public LookupAssetByID LookupAssetByID(Long assetId) {
         return new LookupAssetByID((Client) this, assetId);
     }
 
@@ -84,7 +85,7 @@ public class IndexerClient extends Client {
      * Lookup the list of accounts who hold this asset
      * /v2/assets/{asset-id}/balances
      */
-    public LookupAssetBalances lookupAssetBalances(Long assetId) {
+    public LookupAssetBalances LookupAssetBalances(Long assetId) {
         return new LookupAssetBalances((Client) this, assetId);
     }
 
@@ -92,7 +93,7 @@ public class IndexerClient extends Client {
      * Lookup transactions for an asset.
      * /v2/assets/{asset-id}/transactions
      */
-    public LookupAssetTransactions lookupAssetTransactions(Long assetId) {
+    public LookupAssetTransactions LookupAssetTransactions(Long assetId) {
         return new LookupAssetTransactions((Client) this, assetId);
     }
 
@@ -100,7 +101,7 @@ public class IndexerClient extends Client {
      * Lookup block.
      * /v2/blocks/{round-number}
      */
-    public LookupBlock lookupBlock(Long roundNumber) {
+    public LookupBlock LookupBlock(Long roundNumber) {
         return new LookupBlock((Client) this, roundNumber);
     }
 
@@ -108,7 +109,7 @@ public class IndexerClient extends Client {
      * Search for transactions.
      * /v2/transactions
      */
-    public SearchForTransactions searchForTransactions() {
+    public SearchForTransactions SearchForTransactions() {
         return new SearchForTransactions((Client) this);
     }
 

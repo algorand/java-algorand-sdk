@@ -24,6 +24,14 @@ public class LookupBlock extends Query {
         this.roundNumber = roundNumber;
     }
 
+    /**
+     * Round number
+     */
+    public LookupBlock roundNumber(Long roundNumber) {
+        addQuery("round-number", String.valueOf(roundNumber));
+        return this;
+    }
+
     @Override
     public Response<Block> execute() throws Exception {
         Response<Block> resp = baseExecute();
@@ -32,6 +40,9 @@ public class LookupBlock extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (!qd.queries.containsKey("roundNumber")) {
+            throw new RuntimeException("round-number is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("blocks"));
         addPathSegment(String.valueOf(roundNumber));

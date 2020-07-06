@@ -134,14 +134,6 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Include results which include the rekey-to field.
-     */
-    public SearchForTransactions rekeyTo(Boolean rekeyTo) {
-        addQuery("rekey-to", String.valueOf(rekeyTo));
-        return this;
-    }
-
-    /**
      * Include results for the specified round.
      */
     public SearchForTransactions round(Long round) {

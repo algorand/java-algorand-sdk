@@ -31,6 +31,14 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
+     * account string
+     */
+    public LookupAccountTransactions accountId(Address accountId) {
+        addQuery("account-id", String.valueOf(accountId));
+        return this;
+    }
+
+    /**
      * Include results after the given time. Must be an RFC 3339 formatted string.
      */
     public LookupAccountTransactions afterTime(Date afterTime) {
@@ -114,14 +122,6 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * Include results which include the rekey-to field.
-     */
-    public LookupAccountTransactions rekeyTo(Boolean rekeyTo) {
-        addQuery("rekey-to", String.valueOf(rekeyTo));
-        return this;
-    }
-
-    /**
      * Include results for the specified round.
      */
     public LookupAccountTransactions round(Long round) {
@@ -161,6 +161,9 @@ public class LookupAccountTransactions extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (!qd.queries.containsKey("accountId")) {
+            throw new RuntimeException("account-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(accountId));

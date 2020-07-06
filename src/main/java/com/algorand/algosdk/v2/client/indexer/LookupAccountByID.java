@@ -26,6 +26,14 @@ public class LookupAccountByID extends Query {
     }
 
     /**
+     * account string
+     */
+    public LookupAccountByID accountId(Address accountId) {
+        addQuery("account-id", String.valueOf(accountId));
+        return this;
+    }
+
+    /**
      * Include results for the specified round.
      */
     public LookupAccountByID round(Long round) {
@@ -41,6 +49,9 @@ public class LookupAccountByID extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (!qd.queries.containsKey("accountId")) {
+            throw new RuntimeException("account-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(accountId));

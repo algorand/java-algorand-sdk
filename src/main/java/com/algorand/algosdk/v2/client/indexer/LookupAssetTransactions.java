@@ -22,6 +22,9 @@ public class LookupAssetTransactions extends Query {
 
     private Long assetId;
 
+    /**
+     * @param assetId
+     */
     public LookupAssetTransactions(Client client, Long assetId) {
         super(client, new HttpMethod("get"));
         this.assetId = assetId;
@@ -48,6 +51,11 @@ public class LookupAssetTransactions extends Query {
      */
     public LookupAssetTransactions afterTime(Date afterTime) {
         addQuery("after-time", Utils.getDateString(afterTime));
+        return this;
+    }
+
+    public LookupAssetTransactions assetId(Long assetId) {
+        addQuery("asset-id", String.valueOf(assetId));
         return this;
     }
 
@@ -129,14 +137,6 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
-     * Include results which include the rekey-to field.
-     */
-    public LookupAssetTransactions rekeyTo(Boolean rekeyTo) {
-        addQuery("rekey-to", String.valueOf(rekeyTo));
-        return this;
-    }
-
-    /**
      * Include results for the specified round.
      */
     public LookupAssetTransactions round(Long round) {
@@ -176,6 +176,9 @@ public class LookupAssetTransactions extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (!qd.queries.containsKey("assetId")) {
+            throw new RuntimeException("asset-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("assets"));
         addPathSegment(String.valueOf(assetId));

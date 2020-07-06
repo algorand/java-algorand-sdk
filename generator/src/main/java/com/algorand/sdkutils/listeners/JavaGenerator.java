@@ -5,17 +5,21 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
+import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.listeners.Publisher.Events;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
@@ -86,7 +90,16 @@ public class JavaGenerator implements Subscriber {
     // clientFunction holds a single client function as it is getting contructed
     // If is reset at each new query 
     private StringBuffer clientFunction;
+    
+    // generatedPathsEntry holds the client class path query functions, 
+    // and the corresponding imports
+    StringBuilder generatedPathsEntries;
+    StringBuilder generatedPathsImports;
 
+    // Used for the client file generation
+    private String tokenName;
+    private Boolean tokenOptional;
+    
     public JavaGenerator(
             String clientName,
             String modelPath,
@@ -95,6 +108,8 @@ public class JavaGenerator implements Subscriber {
             String queryPackage,
             String commonPath,
             String commonPackage,
+            String tokenName, 
+            Boolean tokenOptional,
             Publisher publisher) throws IOException {
         publisher.subscribeAll(this);
 
@@ -106,43 +121,14 @@ public class JavaGenerator implements Subscriber {
         this.commonPath = commonPath;
         this.commonPackage = commonPackage;
 
+        this.tokenName = tokenName;
+        this.tokenOptional = tokenOptional;
+        
         javaModelWriter = new JavaModelWriter(this, modelPath);
         clientFunctions = new TreeMap<String, String>();
-    }
-
-    public void terminate() {
-        javaModelWriter.close();
-        javaModelWriter = null;
-
-        writeClientFunctions();
-    }
-
-    private void writeClientFunctions() {
-        BufferedWriter bw = newFile("applicationclient", filesFolder);
-        append(bw, "package " + packageName + "\n\n");
-        append(bw, "import (\n");
-        append(bw, TAB + "\"context\"\n\n");
-        append(bw, TAB + "\"github.com/algorand/go-algorand-sdk/client/v2/common\"\n");
-        append(bw, ")\n\n");
-        append(bw, "const indexerAuthHeader = \"X-Indexer-API-Token\"\n\n");
-        append(bw, "type Client common.Client\n\n");
-
-        append(bw, 
-                "// get performs a GET request to the specific path against the server\n" +
-                        "func (c *Client) get(ctx context.Context, response interface{}, path string, request interface{}, headers []*common.Header) error {\n" +
-                        TAB + "return (*common.Client)(c).Get(ctx, response, path, request, headers)\n" +
-                        "}\n\n" +
-
-                "// MakeClient is the factory for constructing an IndexerClient for a given endpoint.\n" +
-                "func MakeClient(address string, apiToken string) (c *Client, err error) {\n" +
-                TAB + "commonClient, err := common.MakeClient(address, indexerAuthHeader, apiToken)\n" +
-                TAB + "c = (*Client)(commonClient)\n" +
-                TAB + "return\n" +
-                "}\n\n");
-        for (Entry<String, String> e : clientFunctions.entrySet()) {
-            append(bw, e.getValue());
-        }
-        closeFile(bw);
+        
+        generatedPathsEntries = new StringBuilder(); 
+        generatedPathsImports = new StringBuilder();
     }
 
     @Override
@@ -162,7 +148,7 @@ public class JavaGenerator implements Subscriber {
         case NEW_QUERY:
             javaQueryWriter = new JavaQueryWriter(
                     notes[0], notes[1], notes[2],
-                    notes[3], notes[4], queryFilesDirectory, queryPackage, modelPackage);
+                    notes[3], notes[4], this);
             break;
         default:
             throw new RuntimeException("Unimplemented event for note! " + event);
@@ -260,10 +246,6 @@ public class JavaGenerator implements Subscriber {
         return pathSB;
     }
 
-
-
-
-
     private void newQuery(
             String className,
             String returnTypeName,
@@ -310,11 +292,9 @@ public class JavaGenerator implements Subscriber {
         String funcName = Tools.getCamelCase(propName, true);
         String paramName = Tools.getCamelCase(propName, false);
         String desc = Tools.formatCommentGo(type.doc, funcName, "");
-
-
     }
+    
     private void endQuery() {
-
         // client functions
         clientFunction.append(") *" + currentQueryName + " {\n");
         clientFunction.append(TAB + "return &" + currentQueryName + "{");
@@ -359,6 +339,92 @@ public class JavaGenerator implements Subscriber {
         queryWriter = null;
     }
 
+    public void terminate() {
+        javaModelWriter.close();
+        javaModelWriter = null;     
+
+      generateClientFile(
+                clientName,
+                generatedPathsImports,
+                generatedPathsEntries,
+                commonPackage,
+                commonPath,
+                tokenName,
+                tokenOptional);
+
+    }
+    
+
+    /**
+     * Generate the client which wraps up all the builders, accepts the host/port/token, etc.
+     *
+     * clientName    - IndexerClient
+     * importLines   - The contents of xxxxxImports.txt
+     * paths         - The file at genRoot + xxxxxPaths.txt
+     * packageName   - "com.algorand.algosdk.v2.client.common"
+     * packagePath   - "src/main/java/com/algorand/algosdk/v2/client/common"
+     * tokenName     - "X-Indexer-API-Token"
+     * tokenOptional - Indicates that the token is optional and two constructors should be created.
+     *
+     * @param clientName Name of the client class. i.e. IndexerClient
+     * @param importLines Lines to be added to the import section of the template. Generated from a previous step.
+     * @param paths The generated methods for accessing the paths. Generated from a previous step.
+     * @param packageName Name of the package containing the client.
+     * @param packagePath Path where the client will go.
+     * @param tokenName Name of the token used for this application. i.e. X-Algo-API-Token
+     * @param tokenOptional Whether or not a no-token version of the constructor should be created.
+     */
+    private static void generateClientFile(
+            String clientName, 
+            StringBuilder importLines, 
+            StringBuilder paths, 
+            String packageName, 
+            String packagePath, 
+            String tokenName, 
+            Boolean tokenOptional) {
+
+        if (packagePath.endsWith("/")) {
+            new Exception("Path shouldn't have a trailing slash.").printStackTrace();;
+        }
+
+        importLines.append("import com.algorand.algosdk.crypto.Address;\n");
+        
+        StringBuffer sb = new StringBuffer();
+        sb.append("package " + packageName + ";\n\n");
+        sb.append(importLines);
+        sb.append("\n\n");
+        sb.append("public class " + clientName + " extends Client {\n\n");
+
+        sb.append("    /**\n");
+        sb.append("     * Construct an " + clientName + " for communicating with the REST API.\n");
+        sb.append("     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.\n");
+        sb.append("     * @param port REST server port.\n");
+        sb.append("     * @param token authentication token.\n");
+        sb.append("     */\n");
+        sb.append("    public " + clientName + "(String host, int port, String token) {\n" +
+                "        super(host, port, token, \"" + tokenName + "\");\n" +
+                "    }\n");
+
+        if (tokenOptional) {
+            sb.append("\n    /**\n");
+            sb.append("     * Construct an " + clientName + " for communicating with the REST API.\n");
+            sb.append("     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.\n");
+            sb.append("     * @param port REST server port.\n");
+            sb.append("     */\n");
+            sb.append("    public " + clientName + "(String host, int port) {\n" +
+                    "        super(host, port, \"\", \"" + tokenName + "\");\n" +
+                    "    }\n\n");
+        }
+
+        sb.append(paths);
+        sb.append("}\n");
+        try {
+            Utils.writeFile(packagePath + "/" + clientName + ".java", sb.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public static BufferedWriter newFile(String className, String directory) {
         File f = new File(directory + "/" + className + ".java");
         f.getParentFile().mkdirs();
@@ -455,29 +521,26 @@ public class JavaGenerator implements Subscriber {
 
 final class JavaQueryWriter {
 
-    public static final String TAB = JavaGenerator.TAB;
+    private static final String TAB = JavaGenerator.TAB;
 
-    StringBuilder decls;
-    StringBuilder builders;
-    StringBuilder constructorHeader;
-    StringBuilder constructorBody;
-    StringBuilder requestMethod;
-    ArrayList<String> constructorComments;
+    private StringBuilder decls;
+    private StringBuilder builders;
+    private StringBuilder constructorHeader;
+    private StringBuilder constructorBody;
+    private StringBuilder requestMethod;
+    private ArrayList<String> constructorComments;
 
-    String className;
-    String httpMethod;
-    String path;
-    String discAndPath;
+    private String className;
+    private String httpMethod;
+    private String path;
+    private String discAndPath;
 
     StringBuilder generatedPathsEntryBody;
-    StringBuilder generatedPathsEntry;
 
     boolean pAdded = false;
     boolean addFormatMsgpack = false;
-
-    String queryFilesDirectory;
-    String queryPackage;
-    String modelPackage;
+    
+    private JavaGenerator javaGen;
 
     TreeMap<String, Set<String>> imports;
 
@@ -487,9 +550,7 @@ final class JavaQueryWriter {
             String path,
             String desc,	    
             String httpMethod,
-            String queryFilesDirectory,
-            String queryPackage,
-            String modelPackage) {
+            JavaGenerator javaGenerator) {
 
         if (className.equals("RawTransaction")) {
             System.out.println("bla");
@@ -505,10 +566,6 @@ final class JavaQueryWriter {
 
         generatedPathsEntryBody = new StringBuilder();
         this.httpMethod = httpMethod;
-        this.generatedPathsEntry = new StringBuilder();
-        this.queryFilesDirectory = queryFilesDirectory;
-        this.modelPackage = modelPackage;
-        this.queryPackage = queryPackage;
 
         requestMethod.append(getQueryResponseMethod(returnType));
         requestMethod.append("    protected QueryData getRequestString() {\n");
@@ -517,6 +574,8 @@ final class JavaQueryWriter {
 
         this.path = path;
         discAndPath = desc + "\n" + path;
+        
+        this.javaGen = javaGenerator;
 
         imports = new TreeMap<String, Set<String>>();
         Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
@@ -525,8 +584,12 @@ final class JavaQueryWriter {
         Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
         Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
         if (needsClassImport(returnType.toLowerCase())) {
-            Tools.addImport(imports, modelPackage + "." + returnType);
+            Tools.addImport(imports, javaGen.modelPackage + "." + returnType);
         }
+        
+        String methodName = Tools.getCamelCase(className, Character.isUpperCase(className.charAt(0)));
+        javaGen.generatedPathsEntries.append(Tools.formatComment(discAndPath, TAB, true));
+        javaGen.generatedPathsEntries.append("    public " + className + " " + methodName + "(");
     }
 
     public void addQueryProperty(TypeDef propType, boolean inQuery, boolean inPath, boolean inBody) {
@@ -568,10 +631,10 @@ final class JavaQueryWriter {
             constructorBody.append("        this." + propName + " = " + propName + ";\n");
 
             if (pAdded) {
-                generatedPathsEntry.append(",\n            ");
+                javaGen.generatedPathsEntries.append(",\n            ");
             }
 
-            generatedPathsEntry.append(propType.javaTypeName + " " + propName);
+            javaGen.generatedPathsEntries.append(propType.javaTypeName + " " + propName);
             generatedPathsEntryBody.append(", " + propName);
             pAdded = true;
         }
@@ -606,10 +669,12 @@ final class JavaQueryWriter {
 
     public void finalize() {
 
-        generatedPathsEntry.append(") {\n");
-        generatedPathsEntry.append("        return new "+className+"((Client) this");
-        generatedPathsEntry.append(generatedPathsEntryBody);
-        generatedPathsEntry.append(");\n    }\n\n");
+        javaGen.generatedPathsImports.append("import " + javaGen.queryPackage + "." + className + ";\n");
+
+        javaGen.generatedPathsEntries.append(") {\n");
+        javaGen.generatedPathsEntries.append("        return new "+className+"((Client) this");
+        javaGen.generatedPathsEntries.append(generatedPathsEntryBody);
+        javaGen.generatedPathsEntries.append(");\n    }\n\n");
 
         // Add the path construction code.
         // The path is constructed in the end, while the query params are added as the
@@ -657,8 +722,8 @@ final class JavaQueryWriter {
         sb.append(queryParamsCode);
         sb.append("\n}");
 
-        BufferedWriter bw = JavaGenerator.newFile(className, queryFilesDirectory);
-        JavaGenerator.append(bw, "package " + queryPackage + ";\n\n");
+        BufferedWriter bw = JavaGenerator.newFile(className, javaGen.queryFilesDirectory);
+        JavaGenerator.append(bw, "package " + javaGen.queryPackage + ";\n\n");
         JavaGenerator.append(bw, Tools.getImports(imports));
         JavaGenerator.append(bw, sb);
         JavaGenerator.closeFile(bw);
