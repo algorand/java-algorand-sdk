@@ -445,6 +445,8 @@ public class OpenApiParser {
          * 
          * Should use:  getCamelCase(className, false);
          */
+        String methodName = Tools.getCamelCase(className, Character.isUpperCase(className.charAt(0)));
+
         className = Tools.getCamelCase(className, true);
 
         JsonNode paramNode = spec.get("parameters");
@@ -467,7 +469,7 @@ public class OpenApiParser {
             properties = getSortedParameters(paramNode);
         }
 
-        String [] strarray = {className, returnType, path, desc, httpMethod};
+        String [] strarray = {methodName, returnType, path, desc, httpMethod};
         this.publisher.publish(Events.NEW_QUERY, strarray);
 
         processQueryParams(properties);

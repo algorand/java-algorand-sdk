@@ -137,6 +137,14 @@ public class LookupAssetTransactions extends Query {
     }
 
     /**
+     * Include results which include the rekey-to field.
+     */
+    public LookupAssetTransactions rekeyTo(Boolean rekeyTo) {
+        addQuery("rekey-to", String.valueOf(rekeyTo));
+        return this;
+    }
+
+    /**
      * Include results for the specified round.
      */
     public LookupAssetTransactions round(Long round) {

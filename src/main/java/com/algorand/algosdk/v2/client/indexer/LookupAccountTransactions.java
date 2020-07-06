@@ -122,6 +122,14 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
+     * Include results which include the rekey-to field.
+     */
+    public LookupAccountTransactions rekeyTo(Boolean rekeyTo) {
+        addQuery("rekey-to", String.valueOf(rekeyTo));
+        return this;
+    }
+
+    /**
      * Include results for the specified round.
      */
     public LookupAccountTransactions round(Long round) {

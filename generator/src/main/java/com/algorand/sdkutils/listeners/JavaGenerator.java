@@ -387,7 +387,7 @@ public class JavaGenerator implements Subscriber {
             new Exception("Path shouldn't have a trailing slash.").printStackTrace();;
         }
 
-        importLines.append("import com.algorand.algosdk.crypto.Address;\n");
+        importLines.append("import com.algorand.algosdk.crypto.Address;");
         
         StringBuffer sb = new StringBuffer();
         sb.append("package " + packageName + ";\n\n");
@@ -545,18 +545,14 @@ final class JavaQueryWriter {
     TreeMap<String, Set<String>> imports;
 
     public JavaQueryWriter(
-            String className,
+            String methodName,
             String returnType,
             String path,
             String desc,	    
             String httpMethod,
             JavaGenerator javaGenerator) {
 
-        if (className.equals("RawTransaction")) {
-            System.out.println("bla");
-        }
-
-        this.className = className;
+        this.className = Tools.getCamelCase(methodName, true);
         decls = new StringBuilder();
         builders = new StringBuilder();
         constructorHeader = new StringBuilder();
@@ -587,7 +583,6 @@ final class JavaQueryWriter {
             Tools.addImport(imports, javaGen.modelPackage + "." + returnType);
         }
         
-        String methodName = Tools.getCamelCase(className, Character.isUpperCase(className.charAt(0)));
         javaGen.generatedPathsEntries.append(Tools.formatComment(discAndPath, TAB, true));
         javaGen.generatedPathsEntries.append("    public " + className + " " + methodName + "(");
     }

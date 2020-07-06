@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
@@ -19,10 +20,26 @@ public class SearchForAccounts extends Query {
     }
 
     /**
+     * Application ID
+     */
+    public SearchForAccounts applicationId(Long applicationId) {
+        addQuery("application-id", String.valueOf(applicationId));
+        return this;
+    }
+
+    /**
      * Asset ID
      */
     public SearchForAccounts assetId(Long assetId) {
         addQuery("asset-id", String.valueOf(assetId));
+        return this;
+    }
+
+    /**
+     * Include accounts configured to use this spending key.
+     */
+    public SearchForAccounts authAddr(Address authAddr) {
+        addQuery("auth-addr", String.valueOf(authAddr));
         return this;
     }
 
