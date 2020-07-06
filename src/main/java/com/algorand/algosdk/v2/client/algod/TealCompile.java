@@ -6,7 +6,7 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.PostCompileResponse;
+import com.algorand.algosdk.v2.client.model.CompileResponse;
 
 
 /**
@@ -29,9 +29,9 @@ public class TealCompile extends Query {
     }
 
     @Override
-    public Response<PostCompileResponse> execute() throws Exception {
-        Response<PostCompileResponse> resp = baseExecute();
-        resp.setValueType(PostCompileResponse.class);
+    public Response<CompileResponse> execute() throws Exception {
+        Response<CompileResponse> resp = baseExecute();
+        resp.setValueType(CompileResponse.class);
         return resp;
     }
 

@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class PostCompileResponse extends PathResponse {
+public class CompileResponse extends PathResponse {
 
     /**
      * base32 SHA512_256 of program bytes (Address style)
@@ -25,7 +25,7 @@ public class PostCompileResponse extends PathResponse {
         if (this == o) return true;
         if (o == null) return false;
 
-        PostCompileResponse other = (PostCompileResponse) o;
+        CompileResponse other = (CompileResponse) o;
         if (!Objects.deepEquals(this.hash, other.hash)) return false;
         if (!Objects.deepEquals(this.result, other.result)) return false;
 
