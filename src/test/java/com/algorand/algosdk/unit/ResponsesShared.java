@@ -116,6 +116,12 @@ public class ResponsesShared {
                     case "GetSupply":
                         response = algod.GetSupply().execute();
                         break;
+                    case "GetApplicationByID":
+                        response = algod.GetApplicationByID(10L).execute();
+                        break;
+                    case "GetAssetByID":
+                        response = algod.GetAssetByID(10L).execute();
+                        break;
                     case "TransactionParams":
                     case "any": // error case, everything uses the same error message
                         response = algod.TransactionParams().execute();
