@@ -67,7 +67,7 @@ public class JavaGenerator implements Subscriber {
     private String currentQueryReturn;
 
     // imports that go to one query file written by queryWriter
-    private Map<String, Set<String>> imports;
+    private TreeMap<String, Set<String>> imports;
 
     // pathDesc has the comments and the path string template
     private String pathDesc;
@@ -160,8 +160,9 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event, String [] notes) {
         switch(event) {
         case NEW_QUERY:
-            javaQueryWriter = new JavaQueryWriter(notes[0], notes[1], notes[2],
-						  notes[3], notes[4], queryFilesDirectory, queryPackage);
+            javaQueryWriter = new JavaQueryWriter(
+                    notes[0], notes[1], notes[2],
+                    notes[3], notes[4], queryFilesDirectory, queryPackage, modelPackage);
             break;
         default:
             throw new RuntimeException("Unimplemented event for note! " + event);
@@ -170,6 +171,7 @@ public class JavaGenerator implements Subscriber {
 
     @Override
     public void onEvent(Events event, TypeDef type) {
+
         switch(event) {
         case NEW_PROPERTY:
             javaModelWriter.newProperty(type);
@@ -191,7 +193,7 @@ public class JavaGenerator implements Subscriber {
     @Override
     public void onEvent(Events event, StructDef sDef) {
         switch(event) {
-        case NEW_MODEL:            
+        case NEW_MODEL:      
             javaModelWriter.newModel(sDef, this.modelPackage);
             break;
         case NEW_RETURN_TYPE:
@@ -302,7 +304,6 @@ public class JavaGenerator implements Subscriber {
     }
 
     private void addQueryParameter(TypeDef type) {
-
         // Also need to add this to the path struct (model)
         javaModelWriter.newProperty(type);
         String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
@@ -398,10 +399,62 @@ public class JavaGenerator implements Subscriber {
             e.printStackTrace();
         }
     }
+
+    public static void setImportOf(TypeDef typeObj, TreeMap<String, Set<String>> imports) {
+        setImportOf(typeObj, imports, true);
+    }
+    public static void setImportOf(
+            TypeDef typeObj,
+            TreeMap<String, Set<String>> imports,
+            boolean forModel) {
+
+        if (typeObj.isOfType("array")) {
+            Tools.addImport(imports, "java.util.ArrayList");
+            Tools.addImport(imports, "java.util.List");
+        }
+
+        if (typeObj.isOfType("enum")) {
+            if (!forModel) {
+                Tools.addImport(imports, "com.algorand.algosdk.v2.client.model.Enums");
+            }
+            return;
+        }
+
+
+        switch (typeObj.rawTypeName) {
+        case "object":
+            if (typeObj.javaTypeName.equals("HashMap<String,Object>")) {
+                Tools.addImport(imports, "java.util.HashMap");
+            }
+            break;
+        case "SignedTransaction":
+            Tools.addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
+            break;
+
+        case "time":
+            Tools.addImport(imports, "java.util.Date");
+            Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Utils");
+            break;
+        }
+
+        if (typeObj.rawTypeName.equals("binary")) {
+                Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
+            return;
+        }
+
+
+        if (typeObj.javaTypeName.equalsIgnoreCase("Address")) {
+            if (forModel) {
+                Tools.addImport(imports, "java.security.NoSuchAlgorithmException");
+            }
+            Tools.addImport(imports, "com.algorand.algosdk.crypto.Address");
+            return;
+        }
+    }
 }
 
 final class JavaQueryWriter {
-    
+
     public static final String TAB = JavaGenerator.TAB;
 
     StringBuilder decls;
@@ -410,9 +463,10 @@ final class JavaQueryWriter {
     StringBuilder constructorBody;
     StringBuilder requestMethod;
     ArrayList<String> constructorComments;
-    
+
     String className;
     String httpMethod;
+    String path;
     String discAndPath;
 
     StringBuilder generatedPathsEntryBody;
@@ -423,17 +477,24 @@ final class JavaQueryWriter {
 
     String queryFilesDirectory;
     String queryPackage;
+    String modelPackage;
 
     TreeMap<String, Set<String>> imports;
-    
+
     public JavaQueryWriter(
             String className,
             String returnType,
             String path,
             String desc,	    
             String httpMethod,
-	    String queryFilesDirectory,
-	    String queryPackage) {
+            String queryFilesDirectory,
+            String queryPackage,
+            String modelPackage) {
+
+        if (className.equals("RawTransaction")) {
+            System.out.println("bla");
+        }
+
         this.className = className;
         decls = new StringBuilder();
         builders = new StringBuilder();
@@ -443,27 +504,50 @@ final class JavaQueryWriter {
         constructorComments = new ArrayList<String>();
 
         generatedPathsEntryBody = new StringBuilder();
-	this.httpMethod = httpMethod;
+        this.httpMethod = httpMethod;
         this.generatedPathsEntry = new StringBuilder();
-	this.queryFilesDirectory = queryFilesDirectory;
-	this.queryPackage = queryPackage;
-	
+        this.queryFilesDirectory = queryFilesDirectory;
+        this.modelPackage = modelPackage;
+        this.queryPackage = queryPackage;
+
         requestMethod.append(getQueryResponseMethod(returnType));
         requestMethod.append("    protected QueryData getRequestString() {\n");
         pAdded = false;
         addFormatMsgpack = false;
 
-	discAndPath = desc + "\n" + path;
+        this.path = path;
+        discAndPath = desc + "\n" + path;
 
-	imports = new TreeMap<String, Set<String>>();
+        imports = new TreeMap<String, Set<String>>();
+        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
+        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.HttpMethod");
+        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Query");
+        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
+        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
+        if (needsClassImport(returnType.toLowerCase())) {
+            Tools.addImport(imports, modelPackage + "." + returnType);
+        }
     }
 
     public void addQueryProperty(TypeDef propType, boolean inQuery, boolean inPath, boolean inBody) {
 
-        String propName = Tools.getCamelCase(propType.goPropertyName, false);
-        String setterName = Tools.getCamelCase(propType.goPropertyName, false);
+        String propName = Tools.getCamelCase(propType.propertyName, false);
+        String setterName = Tools.getCamelCase(propType.propertyName, false);
 
         String propCode = propType.propertyName;
+
+        // Do not expose format property
+        if (propType.javaTypeName.equals("Enums.Format")) {
+            if (!className.equals("AccountInformation")) {
+                // Don't set format to msgpack for AccountInformation
+                addFormatMsgpack = true;
+            }
+            return;
+        }
+
+        if (!(propType.rawTypeName.equals("binary") && inBody)) { 
+            JavaGenerator.setImportOf(propType, imports, false);
+        }
 
         // The parameters are either in the path or in the query
 
@@ -529,7 +613,7 @@ final class JavaQueryWriter {
 
         // Add the path construction code.
         // The path is constructed in the end, while the query params are added as the
-        ArrayList<String> al = null;//getPathInserts(path);
+        ArrayList<String> al = getPathInserts(path);
         for (String str : al) {
             requestMethod.append(
                     "        addPathSegment(String.valueOf(" + str + "));\n");
@@ -565,20 +649,38 @@ final class JavaQueryWriter {
 
         queryParamsCode.append(builders);
         queryParamsCode.append(requestMethod);
-		
-	StringBuilder sb = new StringBuilder();
-            sb.append("\n");
-            sb.append(Tools.formatComment(discAndPath, "", true));
-            sb.append("public class " + className + " extends Query {\n\n");
-            sb.append(queryParamsCode);
-            sb.append("\n}");
 
-            BufferedWriter bw = JavaGenerator.newFile(className, queryFilesDirectory);
-            JavaGenerator.append(bw, "package " + queryPackage + ";\n\n");
-            JavaGenerator.append(bw, Tools.getImports(imports));
-            JavaGenerator.append(bw, sb);
-            JavaGenerator.closeFile(bw);
- 
+        StringBuilder sb = new StringBuilder();
+        sb.append("\n");
+        sb.append(Tools.formatComment(discAndPath, "", true));
+        sb.append("public class " + className + " extends Query {\n\n");
+        sb.append(queryParamsCode);
+        sb.append("\n}");
+
+        BufferedWriter bw = JavaGenerator.newFile(className, queryFilesDirectory);
+        JavaGenerator.append(bw, "package " + queryPackage + ";\n\n");
+        JavaGenerator.append(bw, Tools.getImports(imports));
+        JavaGenerator.append(bw, sb);
+        JavaGenerator.closeFile(bw);
+
+    }
+
+    // getPathInserts converts the path string into individual tokens which correspond
+    // to the class members in the generated code. 
+    // These are used to set the path segments in the constructor. 
+    static ArrayList<String> getPathInserts(String path) {
+        ArrayList<String> nPath = new ArrayList<String>();
+        StringTokenizer st = new StringTokenizer(path, "/");
+        while (st.hasMoreTokens()) {
+            String elt = st.nextToken();
+            if (elt.charAt(0) == '{') {
+                String jName = Tools.getCamelCase(elt.substring(1, elt.length()-1), false);
+                nPath.add(jName);
+            } else {
+                nPath.add("\"" + elt + "\"");
+            }
+        }
+        return nPath;
     }
 
     static String getQueryResponseMethod(String returnType) {
@@ -600,6 +702,19 @@ final class JavaQueryWriter {
             return "Encoder.encodeToBase64(" + propName + ")";
         default:
             return "String.valueOf("+propName+")";
+        }
+    }
+
+    // returns true if the type needs an import statement. 
+    // Not needed for primitive types. 
+    static boolean needsClassImport(String type) {
+        switch (type) {
+        case "integer":
+            return false;
+        case "string":
+            return false;
+        default:
+            return true;
         }
     }
 
@@ -632,7 +747,7 @@ final class JavaModelWriter {
     // property name is the key
     private TreeMap<String, TypeDef> properties;
 
-    HashMap<String, Set<String>> imports;
+    TreeMap<String, Set<String>> imports;
 
 
     private JavaGenerator javagen;
@@ -682,16 +797,15 @@ final class JavaModelWriter {
             this.close();
             pendingOpenFile = false;            
         }
-        this.imports = new HashMap<String, Set<String>>();
+        this.imports = new TreeMap<String, Set<String>>();
         this.properties = new TreeMap<String, TypeDef>();
 
         if (modelFileWriter == null) {
 
             className = Tools.getCamelCase(sDef.name, true);
+
             modelFileWriter = JavaGenerator.newFile(className, folder);
             JavaGenerator.append(modelFileWriter, "package " + packageName + ";\n\n");
-
-            imports = new HashMap<>();
 
             Tools.addImport(imports, "java.util.Objects"); // used by Objects.deepEquals
 
@@ -727,10 +841,7 @@ final class JavaModelWriter {
             String javaName = prop.getKey();
             TypeDef typeObj = prop.getValue();
 
-            if (typeObj.isOfType("array")) {
-                Tools.addImport(imports, "java.util.ArrayList");
-                Tools.addImport(imports, "java.util.List");
-            }
+            JavaGenerator.setImportOf(typeObj, imports);
 
             String desc = null;
             if (typeObj.doc != null) {
@@ -746,19 +857,21 @@ final class JavaModelWriter {
     }
 
     static void writeExpandedDefinitions(TypeDef typeObj, StringBuilder buffer,
-            HashMap<String, Set<String>> imports, boolean forModel){
+            TreeMap<String, Set<String>> imports, boolean forModel){
+        JavaGenerator.setImportOf(typeObj, imports, forModel);
         if (typeObj.javaTypeName.equalsIgnoreCase("Address")) {
-            getAddress(typeObj, buffer, imports, forModel);
+            getAddress(typeObj, buffer, forModel);
         }
         if (typeObj.isOfType("enum")) {
             getEnum(typeObj, buffer);
         }
-        if (typeObj.rawTypeName.equals("binary")) {
+        if (typeObj.rawTypeName.equals("binary") || 
+                typeObj.rawTypeName.equals("byte")) {
             if (typeObj.javaTypeName.equals("byte[]")) {
-                getBase64Encoded(typeObj, buffer, imports);    
+                getBase64Encoded(typeObj, buffer);    
                 return;
             }
-            getBase64EncodedArray(typeObj, buffer, imports, forModel);
+            getBase64EncodedArray(typeObj, buffer, forModel);
 
         }
 
@@ -766,26 +879,14 @@ final class JavaModelWriter {
 
     // getPropertyWithJsonSetter formats the property into java declaration type with 
     // the appropriate json annotation.
-    static void getPropertyWithJsonSetter(TypeDef typeObj, StringBuilder buffer, 
-            HashMap<String, Set<String>> imports){
+    static void getPropertyWithJsonSetter(TypeDef typeObj, StringBuilder buffer,
+            TreeMap<String, Set<String>> imports){
         String jprop = typeObj.propertyName;
         String javaName = Tools.getCamelCase(jprop, false);
         if (typeObj.isOfType("getterSetter")) {
             writeExpandedDefinitions(typeObj, buffer, imports, true);
             return;
         }
-
-        switch (typeObj.rawTypeName) {
-        case "object":
-            if (typeObj.javaTypeName.equals("HashMap<String,Object>")) {
-                Tools.addImport(imports, "java.util.HashMap");
-            }
-            break;
-        case "SignedTransaction":
-            Tools.addImport(imports, "com.algorand.algosdk.transaction.SignedTransaction");
-            break;
-        }
-
 
         switch (typeObj.javaTypeName) {
         case "java.util.DateTime":
@@ -842,13 +943,9 @@ final class JavaModelWriter {
     // Get array type of base64 encoded bytes.
     // It provides the special getter/setter needed for this type
     static void getBase64EncodedArray(TypeDef typeObj, StringBuilder sb,
-            HashMap<String, Set<String>> imports, boolean forModel) {
+            boolean forModel) {
         if (forModel == false) {
             throw new RuntimeException("array of byte[] cannot yet be used in a path or path query.");
-        }
-
-        if (imports != null) {
-            Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
         }
 
         String propName = typeObj.propertyName;
@@ -874,12 +971,7 @@ final class JavaModelWriter {
 
     // Get base64 encoded byte[] type.
     // It provides the special getter/setter needed for this type
-    static void getBase64Encoded(TypeDef typeObj, StringBuilder sb,
-            HashMap<String, Set<String>> imports) {
-
-        if (imports != null) {
-            Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
-        }
+    static void getBase64Encoded(TypeDef typeObj, StringBuilder sb) {
 
         String propName = typeObj.propertyName;
         String javaName = Tools.getCamelCase(propName, false);
@@ -898,12 +990,7 @@ final class JavaModelWriter {
     // Get TypeDef for Address type. 
     // It provides the special getter/setter needed for this type.
     static void getAddress(TypeDef typeObj, StringBuilder buffer,
-            HashMap<String, Set<String>> imports, boolean forModel){
-
-        if (forModel) {
-            Tools.addImport(imports, "java.security.NoSuchAlgorithmException");
-        }
-        Tools.addImport(imports, "com.algorand.algosdk.crypto.Address");
+            boolean forModel){
 
         String propName = typeObj.propertyName;
         String javaName = Tools.getCamelCase(propName, false);
@@ -944,7 +1031,7 @@ final class JavaModelWriter {
 
         StringBuilder generatedPathsEntryBody = new StringBuilder();
 
-	//        requestMethod.append(getQueryResponseMethod(returnType));
+        //        requestMethod.append(getQueryResponseMethod(returnType));
         requestMethod.append("    protected QueryData getRequestString() {\n");
         boolean pAdded = false;
         boolean addFormatMsgpack = false;
@@ -1004,13 +1091,13 @@ final class JavaModelWriter {
                 builders.append(desc);
             }
             builders.append(TAB + "public " + className + " " + setterName + "(" + propType.javaTypeName + " " + propName + ") {\n");
-	    //            String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
+            //            String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
 
             if (true) {//inBody(prop.getValue())) {
                 builders.append(TAB + TAB + "addToBody("+ propName +");\n");
                 ///publisher.publish(Events.BODY_CONTENT, propType);
             } else {
-		//                builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
+                //                builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
                 ///publisher.publish(Events.QUERY_PARAMETER, propType);
             }
             builders.append(TAB + TAB + "return this;\n");
@@ -1028,7 +1115,7 @@ final class JavaModelWriter {
             }
 
         }
- 
+
         generatedPathsEntry.append(") {\n");
         generatedPathsEntry.append("        return new "+className+"((Client) this");
         generatedPathsEntry.append(generatedPathsEntryBody);

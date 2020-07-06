@@ -89,6 +89,7 @@ public class OpenApiParser {
             JsonNode prop, 
             boolean asObject,
             String propName, boolean forModel) {        
+                
         String desc = prop.get("description") == null ? "" : prop.get("description").asText();
         String goName = prop.get("x-go-name") != null ? 
                 prop.get("x-go-name").asText() : "";
@@ -148,6 +149,10 @@ public class OpenApiParser {
 */
                     if (forModel == false) {
                         throw new RuntimeException("array of byte[] cannot yet be used in a path or path query.");
+                    }
+                    
+                    if (format.equals("byte")) {
+                        type = format;
                     }
 
                     // getterSetter typeName is only used in path.
@@ -389,11 +394,6 @@ public class OpenApiParser {
             String propName = Tools.getCamelCase(prop.getKey(), false);
             TypeDef propType = getType(prop.getValue(), true, prop.getKey(), false);
             
-            // Do not expose format property
-            if (propType.javaTypeName.equals("Enums.Format")) {
-                continue;
-            }
-
             // The parameters are either in the path or in the query
 
             // Populate generator structures for the in path parameters
