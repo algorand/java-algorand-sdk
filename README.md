@@ -5,6 +5,7 @@
 # java-algorand-sdk
 
 [![Build Status](https://travis-ci.com/algorand/java-algorand-sdk.svg?branch=master)](https://travis-ci.com/algorand/java-algorand-sdk?branch=master)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.algorand/algosdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.algorand/algosdk/)
 
 AlgoSDK is a Java library for communicating and interacting with the Algorand network. It contains a REST client for accessing `algod` instances over the web,
 and also exposes functionality for generating keypairs, mnemonics, creating transactions, signing transactions, and serializing data across the network.
@@ -76,16 +77,13 @@ Algorand network status: class NodeStatus {
 
 # Documentation
 
-Javadoc can be found at (https://algorand.github.io/java-algorand-sdk/). Additional resources are located at (https://developer.algorand.org).
+Javadoc can be found at [https://algorand.github.io/java-algorand-sdk](https://algorand.github.io/java-algorand-sdk). <br /> 
+Additional resources and code samples are located at [https://developer.algorand.org](https://developer.algorand.org).
 
 # Cryptography
 
 AlgoSDK depends on `org.bouncycastle:bcprov-jdk15on:1.61` for `Ed25519` signatures, `sha512/256` digests, and deserializing `X.509`-encoded `Ed25519` private keys.
 The latter is the only explicit dependency on an external crypto library - all other references are abstracted through the JCA.
-
-# Longer Example
-
-Take a look at the example located in the `examples/` directory.
 
 # Java 9+
 
