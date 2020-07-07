@@ -38,8 +38,6 @@ public class JavaGenerator implements Subscriber {
     String commonPath;
     String commonPackage;
 
-
-
     // packageName is also the folder where the files sit
     private String packageName;
     // filesFolder is rootFolder/packageName
@@ -90,7 +88,7 @@ public class JavaGenerator implements Subscriber {
     // clientFunction holds a single client function as it is getting contructed
     // If is reset at each new query 
     private StringBuffer clientFunction;
-    
+
     // generatedPathsEntry holds the client class path query functions, 
     // and the corresponding imports
     StringBuilder generatedPathsEntries;
@@ -99,7 +97,9 @@ public class JavaGenerator implements Subscriber {
     // Used for the client file generation
     private String tokenName;
     private Boolean tokenOptional;
-    
+
+    private static TreeMap<String, String> enumDefinitions = new TreeMap<String, String>();
+
     public JavaGenerator(
             String clientName,
             String modelPath,
@@ -123,10 +123,10 @@ public class JavaGenerator implements Subscriber {
 
         this.tokenName = tokenName;
         this.tokenOptional = tokenOptional;
-        
+
         javaModelWriter = new JavaModelWriter(this, modelPath);
         clientFunctions = new TreeMap<String, String>();
-        
+
         generatedPathsEntries = new StringBuilder(); 
         generatedPathsImports = new StringBuilder();
     }
@@ -293,7 +293,7 @@ public class JavaGenerator implements Subscriber {
         String paramName = Tools.getCamelCase(propName, false);
         String desc = Tools.formatCommentGo(type.doc, funcName, "");
     }
-    
+
     private void endQuery() {
         // client functions
         clientFunction.append(") *" + currentQueryName + " {\n");
@@ -343,7 +343,7 @@ public class JavaGenerator implements Subscriber {
         javaModelWriter.close();
         javaModelWriter = null;     
 
-      generateClientFile(
+        generateClientFile(
                 clientName,
                 generatedPathsImports,
                 generatedPathsEntries,
@@ -352,8 +352,10 @@ public class JavaGenerator implements Subscriber {
                 tokenName,
                 tokenOptional);
 
+        generateEnumClasses(this.modelPath, this.modelPackage);
+
     }
-    
+
 
     /**
      * Generate the client which wraps up all the builders, accepts the host/port/token, etc.
@@ -388,7 +390,7 @@ public class JavaGenerator implements Subscriber {
         }
 
         importLines.append("import com.algorand.algosdk.crypto.Address;");
-        
+
         StringBuffer sb = new StringBuffer();
         sb.append("package " + packageName + ";\n\n");
         sb.append(importLines);
@@ -424,7 +426,7 @@ public class JavaGenerator implements Subscriber {
             e.printStackTrace();
         }
     }
-    
+
     public static BufferedWriter newFile(String className, String directory) {
         File f = new File(directory + "/" + className + ".java");
         f.getParentFile().mkdirs();
@@ -504,7 +506,7 @@ public class JavaGenerator implements Subscriber {
         }
 
         if (typeObj.rawTypeName.equals("binary")) {
-                Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
+            Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
             return;
         }
 
@@ -517,7 +519,83 @@ public class JavaGenerator implements Subscriber {
             return;
         }
     }
+
+    // Generate the enum file with accumulated and loaded enum definitions.
+    public void generateEnumClasses (String rootPath, String pkg)  {
+
+        BufferedWriter bw = Tools.getFileWriter("Enums", rootPath);
+        try {
+            bw.append("package " + pkg + ";\n\n");
+            bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
+            bw.append("public class Enums {\n\n");
+            Iterator<String> classes = enumDefinitions.keySet().iterator();
+            while (classes.hasNext()) {
+                String className = classes.next();
+                // Do not expose format property
+                if (className.equals("format")) {
+                    continue;
+                }
+                bw.append(enumDefinitions.get(className));
+                bw.append("\n");
+            }
+            bw.append("}\n");
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void storeEnumDefinition(TypeDef typeObj) {
+        StringBuilder sb = new StringBuilder();
+        String javaTypeName = Tools.getCamelCase(typeObj.propertyName, true);
+        if (typeObj.doc != null && !typeObj.doc.isEmpty()) {
+            sb.append(Tools.formatComment(typeObj.doc, TAB, true));
+        }
+        sb.append(TAB + "public enum " + javaTypeName + " {\n");
+
+        Iterator<String> elmts = typeObj.enumValues.iterator();
+        while(elmts.hasNext()) {
+            String val = elmts.next();
+            sb.append(TAB + TAB + "@JsonProperty(\"" + val + "\") ");
+            String javaEnum = Tools.getCamelCase(val, true).toUpperCase();
+            sb.append(javaEnum);
+            sb.append("(\"" + val + "\")");
+            if (elmts.hasNext()) {
+                sb.append(",\n");
+            } else {
+                sb.append(";\n\n");
+            }
+        }
+        sb.append(TAB + TAB + "final String serializedName;\n");
+        sb.append(TAB + TAB + "" + javaTypeName + "(String name) {\n");
+        sb.append(TAB + TAB + TAB + "this.serializedName = name;\n");
+        sb.append(TAB + TAB + "}\n\n");
+        sb.append(TAB + TAB + "@Override\n");
+        sb.append(TAB + TAB + "public String toString() {\n");
+        sb.append(TAB + TAB + TAB + "return this.serializedName;\n");
+        sb.append(TAB + TAB + "}\n");
+
+        sb.append(TAB + "}\n");
+        javaTypeName = "Enums." + javaTypeName;
+
+        // Check for conflicting duplicate classes
+        String definition = sb.toString();
+        String existingDef = enumDefinitions.get(javaTypeName);
+        if (existingDef != null && existingDef.compareTo(definition) != 0) {
+            System.err.println(definition);
+            System.err.println(existingDef);
+//            new RuntimeException("Conflicting Enum classes" + javaTypeName).printStackTrace();
+            // Could be the comment
+            if (definition.length() < existingDef.length()) {
+                return;
+            }
+        }
+        this.enumDefinitions.put(javaTypeName, sb.toString());
+    }
 }
+
+
 
 final class JavaQueryWriter {
 
@@ -539,7 +617,7 @@ final class JavaQueryWriter {
 
     boolean pAdded = false;
     boolean addFormatMsgpack = false;
-    
+
     private JavaGenerator javaGen;
 
     TreeMap<String, Set<String>> imports;
@@ -570,7 +648,7 @@ final class JavaQueryWriter {
 
         this.path = path;
         discAndPath = desc + "\n" + path;
-        
+
         this.javaGen = javaGenerator;
 
         imports = new TreeMap<String, Set<String>>();
@@ -582,7 +660,7 @@ final class JavaQueryWriter {
         if (needsClassImport(returnType.toLowerCase())) {
             Tools.addImport(imports, javaGen.modelPackage + "." + returnType);
         }
-        
+
         javaGen.generatedPathsEntries.append(Tools.formatComment(discAndPath, TAB, true));
         javaGen.generatedPathsEntries.append("    public " + className + " " + methodName + "(");
     }
@@ -639,6 +717,10 @@ final class JavaQueryWriter {
             desc = Tools.formatComment(desc, TAB, true);
             builders.append(desc);
         }
+        
+        if (propType.isOfType("enum")) {
+            this.javaGen.storeEnumDefinition(propType);            
+        }        
         builders.append(TAB + "public " + className + " " + setterName + "(" + propType.javaTypeName + " " + propName + ") {\n");
         String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
 
@@ -911,7 +993,7 @@ final class JavaModelWriter {
 
             // public type
             if (desc != null) buffer.append(desc);
-            getPropertyWithJsonSetter(typeObj, buffer, imports);
+            getPropertyWithJsonSetter(typeObj, buffer);
             buffer.append("\n");
         }
     }
@@ -922,9 +1004,10 @@ final class JavaModelWriter {
         if (typeObj.javaTypeName.equalsIgnoreCase("Address")) {
             getAddress(typeObj, buffer, forModel);
         }
-        if (typeObj.isOfType("enum")) {
-            getEnum(typeObj, buffer);
-        }
+
+        // Enum is not defined here. It is defined separately in a 
+        // different file.
+
         if (typeObj.rawTypeName.equals("binary") || 
                 typeObj.rawTypeName.equals("byte")) {
             if (typeObj.javaTypeName.equals("byte[]")) {
@@ -939,8 +1022,7 @@ final class JavaModelWriter {
 
     // getPropertyWithJsonSetter formats the property into java declaration type with 
     // the appropriate json annotation.
-    static void getPropertyWithJsonSetter(TypeDef typeObj, StringBuilder buffer,
-            TreeMap<String, Set<String>> imports){
+    void getPropertyWithJsonSetter(TypeDef typeObj, StringBuilder buffer) {
         String jprop = typeObj.propertyName;
         String javaName = Tools.getCamelCase(jprop, false);
         if (typeObj.isOfType("getterSetter")) {
@@ -948,6 +1030,10 @@ final class JavaModelWriter {
             return;
         }
 
+        if (typeObj.isOfType("enum")) {
+            this.javagen.storeEnumDefinition(typeObj);
+        }
+        
         switch (typeObj.javaTypeName) {
         case "java.util.DateTime":
             throw new RuntimeException("Parsing of time is not yet implemented!");
@@ -1334,39 +1420,6 @@ final class JavaModelWriter {
         }
         buffer.append("\n        return true;\n    }\n");
     }
-
-
-    // Generate all the enum classes in the spec file. 
-    public void generateEnumClasses (JsonNode root, String rootPath, String pkg) throws IOException {
-        if (true) {
-            BufferedWriter bw = null;//getFileWriter("Enums", rootPath);
-            bw.append("package " + pkg + ";\n\n");
-            bw.append("import com.fasterxml.jackson.annotation.JsonProperty;\n\n");
-            bw.append("public class Enums {\n\n");
-            JsonNode parameters = root.get("parameters");
-            Iterator<Entry<String, JsonNode>> classes = parameters.fields();
-            while (classes.hasNext()) {
-                Entry<String, JsonNode> cls = classes.next();
-                if (cls.getValue().get("enum") != null) {
-
-                    // Do not expose format property
-                    if (cls.getKey().equals("format")) {
-                        continue;
-                    }
-
-                    if (cls.getValue().get("description") != null) {
-                        String comment = null;
-                        comment = cls.getValue().get("description").asText();
-                        bw.append(Tools.formatComment(comment, "", true));
-                    }
-                    //TypeDef enumType = getEnum(cls.getValue(), cls.getKey(), "");
-                    //bw.append(enumType.def);
-                    bw.append("\n");
-                }
-            }
-            bw.append("}\n");
-            bw.close();
-        }
-    }
-
 }
+
+

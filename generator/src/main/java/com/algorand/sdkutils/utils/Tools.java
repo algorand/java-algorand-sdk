@@ -1,5 +1,9 @@
 package com.algorand.sdkutils.utils;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.Character;
 import java.util.Map;
 import java.util.TreeSet;
@@ -147,4 +151,18 @@ public class Tools {
         sb.append("\n");
         return sb.toString();
     }   
+    
+
+    public static BufferedWriter getFileWriter(String className, String directory)  {
+        File f = new File(directory + "/" + className + ".java");
+        f.getParentFile().mkdirs();
+        BufferedWriter bw = null;
+        try {
+            bw = new BufferedWriter(new FileWriter(f));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bw;
+    }
+
 }
