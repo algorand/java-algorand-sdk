@@ -4,6 +4,9 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.assertj.core.api.Assertions;
 
@@ -13,8 +16,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
-import java.util.Arrays;
-import java.util.Comparator;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,7 +63,110 @@ public class TestingUtils {
 
         JsonNode expectedNode = mapper.readTree(expectedString);
         JsonNode actualNode = mapper.readTree(actualString);
-        assertThat(expectedNode).isEqualTo(actualNode);
+        //manually compare to ignore "empty" / "null" / "missing" fields?
+        compareNodes("root", expectedNode, actualNode);
+        //assertThat(actualNode).isEqualTo(expectedNode);
+    }
+
+    private static void compareNodes(String field, JsonNode expected, JsonNode actual) {
+        JsonNodeType type = null;
+
+        // If one of the objects is null, get the type from the other one.
+        if (expected == null || actual == null) {
+            if (expected != null) type = expected.getNodeType();
+            if (actual != null) type = actual.getNodeType();
+
+            // If they were both null, just return.
+            if (type == null) return;
+        }
+        // If neither is null, the types should be the same.
+        else {
+            assertThat(expected.getNodeType())
+                    .as("Failed to match node types: %s", field)
+                    .isEqualTo(actual.getNodeType());
+            type = expected.getNodeType();
+        }
+
+        // Compare primitive types or recurse complex types.
+        switch (type) {
+            // Compare each index of the array.
+            // Assume that the arrays are sorted and zip thorugh them.
+            case ARRAY:
+                {
+                   int expectedSize = (expected == null) ? 0 : expected.size();
+                   int actualSize = (actual == null) ? 0 : actual.size();
+                   assertThat(expectedSize)
+                           .as("Failed to match array sizes: %s", field)
+                           .isEqualTo(actualSize);
+
+                   if (expectedSize > 0) {
+                       Iterator<JsonNode> expectedElements = expected.elements();
+                       Iterator<JsonNode> actualElements = actual.elements();
+                       int index = 0;
+
+                       while (expectedElements.hasNext() && actualElements.hasNext()) {
+                           compareNodes(field + "[" + index + "]", expectedElements.next(), actualElements.next());
+                           index++;
+                       }
+                   }
+                }
+                break;
+            // Compare the objects.
+            // Allow for missing fields, pass null recursively and let the specific type decide if that is ok.
+            case OBJECT:
+                {
+                    if (expected == null || actual == null) {
+                        Assertions.fail("One of the objects it null and the other isn't empty.");
+                    }
+
+                    // Recursively compare objects field by field (allowing for nulls)
+                    Set<String> allFields = new HashSet<>();
+                    expected.fieldNames().forEachRemaining(allFields::add);
+                    actual.fieldNames().forEachRemaining(allFields::add);
+
+                    for (String nextField : allFields) {
+                        // This will be null if the nextField doesn't exist. That may be OK
+                        JsonNode expectedField = expected.get(nextField);
+                        JsonNode actualField = actual.get(nextField);
+                        compareNodes(field + "." + nextField, expectedField, actualField);
+                    }
+                }
+                break;
+            case NUMBER:
+                {
+                    int expectedValue = (expected == null) ? 0 : expected.asInt();
+                    int actualValue = (actual == null) ? 0 : actual.asInt();
+                    assertThat(actualValue)
+                            .as("Failed to match field: %s", field)
+                            .isEqualTo(expectedValue);
+                }
+                break;
+            case BOOLEAN:
+                {
+                    boolean expectedValue = (expected == null) ? false : expected.asBoolean();
+                    boolean actualValue = (actual == null) ? false : actual.asBoolean();
+                    assertThat(actualValue)
+                            .as("Failed to match field: %s", field)
+                            .isEqualTo(expectedValue);
+                }
+                break;
+            // Compare binary/string the same way
+            case STRING:
+            case BINARY:
+            {
+                String expectedValue = (expected == null) ? "" : expected.asText();
+                String actualValue = (actual == null) ? "" : actual.asText();
+                assertThat(actualValue)
+                        .as("Failed to match field: %s", field)
+                        .isEqualTo(expectedValue);
+            }
+            break;
+            case MISSING:
+            case NULL:
+            case POJO:
+                Assertions.fail("Unhandled type: " + type);
+                break;
+        }
     }
 
     private static void verifyMsgpResponse(Response r, String expected) throws IOException {
