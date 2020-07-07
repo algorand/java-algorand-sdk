@@ -5,16 +5,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
-
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
@@ -24,7 +17,6 @@ import com.algorand.sdkutils.listeners.Publisher.Events;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public class JavaGenerator implements Subscriber {
 
@@ -38,56 +30,11 @@ public class JavaGenerator implements Subscriber {
     String commonPath;
     String commonPackage;
 
-    // packageName is also the folder where the files sit
-    private String packageName;
-    // filesFolder is rootFolder/packageName
-    private String filesFolder;
-
     // JavaModelWriter is a manager of the model file writer
     // It is limited to only one file at a time.
     private JavaModelWriter javaModelWriter;
 
-
     JavaQueryWriter javaQueryWriter;
-
-
-    // Query files
-
-    // This is the individual file for each path query
-    private BufferedWriter queryWriter;
-
-    // path parameters are collected and stored here
-    // this is useful when all the path parameters should be available for 
-    // constructing some functions.  
-    private TreeMap<String, TypeDef> pathParameters;
-
-    // queryFunctions hold all the query functions which go to one file 
-    // written by queryWriter
-    private StringBuffer queryFunctions;
-
-    private String currentQueryName;
-    private String currentQueryReturn;
-
-    // imports that go to one query file written by queryWriter
-    private TreeMap<String, Set<String>> imports;
-
-    // pathDesc has the comments and the path string template
-    private String pathDesc;
-    // path encoded with place-holders from the spec
-    private String path;
-    // request method
-    private String httpMethod;
-
-    // client functions
-
-    // clientFunctions hold all the functions that return the  
-    // makers of the query items. It is to organize them alphabetically sorted
-    // this is reset once at the beginning, and flushed at terminate. 
-    private TreeMap<String, String> clientFunctions;
-
-    // clientFunction holds a single client function as it is getting contructed
-    // If is reset at each new query 
-    private StringBuffer clientFunction;
 
     // generatedPathsEntry holds the client class path query functions, 
     // and the corresponding imports
@@ -125,7 +72,6 @@ public class JavaGenerator implements Subscriber {
         this.tokenOptional = tokenOptional;
 
         javaModelWriter = new JavaModelWriter(this, modelPath);
-        clientFunctions = new TreeMap<String, String>();
 
         generatedPathsEntries = new StringBuilder(); 
         generatedPathsImports = new StringBuilder();
@@ -189,154 +135,6 @@ public class JavaGenerator implements Subscriber {
             throw new RuntimeException("Unemplemented event for StructDef! " + event);
         }
 
-    }
-
-
-    private StringBuffer processPath() {
-        StringBuffer pathSB = new StringBuffer();
-        StringBuffer paramSB = new StringBuffer();
-
-        if (pathParameters.size() > 0) {
-            pathSB.append("fmt.Sprintf(");
-        }
-        pathSB.append("\"");
-
-        StringTokenizer st = new StringTokenizer(path, "/");
-
-        while (st.hasMoreTokens()) {
-            pathSB.append("/");
-            String elt = st.nextToken();
-            if (elt.charAt(0) == '{') {
-
-                // Get the property name
-                // The property name can be different from the name in the path placeholder
-                // The reason for this is the x-go-name property overriding the property name
-                // This is expected to be only case difference
-                String propName = Tools.getCamelCase(elt.substring(1, elt.length()-1), false);
-                if (pathParameters.get(propName) == null) {
-                    // The name is overridden. Find the name
-                    for (String name : pathParameters.keySet()) {
-                        if (name.toUpperCase().equals(propName.toUpperCase())) {
-                            propName = name;
-                        }
-                    }
-                }
-
-                switch(pathParameters.get(propName).javaTypeName) {
-                case "string":
-                    pathSB.append("%s");
-                    break;
-                case "uint64":
-                    pathSB.append("%d");
-                    break;
-                default:
-                    throw new RuntimeException("Unhandled Sprintf type.");
-                }
-                paramSB.append(", s." + propName);
-            } else {
-                pathSB.append(elt);
-            }
-        }
-
-        pathSB.append("\"" + paramSB);
-        if (pathParameters.size() > 0) {
-            pathSB.append(")");
-        }
-
-        return pathSB;
-    }
-
-    private void newQuery(
-            String className,
-            String returnTypeName,
-            String path,
-            String desc,
-            String httpMethod) {
-
-        this.pathDesc = path + "\n" + desc;
-        this.path = path;
-        this.httpMethod = httpMethod;
-        currentQueryName = Tools.getCamelCase(className, true);
-        currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
-
-        pathParameters = new TreeMap<String, TypeDef>();
-        queryFunctions = new StringBuffer();
-        imports = new TreeMap<String, Set<String>>();
-
-        if (queryWriter != null) {
-            throw new RuntimeException("Query writer should be closed!");
-        }
-
-        // Add the entry into the applicationClient file
-        clientFunction = new StringBuffer();
-        clientFunction.append("func (c *Client) " + currentQueryName + "(");
-    }
-
-    private void addPathParameter(TypeDef type) {
-        String propName = Tools.getCamelCase(
-                type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName, 
-                        false);
-        pathParameters.put(propName, type);
-
-        // client functions
-        if (pathParameters.size() > 1) {
-            clientFunction.append(", ");
-        }
-        clientFunction.append(propName + " " + type);
-    }
-
-    private void addQueryParameter(TypeDef type) {
-        // Also need to add this to the path struct (model)
-        javaModelWriter.newProperty(type);
-        String propName = type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName;
-        String funcName = Tools.getCamelCase(propName, true);
-        String paramName = Tools.getCamelCase(propName, false);
-        String desc = Tools.formatCommentGo(type.doc, funcName, "");
-    }
-
-    private void endQuery() {
-        // client functions
-        clientFunction.append(") *" + currentQueryName + " {\n");
-        clientFunction.append(TAB + "return &" + currentQueryName + "{");
-
-        queryWriter = newFile(currentQueryName, filesFolder);
-        append(queryWriter, 
-                "package " + packageName + "\n\n" +
-                "import (\n");
-
-        append(queryWriter, ")\n\n");
-
-        append(queryWriter, Tools.formatCommentGo(pathDesc, currentQueryName, ""));
-        append(queryWriter, "type " + currentQueryName + " struct {\n");
-
-        int formattingWidth = 1;
-        for (String key : pathParameters.keySet()) {
-            if (key.length() > formattingWidth) {
-                formattingWidth = key.length();
-            }
-        }
-        formattingWidth += 1;
-        if (javaModelWriter.modelPropertyAdded()) {
-        }
-
-        clientFunction.append("c: c");
-
-        Iterator<Entry<String, TypeDef>> pps = pathParameters.entrySet().iterator();
-        while(pps.hasNext()) {
-            Entry<String, TypeDef> pp = pps.next();
-            clientFunction.append(", " + pp.getKey() + ": " + pp.getKey());
-        }
-        append(queryWriter, "}\n\n");
-
-        // client functions
-        clientFunction.append("}\n}\n\n");
-
-        clientFunctions.put(currentQueryName, 
-                Tools.formatCommentGo(pathDesc, "", "") + clientFunction.toString());
-
-        append(queryWriter, queryFunctions.toString());
-        closeFile(queryWriter);
-        queryWriter = null;
     }
 
     public void terminate() {
@@ -590,7 +388,7 @@ public class JavaGenerator implements Subscriber {
                 return;
             }
         }
-        this.enumDefinitions.put(javaTypeName, sb.toString());
+        JavaGenerator.enumDefinitions.put(javaTypeName, sb.toString());
     }
 }
 
@@ -920,10 +718,6 @@ final class JavaModelWriter {
         modelFileWriter = null;
     }
 
-    public boolean modelPropertyAdded() {
-        return modelPropertyAdded;
-    }
-
     public void newProperty(TypeDef type) {
         modelPropertyAdded = true;
         properties.put(Tools.getCamelCase(type.propertyName, false), type);
@@ -970,16 +764,11 @@ final class JavaModelWriter {
         return sortedProps;
     }
 
-
-    ////////////////////xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-
-
     // Write the properties of the Model class.
     void writeProperties(StringBuilder buffer) {
         Iterator<Entry<String, TypeDef>> sorted = getSortedProperties();
         while (sorted.hasNext()) {
             Entry<String, TypeDef> prop = sorted.next();
-            String javaName = prop.getKey();
             TypeDef typeObj = prop.getValue();
 
             JavaGenerator.setImportOf(typeObj, imports);
@@ -1051,40 +840,6 @@ final class JavaModelWriter {
         }
     }
 
-
-    // Get array type of base64 encoded bytes.
-    // It provides the special getter/setter needed for this type
-    static void getEnum(TypeDef typeObj, StringBuilder sb) {
-        String javaTypeName = Tools.getCamelCase(typeObj.goPropertyName, true);
-        sb.append(TAB + "public enum " + javaTypeName + " {\n");
-
-        Iterator<String> elmts = typeObj.enumValues.iterator();
-        while(elmts.hasNext()) {
-            String val = elmts.next();
-            sb.append(TAB + TAB + "@JsonProperty(\"" + val + "\") ");
-            String javaEnum = Tools.getCamelCase(val, true).toUpperCase();
-            sb.append(javaEnum);
-            sb.append("(\"" + val + "\")");
-            if (elmts.hasNext()) {
-                sb.append(",\n");
-            } else {
-                sb.append(";\n\n");
-            }
-        }
-        sb.append(TAB + TAB + "final String serializedName;\n");
-        sb.append(TAB + TAB + "" + javaTypeName + "(String name) {\n");
-        sb.append(TAB + TAB + TAB + "this.serializedName = name;\n");
-        sb.append(TAB + TAB + "}\n\n");
-        sb.append(TAB + TAB + "@Override\n");
-        sb.append(TAB + TAB + "public String toString() {\n");
-        sb.append(TAB + TAB + TAB + "return this.serializedName;\n");
-        sb.append(TAB + TAB + "}\n");
-
-        sb.append(TAB + "}\n");
-        javaTypeName = "Enums." + javaTypeName;
-    }
-
-
     // Get array type of base64 encoded bytes.
     // It provides the special getter/setter needed for this type
     static void getBase64EncodedArray(TypeDef typeObj, StringBuilder sb,
@@ -1154,252 +909,6 @@ final class JavaModelWriter {
                 "    }\n" + 
                 "    public Address " + javaName + ";\n");
     }
-
-
-    // Query parameters need be in builder methods.
-    // processQueryParameters do all the processing of the parameters. 
-    String processQueryParams(
-            StringBuilder generatedPathsEntry,
-            Iterator<Entry<String, JsonNode>> properties,
-            String className,
-            String path,
-            String returnType,
-            String httpMethod,
-            Map<String, Set<String>> imports) {
-
-        StringBuilder decls = new StringBuilder();
-        StringBuilder builders = new StringBuilder();
-        StringBuilder constructorHeader = new StringBuilder();
-        StringBuilder constructorBody = new StringBuilder();
-        StringBuilder requestMethod = new StringBuilder();
-        ArrayList<String> constructorComments = new ArrayList<String>();
-
-        StringBuilder generatedPathsEntryBody = new StringBuilder();
-
-        //        requestMethod.append(getQueryResponseMethod(returnType));
-        requestMethod.append("    protected QueryData getRequestString() {\n");
-        boolean pAdded = false;
-        boolean addFormatMsgpack = false;
-
-        while (properties != null && properties.hasNext()) {
-            Entry<String, JsonNode> prop = properties.next();
-            String propName = Tools.getCamelCase(prop.getKey(), false);
-            String setterName = Tools.getCamelCase(prop.getKey(), false);
-            TypeDef propType = null;// = getType(prop.getValue(), true, prop.getKey(), false);
-
-            // Do not expose format property
-            if (propType.javaTypeName.equals("Enums.Format")) {
-                if (!className.equals("AccountInformation")) {
-                    // Don't set format to msgpack for AccountInformation
-                    addFormatMsgpack = true;
-                }
-                continue;
-            }
-            String propCode = prop.getKey();
-
-            // The parameters are either in the path or in the query
-
-            // Populate generator structures for the in path parameters
-            if (true){//inPath(prop.getValue())) {
-                if (propType.isOfType("enum")) {
-                    throw new RuntimeException("Enum in paths is not supported! " + propName);
-                }
-                decls.append(TAB + "private " + propType.javaTypeName + " " + propName + ";\n");
-                String desc = "";
-                if (prop.getValue().get("description") != null) {
-                    propType.doc = desc;
-                    desc = prop.getValue().get("description").asText();
-                    desc = Tools.formatComment("@param " + propName + " " + desc, TAB, false);
-                    constructorComments.add(desc);
-                }
-
-                constructorHeader.append(", " + propType.javaTypeName + " " + propName);
-                constructorBody.append("        this." + propName + " = " + propName + ";\n");
-
-                if (pAdded) {
-                    generatedPathsEntry.append(",\n            ");
-                }
-
-                generatedPathsEntry.append(propType.javaTypeName + " " + propName);
-                generatedPathsEntryBody.append(", " + propName);
-                pAdded = true;
-
-                //publisher.publish(Events.PATH_PARAMETER, propType);
-
-                continue;
-            }
-
-            if (prop.getValue().get("description") != null) {
-                String desc = prop.getValue().get("description").asText();
-                propType.doc = desc;
-                desc = Tools.formatComment(desc, TAB, true);
-                builders.append(desc);
-            }
-            builders.append(TAB + "public " + className + " " + setterName + "(" + propType.javaTypeName + " " + propName + ") {\n");
-            //            String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
-
-            if (true) {//inBody(prop.getValue())) {
-                builders.append(TAB + TAB + "addToBody("+ propName +");\n");
-                ///publisher.publish(Events.BODY_CONTENT, propType);
-            } else {
-                //                builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
-                ///publisher.publish(Events.QUERY_PARAMETER, propType);
-            }
-            builders.append(TAB + TAB + "return this;\n");
-            builders.append(TAB + "}\n");
-            builders.append("\n");
-
-            if (true) {//isRequired(prop.getValue())) {
-                if (true) {//inBody(prop.getValue())) {
-                    requestMethod.append("        if (qd.bodySegments.isEmpty()) {\n");
-                } else {
-                    requestMethod.append("        if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
-                }
-                requestMethod.append("            throw new RuntimeException(\"" +
-                        propCode + " is not set. It is a required parameter.\");\n        }\n");
-            }
-
-        }
-
-        generatedPathsEntry.append(") {\n");
-        generatedPathsEntry.append("        return new "+className+"((Client) this");
-        generatedPathsEntry.append(generatedPathsEntryBody);
-        generatedPathsEntry.append(");\n    }\n\n");
-
-        // Add the path construction code.
-        // The path is constructed in the end, while the query params are added as the
-        ArrayList<String> al = null;//getPathInserts(path);
-        for (String str : al) {
-            requestMethod.append(
-                    "        addPathSegment(String.valueOf(" + str + "));\n");
-        }
-
-        requestMethod.append("\n" +
-                "        return qd;\n" +
-                "    }");
-
-        StringBuilder ans = new StringBuilder();
-        ans.append(decls);
-        if (!decls.toString().isEmpty()) {
-            ans.append("\n");
-        }
-
-        // constructor
-        if (constructorComments.size() > 0) {
-            ans.append("    /**");
-            for (String elt : constructorComments) {
-                ans.append("\n" + elt);
-            }
-            ans.append("\n     */\n");
-        }
-        ans.append("    public "+className+"(Client client");
-        ans.append(constructorHeader);
-        ans.append(") {\n        super(client, new HttpMethod(\""+httpMethod+"\"));\n");
-        if (addFormatMsgpack) {
-            ans.append("        addQuery(\"format\", \"msgpack\");\n");
-        }
-
-        ans.append(constructorBody);
-        ans.append("    }\n\n");
-
-        ans.append(builders);
-        ans.append(requestMethod);
-        return ans.toString();
-    }
-
-
-
-    // Write the class of a path expression
-    // This is the root method for preparing the complete class
-    void writeQueryClass(
-            StringBuilder generatedPathsEntry,
-            JsonNode spec,
-            String path,
-            String directory,
-            String pkg,
-            String modelPkg) throws IOException {
-
-        String httpMethod;
-        Iterator<String> fields = spec.fieldNames();
-        httpMethod = fields.next();
-        spec = spec.get(httpMethod);
-
-        String className = spec.get("operationId").asText();
-
-        /*
-         * TODO: this is a bug: function name should start with a small letter.
-         * However, v2 was released with function names first letter cap. 
-         * Will be good to fix in the future. 
-         * 
-         * Should use:  getCamelCase(className, false);
-         */
-        String methodName = Tools.getCamelCase(className, Character.isUpperCase(className.charAt(0)));
-        className = Tools.getCamelCase(className, true);
-
-        JsonNode paramNode = spec.get("parameters");
-        String returnType = "String";
-        if (spec.has("responses") && spec.get("responses").has("200") &&
-                spec.get("responses").get("200").get("$ref") != null) {
-            returnType = spec.get("responses").get("200").get("$ref").asText();
-            JsonNode returnTypeNode = null;//this.getFromRef(returnType);
-            if (returnTypeNode.get("schema").get("$ref") != null) {
-                returnType = null;// OpenApiParser.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
-            } else {
-                returnType = null;//OpenApiParser.getTypeNameFromRef(returnType);
-                returnType = Tools.getCamelCase(returnType, true);
-            }
-        }
-        String desc = spec.get("description") != null ? spec.get("description").asText() : "";
-        String discAndPath = desc + "\n" + path;
-        System.out.println("Generating ... " + className);
-        Iterator<Entry<String, JsonNode>> properties = null;
-        if ( paramNode != null) {
-            properties = null;//getSortedParameters(paramNode);
-        }
-
-        Map<String, Set<String>> imports = new HashMap<String, Set<String>>();
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.HttpMethod");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Query");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
-        if (true){//needsClassImport(returnType.toLowerCase())) {
-            Tools.addImport(imports, modelPkg + "." + returnType);
-        }
-
-        generatedPathsEntry.append(Tools.formatComment(discAndPath, TAB, true));
-
-        generatedPathsEntry.append("    public " + className + " " + methodName + "(");
-        String [] strarray = {className, returnType, path, desc, httpMethod};
-        //this.publisher.publish(Events.NEW_QUERY, strarray);
-
-        String queryParamsCode = processQueryParams(
-                generatedPathsEntry,
-                properties,
-                className,
-                path,
-                returnType,
-                httpMethod,
-                imports);
-
-        if (true) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("\n");
-            sb.append(Tools.formatComment(discAndPath, "", true));
-            sb.append("public class " + className + " extends Query {\n\n");
-            sb.append(queryParamsCode);
-            sb.append("\n}");
-
-            BufferedWriter bw = null;//getFileWriter(className, directory);
-            bw.append("package " + pkg + ";\n\n");
-            bw.append(Tools.getImports(imports));
-            bw.append(sb);
-            bw.close();
-        }
-
-        //publisher.publish(Events.END_QUERY);
-    }
-
 
     // Writes the compare methods by adding a comparator for each class member. 
     static void writeCompareMethod(String className, 

@@ -122,15 +122,8 @@ public class OpenApiParser {
             case "uint64":
                 return new TypeDef("java.math.BigInteger", type, "", propName, goName, desc, isRequired(prop));
             case "RFC3339 String":
-              //XXX                addImport(imports, "java.util.Date");
-              //XXX                addImport(imports, "com.algorand.algosdk.v2.client.common.Utils");
                 return new TypeDef("Date", "time", "", propName, goName, desc, isRequired(prop));
             case "Address":
-                /* XXX
-                addImport(imports, "com.algorand.algosdk.crypto.Address");
-                if (forModel) {
-                    addImport(imports, "java.security.NoSuchAlgorithmException");
-                }*/
                 return new TypeDef("Address", "address", "getterSetter", propName, 
                         goName, desc, isRequired(prop));
 
@@ -142,11 +135,6 @@ public class OpenApiParser {
             case "digest":
                 if (type.contentEquals("array")) {
                     type = prop.get("items").get("type").asText(); 
-                  /*XXX 
-                    addImport(imports, "com.algorand.algosdk.util.Encoder");
-                    addImport(imports, "java.util.ArrayList");
-                    addImport(imports, "java.util.List");
-*/
                     if (forModel == false) {
                         throw new RuntimeException("array of byte[] cannot yet be used in a path or path query.");
                     }
@@ -159,7 +147,6 @@ public class OpenApiParser {
                     return new TypeDef("", type, "getterSetter,array", 
                             propName, goName, desc, isRequired(prop));
                 } else {
-//XXX                    addImport(imports, "com.algorand.algosdk.util.Encoder");
                     return new TypeDef("byte[]", "binary", "getterSetter", 
                             propName, goName, desc, isRequired(prop));
                 }
@@ -167,7 +154,6 @@ public class OpenApiParser {
                 break;
             case "BlockCertificate":
             case "BlockHeader":
-              //XXX                addImport(imports, "java.util.HashMap");
                 return new TypeDef("HashMap<String,Object>", type, "", propName, goName, desc, isRequired(prop));
             }
         }
@@ -218,44 +204,6 @@ public class OpenApiParser {
             imports.put(key, new TreeSet<String>());
         }
         imports.get(key).add(imp);
-    }
-
-    // getImports organizes the imports and returns the block of import statements
-    // The statements are unique, and organized. 
-    static String getImports(Map<String, Set<String>> imports) {
-        StringBuilder sb = new StringBuilder();
-
-        Set<String> java = imports.get("java");
-        if (java != null) {
-            for (String imp : java) {
-                sb.append("import " + imp + ";\n");
-            }
-            if (imports.get("com") != null) {
-                sb.append("\n");
-            }
-        }
-
-        Set<String> com = imports.get("com");
-        if (com != null) {
-            for (String imp : com) {
-                sb.append("import " + imp + ";\n");
-            }
-        }
-        sb.append("\n");
-        return sb.toString();
-    }
-
-    // returns true if the type needs an import statement. 
-    // Not needed for primitive types. 
-    static boolean needsClassImport(String type) {
-        switch (type) {
-        case "integer":
-            return false;
-        case "string":
-            return false;
-        default:
-            return true;
-        }
     }
 
     // Returns an iterator in sorted order of the properties (json nodes). 
@@ -335,24 +283,6 @@ public class OpenApiParser {
             TypeDef typeObj = getType(prop.getValue(), true, jprop, true);
             publisher.publish(Events.NEW_PROPERTY, typeObj);
         }
-    }
-
-    // getPathInserts converts the path string into individual tokens which correspond
-    // to the class members in the generated code. 
-    // These are used to set the path segments in the constructor. 
-    static ArrayList<String> getPathInserts(String path) {
-        ArrayList<String> nPath = new ArrayList<String>();
-        StringTokenizer st = new StringTokenizer(path, "/");
-        while (st.hasMoreTokens()) {
-            String elt = st.nextToken();
-            if (elt.charAt(0) == '{') {
-                String jName = Tools.getCamelCase(elt.substring(1, elt.length()-1), false);
-                nPath.add(jName);
-            } else {
-                nPath.add("\"" + elt + "\"");
-            }
-        }
-        return nPath;
     }
 
     static boolean isRequired(JsonNode prop) {
