@@ -585,7 +585,6 @@ public class JavaGenerator implements Subscriber {
         if (existingDef != null && existingDef.compareTo(definition) != 0) {
             System.err.println(definition);
             System.err.println(existingDef);
-//            new RuntimeException("Conflicting Enum classes" + javaTypeName).printStackTrace();
             // Could be the comment
             if (definition.length() < existingDef.length()) {
                 return;
