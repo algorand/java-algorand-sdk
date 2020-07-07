@@ -2,13 +2,18 @@ package com.algorand.algosdk.unit.utils;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.assertj.core.api.Assertions;
+import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,6 +27,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestingUtils {
     static ObjectMapper mapper = new ObjectMapper();
+    static ObjectMapper msgpMapper;
+
+    static {
+        // MessagePack
+        msgpMapper = new ObjectMapper(new MessagePackFactory());
+        msgpMapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+        msgpMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
+        // There's some odd bug in Jackson < 2.8.? where null values are not excluded. See:
+        // https://github.com/FasterXML/jackson-databind/issues/1351. So we will
+        // also annotate all fields manually
+        msgpMapper.setSerializationInclusion(JsonInclude.Include.NON_DEFAULT);
+    }
 
     public static <T extends Enum<?>> T searchEnum(Class<T> enumeration, String search) {
         for (T each : enumeration.getEnumConstants()) {
@@ -63,9 +80,19 @@ public class TestingUtils {
 
         JsonNode expectedNode = mapper.readTree(expectedString);
         JsonNode actualNode = mapper.readTree(actualString);
-        //manually compare to ignore "empty" / "null" / "missing" fields?
+
         compareNodes("root", expectedNode, actualNode);
-        //assertThat(actualNode).isEqualTo(expectedNode);
+    }
+
+
+    private static void verifyMsgpResponse(Response r, String expected) throws IOException {
+        String actualString = r.toString();
+        byte[] expectedBytes = Encoder.decodeFromBase64(expected);
+
+        JsonNode actualNode = mapper.readTree(actualString);
+        JsonNode expectedNode = msgpMapper.readTree(expectedBytes);
+
+        compareNodes("root", expectedNode, actualNode);
     }
 
     private static void compareNodes(String field, JsonNode expected, JsonNode actual) {
@@ -81,9 +108,18 @@ public class TestingUtils {
         }
         // If neither is null, the types should be the same.
         else {
-            assertThat(expected.getNodeType())
-                    .as("Failed to match node types: %s", field)
-                    .isEqualTo(actual.getNodeType());
+            // Allow a BINARY/STRING mismatch
+            if (expected.getNodeType() != actual.getNodeType()) {
+                if ((expected.getNodeType() == JsonNodeType.BINARY || expected.getNodeType() == JsonNodeType.STRING) &&
+                    (actual.getNodeType() == JsonNodeType.BINARY || actual.getNodeType() == JsonNodeType.STRING)) {
+                    // allow this mismatch
+                } else {
+                    assertThat(expected.getNodeType())
+                            .as("Failed to match node types: %s", field)
+                            .isEqualTo(actual.getNodeType());
+                }
+            }
+
             type = expected.getNodeType();
         }
 
@@ -150,15 +186,22 @@ public class TestingUtils {
                             .isEqualTo(expectedValue);
                 }
                 break;
-            // Compare binary/string the same way
+            // Allow comparing binary/string together, depending on the encoding it may be required.
             case STRING:
             case BINARY:
             {
-                String expectedValue = (expected == null) ? "" : expected.asText();
-                String actualValue = (actual == null) ? "" : actual.asText();
-                assertThat(actualValue)
-                        .as("Failed to match field: %s", field)
-                        .isEqualTo(expectedValue);
+                // Check for multiple encodings, it's possible that in some cases a base64 value needs to be decoded
+                // and compared against a string. Or in other cases it needs to remain in the base64 encoded format.
+                Set<String> possibleExpectedValues = getPossibleStringsFromNode(expected);
+                Set<String> possibleActualValues = getPossibleStringsFromNode(actual);
+
+                long matches = possibleExpectedValues.stream().filter(v -> possibleActualValues.contains(v)).count();
+
+                assertThat(matches)
+                        .as("There should be at least one match between expected values ['%s'] and actual values ['%s']",
+                                String.join("', '", possibleExpectedValues),
+                                String.join("', '", possibleActualValues))
+                        .isNotZero();
             }
             break;
             case MISSING:
@@ -169,52 +212,19 @@ public class TestingUtils {
         }
     }
 
-    private static void verifyMsgpResponse(Response r, String expected) throws IOException {
-        String expectedString = expected;
-
-        /*
-        // Convert the POJO back into messagepack, this is the most valid approach.
-
-        // These are different and I'm not sure why.
-        // There may be an issue with the source 'msgpacktool' displays it incorrectly as well.
-        String actualString = r.toString();
-
-        Object o = r.body();
-        String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(o));
-
-        assertThat(encoded).isEqualTo(expectedString);
-         */
-
-        // Get both as maps and compare the maps.
-        // Somehow the "type" field is turned into a String in the actual value, but is byte[] in the expected.
-        // Is the source wrong?
-        /*
-        Map<String,Object> exp = Encoder.decodeFromMsgPack(expectedString, Map.class);
-        Map<String,Object> act = Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(r.body()), Map.class);
-        assertThat(act).isEqualTo(exp);
-         */
-
-        // This isn't totally valid because it is comparing the two objects after being serialized by the same
-        // serializer...
-
-        // Manually decode the thing into a POJO and compare the POJOs.
-        // This requires reflection to extract the POJO type.
-        Field f = FieldUtils.getField(r.getClass(), "valueType", true);
-        Class value = null;
-        try {
-            value = (Class) f.get(r);
-        } catch (IllegalAccessException e) {
-            Assertions.fail("No good.");
+    private static Set<String> getPossibleStringsFromNode(JsonNode node) {
+        if (node == null) return ImmutableSet.of("");
+        switch (node.getNodeType()) {
+            case BINARY:
+                return ImmutableSet.of(
+                        new String(Encoder.decodeFromBase64(node.asText())),
+                        node.asText());
+            case STRING:
+                return ImmutableSet.of(node.asText());
+            default:
+                Assertions.fail("Cannot convert to string.");
+                return ImmutableSet.of("");
         }
-
-        Object act = r.body();
-        Object exp = Encoder.decodeFromMsgPack(expectedString, value);
-
-        // This didn't seem to work for deeply nested objects
-        //assertThat(act).isEqualTo(exp);
-
-        // This did
-        assertThat(Encoder.encodeToJson(act)).isEqualTo(Encoder.encodeToJson(exp));
     }
 
     private static URL verifyAndGetURL(String url) {
