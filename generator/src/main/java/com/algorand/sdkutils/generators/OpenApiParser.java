@@ -86,24 +86,23 @@ public class OpenApiParser {
 
     // getType returns the type fron the JsonNode
     TypeDef getType(
-            JsonNode prop, 
+            JsonNode prop,
             boolean asObject,
-            String propName, boolean forModel) {        
-                
+            String propName, boolean forModel) {
+
         String desc = prop.get("description") == null ? "" : prop.get("description").asText();
-        String goName = prop.get("x-go-name") != null ? 
-                prop.get("x-go-name").asText() : "";
+        String goName = prop.get("x-go-name") != null ? prop.get("x-go-name").asText() : "";
         JsonNode refNode = prop.get("$ref");
         if (refNode == null && prop.get("schema") != null) {
             refNode = prop.get("schema").get("$ref");
         }
         if (refNode != null) {
             String type = getTypeNameFromRef(refNode.asText());
-            // Need to check here if this type does not have a class of its own 
+            // Need to check here if this type does not have a class of its own
             // No C/C++ style typedef in java, and this type could be a class with no properties
             prop = getFromRef(refNode.asText());
             if (desc.isEmpty()) {
-                desc = prop.get("description") == null ? "" : prop.get("description").asText(); 
+                desc = prop.get("description") == null ? "" : prop.get("description").asText();
             }
             if (hasProperties(prop)) {
                 return new TypeDef(type, type, "", propName, goName, desc, isRequired(prop));
@@ -124,7 +123,7 @@ public class OpenApiParser {
             case "RFC3339 String":
                 return new TypeDef("Date", "time", "", propName, goName, desc, isRequired(prop));
             case "Address":
-                return new TypeDef("Address", "address", "getterSetter", propName, 
+                return new TypeDef("Address", "address", "getterSetter", propName,
                         goName, desc, isRequired(prop));
 
             case "SignedTransaction":
@@ -134,20 +133,20 @@ public class OpenApiParser {
             case "base64":
             case "digest":
                 if (type.contentEquals("array")) {
-                    type = prop.get("items").get("type").asText(); 
+                    type = prop.get("items").get("type").asText();
                     if (forModel == false) {
                         throw new RuntimeException("array of byte[] cannot yet be used in a path or path query.");
                     }
-                    
+
                     if (format.equals("byte")) {
                         type = format;
                     }
 
                     // getterSetter typeName is only used in path.
-                    return new TypeDef("", type, "getterSetter,array", 
+                    return new TypeDef("", type, "getterSetter,array",
                             propName, goName, desc, isRequired(prop));
                 } else {
-                    return new TypeDef("byte[]", "binary", "getterSetter", 
+                    return new TypeDef("byte[]", "binary", "getterSetter",
                             propName, goName, desc, isRequired(prop));
                 }
             case "AccountID":
@@ -159,17 +158,20 @@ public class OpenApiParser {
         }
         switch (type) {
         case "integer":
-            String longName = asObject ? "Long" : "long"; 
+            String longName = asObject ? "Long" : "long";
             return new TypeDef(longName, type, "", propName, goName, desc, isRequired(prop));
         case "object":
         case "string":
             return new TypeDef("String", type, "", propName, goName, desc, isRequired(prop));
         case "boolean":
-            String boolName = asObject ? "Boolean" : "boolean"; 
+            String boolName = asObject ? "Boolean" : "boolean";
             return new TypeDef(boolName, type, "", propName, goName, desc, isRequired(prop));
         case "array":
             JsonNode arrayTypeNode = prop.get("items");
             TypeDef typeName = getType(arrayTypeNode, asObject, propName, forModel);
+            if (typeName.isOfType("getterSetter")) {
+                type = type + ",getterSetter";
+            }
             return new TypeDef("List<" + typeName.javaTypeName + ">", typeName.rawTypeName,
                     type, propName, goName, desc, isRequired(prop));
         default:
@@ -178,14 +180,14 @@ public class OpenApiParser {
     }
 
     // getTypeFormat returns the additional type formatting information
-    // There could be multiple such tags in the spec file. This method knows which 
-    // one is relevant here. 
+    // There could be multiple such tags in the spec file. This method knows which
+    // one is relevant here.
     public static String getTypeFormat(JsonNode typeNode, String propName) {
         String format = typeNode.get("x-algorand-format") != null ? typeNode.get("x-algorand-format").asText() : "";
         String type = typeNode.get("type").asText();
         format = typeNode.get("format") != null && format.isEmpty() ? typeNode.get("format").asText() : format;
-        if ((propName.equals("address") || 
-                propName.contentEquals("account-id") || 
+        if ((propName.equals("address") ||
+                propName.contentEquals("account-id") ||
                 propName.contentEquals("AccountID")) &&
                 type.equals("string")) {
             format = "Address";
@@ -197,7 +199,7 @@ public class OpenApiParser {
     }
 
     // Imports are collected and organized before printed as import statements.
-    // addImports adds a needed import class. 
+    // addImports adds a needed import class.
     static void addImport(Map<String, Set<String>> imports, String imp) {
         String key = imp.substring(0, imp.indexOf('.'));
         if (imports.get(key) == null) {
@@ -206,7 +208,7 @@ public class OpenApiParser {
         imports.get(key).add(imp);
     }
 
-    // Returns an iterator in sorted order of the properties (json nodes). 
+    // Returns an iterator in sorted order of the properties (json nodes).
     static Iterator<Entry<String, JsonNode>> getSortedProperties(JsonNode properties) {
         Iterator<Entry<String, JsonNode>> props = properties.fields();
         TreeMap<String, JsonNode> propMap = new TreeMap<String, JsonNode>();
@@ -218,7 +220,7 @@ public class OpenApiParser {
         return sortedProps;
     }
 
-    // Returns an iterator in sorted order of the parameters (json nodes). 
+    // Returns an iterator in sorted order of the parameters (json nodes).
     Iterator<Entry<String, JsonNode>> getSortedParameters(JsonNode properties) {
         TreeMap<String, JsonNode> tm = new TreeMap<String, JsonNode>();
         if (properties == null) {
@@ -243,15 +245,14 @@ public class OpenApiParser {
         return null;
     }
 
-    // writeClass writes the Model class. 
-    // This is the root method for writing the complete class. 
-    void writeClass(String className, 
+    // writeClass writes the Model class.
+    // This is the root method for writing the complete class.
+    void writeClass(String className,
             JsonNode parentNode,
-            JsonNode propertiesNode, 
-            String desc, 
+            JsonNode propertiesNode,
+            String desc,
             Events event) throws IOException {
         System.out.println("Generating ... " + className);
-       
 
         // Collect any required fields for this definition.
         Set<String> requiredProperties = new HashSet<>();
@@ -315,7 +316,7 @@ public class OpenApiParser {
     }
 
     // Query parameters need be in builder methods.
-    // processQueryParameters do all the processing of the parameters. 
+    // processQueryParameters do all the processing of the parameters.
     void processQueryParams(
             Iterator<Entry<String, JsonNode>> properties) {
 
@@ -323,15 +324,15 @@ public class OpenApiParser {
             Entry<String, JsonNode> prop = properties.next();
             String propName = Tools.getCamelCase(prop.getKey(), false);
             TypeDef propType = getType(prop.getValue(), true, prop.getKey(), false);
-            
+
             // The parameters are either in the path or in the query
 
             // Populate generator structures for the in path parameters
             if (inPath(prop.getValue())) {
                 if (propType.isOfType("enum")) {
                     throw new RuntimeException("Enum in paths is not supported! " + propName);
-                }             
-                publisher.publish(Events.PATH_PARAMETER, propType); 
+                }
+                publisher.publish(Events.PATH_PARAMETER, propType);
                 continue;
             }
             if (inBody(prop.getValue())) {
@@ -367,12 +368,12 @@ public class OpenApiParser {
         spec = spec.get(httpMethod);
 
         String className = spec.get("operationId").asText();
-        
+
         /*
          * TODO: this is a bug: function name should start with a small letter.
-         * However, v2 was released with function names first letter cap. 
-         * Will be good to fix in the future. 
-         * 
+         * However, v2 was released with function names first letter cap.
+         * Will be good to fix in the future.
+         *
          * Should use:  getCamelCase(className, false);
          */
         String methodName = Tools.getCamelCase(className, Character.isUpperCase(className.charAt(0)));
@@ -407,11 +408,10 @@ public class OpenApiParser {
         publisher.publish(Events.END_QUERY);
     }
 
-    // Generate all the Indexer or algod model classes 
+    // Generate all the Indexer or algod model classes
     public void generateAlgodIndexerObjects (JsonNode root) throws IOException {
-        JsonNode schemas = root.get("components") != null ?
-                root.get("components").get("schemas") :
-                    root.get("definitions");
+        JsonNode schemas = root.get("components") !=
+                null ? root.get("components").get("schemas") : root.get("definitions");
                 Iterator<Entry<String, JsonNode>> classes = schemas.fields();
                 while (classes.hasNext()) {
                     Entry<String, JsonNode> cls = classes.next();
@@ -428,28 +428,25 @@ public class OpenApiParser {
                 }
     }
 
-    // Generate all the Indexer or algod return type classes 
+    // Generate all the Indexer or algod return type classes
     public void generateReturnTypes (JsonNode root) throws IOException {
-        JsonNode returns = root.get("components") != null ? 
-                root.get("components").get("responses") : 
-                    root.get("responses");
-        // If they are defined inline, there will not be a return types section.
-        if (returns == null) return;
-        Iterator<Entry<String, JsonNode>> returnTypes = returns.fields();
-        while (returnTypes.hasNext()) {
-            Entry<String, JsonNode> rtype = returnTypes.next();
-            System.out.println("looking at: " + rtype.getKey());
-            JsonNode rSchema = rtype.getValue().get("content") != null ?
-                    rtype.getValue().get("content").get("application/json").get("schema") :
-                        rtype.getValue().get("schema");
-
-                    if (rSchema.get("$ref") != null ) {
-                        // It refers to a defined class
-                        continue;
-                    }
-                    writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
-                            null, Events.NEW_RETURN_TYPE);
-        }
+        JsonNode returns = root.get("components") !=
+                null ? root.get("components").get("responses") : root.get("responses");
+                // If they are defined inline, there will not be a return types section.
+                if (returns == null) return;
+                Iterator<Entry<String, JsonNode>> returnTypes = returns.fields();
+                while (returnTypes.hasNext()) {
+                    Entry<String, JsonNode> rtype = returnTypes.next();
+                    System.out.println("looking at: " + rtype.getKey());
+                    JsonNode rSchema = rtype.getValue().get("content") !=
+                            null ? rtype.getValue().get("content").get("application/json").get("schema") : rtype.getValue().get("schema");
+                            if (rSchema.get("$ref") != null ) {
+                                // It refers to a defined class
+                                continue;
+                            }
+                            writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
+                                    null, Events.NEW_RETURN_TYPE);
+                }
     }
 
     // Generate all the path expression classes
@@ -459,11 +456,12 @@ public class OpenApiParser {
         Iterator<Entry<String, JsonNode>> pathIter = paths.fields();
         while (pathIter.hasNext()) {
             Entry<String, JsonNode> path = pathIter.next();
-            JsonNode privateTag = path.getValue().get("post") != null ? path.getValue().get("post").get("tags") : null;
-            if (privateTag != null && privateTag.elements().next().asText().equals("private")) {
-                continue;
-            }
-            writeQueryClass(path.getValue(), path.getKey());
+            JsonNode privateTag = path.getValue().get("post") !=
+                    null ? path.getValue().get("post").get("tags") : null;
+                    if (privateTag != null && privateTag.elements().next().asText().equals("private")) {
+                        continue;
+                    }
+                    writeQueryClass(path.getValue(), path.getKey());
         }
     }
 

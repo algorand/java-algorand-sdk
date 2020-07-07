@@ -36,7 +36,7 @@ public class JavaGenerator implements Subscriber {
 
     JavaQueryWriter javaQueryWriter;
 
-    // generatedPathsEntry holds the client class path query functions, 
+    // generatedPathsEntry holds the client class path query functions,
     // and the corresponding imports
     StringBuilder generatedPathsEntries;
     StringBuilder generatedPathsImports;
@@ -55,7 +55,7 @@ public class JavaGenerator implements Subscriber {
             String queryPackage,
             String commonPath,
             String commonPackage,
-            String tokenName, 
+            String tokenName,
             Boolean tokenOptional,
             Publisher publisher) throws IOException {
         publisher.subscribeAll(this);
@@ -73,7 +73,7 @@ public class JavaGenerator implements Subscriber {
 
         javaModelWriter = new JavaModelWriter(this, modelPath);
 
-        generatedPathsEntries = new StringBuilder(); 
+        generatedPathsEntries = new StringBuilder();
         generatedPathsImports = new StringBuilder();
     }
 
@@ -125,7 +125,7 @@ public class JavaGenerator implements Subscriber {
     @Override
     public void onEvent(Events event, StructDef sDef) {
         switch(event) {
-        case NEW_MODEL:      
+        case NEW_MODEL:
             javaModelWriter.newModel(sDef, this.modelPackage);
             break;
         case NEW_RETURN_TYPE:
@@ -139,7 +139,7 @@ public class JavaGenerator implements Subscriber {
 
     public void terminate() {
         javaModelWriter.close();
-        javaModelWriter = null;     
+        javaModelWriter = null;
 
         generateClientFile(
                 clientName,
@@ -175,12 +175,12 @@ public class JavaGenerator implements Subscriber {
      * @param tokenOptional Whether or not a no-token version of the constructor should be created.
      */
     private static void generateClientFile(
-            String clientName, 
-            StringBuilder importLines, 
-            StringBuilder paths, 
-            String packageName, 
-            String packagePath, 
-            String tokenName, 
+            String clientName,
+            StringBuilder importLines,
+            StringBuilder paths,
+            String packageName,
+            String packagePath,
+            String tokenName,
             Boolean tokenOptional) {
 
         if (packagePath.endsWith("/")) {
@@ -303,13 +303,14 @@ public class JavaGenerator implements Subscriber {
             break;
         }
 
-        if (typeObj.rawTypeName.equals("binary")) {
+        if (typeObj.rawTypeName.equals("binary") || typeObj.rawTypeName.equals("byte")) {
             Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
             return;
         }
 
 
-        if (typeObj.javaTypeName.equalsIgnoreCase("Address")) {
+        if (typeObj.javaTypeName.equalsIgnoreCase("Address") ||
+                typeObj.javaTypeName.equalsIgnoreCase("List<Address>")) {
             if (forModel) {
                 Tools.addImport(imports, "java.security.NoSuchAlgorithmException");
             }
@@ -423,7 +424,7 @@ final class JavaQueryWriter {
             String methodName,
             String returnType,
             String path,
-            String desc,	    
+            String desc,
             String httpMethod,
             JavaGenerator javaGenerator) {
 
@@ -478,7 +479,7 @@ final class JavaQueryWriter {
             return;
         }
 
-        if (!(propType.rawTypeName.equals("binary") && inBody)) { 
+        if (!(propType.rawTypeName.equals("binary") && inBody)) {
             JavaGenerator.setImportOf(propType, imports, false);
         }
 
@@ -509,20 +510,29 @@ final class JavaQueryWriter {
             pAdded = true;
         }
 
+        String exception = getThrownException(inBody, propType.javaTypeName);
+
         if (propType.doc != null) {
             String desc = propType.doc;
+            if (!exception.isEmpty()) {
+                desc = desc + "\n" + "@throws " + exception; 
+            }
             desc = Tools.formatComment(desc, TAB, true);
             builders.append(desc);
         }
-        
+
         if (propType.isOfType("enum")) {
-            this.javaGen.storeEnumDefinition(propType);            
-        }        
-        builders.append(TAB + "public " + className + " " + setterName + "(" + propType.javaTypeName + " " + propName + ") {\n");
+            this.javaGen.storeEnumDefinition(propType);
+        }
+                
+        String exceptionStm = exception.isEmpty() ? "" : "throws " + exception + " ";
+        builders.append(TAB + "public " + className + " " + setterName + 
+                "(" + propType.javaTypeName + " " + propName + ") " + exceptionStm + "{\n");
         String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
 
         if (inBody) {
-            builders.append(TAB + TAB + "addToBody("+ propName +");\n");
+            String valueOfByteA = getByteArrayValueOfStatement(propType.javaTypeName, propName);
+            builders.append(TAB + TAB + "addToBody("+ valueOfByteA +");\n");
         } else {
             builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
         }
@@ -605,8 +615,8 @@ final class JavaQueryWriter {
     }
 
     // getPathInserts converts the path string into individual tokens which correspond
-    // to the class members in the generated code. 
-    // These are used to set the path segments in the constructor. 
+    // to the class members in the generated code.
+    // These are used to set the path segments in the constructor.
     static ArrayList<String> getPathInserts(String path) {
         ArrayList<String> nPath = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(path, "/");
@@ -643,9 +653,32 @@ final class JavaQueryWriter {
             return "String.valueOf("+propName+")";
         }
     }
+    
+    String getByteArrayValueOfStatement(String propType, String propName) {
+        switch (propType) {
+        case "DryrunRequest":
+            Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
+            Tools.addImport(imports, "com.algorand.algosdk.v2.client.model.DryrunRequest");
+            Tools.addImport(imports, "com.fasterxml.jackson.core.JsonProcessingException");
+            return "Encoder.encodeToMsgPack(jsonobj)";
+            default:
+                return propName;
+        }
+    }
 
-    // returns true if the type needs an import statement. 
-    // Not needed for primitive types. 
+    String getThrownException(boolean inBody, String propType) {
+        switch (propType) {
+        case "DryrunRequest":
+            if (inBody) {
+                return "JsonProcessingException";
+            }
+            default:
+                return "";
+        }
+    }
+    
+    // returns true if the type needs an import statement.
+    // Not needed for primitive types.
     static boolean needsClassImport(String type) {
         switch (type) {
         case "integer":
@@ -667,18 +700,18 @@ final class JavaModelWriter {
     private BufferedWriter modelFileWriter;
 
     // currentModelBuffer holds the model code as it is constructed
-    // used for skipping models with no parameters. 
+    // used for skipping models with no parameters.
     private StringBuilder currentModelBuffer;
 
-    // pendingOpenStruct indicates if a struct is not closed yet, 
-    // expecting more parameters. This is useful to do away with the 
-    // end call. The end call is implicit at the time of a new struct or 
-    // at the time of terminate. 
+    // pendingOpenStruct indicates if a struct is not closed yet,
+    // expecting more parameters. This is useful to do away with the
+    // end call. The end call is implicit at the time of a new struct or
+    // at the time of terminate.
     private boolean pendingOpenFile;
 
 
     // Indicates if any property is added to this model
-    // used for skipping models with no parameters.  
+    // used for skipping models with no parameters.
     private boolean modelPropertyAdded;
 
     private String className;
@@ -730,7 +763,7 @@ final class JavaModelWriter {
 
         if (pendingOpenFile) {
             this.close();
-            pendingOpenFile = false;            
+            pendingOpenFile = false;
         }
         this.imports = new TreeMap<String, Set<String>>();
         this.properties = new TreeMap<String, TypeDef>();
@@ -758,7 +791,7 @@ final class JavaModelWriter {
         modelPropertyAdded = false;
     }
 
-    // Returns an iterator in sorted order of the properties (json nodes). 
+    // Returns an iterator in sorted order of the properties (json nodes).
     Iterator<Entry<String, TypeDef>> getSortedProperties() {
         Iterator<Entry<String, TypeDef>>sortedProps = properties.entrySet().iterator();
         return sortedProps;
@@ -790,16 +823,20 @@ final class JavaModelWriter {
             TreeMap<String, Set<String>> imports, boolean forModel){
         JavaGenerator.setImportOf(typeObj, imports, forModel);
         if (typeObj.javaTypeName.equalsIgnoreCase("Address")) {
-            getAddress(typeObj, buffer, forModel);
+            getAddress(typeObj, buffer);
         }
 
-        // Enum is not defined here. It is defined separately in a 
+        if (typeObj.javaTypeName.equalsIgnoreCase("List<Address>")) {
+            getAddressArray(typeObj, buffer);
+        }
+
+        // Enum is not defined here. It is defined separately in a
         // different file.
 
-        if (typeObj.rawTypeName.equals("binary") || 
+        if (typeObj.rawTypeName.equals("binary") ||
                 typeObj.rawTypeName.equals("byte")) {
             if (typeObj.javaTypeName.equals("byte[]")) {
-                getBase64Encoded(typeObj, buffer);    
+                getBase64Encoded(typeObj, buffer);
                 return;
             }
             getBase64EncodedArray(typeObj, buffer, forModel);
@@ -808,7 +845,7 @@ final class JavaModelWriter {
 
     }
 
-    // getPropertyWithJsonSetter formats the property into java declaration type with 
+    // getPropertyWithJsonSetter formats the property into java declaration type with
     // the appropriate json annotation.
     void getPropertyWithJsonSetter(TypeDef typeObj, StringBuilder buffer) {
         String jprop = typeObj.propertyName;
@@ -821,7 +858,7 @@ final class JavaModelWriter {
         if (typeObj.isOfType("enum")) {
             this.javagen.storeEnumDefinition(typeObj);
         }
-        
+
         switch (typeObj.javaTypeName) {
         case "java.util.DateTime":
             throw new RuntimeException("Parsing of time is not yet implemented!");
@@ -887,31 +924,52 @@ final class JavaModelWriter {
         // getterSetter typeName is only used in path.
     }
 
-    // Get TypeDef for Address type. 
+    // Get TypeDef for Address type.
     // It provides the special getter/setter needed for this type.
-    static void getAddress(TypeDef typeObj, StringBuilder buffer,
-            boolean forModel){
+    static void getAddress(TypeDef typeObj, StringBuilder buffer) {
 
         String propName = typeObj.propertyName;
         String javaName = Tools.getCamelCase(propName, false);
 
-        buffer.append(TAB + "@JsonProperty(\"" + propName + "\")\n" + 
-                "    public void " + javaName + "(String "+ javaName +") throws NoSuchAlgorithmException {\n" + 
-                "        this."+ javaName +" = new Address("+ javaName +");\n" + 
-                "    }\n" + 
-                "    @JsonProperty(\""+ propName +"\")\n" + 
-                "    public String "+ javaName +"() throws NoSuchAlgorithmException {\n" + 
+        buffer.append(TAB + "@JsonProperty(\"" + propName + "\")\n" +
+                "    public void " + javaName + "(String "+ javaName +") throws NoSuchAlgorithmException {\n" +
+                "        this."+ javaName +" = new Address("+ javaName +");\n" +
+                "    }\n" +
+                "    @JsonProperty(\""+ propName +"\")\n" +
+                "    public String "+ javaName +"() throws NoSuchAlgorithmException {\n" +
                 "        if (this."+ javaName +" != null) {\n" +
                 "            return this."+ javaName +".encodeAsString();\n" +
                 "        } else {\n" +
                 "            return null;\n" +
                 "        }\n" +
-                "    }\n" + 
+                "    }\n" +
                 "    public Address " + javaName + ";\n");
     }
 
-    // Writes the compare methods by adding a comparator for each class member. 
-    static void writeCompareMethod(String className, 
+    static void getAddressArray(TypeDef typeObj, StringBuilder buffer){
+        String propName = typeObj.propertyName;
+        String javaName = Tools.getCamelCase(propName, false);
+        buffer.append(
+                "    @JsonProperty(\"" + propName + "\")\n" +
+                        "    public void accounts(List<String> " + javaName + ") throws NoSuchAlgorithmException {\n" +
+                        "        this." + javaName + " = new ArrayList<Address>();\n" +
+                        "        for (String val : " + javaName + ") {\n" +
+                        "            this." + javaName + ".add(new Address(val));\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    @JsonProperty(\"" + propName + "\")\n" +
+                        "    public List<String> " + javaName + "() throws NoSuchAlgorithmException {\n" +
+                        "        ArrayList<String> ret = new ArrayList<String>();\n" +
+                        "        for (Address val : this." + javaName + ") {\n" +
+                        "            ret.add(val.encodeAsString());\n" +
+                        "        }\n" +
+                        "        return ret;\n" +
+                        "    }\n" +
+                        "    public List<Address> " + javaName + " = new ArrayList<Address>();\n");
+    }
+
+    // Writes the compare methods by adding a comparator for each class member.
+    static void writeCompareMethod(String className,
             StringBuilder buffer, Iterator<Entry<String, TypeDef>> properties) {
         buffer.append("    @Override\n" +
                 "    public boolean equals(Object o) {\n" +
@@ -929,5 +987,3 @@ final class JavaModelWriter {
         buffer.append("\n        return true;\n    }\n");
     }
 }
-
-
