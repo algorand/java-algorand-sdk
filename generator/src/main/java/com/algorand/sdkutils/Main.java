@@ -110,7 +110,7 @@ public class Main {
      */
     private static void javaGenerator(JavaGeneratorArgs args, JCommander command) {
         try {
-            Generate.Generate(
+            Generate.generate(
                     args.clientName,
                     args.specfile,
                     args.modelPath,
@@ -121,7 +121,7 @@ public class Main {
                     args.commonPackage,
                     args.tokenName,
                     args.tokenRequired,
-                    null);
+                    "");
         } catch (Exception e) {
             System.out.println("Problem generating code:" + e.getMessage());
             System.out.println("\n\n");

@@ -29,7 +29,7 @@ public class Generate {
      * @param goDirectory    When specified, will generate go code.
      */
     @Deprecated
-    public static void Generate(
+    public static void generate(
             String clientName,
             File specfile,
             String modelPath,
