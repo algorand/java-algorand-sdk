@@ -31,14 +31,6 @@ public class LookupAccountTransactions extends Query {
     }
 
     /**
-     * account string
-     */
-    public LookupAccountTransactions accountId(Address accountId) {
-        addQuery("account-id", String.valueOf(accountId));
-        return this;
-    }
-
-    /**
      * Include results after the given time. Must be an RFC 3339 formatted string.
      */
     public LookupAccountTransactions afterTime(Date afterTime) {

@@ -24,11 +24,6 @@ public class LookupAssetByID extends Query {
         this.assetId = assetId;
     }
 
-    public LookupAssetByID assetId(Long assetId) {
-        addQuery("asset-id", String.valueOf(assetId));
-        return this;
-    }
-
     @Override
     public Response<AssetResponse> execute() throws Exception {
         Response<AssetResponse> resp = baseExecute();

@@ -26,14 +26,6 @@ public class AccountInformation extends Query {
         this.address = address;
     }
 
-    /**
-     * An account public key
-     */
-    public AccountInformation address(Address address) {
-        addQuery("address", String.valueOf(address));
-        return this;
-    }
-
     @Override
     public Response<Account> execute() throws Exception {
         Response<Account> resp = baseExecute();

@@ -29,14 +29,6 @@ public class GetPendingTransactionsByAddress extends Query {
     }
 
     /**
-     * An account public key
-     */
-    public GetPendingTransactionsByAddress address(Address address) {
-        addQuery("address", String.valueOf(address));
-        return this;
-    }
-
-    /**
      * Truncated number of transactions to display. If max=0, returns all pending txns.
      */
     public GetPendingTransactionsByAddress max(Long max) {

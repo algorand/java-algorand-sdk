@@ -54,11 +54,6 @@ public class LookupAssetTransactions extends Query {
         return this;
     }
 
-    public LookupAssetTransactions assetId(Long assetId) {
-        addQuery("asset-id", String.valueOf(assetId));
-        return this;
-    }
-
     /**
      * Include results before the given time. Must be an RFC 3339 formatted string.
      */

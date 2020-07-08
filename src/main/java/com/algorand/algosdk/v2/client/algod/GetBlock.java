@@ -24,14 +24,6 @@ public class GetBlock extends Query {
         this.round = round;
     }
 
-    /**
-     * The round from which to fetch block information.
-     */
-    public GetBlock round(Long round) {
-        addQuery("round", String.valueOf(round));
-        return this;
-    }
-
     @Override
     public Response<BlockResponse> execute() throws Exception {
         Response<BlockResponse> resp = baseExecute();

@@ -31,14 +31,6 @@ public class PendingTransactionInformation extends Query {
         this.txid = txid;
     }
 
-    /**
-     * A transaction id
-     */
-    public PendingTransactionInformation txid(String txid) {
-        addQuery("txid", String.valueOf(txid));
-        return this;
-    }
-
     @Override
     public Response<PendingTransactionResponse> execute() throws Exception {
         Response<PendingTransactionResponse> resp = baseExecute();

@@ -26,14 +26,6 @@ public class LookupAccountByID extends Query {
     }
 
     /**
-     * account string
-     */
-    public LookupAccountByID accountId(Address accountId) {
-        addQuery("account-id", String.valueOf(accountId));
-        return this;
-    }
-
-    /**
      * Include results for the specified round.
      */
     public LookupAccountByID round(Long round) {

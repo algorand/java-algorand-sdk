@@ -25,14 +25,6 @@ public class WaitForBlock extends Query {
         this.round = round;
     }
 
-    /**
-     * The round to wait until returning status
-     */
-    public WaitForBlock round(Long round) {
-        addQuery("round", String.valueOf(round));
-        return this;
-    }
-
     @Override
     public Response<NodeStatusResponse> execute() throws Exception {
         Response<NodeStatusResponse> resp = baseExecute();

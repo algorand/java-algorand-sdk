@@ -367,7 +367,7 @@ public class JavaGenerator implements Subscriber {
             }
         }
         sb.append(TAB + TAB + "final String serializedName;\n");
-        sb.append(TAB + TAB + "" + javaTypeName + "(String name) {\n");
+        sb.append(TAB + TAB + javaTypeName + "(String name) {\n");
         sb.append(TAB + TAB + TAB + "this.serializedName = name;\n");
         sb.append(TAB + TAB + "}\n\n");
         sb.append(TAB + TAB + "@Override\n");
@@ -508,37 +508,38 @@ final class JavaQueryWriter {
             javaGen.generatedPathsEntries.append(propType.javaTypeName + " " + propName);
             generatedPathsEntryBody.append(", " + propName);
             pAdded = true;
-        }
-
-        String exception = getThrownException(inBody, propType.javaTypeName);
-
-        if (propType.doc != null) {
-            String desc = propType.doc;
-            if (!exception.isEmpty()) {
-                desc = desc + "\n" + "@throws " + exception; 
-            }
-            desc = Tools.formatComment(desc, TAB, true);
-            builders.append(desc);
-        }
-
-        if (propType.isOfType("enum")) {
-            this.javaGen.storeEnumDefinition(propType);
-        }
-                
-        String exceptionStm = exception.isEmpty() ? "" : "throws " + exception + " ";
-        builders.append(TAB + "public " + className + " " + setterName + 
-                "(" + propType.javaTypeName + " " + propName + ") " + exceptionStm + "{\n");
-        String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
-
-        if (inBody) {
-            String valueOfByteA = getByteArrayValueOfStatement(propType.javaTypeName, propName);
-            builders.append(TAB + TAB + "addToBody("+ valueOfByteA +");\n");
         } else {
-            builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
+
+            String exception = getThrownException(inBody, propType.javaTypeName);
+
+            if (propType.doc != null) {
+                String desc = propType.doc;
+                if (!exception.isEmpty()) {
+                    desc = desc + "\n" + "@throws " + exception; 
+                }
+                desc = Tools.formatComment(desc, TAB, true);
+                builders.append(desc);
+            }
+
+            if (propType.isOfType("enum")) {
+                this.javaGen.storeEnumDefinition(propType);
+            }
+
+            String exceptionStm = exception.isEmpty() ? "" : "throws " + exception + " ";
+            builders.append(TAB + "public " + className + " " + setterName + 
+                    "(" + propType.javaTypeName + " " + propName + ") " + exceptionStm + "{\n");
+            String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
+
+            if (inBody) {
+                String valueOfByteA = getByteArrayValueOfStatement(propType.javaTypeName, propName);
+                builders.append(TAB + TAB + "addToBody("+ valueOfByteA +");\n");
+            } else {
+                builders.append(TAB + TAB + "addQuery(\"" + propCode + "\", "+ valueOfString +");\n");
+            }
+            builders.append(TAB + TAB + "return this;\n");
+            builders.append(TAB + "}\n");
+            builders.append("\n");
         }
-        builders.append(TAB + TAB + "return this;\n");
-        builders.append(TAB + "}\n");
-        builders.append("\n");
 
         if (propType.required) {
             if (inBody) {
@@ -653,7 +654,7 @@ final class JavaQueryWriter {
             return "String.valueOf("+propName+")";
         }
     }
-    
+
     String getByteArrayValueOfStatement(String propType, String propName) {
         switch (propType) {
         case "DryrunRequest":
@@ -661,8 +662,8 @@ final class JavaQueryWriter {
             Tools.addImport(imports, "com.algorand.algosdk.v2.client.model.DryrunRequest");
             Tools.addImport(imports, "com.fasterxml.jackson.core.JsonProcessingException");
             return "Encoder.encodeToMsgPack(jsonobj)";
-            default:
-                return propName;
+        default:
+            return propName;
         }
     }
 
@@ -672,11 +673,11 @@ final class JavaQueryWriter {
             if (inBody) {
                 return "JsonProcessingException";
             }
-            default:
-                return "";
+        default:
+            return "";
         }
     }
-    
+
     // returns true if the type needs an import statement.
     // Not needed for primitive types.
     static boolean needsClassImport(String type) {
@@ -809,7 +810,7 @@ final class JavaModelWriter {
             String desc = null;
             if (typeObj.doc != null) {
                 desc = typeObj.doc;
-                desc = Tools.formatComment(desc, TAB + "", true);
+                desc = Tools.formatComment(desc, TAB, true);
             }
 
             // public type

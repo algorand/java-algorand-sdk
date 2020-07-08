@@ -24,11 +24,6 @@ public class LookupAssetBalances extends Query {
         this.assetId = assetId;
     }
 
-    public LookupAssetBalances assetId(Long assetId) {
-        addQuery("asset-id", String.valueOf(assetId));
-        return this;
-    }
-
     /**
      * Results should have an amount greater than this value. MicroAlgos are the
      * default currency unless an asset-id is provided, in which case the asset will be

@@ -161,6 +161,7 @@ public class OpenApiParser {
             String longName = asObject ? "Long" : "long";
             return new TypeDef(longName, type, "", propName, goName, desc, isRequired(prop));
         case "object":
+            return new TypeDef("HashMap<String,Object>", type, "", propName, goName, desc, isRequired(prop));
         case "string":
             return new TypeDef("String", type, "", propName, goName, desc, isRequired(prop));
         case "boolean":

@@ -24,14 +24,6 @@ public class LookupBlock extends Query {
         this.roundNumber = roundNumber;
     }
 
-    /**
-     * Round number
-     */
-    public LookupBlock roundNumber(Long roundNumber) {
-        addQuery("round-number", String.valueOf(roundNumber));
-        return this;
-    }
-
     @Override
     public Response<Block> execute() throws Exception {
         Response<Block> resp = baseExecute();
