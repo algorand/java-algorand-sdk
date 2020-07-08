@@ -492,46 +492,8 @@ public class GoGenerator implements Subscriber {
                 goType =  "*map[string]interface{}";
             }
             break;
-
-        case "Asset":
-        case "AssetHolding":
-        case "AssetParams":
-        case "AccountParticipation":
-        case "Application":
-        case "ApplicationLocalState":
-        case "ApplicationStateSchema":
-        case "ApplicationParams":
-        case "BlockRewards":
-        case "BlockUpgradeState":
-        case "BlockUpgradeVote":
-        case "MiniAssetHolding":
-        case "TealValue":
-        case "TealKeyValue":
-        case "Transaction":
-        case "TransactionAssetConfig":
-        case "TransactionAssetFreeze":
-        case "TransactionAssetTransfer":
-        case "TransactionKeyreg":
-        case "TransactionPayment":
-        case "TransactionSignature":
-        case "TransactionSignatureLogicsig":
-        case "TransactionSignatureMultisig":
-        case "TransactionSignatureMultisigSubsignature":
-        case "ApplicationLocalStates":
-        case "EvalDelta":
-        case "DryrunState":
-        case "AccountStateDelta":
-        case "VersionBuild":
-        case "DryrunApp":
-        case "DryrunSource":
-        case "DryrunTxnResult":
-        case "EvalDeltaKeyValue":
-        case "StaleDelta":
-        case "DryrunRequest":
-            goType = type;
-            break;
         default:
-            goType = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";            
+            goType = type;
         }
         if (array) {
             return new TypeConverter("[]" + goType, converter);

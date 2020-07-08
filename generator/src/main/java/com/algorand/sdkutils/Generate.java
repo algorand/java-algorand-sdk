@@ -52,9 +52,8 @@ public class Generate {
 
         if (goDirectory != null && !goDirectory.isEmpty()) {
             new GoGenerator(goDirectory, "indexer", publisher);
-        } 
-
-        new JavaGenerator(
+        } else {
+	    new JavaGenerator(
                 clientName,
                 modelPath,
                 modelPackage,
@@ -65,7 +64,8 @@ public class Generate {
                 tokenName,
                 tokenOptional,
                 publisher);
-        
+        }
+	
         // Generate classes from the schemas
         // These are the non-premetive types for which classes are needed
         System.out.println("Generating " + modelPackage + " to " + modelPath);
