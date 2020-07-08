@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Enums {
 
+    // TODO: The generator should add this, it was added manually for now.
     /**
      * (apan) defines the what additional actions occur with the transaction.
      * Valid types:

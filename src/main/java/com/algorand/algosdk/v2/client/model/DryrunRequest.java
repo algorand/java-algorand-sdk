@@ -18,7 +18,7 @@ public class DryrunRequest extends PathResponse {
     public List<Account> accounts = new ArrayList<Account>();
 
     @JsonProperty("apps")
-    public List<DryrunApp> apps = new ArrayList<DryrunApp>();
+    public List<Application> apps = new ArrayList<Application>();
 
     /**
      * LatestTimestamp is available to some TEAL scripts. Defaults to the latest

@@ -16,6 +16,7 @@ import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
+import com.algorand.algosdk.v2.client.algod.TealDryrun;
 import com.algorand.algosdk.crypto.Address;
 
 public class AlgodClient extends Client {
@@ -162,6 +163,15 @@ public class AlgodClient extends Client {
      */
     public TealCompile TealCompile() {
         return new TealCompile((Client) this);
+    }
+
+    /**
+     * Executes TEAL program(s) in context and returns debugging information about the
+     * execution.
+     * /v2/teal/dryrun
+     */
+    public TealDryrun TealDryrun() {
+        return new TealDryrun((Client) this);
     }
 
 }

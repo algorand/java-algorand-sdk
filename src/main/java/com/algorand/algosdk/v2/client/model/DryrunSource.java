@@ -11,6 +11,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class DryrunSource extends PathResponse {
 
+    @JsonProperty("app-index")
+    public java.math.BigInteger appIndex;
+
     /**
      * FieldName is what kind of sources this is. If lsig then it goes into the
      * transactions[this.TxnIndex].LogicSig. If approv or clearp it goes into the
@@ -18,9 +21,6 @@ public class DryrunSource extends PathResponse {
      */
     @JsonProperty("field-name")
     public String fieldName;
-
-    @JsonProperty("id")
-    public Long id;
 
     @JsonProperty("source")
     public String source;
@@ -35,8 +35,8 @@ public class DryrunSource extends PathResponse {
         if (o == null) return false;
 
         DryrunSource other = (DryrunSource) o;
+        if (!Objects.deepEquals(this.appIndex, other.appIndex)) return false;
         if (!Objects.deepEquals(this.fieldName, other.fieldName)) return false;
-        if (!Objects.deepEquals(this.id, other.id)) return false;
         if (!Objects.deepEquals(this.source, other.source)) return false;
         if (!Objects.deepEquals(this.txnIndex, other.txnIndex)) return false;
 
