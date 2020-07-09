@@ -120,7 +120,7 @@ public class Main {
                     args.commonPath,
                     args.commonPackage,
                     args.tokenName,
-                    args.tokenRequired,
+                    !args.tokenRequired,
                     "");
         } catch (Exception e) {
             System.out.println("Problem generating code:" + e.getMessage());
