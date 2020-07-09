@@ -19,7 +19,6 @@ public class TypeDef {
     public TypeDef(
             String javaTypeName,
             String rawTypeName,
-            String def, 
             String type, 
             String propertyName,
             String goPropertyName,
@@ -27,24 +26,7 @@ public class TypeDef {
             boolean required) {
         this.javaTypeName = javaTypeName;
         this.rawTypeName = rawTypeName;
-        this.def = def;
         this.type = type;
-        this.propertyName = propertyName;
-        this.goPropertyName = goPropertyName;
-        this.doc = doc;
-        this.enumValues = null;
-        this.required = required;
-    }
-    public TypeDef(String typeName,
-            String rawTypeName,
-            String propertyName, 
-            String goPropertyName,
-            String doc,
-            boolean required) {
-        this.javaTypeName = typeName;
-        this.rawTypeName = rawTypeName;
-        this.def = null;
-        this.type = null;
         this.propertyName = propertyName;
         this.goPropertyName = goPropertyName;
         this.doc = doc;
@@ -67,7 +49,6 @@ public class TypeDef {
         return
                 "javaTypeName: '" + javaTypeName + "', " +
                 "rawTypeName: '" + rawTypeName + "', " +
-                "def: '" + def + "', " +
                 "propertyName: '" + propertyName + "', " +
                 "goPropertyName: '" + goPropertyName + "', " +
                 "doc: '" + doc + "', " +
@@ -77,7 +58,6 @@ public class TypeDef {
 
     public String javaTypeName;
     public String rawTypeName;
-    public String def;
     public String propertyName;
     public String goPropertyName;
     public String doc;

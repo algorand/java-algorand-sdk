@@ -3,6 +3,7 @@ package com.algorand.sdkutils;
 import com.algorand.sdkutils.generators.OpenApiParser;
 import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.listeners.GoGenerator;
+import com.algorand.sdkutils.listeners.JavaGenerator;
 import com.algorand.sdkutils.listeners.Publisher;
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -28,7 +29,7 @@ public class Generate {
      * @param goDirectory    When specified, will generate go code.
      */
     @Deprecated
-    public static void Generate(
+    public static void generate(
             String clientName,
             File specfile,
             String modelPath,
@@ -46,49 +47,44 @@ public class Generate {
             root = Utils.getRoot(fis);
         }
 
-        OpenApiParser g = null;
         Publisher publisher = new Publisher();
+        OpenApiParser g = new OpenApiParser(root, publisher);
 
         if (goDirectory != null && !goDirectory.isEmpty()) {
-            g = new OpenApiParser(root, publisher);
             new GoGenerator(goDirectory, "indexer", publisher);
         } else {
-            g = new OpenApiParser(root);
+	    new JavaGenerator(
+                clientName,
+                modelPath,
+                modelPackage,
+                pathsPath,
+                pathsPackage,
+                commonPath,
+                commonPackage,
+                tokenName,
+                tokenOptional,
+                publisher);
         }
-
+	
         // Generate classes from the schemas
         // These are the non-premetive types for which classes are needed
         System.out.println("Generating " + modelPackage + " to " + modelPath);
-        g.generateAlgodIndexerObjects(root, modelPath, modelPackage);
-        g.generateEnumClasses(root, modelPath, modelPackage);
+        g.generateAlgodIndexerObjects(root);
 
         // Generate classes from the return types which have more than one return element
         System.out.println("Generating " + modelPackage + " to " + modelPath);
-        g.generateReturnTypes(root, modelPath, modelPackage);
+        g.generateReturnTypes(root);
 
         // Generate the algod methods
         File imports = Files.createTempFile("imports_file", "txt").toFile();
         File paths = Files.createTempFile("pathss_file", "txt").toFile();
 
         System.out.println("Generating " + pathsPackage + " to " + pathsPath);
-        g.generateQueryMethods(
-                pathsPath,
-                pathsPackage,
-                modelPackage,
-                imports,
-                paths);
+        g.generateQueryMethods();
 
         Collection<String> lines = Files.readAllLines(imports.toPath());
         lines.add("import com.algorand.algosdk.crypto.Address;");
 
-        Utils.generateClientFile(
-                clientName,
-                lines,
-                paths,
-                commonPackage,
-                commonPath,
-                tokenName,
-                tokenOptional);
-        publisher.terminate();
+        publisher.terminate();       
     }
 }

@@ -49,7 +49,7 @@ public class GoGenerator implements Subscriber {
 
     // queryFunctions hold all the query functions which go to one file 
     // written by queryWriter
-    private StringBuffer queryFunctions;
+    private StringBuilder queryFunctions;
 
     private String currentQueryName;
     private String currentQueryReturn;
@@ -73,7 +73,7 @@ public class GoGenerator implements Subscriber {
 
     // clientFunction holds a single client function as it is getting contructed
     // If is reset at each new query 
-    private StringBuffer clientFunction;
+    private StringBuilder clientFunction;
 
 
     public GoGenerator(String rootFolder, String packageName, Publisher publisher) throws IOException {
@@ -122,8 +122,8 @@ public class GoGenerator implements Subscriber {
     }
 
     // Constructs the Do function, which returns the response object 
-    private StringBuffer getDoFunction() {
-        StringBuffer sb = new StringBuffer();
+    private StringBuilder getDoFunction() {
+        StringBuilder sb = new StringBuilder();
         String desc = Tools.formatCommentGo("Do performs HTTP request", "", "");
         sb.append(desc);
         sb.append("func (s *" + currentQueryName + ") Do(ctx context.Context,\n" + 
@@ -176,6 +176,8 @@ public class GoGenerator implements Subscriber {
             addPathParameter(type);
             break;
         case BODY_CONTENT:
+            // This is not really a path parameter, but will behave like one in most situation of code generation
+            addPathParameter(type);
             break;
         default:
             throw new RuntimeException("Unimplemented event for TypeDef! " + event);
@@ -197,9 +199,9 @@ public class GoGenerator implements Subscriber {
 
     }
 
-    private StringBuffer processPath() {
-        StringBuffer pathSB = new StringBuffer();
-        StringBuffer paramSB = new StringBuffer();
+    private StringBuilder processPath() {
+        StringBuilder pathSB = new StringBuilder();
+        StringBuilder paramSB = new StringBuilder();
 
         if (pathParameters.size() > 0) {
             pathSB.append("fmt.Sprintf(");
@@ -267,7 +269,7 @@ public class GoGenerator implements Subscriber {
         currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
 
         pathParameters = new TreeMap<String, String>();
-        queryFunctions = new StringBuffer();
+        queryFunctions = new StringBuilder();
         imports = new TreeMap<String, Set<String>>();
 
         if (queryWriter != null) {
@@ -280,7 +282,7 @@ public class GoGenerator implements Subscriber {
         modelWriter.newModel(new StructDef(currentQueryName + "Params", "", null, null), "filtermodels", "models");
 
         // Add the entry into the applicationClient file
-        clientFunction = new StringBuffer();
+        clientFunction = new StringBuilder();
         clientFunction.append("func (c *Client) " + currentQueryName + "(");
     }
 
@@ -319,13 +321,14 @@ public class GoGenerator implements Subscriber {
         append(queryFunctions, TAB + "return s\n}\n\n");
     }
 
-    private StringBuffer spaces (int c) {
-        StringBuffer sb = new StringBuffer();
+    private StringBuilder spaces (int c) {
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < c; i++) {
             sb.append(' ');
         }
         return sb;
     }
+    
     private void endQuery() {
 
         // client functions
@@ -406,11 +409,11 @@ public class GoGenerator implements Subscriber {
         }
     }
 
-    public static void append(StringBuffer sb, String text) {
+    public static void append(StringBuilder sb, String text) {
         sb.append(text);
     }
 
-    public static void append(BufferedWriter sb, StringBuffer text) {
+    public static void append(BufferedWriter sb, StringBuilder text) {
         try {
             sb.append(text);
         } catch (IOException e) {
@@ -489,45 +492,8 @@ public class GoGenerator implements Subscriber {
                 goType =  "*map[string]interface{}";
             }
             break;
-
-        case "Asset":
-        case "AssetHolding":
-        case "AssetParams":
-        case "AccountParticipation":
-        case "Application":
-        case "ApplicationLocalState":
-        case "ApplicationStateSchema":
-        case "ApplicationParams":
-        case "BlockRewards":
-        case "BlockUpgradeState":
-        case "BlockUpgradeVote":
-        case "MiniAssetHolding":
-        case "TealValue":
-        case "TealKeyValue":
-        case "Transaction":
-        case "TransactionAssetConfig":
-        case "TransactionAssetFreeze":
-        case "TransactionAssetTransfer":
-        case "TransactionKeyreg":
-        case "TransactionPayment":
-        case "TransactionSignature":
-        case "TransactionSignatureLogicsig":
-        case "TransactionSignatureMultisig":
-        case "TransactionSignatureMultisigSubsignature":
-        case "ApplicationLocalStates":
-        case "EvalDelta":
-        case "DryrunState":
-        case "AccountStateDelta":
-        case "VersionBuild":
-        case "DryrunApp":
-        case "DryrunSource":
-        case "DryrunTxnResult":
-        case "EvalDeltaKeyValue":
-        case "StaleDelta":            
-            goType = type;
-            break;
         default:
-            goType = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";            
+            goType = type;
         }
         if (array) {
             return new TypeConverter("[]" + goType, converter);
@@ -567,8 +533,8 @@ public class GoGenerator implements Subscriber {
 
     // getImports organizes the imports and returns the block of import statements
     // The statements are unique, and organized. 
-    StringBuffer getImports() {
-        StringBuffer sb = new StringBuffer();
+    StringBuilder getImports() {
+        StringBuilder sb = new StringBuilder();
 
         Set<String> catA = imports.get("A");
         if (catA != null) {
@@ -602,7 +568,7 @@ final class ModelWriter {
 
     // currentModelBuffer holds the model code as it is constructed
     // used for skipping models with no parameters. 
-    private StringBuffer currentModelBuffer;
+    private StringBuilder currentModelBuffer;
     
     // pendingOpenStruct indicates if a struct is not closed yet, 
     // expecting more parameters. This is useful to do away with the 
@@ -680,7 +646,7 @@ final class ModelWriter {
             GoGenerator.append(modelWriter, "package " + packageName + "\n\n");
             this.filename = filename;
         }
-        currentModelBuffer = new StringBuffer();
+        currentModelBuffer = new StringBuilder();
         if (sDef.doc != null) {
             GoGenerator.append(currentModelBuffer, Tools.formatCommentGo(sDef.doc, sDef.name, ""));
         }
