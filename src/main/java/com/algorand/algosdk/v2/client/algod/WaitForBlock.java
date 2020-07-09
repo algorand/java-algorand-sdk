@@ -33,9 +33,6 @@ public class WaitForBlock extends Query {
     }
 
     protected QueryData getRequestString() {
-        if (!qd.queries.containsKey("round")) {
-            throw new RuntimeException("round is not set. It is a required parameter.");
-        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("status"));
         addPathSegment(String.valueOf("wait-for-block-after"));

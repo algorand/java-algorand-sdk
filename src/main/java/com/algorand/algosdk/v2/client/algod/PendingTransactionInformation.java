@@ -39,9 +39,6 @@ public class PendingTransactionInformation extends Query {
     }
 
     protected QueryData getRequestString() {
-        if (!qd.queries.containsKey("txid")) {
-            throw new RuntimeException("txid is not set. It is a required parameter.");
-        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("transactions"));
         addPathSegment(String.valueOf("pending"));

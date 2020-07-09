@@ -12,19 +12,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TransactionSignature extends PathResponse {
 
-    /**
-     * (lsig) Programatic transaction signature.
-     * Definition:
-     * data/transactions/logicsig.go
-     */
     @JsonProperty("logicsig")
     public TransactionSignatureLogicsig logicsig;
 
-    /**
-     * (msig) structure holding multiple subsignatures.
-     * Definition:
-     * crypto/multisig.go : MultisigSig
-     */
     @JsonProperty("multisig")
     public TransactionSignatureMultisig multisig;
 

@@ -32,9 +32,6 @@ public class LookupBlock extends Query {
     }
 
     protected QueryData getRequestString() {
-        if (!qd.queries.containsKey("roundNumber")) {
-            throw new RuntimeException("round-number is not set. It is a required parameter.");
-        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("blocks"));
         addPathSegment(String.valueOf(roundNumber));

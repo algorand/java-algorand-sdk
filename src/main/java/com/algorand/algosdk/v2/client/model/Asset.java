@@ -16,12 +16,6 @@ public class Asset extends PathResponse {
     @JsonProperty("index")
     public Long index;
 
-    /**
-     * AssetParams specifies the parameters for an asset.
-     * (apar) when part of an AssetConfig transaction.
-     * Definition:
-     * data/transactions/asset.go : AssetParams
-     */
     @JsonProperty("params")
     public AssetParams params;
 

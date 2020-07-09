@@ -44,9 +44,6 @@ public class GetPendingTransactionsByAddress extends Query {
     }
 
     protected QueryData getRequestString() {
-        if (!qd.queries.containsKey("address")) {
-            throw new RuntimeException("address is not set. It is a required parameter.");
-        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(address));

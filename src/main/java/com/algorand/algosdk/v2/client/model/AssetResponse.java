@@ -7,9 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AssetResponse extends PathResponse {
 
-    /**
-     * Specifies both the unique identifier and the parameters for an asset
-     */
     @JsonProperty("asset")
     public Asset asset;
 

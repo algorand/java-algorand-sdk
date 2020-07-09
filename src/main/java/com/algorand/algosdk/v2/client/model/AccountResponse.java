@@ -7,12 +7,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AccountResponse extends PathResponse {
 
-    /**
-     * Account information at a given round.
-     * Definition:
-     * data/basics/userBalance.go : AccountData
-     *
-     */
     @JsonProperty("account")
     public Account account;
 

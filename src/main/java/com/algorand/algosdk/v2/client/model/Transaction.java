@@ -18,37 +18,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Transaction extends PathResponse {
 
-    /**
-     * Fields for application transactions.
-     * Definition:
-     * data/transactions/application.go : ApplicationCallTxnFields
-     */
-    @JsonProperty("application-transaction")
-    public TransactionApplication applicationTransaction;
-
-    /**
-     * Fields for asset allocation, re-configuration, and destruction.
-     * A zero value for asset-id indicates asset creation.
-     * A zero value for the params indicates asset destruction.
-     * Definition:
-     * data/transactions/asset.go : AssetConfigTxnFields
-     */
     @JsonProperty("asset-config-transaction")
     public TransactionAssetConfig assetConfigTransaction;
 
-    /**
-     * Fields for an asset freeze transaction.
-     * Definition:
-     * data/transactions/asset.go : AssetFreezeTxnFields
-     */
     @JsonProperty("asset-freeze-transaction")
     public TransactionAssetFreeze assetFreezeTransaction;
 
-    /**
-     * Fields for an asset transfer transaction.
-     * Definition:
-     * data/transactions/asset.go : AssetTransferTxnFields
-     */
     @JsonProperty("asset-transfer-transaction")
     public TransactionAssetTransfer assetTransferTransaction;
 
@@ -87,13 +62,6 @@ public class Transaction extends PathResponse {
      */
     @JsonProperty("confirmed-round")
     public Long confirmedRound;
-
-    /**
-     * Specifies an application index (ID) if an application was created with this
-     * transaction.
-     */
-    @JsonProperty("created-application-index")
-    public Long createdApplicationIndex;
 
     /**
      * Specifies an asset index (ID) if an asset was created with this transaction.
@@ -159,11 +127,6 @@ public class Transaction extends PathResponse {
     @JsonProperty("intra-round-offset")
     public Long intraRoundOffset;
 
-    /**
-     * Fields for a keyreg transaction.
-     * Definition:
-     * data/transactions/keyreg.go : KeyregTxnFields
-     */
     @JsonProperty("keyreg-transaction")
     public TransactionKeyreg keyregTransaction;
 
@@ -203,11 +166,6 @@ public class Transaction extends PathResponse {
     }
     public byte[] note;
 
-    /**
-     * Fields for a payment transaction.
-     * Definition:
-     * data/transactions/payment.go : PaymentTxnFields
-     */
     @JsonProperty("payment-transaction")
     public TransactionPayment paymentTransaction;
 
@@ -254,10 +212,6 @@ public class Transaction extends PathResponse {
     @JsonProperty("sender-rewards")
     public Long senderRewards;
 
-    /**
-     * Validation signature associated with some data. Only one of the signatures
-     * should be provided.
-     */
     @JsonProperty("signature")
     public TransactionSignature signature;
 
@@ -270,7 +224,6 @@ public class Transaction extends PathResponse {
      *   (acfg) asset-config-transaction
      *   (axfer) asset-transfer-transaction
      *   (afrz) asset-freeze-transaction
-     *   (appl) application-transaction
      */
     @JsonProperty("tx-type")
     public Enums.TxType txType;
@@ -282,7 +235,6 @@ public class Transaction extends PathResponse {
         if (o == null) return false;
 
         Transaction other = (Transaction) o;
-        if (!Objects.deepEquals(this.applicationTransaction, other.applicationTransaction)) return false;
         if (!Objects.deepEquals(this.assetConfigTransaction, other.assetConfigTransaction)) return false;
         if (!Objects.deepEquals(this.assetFreezeTransaction, other.assetFreezeTransaction)) return false;
         if (!Objects.deepEquals(this.assetTransferTransaction, other.assetTransferTransaction)) return false;
@@ -290,7 +242,6 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;
         if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
-        if (!Objects.deepEquals(this.createdApplicationIndex, other.createdApplicationIndex)) return false;
         if (!Objects.deepEquals(this.createdAssetIndex, other.createdAssetIndex)) return false;
         if (!Objects.deepEquals(this.fee, other.fee)) return false;
         if (!Objects.deepEquals(this.firstValid, other.firstValid)) return false;

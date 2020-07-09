@@ -49,14 +49,6 @@ public class SearchForTransactions extends Query {
     }
 
     /**
-     * Application ID
-     */
-    public SearchForTransactions applicationId(Long applicationId) {
-        addQuery("application-id", String.valueOf(applicationId));
-        return this;
-    }
-
-    /**
      * Asset ID
      */
     public SearchForTransactions assetId(Long assetId) {

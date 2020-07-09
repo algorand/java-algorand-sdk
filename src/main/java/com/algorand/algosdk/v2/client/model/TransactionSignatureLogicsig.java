@@ -49,11 +49,6 @@ public class TransactionSignatureLogicsig extends PathResponse {
     }
     public byte[] logic;
 
-    /**
-     * (msig) structure holding multiple subsignatures.
-     * Definition:
-     * crypto/multisig.go : MultisigSig
-     */
     @JsonProperty("multisig-signature")
     public TransactionSignatureMultisig multisigSignature;
 

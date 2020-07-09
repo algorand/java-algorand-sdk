@@ -20,14 +20,6 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * Application ID
-     */
-    public SearchForAccounts applicationId(Long applicationId) {
-        addQuery("application-id", String.valueOf(applicationId));
-        return this;
-    }
-
-    /**
      * Asset ID
      */
     public SearchForAccounts assetId(Long assetId) {

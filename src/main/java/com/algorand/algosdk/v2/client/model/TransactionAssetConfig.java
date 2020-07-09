@@ -20,12 +20,6 @@ public class TransactionAssetConfig extends PathResponse {
     @JsonProperty("asset-id")
     public Long assetId;
 
-    /**
-     * AssetParams specifies the parameters for an asset.
-     * (apar) when part of an AssetConfig transaction.
-     * Definition:
-     * data/transactions/asset.go : AssetParams
-     */
     @JsonProperty("params")
     public AssetParams params;
 

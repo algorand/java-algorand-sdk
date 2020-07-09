@@ -47,9 +47,6 @@ public class Block extends PathResponse {
     }
     public byte[] previousBlockHash;
 
-    /**
-     * Fields relating to rewards,
-     */
     @JsonProperty("rewards")
     public BlockRewards rewards;
 
@@ -112,15 +109,9 @@ public class Block extends PathResponse {
     @JsonProperty("txn-counter")
     public Long txnCounter;
 
-    /**
-     * Fields relating to a protocol upgrade.
-     */
     @JsonProperty("upgrade-state")
     public BlockUpgradeState upgradeState;
 
-    /**
-     * Fields relating to voting for a protocol upgrade.
-     */
     @JsonProperty("upgrade-vote")
     public BlockUpgradeVote upgradeVote;
 

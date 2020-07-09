@@ -4,8 +4,6 @@ import com.algorand.algosdk.v2.client.indexer.MakeHealthCheck;
 import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
-import com.algorand.algosdk.v2.client.indexer.SearchForApplications;
-import com.algorand.algosdk.v2.client.indexer.LookupApplicationByID;
 import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
@@ -64,22 +62,6 @@ public class IndexerClient extends Client {
      */
     public LookupAccountTransactions lookupAccountTransactions(Address accountId) {
         return new LookupAccountTransactions((Client) this, accountId);
-    }
-
-    /**
-     * Search for applications
-     * /v2/applications
-     */
-    public SearchForApplications searchForApplications() {
-        return new SearchForApplications((Client) this);
-    }
-
-    /**
-     * Lookup application.
-     * /v2/applications/{application-id}
-     */
-    public LookupApplicationByID lookupApplicationByID(Long applicationId) {
-        return new LookupApplicationByID((Client) this, applicationId);
     }
 
     /**
