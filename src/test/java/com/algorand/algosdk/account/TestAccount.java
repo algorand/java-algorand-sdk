@@ -8,6 +8,9 @@ import com.algorand.algosdk.util.Encoder;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -291,5 +294,36 @@ public class TestAccount {
         SignedTransaction stx = Account.signLogicsigTransaction(lsig, tx);
 
         assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenTx);
+    }
+    @Test
+    public void testTealSign() throws Exception {
+        byte[] data = Encoder.decodeFromBase64("Ux8jntyBJQarjKGF8A==");
+        byte[] seed = Encoder.decodeFromBase64("5Pf7eGMA52qfMT4R4/vYCt7con/7U3yejkdXkrcb26Q=");
+        byte[] prog = Encoder.decodeFromBase64("ASABASI=");
+        Address addr = new Address("6Z3C3LDVWGMX23BMSYMANACQOSINPFIRF77H7N3AWJZYV6OH6GWTJKVMXY");
+        Account acc = new Account(seed);
+        Signature sig1 = acc.tealSign(data, addr);
+        Signature sig2 = acc.tealSignFromProgram(data, prog);
+
+        assertThat(sig1).isEqualTo(sig2);
+
+        byte[] prefix = ("ProgData").getBytes(StandardCharsets.UTF_8);
+        byte[] rawAddr = addr.getBytes();
+        byte[] message = new byte[prefix.length + rawAddr.length + data.length];
+        ByteBuffer buf = ByteBuffer.wrap(message);
+        buf.put(prefix).put(rawAddr).put(data);
+
+        PublicKey pk = acc.getAddress().toVerifyKey();
+
+        boolean verified = false;
+        try {
+            java.security.Signature sig = java.security.Signature.getInstance("EdDSA");
+            sig.initVerify(pk);
+            sig.update(buf.array());
+            verified = sig.verify(sig1.getBytes());
+        } catch (Exception ex) {
+            verified = false;
+        }
+        assertThat(verified).isTrue();
     }
 }

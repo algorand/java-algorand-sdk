@@ -20,12 +20,12 @@ public class Rekeying {
 
     @SuppressWarnings("rawtypes")
     private TransactionBuilder transactionBuilder;
-    private Account account;
     private SignedTransaction signedTransaction;
+    public Account account;
 
     @Given("payment transaction parameters {int} {int} {int} {string} {string} {string} {int} {string} {string}")	
     public void payment_transaction_parameters(
-            Integer fee, Integer fv, Integer lv, String gh, 
+            Integer fee, Integer fv, Integer lv, String gh,
             String to, String close, Integer amt, String gen, String note) {
 
         transactionBuilder = PaymentTransactionBuilder.Builder()

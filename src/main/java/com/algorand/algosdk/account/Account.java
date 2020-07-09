@@ -14,6 +14,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -34,6 +35,7 @@ public class Account {
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
+    private static final byte[] PROGDATA_SIGN_PREFIX = ("ProgData").getBytes(StandardCharsets.UTF_8);
     public static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
 
     /**
@@ -529,6 +531,32 @@ public class Account {
         } catch (Exception ex) {
             throw new IOException("could not encode transactions", ex);
         }
+    }
+
+    /**
+     * Creates Signature compatible with ed25519verify TEAL opcode from data and contract address (program hash).
+     * @param data byte[]
+     * @param contractAddress Address
+     * @return Signature
+     */
+    public Signature tealSign(byte[] data, Address contractAddress) throws NoSuchAlgorithmException, IOException {
+        byte[] rawAddress = contractAddress.getBytes();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(PROGDATA_SIGN_PREFIX);
+        baos.write(rawAddress);
+        baos.write(data);
+        return this.rawSignBytes(baos.toByteArray());
+    }
+
+    /**
+     * Creates Signature compatible with ed25519verify TEAL opcode from data and program bytes
+     * @param data byte[]
+     * @param program byte[]
+     * @return Signature
+     */
+    public Signature tealSignFromProgram(byte[] data, byte[] program) throws NoSuchAlgorithmException, IOException {
+        LogicsigSignature lsig = new LogicsigSignature(program);
+        return this.tealSign(data, lsig.toAddress());
     }
 
     // Return a pre-set seed in response to nextBytes or generateSeed
