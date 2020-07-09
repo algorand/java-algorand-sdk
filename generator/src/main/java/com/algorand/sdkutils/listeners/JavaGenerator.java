@@ -382,11 +382,22 @@ public class JavaGenerator implements Subscriber {
         String definition = sb.toString();
         String existingDef = enumDefinitions.get(javaTypeName);
         if (existingDef != null && existingDef.compareTo(definition) != 0) {
-            System.err.println(definition);
-            System.err.println(existingDef);
-            // Could be the comment
-            if (definition.length() < existingDef.length()) {
-                return;
+            // Could be the comment missing in one
+            int ei = existingDef.indexOf("*/\n");
+            if (ei == -1) ei = 0; else ei += 3;
+            String existingBody = existingDef.substring(ei);
+            int di = definition.indexOf("*/\n");
+            if (di == -1) di = 0; else di += 3;
+            String definitionBody = definition.substring(di);
+            if (existingBody.equals(definitionBody)) {
+                if (definition.length() < existingDef.length()) {
+                    return;
+                }
+            } else {
+                System.err.println(definition);
+                System.err.println(existingDef);
+                throw new RuntimeException("Conflicting enum classes.");
+
             }
         }
         JavaGenerator.enumDefinitions.put(javaTypeName, sb.toString());
@@ -544,8 +555,10 @@ final class JavaQueryWriter {
         if (propType.required) {
             if (inBody) {
                 requestMethod.append("        if (qd.bodySegments.isEmpty()) {\n");
-            } else {
+            } else if (inQuery) {
                 requestMethod.append("        if (!qd.queries.containsKey(\"" + propName + "\")) {\n");
+            } else if (inPath) {
+                requestMethod.append("        if (this." + propName + " == null) {\n");
             }
             requestMethod.append("            throw new RuntimeException(\"" +
                     propCode + " is not set. It is a required parameter.\");\n        }\n");
@@ -661,7 +674,7 @@ final class JavaQueryWriter {
             Tools.addImport(imports, "com.algorand.algosdk.util.Encoder");
             Tools.addImport(imports, "com.algorand.algosdk.v2.client.model.DryrunRequest");
             Tools.addImport(imports, "com.fasterxml.jackson.core.JsonProcessingException");
-            return "Encoder.encodeToMsgPack(jsonobj)";
+            return "Encoder.encodeToMsgPack("+propName+")";
         default:
             return propName;
         }
