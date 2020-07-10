@@ -29,8 +29,12 @@ public class TransactionSteps {
     }
 
     public static TEALProgram loadTEALProgramFromFile(String file) {
+        return new TEALProgram(loadResource(file));
+    }
+
+    public static byte[] loadResource(String file) {
         try {
-            return new TEALProgram(ResourceUtils.readResource(file));
+            return ResourceUtils.readResource(file);
         } catch (Exception e) {
             Assertions.fail("Unable to read file ('"+file+"') required by test: " + e.getMessage(), e);
         }
