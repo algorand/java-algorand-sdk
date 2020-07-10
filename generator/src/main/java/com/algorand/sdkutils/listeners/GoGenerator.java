@@ -63,6 +63,9 @@ public class GoGenerator implements Subscriber {
     private String path;
     // request method
     private String httpMethod;
+    
+    // models go to the same file. This is the file name
+    public String modelsFilename; 
 
     // client functions
 
@@ -76,7 +79,12 @@ public class GoGenerator implements Subscriber {
     private StringBuilder clientFunction;
 
 
-    public GoGenerator(String rootFolder, String packageName, Publisher publisher) throws IOException {
+    public GoGenerator(
+            String rootFolder,
+            String packageName,
+            String modelsFilename,
+            Publisher publisher) throws IOException {
+        
         publisher.subscribeAll(this);
 
         modelWriter = null;
@@ -84,6 +92,7 @@ public class GoGenerator implements Subscriber {
         filesFolder = rootFolder + File.separatorChar + packageName;
         modelWriter = new ModelWriter(this, filesFolder);
         this.packageName = packageName;
+        this.modelsFilename = modelsFilename;
     }
 
     public void terminate() {
@@ -188,10 +197,10 @@ public class GoGenerator implements Subscriber {
     public void onEvent(Events event, StructDef sDef) {
         switch(event) {
         case NEW_MODEL:
-            modelWriter.newModel(sDef, "responsemodels", "models");
+            modelWriter.newModel(sDef, modelsFilename, "models");
             break;
         case NEW_RETURN_TYPE:
-            modelWriter.newModel(sDef, "responsemodels", "models");
+            modelWriter.newModel(sDef, modelsFilename, "models");
             break;
         default:
             throw new RuntimeException("Unemplemented event for StructDef! " + event);
@@ -457,9 +466,6 @@ public class GoGenerator implements Subscriber {
             break;
         case "string":
             goType = type;
-            break;        
-        case "Account":
-            goType = "string";
             break;
         case "address":
             goType = asType ? "types.Address" : "string";
@@ -487,9 +493,9 @@ public class GoGenerator implements Subscriber {
         case "object":
         case "SignedTransaction":
             if (array) {
-                goType =  "map[string]interface{}";
+                goType =  "types.SignedTxn";
             } else {
-                goType =  "*map[string]interface{}";
+                goType =  "*types.SignedTxn";
             }
             break;
         default:
@@ -644,6 +650,10 @@ final class ModelWriter {
         if (modelWriter == null) {
             modelWriter = GoGenerator.newFile(filename, folder);
             GoGenerator.append(modelWriter, "package " + packageName + "\n\n");
+            if (filename.equals(this.gogen.modelsFilename)) {
+                GoGenerator.append(modelWriter, 
+                        "import \"github.com/algorand/go-algorand-sdk/types\"\n\n");
+            }
             this.filename = filename;
         }
         currentModelBuffer = new StringBuilder();
