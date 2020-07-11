@@ -47,6 +47,9 @@ public class GoGenerator implements Subscriber {
     // constructing some functions.  
     private TreeMap<String, String> pathParameters;
 
+    // it is not expected to be more than 1 elt, but who knows...
+    private TreeMap<String, String> bodyParameter; 
+    
     // queryFunctions hold all the query functions which go to one file 
     // written by queryWriter
     private StringBuilder queryFunctions;
@@ -66,6 +69,8 @@ public class GoGenerator implements Subscriber {
     
     // models go to the same file. This is the file name
     public String modelsFilename; 
+    
+    boolean setFormatToMsgpack;
 
     // client functions
 
@@ -140,8 +145,20 @@ public class GoGenerator implements Subscriber {
 
         sb.append(TAB + "err = s.c." + this.httpMethod + "(ctx, &response,\n");
         sb.append(TAB + TAB + processPath());
+
+        if (queryFunctions.length() > 0) {
+            if (bodyParameter.size() > 0) {
+                throw new RuntimeException("bla");
+            }
+        }
+
         if (queryFunctions.length() == 0) {
-            sb.append(", nil, headers)\n");
+            if (bodyParameter.size() == 0) {
+                sb.append(", nil, headers)\n");
+            }
+            else {
+                sb.append(", s." + bodyParameter.firstKey() + ", headers)\n");
+            }
         } else {
             sb.append(", s.p, headers)\n");
         }
@@ -185,8 +202,7 @@ public class GoGenerator implements Subscriber {
             addPathParameter(type);
             break;
         case BODY_CONTENT:
-            // This is not really a path parameter, but will behave like one in most situation of code generation
-            addPathParameter(type);
+            addBodyParameter(type);
             break;
         default:
             throw new RuntimeException("Unimplemented event for TypeDef! " + event);
@@ -278,14 +294,15 @@ public class GoGenerator implements Subscriber {
         currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
 
         pathParameters = new TreeMap<String, String>();
+        bodyParameter = new TreeMap<String, String>();
         queryFunctions = new StringBuilder();
         imports = new TreeMap<String, Set<String>>();
+        
+        setFormatToMsgpack = false;
 
         if (queryWriter != null) {
             throw new RuntimeException("Query writer should be closed!");
         }
-
-        pathParameters = new TreeMap<String, String>();
 
         // Also need to create the struct for the parameters
         modelWriter.newModel(new StructDef(currentQueryName + "Params", "", null, null), "filtermodels", "models");
@@ -303,13 +320,32 @@ public class GoGenerator implements Subscriber {
         pathParameters.put(propName, gotype);
 
         // client functions
-        if (pathParameters.size() > 1) {
+        if (pathParameters.size() + bodyParameter.size() > 1) {
+            clientFunction.append(", ");
+        }
+        clientFunction.append(propName + " " + gotype);
+    }
+
+    private void addBodyParameter(TypeDef type) {
+        String gotype = goType(type.rawTypeName, type.isOfType("array"));
+        String propName = Tools.getCamelCase(
+                type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName, 
+                        false);
+        bodyParameter.put(propName, gotype);
+
+        // client functions
+        if (pathParameters.size() + bodyParameter.size() > 1) {
             clientFunction.append(", ");
         }
         clientFunction.append(propName + " " + gotype);
     }
 
     private void addQueryParameter(TypeDef type) {
+        // Do not expose format property
+        if (type.javaTypeName.equals("Enums.Format")) {
+            setFormatToMsgpack = true;
+            return;
+        }
 
         // Also need to add this to the path struct (model)
         modelWriter.newProperty(type, Annotation.URL);
@@ -367,12 +403,25 @@ public class GoGenerator implements Subscriber {
                 formattingWidth = key.length();
             }
         }
+        
+        String bodyp = null; 
+        if (bodyParameter.size() > 0) {
+            bodyp = bodyParameter.firstKey();
+            if (bodyp.length() > formattingWidth) {
+                formattingWidth = bodyp.length();
+            }
+        }
+                
         formattingWidth += 1;
         append(queryWriter, TAB + "c" + spaces(formattingWidth - 1) + "*Client\n");
         if (modelWriter.modelPropertyAdded()) {
             append(queryWriter, TAB + "p" + spaces(formattingWidth - 1) + "models." + currentQueryName + "Params\n");
         }
-
+        if (bodyParameter.size() > 0) {
+            append(queryWriter, TAB + bodyp + spaces(formattingWidth - bodyp.length()) + 
+                    bodyParameter.get(bodyp) + "\n");
+        }
+                
         clientFunction.append("c: c");
 
         Iterator<Entry<String, String>> pps = pathParameters.entrySet().iterator();
