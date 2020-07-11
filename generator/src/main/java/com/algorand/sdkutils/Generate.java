@@ -51,7 +51,7 @@ public class Generate {
         OpenApiParser g = new OpenApiParser(root, publisher);
 
         if (goDirectory != null && !goDirectory.isEmpty()) {
-            new GoGenerator(goDirectory, "indexer", publisher);
+            new GoGenerator(goDirectory, "indexer", "responsemodels", publisher);
         } else {
 	    new JavaGenerator(
                 clientName,

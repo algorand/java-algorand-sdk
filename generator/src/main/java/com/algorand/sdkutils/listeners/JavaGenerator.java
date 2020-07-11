@@ -526,7 +526,7 @@ final class JavaQueryWriter {
             if (propType.doc != null) {
                 String desc = propType.doc;
                 if (!exception.isEmpty()) {
-                    desc = desc + "\n" + "@throws " + exception; 
+                    desc = desc + "\n" + "@throws " + exception;
                 }
                 desc = Tools.formatComment(desc, TAB, true);
                 builders.append(desc);
@@ -537,7 +537,7 @@ final class JavaQueryWriter {
             }
 
             String exceptionStm = exception.isEmpty() ? "" : "throws " + exception + " ";
-            builders.append(TAB + "public " + className + " " + setterName + 
+            builders.append(TAB + "public " + className + " " + setterName +
                     "(" + propType.javaTypeName + " " + propName + ") " + exceptionStm + "{\n");
             String valueOfString = getStringValueOfStatement(propType.javaTypeName, propName);
 
