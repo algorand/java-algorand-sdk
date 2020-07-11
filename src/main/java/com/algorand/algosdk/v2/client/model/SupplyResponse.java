@@ -5,6 +5,9 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Supply represents the current supply of MicroAlgos in the system.
+ */
 public class SupplyResponse extends PathResponse {
 
     /**

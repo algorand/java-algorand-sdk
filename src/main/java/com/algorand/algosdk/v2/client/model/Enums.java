@@ -4,7 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Enums {
 
-    // TODO: The generator should add this, it was added manually for now.
+    /**
+     * Combine with the address parameter to define what type of address to search for.
+     */
+    public enum AddressRole {
+        @JsonProperty("sender") SENDER("sender"),
+        @JsonProperty("receiver") RECEIVER("receiver"),
+        @JsonProperty("freeze-target") FREEZETARGET("freeze-target");
+
+        final String serializedName;
+        AddressRole(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
+
     /**
      * (apan) defines the what additional actions occur with the transaction.
      * Valid types:
@@ -36,25 +54,6 @@ public class Enums {
     }
 
     /**
-     * Combine with the address parameter to define what type of address to search for.
-     */
-    public enum AddressRole {
-        @JsonProperty("sender") SENDER("sender"),
-        @JsonProperty("receiver") RECEIVER("receiver"),
-        @JsonProperty("freeze-target") FREEZETARGET("freeze-target");
-
-        final String serializedName;
-        AddressRole(String name) {
-            this.serializedName = name;
-        }
-
-        @Override
-        public String toString() {
-            return this.serializedName;
-        }
-    }
-
-    /**
      * SigType filters just results using the specified type of signature:
      *   sig - Standard
      *   msig - MultiSig
@@ -76,6 +75,17 @@ public class Enums {
         }
     }
 
+    /**
+     * (type) Indicates what type of transaction this is. Different types have
+     * different fields.
+     * Valid types, and where their fields are stored:
+     *   (pay) payment-transaction
+     *   (keyreg) keyreg-transaction
+     *   (acfg) asset-config-transaction
+     *   (axfer) asset-transfer-transaction
+     *   (afrz) asset-freeze-transaction
+     *   (appl) application-transaction
+     */
     public enum TxType {
         @JsonProperty("pay") PAY("pay"),
         @JsonProperty("keyreg") KEYREG("keyreg"),

@@ -7,6 +7,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ApplicationResponse extends PathResponse {
 
+    /**
+     * Application index and its parameters
+     */
     @JsonProperty("application")
     public Application application;
 

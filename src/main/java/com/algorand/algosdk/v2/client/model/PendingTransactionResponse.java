@@ -6,6 +6,16 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Given a transaction id of a recently submitted transaction, it returns
+ * information about it. There are several cases when this might succeed:
+ * - transaction committed (committed round > 0)
+ * - transaction still in the pool (committed round = 0, pool error = "")
+ * - transaction removed from pool due to error (committed round = 0, pool error !=
+ * "")
+ * Or the transaction may have happened sufficiently long ago that the node no
+ * longer remembers it, and this will return an error.
+ */
 public class PendingTransactionResponse extends PathResponse {
 
     /**

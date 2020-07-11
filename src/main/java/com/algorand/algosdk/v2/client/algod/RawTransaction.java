@@ -1,6 +1,5 @@
 package com.algorand.algosdk.v2.client.algod;
 
-import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;

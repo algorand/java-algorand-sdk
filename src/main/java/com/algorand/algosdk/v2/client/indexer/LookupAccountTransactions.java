@@ -161,6 +161,9 @@ public class LookupAccountTransactions extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.accountId == null) {
+            throw new RuntimeException("account-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(accountId));

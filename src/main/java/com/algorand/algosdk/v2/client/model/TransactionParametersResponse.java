@@ -6,6 +6,10 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * TransactionParams contains the parameters that help a client construct a new
+ * transaction.
+ */
 public class TransactionParametersResponse extends PathResponse {
 
     /**

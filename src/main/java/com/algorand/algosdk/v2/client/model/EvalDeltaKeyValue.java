@@ -13,6 +13,9 @@ public class EvalDeltaKeyValue extends PathResponse {
     @JsonProperty("key")
     public String key;
 
+    /**
+     * Represents a TEAL value delta.
+     */
     @JsonProperty("value")
     public EvalDelta value;
 

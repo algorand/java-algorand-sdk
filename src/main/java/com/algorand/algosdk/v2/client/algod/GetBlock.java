@@ -32,6 +32,9 @@ public class GetBlock extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.round == null) {
+            throw new RuntimeException("round is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("blocks"));
         addPathSegment(String.valueOf(round));

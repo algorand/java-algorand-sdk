@@ -16,6 +16,9 @@ public class LookupApplicationByID extends Query {
 
     private Long applicationId;
 
+    /**
+     * @param applicationId
+     */
     public LookupApplicationByID(Client client, Long applicationId) {
         super(client, new HttpMethod("get"));
         this.applicationId = applicationId;
@@ -29,6 +32,9 @@ public class LookupApplicationByID extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.applicationId == null) {
+            throw new RuntimeException("application-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("applications"));
         addPathSegment(String.valueOf(applicationId));
