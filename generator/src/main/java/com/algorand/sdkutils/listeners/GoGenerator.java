@@ -146,12 +146,6 @@ public class GoGenerator implements Subscriber {
         sb.append(TAB + "err = s.c." + this.httpMethod + "(ctx, &response,\n");
         sb.append(TAB + TAB + processPath());
 
-        if (queryFunctions.length() > 0) {
-            if (bodyParameter.size() > 0) {
-                throw new RuntimeException("bla");
-            }
-        }
-
         if (queryFunctions.length() == 0) {
             if (bodyParameter.size() == 0) {
                 sb.append(", nil, headers)\n");
