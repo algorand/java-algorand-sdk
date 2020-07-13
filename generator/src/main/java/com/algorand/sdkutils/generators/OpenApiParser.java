@@ -442,11 +442,13 @@ public class OpenApiParser {
                     JsonNode rSchema = rtype.getValue().get("content") !=
                             null ? rtype.getValue().get("content").get("application/json").get("schema") : rtype.getValue().get("schema");
                             if (rSchema.get("$ref") != null ) {
-                                // It refers to a defined class
-                                continue;
+                                // It refers to a defined class, so set that it's an alias in case the listener cares.
+                                StructDef sDef = new StructDef(rtype.getKey(), rSchema.get("$ref").asText());
+                                publisher.publish(Events.NEW_RETURN_TYPE, sDef);
+                            } else {
+                                writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
+                                        null, Events.NEW_RETURN_TYPE);
                             }
-                            writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
-                                    null, Events.NEW_RETURN_TYPE);
                 }
     }
 

@@ -85,10 +85,12 @@ public class ResponseGenerator implements Subscriber {
         List<ObjectNode> nodes = getObject(def, properties);
 
         try (Stream<Path> existing = Files.list(args.outputDirectory.toPath())){
+            List<Path> existingFiles = existing.collect(Collectors.toList());
+
             String prefix = args.prefix + "_" + def.name + "_";
 
             // See how many files are already there to initialize the count.
-            long num = existing
+            long num = existingFiles.stream()
                     .filter(p -> p.getFileName().toString().startsWith(prefix))
                     .count();
 
@@ -251,6 +253,25 @@ public class ResponseGenerator implements Subscriber {
      */
     @Override
     public void terminate() {
+        // Flatten aliases
+        findEntry(args.filter, false)
+                .forEach(entry -> {
+                    String aliasOf = entry.getKey().aliasOf;
+
+                    if (StringUtils.isNotEmpty(aliasOf)) {
+                        // parse out the model name.
+                        // For example "Applications" out of "#/definitions/Applications"
+                        String alias = StringUtils.substringAfterLast(aliasOf, "/");
+                        // Lookup the alias
+                        List<Map.Entry<StructDef, List<TypeDef>>> entries = findEntry(alias, true);
+                        if (entries.size() != 1) {
+                            System.out.println("Failed to find single alias for '" + aliasOf + "'.");
+                            return;
+                        }
+                        entry.setValue(entries.get(0).getValue());
+                    }
+                });
+
         findEntry(args.filter, false)
                 .forEach(entry -> {
                     try {
@@ -300,6 +321,7 @@ public class ResponseGenerator implements Subscriber {
         if (event == Publisher.Events.NEW_MODEL) {
             models.put(sDef, activeList);
         } else if (event == Publisher.Events.NEW_RETURN_TYPE){
+            System.out.println(sDef.name);
             responses.put(sDef, activeList);
         } else {
             System.out.println("unhandled event: " + event);
