@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.model.HealthCheck;
 
 
 /**
+ * Returns 200 if healthy.
  * /health
  */
 public class MakeHealthCheck extends Query {

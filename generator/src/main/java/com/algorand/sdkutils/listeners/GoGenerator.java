@@ -299,7 +299,7 @@ public class GoGenerator implements Subscriber {
         }
 
         // Also need to create the struct for the parameters
-        modelWriter.newModel(new StructDef(currentQueryName + "Params", "", null, null), "filtermodels", "models");
+        modelWriter.newModel(new StructDef(currentQueryName + "Params", "defines parameters for " + currentQueryName, null, null), "filtermodels", "models");
 
         // Add the entry into the applicationClient file
         clientFunction = new StringBuilder();
@@ -700,7 +700,7 @@ final class ModelWriter {
             this.filename = filename;
         }
         currentModelBuffer = new StringBuilder();
-        if (sDef.doc != null) {
+        if (sDef.doc != null && !sDef.doc.isEmpty()) {
             GoGenerator.append(currentModelBuffer, Tools.formatCommentGo(sDef.doc, sDef.name, ""));
         }
         GoGenerator.append(currentModelBuffer, "type " + sDef.name + " struct {");

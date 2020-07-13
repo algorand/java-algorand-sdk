@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.model.BlockResponse;
 
 
 /**
+ * Get the block for the given round.
  * /v2/blocks/{round}
  */
 public class GetBlock extends Query {

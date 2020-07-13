@@ -8,6 +8,7 @@ import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
+ * Return metrics about algod functioning.
  * /metrics
  */
 public class Metrics extends Query {

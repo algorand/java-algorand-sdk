@@ -395,7 +395,12 @@ public class OpenApiParser {
                 returnType = Tools.getCamelCase(returnType, true);
             }
         }
-        String desc = spec.get("description") != null ? spec.get("description").asText() : "";
+        String desc = "";
+        if (spec.has("description")) {
+            desc = spec.get("description").asText();
+        } else if (spec.has("summary")) {
+            desc = spec.get("summary").asText();
+        }
         System.out.println("Generating ... " + className);
         Iterator<Entry<String, JsonNode>> properties = null;
         if ( paramNode != null) {

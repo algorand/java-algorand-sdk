@@ -36,6 +36,7 @@ public class IndexerClient extends Client {
     }
 
     /**
+     * Returns 200 if healthy.
      * /health
      */
     public MakeHealthCheck makeHealthCheck() {
