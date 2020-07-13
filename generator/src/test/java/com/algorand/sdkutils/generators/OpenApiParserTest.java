@@ -62,7 +62,7 @@ class OpenApiParserTest {
                 .onEvent(any(), any(String[].class));
 
         // Property, Path param, Query param, Body
-        verify(subscriber, times(27))
+        verify(subscriber, times(42))
                 .onEvent(any(), any(TypeDef.class));
     }
 }
