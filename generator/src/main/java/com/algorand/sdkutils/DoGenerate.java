@@ -19,17 +19,31 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  *
  * Usage examples:
- * --algodspec go-algorand/daemon/algod/api/algod.oas2.json
- * --indexerspec indexer/api/indexer.oas2.json
- * -m application_responsemodels
- * --filter DryrunRequest,DryrunSource,ApplicationStateSchema,ApplicationLocalStates,ApplicationLocalState,TealKeyValue,TealValue,AccountStateDelta,EvalDeltaKeyValue,EvalDelta,Application,ApplicationParams,DryrunState,DryrunTxnResult,CompileResponse,DryrunResponse
+ * Go:
+ * -g go
+ * --algodspec /Users/shantkarakashian/go/src/github.com/algorand/go-algorand/daemon/algod/api/algod.oas2.json
+ * --indexerspec /Users/shantkarakashian/go/src/github.com/algorand/indexer/api/indexer.oas2.json
+ * -m application
+ * --filter
+ * 
+ *  Java:
+ *  -g java
+ *  --algodspec /Users/shantkarakashian/go/src/github.com/algorand/go-algorand/daemon/algod/api/algod.oas2.json
+ *  --indexerspec /Users/shantkarakashian/go/src/github.com/algorand/indexer/api/indexer.oas2.json
+ *  AccountStateDelta,Application,ApplicationLocalState,ApplicationLocalStates,ApplicationParams,ApplicationResponse,ApplicationStateSchema,ApplicationsResponse,CatchpointAbortResponse,CatchpointStartResponse,CompileResponse,DryrunRequest,DryrunResponse,DryrunSource,DryrunState,DryrunTxnResult,EvalDelta,EvalDeltaKeyValue,StateSchema,TealKeyValue,TealValue,TransactionApplication,GetApplicationByID,GetAssetByID,TealCompile,TealDryrun,LookupApplicationByID,SearchForApplications,LookupApplication
+ *  
  */
-public class RunAlgodV2AndIndexerGenerators {
+public class DoGenerate {
 
     @Parameters(commandDescription = "Generate the Java Client SDK.")
     public static class GeneratorArgs {
         @Parameter(names = {"-h", "--help"}, help = true)
         public boolean help = false;
+
+        @Parameter(required = true,
+                names = {"-g"},
+                description = "Only one language a time can be generated: go or java. Default value is java")
+        public String genLanguage = "java";
 
         @Parameter(required = false,
                 names = {"--algodspec"},
@@ -92,18 +106,26 @@ public class RunAlgodV2AndIndexerGenerators {
         }
 
         OpenApiParser g = new OpenApiParser(root, publisher, filterList);
-        new GoGenerator("go-sdk", "algod", gArgs.modelsFilePrefix, publisher);
-        new JavaGenerator(
-                "AlgodClient",
-                "../src/main/java/com/algorand/algosdk/v2/client/model",
-                "com.algorand.algosdk.v2.client.model",
-                "../src/main/java/com/algorand/algosdk/v2/client/algod",
-                "com.algorand.algosdk.v2.client.algod",
-                "../src/main/java/com/algorand/algosdk/v2/client/common",
-                "com.algorand.algosdk.v2.client.common",
-                "X-Algo-API-Token",
-                false,
-                publisher);
+        switch (gArgs.genLanguage) {
+        case "go":
+            new GoGenerator("go-sdk", "algod", gArgs.modelsFilePrefix, publisher);
+            break;
+        case "java":
+            new JavaGenerator(
+                    "AlgodClient",
+                    "../src/main/java/com/algorand/algosdk/v2/client/model",
+                    "com.algorand.algosdk.v2.client.model",
+                    "../src/main/java/com/algorand/algosdk/v2/client/algod",
+                    "com.algorand.algosdk.v2.client.algod",
+                    "../src/main/java/com/algorand/algosdk/v2/client/common",
+                    "com.algorand.algosdk.v2.client.common",
+                    "X-Algo-API-Token",
+                    false,
+                    publisher);
+            break;
+        default:
+            throw new RuntimeException("Do not know how to generate for: " + gArgs.genLanguage);
+        }
 
         g.parse();
 
@@ -112,19 +134,26 @@ public class RunAlgodV2AndIndexerGenerators {
             root = Utils.getRoot(fis);
         }
         g = new OpenApiParser(root, publisher, filterList);
-        new GoGenerator("go-sdk", "indexer", gArgs.modelsFilePrefix, publisher);
-        new JavaGenerator(
-                "IndexerClient",
-                "../src/main/java/com/algorand/algosdk/v2/client/model",
-                "com.algorand.algosdk.v2.client.model",
-                "../src/main/java/com/algorand/algosdk/v2/client/indexer",
-                "com.algorand.algosdk.v2.client.indexer",
-                "../src/main/java/com/algorand/algosdk/v2/client/common",
-                "com.algorand.algosdk.v2.client.common",
-                "X-Indexer-API-Token",
-                true,
-                publisher);
-
+        switch (gArgs.genLanguage) {
+        case "go":
+            new GoGenerator("go-sdk", "indexer", gArgs.modelsFilePrefix, publisher);
+            break;
+        case "java":
+            new JavaGenerator(
+                    "IndexerClient",
+                    "../src/main/java/com/algorand/algosdk/v2/client/model",
+                    "com.algorand.algosdk.v2.client.model",
+                    "../src/main/java/com/algorand/algosdk/v2/client/indexer",
+                    "com.algorand.algosdk.v2.client.indexer",
+                    "../src/main/java/com/algorand/algosdk/v2/client/common",
+                    "com.algorand.algosdk.v2.client.common",
+                    "X-Indexer-API-Token",
+                    true,
+                    publisher);
+            break;
+        default:
+            throw new RuntimeException("Do not know how to generate for: " + gArgs.genLanguage);
+        }
         g.parse();
     }
 }
