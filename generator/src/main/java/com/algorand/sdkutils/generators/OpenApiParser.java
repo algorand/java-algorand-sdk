@@ -171,7 +171,7 @@ public class OpenApiParser {
             String boolName = asObject ? "Boolean" : "boolean";
             return new TypeDef(boolName, type, "", propName, goName, desc, isRequired(prop));
         case "array":
-            JsonNode arrayTypeNode = prop.get("items");
+            JsonNode arrayTypeNode = typeNode.get("items");
             TypeDef typeName = getType(arrayTypeNode, asObject, propName, forModel);
             if (typeName.isOfType("getterSetter")) {
                 type = type + ",getterSetter";
@@ -179,7 +179,7 @@ public class OpenApiParser {
             return new TypeDef("List<" + typeName.javaTypeName + ">", typeName.rawTypeName,
                     type, propName, goName, desc, isRequired(prop));
         default:
-            throw new RuntimeException("Unrecognized type: " + type);
+            return new TypeDef(type, type, "", propName, goName, desc, isRequired(prop));
         }
     }
 
