@@ -45,8 +45,8 @@ public class RunAlgodV2AndIndexerGenerators {
 
         @Parameter(required = false,
                 names = {"-m"},
-                description = "Name of the models file for Go. By default: \"responsemodels\".")
-        public String modelsFilename = "responsemodels";
+                description = "The frefix of filtermodels and responsemodels file names for Go.")
+        public String modelsFilePrefix = "";
 
         @Parameter(required = false,
                 names = {"--filter"},
@@ -92,7 +92,7 @@ public class RunAlgodV2AndIndexerGenerators {
         }
 
         OpenApiParser g = new OpenApiParser(root, publisher, filterList);
-        new GoGenerator("go-sdk", "algod", gArgs.modelsFilename, publisher);
+        new GoGenerator("go-sdk", "algod", gArgs.modelsFilePrefix, publisher);
         new JavaGenerator(
                 "AlgodClient",
                 "../src/main/java/com/algorand/algosdk/v2/client/model",
@@ -111,8 +111,8 @@ public class RunAlgodV2AndIndexerGenerators {
         try (FileInputStream fis = new FileInputStream(gArgs.iSpecFilePath)) {
             root = Utils.getRoot(fis);
         }
-        g = new OpenApiParser(root, publisher);
-        new GoGenerator("go-sdk", "indexer", gArgs.modelsFilename, publisher);
+        g = new OpenApiParser(root, publisher, filterList);
+        new GoGenerator("go-sdk", "indexer", gArgs.modelsFilePrefix, publisher);
         new JavaGenerator(
                 "IndexerClient",
                 "../src/main/java/com/algorand/algosdk/v2/client/model",
