@@ -61,6 +61,8 @@ public class GoGenerator implements Subscriber {
 
     // imports that go to one query file written by queryWriter
     private Map<String, Set<String>> imports;
+    
+    private boolean clientUsesModels = false;
 
     // pathDesc has the comments and the path string template
     private String pathDesc;
@@ -112,12 +114,19 @@ public class GoGenerator implements Subscriber {
     private void writeClientFunctions() {
         BufferedWriter bw = newFile(modelsFilePrefix + "client", filesFolder);
         append(bw, "package " + packageName + "\n\n");
-        append(bw, "import (\n");
+        if (clientUsesModels || this.modelsFilePrefix.isEmpty()) {
+            append(bw, "import (\n");
+        }
         if (this.modelsFilePrefix.isEmpty()) {
             append(bw, TAB + "\"context\"\n\n");
+            append(bw, TAB + "\"github.com/algorand/go-algorand-sdk/client/v2/common\"\n");
         }
-        append(bw, TAB + "\"github.com/algorand/go-algorand-sdk/client/v2/common/models\"\n");
-        append(bw, ")\n\n");
+        if (clientUsesModels) {
+            append(bw, TAB + "\"github.com/algorand/go-algorand-sdk/client/v2/common/models\"\n");
+        }
+        if (clientUsesModels || this.modelsFilePrefix.isEmpty()) {
+            append(bw, ")\n\n");
+        }
         if (this.modelsFilePrefix.isEmpty()) {
             append(bw, "const indexerAuthHeader = \"X-Indexer-API-Token\"\n\n");
             append(bw, "type Client common.Client\n\n");
@@ -138,6 +147,7 @@ public class GoGenerator implements Subscriber {
             append(bw, e.getValue());
         }
         closeFile(bw);
+        clientUsesModels = false;
     }
 
     // Constructs the Do function, which returns the response object 
@@ -563,6 +573,10 @@ public class GoGenerator implements Subscriber {
             } else {
                 goType =  "*types.SignedTxn";
             }
+            break;
+        case "DryrunRequest":
+            goType = "models." + type;
+            this.clientUsesModels = true;
             break;
         default:
             goType = type;
