@@ -1,6 +1,5 @@
 package com.algorand.algosdk.v2.client.algod;
 
-import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
@@ -10,6 +9,7 @@ import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 
 
 /**
+ * Broadcasts a raw transaction to the network.
  * /v2/transactions
  */
 public class RawTransaction extends Query {

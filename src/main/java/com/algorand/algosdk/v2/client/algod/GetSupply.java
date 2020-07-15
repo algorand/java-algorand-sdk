@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.model.SupplyResponse;
 
 
 /**
+ * Get the current supply reported by the ledger.
  * /v2/ledger/supply
  */
 public class GetSupply extends Query {

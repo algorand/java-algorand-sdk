@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -47,6 +49,9 @@ public class GoGenerator implements Subscriber {
     // constructing some functions.  
     private TreeMap<String, String> pathParameters;
 
+    // it is not expected to be more than 1 elt, but who knows...
+    private TreeMap<String, TypeConverter> bodyParameter; 
+    
     // queryFunctions hold all the query functions which go to one file 
     // written by queryWriter
     private StringBuilder queryFunctions;
@@ -56,6 +61,8 @@ public class GoGenerator implements Subscriber {
 
     // imports that go to one query file written by queryWriter
     private Map<String, Set<String>> imports;
+    
+    private boolean clientUsesModels = false;
 
     // pathDesc has the comments and the path string template
     private String pathDesc;
@@ -64,8 +71,10 @@ public class GoGenerator implements Subscriber {
     // request method
     private String httpMethod;
     
-    // models go to the same file. This is the file name
-    public String modelsFilename; 
+    // models go to the same file. This is the prefix of the file names
+    public String modelsFilePrefix; 
+    
+    boolean setFormatToMsgpack;
 
     // client functions
 
@@ -82,7 +91,7 @@ public class GoGenerator implements Subscriber {
     public GoGenerator(
             String rootFolder,
             String packageName,
-            String modelsFilename,
+            String modelsFilePrefix,
             Publisher publisher) throws IOException {
         
         publisher.subscribeAll(this);
@@ -90,9 +99,9 @@ public class GoGenerator implements Subscriber {
         modelWriter = null;
         clientFunctions = new TreeMap<String, String>();
         filesFolder = rootFolder + File.separatorChar + packageName;
-        modelWriter = new ModelWriter(this, filesFolder);
+        modelWriter = new ModelWriter(this, rootFolder);
         this.packageName = packageName;
-        this.modelsFilename = modelsFilename;
+        this.modelsFilePrefix = modelsFilePrefix.isEmpty() ? "" : modelsFilePrefix+"_";
     }
 
     public void terminate() {
@@ -103,16 +112,25 @@ public class GoGenerator implements Subscriber {
     }
 
     private void writeClientFunctions() {
-        BufferedWriter bw = newFile("applicationclient", filesFolder);
+        BufferedWriter bw = newFile(modelsFilePrefix + "client", filesFolder);
         append(bw, "package " + packageName + "\n\n");
-        append(bw, "import (\n");
-        append(bw, TAB + "\"context\"\n\n");
-        append(bw, TAB + "\"github.com/algorand/go-algorand-sdk/client/v2/common\"\n");
-        append(bw, ")\n\n");
-        append(bw, "const indexerAuthHeader = \"X-Indexer-API-Token\"\n\n");
-        append(bw, "type Client common.Client\n\n");
-
-        append(bw, 
+        if (clientUsesModels || this.modelsFilePrefix.isEmpty()) {
+            append(bw, "import (\n");
+        }
+        if (this.modelsFilePrefix.isEmpty()) {
+            append(bw, TAB + "\"context\"\n\n");
+            append(bw, TAB + "\"github.com/algorand/go-algorand-sdk/client/v2/common\"\n");
+        }
+        if (clientUsesModels) {
+            append(bw, TAB + "\"github.com/algorand/go-algorand-sdk/client/v2/common/models\"\n");
+        }
+        if (clientUsesModels || this.modelsFilePrefix.isEmpty()) {
+            append(bw, ")\n\n");
+        }
+        if (this.modelsFilePrefix.isEmpty()) {
+            append(bw, "const indexerAuthHeader = \"X-Indexer-API-Token\"\n\n");
+            append(bw, "type Client common.Client\n\n");
+            append(bw, 
                 "// get performs a GET request to the specific path against the server\n" +
                         "func (c *Client) get(ctx context.Context, response interface{}, path string, request interface{}, headers []*common.Header) error {\n" +
                         TAB + "return (*common.Client)(c).Get(ctx, response, path, request, headers)\n" +
@@ -124,10 +142,12 @@ public class GoGenerator implements Subscriber {
                 TAB + "c = (*Client)(commonClient)\n" +
                 TAB + "return\n" +
                 "}\n\n");
+        }
         for (Entry<String, String> e : clientFunctions.entrySet()) {
             append(bw, e.getValue());
         }
         closeFile(bw);
+        clientUsesModels = false;
     }
 
     // Constructs the Do function, which returns the response object 
@@ -140,8 +160,20 @@ public class GoGenerator implements Subscriber {
 
         sb.append(TAB + "err = s.c." + this.httpMethod + "(ctx, &response,\n");
         sb.append(TAB + TAB + processPath());
+
         if (queryFunctions.length() == 0) {
-            sb.append(", nil, headers)\n");
+            if (bodyParameter.size() == 0) {
+                sb.append(", nil, headers)\n");
+            }
+            else {
+                String serializerFormat = bodyParameter.firstEntry().getValue().serializerFormat;
+                if (serializerFormat.isEmpty()) {
+                    sb.append(", s." + bodyParameter.firstKey() + ", headers)\n");  
+                } else {
+                    String serialized = String.format(serializerFormat, "s." + bodyParameter.firstKey());
+                    sb.append(", " + serialized + ", headers)\n");
+                }
+            }
         } else {
             sb.append(", s.p, headers)\n");
         }
@@ -185,8 +217,7 @@ public class GoGenerator implements Subscriber {
             addPathParameter(type);
             break;
         case BODY_CONTENT:
-            // This is not really a path parameter, but will behave like one in most situation of code generation
-            addPathParameter(type);
+            addBodyParameter(type);
             break;
         default:
             throw new RuntimeException("Unimplemented event for TypeDef! " + event);
@@ -197,10 +228,10 @@ public class GoGenerator implements Subscriber {
     public void onEvent(Events event, StructDef sDef) {
         switch(event) {
         case NEW_MODEL:
-            modelWriter.newModel(sDef, modelsFilename, "models");
+            modelWriter.newModel(sDef, modelsFilePrefix + "responsemodels", "models");
             break;
         case NEW_RETURN_TYPE:
-            modelWriter.newModel(sDef, modelsFilename, "models");
+            modelWriter.newModel(sDef, modelsFilePrefix + "responsemodels", "models");
             break;
         default:
             throw new RuntimeException("Unemplemented event for StructDef! " + event);
@@ -278,17 +309,22 @@ public class GoGenerator implements Subscriber {
         currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
 
         pathParameters = new TreeMap<String, String>();
+        bodyParameter = new TreeMap<String, TypeConverter>();
         queryFunctions = new StringBuilder();
         imports = new TreeMap<String, Set<String>>();
+        
+        setFormatToMsgpack = false;
 
         if (queryWriter != null) {
             throw new RuntimeException("Query writer should be closed!");
         }
 
-        pathParameters = new TreeMap<String, String>();
-
         // Also need to create the struct for the parameters
-        modelWriter.newModel(new StructDef(currentQueryName + "Params", "", null, null), "filtermodels", "models");
+        modelWriter.newModel(
+                new StructDef(
+                        currentQueryName + "Params", 
+                        "defines parameters for " + currentQueryName, null, null), 
+                modelsFilePrefix + "filtermodels", "models");
 
         // Add the entry into the applicationClient file
         clientFunction = new StringBuilder();
@@ -303,13 +339,32 @@ public class GoGenerator implements Subscriber {
         pathParameters.put(propName, gotype);
 
         // client functions
-        if (pathParameters.size() > 1) {
+        if (pathParameters.size() + bodyParameter.size() > 1) {
             clientFunction.append(", ");
         }
         clientFunction.append(propName + " " + gotype);
     }
 
+    private void addBodyParameter(TypeDef type) {
+        TypeConverter gotype = goType(type.rawTypeName, type.isOfType("array"), false, "");
+        String propName = Tools.getCamelCase(
+                type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName, 
+                        false);
+        bodyParameter.put(propName, gotype);
+
+        // client functions
+        if (pathParameters.size() + bodyParameter.size() > 1) {
+            clientFunction.append(", ");
+        }
+        clientFunction.append(propName + " " + gotype.type);
+    }
+
     private void addQueryParameter(TypeDef type) {
+        // Do not expose format property
+        if (type.javaTypeName.equals("Enums.Format")) {
+            setFormatToMsgpack = true;
+            return;
+        }
 
         // Also need to add this to the path struct (model)
         modelWriter.newProperty(type, Annotation.URL);
@@ -318,7 +373,7 @@ public class GoGenerator implements Subscriber {
         String paramName = Tools.getCamelCase(propName, false);
         String desc = Tools.formatCommentGo(type.doc, funcName, "");
         TypeConverter typeConv = goType(type.rawTypeName, type.isOfType("array"), 
-                true, propName);
+                true, paramName);
 
 
         append(queryFunctions, desc);
@@ -367,12 +422,25 @@ public class GoGenerator implements Subscriber {
                 formattingWidth = key.length();
             }
         }
+        
+        String bodyp = null; 
+        if (bodyParameter.size() > 0) {
+            bodyp = bodyParameter.firstKey();
+            if (bodyp.length() > formattingWidth) {
+                formattingWidth = bodyp.length();
+            }
+        }
+                
         formattingWidth += 1;
         append(queryWriter, TAB + "c" + spaces(formattingWidth - 1) + "*Client\n");
         if (modelWriter.modelPropertyAdded()) {
             append(queryWriter, TAB + "p" + spaces(formattingWidth - 1) + "models." + currentQueryName + "Params\n");
         }
-
+        if (bodyParameter.size() > 0) {
+            append(queryWriter, TAB + bodyp + spaces(formattingWidth - bodyp.length()) + 
+                    bodyParameter.get(bodyp).type + "\n");
+        }
+                
         clientFunction.append("c: c");
 
         Iterator<Entry<String, String>> pps = pathParameters.entrySet().iterator();
@@ -381,6 +449,9 @@ public class GoGenerator implements Subscriber {
             append(queryWriter, TAB + pp.getKey() + 
                     spaces(formattingWidth - pp.getKey().length()) + pp.getValue() + "\n");
             clientFunction.append(", " + pp.getKey() + ": " + pp.getKey());
+        }
+        if (bodyParameter.size() > 0) {
+            clientFunction.append(", " + bodyp + ": " + bodyp);
         }
         append(queryWriter, "}\n\n");
 
@@ -396,6 +467,20 @@ public class GoGenerator implements Subscriber {
         queryWriter = null;
     }
 
+    public static BufferedWriter openFile(String filename, String folder) {
+        filename = filename.substring(0,1).toLowerCase() + filename.substring(1);
+        String pathName = folder + 
+                File.separatorChar +
+                filename +
+                ".go";
+        try {
+            return new BufferedWriter(new FileWriter(pathName, true));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
     public static BufferedWriter newFile(String filename, String folder) {
         filename = filename.substring(0,1).toLowerCase() + filename.substring(1);
         String pathName = folder + 
@@ -445,10 +530,12 @@ public class GoGenerator implements Subscriber {
     class TypeConverter {
         public String type;
         public String converter;
+        public String serializerFormat;
 
-        public TypeConverter(String type, String converter) {
+        public TypeConverter(String type, String converter, String serializer) {
             this.type = type;
             this.converter = converter;
+            this.serializerFormat = serializer;
         }
     }
 
@@ -456,6 +543,7 @@ public class GoGenerator implements Subscriber {
 
         String goType = "";
         String converter = paramName;
+        String serializer = "";
 
         switch (type) {
         case "boolean":
@@ -484,7 +572,7 @@ public class GoGenerator implements Subscriber {
             break;
 
         case "binary":
-            goType = asType ? "[]byte" : "string";
+            goType = "[]byte";
             if (asType) {
                 addImport("A", "encoding/base64");
                 converter = "base64.StdEncoding.EncodeToString(" + paramName +")";
@@ -498,13 +586,22 @@ public class GoGenerator implements Subscriber {
                 goType =  "*types.SignedTxn";
             }
             break;
+        case "DryrunRequest":
+            // Here, we are checking if it is DryrunRequest
+            // Ideally, in the spec file, consumes: application/msgpack indicates this,
+            // and that information should be leveraged for this purpose. 
+            goType = "models." + type;
+            serializer = "msgpack.Encode(&%s)";
+            addImport("C", "github.com/algorand/go-algorand-sdk/encoding/msgpack");
+            this.clientUsesModels = true;
+            break;
         default:
             goType = type;
         }
         if (array) {
-            return new TypeConverter("[]" + goType, converter);
+            return new TypeConverter("[]" + goType, converter, serializer);
         }
-        return new TypeConverter(goType, converter);
+        return new TypeConverter(goType, converter, serializer);
     }
 
     public static String goAnnotation(String propertyName, Annotation annotation, boolean required) {
@@ -568,7 +665,7 @@ public class GoGenerator implements Subscriber {
     }
 }
 
-final class ModelWriter {
+final class MultiStructFile {
     // modelWriter writes all the response and other structures into a single file
     private BufferedWriter modelWriter;
 
@@ -586,17 +683,33 @@ final class ModelWriter {
     // Indicates if any property is added to this model
     // used for skipping models with no parameters.  
     private boolean modelPropertyAdded;
-
-    private GoGenerator gogen;
-    private String folder;
-    private String filename;
     
-    public ModelWriter(GoGenerator gogen, String folder) {
+    GoGenerator gogen;
+    
+    String currentModel = "";
+    HashSet<String> hasModels = new HashSet<String>();
+    
+    String filename;
+    String folder;
+    
+    public MultiStructFile(String folder, GoGenerator gogen, 
+            String filename, String packageName) {
+        this.gogen = gogen;
+        
         currentModelBuffer = null;
         pendingOpenStruct = false;
-        this.gogen = gogen;
+        currentModel = "";
+        hasModels = new HashSet<String>();
+        
+        modelWriter = GoGenerator.newFile(filename, folder);
+        GoGenerator.append(modelWriter, "package " + packageName + "\n\n");
+        if (filename.equals(gogen.modelsFilePrefix + "responsemodels")) {
+            GoGenerator.append(modelWriter, 
+                    "import \"github.com/algorand/go-algorand-sdk/types\"\n\n");
+        }
+        
+        this.filename = filename;
         this.folder = folder;
-        this.filename = "";
     }
     
     public void close () {
@@ -605,7 +718,7 @@ final class ModelWriter {
         }
         pendingOpenStruct = false;
         
-        if (modelPropertyAdded) {
+        if (modelPropertyAdded && !hasModels.contains(currentModel)) {
             GoGenerator.append(modelWriter, currentModelBuffer);
         }
         modelPropertyAdded = false;
@@ -613,11 +726,37 @@ final class ModelWriter {
         if (modelWriter != null) {
             GoGenerator.closeFile(modelWriter);
         }
-        modelWriter = null;
+        currentModel = "";
+        modelWriter = null;   
     }
-    
-    public boolean modelPropertyAdded() {
-        return modelPropertyAdded;
+
+
+    // newModel can write into one file at a time.
+    // This is a limitation, but there is no need for more.
+    // At any time, there can be one currentModelBuffer, and one modelWriter
+    public void newModel(StructDef sDef) {
+        if (pendingOpenStruct) {
+            GoGenerator.append(currentModelBuffer, "}\n\n");
+        }
+        
+        if (modelWriter == null) {
+            // the file was closed, then opened again
+            modelWriter = GoGenerator.openFile(filename, folder);
+        }
+        
+        if (modelPropertyAdded && !hasModels.contains(currentModel)) {
+            GoGenerator.append(modelWriter, currentModelBuffer);
+            hasModels.add(currentModel);
+        }
+        
+        currentModel = sDef.name;
+        currentModelBuffer = new StringBuilder();
+        if (sDef.doc != null && !sDef.doc.isEmpty()) {
+            GoGenerator.append(currentModelBuffer, Tools.formatCommentGo(sDef.doc, sDef.name, ""));
+        }
+        GoGenerator.append(currentModelBuffer, "type " + sDef.name + " struct {");
+        pendingOpenStruct = true;
+        modelPropertyAdded = false;
     }
 
     public void newProperty(TypeDef type, GoGenerator.Annotation annType) {
@@ -629,39 +768,49 @@ final class ModelWriter {
         GoGenerator.append(currentModelBuffer, GoGenerator.TAB + propName + " ");
         GoGenerator.append(currentModelBuffer, gogen.goType(type.rawTypeName, type.isOfType("array")) + " ");
         GoGenerator.append(currentModelBuffer, GoGenerator.goAnnotation(type.propertyName, annType, type.required));
-        if (type.propertyName.charAt(0) == 'A') {
-            return;
+    }
+    
+    public boolean modelPropertyAdded() {
+        return modelPropertyAdded;
+    }
+
+}
+
+final class ModelWriter {
+    GoGenerator gogen;
+    String folder;
+    static private HashMap<String,MultiStructFile> multiFiles = new HashMap<String, MultiStructFile>();;
+    MultiStructFile currentFile;
+    
+    public ModelWriter(GoGenerator gogen, String folder) {
+        this.gogen = gogen;
+        this.folder = folder;
+        currentFile = null;
+    }
+    
+    public void close () {
+        for(String file: multiFiles.keySet()) {
+            multiFiles.get(file).close();
         }
+    }
+    
+    public boolean modelPropertyAdded() {
+        return currentFile.modelPropertyAdded();
+    }
+
+    public void newProperty(TypeDef type, GoGenerator.Annotation annType) {
+        currentFile.newProperty(type, annType);
     }
     
     // newModel can write into one file at a time.
     // This is a limitation, but there is no need for more.
     // At any time, there can be one currentModelBuffer, and one modelWriter
     public void newModel(StructDef sDef, String filename, String packageName) {
-        if (filename.compareTo(this.filename) != 0) {
-            this.close();
+        if (!multiFiles.containsKey(filename)) {
+            MultiStructFile mf = new MultiStructFile(folder, gogen, filename, packageName);
+            multiFiles.put(filename, mf);
         }
-        if (pendingOpenStruct) {
-            GoGenerator.append(currentModelBuffer, "}\n\n");
-        }
-        if (modelPropertyAdded) {
-            GoGenerator.append(modelWriter, currentModelBuffer);
-        }
-        if (modelWriter == null) {
-            modelWriter = GoGenerator.newFile(filename, folder);
-            GoGenerator.append(modelWriter, "package " + packageName + "\n\n");
-            if (filename.equals(this.gogen.modelsFilename)) {
-                GoGenerator.append(modelWriter, 
-                        "import \"github.com/algorand/go-algorand-sdk/types\"\n\n");
-            }
-            this.filename = filename;
-        }
-        currentModelBuffer = new StringBuilder();
-        if (sDef.doc != null) {
-            GoGenerator.append(currentModelBuffer, Tools.formatCommentGo(sDef.doc, sDef.name, ""));
-        }
-        GoGenerator.append(currentModelBuffer, "type " + sDef.name + " struct {");
-        pendingOpenStruct = true;
-        modelPropertyAdded = false;
+        currentFile = multiFiles.get(filename);
+        currentFile.newModel(sDef);
     }
 }

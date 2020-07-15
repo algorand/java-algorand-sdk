@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 
 /**
+ * Get parameters for constructing a new transaction
  * /v2/transactions/params
  */
 public class TransactionParams extends Query {

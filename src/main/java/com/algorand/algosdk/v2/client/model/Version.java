@@ -14,6 +14,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Version extends PathResponse {
 
+    /**
+     * the current algod build version information.
+     */
     @JsonProperty("build")
     public VersionBuild build;
 

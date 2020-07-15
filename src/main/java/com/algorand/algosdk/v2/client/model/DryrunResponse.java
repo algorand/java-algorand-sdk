@@ -7,6 +7,9 @@ import java.util.Objects;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * DryrunResponse contains per-txn debug information from a dryrun.
+ */
 public class DryrunResponse extends PathResponse {
 
     @JsonProperty("error")

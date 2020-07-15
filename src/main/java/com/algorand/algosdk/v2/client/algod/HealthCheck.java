@@ -8,6 +8,7 @@ import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
+ * Returns OK if healthy.
  * /health
  */
 public class HealthCheck extends Query {

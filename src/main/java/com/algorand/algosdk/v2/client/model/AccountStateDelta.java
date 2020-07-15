@@ -28,6 +28,9 @@ public class AccountStateDelta extends PathResponse {
     }
     public Address address;
 
+    /**
+     * Application state delta.
+     */
     @JsonProperty("delta")
     public List<EvalDeltaKeyValue> delta = new ArrayList<EvalDeltaKeyValue>();
 

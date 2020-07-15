@@ -34,6 +34,9 @@ public class AccountInformation extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.address == null) {
+            throw new RuntimeException("address is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(address));
