@@ -50,7 +50,7 @@ public class GoGenerator implements Subscriber {
     private TreeMap<String, String> pathParameters;
 
     // it is not expected to be more than 1 elt, but who knows...
-    private TreeMap<String, String> bodyParameter; 
+    private TreeMap<String, TypeConverter> bodyParameter; 
     
     // queryFunctions hold all the query functions which go to one file 
     // written by queryWriter
@@ -166,7 +166,13 @@ public class GoGenerator implements Subscriber {
                 sb.append(", nil, headers)\n");
             }
             else {
-                sb.append(", s." + bodyParameter.firstKey() + ", headers)\n");
+                String serializerFormat = bodyParameter.firstEntry().getValue().serializerFormat;
+                if (serializerFormat.isEmpty()) {
+                    sb.append(", s." + bodyParameter.firstKey() + ", headers)\n");  
+                } else {
+                    String serialized = String.format(serializerFormat, "s." + bodyParameter.firstKey());
+                    sb.append(", " + serialized + ", headers)\n");
+                }
             }
         } else {
             sb.append(", s.p, headers)\n");
@@ -303,7 +309,7 @@ public class GoGenerator implements Subscriber {
         currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
 
         pathParameters = new TreeMap<String, String>();
-        bodyParameter = new TreeMap<String, String>();
+        bodyParameter = new TreeMap<String, TypeConverter>();
         queryFunctions = new StringBuilder();
         imports = new TreeMap<String, Set<String>>();
         
@@ -340,7 +346,7 @@ public class GoGenerator implements Subscriber {
     }
 
     private void addBodyParameter(TypeDef type) {
-        String gotype = goType(type.rawTypeName, type.isOfType("array"));
+        TypeConverter gotype = goType(type.rawTypeName, type.isOfType("array"), false, "");
         String propName = Tools.getCamelCase(
                 type.goPropertyName.isEmpty() ? type.propertyName : type.goPropertyName, 
                         false);
@@ -350,7 +356,7 @@ public class GoGenerator implements Subscriber {
         if (pathParameters.size() + bodyParameter.size() > 1) {
             clientFunction.append(", ");
         }
-        clientFunction.append(propName + " " + gotype);
+        clientFunction.append(propName + " " + gotype.type);
     }
 
     private void addQueryParameter(TypeDef type) {
@@ -432,7 +438,7 @@ public class GoGenerator implements Subscriber {
         }
         if (bodyParameter.size() > 0) {
             append(queryWriter, TAB + bodyp + spaces(formattingWidth - bodyp.length()) + 
-                    bodyParameter.get(bodyp) + "\n");
+                    bodyParameter.get(bodyp).type + "\n");
         }
                 
         clientFunction.append("c: c");
@@ -443,6 +449,9 @@ public class GoGenerator implements Subscriber {
             append(queryWriter, TAB + pp.getKey() + 
                     spaces(formattingWidth - pp.getKey().length()) + pp.getValue() + "\n");
             clientFunction.append(", " + pp.getKey() + ": " + pp.getKey());
+        }
+        if (bodyParameter.size() > 0) {
+            clientFunction.append(", " + bodyp + ": " + bodyp);
         }
         append(queryWriter, "}\n\n");
 
@@ -521,10 +530,12 @@ public class GoGenerator implements Subscriber {
     class TypeConverter {
         public String type;
         public String converter;
+        public String serializerFormat;
 
-        public TypeConverter(String type, String converter) {
+        public TypeConverter(String type, String converter, String serializer) {
             this.type = type;
             this.converter = converter;
+            this.serializerFormat = serializer;
         }
     }
 
@@ -532,6 +543,7 @@ public class GoGenerator implements Subscriber {
 
         String goType = "";
         String converter = paramName;
+        String serializer = "";
 
         switch (type) {
         case "boolean":
@@ -575,16 +587,21 @@ public class GoGenerator implements Subscriber {
             }
             break;
         case "DryrunRequest":
+            // Here, we are checking if it is DryrunRequest
+            // Ideally, in the spec file, consumes: application/msgpack indicates this,
+            // and that information should be leveraged for this purpose. 
             goType = "models." + type;
+            serializer = "msgpack.Encode(&%s)";
+            addImport("C", "github.com/algorand/go-algorand-sdk/encoding/msgpack");
             this.clientUsesModels = true;
             break;
         default:
             goType = type;
         }
         if (array) {
-            return new TypeConverter("[]" + goType, converter);
+            return new TypeConverter("[]" + goType, converter, serializer);
         }
-        return new TypeConverter(goType, converter);
+        return new TypeConverter(goType, converter, serializer);
     }
 
     public static String goAnnotation(String propertyName, Annotation annotation, boolean required) {
