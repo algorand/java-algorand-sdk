@@ -25,6 +25,9 @@ public class DryrunTxnResult extends PathResponse {
     @JsonProperty("disassembly")
     public List<String> disassembly = new ArrayList<String>();
 
+    /**
+     * Application state delta.
+     */
     @JsonProperty("global-delta")
     public List<EvalDeltaKeyValue> globalDelta = new ArrayList<EvalDeltaKeyValue>();
 

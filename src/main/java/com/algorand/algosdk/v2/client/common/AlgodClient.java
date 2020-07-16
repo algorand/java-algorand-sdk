@@ -31,6 +31,7 @@ public class AlgodClient extends Client {
         super(host, port, token, "X-Algo-API-Token");
     }
     /**
+     * Returns OK if healthy.
      * /health
      */
     public HealthCheck HealthCheck() {
@@ -38,6 +39,7 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Return metrics about algod functioning.
      * /metrics
      */
     public Metrics Metrics() {
@@ -72,6 +74,7 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get the block for the given round.
      * /v2/blocks/{round}
      */
     public GetBlock GetBlock(Long round) {
@@ -79,6 +82,7 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get the current supply reported by the ledger.
      * /v2/ledger/supply
      */
     public GetSupply GetSupply() {
@@ -86,6 +90,7 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Gets the current node status.
      * /v2/status
      */
     public GetStatus GetStatus() {
@@ -102,6 +107,7 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Broadcasts a raw transaction to the network.
      * /v2/transactions
      */
     public RawTransaction RawTransaction() {
@@ -109,6 +115,7 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get parameters for constructing a new transaction
      * /v2/transactions/params
      */
     public TransactionParams TransactionParams() {

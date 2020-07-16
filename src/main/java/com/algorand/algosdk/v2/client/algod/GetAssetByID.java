@@ -33,6 +33,9 @@ public class GetAssetByID extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.assetId == null) {
+            throw new RuntimeException("asset-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("assets"));
         addPathSegment(String.valueOf(assetId));

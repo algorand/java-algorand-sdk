@@ -13,6 +13,9 @@ public class TealKeyValue extends PathResponse {
     @JsonProperty("key")
     public String key;
 
+    /**
+     * Represents a TEAL value.
+     */
     @JsonProperty("value")
     public TealValue value;
 

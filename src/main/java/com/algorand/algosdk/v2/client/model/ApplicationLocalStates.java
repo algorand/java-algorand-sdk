@@ -13,6 +13,9 @@ public class ApplicationLocalStates extends PathResponse {
     @JsonProperty("id")
     public Long id;
 
+    /**
+     * Stores local state associated with an application.
+     */
     @JsonProperty("state")
     public ApplicationLocalState state;
 

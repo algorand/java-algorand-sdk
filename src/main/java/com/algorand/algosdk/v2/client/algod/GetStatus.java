@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
 
 
 /**
+ * Gets the current node status.
  * /v2/status
  */
 public class GetStatus extends Query {

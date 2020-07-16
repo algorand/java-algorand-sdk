@@ -26,9 +26,12 @@ public class OpenApiParser {
 
     protected JsonNode root;
     protected Publisher publisher;
-    protected final boolean javaMode;
 
     protected ObjectMapper mapper = new ObjectMapper();
+
+    // List of classes which will be processed.
+    // If empty, all classes will be processed.
+    private HashSet<String> filterList;
 
     /**
      * Parse the file and drive the publisher.
@@ -168,7 +171,7 @@ public class OpenApiParser {
             String boolName = asObject ? "Boolean" : "boolean";
             return new TypeDef(boolName, type, "", propName, goName, desc, isRequired(prop));
         case "array":
-            JsonNode arrayTypeNode = prop.get("items");
+            JsonNode arrayTypeNode = typeNode.get("items");
             TypeDef typeName = getType(arrayTypeNode, asObject, propName, forModel);
             if (typeName.isOfType("getterSetter")) {
                 type = type + ",getterSetter";
@@ -176,7 +179,7 @@ public class OpenApiParser {
             return new TypeDef("List<" + typeName.javaTypeName + ">", typeName.rawTypeName,
                     type, propName, goName, desc, isRequired(prop));
         default:
-            throw new RuntimeException("Unrecognized type: " + type);
+            return new TypeDef(type, type, "", propName, goName, desc, isRequired(prop));
         }
     }
 
@@ -291,8 +294,6 @@ public class OpenApiParser {
         if (prop.get("required") != null) {
             if (prop.get("required").isBoolean()) {
                 return prop.get("required").asBoolean();
-            } else {
-                System.out.println("*** isRequired unknown");
             }
         }
         return false;
@@ -394,7 +395,12 @@ public class OpenApiParser {
                 returnType = Tools.getCamelCase(returnType, true);
             }
         }
-        String desc = spec.get("description") != null ? spec.get("description").asText() : "";
+        String desc = "";
+        if (spec.has("description")) {
+            desc = spec.get("description").asText();
+        } else if (spec.has("summary")) {
+            desc = spec.get("summary").asText();
+        }
         System.out.println("Generating ... " + className);
         Iterator<Entry<String, JsonNode>> properties = null;
         if ( paramNode != null) {
@@ -424,6 +430,10 @@ public class OpenApiParser {
                     if (cls.getValue().get("description") != null) {
                         desc = cls.getValue().get("description").asText();
                     }
+                    String className = Tools.getCamelCase(cls.getKey(), true);
+                    if (!filterList.isEmpty() && !filterList.contains(className)) {
+                        continue;
+                    }
                     writeClass(cls.getKey(), cls.getValue(), cls.getValue().get("properties"),
                             desc, Events.NEW_MODEL);
                 }
@@ -438,17 +448,28 @@ public class OpenApiParser {
                 Iterator<Entry<String, JsonNode>> returnTypes = returns.fields();
                 while (returnTypes.hasNext()) {
                     Entry<String, JsonNode> rtype = returnTypes.next();
-                    System.out.println("looking at: " + rtype.getKey());
-                    JsonNode rSchema = rtype.getValue().get("content") !=
-                            null ? rtype.getValue().get("content").get("application/json").get("schema") : rtype.getValue().get("schema");
-                            if (rSchema.get("$ref") != null ) {
-                                // It refers to a defined class, so set that it's an alias in case the listener cares.
-                                StructDef sDef = new StructDef(rtype.getKey(), rSchema.get("$ref").asText());
-                                publisher.publish(Events.NEW_RETURN_TYPE, sDef);
-                            } else {
-                                writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
-                                        null, Events.NEW_RETURN_TYPE);
-                            }
+                    JsonNode rSchema = null;
+                    if (rtype.getValue().has("content")) {
+                        rSchema = rtype.getValue().get("content").get("application/json").get("schema");
+                    } else {
+                        rSchema = rtype.getValue().get("schema");
+                    }
+                    if (rSchema.get("$ref") != null ) {
+                        // It refers to a defined class
+                        continue;
+                    }
+                    String className = Tools.getCamelCase(rtype.getKey(), true);
+                    if (!filterList.isEmpty() && !filterList.contains(className)) {
+                        continue;
+                    }
+                    String desc = "";
+                    if (rtype.getValue().has("description") &&
+                            !rtype.getValue().get("description").asText().equals("(empty)")) {
+                        desc = rtype.getValue().get("description").asText();
+                    }
+
+                    writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
+                            desc, Events.NEW_RETURN_TYPE);
                 }
     }
 
@@ -464,6 +485,11 @@ public class OpenApiParser {
                     if (privateTag != null && privateTag.elements().next().asText().equals("private")) {
                         continue;
                     }
+                    String className = Tools.getCamelCase(
+                            path.getValue().get(path.getValue().fieldNames().next()).get("operationId").asText(), true);
+                    if (!filterList.isEmpty() && !filterList.contains(className)) {
+                        continue;
+                    }
                     writeQueryClass(path.getValue(), path.getKey());
         }
     }
@@ -473,14 +499,20 @@ public class OpenApiParser {
      */
     @Deprecated
     public OpenApiParser(JsonNode root) {
-        this.javaMode = true;
         this.root = root;
         this.publisher = new Publisher();
     }
 
     public OpenApiParser(JsonNode root, Publisher publisher) {
-        this.javaMode = false;
         this.root = root;
         this.publisher = publisher;
+        this.filterList = new HashSet<String>();
+    }
+
+    public OpenApiParser(JsonNode root, Publisher publisher, HashSet<String> filterList) {
+        this.root = root;
+        this.publisher = publisher;
+        this.filterList = filterList;
+
     }
 }

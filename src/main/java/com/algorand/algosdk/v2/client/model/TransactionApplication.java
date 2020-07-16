@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TransactionApplication extends PathResponse {
 
-    // TODO: Generator needs to be updated to setup the Address like this.
     /**
      * (apat) List of accounts in addition to the sender that may be accessed from the
      * application's approval-program and clear-state-program.
@@ -92,12 +91,35 @@ public class TransactionApplication extends PathResponse {
     @JsonProperty("foreign-apps")
     public List<Long> foreignApps = new ArrayList<Long>();
 
+    /**
+     * Represents a (apls) local-state or (apgs) global-state schema. These schemas
+     * determine how much storage may be used in a local-state or global-state for an
+     * application. The more space used, the larger minimum balance must be maintained
+     * in the account holding the data.
+     */
     @JsonProperty("global-state-schema")
     public StateSchema globalStateSchema;
 
+    /**
+     * Represents a (apls) local-state or (apgs) global-state schema. These schemas
+     * determine how much storage may be used in a local-state or global-state for an
+     * application. The more space used, the larger minimum balance must be maintained
+     * in the account holding the data.
+     */
     @JsonProperty("local-state-schema")
     public StateSchema localStateSchema;
 
+    /**
+     * (apan) defines the what additional actions occur with the transaction.
+     * Valid types:
+     *   noop
+     *   optin
+     *   closeout
+     *   clear
+     *   update
+     *   update
+     *   delete
+     */
     @JsonProperty("on-completion")
     public Enums.OnCompletion onCompletion;
 

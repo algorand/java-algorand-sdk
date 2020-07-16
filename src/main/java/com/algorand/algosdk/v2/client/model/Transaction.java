@@ -18,15 +18,37 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class Transaction extends PathResponse {
 
+    /**
+     * Fields for application transactions.
+     * Definition:
+     * data/transactions/application.go : ApplicationCallTxnFields
+     */
     @JsonProperty("application-transaction")
     public TransactionApplication applicationTransaction;
 
+    /**
+     * Fields for asset allocation, re-configuration, and destruction.
+     * A zero value for asset-id indicates asset creation.
+     * A zero value for the params indicates asset destruction.
+     * Definition:
+     * data/transactions/asset.go : AssetConfigTxnFields
+     */
     @JsonProperty("asset-config-transaction")
     public TransactionAssetConfig assetConfigTransaction;
 
+    /**
+     * Fields for an asset freeze transaction.
+     * Definition:
+     * data/transactions/asset.go : AssetFreezeTxnFields
+     */
     @JsonProperty("asset-freeze-transaction")
     public TransactionAssetFreeze assetFreezeTransaction;
 
+    /**
+     * Fields for an asset transfer transaction.
+     * Definition:
+     * data/transactions/asset.go : AssetTransferTxnFields
+     */
     @JsonProperty("asset-transfer-transaction")
     public TransactionAssetTransfer assetTransferTransaction;
 
@@ -137,6 +159,11 @@ public class Transaction extends PathResponse {
     @JsonProperty("intra-round-offset")
     public Long intraRoundOffset;
 
+    /**
+     * Fields for a keyreg transaction.
+     * Definition:
+     * data/transactions/keyreg.go : KeyregTxnFields
+     */
     @JsonProperty("keyreg-transaction")
     public TransactionKeyreg keyregTransaction;
 
@@ -176,6 +203,11 @@ public class Transaction extends PathResponse {
     }
     public byte[] note;
 
+    /**
+     * Fields for a payment transaction.
+     * Definition:
+     * data/transactions/payment.go : PaymentTxnFields
+     */
     @JsonProperty("payment-transaction")
     public TransactionPayment paymentTransaction;
 
@@ -222,6 +254,10 @@ public class Transaction extends PathResponse {
     @JsonProperty("sender-rewards")
     public Long senderRewards;
 
+    /**
+     * Validation signature associated with some data. Only one of the signatures
+     * should be provided.
+     */
     @JsonProperty("signature")
     public TransactionSignature signature;
 

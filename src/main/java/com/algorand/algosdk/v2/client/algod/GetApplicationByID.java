@@ -33,6 +33,9 @@ public class GetApplicationByID extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.applicationId == null) {
+            throw new RuntimeException("application-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("applications"));
         addPathSegment(String.valueOf(applicationId));

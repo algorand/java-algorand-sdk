@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.model.BlockResponse;
 
 
 /**
+ * Get the block for the given round.
  * /v2/blocks/{round}
  */
 public class GetBlock extends Query {
@@ -32,6 +33,9 @@ public class GetBlock extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.round == null) {
+            throw new RuntimeException("round is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("blocks"));
         addPathSegment(String.valueOf(round));

@@ -102,6 +102,10 @@ public class Account extends PathResponse {
     @JsonProperty("created-assets")
     public List<Asset> createdAssets = new ArrayList<Asset>();
 
+    /**
+     * AccountParticipation describes the parameters used by this account in consensus
+     * protocol.
+     */
     @JsonProperty("participation")
     public AccountParticipation participation;
 

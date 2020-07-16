@@ -1,13 +1,14 @@
 package com.algorand.algosdk.v2.client.algod;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.DryrunResponse;
-// TODO: The generator should add this in. It was manually added for now.
 import com.algorand.algosdk.v2.client.model.DryrunRequest;
+import com.algorand.algosdk.v2.client.model.DryrunResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 
 /**
@@ -23,9 +24,10 @@ public class TealDryrun extends Query {
 
     /**
      * Transaction (or group) and any accompanying state-simulation data.
+     * @throws JsonProcessingException
      */
-    public TealDryrun request(DryrunRequest request) {
-        addToBody(request);
+    public TealDryrun request(DryrunRequest request) throws JsonProcessingException {
+        addToBody(Encoder.encodeToMsgPack(request));
         return this;
     }
 
