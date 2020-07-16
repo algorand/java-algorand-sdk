@@ -124,12 +124,18 @@ public class JavaGenerator implements Subscriber {
 
     @Override
     public void onEvent(Events event, StructDef sDef) {
+        if (sDef.aliasOf != null && sDef.aliasOf != "") {
+            System.out.println("ALIAS!");
+        }
         switch(event) {
         case NEW_MODEL:
             javaModelWriter.newModel(sDef, this.modelPackage);
             break;
         case NEW_RETURN_TYPE:
-            javaModelWriter.newModel(sDef, this.modelPackage);
+            // Ignore aliases for now...
+            if (sDef.aliasOf == null || sDef.aliasOf != "") {
+                javaModelWriter.newModel(sDef, this.modelPackage);
+            }
             break;
         default:
             throw new RuntimeException("Unemplemented event for StructDef! " + event);

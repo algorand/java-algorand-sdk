@@ -231,7 +231,10 @@ public class GoGenerator implements Subscriber {
             modelWriter.newModel(sDef, modelsFilePrefix + "responsemodels", "models");
             break;
         case NEW_RETURN_TYPE:
-            modelWriter.newModel(sDef, modelsFilePrefix + "responsemodels", "models");
+            // Ignore aliases for now...
+            if (sDef.aliasOf == null || sDef.aliasOf != "") {
+                modelWriter.newModel(sDef, modelsFilePrefix + "responsemodels", "models");
+            }
             break;
         default:
             throw new RuntimeException("Unemplemented event for StructDef! " + event);
