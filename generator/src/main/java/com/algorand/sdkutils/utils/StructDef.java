@@ -6,9 +6,15 @@ import java.util.Set;
 public class StructDef {
 
     public String name;
+    public String aliasOf;
     public String doc;
     public Set<String> requiredProperties = new HashSet<>();
     public Set<String> mutuallyExclusiveProperties = new HashSet<>();
+
+    public StructDef(String name, String aliasOf) {
+        this.name = name;
+        this.aliasOf = aliasOf;
+    }
 
     public StructDef(String name, String doc, Set<String> requiredProperties, Set<String> mutuallyExclusiveProperties) {
         this.name = name;

@@ -85,10 +85,12 @@ public class ResponseGenerator implements Subscriber {
         List<ObjectNode> nodes = getObject(def, properties);
 
         try (Stream<Path> existing = Files.list(args.outputDirectory.toPath())){
+            List<Path> existingFiles = existing.collect(Collectors.toList());
+
             String prefix = args.prefix + "_" + def.name + "_";
 
             // See how many files are already there to initialize the count.
-            long num = existing
+            long num = existingFiles.stream()
                     .filter(p -> p.getFileName().toString().startsWith(prefix))
                     .count();
 
@@ -183,12 +185,6 @@ public class ResponseGenerator implements Subscriber {
      * representations of the data.
      */
     private List<JsonNode> getData(StructDef parent, TypeDef prop) {
-        // Hook into an interesting spot...
-        /*
-        if (!parent.mutuallyExclusiveProperties.isEmpty()) {
-            System.out.println("here");
-        }
-         */
         if (prop.enumValues != null) {
             int idx = random.nextInt(prop.enumValues.size());
             return ImmutableList.of(new TextNode(prop.enumValues.get(idx)));
@@ -251,6 +247,22 @@ public class ResponseGenerator implements Subscriber {
      */
     @Override
     public void terminate() {
+        // Flatten aliases
+        findEntry(args.filter, false)
+                .forEach(entry -> {
+                    String aliasOf = entry.getKey().aliasOf;
+
+                    if (StringUtils.isNotEmpty(aliasOf)) {
+                        // Lookup the real object to generate the response file.
+                        List<Map.Entry<StructDef, List<TypeDef>>> entries = findEntry(aliasOf, true);
+                        if (entries.size() != 1) {
+                            System.out.println("Failed to find single alias for '" + aliasOf + "'.");
+                            return;
+                        }
+                        entry.setValue(entries.get(0).getValue());
+                    }
+                });
+
         findEntry(args.filter, false)
                 .forEach(entry -> {
                     try {
