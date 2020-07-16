@@ -124,9 +124,6 @@ public class JavaGenerator implements Subscriber {
 
     @Override
     public void onEvent(Events event, StructDef sDef) {
-        if (sDef.aliasOf != null && sDef.aliasOf != "") {
-            System.out.println("ALIAS!");
-        }
         switch(event) {
         case NEW_MODEL:
             javaModelWriter.newModel(sDef, this.modelPackage);
