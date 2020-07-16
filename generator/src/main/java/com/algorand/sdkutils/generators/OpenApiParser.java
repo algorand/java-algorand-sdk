@@ -455,7 +455,9 @@ public class OpenApiParser {
                         rSchema = rtype.getValue().get("schema");
                     }
                     if (rSchema.get("$ref") != null ) {
-                        // It refers to a defined class
+                        // It refers to a defined class, create an alias
+                        String realType = getTypeNameFromRef(rSchema.get("$ref").asText());
+                        publisher.publish(Events.NEW_RETURN_TYPE, new StructDef(rtype.getKey(), realType));
                         continue;
                     }
                     String className = Tools.getCamelCase(rtype.getKey(), true);

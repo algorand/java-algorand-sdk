@@ -259,11 +259,8 @@ public class ResponseGenerator implements Subscriber {
                     String aliasOf = entry.getKey().aliasOf;
 
                     if (StringUtils.isNotEmpty(aliasOf)) {
-                        // parse out the model name.
-                        // For example "Applications" out of "#/definitions/Applications"
-                        String alias = StringUtils.substringAfterLast(aliasOf, "/");
-                        // Lookup the alias
-                        List<Map.Entry<StructDef, List<TypeDef>>> entries = findEntry(alias, true);
+                        // Lookup the real object to generate the response file.
+                        List<Map.Entry<StructDef, List<TypeDef>>> entries = findEntry(aliasOf, true);
                         if (entries.size() != 1) {
                             System.out.println("Failed to find single alias for '" + aliasOf + "'.");
                             return;
