@@ -51,7 +51,7 @@ public class Account extends PathResponse {
      * Note the raw object uses `map[int] -> AppLocalState` for this type.
      */
     @JsonProperty("apps-local-state")
-    public List<ApplicationLocalStates> appsLocalState = new ArrayList<ApplicationLocalStates>();
+    public List<ApplicationLocalState> appsLocalState = new ArrayList<ApplicationLocalState>();
 
     /**
      * (tsch) stores the sum of all of the local schemas and global schemas in this
