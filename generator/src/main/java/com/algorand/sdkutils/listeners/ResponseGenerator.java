@@ -185,12 +185,6 @@ public class ResponseGenerator implements Subscriber {
      * representations of the data.
      */
     private List<JsonNode> getData(StructDef parent, TypeDef prop) {
-        // Hook into an interesting spot...
-        /*
-        if (!parent.mutuallyExclusiveProperties.isEmpty()) {
-            System.out.println("here");
-        }
-         */
         if (prop.enumValues != null) {
             int idx = random.nextInt(prop.enumValues.size());
             return ImmutableList.of(new TextNode(prop.enumValues.get(idx)));
@@ -318,7 +312,6 @@ public class ResponseGenerator implements Subscriber {
         if (event == Publisher.Events.NEW_MODEL) {
             models.put(sDef, activeList);
         } else if (event == Publisher.Events.NEW_RETURN_TYPE){
-            System.out.println(sDef.name);
             responses.put(sDef, activeList);
         } else {
             System.out.println("unhandled event: " + event);
