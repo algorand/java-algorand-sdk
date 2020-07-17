@@ -13,6 +13,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ApplicationLocalState extends PathResponse {
 
     /**
+     * The application which this local state is for.
+     */
+    @JsonProperty("id")
+    public Long id;
+
+    /**
      * (tkv) storage.
      */
     @JsonProperty("key-value")
@@ -31,6 +37,7 @@ public class ApplicationLocalState extends PathResponse {
         if (o == null) return false;
 
         ApplicationLocalState other = (ApplicationLocalState) o;
+        if (!Objects.deepEquals(this.id, other.id)) return false;
         if (!Objects.deepEquals(this.keyValue, other.keyValue)) return false;
         if (!Objects.deepEquals(this.schema, other.schema)) return false;
 

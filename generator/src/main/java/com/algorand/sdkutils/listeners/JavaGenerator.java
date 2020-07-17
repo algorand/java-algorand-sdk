@@ -129,7 +129,10 @@ public class JavaGenerator implements Subscriber {
             javaModelWriter.newModel(sDef, this.modelPackage);
             break;
         case NEW_RETURN_TYPE:
-            javaModelWriter.newModel(sDef, this.modelPackage);
+            // Ignore aliases for now...
+            if (sDef.aliasOf == null || sDef.aliasOf != "") {
+                javaModelWriter.newModel(sDef, this.modelPackage);
+            }
             break;
         default:
             throw new RuntimeException("Unemplemented event for StructDef! " + event);
