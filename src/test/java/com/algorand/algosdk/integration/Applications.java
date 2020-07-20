@@ -194,9 +194,6 @@ public class Applications {
 
         com.algorand.algosdk.v2.client.model.Account acct = acctResponse.body();
 
-        if(!acct.appsTotalSchema.numByteSlice.equals(numByteSlices)) {
-            System.out.println("wut");
-        }
         assertThat(acct.appsTotalSchema.numByteSlice).isEqualTo(numByteSlices);
         assertThat(acct.appsTotalSchema.numUint).isEqualTo(numUints);
 
