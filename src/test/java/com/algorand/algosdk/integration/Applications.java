@@ -8,18 +8,21 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
-import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
+import com.algorand.algosdk.v2.client.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.algorand.algosdk.cucumber.shared.TransactionSteps.loadTEALProgramFromFile;
 import static com.algorand.algosdk.util.ConversionUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class Applications {
     private final Clients clients;
@@ -125,13 +128,13 @@ public class Applications {
 
         // If an error was expected, make sure it is set correctly.
         if (StringUtils.isNotEmpty(error)) {
-            Assertions.assertThat(rPost.isSuccessful()).isFalse();
-            Assertions.assertThat(rPost.message()).containsIgnoringCase(error);
+            assertThat(rPost.isSuccessful()).isFalse();
+            assertThat(rPost.message()).containsIgnoringCase(error);
             return;
         }
 
         // Otherwise make sure the transaction was submitted successfully.
-        Assertions.assertThat(rPost.isSuccessful()).isTrue();
+        assertThat(rPost.isSuccessful()).isTrue();
 
         // And save the txId for later
         this.txId = rPost.body().txId;
@@ -176,5 +179,86 @@ public class Applications {
         } catch (Exception e) {
             Assertions.fail("Oops: " + e.getMessage(), e);
         }
+    }
+
+    @Then("The transient account should have the created app {string} and total schema byte-slices {long} and uints {long}, the application {string} state contains key {string} with value {string}")
+    public void checkAccountData(
+            String created,
+            Long numByteSlices,
+            Long numUints,
+            String stateLocation,
+            String hasKey,
+            String keyValue
+    ) throws Exception {
+        Response<com.algorand.algosdk.v2.client.model.Account> acctResponse = clients.v2Client.AccountInformation(transientAccount.getAddress()).execute();
+
+        com.algorand.algosdk.v2.client.model.Account acct = acctResponse.body();
+
+        if(!acct.appsTotalSchema.numByteSlice.equals(numByteSlices)) {
+            System.out.println("wut");
+        }
+        assertThat(acct.appsTotalSchema.numByteSlice).isEqualTo(numByteSlices);
+        assertThat(acct.appsTotalSchema.numUint).isEqualTo(numUints);
+
+        // If we don't expect the
+        if (Boolean.parseBoolean(created) == false) {
+            assertThat(acct.createdApps).extracting("id").doesNotContain(appId);
+            return;
+        }
+
+        // Top level assertions.
+        assertThat(acct.createdApps).extracting("id").contains(appId);
+
+        // If there is no key to check, we're done.
+        if (StringUtils.isEmpty(hasKey)) {
+            return;
+        }
+
+        // Verify the key-value is set
+        boolean found = false;
+
+        List<TealKeyValue> keyValues = null;
+
+        // Find global or local key-values
+        if (StringUtils.equalsIgnoreCase(stateLocation, "local")) {
+            List<ApplicationLocalState> matches = acct.appsLocalState.stream()
+                    .filter(app -> app.id.equals(appId))
+                    .collect(Collectors.toList());
+            if (matches.size() != 1) {
+                List<ApplicationLocalState> matches2 = acct.appsLocalState.stream()
+                        .filter(app -> app.id.equals(appId))
+                        .collect(Collectors.toList());
+                System.out.println("BREAK");
+            }
+            assertThat(matches).hasSize(1);
+            keyValues = matches.get(0).keyValue;
+        }
+        if (StringUtils.equalsIgnoreCase(stateLocation, "global")) {
+            List<ApplicationParams> matches = acct.createdApps.stream()
+                    .filter(app -> app.id.equals(appId))
+                    .map(app -> app.params)
+                    .collect(Collectors.toList());
+            if (matches.size() != 1) {
+                System.out.println("BREAK");
+            }
+            assertThat(matches).hasSize(1);
+            keyValues = matches.get(0).globalState;
+        }
+
+        // Check for expected key-value
+        assertThat(keyValues).hasSizeGreaterThan(0);
+        for (TealKeyValue kv : keyValues) {
+            if (StringUtils.equals(kv.key, hasKey)) {
+                if (kv.value.type.equals(1)) {
+                    assertThat(kv.value.bytes).isEqualTo(keyValue);
+                } else if (kv.value.type.equals(0)) {
+                    assertThat(kv.value.uint).isEqualTo(Long.parseLong(keyValue));
+                }
+                // Check that the values are equal.
+                found = true;
+            }
+        }
+
+        assertThat(found).as("Couldn't find key '%s'", hasKey).isTrue();
     }
 }
