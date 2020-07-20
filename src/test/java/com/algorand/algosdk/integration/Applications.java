@@ -221,12 +221,6 @@ public class Applications {
             List<ApplicationLocalState> matches = acct.appsLocalState.stream()
                     .filter(app -> app.id.equals(appId))
                     .collect(Collectors.toList());
-            if (matches.size() != 1) {
-                List<ApplicationLocalState> matches2 = acct.appsLocalState.stream()
-                        .filter(app -> app.id.equals(appId))
-                        .collect(Collectors.toList());
-                System.out.println("BREAK");
-            }
             assertThat(matches).hasSize(1);
             keyValues = matches.get(0).keyValue;
         }
@@ -235,9 +229,6 @@ public class Applications {
                     .filter(app -> app.id.equals(appId))
                     .map(app -> app.params)
                     .collect(Collectors.toList());
-            if (matches.size() != 1) {
-                System.out.println("BREAK");
-            }
             assertThat(matches).hasSize(1);
             keyValues = matches.get(0).globalState;
         }
