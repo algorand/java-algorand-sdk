@@ -194,10 +194,11 @@ public class Applications {
 
         com.algorand.algosdk.v2.client.model.Account acct = acctResponse.body();
 
+        // Check the total schema sizes
         assertThat(acct.appsTotalSchema.numByteSlice).isEqualTo(numByteSlices);
         assertThat(acct.appsTotalSchema.numUint).isEqualTo(numUints);
 
-        // If we don't expect the
+        // If we don't expect the app to exist, verify that it isn't there and exit.
         if (Boolean.parseBoolean(created) == false) {
             assertThat(acct.createdApps).extracting("id").doesNotContain(appId);
             return;
