@@ -575,6 +575,7 @@ public class GoGenerator implements Subscriber {
             break;
 
         case "binary":
+        case "byte":
             goType = "[]byte";
             if (asType) {
                 addImport("A", "encoding/base64");
