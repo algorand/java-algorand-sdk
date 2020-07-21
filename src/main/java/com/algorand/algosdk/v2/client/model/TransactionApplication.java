@@ -72,7 +72,14 @@ public class TransactionApplication extends PathResponse {
      * reject the transaction.
      */
     @JsonProperty("approval-program")
-    public String approvalProgram;
+    public void approvalProgram(String base64Encoded) {
+        this.approvalProgram = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("approval-program")
+    public String approvalProgram() {
+        return Encoder.encodeToBase64(this.approvalProgram);
+    }
+    public byte[] approvalProgram;
 
     /**
      * (apsu) Logic executed for application transactions with on-completion set to
@@ -81,7 +88,14 @@ public class TransactionApplication extends PathResponse {
      * transaction.
      */
     @JsonProperty("clear-state-program")
-    public String clearStateProgram;
+    public void clearStateProgram(String base64Encoded) {
+        this.clearStateProgram = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("clear-state-program")
+    public String clearStateProgram() {
+        return Encoder.encodeToBase64(this.clearStateProgram);
+    }
+    public byte[] clearStateProgram;
 
     /**
      * (apfa) Lists the applications in addition to the application-id whose global
