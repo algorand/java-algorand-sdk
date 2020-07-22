@@ -1,7 +1,9 @@
 package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.ResourceUtils;
 import com.algorand.algosdk.v2.client.common.*;
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.model.*;
@@ -11,6 +13,9 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+
+import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -31,6 +36,9 @@ public class Indexer {
     Response<AssetBalancesResponse> assetBalancesResponse;
     Response<TransactionsResponse> transactionsResponse;
     Response<AssetsResponse> assetsResponse;
+    Response<ApplicationsResponse> applicationsResponse;
+
+    Response response;
 
     @Given("indexer client {int} at {string} port {int} with token {string}")
     public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
@@ -453,5 +461,28 @@ public class Indexer {
         response.assets.forEach(a -> assertThat(a.index).isEqualTo(assetId));
     }
 
+
+    @When("I use {int} to search for applications with {long}, {long}, and token {string}")
+    public void i_use_to_search_for_applications_with_and_token(Integer indexer, Long limit, Long applicationId, String token) throws Exception {
+        SearchForApplications query = indexerClients.get(indexer).searchForApplications();
+
+        if (limit != 0)                    query.limit(limit);
+        if (applicationId != 0)            query.applicationId(applicationId);
+        if (StringUtils.isNotEmpty(token)) query.next(token);
+
+        response = query.execute();
+    }
+
+    @When("I use {int} to lookup application with {long}")
+    public void i_use_to_lookup_application_with(Integer indexer, Long applicationId) throws Exception {
+        response = indexerClients.get(indexer).lookupApplicationByID(applicationId).execute();
+    }
+
+    @Then("the parsed response should equal {string}.")
+    public void the_parsed_response_should_equal(String jsonFile) throws IOException {
+        File f = new File("src/test/resources/" + jsonFile);
+        assertThat(f).canRead();
+        TestingUtils.verifyResponse(response, f);
+    }
 
 }
