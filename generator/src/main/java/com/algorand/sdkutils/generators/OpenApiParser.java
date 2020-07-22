@@ -135,6 +135,7 @@ public class OpenApiParser {
             case "byte":
             case "base64":
             case "digest":
+            case "TEALProgram":
                 if (type.contentEquals("array")) {
                     type = prop.get("items").get("type").asText();
                     if (forModel == false) {
