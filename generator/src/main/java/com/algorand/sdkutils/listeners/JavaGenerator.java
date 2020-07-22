@@ -731,6 +731,7 @@ final class JavaModelWriter {
     // used for skipping models with no parameters.
     private boolean modelPropertyAdded;
 
+    private String packageName;
     private String className;
 
     // property name is the key
@@ -751,15 +752,25 @@ final class JavaModelWriter {
 
     public void close () {
 
+        if (!modelPropertyAdded) {
+            // No file should be generated
+            // There are some alias types in one spec file, which 
+            // are in contradiction with real types in the other spec file.
+            // We don't want the alias type file to corrupt the real type object.
+            return;
+        }
+        modelFileWriter = JavaGenerator.newFile(className, folder);
+        JavaGenerator.append(modelFileWriter, "package " + packageName + ";\n\n");
+
         writeProperties(currentModelBuffer);
         writeCompareMethod(className, currentModelBuffer, getSortedProperties());
 
         JavaGenerator.append(currentModelBuffer, "}\n");
 
         JavaGenerator.append(modelFileWriter, Tools.getImports(imports));
-        if (modelPropertyAdded) {
-            JavaGenerator.append(modelFileWriter, currentModelBuffer);
-        }
+
+        JavaGenerator.append(modelFileWriter, currentModelBuffer);
+
         modelPropertyAdded = false;
 
         if (modelFileWriter != null) {
@@ -782,27 +793,24 @@ final class JavaModelWriter {
             this.close();
             pendingOpenFile = false;
         }
+
         this.imports = new TreeMap<String, Set<String>>();
         this.properties = new TreeMap<String, TypeDef>();
 
-        if (modelFileWriter == null) {
+        className = Tools.getCamelCase(sDef.name, true);
+        this.packageName = packageName;
 
-            className = Tools.getCamelCase(sDef.name, true);
+        Tools.addImport(imports, "java.util.Objects"); // used by Objects.deepEquals
 
-            modelFileWriter = JavaGenerator.newFile(className, folder);
-            JavaGenerator.append(modelFileWriter, "package " + packageName + ";\n\n");
+        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
+        Tools.addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
 
-            Tools.addImport(imports, "java.util.Objects"); // used by Objects.deepEquals
-
-            Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.PathResponse");
-            Tools.addImport(imports, "com.fasterxml.jackson.annotation.JsonProperty");
-
-            currentModelBuffer = new StringBuilder();
-            if (sDef.doc != null) {
-                JavaGenerator.append(currentModelBuffer, Tools.formatComment(sDef.doc, "", true));
-            }
-            JavaGenerator.append(currentModelBuffer, "public class " + className + " extends PathResponse {\n\n");
+        currentModelBuffer = new StringBuilder();
+        if (sDef.doc != null) {
+            JavaGenerator.append(currentModelBuffer, Tools.formatComment(sDef.doc, "", true));
         }
+        JavaGenerator.append(currentModelBuffer, "public class " + className + " extends PathResponse {\n\n");
+
 
         pendingOpenFile = true;
         modelPropertyAdded = false;

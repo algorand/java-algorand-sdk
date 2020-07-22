@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -18,13 +19,27 @@ public class ApplicationParams extends PathResponse {
      * (approv) approval program.
      */
     @JsonProperty("approval-program")
-    public String approvalProgram;
+    public void approvalProgram(String base64Encoded) {
+        this.approvalProgram = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("approval-program")
+    public String approvalProgram() {
+        return Encoder.encodeToBase64(this.approvalProgram);
+    }
+    public byte[] approvalProgram;
 
     /**
      * (clearp) approval program.
      */
     @JsonProperty("clear-state-program")
-    public String clearStateProgram;
+    public void clearStateProgram(String base64Encoded) {
+        this.clearStateProgram = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("clear-state-program")
+    public String clearStateProgram() {
+        return Encoder.encodeToBase64(this.clearStateProgram);
+    }
+    public byte[] clearStateProgram;
 
     /**
      * The address that created this application. This is the address where the
