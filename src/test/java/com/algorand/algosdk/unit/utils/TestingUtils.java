@@ -61,15 +61,14 @@ public class TestingUtils {
         if (!r.isSuccessful()) {
             assertThat(r.message()).isEqualTo(expected);
         } else {
-            switch (r.getContentType()) {
-                case "application/json":
-                    verifyJsonResponse(r, expected);
-                    break;
-                case "application/msgpack":
+            if (r.getContentType().contains("application/json")) {
+                verifyJsonResponse(r, expected);
+            }
+            else if (r.getContentType().contains("application/msgpack")) {
                     verifyMsgpResponse(r, expected);
-                    break;
-                default:
-                    Assertions.fail("Unknown content type, cannot verify: " + r.getContentType());
+            }
+            else {
+                Assertions.fail("Unknown content type, cannot verify: " + r.getContentType());
             }
         }
     }
@@ -189,23 +188,25 @@ public class TestingUtils {
             // Allow comparing binary/string together, depending on the encoding it may be required.
             case STRING:
             case BINARY:
-            {
-                // Check for multiple encodings, it's possible that in some cases a base64 value needs to be decoded
-                // and compared against a string. Or in other cases it needs to remain in the base64 encoded format.
-                Set<String> possibleExpectedValues = getPossibleStringsFromNode(expected);
-                Set<String> possibleActualValues = getPossibleStringsFromNode(actual);
+                {
+                    // Check for multiple encodings, it's possible that in some cases a base64 value needs to be decoded
+                    // and compared against a string. Or in other cases it needs to remain in the base64 encoded format.
+                    Set<String> possibleExpectedValues = getPossibleStringsFromNode(expected);
+                    Set<String> possibleActualValues = getPossibleStringsFromNode(actual);
 
-                long matches = possibleExpectedValues.stream().filter(v -> possibleActualValues.contains(v)).count();
+                    long matches = possibleExpectedValues.stream().filter(v -> possibleActualValues.contains(v)).count();
 
-                assertThat(matches)
-                        .as("There should be at least one match between expected values ['%s'] and actual values ['%s']",
-                                String.join("', '", possibleExpectedValues),
-                                String.join("', '", possibleActualValues))
-                        .isNotZero();
-            }
-            break;
-            case MISSING:
+                    assertThat(matches)
+                            .as("There should be at least one match between expected values ['%s'] and actual values ['%s']",
+                                    String.join("', '", possibleExpectedValues),
+                                    String.join("', '", possibleActualValues))
+                            .isNotZero();
+                }
+                break;
             case NULL:
+                // This is fine.
+                break;
+            case MISSING:
             case POJO:
                 Assertions.fail("Unhandled type: " + type);
                 break;
