@@ -170,24 +170,24 @@ public class Indexer {
     }
 
     @When("I use {int} to search for an account with {long}, {long}, {long}, {long} and token {string}")
-    public void searchForAnAccount(Integer indexer, Long assetId, Long limit, Long gt, Long lt, String token) throws Exception {
+    public void oldSearchForAccounts(Integer indexer, Long assetId, Long limit, Long gt, Long lt, String token) throws Exception {
+        searchForAccounts(indexer, assetId, limit, gt, lt, "", 0L, token);
+    }
+
+    @When("I use {int} to search for an account with {long}, {long}, {long}, {long}, {string}, {long} and token {string}")
+    public void searchForAccounts(Integer indexer, Long assetId, Long limit, Long gt, Long lt, String authAddr, Long applicationId, String token) throws Exception {
         SearchForAccounts query = indexerClients.get(indexer).searchForAccounts();
-        if (assetId != 0) {
-            query.assetId(assetId);
-        }
-        if (limit != 0) {
-            query.limit(limit);
-        }
-        if (gt != 0) {
-            query.currencyGreaterThan(gt);
-        }
-        if (lt != 0) {
-            query.currencyLessThan(lt);
-        }
-        if (StringUtils.isNotEmpty(token)) {
-            query.next(token);
-        }
+
+        if (assetId != 0)                     query.assetId(assetId);
+        if (limit != 0)                       query.limit(limit);
+        if (gt != 0)                          query.currencyGreaterThan(gt);
+        if (lt != 0)                          query.currencyLessThan(lt);
+        if (StringUtils.isNotEmpty(token))    query.next(token);
+        if (StringUtils.isNotEmpty(authAddr)) query.authAddr(new Address(authAddr));
+        if (applicationId != 0)               query.applicationId(applicationId);
+
         accountsResponse = query.execute();
+        response = accountsResponse;
     }
 
     @Then("There are {int}, the first has {long}, {long}, {long}, {long}, {string}, {long}, {string}, {string}")
@@ -226,71 +226,54 @@ public class Indexer {
     @Then("I get the next page using {int} to search for an account with {long}, {long}, {long} and {long}")
     public void i_get_the_next_page_using_to_search_for_an_account_with_and(Integer indexer, Long assetId, Long limit, Long gt, Long lt) throws Exception {
         AccountsResponse response = accountsResponse.body();
-        searchForAnAccount(indexer, assetId, limit, gt, lt, response.nextToken);
+        searchForAccounts(indexer, assetId, limit, gt, lt, "", 0L, response.nextToken);
     }
 
     @When("I use {int} to search for transactions with {long}, {string}, {string}, {string}, {string}, {long}, {long}, {long}, {long}, {string}, {string}, {long}, {long}, {string}, {string}, {string} and token {string}")
-    public void i_use_to_search_for_transactions_with_and_token(Integer indexer, Long limit, String notePrefix,
+    public void oldSearchForTransactions(Integer indexer, Long limit, String notePrefix,
                                                                 String txType, String sigType, String txId, Long round,
                                                                 Long minRound, Long maxRound, Long assetId,
                                                                 String beforeTime, String afterTime, Long currencyGT,
                                                                 Long currencyLT, String address, String addressRole,
-                                                                String excludeCloseTo, String token) throws Exception {
+                                                                String excludeCloseTo, String token
+    ) throws Exception {
+        searchForTransactions(indexer, limit, notePrefix, txType, sigType, txId, round, minRound, maxRound, assetId,
+                beforeTime, afterTime, currencyGT, currencyLT, address, addressRole, excludeCloseTo, 0L,
+                token);
+    }
+
+    @When("I use {int} to search for transactions with {long}, {string}, {string}, {string}, {string}, {long}, {long}, {long}, {long}, {string}, {string}, {long}, {long}, {string}, {string}, {string}, {long} and token {string}")
+    public void searchForTransactions(Integer indexer, Long limit, String notePrefix,
+                                                                String txType, String sigType, String txId, Long round,
+                                                                Long minRound, Long maxRound, Long assetId,
+                                                                String beforeTime, String afterTime, Long currencyGT,
+                                                                Long currencyLT, String address, String addressRole,
+                                                                String excludeCloseTo, Long applicaitonId, String token
+    ) throws Exception {
         SearchForTransactions query = indexerClients.get(indexer).searchForTransactions();
 
-        if (limit != 0) {
-            query.limit(limit);
-        }
-        if (StringUtils.isNotEmpty(notePrefix)) {
-            query.notePrefix(Encoder.decodeFromBase64(notePrefix));
-        }
-        if (StringUtils.isNotEmpty(txType)) {
-            query.txType(searchEnum(Enums.TxType.class, txType));
-        }
-        if (StringUtils.isNotEmpty(sigType)) {
-            query.sigType(searchEnum(Enums.SigType.class, sigType));
-        }
-        if (StringUtils.isNotEmpty(txId)) {
-            query.txid(txId);
-        }
-        if (round != 0) {
-            query.round(round);
-        }
-        if (minRound != 0) {
-            query.minRound(minRound);
-        }
-        if (maxRound != 0) {
-            query.maxRound(maxRound);
-        }
-        if (assetId != 0) {
-            query.assetId(assetId);
-        }
-        if (StringUtils.isNotEmpty(beforeTime)) {
-            query.beforeTime(Utils.parseDate(beforeTime));
-        }
-        if (StringUtils.isNotEmpty(afterTime)) {
-            query.afterTime(Utils.parseDate(afterTime));
-        }
-        if (currencyGT != 0) {
-            query.currencyGreaterThan(currencyGT);
-        }
-        if (currencyLT != 0) {
-            query.currencyLessThan(currencyLT);
-        }
-        if (StringUtils.isNotEmpty(address)) {
-            query.address(new Address(address));
-        }
-        if (StringUtils.isNotEmpty(addressRole)) {
-            query.addressRole(Enums.AddressRole.valueOf(addressRole.toUpperCase()));
-        }
-        if (StringUtils.isNotEmpty(excludeCloseTo)) {
-            query.excludeCloseTo(Boolean.parseBoolean(excludeCloseTo));
-        }
-        if (StringUtils.isNotEmpty(token)) {
-            query.next(token);
-        }
+        if (limit != 0)                             query.limit(limit);
+        if (StringUtils.isNotEmpty(notePrefix))     query.notePrefix(Encoder.decodeFromBase64(notePrefix));
+        if (StringUtils.isNotEmpty(txType))         query.txType(searchEnum(Enums.TxType.class, txType));
+        if (StringUtils.isNotEmpty(sigType))        query.sigType(searchEnum(Enums.SigType.class, sigType));
+        if (StringUtils.isNotEmpty(txId))           query.txid(txId);
+        if (round != 0)                             query.round(round);
+        if (minRound != 0)                          query.minRound(minRound);
+        if (maxRound != 0)                          query.maxRound(maxRound);
+        if (assetId != 0)                           query.assetId(assetId);
+        if (StringUtils.isNotEmpty(beforeTime))     query.beforeTime(Utils.parseDate(beforeTime));
+        if (StringUtils.isNotEmpty(afterTime))      query.afterTime(Utils.parseDate(afterTime));
+        if (currencyGT != 0)                        query.currencyGreaterThan(currencyGT);
+        if (currencyLT != 0)                        query.currencyLessThan(currencyLT);
+        if (StringUtils.isNotEmpty(address))        query.address(new Address(address));
+        if (StringUtils.isNotEmpty(addressRole))    query.addressRole(Enums.AddressRole.valueOf(addressRole.toUpperCase()));
+        if (StringUtils.isNotEmpty(excludeCloseTo)) query.excludeCloseTo(Boolean.parseBoolean(excludeCloseTo));
+        if (StringUtils.isNotEmpty(token))          query.next(token);
+        if (applicaitonId != 0)                     query.applicationId(applicaitonId);
 
+        // This step is followed by multiple 'then' steps, so save the state in two places.
         transactionsResponse = query.execute();
+        response = transactionsResponse;
     }
 
     @Then("there are {int} transactions in the response, the first is {string}.")
@@ -424,9 +407,9 @@ public class Indexer {
         String next = transactionsResponse.body().nextToken;
 
         // Reuse the all-args wrapper, injecting the next token
-        i_use_to_search_for_transactions_with_and_token(indexer, limit, "", "", "", "",
+        searchForTransactions(indexer, limit, "", "", "", "",
                 0L, 0L, maxRound, 0L, "", "", 0L, 0L,
-                "", "", "", next);
+                "", "", "", 0L, next);
     }
 
     @When("I use {int} to search for assets with {long}, {long}, {string}, {string}, {string}, and token {string}")
@@ -482,6 +465,7 @@ public class Indexer {
     public void the_parsed_response_should_equal(String jsonFile) throws IOException {
         File f = new File("src/test/resources/" + jsonFile);
         assertThat(f).canRead();
+        String json = response.toString();
         TestingUtils.verifyResponse(response, f);
     }
 

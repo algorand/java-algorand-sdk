@@ -91,7 +91,8 @@ public class Enums {
         @JsonProperty("keyreg") KEYREG("keyreg"),
         @JsonProperty("acfg") ACFG("acfg"),
         @JsonProperty("axfer") AXFER("axfer"),
-        @JsonProperty("afrz") AFRZ("afrz");
+        @JsonProperty("afrz") AFRZ("afrz"),
+        @JsonProperty("appl") APPL("appl");
 
         final String serializedName;
         TxType(String name) {

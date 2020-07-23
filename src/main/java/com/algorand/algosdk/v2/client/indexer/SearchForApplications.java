@@ -26,11 +26,17 @@ public class SearchForApplications extends Query {
         return this;
     }
 
+    /**
+     * Maximum number of results to return.
+     */
     public SearchForApplications limit(Long limit) {
         addQuery("limit", String.valueOf(limit));
         return this;
     }
 
+    /**
+     * The next page of results. Use the next token provided by the previous results.
+     */
     public SearchForApplications next(String next) {
         addQuery("next", String.valueOf(next));
         return this;

@@ -80,15 +80,15 @@ public class Client {
         if (token != null) {
             reqBuilder.addHeader(tokenKey, token);
         }
-        RequestBody rb = RequestBody.create(
-                MediaType.parse("Binary data"),
-                qData.bodySegments.isEmpty() ? new byte[0] : qData.bodySegments.get(0));
 
         switch (httpMethod.method()) {
         case HttpMethod.GET:
             reqBuilder.get();
             break;
         case HttpMethod.POST:
+            RequestBody rb = RequestBody.create(
+                    MediaType.parse("Binary data"),
+                    qData.bodySegments.isEmpty() ? new byte[0] : qData.bodySegments.get(0));
             reqBuilder.post(rb);
             break;
         }
