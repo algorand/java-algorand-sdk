@@ -68,10 +68,6 @@ public class EvalDelta {
 
         assertThat(tx).as("Indexer was unable to return txid %s.", applications.txId).isNotNull();
 
-
-        //I JUST REBUILD THE TEST ENVIRONMENT USING MY INDEXER BRANCH IN HOPES THAT THE DELTA VALUES ARE NOW THERE
-
-
         // Grab local or global key/value deltas.
         // Algod
         List<EvalDeltaKeyValue> keyValuesAlgod = null;
