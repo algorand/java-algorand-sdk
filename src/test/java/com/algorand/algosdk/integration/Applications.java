@@ -3,6 +3,7 @@ package com.algorand.algosdk.integration;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.cucumber.shared.Utils;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -27,13 +28,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class Applications {
     private final Clients clients;
     private final Stepdefs base;
+    private final TransientAccount transientAccount;
 
-    private Transaction transaction;
-    private Account transientAccount = null;
-    private String txId = null;
-    private Long appId = 0L;
+    public Transaction transaction;
+    public String txId = null;
+    public Long appId = 0L;
 
-    public Applications(Clients clients, Stepdefs base) {
+    public Applications(TransientAccount transientAccount, Clients clients, Stepdefs base) {
+        this.transientAccount = transientAccount;
         this.clients = clients;
         this.base = base;
     }
@@ -87,7 +89,7 @@ public class Applications {
         }
 
         // Send with transient account, suggested params and current application
-        builder.sender(this.transientAccount.getAddress());
+        builder.sender(this.transientAccount.transientAccount.getAddress());
         builder.lookupParams(this.clients.v2Client);
         if (this.appId != 0) {
             builder.applicationId(appId);
@@ -96,32 +98,9 @@ public class Applications {
         this.transaction = builder.build();
     }
 
-    @Given("I create a new transient account and fund it with {long} microalgos.")
-    public void createAndFundTransientAccount(Long amount) throws Exception {
-        // Create a new account.
-        this.transientAccount = new Account();
-
-        // Fund it with one of the base wallets.
-        Address sender = base.getAddress(1);
-
-        Transaction tx = Transaction.PaymentTransactionBuilder()
-                .sender(sender)
-                .receiver(this.transientAccount.getAddress())
-                .amount(amount)
-                .lookupParams(clients.v2Client)
-                .build();
-        SignedTransaction stx = base.signWithAddress(tx, sender);
-
-        Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
-
-        // Save the txid and hook into another step to help us out.
-        this.txId = rPost.body().txId;
-        waitForTransactionToBeConfirmed();
-    }
-
     @Given("I sign and submit the transaction, saving the txid. If there is an error it is {string}.")
     public void sendTransactionWithTransientAccountAndCheckForError(String error) throws Exception {
-        SignedTransaction stx = this.transientAccount.signTransaction(this.transaction);
+        SignedTransaction stx = this.transientAccount.transientAccount.signTransaction(this.transaction);
 
         // Submit
         Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
@@ -142,18 +121,7 @@ public class Applications {
 
     @Given("I wait for the transaction to be confirmed.")
     public void waitForTransactionToBeConfirmed() throws Exception {
-        Duration timeout = Duration.ofSeconds(10);
-        Long start = System.currentTimeMillis();
-        Response<PendingTransactionResponse> r;
-        // Keep checking until the timeout.
-        do {
-            r = clients.v2Client.PendingTransactionInformation(txId).execute();
-            // If the transaction has been confirmed, exit.
-            if (r.body().confirmedRound != null) {
-                return;
-            }
-            Thread.sleep(250);
-        } while ( (System.currentTimeMillis() - start) < timeout.toMillis());
+        Utils.waitForConfirmation(clients.v2Client, txId);
     }
 
     // TODO: Use V2 Pending Transaction endpoint when it is available.
@@ -190,7 +158,7 @@ public class Applications {
             String hasKey,
             String keyValue
     ) throws Exception {
-        Response<com.algorand.algosdk.v2.client.model.Account> acctResponse = clients.v2Client.AccountInformation(transientAccount.getAddress()).execute();
+        Response<com.algorand.algosdk.v2.client.model.Account> acctResponse = clients.v2Client.AccountInformation(transientAccount.transientAccount.getAddress()).execute();
 
         com.algorand.algosdk.v2.client.model.Account acct = acctResponse.body();
 
