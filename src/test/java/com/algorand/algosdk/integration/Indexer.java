@@ -26,8 +26,6 @@ import static com.algorand.algosdk.unit.utils.TestingUtils.searchEnum;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Indexer {
-    Map<Integer, IndexerClient> indexerClients = new HashMap<>();
-
     Response<HealthCheck> healthResponse;
     Response<Block> blockResponse;
     Response<AccountResponse> accountResponse;
@@ -40,14 +38,15 @@ public class Indexer {
 
     Response response;
 
-    @Given("indexer client {int} at {string} port {int} with token {string}")
-    public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
-        indexerClients.put(index, new IndexerClient(uri, port, ""));
+    private final Clients clients;
+
+    public Indexer(Clients clients) {
+        this.clients = clients;
     }
 
     @When("I use {int} to check the services health")
     public void i_use_to_check_the_services_health(Integer index) throws Exception {
-        healthResponse = indexerClients.get(index).makeHealthCheck().execute();
+        healthResponse = clients.indexerClients.get(index).makeHealthCheck().execute();
     }
 
     @Then("I receive status code {int}")
@@ -57,7 +56,7 @@ public class Indexer {
 
     @When("I use {int} to lookup block {long}")
     public void i_request_block_with_indexer(Integer indexer, Long block) throws Exception {
-        blockResponse = indexerClients.get(indexer).lookupBlock(block).execute();
+        blockResponse = clients.indexerClients.get(indexer).lookupBlock(block).execute();
     }
 
     @Then("The block was confirmed at {long}, contains {int} transactions, has the previous block hash {string}")
@@ -71,7 +70,7 @@ public class Indexer {
 
     @When("I use {int} to lookup account {string} at round {long}")
     public void i_lookup_account_with(Integer indexer, String account, Long round) throws Exception {
-        LookupAccountByID query = indexerClients.get(indexer).lookupAccountByID(new Address(account));
+        LookupAccountByID query = clients.indexerClients.get(indexer).lookupAccountByID(new Address(account));
         if (round != 0) {
             query.round(round);
         }
@@ -116,7 +115,7 @@ public class Indexer {
 
     @When("I use {int} to lookup asset {long}")
     public void i_lookup_asset_with(Integer indexer, Long assetId) throws Exception {
-        assetResponse = indexerClients.get(indexer).lookupAssetByID(assetId).execute();
+        assetResponse = clients.indexerClients.get(indexer).lookupAssetByID(assetId).execute();
     }
 
     @Then("The asset found has: {string}, {string}, {string}, {long}, {string}, {biginteger}, {string}")
@@ -135,7 +134,7 @@ public class Indexer {
 
     @When("I use {int} to lookup asset balances for {long} with {long}, {long}, {long} and token {string}")
     public void i_lookup_asset_balances_for_with_with(Integer indexer, Long assetId, Long currencyGT, Long currencyLT, Long limit, String next) throws Exception {
-        LookupAssetBalances query = indexerClients.get(indexer).lookupAssetBalances(assetId);
+        LookupAssetBalances query = clients.indexerClients.get(indexer).lookupAssetBalances(assetId);
         if (currencyGT != 0) {
             query.currencyGreaterThan(currencyGT);
         }
@@ -176,7 +175,7 @@ public class Indexer {
 
     @When("I use {int} to search for an account with {long}, {long}, {long}, {long}, {string}, {long} and token {string}")
     public void searchForAccounts(Integer indexer, Long assetId, Long limit, Long gt, Long lt, String authAddr, Long applicationId, String token) throws Exception {
-        SearchForAccounts query = indexerClients.get(indexer).searchForAccounts();
+        SearchForAccounts query = clients.indexerClients.get(indexer).searchForAccounts();
 
         if (assetId != 0)                     query.assetId(assetId);
         if (limit != 0)                       query.limit(limit);
@@ -250,7 +249,7 @@ public class Indexer {
                                                                 Long currencyLT, String address, String addressRole,
                                                                 String excludeCloseTo, Long applicaitonId, String token
     ) throws Exception {
-        SearchForTransactions query = indexerClients.get(indexer).searchForTransactions();
+        SearchForTransactions query = clients.indexerClients.get(indexer).searchForTransactions();
 
         if (limit != 0)                             query.limit(limit);
         if (StringUtils.isNotEmpty(notePrefix))     query.notePrefix(Encoder.decodeFromBase64(notePrefix));
@@ -392,13 +391,13 @@ public class Indexer {
 
     @When("I use {int} to search for all {string} transactions")
     public void i_use_to_search_for_all_transactions(Integer indexer, String account) throws Exception {
-        LookupAccountTransactions query = indexerClients.get(indexer).lookupAccountTransactions(new Address(account));
+        LookupAccountTransactions query = clients.indexerClients.get(indexer).lookupAccountTransactions(new Address(account));
         transactionsResponse = query.execute();
     }
 
     @When("I use {int} to search for all {long} asset transactions")
     public void i_use_to_search_for_all_asset_transactions(Integer indexer, Long assetId) throws Exception {
-        LookupAssetTransactions query = indexerClients.get(indexer).lookupAssetTransactions(assetId);
+        LookupAssetTransactions query = clients.indexerClients.get(indexer).lookupAssetTransactions(assetId);
         transactionsResponse = query.execute();
     }
 
@@ -414,7 +413,7 @@ public class Indexer {
 
     @When("I use {int} to search for assets with {long}, {long}, {string}, {string}, {string}, and token {string}")
     public void i_use_to_search_for_assets_with_and_token(Integer indexer, Long limit, Long assetId, String creator, String name, String unit, String token) throws Exception {
-        SearchForAssets query = indexerClients.get(indexer).searchForAssets();
+        SearchForAssets query = clients.indexerClients.get(indexer).searchForAssets();
 
         if (limit != 0) {
             query.limit(limit);
@@ -447,7 +446,7 @@ public class Indexer {
 
     @When("I use {int} to search for applications with {long}, {long}, and token {string}")
     public void i_use_to_search_for_applications_with_and_token(Integer indexer, Long limit, Long applicationId, String token) throws Exception {
-        SearchForApplications query = indexerClients.get(indexer).searchForApplications();
+        SearchForApplications query = clients.indexerClients.get(indexer).searchForApplications();
 
         if (limit != 0)                    query.limit(limit);
         if (applicationId != 0)            query.applicationId(applicationId);
@@ -458,7 +457,7 @@ public class Indexer {
 
     @When("I use {int} to lookup application with {long}")
     public void i_use_to_lookup_application_with(Integer indexer, Long applicationId) throws Exception {
-        response = indexerClients.get(indexer).lookupApplicationByID(applicationId).execute();
+        response = clients.indexerClients.get(indexer).lookupApplicationByID(applicationId).execute();
     }
 
     @Then("the parsed response should equal {string}.")

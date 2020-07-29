@@ -21,6 +21,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class PendingTransactionResponse extends PathResponse {
 
     /**
+     * The application index if the transaction was found and it created an
+     * application.
+     */
+    @JsonProperty("application-index")
+    public Long applicationIndex;
+
+    /**
      * The asset index if the transaction was found and it created an asset.
      */
     @JsonProperty("asset-index")
@@ -92,6 +99,7 @@ public class PendingTransactionResponse extends PathResponse {
         if (o == null) return false;
 
         PendingTransactionResponse other = (PendingTransactionResponse) o;
+        if (!Objects.deepEquals(this.applicationIndex, other.applicationIndex)) return false;
         if (!Objects.deepEquals(this.assetIndex, other.assetIndex)) return false;
         if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;

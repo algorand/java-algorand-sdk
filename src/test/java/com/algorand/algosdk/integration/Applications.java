@@ -1,8 +1,6 @@
 package com.algorand.algosdk.integration;
 
-import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
-import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.cucumber.shared.Utils;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -16,7 +14,6 @@ import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +49,14 @@ public class Applications {
                         .clearStateProgram(loadTEALProgramFromFile(clearProgramFile))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
                         .localStateSchema(new StateSchema(localInts, localBytes));
+                break;
+            case "create_optin":
+                builder = Transaction.ApplicationCreateTransactionBuilder()
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile))
+                        .globalStateSchema(new StateSchema(globalInts, globalBytes))
+                        .localStateSchema(new StateSchema(localInts, localBytes))
+                        .optIn(true);
                 break;
             case "update":
                 builder = Transaction.ApplicationUpdateTransactionBuilder()
@@ -127,26 +132,9 @@ public class Applications {
     // TODO: Use V2 Pending Transaction endpoint when it is available.
     //       The initial implementation hacks into the v1 endpoint to manually extract the new data.
     @Given("I remember the new application ID.")
-    public void rememberTheNewApplicatoinId() {
-        try {
-            com.squareup.okhttp.Call call = base.acl.pendingTransactionInformationCall(txId, null, null);
-            com.squareup.okhttp.Response r2 = call.execute();
-            String raw = r2.body().string();
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> responseMap = mapper.readValue(raw, Map.class);
-            if (responseMap.containsKey("txresults")) {
-                Object next = responseMap.get("txresults");
-                if (next instanceof Map) {
-                    if (((Map) next).containsKey("createdapp")) {
-                        Object appId = ((Map) next).get("createdapp");
-                        this.appId = Long.valueOf(String.valueOf(appId));
-                        return;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Assertions.fail("Oops: " + e.getMessage(), e);
-        }
+    public void rememberTheNewApplicatoinId() throws Exception {
+        PendingTransactionResponse r = clients.v2Client.PendingTransactionInformation(txId).execute().body();
+        this.appId = r.applicationIndex;
     }
 
     @Then("The transient account should have the created app {string} and total schema byte-slices {long} and uints {long}, the application {string} state contains key {string} with value {string}")
