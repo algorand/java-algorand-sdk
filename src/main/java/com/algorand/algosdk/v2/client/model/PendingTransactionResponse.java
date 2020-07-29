@@ -1,5 +1,7 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -43,6 +45,20 @@ public class PendingTransactionResponse extends PathResponse {
     public Long confirmedRound;
 
     /**
+     * (gd) Global state key/value changes for the application being executed by this
+     * transaction.
+     */
+    @JsonProperty("global-state-delta")
+    public List<EvalDeltaKeyValue> globalStateDelta = new ArrayList<EvalDeltaKeyValue>();
+
+    /**
+     * (ld) Local state key/value changes for the application being executed by this
+     * transaction.
+     */
+    @JsonProperty("local-state-delta")
+    public List<AccountStateDelta> localStateDelta = new ArrayList<AccountStateDelta>();
+
+    /**
      * Indicates that the transaction was kicked out of this node's transaction pool
      * (and specifies why that happened). An empty string indicates the transaction
      * wasn't kicked out of this node's txpool due to an error.
@@ -80,6 +96,8 @@ public class PendingTransactionResponse extends PathResponse {
         if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;
         if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
+        if (!Objects.deepEquals(this.globalStateDelta, other.globalStateDelta)) return false;
+        if (!Objects.deepEquals(this.localStateDelta, other.localStateDelta)) return false;
         if (!Objects.deepEquals(this.poolError, other.poolError)) return false;
         if (!Objects.deepEquals(this.receiverRewards, other.receiverRewards)) return false;
         if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;
