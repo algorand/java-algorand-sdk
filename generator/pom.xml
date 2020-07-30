@@ -39,12 +39,35 @@
         <maven.surefire.version>3.0.0-M4</maven.surefire.version>
 
         <!-- Test sources at 1.8 to allow using JUnit5 -->
-        <java.version>1.8</java.version>
+        <java.version>1.9</java.version>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <!-- Keep log4j versions synchronized -->
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-bom</artifactId>
+                <version>2.13.3</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+
         <!-- CLI -->
         <dependency>
             <groupId>com.beust</groupId>
@@ -217,11 +240,15 @@
           </plugin>
           <plugin>
               <artifactId>maven-assembly-plugin</artifactId>
+              <version>3.3.0</version>
               <configuration>
                   <archive>
                       <manifest>
                           <mainClass>com.algorand.sdkutils.Main</mainClass>
                       </manifest>
+                      <manifestEntries>
+                          <Multi-Release>true</Multi-Release>
+                      </manifestEntries>
                   </archive>
                   <descriptorRefs>
                       <descriptorRef>jar-with-dependencies</descriptorRef>

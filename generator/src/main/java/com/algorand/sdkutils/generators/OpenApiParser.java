@@ -20,8 +20,12 @@ import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class OpenApiParser {
+    protected static final Logger logger = LogManager.getLogger();
+
     public static final String TAB = "    ";
 
     protected JsonNode root;
@@ -39,15 +43,15 @@ public class OpenApiParser {
     public void parse() throws Exception {
         // TODO: Verify compatible OpenAPI version.
 
-        System.out.println("Parsing definitions.");
+        logger.info("Parsing definitions.");
         this.generateAlgodIndexerObjects(root);
 
         // Generate classes from the return types which have more than one return element
-        System.out.println("Parsing responses.");
+        logger.info("Parsing responses.");
         this.generateReturnTypes(root);
 
         // Generate the algod methods
-        System.out.println("Parsing paths.");
+        logger.info("Parsing paths.");
         this.generateQueryMethods();
 
         publisher.terminate();
@@ -257,7 +261,7 @@ public class OpenApiParser {
             JsonNode propertiesNode,
             String desc,
             Events event) throws IOException {
-        System.out.println("Generating ... " + className);
+        logger.info("Generating ... %s", className);
 
         // Collect any required fields for this definition.
         Set<String> requiredProperties = new HashSet<>();
@@ -402,7 +406,7 @@ public class OpenApiParser {
         } else if (spec.has("summary")) {
             desc = spec.get("summary").asText();
         }
-        System.out.println("Generating ... " + className);
+        logger.info("Generating ... %s", className);
         Iterator<Entry<String, JsonNode>> properties = null;
         if ( paramNode != null) {
             properties = getSortedParameters(paramNode);

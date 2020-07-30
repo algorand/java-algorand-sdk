@@ -2,6 +2,8 @@ package com.algorand.sdkutils;
 
 import com.algorand.sdkutils.listeners.ResponseGenerator;
 import com.beust.jcommander.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.File;
 
@@ -31,6 +33,10 @@ public class Main {
             return;
         }
 
+        if (common.verbose) {
+            Configurator.setRootLevel(Level.DEBUG);
+        }
+
         // Route to command handler.
         String commandName = root.getParsedCommand();
         JCommander command = root.getCommands().get(commandName);
@@ -52,6 +58,9 @@ public class Main {
     public static class CommonArgs {
         @Parameter(names = {"-h", "--help"}, help = true)
         public boolean help = false;
+
+        @Parameter(names = {"-v", "--verbose"}, description = "Print additional logging output to console.")
+        public boolean verbose;
 
         @Parameter(names = {"-s", "--specfile"}, description = "Path to specfile used by generator.")
         public File specfile;

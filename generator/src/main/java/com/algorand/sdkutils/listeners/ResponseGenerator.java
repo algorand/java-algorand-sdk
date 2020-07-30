@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,6 +27,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ResponseGenerator implements Subscriber {
+    protected static final Logger logger = LogManager.getLogger();
+
     public static void main(ResponseGeneratorArgs args, JCommander command) throws Exception {
         // kaizen parser test
         //OpenApi3 model = new OpenApi3Parser().parse(args.specfile, true);
@@ -46,18 +50,30 @@ public class ResponseGenerator implements Subscriber {
         @com.beust.jcommander.Parameter(names = {"-f", "--filter"}, description = "Only generate response files for objects which contain the given value as a substring.")
         public String filter;
 
-        @com.beust.jcommander.Parameter(required = true, names = {"-o", "--output-dir"}, description = "Location to place response objects.")
+        @com.beust.jcommander.Parameter(names = {"-l", "--list"}, description = "List types which could be generated instead of generating them.")
+        boolean list;
+
+        @com.beust.jcommander.Parameter(names = {"-o", "--output-dir"}, description = "Location to place response objects.")
         File outputDirectory;
 
-        @com.beust.jcommander.Parameter(required = true, names = {"-p", "--prefix"}, description = "Prefix to resulting response files.")
+        @com.beust.jcommander.Parameter(names = {"-p", "--prefix"}, description = "Prefix to resulting response files.")
         String prefix;
 
         @Override
         public void validate(JCommander command) {
             super.validate(command);
 
-            if (!this.outputDirectory.isDirectory()) {
-                throw new RuntimeException("Output directory must be a valid directory: " + this.outputDirectory.getAbsolutePath());
+            // list mode validation
+            if (list) {
+                if(this.outputDirectory != null) {
+                    throw new RuntimeException("Illegal paremeter combination: do not combine '--list' with '--output-dir'.");
+                }
+            }
+            // generate mode validation
+            else {
+                if (!this.outputDirectory.isDirectory()) {
+                    throw new RuntimeException("Output directory must be a valid directory: " + this.outputDirectory.getAbsolutePath());
+                }
             }
         }
     }
@@ -100,7 +116,7 @@ public class ResponseGenerator implements Subscriber {
                 // TODO: support messagepack as well?
                 Path output = new File(args.outputDirectory, prefix + (num++) + ".json").toPath();
 
-                System.out.println("Exporting example of " + def.name + " to: " + output.getFileName());
+                logger.info("Exporting example of %s to: %s", def.name, output.getFileName());
                 Files.write(output, json.getBytes());
             }
         } catch (JsonProcessingException e) {
@@ -200,7 +216,7 @@ public class ResponseGenerator implements Subscriber {
         if (prop.rawTypeName.equals("boolean")) {
             return ImmutableList.of(BooleanNode.valueOf(random.nextBoolean()));
         }
-        if (prop.rawTypeName.equals("binary")) {
+        if (prop.rawTypeName.equals("binary") || prop.rawTypeName.equals("byte")) {
             // TODO: Binary data limits from spec.
             byte[] data = new byte[random.nextInt(500) + 1];
             random.nextBytes(data);
@@ -256,7 +272,7 @@ public class ResponseGenerator implements Subscriber {
                         // Lookup the real object to generate the response file.
                         List<Map.Entry<StructDef, List<TypeDef>>> entries = findEntry(aliasOf, true);
                         if (entries.size() != 1) {
-                            System.out.println("Failed to find single alias for '" + aliasOf + "'.");
+                            logger.error("Failed to find single alias for '%s'.", aliasOf);
                             return;
                         }
                         entry.setValue(entries.get(0).getValue());
@@ -265,11 +281,18 @@ public class ResponseGenerator implements Subscriber {
 
         findEntry(args.filter, false)
                 .forEach(entry -> {
-                    try {
-                        export(entry.getKey(), entry.getValue());
-                    } catch (Exception e) {
-                        System.out.println("Unable to generate: " + entry.getKey());
-                        e.printStackTrace();
+                    // list mode
+                    if(args.list) {
+                        System.out.println("* " + entry.getKey().name);
+                    }
+                    // generate mode
+                    else {
+                        try {
+                            export(entry.getKey(), entry.getValue());
+                        } catch (Exception e) {
+                            logger.error("Unable to generate: %s", entry.getKey());
+                            e.printStackTrace();
+                        }
                     }
                 });
     }
@@ -302,7 +325,7 @@ public class ResponseGenerator implements Subscriber {
         if (event == Publisher.Events.NEW_PROPERTY) {
             activeList.add(type);
         } else {
-            System.out.println("unhandled event: " + event);
+            logger.info("unhandled event: %s", event);
         }
     }
 
@@ -314,7 +337,7 @@ public class ResponseGenerator implements Subscriber {
         } else if (event == Publisher.Events.NEW_RETURN_TYPE){
             responses.put(sDef, activeList);
         } else {
-            System.out.println("unhandled event: " + event);
+            logger.info("unhandled event: %s", event);
         }
     }
 
@@ -323,7 +346,7 @@ public class ResponseGenerator implements Subscriber {
      */
     @Override
     public void onEvent(Publisher.Events event) {
-        //System.out.println("(event) - " + event);
+        logger.info("unhandled event: %s", event);
     }
 
     /**
@@ -331,20 +354,20 @@ public class ResponseGenerator implements Subscriber {
      */
     @Override
     public void onEvent(Publisher.Events event, String[] notes) {
-        //System.out.println("(event, []notes) - " + String.join(",", notes));
+        logger.info("Unhandled event (event, []notes) - %s", String.join(",", notes));
     }
 
     /*
     // This prints out the path and all of its parameters
     private static void describeModel(OpenApi3 model) {
-        System.out.printf("Title: %s\n", model.getInfo().getTitle());
+        logger.info("Title: %s\n", model.getInfo().getTitle());
         for (Path path : model.getPaths().values()) {
-            System.out.printf("Path %s:\n", Overlay.of(path).getPathInParent());
+            logger.info("Path %s:\n", Overlay.of(path).getPathInParent());
             for (Operation op : path.getOperations().values()) {
-                System.out.printf("  %s: [%s] %s\n", Overlay.of(op).getPathInParent().toUpperCase(),
+                logger.info("  %s: [%s] %s\n", Overlay.of(op).getPathInParent().toUpperCase(),
                         op.getOperationId(), op.getSummary());
                 for (Parameter param : op.getParameters()) {
-                    System.out.printf("    %s[%s]:, %s - %s\n", param.getName(), param.getIn(), getParameterType(param),
+                    logger.info("    %s[%s]:, %s - %s\n", param.getName(), param.getIn(), getParameterType(param),
                             param.getDescription());
                 }
             }
