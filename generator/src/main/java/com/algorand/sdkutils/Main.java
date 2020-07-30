@@ -35,7 +35,6 @@ public class Main {
 
         if (common.verbose) {
             Configurator.setRootLevel(Level.DEBUG);
-            Configurator.set
         }
 
         // Route to command handler.
