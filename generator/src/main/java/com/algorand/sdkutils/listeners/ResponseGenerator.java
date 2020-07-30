@@ -216,7 +216,7 @@ public class ResponseGenerator implements Subscriber {
         if (prop.rawTypeName.equals("boolean")) {
             return ImmutableList.of(BooleanNode.valueOf(random.nextBoolean()));
         }
-        if (prop.rawTypeName.equals("binary")) {
+        if (prop.rawTypeName.equals("binary") || prop.rawTypeName.equals("byte")) {
             // TODO: Binary data limits from spec.
             byte[] data = new byte[random.nextInt(500) + 1];
             random.nextBytes(data);
