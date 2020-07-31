@@ -14,6 +14,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<byte[]> applicationArgs;
     private List<Address> accounts;
     private List<Long> foreignApps;
+    private List<Long> foreignAssets;
     private Long applicationId;
 
     /**
@@ -34,6 +35,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         if (applicationArgs != null) txn.applicationArgs = applicationArgs;
         if (accounts != null) txn.accounts = accounts;
         if (foreignApps != null) txn.foreignApps = foreignApps;
+        if (foreignAssets != null) txn.foreignAssets = foreignAssets;
     }
 
     /**
@@ -87,6 +89,15 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      */
     public T foreignApps(List<Long> foreignApps) {
         this.foreignApps = foreignApps;
+        return (T) this;
+    }
+
+    /**
+     * ForeignAssets lists the assets whose global states may be accessed by this
+     * application. The access is read-only.
+     */
+    public T foreignAssets(List<Long> foreignAssets) {
+        this.foreignAssets = foreignAssets;
         return (T) this;
     }
 }
