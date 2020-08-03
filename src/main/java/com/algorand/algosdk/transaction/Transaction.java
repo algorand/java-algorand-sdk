@@ -135,6 +135,9 @@ public class Transaction implements Serializable {
     @JsonProperty("apfa")
     public List<Long> foreignApps = new ArrayList<>();
 
+    @JsonProperty("apas")
+    public List<Long> foreignAssets = new ArrayList<>();
+
     @JsonProperty("apgs")
     public StateSchema globalStateSchema = new StateSchema();
 
@@ -268,6 +271,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 
@@ -361,6 +365,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
+                null,
                 null,
                 null,
                 null,
@@ -482,6 +487,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
+                null,
                 null,
                 null,
                 null,
@@ -635,6 +641,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("apap") byte[] approvalProgram,
                         @JsonProperty("apat") List<byte[]> accounts,
                         @JsonProperty("apfa") List<Long> foreignApps,
+                        @JsonProperty("apas") List<Long> foreignAssets,
                         @JsonProperty("apgs") StateSchema globalStateSchema,
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
@@ -681,6 +688,7 @@ public class Transaction implements Serializable {
              approvalProgram == null ? null : new TEALProgram(approvalProgram),
              convertToAddressList(accounts),
              foreignApps,
+             foreignAssets,
              globalStateSchema,
              applicationId,
              localStateSchema,
@@ -735,6 +743,7 @@ public class Transaction implements Serializable {
                         TEALProgram approvalProgram,
                         List<Address> accounts,
                         List<Long> foreignApps,
+                        List<Long> foreignAssets,
                         StateSchema globalStateSchema,
                         Long applicationId,
                         StateSchema localStateSchema,
@@ -774,6 +783,7 @@ public class Transaction implements Serializable {
         if (approvalProgram != null) this.approvalProgram = approvalProgram;
         if (accounts != null) this.accounts = accounts;
         if (foreignApps != null) this.foreignApps = foreignApps;
+        if (foreignAssets != null) this.foreignAssets = foreignAssets;
         if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
         if (applicationId != null) this.applicationId = applicationId;
         if (localStateSchema != null) this.localStateSchema = globalStateSchema;

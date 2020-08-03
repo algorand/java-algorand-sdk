@@ -1,5 +1,7 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -17,6 +19,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * longer remembers it, and this will return an error.
  */
 public class PendingTransactionResponse extends PathResponse {
+
+    /**
+     * The application index if the transaction was found and it created an
+     * application.
+     */
+    @JsonProperty("application-index")
+    public Long applicationIndex;
 
     /**
      * The asset index if the transaction was found and it created an asset.
@@ -41,6 +50,20 @@ public class PendingTransactionResponse extends PathResponse {
      */
     @JsonProperty("confirmed-round")
     public Long confirmedRound;
+
+    /**
+     * (gd) Global state key/value changes for the application being executed by this
+     * transaction.
+     */
+    @JsonProperty("global-state-delta")
+    public List<EvalDeltaKeyValue> globalStateDelta = new ArrayList<EvalDeltaKeyValue>();
+
+    /**
+     * (ld) Local state key/value changes for the application being executed by this
+     * transaction.
+     */
+    @JsonProperty("local-state-delta")
+    public List<AccountStateDelta> localStateDelta = new ArrayList<AccountStateDelta>();
 
     /**
      * Indicates that the transaction was kicked out of this node's transaction pool
@@ -76,10 +99,13 @@ public class PendingTransactionResponse extends PathResponse {
         if (o == null) return false;
 
         PendingTransactionResponse other = (PendingTransactionResponse) o;
+        if (!Objects.deepEquals(this.applicationIndex, other.applicationIndex)) return false;
         if (!Objects.deepEquals(this.assetIndex, other.assetIndex)) return false;
         if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;
         if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
+        if (!Objects.deepEquals(this.globalStateDelta, other.globalStateDelta)) return false;
+        if (!Objects.deepEquals(this.localStateDelta, other.localStateDelta)) return false;
         if (!Objects.deepEquals(this.poolError, other.poolError)) return false;
         if (!Objects.deepEquals(this.receiverRewards, other.receiverRewards)) return false;
         if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;

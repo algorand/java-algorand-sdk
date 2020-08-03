@@ -4,6 +4,7 @@ import com.algorand.algosdk.crypto.Address;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.util.Strings;
 
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,9 @@ public class ConversionUtils {
                         case "str":
                             converted = parts[1].getBytes();
                             break;
+                        case "int":
+                            converted = BigInteger.valueOf(Integer.parseInt(parts[1])).toByteArray();
+                            break;
                         default:
                             Assertions.fail("Doesn't currently support '" + parts[0] + "' convertion.");
                     }
@@ -36,6 +40,12 @@ public class ConversionUtils {
      */
     public static List<Long> convertForeignApps(String foreignApps) {
         return Arrays.stream(Strings.split(foreignApps, ','))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Long> convertForeignAssets(String foreignAssets) {
+        return Arrays.stream(Strings.split(foreignAssets, ','))
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
     }

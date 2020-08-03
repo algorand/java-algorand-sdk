@@ -1,6 +1,8 @@
 package com.algorand.algosdk.v2.client.model;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.crypto.Address;
@@ -133,6 +135,13 @@ public class Transaction extends PathResponse {
     public String genesisId;
 
     /**
+     * (gd) Global state key/value changes for the application being executed by this
+     * transaction.
+     */
+    @JsonProperty("global-state-delta")
+    public List<EvalDeltaKeyValue> globalStateDelta = new ArrayList<EvalDeltaKeyValue>();
+
+    /**
      * (grp) Base64 encoded byte array of a sha512/256 digest. When present indicates
      * that this transaction is part of a transaction group and the value is the
      * sha512/256 hash of the transactions in that group.
@@ -189,6 +198,13 @@ public class Transaction extends PathResponse {
         return Encoder.encodeToBase64(this.lease);
     }
     public byte[] lease;
+
+    /**
+     * (ld) Local state key/value changes for the application being executed by this
+     * transaction.
+     */
+    @JsonProperty("local-state-delta")
+    public List<AccountStateDelta> localStateDelta = new ArrayList<AccountStateDelta>();
 
     /**
      * (note) Free form data.
@@ -296,12 +312,14 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.firstValid, other.firstValid)) return false;
         if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
         if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
+        if (!Objects.deepEquals(this.globalStateDelta, other.globalStateDelta)) return false;
         if (!Objects.deepEquals(this.group, other.group)) return false;
         if (!Objects.deepEquals(this.id, other.id)) return false;
         if (!Objects.deepEquals(this.intraRoundOffset, other.intraRoundOffset)) return false;
         if (!Objects.deepEquals(this.keyregTransaction, other.keyregTransaction)) return false;
         if (!Objects.deepEquals(this.lastValid, other.lastValid)) return false;
         if (!Objects.deepEquals(this.lease, other.lease)) return false;
+        if (!Objects.deepEquals(this.localStateDelta, other.localStateDelta)) return false;
         if (!Objects.deepEquals(this.note, other.note)) return false;
         if (!Objects.deepEquals(this.paymentTransaction, other.paymentTransaction)) return false;
         if (!Objects.deepEquals(this.receiverRewards, other.receiverRewards)) return false;

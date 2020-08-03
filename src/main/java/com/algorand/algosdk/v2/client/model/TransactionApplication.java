@@ -106,6 +106,13 @@ public class TransactionApplication extends PathResponse {
     public List<Long> foreignApps = new ArrayList<Long>();
 
     /**
+     * (apas) lists the assets whose parameters may be accessed by this application's
+     * ApprovalProgram and ClearStateProgram. The access is read-only.
+     */
+    @JsonProperty("foreign-assets")
+    public List<Long> foreignAssets = new ArrayList<Long>();
+
+    /**
      * Represents a (apls) local-state or (apgs) global-state schema. These schemas
      * determine how much storage may be used in a local-state or global-state for an
      * application. The more space used, the larger minimum balance must be maintained
@@ -150,6 +157,7 @@ public class TransactionApplication extends PathResponse {
         if (!Objects.deepEquals(this.approvalProgram, other.approvalProgram)) return false;
         if (!Objects.deepEquals(this.clearStateProgram, other.clearStateProgram)) return false;
         if (!Objects.deepEquals(this.foreignApps, other.foreignApps)) return false;
+        if (!Objects.deepEquals(this.foreignAssets, other.foreignAssets)) return false;
         if (!Objects.deepEquals(this.globalStateSchema, other.globalStateSchema)) return false;
         if (!Objects.deepEquals(this.localStateSchema, other.localStateSchema)) return false;
         if (!Objects.deepEquals(this.onCompletion, other.onCompletion)) return false;
