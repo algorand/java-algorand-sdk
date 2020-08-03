@@ -44,6 +44,12 @@ public class ConversionUtils {
                 .collect(Collectors.toList());
     }
 
+    public static List<Long> convertForeignAssets(String foreignAssets) {
+        return Arrays.stream(Strings.split(foreignAssets, ','))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+    }
+
     public static Address convertOrFailTest(String addrString) {
         try {
             return new Address(addrString);
