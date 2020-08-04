@@ -14,7 +14,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.*;
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.Resources;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -92,7 +91,7 @@ public class ResponseGenerator implements Subscriber {
 
     private Random random = new Random();
     private String randomString = "oZSrqon3hT7qQqrHNUle"; // This string was generated randomly from random.org/strings
-    private List<byte[]> signedTransactions = new ArrayList<>();
+    private List<JsonNode> signedTransactions = new ArrayList<>();
 
     private static class ExportType {
         final QueryDef query;
@@ -128,7 +127,9 @@ public class ResponseGenerator implements Subscriber {
                 InputStream fis = getResourceAsStream (loader, path + "/" + filename);
                 byte[] data = new byte[fis.available()];
                 fis.read(data);
-                this.signedTransactions.add(data);
+                Map<String,Object> stx = Encoder.decodeFromMsgPack(data, Map.class);
+                JsonNode node = mapper.valueToTree(stx);
+                this.signedTransactions.add(node);
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to initialize transactions.");
@@ -243,8 +244,7 @@ public class ResponseGenerator implements Subscriber {
     }
 
     public JsonNode makeSignedTransactionNode() {
-        byte[] randomTxn = signedTransactions.get(random.nextInt(signedTransactions.size()));
-        return new BinaryNode(randomTxn);
+        return signedTransactions.get(random.nextInt(signedTransactions.size()));
     }
 
     /**
