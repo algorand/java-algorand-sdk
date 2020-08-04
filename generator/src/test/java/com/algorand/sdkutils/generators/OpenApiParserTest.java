@@ -2,6 +2,7 @@ package com.algorand.sdkutils.generators;
 
 import com.algorand.sdkutils.listeners.Publisher;
 import com.algorand.sdkutils.listeners.Subscriber;
+import com.algorand.sdkutils.utils.QueryDef;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,7 +60,7 @@ class OpenApiParserTest {
 
         // 'onEvent(evt, []String)` - called 14 times, once for each NEW_QUERY.
         verify(subscriber, times(14))
-                .onEvent(any(), any(String[].class));
+                .onEvent(any(), any(QueryDef.class));
 
         // Property, Path param, Query param, Body
         verify(subscriber, times(42))

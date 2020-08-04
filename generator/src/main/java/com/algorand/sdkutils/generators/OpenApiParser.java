@@ -14,6 +14,7 @@ import java.util.TreeSet;
 
 import com.algorand.sdkutils.listeners.Publisher;
 import com.algorand.sdkutils.listeners.Publisher.Events;
+import com.algorand.sdkutils.utils.QueryDef;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
@@ -412,8 +413,17 @@ public class OpenApiParser {
             properties = getSortedParameters(paramNode);
         }
 
-        String [] strarray = {methodName, returnType, path, desc, httpMethod};
-        this.publisher.publish(Events.NEW_QUERY, strarray);
+        List<String> contentTypes = new ArrayList<>();
+        if (spec.has("produces") && spec.get("produces").isArray()) {
+            for (JsonNode value : spec.get("produces")) {
+                if (value.isTextual()) {
+                    contentTypes.add(value.asText());
+                } else {
+                    throw new RuntimeException("Unexpected content type: " + value.toString());
+                }
+            }
+        }
+        this.publisher.publish(Events.NEW_QUERY, new QueryDef(methodName, returnType, path, desc, httpMethod, contentTypes));
 
         processQueryParams(properties);
 
