@@ -9,33 +9,37 @@ import com.algorand.algosdk.v2.client.model.BlockResponse;
 
 
 /**
- * /v2/blocks/{round} 
+ * Get the block for the given round.
+ * /v2/blocks/{round}
  */
 public class GetBlock extends Query {
 
-	private Long round;
+    private Long round;
 
-	/**
-	 * @param round The round from which to fetch block information. 
-	 */
-	public GetBlock(Client client, Long round) {
-		super(client, new HttpMethod("get"));
-		addQuery("format", "msgpack");
-		this.round = round;
-	}
+    /**
+     * @param round The round from which to fetch block information.
+     */
+    public GetBlock(Client client, Long round) {
+        super(client, new HttpMethod("get"));
+        addQuery("format", "msgpack");
+        this.round = round;
+    }
 
-	@Override
-	public Response<BlockResponse> execute() throws Exception {
-		Response<BlockResponse> resp = baseExecute();
-		resp.setValueType(BlockResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<BlockResponse> execute() throws Exception {
+        Response<BlockResponse> resp = baseExecute();
+        resp.setValueType(BlockResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("blocks"));
-		addPathSegment(String.valueOf(round));
+    protected QueryData getRequestString() {
+        if (this.round == null) {
+            throw new RuntimeException("round is not set. It is a required parameter.");
+        }
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("blocks"));
+        addPathSegment(String.valueOf(round));
 
-		return qd;
-	}
+        return qd;
+    }
 }

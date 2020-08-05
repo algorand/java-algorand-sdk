@@ -8,25 +8,25 @@ import com.algorand.algosdk.v2.client.common.Response;
 
 
 /**
- * Returns the entire swagger spec in json. 
- * /swagger.json 
+ * Returns the entire swagger spec in json.
+ * /swagger.json
  */
 public class SwaggerJSON extends Query {
 
-	public SwaggerJSON(Client client) {
-		super(client, new HttpMethod("get"));
-	}
+    public SwaggerJSON(Client client) {
+        super(client, new HttpMethod("get"));
+    }
 
-	@Override
-	public Response<String> execute() throws Exception {
-		Response<String> resp = baseExecute();
-		resp.setValueType(String.class);
-		return resp;
-	}
+    @Override
+    public Response<String> execute() throws Exception {
+        Response<String> resp = baseExecute();
+        resp.setValueType(String.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("swagger.json"));
+    protected QueryData getRequestString() {
+        addPathSegment(String.valueOf("swagger.json"));
 
-		return qd;
-	}
+        return qd;
+    }
 }

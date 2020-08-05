@@ -10,46 +10,49 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionsResponse;
 
 
 /**
- * Get the list of pending transactions by address, sorted by priority, in 
- * decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending 
- * transactions. 
- * /v2/accounts/{address}/transactions/pending 
+ * Get the list of pending transactions by address, sorted by priority, in
+ * decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending
+ * transactions.
+ * /v2/accounts/{address}/transactions/pending
  */
 public class GetPendingTransactionsByAddress extends Query {
 
-	private Address address;
+    private Address address;
 
-	/**
-	 * @param address An account public key 
-	 */
-	public GetPendingTransactionsByAddress(Client client, Address address) {
-		super(client, new HttpMethod("get"));
-		addQuery("format", "msgpack");
-		this.address = address;
-	}
+    /**
+     * @param address An account public key
+     */
+    public GetPendingTransactionsByAddress(Client client, Address address) {
+        super(client, new HttpMethod("get"));
+        addQuery("format", "msgpack");
+        this.address = address;
+    }
 
-	/**
-	 * Truncated number of transactions to display. If max=0, returns all pending txns. 
-	 */
-	public GetPendingTransactionsByAddress max(Long max) {
-		addQuery("max", String.valueOf(max));
-		return this;
-	}
+    /**
+     * Truncated number of transactions to display. If max=0, returns all pending txns.
+     */
+    public GetPendingTransactionsByAddress max(Long max) {
+        addQuery("max", String.valueOf(max));
+        return this;
+    }
 
-	@Override
-	public Response<PendingTransactionsResponse> execute() throws Exception {
-		Response<PendingTransactionsResponse> resp = baseExecute();
-		resp.setValueType(PendingTransactionsResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<PendingTransactionsResponse> execute() throws Exception {
+        Response<PendingTransactionsResponse> resp = baseExecute();
+        resp.setValueType(PendingTransactionsResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("accounts"));
-		addPathSegment(String.valueOf(address));
-		addPathSegment(String.valueOf("transactions"));
-		addPathSegment(String.valueOf("pending"));
+    protected QueryData getRequestString() {
+        if (this.address == null) {
+            throw new RuntimeException("address is not set. It is a required parameter.");
+        }
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("accounts"));
+        addPathSegment(String.valueOf(address));
+        addPathSegment(String.valueOf("transactions"));
+        addPathSegment(String.valueOf("pending"));
 
-		return qd;
-	}
+        return qd;
+    }
 }

@@ -9,35 +9,38 @@ import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
 
 
 /**
- * Waits for a block to appear after round {round} and returns the node's status at 
- * the time. 
- * /v2/status/wait-for-block-after/{round} 
+ * Waits for a block to appear after round {round} and returns the node's status at
+ * the time.
+ * /v2/status/wait-for-block-after/{round}
  */
 public class WaitForBlock extends Query {
 
-	private Long round;
+    private Long round;
 
-	/**
-	 * @param round The round to wait until returning status 
-	 */
-	public WaitForBlock(Client client, Long round) {
-		super(client, new HttpMethod("get"));
-		this.round = round;
-	}
+    /**
+     * @param round The round to wait until returning status
+     */
+    public WaitForBlock(Client client, Long round) {
+        super(client, new HttpMethod("get"));
+        this.round = round;
+    }
 
-	@Override
-	public Response<NodeStatusResponse> execute() throws Exception {
-		Response<NodeStatusResponse> resp = baseExecute();
-		resp.setValueType(NodeStatusResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<NodeStatusResponse> execute() throws Exception {
+        Response<NodeStatusResponse> resp = baseExecute();
+        resp.setValueType(NodeStatusResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("status"));
-		addPathSegment(String.valueOf("wait-for-block-after"));
-		addPathSegment(String.valueOf(round));
+    protected QueryData getRequestString() {
+        if (this.round == null) {
+            throw new RuntimeException("round is not set. It is a required parameter.");
+        }
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("status"));
+        addPathSegment(String.valueOf("wait-for-block-after"));
+        addPathSegment(String.valueOf(round));
 
-		return qd;
-	}
+        return qd;
+    }
 }

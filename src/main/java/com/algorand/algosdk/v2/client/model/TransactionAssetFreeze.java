@@ -8,48 +8,52 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Fields for an asset freeze transaction. 
- * Definition: 
- * data/transactions/asset.go : AssetFreezeTxnFields 
+ * Fields for an asset freeze transaction.
+ * Definition:
+ * data/transactions/asset.go : AssetFreezeTxnFields
  */
 public class TransactionAssetFreeze extends PathResponse {
 
-	/**
-	 * (fadd) Address of the account whose asset is being frozen or thawed. 
-	 */
-	@JsonProperty("address")
-	public void address(String address) throws NoSuchAlgorithmException {
-		 this.address = new Address(address);
-	 }
-	@JsonProperty("address")
-	public String address() throws NoSuchAlgorithmException {
-		return this.address.encodeAsString();
-	}
-	public Address address;
+    /**
+     * (fadd) Address of the account whose asset is being frozen or thawed.
+     */
+    @JsonProperty("address")
+    public void address(String address) throws NoSuchAlgorithmException {
+        this.address = new Address(address);
+    }
+    @JsonProperty("address")
+    public String address() throws NoSuchAlgorithmException {
+        if (this.address != null) {
+            return this.address.encodeAsString();
+        } else {
+            return null;
+        }
+    }
+    public Address address;
 
-	/**
-	 * (faid) ID of the asset being frozen or thawed. 
-	 */
-	@JsonProperty("asset-id")
-	public Long assetId;
+    /**
+     * (faid) ID of the asset being frozen or thawed.
+     */
+    @JsonProperty("asset-id")
+    public Long assetId;
 
-	/**
-	 * (afrz) The new freeze status. 
-	 */
-	@JsonProperty("new-freeze-status")
-	public Boolean newFreezeStatus;
+    /**
+     * (afrz) The new freeze status.
+     */
+    @JsonProperty("new-freeze-status")
+    public Boolean newFreezeStatus;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		TransactionAssetFreeze other = (TransactionAssetFreeze) o;
-		if (!Objects.deepEquals(this.address, other.address)) return false;
-		if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
-		if (!Objects.deepEquals(this.newFreezeStatus, other.newFreezeStatus)) return false;
+        TransactionAssetFreeze other = (TransactionAssetFreeze) o;
+        if (!Objects.deepEquals(this.address, other.address)) return false;
+        if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
+        if (!Objects.deepEquals(this.newFreezeStatus, other.newFreezeStatus)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

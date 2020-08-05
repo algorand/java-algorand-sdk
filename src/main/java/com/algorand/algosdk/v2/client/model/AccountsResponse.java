@@ -9,33 +9,33 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AccountsResponse extends PathResponse {
 
-	@JsonProperty("accounts")
-	public List<Account> accounts = new ArrayList<Account>();
+    @JsonProperty("accounts")
+    public List<Account> accounts = new ArrayList<Account>();
 
-	/**
-	 * Round at which the results were computed. 
-	 */
-	@JsonProperty("current-round")
-	public Long currentRound;
+    /**
+     * Round at which the results were computed.
+     */
+    @JsonProperty("current-round")
+    public Long currentRound;
 
-	/**
-	 * Used for pagination, when making another request provide this token with the 
-	 * next parameter. 
-	 */
-	@JsonProperty("next-token")
-	public String nextToken;
+    /**
+     * Used for pagination, when making another request provide this token with the
+     * next parameter.
+     */
+    @JsonProperty("next-token")
+    public String nextToken;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		AccountsResponse other = (AccountsResponse) o;
-		if (!Objects.deepEquals(this.accounts, other.accounts)) return false;
-		if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
-		if (!Objects.deepEquals(this.nextToken, other.nextToken)) return false;
+        AccountsResponse other = (AccountsResponse) o;
+        if (!Objects.deepEquals(this.accounts, other.accounts)) return false;
+        if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
+        if (!Objects.deepEquals(this.nextToken, other.nextToken)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

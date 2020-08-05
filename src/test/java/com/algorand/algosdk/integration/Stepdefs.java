@@ -1,55 +1,51 @@
 package com.algorand.algosdk.integration;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
-import com.algorand.algosdk.crypto.MultisigAddress;
-import com.algorand.algosdk.crypto.MultisigSignature;
-import com.algorand.algosdk.transaction.SignedTransaction;
-import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.AlgoConverter;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.algorand.algosdk.algod.client.AlgodClient;
+import com.algorand.algosdk.algod.client.ApiException;
+import com.algorand.algosdk.algod.client.api.AlgodApi;
+import com.algorand.algosdk.algod.client.model.*;
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
-import com.algorand.algosdk.algod.client.AlgodClient;
-import com.algorand.algosdk.algod.client.api.AlgodApi;
-import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.algod.client.model.*;
+import com.algorand.algosdk.builder.transaction.TransactionBuilder;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
 import com.algorand.algosdk.kmd.client.model.*;
 import com.algorand.algosdk.mnemonic.Mnemonic;
-import com.algorand.algosdk.crypto.ParticipationPublicKey;
-import com.algorand.algosdk.crypto.VRFPublicKey;
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.AlgoConverter;
+import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.CompileResponse;
+import com.algorand.algosdk.v2.client.model.DryrunResponse;
+import com.algorand.algosdk.v2.client.model.DryrunRequest;
+import com.algorand.algosdk.v2.client.model.DryrunSource;
 
-import java.math.BigInteger;
-import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.threeten.bp.LocalDate;
 
-import java.util.List;
-import java.util.Set;
-import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
+import static com.algorand.algosdk.cucumber.shared.TransactionSteps.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
-
+import static org.assertj.core.api.Assertions.fail;
 
 public class Stepdefs {
     public static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -61,6 +57,7 @@ public class Stepdefs {
     SignedTransaction[] stxs;
     byte[] stxBytes;
     Transaction txn;
+    TransactionBuilder txnBuilder;
     String txid;
     Account account;
     Address pk;
@@ -84,6 +81,7 @@ public class Stepdefs {
     AlgodClient algodClient;
     KmdApi kcl;
     KmdClient kmdClient;
+    com.algorand.algosdk.v2.client.common.AlgodClient aclv2;
     String handle;
     List<String> versions;
     NodeStatus status;
@@ -112,8 +110,12 @@ public class Stepdefs {
     BigInteger assetID = BigInteger.valueOf(1);
     String assetName = "testcoin";
     String assetUnitName = "coins";
-    Transaction.AssetParams expectedParams = null;
+    com.algorand.algosdk.transaction.AssetParams expectedParams = null;
     AssetParams queriedParams = new AssetParams();
+
+    /* Compile / Dryrun */
+    Response<CompileResponse> compileResponse;
+    Response<DryrunResponse> dryrunResponse;
 
     protected Address getAddress(int i) {
         if (addresses == null) {
@@ -140,6 +142,19 @@ public class Stepdefs {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Convenience method to lookup a secret key and sign a transaction with the key.
+     */
+    public SignedTransaction signWithAddress(Transaction tx, Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+        ExportKeyRequest req = new ExportKeyRequest();
+        req.setAddress(addr.toString());
+        req.setWalletHandleToken(handle);
+        req.setWalletPassword(walletPswd);
+        byte[] secretKey = kcl.exportKey(req).getPrivateKey();
+        Account acct = new Account(Arrays.copyOfRange(secretKey, 0, 32));
+        return acct.signTransaction(tx);
     }
 
     /**
@@ -580,6 +595,12 @@ public class Stepdefs {
         algodClient.setBasePath("http://localhost:" + algodPort);
         acl = new AlgodApi(algodClient);
     }
+    @Given("an algod v2 client")
+    public void aClientv2() throws FileNotFoundException, IOException{
+        aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
+            "http://localhost", algodPort, token
+        );
+    }
 
     @Given("wallet information")
     public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
@@ -609,13 +630,13 @@ public class Stepdefs {
         } else{
             this.note = Encoder.decodeFromBase64(note);
         }
-        txn = Transaction.PaymentTransactionBuilder()
+        txnBuilder = Transaction.PaymentTransactionBuilder()
                 .sender(getAddress(0))
                 .suggestedParams(params)
                 .note(this.note)
                 .amount(amt)
-                .receiver(getAddress(1))
-                .build();
+                .receiver(getAddress(1));
+        txn = txnBuilder.build();
         pk = getAddress(0);
     }
 
@@ -659,10 +680,11 @@ public class Stepdefs {
     @Then("the transaction should go through")
     public void checkTxn() throws ApiException, InterruptedException{
         String ans = acl.pendingTransactionInformation(txid).getFrom();
-        assertThat(pk.toString()).isEqualTo(ans);
+        assertThat(this.txn.sender.toString()).isEqualTo(ans);
         acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
-        assertThat(acl.transactionInformation(pk.toString(), txid).getFrom()).isEqualTo(pk.toString());
-        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
+        String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
+        assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
+        assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
     }
 
     @Then("I can get the transaction by ID")
@@ -1207,5 +1229,92 @@ public class Stepdefs {
                 .build();
         this.txn = tx;
         this.pk = getAddress(0);
+    }
+
+    @When("I add a rekeyTo field with address {string}")
+    public void i_add_a_rekeyTo_field_with_address(String string) {
+        txnBuilder.rekey(string);
+        txn = txnBuilder.build();
+    }
+
+    @When("I add a rekeyTo field with the private key algorand address")
+    public void i_add_a_rekeyTo_field_with_the_private_key_algorand_address() {
+        txnBuilder.rekey(this.pk.toString());
+        txn = txnBuilder.build();
+    }
+
+    @When("I compile a teal program {string}")
+    public void i_compile_teal_program(String path) throws Exception {
+        byte[] source = loadResource(path);
+        compileResponse = aclv2.TealCompile().source(source).execute();
+    }
+
+    @Then("it is compiled with {int} and {string} and {string}")
+    public void it_is_compiled_with(Integer status, String result, String hash) {
+        assertThat(compileResponse.code()).isEqualTo(status);
+        CompileResponse body = compileResponse.body();
+        if (body != null) {
+            assertThat(compileResponse.isSuccessful()).isTrue();
+            assertThat(body.result).isEqualTo(result);
+            assertThat(body.hash).isEqualTo(hash);
+        } else {
+            assertThat(compileResponse.isSuccessful()).isFalse();
+        }
+    }
+
+    @When("I dryrun a {string} program {string}")
+    public void i_dryrun_a_program(String kind, String path) throws Exception {
+        byte[] data = loadResource(path);
+        List<DryrunSource> sources = new ArrayList<DryrunSource>();
+        List<SignedTransaction> stxns = new ArrayList<SignedTransaction>();
+        Account account = new Account();
+        Address pk = account.getAddress();
+        Digest gh = new Digest(Encoder.decodeFromBase64("ZIkPs8pTDxbRJsFB1yJ7gvnpDu0Q85FRkl2NCkEAQLU="));
+        Transaction txn = Transaction.PaymentTransactionBuilder()
+            .sender(pk)
+            .fee(1000)
+            .firstValid(1)
+            .lastValid(100)
+            .amount(1000)
+            .genesisHash(gh)
+            .receiver(pk)
+            .build();
+
+        if (kind.equals("compiled")) {
+            LogicsigSignature lsig = new LogicsigSignature(data);
+            SignedTransaction stxn = new SignedTransaction(txn, lsig);
+            stxns.add(stxn);
+        } else if (kind.equals("source")) {
+            DryrunSource drs = new DryrunSource();
+            drs.fieldName = "lsig";
+            drs.source = new String(data);
+            drs.txnIndex = 0l;
+            sources.add(drs);
+            SignedTransaction stxn = new SignedTransaction(txn, new Signature());
+            stxns.add(stxn);
+        } else {
+            fail("kind " + kind + " not in (compiled, source)");
+        }
+
+        DryrunRequest dr = new DryrunRequest();
+        dr.txns = stxns;
+        dr.sources = sources;
+        dryrunResponse = aclv2.TealDryrun().request(dr).execute();
+    }
+
+    @When("I get execution result {string}")
+    public void i_get_execution_result(String result) throws Exception {
+        DryrunResponse ddr = dryrunResponse.body();
+        assertThat(ddr).isNotNull();
+        assertThat(ddr.txns).isNotNull();
+        assertThat(ddr.txns.size()).isGreaterThan(0);
+        List<String> msgs = new ArrayList<String>();
+        if (ddr.txns.get(0).appCallMessages.size() > 0) {
+            msgs = ddr.txns.get(0).appCallMessages;
+        } else if (ddr.txns.get(0).logicSigMessages.size() > 0) {
+            msgs = ddr.txns.get(0).logicSigMessages;
+        }
+        assertThat(msgs.size()).isGreaterThan(0);
+        assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
 }

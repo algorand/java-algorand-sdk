@@ -1,35 +1,25 @@
 package com.algorand.algosdk.account;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.security.SignatureException;
-import java.util.Arrays;
-
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
-import com.algorand.algosdk.crypto.LogicsigSignature;
-import com.algorand.algosdk.crypto.MultisigAddress;
-import com.algorand.algosdk.crypto.MultisigSignature;
-import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.crypto.Signature;
+import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Encoder;
-
 import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.util.Arrays;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.
@@ -45,6 +35,7 @@ public class Account {
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
     private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
+    private static final byte[] PROGDATA_SIGN_PREFIX = ("ProgData").getBytes(StandardCharsets.UTF_8);
     public static final BigInteger MIN_TX_FEE_UALGOS = BigInteger.valueOf(1000);
 
     /**
@@ -136,7 +127,11 @@ public class Account {
         try {
             byte[] prefixEncodedTx = tx.bytesToSign();
             Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
-            return new SignedTransaction(tx, txSig, tx.txID());
+            SignedTransaction stx = new SignedTransaction(tx, txSig, tx.txID());
+            if (!tx.sender.equals(this.address)) {
+                stx.authAddr(this.address);
+            }
+            return stx;
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
@@ -255,9 +250,16 @@ public class Account {
      * @return an estimated byte size for the transaction.
      */
     public static BigInteger estimatedEncodedSize(Transaction tx) throws NoSuchAlgorithmException {
-        Account acc = new Account();
         try {
-            return BigInteger.valueOf(Encoder.encodeToMsgPack(acc.signTransaction(tx)).length);
+            // The transaction is signed with a random account to get the size of the signed transaction.
+            // SignTransaction does the signing, but also sets authAddr which is not desired here. 
+            long length = Encoder.encodeToMsgPack(
+                    new SignedTransaction(
+                            tx, 
+                            new Account().rawSignBytes(
+                                    Arrays.copyOf(tx.bytesToSign(), tx.bytesToSign().length)),
+                            tx.txID())).length;
+            return BigInteger.valueOf(length);
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
         }
@@ -529,6 +531,32 @@ public class Account {
         } catch (Exception ex) {
             throw new IOException("could not encode transactions", ex);
         }
+    }
+
+    /**
+     * Creates Signature compatible with ed25519verify TEAL opcode from data and contract address (program hash).
+     * @param data byte[]
+     * @param contractAddress Address
+     * @return Signature
+     */
+    public Signature tealSign(byte[] data, Address contractAddress) throws NoSuchAlgorithmException, IOException {
+        byte[] rawAddress = contractAddress.getBytes();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(PROGDATA_SIGN_PREFIX);
+        baos.write(rawAddress);
+        baos.write(data);
+        return this.rawSignBytes(baos.toByteArray());
+    }
+
+    /**
+     * Creates Signature compatible with ed25519verify TEAL opcode from data and program bytes
+     * @param data byte[]
+     * @param program byte[]
+     * @return Signature
+     */
+    public Signature tealSignFromProgram(byte[] data, byte[] program) throws NoSuchAlgorithmException, IOException {
+        LogicsigSignature lsig = new LogicsigSignature(program);
+        return this.tealSign(data, lsig.toAddress());
     }
 
     // Return a pre-set seed in response to nextBytes or generateSeed

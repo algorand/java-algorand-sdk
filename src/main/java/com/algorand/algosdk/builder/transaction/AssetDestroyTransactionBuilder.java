@@ -3,6 +3,7 @@ package com.algorand.algosdk.builder.transaction;
 import com.algorand.algosdk.transaction.Transaction;
 
 import java.math.BigInteger;
+import java.util.Objects;
 
 /**
  * Build an asset destroy transaction.
@@ -18,6 +19,7 @@ import java.math.BigInteger;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger assetIndex = null;
 
@@ -33,15 +35,12 @@ public class AssetDestroyTransactionBuilder<T extends AssetDestroyTransactionBui
     }
 
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createAssetDestroyTransaction(
-                sender,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisHash,
-                assetIndex);
+    protected void applyTo(Transaction txn) {
+        Objects.requireNonNull(assetIndex, "assetIndex is required.");
+
+        if (assetIndex != null) {
+            txn.assetIndex = assetIndex;
+        }
     }
 
     /**

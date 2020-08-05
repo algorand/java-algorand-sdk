@@ -21,6 +21,8 @@ import java.util.Arrays;
 public class TxGroup implements Serializable{
     private static final byte[] TG_PREFIX = ("TG").getBytes(StandardCharsets.UTF_8);
 
+    public static int MAX_TX_GROUP_SIZE = 16;
+
     @JsonProperty("txlist")
     private Digest[] txGroupHashes;
 
@@ -32,6 +34,9 @@ public class TxGroup implements Serializable{
     public static Digest computeGroupID(Transaction ...txns) throws IOException, IllegalArgumentException {
         if (txns == null || txns.length == 0) {
             throw new IllegalArgumentException("empty transaction list");
+        }
+        if (txns.length > MAX_TX_GROUP_SIZE) {
+            throw new IllegalArgumentException("max group size is " + MAX_TX_GROUP_SIZE);
         }
         Digest[] txIDs = new Digest[txns.length];
         for (int i = 0; i < txns.length; i++) {

@@ -9,33 +9,36 @@ import com.algorand.algosdk.v2.client.model.Block;
 
 
 /**
- * Lookup block. 
- * /v2/blocks/{round-number} 
+ * Lookup block.
+ * /v2/blocks/{round-number}
  */
 public class LookupBlock extends Query {
 
-	private Long roundNumber;
+    private Long roundNumber;
 
-	/**
-	 * @param roundNumber Round number 
-	 */
-	public LookupBlock(Client client, Long roundNumber) {
-		super(client, new HttpMethod("get"));
-		this.roundNumber = roundNumber;
-	}
+    /**
+     * @param roundNumber Round number
+     */
+    public LookupBlock(Client client, Long roundNumber) {
+        super(client, new HttpMethod("get"));
+        this.roundNumber = roundNumber;
+    }
 
-	@Override
-	public Response<Block> execute() throws Exception {
-		Response<Block> resp = baseExecute();
-		resp.setValueType(Block.class);
-		return resp;
-	}
+    @Override
+    public Response<Block> execute() throws Exception {
+        Response<Block> resp = baseExecute();
+        resp.setValueType(Block.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("blocks"));
-		addPathSegment(String.valueOf(roundNumber));
+    protected QueryData getRequestString() {
+        if (this.roundNumber == null) {
+            throw new RuntimeException("round-number is not set. It is a required parameter.");
+        }
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("blocks"));
+        addPathSegment(String.valueOf(roundNumber));
 
-		return qd;
-	}
+        return qd;
+    }
 }

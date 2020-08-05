@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * TransactionBuilder has parameters common to all transactions types.
  */
+@SuppressWarnings("unchecked")
 public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     protected final Transaction.Type type;
 
@@ -29,6 +30,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     protected BigInteger lastValid = null;
     protected byte[] note = null;
     protected byte[] lease = null;
+    protected Address rekeyTo = null;
     protected String genesisID = null;
     protected Digest genesisHash = null;
     protected Digest group = null;
@@ -37,28 +39,38 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         this.type = type;
     }
 
-    protected abstract Transaction buildInternal();
-
+    protected abstract void applyTo(Transaction txn);
+    
     /**
      * Build the Transaction object. An exception is thrown if a valid transaction cannot be created with the provided
      * fields.
      * @return A transaction.
      */
     final public Transaction build() {
-        if(fee != null && flatFee != null) {
-            throw new IllegalArgumentException("Cannot set both fee and flatFee.");
-        }
 
         if (lastValid == null && firstValid != null) {
             lastValid = firstValid.add(BigInteger.valueOf(1000));
         }
 
-        Transaction txn = buildInternal();
+        Transaction txn = new Transaction();
+        txn.type = type;
+        applyTo(txn);
 
-        if(lease != null) {
-            txn.setLease(lease);
+        if (sender != null) txn.sender = sender;
+        if (firstValid != null) txn.firstValid = firstValid;
+        if (lastValid != null) txn.lastValid = lastValid;
+        if (note != null && note.length > 0) txn.note = note;
+        if (rekeyTo != null) txn.rekeyTo = rekeyTo;
+        if (genesisID != null) txn.genesisID = genesisID;
+        if (genesisHash != null) txn.genesisHash = genesisHash;
+        
+        if (lease != null && lease.length != 0) {
+            txn.setLease(new Lease(lease));
         }
 
+        if(fee != null && flatFee != null) {
+            throw new IllegalArgumentException("Cannot set both fee and flatFee.");
+        }
         if(fee != null) {
             try {
                 Account.setFeeByFeePerByte(txn, fee);
@@ -67,7 +79,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
             }
         }
         if (flatFee != null) {
-            txn.setFee(flatFee);
+            txn.fee = flatFee;
+        }
+        if (txn.fee == null || txn.fee == BigInteger.valueOf(0)) {
+            txn.fee = Account.MIN_TX_FEE_UALGOS;
         }
 
         return txn;
@@ -371,6 +386,37 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
      */
     public T leaseB64(String lease) {
         this.lease = Encoder.decodeFromBase64(lease);
+        return (T) this;
+    }
+
+    /**
+     * Rekey to the sender account.
+     * @return This builder.
+     */
+    public T rekey(Address rekeyTo) {
+        this.rekeyTo = rekeyTo;
+        return (T) this;
+    }
+
+    /**
+     * Rekey to the account in the human-readable address format.
+     * @return This builder.
+     */
+    public T rekey(String rekeyTo) {
+        try {
+            this.rekeyTo = new Address(rekeyTo);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
+        }
+        return (T) this;
+    }
+
+    /**
+     * Rekey to the account in the raw 32 byte format.
+     * @return This builder.
+     */
+    public T rekey(byte[] rekeyTo) {
+        this.rekeyTo = new Address(rekeyTo);
         return (T) this;
     }
 

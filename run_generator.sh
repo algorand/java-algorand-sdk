@@ -64,20 +64,10 @@ if [[ ! -f "$ALGOD_SPEC" ]]; then
   my_exit 1
 fi
 
-mvn package
+mvn clean package
 
 java -jar target/generator-*-jar-with-dependencies.jar \
-       -c  "../src/main/java/com/algorand/algosdk/v2/client/common" \
-       -cp "com.algorand.algosdk.v2.client.common" \
-       -m  "../src/main/java/com/algorand/algosdk/v2/client/model" \
-       -mp "com.algorand.algosdk.v2.client.model" \
-       -n  "IndexerClient" \
-       -p  "../src/main/java/com/algorand/algosdk/v2/client/indexer" \
-       -pp "com.algorand.algosdk.v2.client.indexer" \
-       -t  "X-Indexer-API-Token" \
-       -s  "$INDEXER_SPEC"
-
-java -jar target/generator-*-jar-with-dependencies.jar \
+       java \
        -c  "../src/main/java/com/algorand/algosdk/v2/client/common" \
        -cp "com.algorand.algosdk.v2.client.common" \
        -m  "../src/main/java/com/algorand/algosdk/v2/client/model" \
@@ -88,3 +78,17 @@ java -jar target/generator-*-jar-with-dependencies.jar \
        -t  "X-Algo-API-Token" \
        -tr \
        -s  "$ALGOD_SPEC"
+
+# There is one enum only defined by indexer. Run this second to avoid
+# overwriting the second one.
+java -jar target/generator-*-jar-with-dependencies.jar \
+       java \
+       -c  "../src/main/java/com/algorand/algosdk/v2/client/common" \
+       -cp "com.algorand.algosdk.v2.client.common" \
+       -m  "../src/main/java/com/algorand/algosdk/v2/client/model" \
+       -mp "com.algorand.algosdk.v2.client.model" \
+       -n  "IndexerClient" \
+       -p  "../src/main/java/com/algorand/algosdk/v2/client/indexer" \
+       -pp "com.algorand.algosdk.v2.client.indexer" \
+       -t  "X-Indexer-API-Token" \
+       -s  "$INDEXER_SPEC"

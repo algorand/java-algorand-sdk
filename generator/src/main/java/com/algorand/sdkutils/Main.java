@@ -1,211 +1,144 @@
 package com.algorand.sdkutils;
 
-import com.algorand.sdkutils.generators.Generator;
-import com.algorand.sdkutils.generators.Utils;
-import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.cli.*;
+import com.algorand.sdkutils.listeners.ResponseGenerator;
+import com.beust.jcommander.*;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.nio.file.Files;
-import java.util.Collection;
 
 public class Main {
-    public static void main (String args[]) {
-        Options o = generateOptions();
 
-        try {
-            CommandLineParser parser = new DefaultParser();
-            CommandLine line = parser.parse(o, args);
+    /**
+     * Main function. Setup argument parser and direct results to the appropriate handler.
+     */
+    public static void main(String argv[]) throws Exception {
+        // Empty argument objects.
+        CommonArgs common = new CommonArgs();
+        JavaGeneratorArgs java = new JavaGeneratorArgs();
+        ResponseGenerator.ResponseGeneratorArgs responses = new ResponseGenerator.ResponseGeneratorArgs();
 
-            if (line.hasOption("help")) {
-                HelpFormatter formatter = new HelpFormatter();
-                formatter.printHelp("generator", o);
+        // Collect configuration and parse arguments.
+        JCommander root = JCommander.newBuilder()
+                .addObject(common)
+                //.addCommand("go", go)
+                .addCommand("java", java)
+                .addCommand("responses", responses)
+                .build();
+        root.parse(argv);
+
+        // Root level help generated from parameter annotations.
+        if (common.help) {
+            common.validate(root);
+            return;
+        }
+
+        if (common.verbose) {
+            Configurator.setRootLevel(Level.DEBUG);
+        }
+
+        // Route to command handler.
+        String commandName = root.getParsedCommand();
+        JCommander command = root.getCommands().get(commandName);
+        switch(commandName) {
+            case "java":
+                java.validate(command);
+                javaGenerator(java, command);
+                return;
+            case "responses":
+                responses.validate(command);
+                ResponseGenerator.main(responses, command);
+                return;
+        }
+    }
+
+    /**
+     * Arguments shared by all commands.
+     */
+    public static class CommonArgs {
+        @Parameter(names = {"-h", "--help"}, help = true)
+        public boolean help = false;
+
+        @Parameter(names = {"-v", "--verbose"}, description = "Print additional logging output to console.")
+        public boolean verbose;
+
+        @Parameter(names = {"-s", "--specfile"}, description = "Path to specfile used by generator.")
+        public File specfile;
+
+        /**
+         * Override this to add any custom validation for other command arguments.
+         */
+        public void validate(JCommander command) {
+            if (this.help) {
+                command.usage();
                 System.exit(0);
             }
 
-            Main.Generate(
-                    line.getOptionValue("n"),
-                    new File(line.getOptionValue("s")),
-                    line.getOptionValue("m"),
-                    line.getOptionValue("mp"),
-                    line.getOptionValue("p"),
-                    line.getOptionValue("pp"),
-                    line.getOptionValue("c"),
-                    line.getOptionValue("cp"),
-                    line.getOptionValue("t"),
-                    !line.hasOption("tr"));
-        } catch (ParseException e) {
-            System.out.println("Problem processing arguments: " + e.getMessage());
-            System.out.println("\n\n");
-            e.printStackTrace();
-            System.out.println("\n\n");
+            if (this.specfile == null) {
+                throw new RuntimeException("Specfile must be provided with -s or --specfile");
+            }
 
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("generator", o);
-            System.exit(0);
+            if (!this.specfile.canRead()) {
+                throw new RuntimeException("Cannot read file: " + this.specfile.getAbsolutePath());
+            }
+        }
+    }
+
+    @Parameters(commandDescription = "Generate the Java Client SDK.")
+    public static class JavaGeneratorArgs extends CommonArgs {
+        @Parameter(required = true, names = {"-n", "--client-name"}, description = "Full path to the OpenAPI v2 spec file.")
+        public String clientName;
+
+        @Parameter(required = true, names = {"-m", "--model-path"}, description = "Path where generated model files will be placed.")
+        public String modelPath;
+
+        @Parameter(required = true, names = {"-mp", "--model-package"}, description = "Package name to put at the top of generated model files.")
+        public String modelPackage;
+
+        @Parameter(required = true, names = {"-p", "--paths-path"}, description = "Path where generated paths files will be placed.")
+        public String pathsPath;
+
+        @Parameter(required = true, names = {"-pp", "--paths-package"}, description = "Package name to put at the top of generated paths files.")
+        public String pathsPackage;
+
+        @Parameter(required = true, names = {"-c", "--common-path"}, description = "Path where generated client files will be placed.")
+        public String commonPath;
+
+        @Parameter(required = true, names = {"-cp", "--common-package"}, description = "Package name to put at the top of generated client files.")
+        public String commonPackage;
+
+        @Parameter(required = true, names = {"-t", "--token-name"}, description = "Name of the token used for this application. i.e. X-Algo-API-Token.")
+        public String tokenName;
+
+        @Parameter(names = {"-tr", "--token-required"}, description = "Whether or not a no-token version of the constructor should be created.")
+        public Boolean tokenRequired = false;
+    }
+
+    /**
+     * Route command to java generator.
+     */
+    private static void javaGenerator(JavaGeneratorArgs args, JCommander command) {
+        try {
+            Generate.generate(
+                    args.clientName,
+                    args.specfile,
+                    args.modelPath,
+                    args.modelPackage,
+                    args.pathsPath,
+                    args.pathsPackage,
+                    args.commonPath,
+                    args.commonPackage,
+                    args.tokenName,
+                    !args.tokenRequired,
+                    "");
         } catch (Exception e) {
             System.out.println("Problem generating code:" + e.getMessage());
             System.out.println("\n\n");
             e.printStackTrace();
             System.out.println("\n\n");
 
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("generator", o);
+            command.usage();
             System.exit(0);
         }
-    }
-
-    /**
-     * @param clientName     Name of the client class. i.e. IndexerClient
-     * @param specfile       Full path to the OpenAPI v2 spec file.
-     * @param modelPath      Path where generated model files will be placed.
-     * @param modelPackage   Package name to put at the top of generated model files.
-     * @param pathsPath      Path where generated path builder files will be placed.
-     * @param pathsPackage   Package name to put at the top of generated path builder files.
-     * @param commonPath     Path where the common files are, this is where the client class will be placed.
-     * @param commonPackage  Package name to put at the top of generated client class.
-     * @param tokenName      Name of the token used for this application. i.e. X-Algo-API-Token
-     * @param tokenOptional  Whether or not a no-token version of the constructor should be created.
-     */
-    public static void Generate(
-            String clientName,
-            File specfile,
-            String modelPath,
-            String modelPackage,
-            String pathsPath,
-            String pathsPackage,
-            String commonPath,
-            String commonPackage,
-            String tokenName,
-            Boolean tokenOptional) throws Exception {
-
-        JsonNode root;
-        try (FileInputStream fis = new FileInputStream(specfile)) {
-            root = Utils.getRoot(fis);
-        }
-
-        Generator g = new Generator(root);
-
-        // Generate classes from the schemas
-        System.out.println("Generating " + modelPackage + " to " + modelPath);
-        Generator.generateAlgodIndexerObjects(root, modelPath, modelPackage);
-        Generator.generateEnumClasses(root, modelPath, modelPackage);
-
-        // Generate classes from the return types which have more than one return element
-        System.out.println("Generating " + modelPackage + " to " + modelPath);
-        Generator.generateReturnTypes(root, modelPath, modelPackage);
-
-        // Generate the algod methods
-        File imports = Files.createTempFile("imports_file", "txt").toFile();
-        File paths = Files.createTempFile("pathss_file", "txt").toFile();
-
-        System.out.println("Generating " + pathsPackage + " to " + pathsPath);
-        g.generateQueryMethods(
-                pathsPath,
-                pathsPackage,
-                modelPackage,
-                imports,
-                paths);
-
-        Collection<String> lines = Files.readAllLines(imports.toPath());
-        lines.add("import com.algorand.algosdk.crypto.Address;");
-
-        Utils.generateClientFile(
-                clientName,
-                lines,
-                paths,
-                commonPackage,
-                commonPath,
-                tokenName,
-                tokenOptional);
-    }
-
-    private static Options generateOptions() {
-        Options options = new Options();
-
-        options.addOption(Option.builder("h")
-                .longOpt("help")
-                .desc("Print help information.")
-                .build());
-
-        options.addOption(Option.builder("n")
-                .longOpt("client-name")
-                .desc("Name of the client class. i.e. IndexerClient")
-                .hasArg()
-                .argName("CLIENT NAME")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("s")
-                .longOpt("specfile")
-                .desc("Full path to the OpenAPI v2 spec file.")
-                .hasArg()
-                .argName("SPECFILE")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("m")
-                .longOpt("model-path")
-                .desc("Path where generated model files will be placed.")
-                .hasArg()
-                .argName("MODEL PATH")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("mp")
-                .longOpt("model-package")
-                .desc("Package name to put at the top of generated model files.")
-                .hasArg()
-                .argName("MODEL PACKAGE")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("p")
-                .longOpt("paths-path")
-                .desc("Path where generated path builder files will be placed.")
-                .hasArg()
-                .argName("PATH BUILDER PATH")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("pp")
-                .longOpt("paths-package")
-                .desc("Package name to put at the top of generated path builder files.")
-                .hasArg()
-                .argName("PATH BUILDER PACKAGE")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("c")
-                .longOpt("common-path")
-                .desc("Path where the common files are, this is where the client class will be placed.")
-                .hasArg()
-                .argName("COMMON PATH")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("cp")
-                .longOpt("common-package")
-                .desc("Package name to put at the top of generated client class.")
-                .hasArg()
-                .argName("COMMON PACKAGE")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("t")
-                .longOpt("token-name")
-                .desc("Name of the token used for this application. i.e. X-Algo-API-Token")
-                .hasArg()
-                .argName("TOKEN NAME")
-                .required()
-                .build());
-
-        options.addOption(Option.builder("tr")
-                .longOpt("token-required-flag")
-                .desc("Whether or not a no-token version of the constructor should be created.")
-                .build());
-
-        return options;
     }
 }

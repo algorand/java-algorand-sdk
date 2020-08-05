@@ -6,7 +6,7 @@ pushd $rootdir
 
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
-TEST_BRANCH=develop
+TEST_BRANCH=master
 
 function help {
   echo "Options:"
@@ -46,16 +46,19 @@ rm -rf test-harness
 git clone --single-branch --branch ${TEST_BRANCH} https://github.com/algorand/algorand-sdk-testing.git test-harness
 
 ## Copy feature files into the project resources
+
 rm -rf src/test/resources/com/algorand/algosdk/integration
 rm -rf src/test/resources/com/algorand/algosdk/unit
 mkdir -p src/test/resources/com/algorand/algosdk/integration
 mkdir -p src/test/resources/com/algorand/algosdk/unit
 
-# These are too tightly coupled with the integration tests.
+# The Java implementation of these is too tightly coupled with the
+# integration tests, so add them to the integration tests instead.
 mv test-harness/features/unit/offline.feature test-harness/features/integration/
 
 cp -r test-harness/features/integration/* src/test/resources/com/algorand/algosdk/integration
 cp -r test-harness/features/unit/* src/test/resources/com/algorand/algosdk/unit
+cp -r test-harness/features/resources/* src/test/resources/
 
 if [ "${UPDATE_FEATURE_FILES_ONLY}" == "1" ]; then
     my_exit 1

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AlgodResponses {
     AlgodClient client;
@@ -25,6 +26,7 @@ public class AlgodResponses {
     Response<PostTransactionsResponse> postTransactionsResponse;
     Response<SupplyResponse> supplyResponse;
     Response<TransactionParametersResponse> transactionParametersResponse;
+    Response<DryrunResponse> tealDryrunResponse;
 
     public AlgodResponses(ResponsesShared shared) {
         this.shared = shared;
@@ -91,6 +93,12 @@ public class AlgodResponses {
         transactionParametersResponse = client.TransactionParams().execute();
     }
 
+    @When("we make any Dryrun call")
+    public void we_make_any_Dryrun_call() throws Exception {
+        ClientMocker.infect(client);
+        tealDryrunResponse = client.TealDryrun().request(new DryrunRequest()).execute();
+    }
+
     @Then("the parsed Pending Transaction Information response should have sender {string}")
     public void the_parsed_Pending_Transaction_Information_response_should_have_sender(String string) throws IOException {
         verifyResponse(pendingTransactionResponse, shared.bodyFile);
@@ -139,5 +147,12 @@ public class AlgodResponses {
     @Then("the parsed Send Raw Transaction response should have txid {string}")
     public void the_parsed_Send_Raw_Transaction_response_should_have_txid(String txid) throws IOException {
         verifyResponse(postTransactionsResponse, shared.bodyFile);
+    }
+
+    @Then("the parsed Dryrun Response should have global delta {string} with {int}")
+    public void the_parsed_Dryrun_Response_should_have(String key, int action) throws Exception {
+        verifyResponse(tealDryrunResponse, shared.bodyFile);
+        assertThat(tealDryrunResponse.body().txns.get(0).globalDelta.get(0).key).isEqualTo(key);
+        assertThat(tealDryrunResponse.body().txns.get(0).globalDelta.get(0).value.action).isEqualTo(action);
     }
 }

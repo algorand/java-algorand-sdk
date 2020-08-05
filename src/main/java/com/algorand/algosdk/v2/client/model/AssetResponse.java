@@ -7,25 +7,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AssetResponse extends PathResponse {
 
-	@JsonProperty("asset")
-	public Asset asset;
+    /**
+     * Specifies both the unique identifier and the parameters for an asset
+     */
+    @JsonProperty("asset")
+    public Asset asset;
 
-	/**
-	 * Round at which the results were computed. 
-	 */
-	@JsonProperty("current-round")
-	public Long currentRound;
+    /**
+     * Round at which the results were computed.
+     */
+    @JsonProperty("current-round")
+    public Long currentRound;
 
-	@Override
-	public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
 
-		if (this == o) return true;
-		if (o == null) return false;
+        if (this == o) return true;
+        if (o == null) return false;
 
-		AssetResponse other = (AssetResponse) o;
-		if (!Objects.deepEquals(this.asset, other.asset)) return false;
-		if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
+        AssetResponse other = (AssetResponse) o;
+        if (!Objects.deepEquals(this.asset, other.asset)) return false;
+        if (!Objects.deepEquals(this.currentRound, other.currentRound)) return false;
 
-		return true;
-	}
+        return true;
+    }
 }

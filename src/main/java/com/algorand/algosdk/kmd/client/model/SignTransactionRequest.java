@@ -13,10 +13,12 @@
 
 package com.algorand.algosdk.kmd.client.model;
 
+import java.util.Objects;
+
 import com.google.gson.annotations.SerializedName;
+
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * APIV1POSTTransactionSignRequest is the request for &#x60;POST /v1/transaction/sign&#x60;
@@ -32,6 +34,9 @@ public class SignTransactionRequest {
 
   @SerializedName("wallet_password")
   private String walletPassword = null;
+
+  @SerializedName("public_key")
+  private byte[] publicKey = null;
 
   public SignTransactionRequest transaction(byte[] transaction) {
     this.transaction = transaction;
@@ -97,14 +102,15 @@ public class SignTransactionRequest {
     return false;
   }
     SignTransactionRequest signTransactionRequest = (SignTransactionRequest) o;
-    return ObjectUtils.equals(this.transaction, signTransactionRequest.transaction) &&
-    ObjectUtils.equals(this.walletHandleToken, signTransactionRequest.walletHandleToken) &&
-    ObjectUtils.equals(this.walletPassword, signTransactionRequest.walletPassword);
+    return this.transaction.equals(signTransactionRequest.transaction) &&
+    		this.walletHandleToken.equals(signTransactionRequest.walletHandleToken) &&
+    		this.walletPassword.equals(signTransactionRequest.walletPassword) &&
+    		this.publicKey.equals(signTransactionRequest.publicKey);
   }
 
   @Override
   public int hashCode() {
-    return ObjectUtils.hashCodeMulti(transaction, walletHandleToken, walletPassword);
+	 return Objects.hash(transaction, walletHandleToken, walletPassword, publicKey);
   }
 
 

@@ -9,26 +9,27 @@ import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 
 /**
- * /v2/transactions/params 
+ * Get parameters for constructing a new transaction
+ * /v2/transactions/params
  */
 public class TransactionParams extends Query {
 
-	public TransactionParams(Client client) {
-		super(client, new HttpMethod("get"));
-	}
+    public TransactionParams(Client client) {
+        super(client, new HttpMethod("get"));
+    }
 
-	@Override
-	public Response<TransactionParametersResponse> execute() throws Exception {
-		Response<TransactionParametersResponse> resp = baseExecute();
-		resp.setValueType(TransactionParametersResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<TransactionParametersResponse> execute() throws Exception {
+        Response<TransactionParametersResponse> resp = baseExecute();
+        resp.setValueType(TransactionParametersResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("transactions"));
-		addPathSegment(String.valueOf("params"));
+    protected QueryData getRequestString() {
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("transactions"));
+        addPathSegment(String.valueOf("params"));
 
-		return qd;
-	}
+        return qd;
+    }
 }

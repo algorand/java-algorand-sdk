@@ -1,6 +1,8 @@
 package com.algorand.algosdk.builder.transaction;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.Transaction.Type;
 
 import java.math.BigInteger;
 
@@ -27,6 +29,7 @@ import java.math.BigInteger;
  * You may only set addresses which are not zero for the existing asset.
  * Do not set assetUnitName, assetName, url, metadataHash, assetDecimals, assetTotal or defaultFrozen.
  */
+@SuppressWarnings("unchecked")
 public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactionBuilder<T>> extends AssetCreateTransactionBuilder<T> {
     protected BigInteger assetIndex = null;
     protected boolean strictEmptyAddressChecking = true;
@@ -38,8 +41,12 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
         return new AssetConfigureTransactionBuilder<>();
     }
 
+    private AssetConfigureTransactionBuilder() {
+        super(Type.AssetConfig);
+    }
+
     @Override
-    protected Transaction buildInternal() {
+    protected void applyTo(Transaction txn) {
         if (this.assetUnitName != null) {
             throw new IllegalArgumentException("Must not set assetUnitName.");
         }
@@ -62,20 +69,19 @@ public class AssetConfigureTransactionBuilder<T extends AssetConfigureTransactio
             throw new IllegalArgumentException("Must not set defaultFrozen.");
         }
 
-        return Transaction.createAssetConfigureTransaction(
-                sender,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisID,
-                genesisHash,
-                assetIndex,
-                manager,
-                reserve,
-                freeze,
-                clawback,
-                strictEmptyAddressChecking);
+        Address defaultAddr = new Address();
+        if (strictEmptyAddressChecking && ( 
+                (manager == null || manager.equals(defaultAddr)) ||
+                (reserve == null || reserve.equals(defaultAddr)) || 
+                (freeze == null || freeze.equals(defaultAddr)) ||
+                (clawback == null || clawback.equals(defaultAddr))
+                )) {
+            throw new RuntimeException("strict empty address checking requested but "
+                    + "empty or default address supplied to one or more manager addresses");
+        }
+        
+        if (assetIndex != null) txn.assetIndex = assetIndex;
+        super.applyTo(txn);
     }
 
     /**

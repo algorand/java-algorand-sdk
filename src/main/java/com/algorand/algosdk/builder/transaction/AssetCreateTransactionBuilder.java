@@ -1,12 +1,14 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.AssetParams;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Build an asset create transaction, a specialized form of the AssetConfigurationTransaction with a null index.
@@ -34,6 +36,7 @@ import java.security.NoSuchAlgorithmException;
  *     group
  *     lease
  */
+@SuppressWarnings("unchecked")
 public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuilder<T>> extends TransactionBuilder<T> {
     protected BigInteger assetTotal = null;
     protected Integer assetDecimals = null;
@@ -54,20 +57,26 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
         return new AssetCreateTransactionBuilder<>();
     }
 
-    protected AssetCreateTransactionBuilder() {
+    private AssetCreateTransactionBuilder() {
         super(Transaction.Type.AssetConfig);
     }
 
+    protected AssetCreateTransactionBuilder(Transaction.Type type) {
+        super(type);
+    }
+
     @Override
-    protected Transaction buildInternal() {
-        return Transaction.createAssetCreateTransaction(
-                sender,
-                fee,
-                firstValid,
-                lastValid,
-                note,
-                genesisID,
-                genesisHash,
+    protected void applyTo(Transaction txn) {
+        if (this.getClass() == AssetCreateTransactionBuilder.class) {
+            Objects.requireNonNull(sender, "sender is required.");
+            Objects.requireNonNull(firstValid, "firstValid is required.");
+            Objects.requireNonNull(lastValid, "lastValid is required.");
+            Objects.requireNonNull(genesisHash, "genesisHash is required.");
+            Objects.requireNonNull(assetTotal, "assetTotal is required.");
+            Objects.requireNonNull(assetDecimals, "assetDecimals is required.");
+        }
+
+        AssetParams params = new AssetParams(
                 assetTotal,
                 assetDecimals,
                 defaultFrozen,
@@ -77,9 +86,9 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
                 metadataHash,
                 manager,
                 reserve,
-                freeze,
-                clawback
-        );
+                freeze, 
+                clawback);
+        txn.assetParams = params;
     }
 
     /**

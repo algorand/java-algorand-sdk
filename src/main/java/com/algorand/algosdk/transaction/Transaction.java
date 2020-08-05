@@ -2,24 +2,18 @@ package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.*;
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.ParticipationPublicKey;
-import com.algorand.algosdk.crypto.VRFPublicKey;
+import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.*;
-import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A raw serializable transaction class, used to generate transactions to broadcast to the network.
@@ -32,8 +26,8 @@ public class Transaction implements Serializable {
     @JsonProperty("type")
     public Type type = Type.Default;
 
-    // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields. This circumvents our encoders'
-    // inability to sort child fields.
+    // Instead of embedding POJOs and using JsonUnwrapped, we explicitly export inner fields.
+    // This circumvents our encoders' inability to sort child fields.
     /* header fields ***********************************************************/
     @JsonProperty("snd")
     public Address sender = new Address();
@@ -53,6 +47,8 @@ public class Transaction implements Serializable {
     public Digest group = new Digest();
     @JsonProperty("lx")
     public byte[] lease;
+    @JsonProperty("rekey")
+    public Address rekeyTo = new Address();
 
     /* payment fields  *********************************************************/
     @JsonProperty("amt")
@@ -116,11 +112,44 @@ public class Transaction implements Serializable {
     /* asset freeze fields */
     @JsonProperty("fadd")
     public Address freezeTarget = new Address();
+
     @JsonProperty("faid")
     public BigInteger assetFreezeID = BigInteger.valueOf(0);
+
     @JsonProperty("afrz")
     public boolean freezeState = false;
-    
+
+    /* application fields */
+    @JsonProperty("apaa")
+    public List<byte[]> applicationArgs = new ArrayList<>();
+
+    @JsonProperty("apan")
+    public OnCompletion onCompletion = OnCompletion.NoOpOC;
+
+    @JsonProperty("apap")
+    public TEALProgram approvalProgram = null;
+
+    @JsonProperty("apat")
+    public List<Address> accounts = new ArrayList<>();
+
+    @JsonProperty("apfa")
+    public List<Long> foreignApps = new ArrayList<>();
+
+    @JsonProperty("apas")
+    public List<Long> foreignAssets = new ArrayList<>();
+
+    @JsonProperty("apgs")
+    public StateSchema globalStateSchema = new StateSchema();
+
+    @JsonProperty("apid")
+    public Long applicationId = 0L;
+
+    @JsonProperty("apls")
+    public StateSchema localStateSchema = new StateSchema();
+
+    @JsonProperty("apsu")
+    public TEALProgram clearStateProgram = null;
+
     /**
      * Create a payment transaction
      * @param fromAddr source address
@@ -210,6 +239,7 @@ public class Transaction implements Serializable {
                 genesisHash,
                 null,
                 null,
+                null,
                 // payment fields
                 amount,
                 receiver,
@@ -232,7 +262,17 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
-                false); // default value which wont be included in the serialized object.
+                false, // default value which wont be included in the serialized object.
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     /**
@@ -253,8 +293,7 @@ public class Transaction implements Serializable {
                        String genesisID, Digest genesisHash,
                        ParticipationPublicKey votePK, VRFPublicKey vrfPK,
                        BigInteger voteFirst, BigInteger voteLast, BigInteger voteKeyDilution) {
-        // populate with default values which will be ignored...
-        this.type = Type.KeyRegistration;        
+        this.type = Type.KeyRegistration;
         if (sender != null) this.sender = sender;
         setFee(fee);
         if (firstValid != null) this.firstValid = firstValid;
@@ -302,6 +341,7 @@ public class Transaction implements Serializable {
                 genesisHash,
                 null,
                 null,
+                null,
                 // payment fields
                 null,
                 null,
@@ -324,7 +364,17 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
-                false); // default value which wont be included in the serialized object.
+                false, // default value which wont be included in the serialized object.
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
 
     /**
@@ -413,6 +463,7 @@ public class Transaction implements Serializable {
                 genesisHash,
                 null,
                 null,
+                null,
                 // payment fields
                 null,
                 null,
@@ -435,7 +486,17 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
-                false); // default value which wont be included in the serialized object.
+                false, // default value which wont be included in the serialized object.
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null);
     }
     
     /**
@@ -500,7 +561,7 @@ public class Transaction implements Serializable {
     		Address freeze, 
     		Address clawback,
     		boolean strictEmptyAddressChecking) {
-    	Address defaultAddr = new Address();
+        Address defaultAddr = new Address();
     	if (strictEmptyAddressChecking && ( 
     			(manager == null || manager.equals(defaultAddr)) ||
     			(reserve == null || reserve.equals(defaultAddr)) ||	
@@ -524,7 +585,19 @@ public class Transaction implements Serializable {
     			freeze, 
     			clawback);
     }
-   
+
+    /**
+     * Helper for Jackson conversion.
+     */
+    private static List<Address> convertToAddressList(List<byte[]> addressBytes) {
+        if (addressBytes == null) return null;
+        List<Address> result = new ArrayList<>();
+        for (byte[] addr : addressBytes) {
+            result.add(new Address(addr));
+        }
+        return result;
+    }
+
     // workaround for nested JsonValue classes
     @JsonCreator
     private Transaction(@JsonProperty("type") Type type,
@@ -537,6 +610,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("gen") String genesisID,
                         @JsonProperty("gh") byte[] genesisHash,
                         @JsonProperty("lx") byte[] lease,
+                        @JsonProperty("rekey") byte[] rekeyTo,
                         @JsonProperty("grp") byte[] group,			
                         // payment fields
                         @JsonProperty("amt") BigInteger amount,
@@ -560,7 +634,19 @@ public class Transaction implements Serializable {
                         // asset freeze fields
                         @JsonProperty("fadd") byte[] freezeTarget,
                         @JsonProperty("faid") BigInteger assetFreezeID,
-                        @JsonProperty("afrz") boolean freezeState) {
+                        @JsonProperty("afrz") boolean freezeState,
+                        // application fields
+                        @JsonProperty("apaa") List<byte[]> applicationArgs,
+                        @JsonProperty("apan") OnCompletion onCompletion,
+                        @JsonProperty("apap") byte[] approvalProgram,
+                        @JsonProperty("apat") List<byte[]> accounts,
+                        @JsonProperty("apfa") List<Long> foreignApps,
+                        @JsonProperty("apas") List<Long> foreignAssets,
+                        @JsonProperty("apgs") StateSchema globalStateSchema,
+                        @JsonProperty("apid") Long applicationId,
+                        @JsonProperty("apls") StateSchema localStateSchema,
+                        @JsonProperty("apsu") byte[] clearStateProgram
+                        ) throws IOException {
         this(
              type,
              //header fields
@@ -572,6 +658,7 @@ public class Transaction implements Serializable {
              genesisID,
              new Digest(genesisHash),
              lease,
+             new Address(rekeyTo),
              new Digest(group),
              // payment fields
              amount,
@@ -594,7 +681,19 @@ public class Transaction implements Serializable {
              new Address(assetCloseTo),
              new Address(freezeTarget),
              assetFreezeID,
-             freezeState);
+             freezeState,
+             // application fields
+             applicationArgs,
+             onCompletion,
+             approvalProgram == null ? null : new TEALProgram(approvalProgram),
+             convertToAddressList(accounts),
+             foreignApps,
+             foreignAssets,
+             globalStateSchema,
+             applicationId,
+             localStateSchema,
+             clearStateProgram == null ? null : new TEALProgram(clearStateProgram)
+        );
     }
 
     /**
@@ -612,7 +711,8 @@ public class Transaction implements Serializable {
                         byte[] note,
                         String genesisID,
                         Digest genesisHash,
-                        byte[] lease, 
+                        byte[] lease,
+                        Address rekeyTo,
                         Digest group,
                         // payment fields
                         BigInteger amount,
@@ -636,7 +736,19 @@ public class Transaction implements Serializable {
                         Address assetCloseTo,
                         Address freezeTarget,
                         BigInteger assetFreezeID,
-                        boolean freezeState) {
+                        boolean freezeState,
+                        // application fields
+                        List<byte[]> applicationArgs,
+                        OnCompletion onCompletion,
+                        TEALProgram approvalProgram,
+                        List<Address> accounts,
+                        List<Long> foreignApps,
+                        List<Long> foreignAssets,
+                        StateSchema globalStateSchema,
+                        Long applicationId,
+                        StateSchema localStateSchema,
+                        TEALProgram clearStateProgram
+                        ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
         setFee(fee);
@@ -646,6 +758,7 @@ public class Transaction implements Serializable {
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
         setLease(lease);
+        if (rekeyTo != null) this.rekeyTo = rekeyTo;
         if (group != null) this.group = group;
         if (amount != null) this.amount = amount;
         if (receiver != null) this.receiver = receiver;
@@ -665,10 +778,20 @@ public class Transaction implements Serializable {
         if (freezeTarget != null) this.freezeTarget = freezeTarget;
         if (assetFreezeID != null) this.assetFreezeID = assetFreezeID;
         this.freezeState = freezeState;
+        if (applicationArgs != null) this.applicationArgs = applicationArgs;
+        if (onCompletion != null) this.onCompletion = onCompletion;
+        if (approvalProgram != null) this.approvalProgram = approvalProgram;
+        if (accounts != null) this.accounts = accounts;
+        if (foreignApps != null) this.foreignApps = foreignApps;
+        if (foreignAssets != null) this.foreignAssets = foreignAssets;
+        if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
+        if (applicationId != null) this.applicationId = applicationId;
+        if (localStateSchema != null) this.localStateSchema = globalStateSchema;
+        if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
     }
 
     // Used by Jackson to determine "default" values.
-    protected Transaction() {
+    public Transaction() {
         // Override the default to 0 so that it will be serialized
         this.fee = BigInteger.valueOf(0);
     }
@@ -991,18 +1114,10 @@ public class Transaction implements Serializable {
         KeyRegistration("keyreg"),
         AssetConfig("acfg"),
         AssetTransfer("axfer"),
-        AssetFreeze("afrz");
+        AssetFreeze("afrz"),
+        ApplicationCall("appl");
 
         private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
-
-        static {
-            namesMap.put(Default.value, Default);
-            namesMap.put(Payment.value, Payment);
-            namesMap.put(KeyRegistration.value, KeyRegistration);
-            namesMap.put(AssetConfig.value, AssetConfig);
-            namesMap.put(AssetTransfer.value, AssetTransfer);
-            namesMap.put(AssetFreeze.value, AssetFreeze);
-        }
 
         private final String value;
         Type(String value) {
@@ -1016,7 +1131,12 @@ public class Transaction implements Serializable {
          */
         @JsonCreator
         public static Type forValue(String value) {
-            return namesMap.get(value);
+            for (Type t :  values()) {
+                if(t.value.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return null;
         }
 
         /**
@@ -1025,11 +1145,54 @@ public class Transaction implements Serializable {
          */
         @JsonValue
         public String toValue() {
-            for (Map.Entry<String, Type> entry : namesMap.entrySet()) {
-                if (entry.getValue() == this)
-                    return entry.getKey();
+            return value;
+        }
+    }
+
+    public enum OnCompletion {
+        NoOpOC(0, "noop"),
+        OptInOC(1, "optin"),
+        CloseOutOC(2, "closeout"),
+        ClearStateOC(3, "clearstate"),
+        UpdateApplicationOC(4, "update"),
+        DeleteApplicationOC(5, "delete");
+
+        private final int serializedValue;
+        private final String serializedName;
+
+        OnCompletion(int serializeValue, String serializedName) {
+            this.serializedValue = serializeValue;
+            this.serializedName = serializedName;
+        }
+
+        @JsonCreator
+        public OnCompletion String(String name) {
+            for(OnCompletion oc : values()) {
+                if (oc.serializedName.equalsIgnoreCase(name)) {
+                    return oc;
+                }
             }
             return null;
+        }
+
+        @JsonCreator
+        public OnCompletion String(int value) {
+            for(OnCompletion oc : values()) {
+                if (oc.serializedValue == value) {
+                    return oc;
+                }
+            }
+            return null;
+        }
+
+        @JsonValue
+        public int toValue() {
+            return serializedValue;
+        }
+
+        @Override
+        public String toString() {
+            return serializedName;
         }
     }
 
@@ -1056,7 +1219,7 @@ public class Transaction implements Serializable {
             System.arraycopy(encodedTx, 0, prefixEncodedTx, TX_SIGN_PREFIX.length, encodedTx.length);
             return prefixEncodedTx;
         } catch (IOException e) {
-            throw new RuntimeException("serialization failed", e);
+            throw new RuntimeException("serialization failed: " + e.getMessage(), e);
         }
     }
 
@@ -1117,158 +1280,9 @@ public class Transaction implements Serializable {
                 freezeTarget.equals(that.freezeTarget) &&
                 assetFreezeID.equals(that.assetFreezeID) &&
                 freezeState == that.freezeState &&
+                rekeyTo.equals(that.rekeyTo) &&
                 Arrays.equals(lease, ((Transaction) o).lease);
     }
-
-    @JsonPropertyOrder(alphabetic=true)
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    public static class AssetParams implements Serializable {
-        // total asset issuance
-        @JsonProperty("t")
-        public BigInteger assetTotal = BigInteger.valueOf(0);
-
-        // Decimals specifies the number of digits to display after the decimal
-        // place when displaying this asset. A value of 0 represents an asset
-        // that is not divisible, a value of 1 represents an asset divisible
-        // into tenths, and so on. This value must be between 0 and 19
-        // (inclusive).
-        @JsonProperty("dc")
-        public Integer assetDecimals = 0;
-
-        // whether each account has their asset slot frozen for this asset by default
-        @JsonProperty("df")
-        public boolean assetDefaultFrozen = false;
-
-        // a hint to the unit name of the asset
-        @JsonProperty("un")
-        public String assetUnitName = "";
-
-        // the name of the asset
-        @JsonProperty("an")
-        public String assetName = "";
-
-        // URL where more information about the asset can be retrieved
-        @JsonProperty("au")
-        public String url = "";
-
-        // MetadataHash specifies a commitment to some unspecified asset
-        // metadata. The format of this metadata is up to the application.
-        @JsonProperty("am")
-        public byte [] metadataHash;
-
-        // the address which has the ability to reconfigure the asset
-        @JsonProperty("m")
-        public Address assetManager = new Address();
-
-        // the asset reserve: assets owned by this address do not count against circulation
-        @JsonProperty("r")
-        public Address assetReserve = new Address();
-
-        // the address which has the ability to freeze/unfreeze accounts holding this asset
-        @JsonProperty("f")
-        public Address assetFreeze = new Address();
-
-        // the address which has the ability to issue clawbacks against asset-holding accounts
-        @JsonProperty("c")
-        public Address assetClawback = new Address();
-        
-        public AssetParams(
-                BigInteger assetTotal,
-                Integer assetDecimals,
-                boolean defaultFrozen,
-                String assetUnitName,
-                String assetName,
-                String url,
-                byte [] metadataHash,
-                Address manager,
-                Address reserve,
-                Address freeze,
-                Address clawback) {
-            if(assetTotal != null) this.assetTotal = assetTotal;
-            if(assetDecimals != null) this.assetDecimals = assetDecimals;
-            this.assetDefaultFrozen = defaultFrozen;
-            if(manager != null) this.assetManager = manager;
-            if(reserve != null) this.assetReserve = reserve;
-            if(freeze != null) this.assetFreeze = freeze;
-            if(clawback != null) this.assetClawback = clawback;
-
-            if(assetDecimals != null) {
-                if (assetDecimals < 0 || assetDecimals > 19) throw new RuntimeException("assetDecimals cannot be less than 0 or greater than 19");
-                this.assetDecimals = assetDecimals;
-            }
-
-            if(assetUnitName != null) {
-                if (assetUnitName.length() > 8) throw new RuntimeException("assetUnitName cannot be greater than 8 characters");
-                this.assetUnitName = assetUnitName;
-            }
-
-            if(assetName != null) {
-                if (assetName.length() > 32) throw new RuntimeException("assetName cannot be greater than 32 characters");
-                this.assetName = assetName;
-            }
-
-            if(url != null) {
-                if (url.length() > 32) throw new RuntimeException("asset url cannot be greater than 32 characters");
-                this.url = url;
-            }
-
-            if(metadataHash != null) {
-                if (metadataHash.length > 32) throw new RuntimeException("asset metadataHash cannot be greater than 32 bytes");
-                if (!Base64.isBase64(metadataHash)) throw new RuntimeException("asset metadataHash '" + new String(metadataHash) + "' is not base64 encoded");
-                this.metadataHash = metadataHash;
-            }
-        }
-
-        public AssetParams() {
-
-        }
-
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            AssetParams that = (AssetParams) o;
-            return assetTotal.equals(that.assetTotal) &&
-                assetDecimals.equals(that.assetDecimals) &&
-                (assetDefaultFrozen == that.assetDefaultFrozen) &&
-                assetName.equals(that.assetName) &&
-                assetUnitName.equals(that.assetUnitName) &&
-                url.equals(that.url) &&
-                Arrays.equals(metadataHash, that.metadataHash) &&
-                assetManager.equals(that.assetManager) &&
-                assetReserve.equals(that.assetReserve) &&
-                assetFreeze.equals(that.assetFreeze) &&
-                assetClawback.equals(that.assetClawback);
-        }
-
-        @JsonCreator
-        private AssetParams(@JsonProperty("t") BigInteger assetTotal,
-            @JsonProperty("dc") Integer assetDecimals,
-            @JsonProperty("df") boolean assetDefaultFrozen,
-            @JsonProperty("un") String assetUnitName,
-            @JsonProperty("an") String assetName,
-            @JsonProperty("au") String url,
-            @JsonProperty("am") byte[] metadataHash,
-            @JsonProperty("m") byte[] assetManager,
-            @JsonProperty("r") byte[] assetReserve,
-            @JsonProperty("f") byte[] assetFreeze,
-            @JsonProperty("c") byte[] assetClawback) {
-            this(assetTotal, assetDecimals, assetDefaultFrozen, assetUnitName, assetName, url, metadataHash, new Address(assetManager), new Address(assetReserve), new Address(assetFreeze), new Address(assetClawback));
-        }
-        
-        /**
-         * Convert the given object to string with each line indented by 4 spaces
-         * (except the first line).
-         */
-        private String toIndentedString(java.lang.Object o) {
-          if (o == null) {
-            return "null";
-          }
-          return o.toString().replace("\n", "\n    ");
-        }
-    }
-
 
     /**
      * Create a {@link PaymentTransactionBuilder}.
@@ -1331,5 +1345,54 @@ public class Transaction implements Serializable {
      */
     public static AssetFreezeTransactionBuilder<?> AssetFreezeTransactionBuilder() {
         return AssetFreezeTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationCreateTransactionBuilder}.
+     */
+    public static ApplicationCreateTransactionBuilder<?> ApplicationCreateTransactionBuilder() {
+        return ApplicationCreateTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationUpdateTransactionBuilder}.
+     */
+    public static ApplicationUpdateTransactionBuilder<?> ApplicationUpdateTransactionBuilder() {
+        return ApplicationUpdateTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationDeleteTransactionBuilder}.
+     */
+    public static ApplicationDeleteTransactionBuilder<?> ApplicationDeleteTransactionBuilder() {
+        return ApplicationDeleteTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationOptInTransactionBuilder}.
+     */
+    public static ApplicationOptInTransactionBuilder<?> ApplicationOptInTransactionBuilder() {
+        return ApplicationOptInTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationCloseTransactionBuilder}.
+     */
+    public static ApplicationCloseTransactionBuilder<?> ApplicationCloseTransactionBuilder() {
+        return ApplicationCloseTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationCallTransactionBuilder}.
+     */
+    public static ApplicationCallTransactionBuilder<?> ApplicationCallTransactionBuilder() {
+        return ApplicationCallTransactionBuilder.Builder();
+    }
+
+    /**
+     * Create a {@link ApplicationClearTransactionBuilder}.
+     */
+    public static ApplicationClearTransactionBuilder<?> ApplicationClearTransactionBuilder() {
+        return ApplicationClearTransactionBuilder.Builder();
     }
 }

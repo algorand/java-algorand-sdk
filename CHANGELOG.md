@@ -1,3 +1,6 @@
+# 1.5.0
+- Added support for Algorand Smart Contract Applications.
+
 # 1.4.2
 - Accept URI formatting in AlgodClient and IndexerClient to specify connection scheme.
 

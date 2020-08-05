@@ -1,5 +1,6 @@
 package com.algorand.algosdk.transaction;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.Signature;
@@ -24,6 +25,11 @@ public class SignedTransaction implements Serializable {
     public MultisigSignature mSig = new MultisigSignature();
     @JsonProperty("lsig")
     public LogicsigSignature lSig = new LogicsigSignature();
+    @JsonProperty("sgnr")
+    public void authAddr(byte[] sigAddr) throws NoSuchAlgorithmException {
+        this.authAddr = new Address(sigAddr);
+    }
+    public Address authAddr = new Address();
 
     @JsonIgnore
     public String transactionID = "";
@@ -65,17 +71,24 @@ public class SignedTransaction implements Serializable {
     private SignedTransaction() {
     }
 
+    public SignedTransaction authAddr(Address authAddr) {
+        this.authAddr = authAddr;
+        return this;
+    }
+
     @JsonCreator
     public SignedTransaction(
             @JsonProperty("txn") Transaction tx,
             @JsonProperty("sig") byte[] sig,
             @JsonProperty("msig") MultisigSignature mSig,
-            @JsonProperty("lsig") LogicsigSignature lSig
+            @JsonProperty("lsig") LogicsigSignature lSig,
+            @JsonProperty("sgnr") byte[] authAddr
     ) {
         if (tx != null) this.tx = tx;
         if (sig != null) this.sig = new Signature(sig);
         if (mSig != null) this.mSig = mSig;
         if (lSig != null) this.lSig = lSig;
+        if (authAddr != null) this.authAddr = new Address(authAddr);
         // don't recover the txid yet
     }
 
@@ -86,6 +99,7 @@ public class SignedTransaction implements Serializable {
             if (!tx.equals(actual.tx)) return false;
             if (!sig.equals(actual.sig)) return false;
             if (!lSig.equals(actual.lSig)) return false;
+            if (!authAddr.equals(actual.authAddr)) return false;
             return this.mSig.equals(actual.mSig);
         } else {
             return false;

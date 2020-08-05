@@ -10,41 +10,44 @@ import com.algorand.algosdk.v2.client.model.AccountResponse;
 
 
 /**
- * Lookup account information. 
- * /v2/accounts/{account-id} 
+ * Lookup account information.
+ * /v2/accounts/{account-id}
  */
 public class LookupAccountByID extends Query {
 
-	private Address accountId;
+    private Address accountId;
 
-	/**
-	 * @param accountId account string 
-	 */
-	public LookupAccountByID(Client client, Address accountId) {
-		super(client, new HttpMethod("get"));
-		this.accountId = accountId;
-	}
+    /**
+     * @param accountId account string
+     */
+    public LookupAccountByID(Client client, Address accountId) {
+        super(client, new HttpMethod("get"));
+        this.accountId = accountId;
+    }
 
-	/**
-	 * Include results for the specified round. 
-	 */
-	public LookupAccountByID round(Long round) {
-		addQuery("round", String.valueOf(round));
-		return this;
-	}
+    /**
+     * Include results for the specified round.
+     */
+    public LookupAccountByID round(Long round) {
+        addQuery("round", String.valueOf(round));
+        return this;
+    }
 
-	@Override
-	public Response<AccountResponse> execute() throws Exception {
-		Response<AccountResponse> resp = baseExecute();
-		resp.setValueType(AccountResponse.class);
-		return resp;
-	}
+    @Override
+    public Response<AccountResponse> execute() throws Exception {
+        Response<AccountResponse> resp = baseExecute();
+        resp.setValueType(AccountResponse.class);
+        return resp;
+    }
 
-	protected QueryData getRequestString() {
-		addPathSegment(String.valueOf("v2"));
-		addPathSegment(String.valueOf("accounts"));
-		addPathSegment(String.valueOf(accountId));
+    protected QueryData getRequestString() {
+        if (this.accountId == null) {
+            throw new RuntimeException("account-id is not set. It is a required parameter.");
+        }
+        addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("accounts"));
+        addPathSegment(String.valueOf(accountId));
 
-		return qd;
-	}
+        return qd;
+    }
 }
