@@ -126,6 +126,15 @@ public class ResponsesShared {
                     case "any": // error case, everything uses the same error message
                         response = algod.TransactionParams().execute();
                         break;
+                    case "PendingTransactionInformation":
+                        response = algod.PendingTransactionInformation("transaction").execute();
+                        break;
+                    case "GetPendingTransactions":
+                        response = algod.GetPendingTransactions().execute();
+                        break;
+                    case "GetPendingTransactionsByAddress":
+                        response = algod.GetPendingTransactionsByAddress(new Address()).execute();
+                        break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
                 }
