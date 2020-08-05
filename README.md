@@ -27,6 +27,15 @@ Maven:
 </dependency>
 ```
 
+For smart contract application support:
+```xml
+<dependency>
+    <groupId>com.algorand</groupId>
+    <artifactId>algosdk</artifactId>
+    <version>1.5.0-beta</version>
+</dependency>
+```
+
 # Quickstart
 
 ```java
