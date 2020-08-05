@@ -189,18 +189,20 @@ public class TestingUtils {
             case STRING:
             case BINARY:
                 {
-                    // Check for multiple encodings, it's possible that in some cases a base64 value needs to be decoded
-                    // and compared against a string. Or in other cases it needs to remain in the base64 encoded format.
-                    Set<String> possibleExpectedValues = getPossibleStringsFromNode(expected);
-                    Set<String> possibleActualValues = getPossibleStringsFromNode(actual);
+                    String expectedValue = (expected == null) ? "" : expected.asText();
+                    String actualValue = (actual == null) ? "" : actual.asText();
 
-                    long matches = possibleExpectedValues.stream().filter(v -> possibleActualValues.contains(v)).count();
-
-                    assertThat(matches)
-                            .as("There should be at least one match between expected values ['%s'] and actual values ['%s']",
-                                    String.join("', '", possibleExpectedValues),
-                                    String.join("', '", possibleActualValues))
-                            .isNotZero();
+                    if (!expectedValue.equals(actualValue)) {
+                        String decodedActual = new String(Encoder.decodeFromBase64(actualValue));
+                        String decodedExpected = new String(Encoder.decodeFromBase64(expectedValue));
+                        if (decodedExpected.equals(actualValue)) {
+                            // good, continue
+                        } else if (decodedActual.equals(expectedValue)) {
+                            // good, continue
+                        } else {
+                            Assertions.fail("Unable to find a match between ['%s'] and ['%s']", expectedValue, actualValue);
+                        }
+                    }
                 }
                 break;
             case NULL:
@@ -210,21 +212,6 @@ public class TestingUtils {
             case POJO:
                 Assertions.fail("Unhandled type: " + type);
                 break;
-        }
-    }
-
-    private static Set<String> getPossibleStringsFromNode(JsonNode node) {
-        if (node == null) return ImmutableSet.of("");
-        switch (node.getNodeType()) {
-            case BINARY:
-                return ImmutableSet.of(
-                        new String(Encoder.decodeFromBase64(node.asText())),
-                        node.asText());
-            case STRING:
-                return ImmutableSet.of(node.asText());
-            default:
-                Assertions.fail("Cannot convert to string.");
-                return ImmutableSet.of("");
         }
     }
 
