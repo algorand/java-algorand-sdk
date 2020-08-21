@@ -23,16 +23,7 @@ Maven:
 <dependency>
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>1.4.2</version>
-</dependency>
-```
-
-For smart contract application support:
-```xml
-<dependency>
-    <groupId>com.algorand</groupId>
-    <artifactId>algosdk</artifactId>
-    <version>1.5.0-beta</version>
+    <version>1.5.0</version>
 </dependency>
 ```
 
