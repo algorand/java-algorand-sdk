@@ -58,7 +58,6 @@ public class TestLogic {
         IntConstBlock results = readIntConstBlock(data, 0);
         assertThat(results.size).isEqualTo(data.length);
         assertThat(results.results)
-                .extracting("value")
                 .containsExactlyElementsOf(ImmutableList.of(0, 1, 456, 123, 2));
     }
 
@@ -85,7 +84,7 @@ public class TestLogic {
         // Null argument
         ProgramData programData = readProgram(program, null);
         assertThat(programData.good).isTrue();
-        assertThat(programData.intBlock).extracting("value")
+        assertThat(programData.intBlock)
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isEmpty();
 
@@ -93,7 +92,7 @@ public class TestLogic {
         ArrayList<byte[]> args = new ArrayList<>();
         programData = readProgram(program, args);
         assertThat(programData.good).isTrue();
-        assertThat(programData.intBlock).extracting("value")
+        assertThat(programData.intBlock)
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isEmpty();
 
@@ -104,7 +103,7 @@ public class TestLogic {
 
         programData = readProgram(program, args);
         assertThat(programData.good).isTrue();
-        assertThat(programData.intBlock).extracting("value")
+        assertThat(programData.intBlock)
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isEmpty();
 
@@ -116,7 +115,7 @@ public class TestLogic {
         System.arraycopy(int1, 0, program2, program.length, int1.length);
         programData = readProgram(program2, args);
         assertThat(programData.good).isTrue();
-        assertThat(programData.intBlock).extracting("value")
+        assertThat(programData.intBlock)
                 .containsExactlyElementsOf(ImmutableList.of(1));
         assertThat(programData.byteBlock).isEmpty();
    }
