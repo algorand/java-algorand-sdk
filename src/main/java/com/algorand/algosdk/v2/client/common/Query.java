@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.common;
 
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.model.Account;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public abstract class Query {
@@ -17,9 +18,13 @@ public abstract class Query {
     protected abstract QueryData getRequestString();
 
     protected <T>Response<T> baseExecute() throws Exception {
+        return baseExecute(null, null);
+    }
+
+    protected <T>Response<T> baseExecute(String[] headers, String[] values) throws Exception {
 
         QueryData qData = this.getRequestString();
-        com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod);
+        com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod, headers, values);
         if (resp.isSuccessful()) {
             return new Response<T>(resp.code(), null, resp.body().contentType().toString(), resp.body().bytes());
         } else {
@@ -64,4 +69,5 @@ public abstract class Query {
     }
 
     public abstract Response<?> execute() throws Exception;
+    public abstract Response<?> execute(String[] headers, String[] values) throws Exception;
 }

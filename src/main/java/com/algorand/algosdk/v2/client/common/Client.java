@@ -73,12 +73,25 @@ public class Client {
         this.tokenKey = tokenKey;
     }
 
-    public Response executeCall(QueryData qData, HttpMethod httpMethod) throws Exception {
+    public Response executeCall(QueryData qData, HttpMethod httpMethod, String[] headers, String[] values) throws Exception {
 
         HttpUrl httpUrl = getHttpUrl(qData, port, host);
         Builder reqBuilder = new Request.Builder().url(httpUrl);
+
+        // Token header
         if (token != null) {
             reqBuilder.addHeader(tokenKey, token);
+        }
+
+        // Custom headers.
+        if (headers != null || values != null) {
+            if (headers == null || values == null || headers.length != values.length) {
+                throw new IllegalArgumentException("Header and value arrays must be the same length.");
+            }
+
+            for (int i = 0; i < headers.length; i++) {
+                reqBuilder.addHeader(headers[i], values[i]);
+            }
         }
 
         switch (httpMethod.method()) {

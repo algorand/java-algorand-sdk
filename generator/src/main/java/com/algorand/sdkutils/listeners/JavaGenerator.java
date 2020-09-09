@@ -644,12 +644,31 @@ final class JavaQueryWriter {
 
     static String getQueryResponseMethod(String returnType) {
         String ret =
+                "   /**\n" +
+                "    * Execute the query." +
+                "    * @return the query response object.\n" +
+                "    * @throws Exception\n" +
+                "    */\n" +
                 "    @Override\n" +
-                        "    public Response<" + returnType + "> execute() throws Exception {\n" +
-                        "        Response<" + returnType + "> resp = baseExecute();\n" +
-                        "        resp.setValueType(" + returnType + ".class);\n" +
-                        "        return resp;\n" +
-                        "    }\n\n";
+                "    public Response<" + returnType + "> execute() throws Exception {\n" +
+                "        Response<" + returnType + "> resp = baseExecute();\n" +
+                "        resp.setValueType(" + returnType + ".class);\n" +
+                "        return resp;\n" +
+                "    }\n\n" +
+                "   /**\n" +
+                "    * Execute the query with custom headers, there must be an equal number of keys and values\n" +
+                "    * or else an error will be generated.\n" +
+                "    * @param headers an array of header keys\n" +
+                "    * @param values an array of header values\n" +
+                "    * @return the query response object.\n" +
+                "    * @throws Exception\n" +
+                "    */\n" +
+                "    @Override\n" +
+                "    public Response<" + returnType + "> execute() throws Exception {\n" +
+                "        Response<" + returnType + "> resp = baseExecute(String[] headers, String[] values);\n" +
+                "        resp.setValueType(" + returnType + ".class);\n" +
+                "        return resp;\n" +
+                "    }\n\n";
         return ret;
     }
 
