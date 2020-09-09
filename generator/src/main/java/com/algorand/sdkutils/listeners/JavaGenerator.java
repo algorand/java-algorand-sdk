@@ -82,7 +82,7 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event) {
         switch(event) {
         case END_QUERY:
-            javaQueryWriter.finalize();
+            javaQueryWriter.finish();
             break;
         default:
             throw new RuntimeException("Unimplemented event! " + event);
@@ -561,7 +561,7 @@ final class JavaQueryWriter {
         }
     }
 
-    public void finalize() {
+    public void finish() {
 
         javaGen.generatedPathsImports.append("import " + javaGen.queryPackage + "." + className + ";\n");
 
@@ -766,7 +766,7 @@ final class JavaModelWriter {
 
         if (!modelPropertyAdded) {
             // No file should be generated
-            // There are some alias types in one spec file, which 
+            // There are some alias types in one spec file, which
             // are in contradiction with real types in the other spec file.
             // We don't want the alias type file to corrupt the real type object.
             return;
