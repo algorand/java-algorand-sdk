@@ -645,7 +645,7 @@ final class JavaQueryWriter {
     static String getQueryResponseMethod(String returnType) {
         String ret =
                 "   /**\n" +
-                "    * Execute the query." +
+                "    * Execute the query.\n" +
                 "    * @return the query response object.\n" +
                 "    * @throws Exception\n" +
                 "    */\n" +
