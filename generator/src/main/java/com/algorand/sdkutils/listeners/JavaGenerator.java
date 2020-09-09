@@ -664,8 +664,8 @@ final class JavaQueryWriter {
                 "    * @throws Exception\n" +
                 "    */\n" +
                 "    @Override\n" +
-                "    public Response<" + returnType + "> execute() throws Exception {\n" +
-                "        Response<" + returnType + "> resp = baseExecute(String[] headers, String[] values);\n" +
+                "    public Response<" + returnType + "> execute(String[] headers, String[] values) throws Exception {\n" +
+                "        Response<" + returnType + "> resp = baseExecute(headers, values);\n" +
                 "        resp.setValueType(" + returnType + ".class);\n" +
                 "        return resp;\n" +
                 "    }\n\n";
