@@ -27,9 +27,29 @@ public class TealCompile extends Query {
         return this;
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<CompileResponse> execute() throws Exception {
         Response<CompileResponse> resp = baseExecute();
+        resp.setValueType(CompileResponse.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<CompileResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<CompileResponse> resp = baseExecute(headers, values);
         resp.setValueType(CompileResponse.class);
         return resp;
     }

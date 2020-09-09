@@ -25,9 +25,29 @@ public class GetBlock extends Query {
         this.round = round;
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<BlockResponse> execute() throws Exception {
         Response<BlockResponse> resp = baseExecute();
+        resp.setValueType(BlockResponse.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<BlockResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<BlockResponse> resp = baseExecute(headers, values);
         resp.setValueType(BlockResponse.class);
         return resp;
     }

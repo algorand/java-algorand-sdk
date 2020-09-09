@@ -66,9 +66,29 @@ public class SearchForAssets extends Query {
         return this;
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<AssetsResponse> execute() throws Exception {
         Response<AssetsResponse> resp = baseExecute();
+        resp.setValueType(AssetsResponse.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<AssetsResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<AssetsResponse> resp = baseExecute(headers, values);
         resp.setValueType(AssetsResponse.class);
         return resp;
     }

@@ -181,9 +181,29 @@ public class SearchForTransactions extends Query {
         return this;
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<TransactionsResponse> execute() throws Exception {
         Response<TransactionsResponse> resp = baseExecute();
+        resp.setValueType(TransactionsResponse.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<TransactionsResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<TransactionsResponse> resp = baseExecute(headers, values);
         resp.setValueType(TransactionsResponse.class);
         return resp;
     }
