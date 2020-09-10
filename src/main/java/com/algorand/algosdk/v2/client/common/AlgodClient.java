@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client.common;
 
 import com.algorand.algosdk.v2.client.algod.HealthCheck;
 import com.algorand.algosdk.v2.client.algod.Metrics;
+import com.algorand.algosdk.v2.client.algod.GetGenesis;
 import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
 import com.algorand.algosdk.v2.client.algod.GetVersion;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
@@ -45,6 +46,14 @@ public class AlgodClient extends Client {
      */
     public Metrics Metrics() {
         return new Metrics((Client) this);
+    }
+
+    /**
+     * Returns the entire genesis file in json.
+     * /genesis
+     */
+    public GetGenesis GetGenesis() {
+        return new GetGenesis((Client) this);
     }
 
     /**

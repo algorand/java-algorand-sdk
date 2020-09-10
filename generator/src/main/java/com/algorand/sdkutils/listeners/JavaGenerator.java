@@ -614,7 +614,7 @@ final class JavaQueryWriter {
         sb.append(Tools.formatComment(discAndPath, "", true));
         sb.append("public class " + className + " extends Query {\n\n");
         sb.append(queryParamsCode);
-        sb.append("\n}");
+        sb.append("\n}\n");
 
         BufferedWriter bw = JavaGenerator.newFile(className, javaGen.queryFilesDirectory);
         JavaGenerator.append(bw, "package " + javaGen.queryPackage + ";\n\n");
