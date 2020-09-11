@@ -33,9 +33,29 @@ public class LookupAccountByID extends Query {
         return this;
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<AccountResponse> execute() throws Exception {
         Response<AccountResponse> resp = baseExecute();
+        resp.setValueType(AccountResponse.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<AccountResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<AccountResponse> resp = baseExecute(headers, values);
         resp.setValueType(AccountResponse.class);
         return resp;
     }

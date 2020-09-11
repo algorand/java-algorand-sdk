@@ -3,6 +3,7 @@ package com.algorand.algosdk.v2.client.common;
 import com.algorand.algosdk.v2.client.algod.HealthCheck;
 import com.algorand.algosdk.v2.client.algod.Metrics;
 import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
+import com.algorand.algosdk.v2.client.algod.GetVersion;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
@@ -52,6 +53,15 @@ public class AlgodClient extends Client {
      */
     public SwaggerJSON SwaggerJSON() {
         return new SwaggerJSON((Client) this);
+    }
+
+    /**
+     * Retrieves the supported API versions, binary build versions, and genesis
+     * information.
+     * /versions
+     */
+    public GetVersion GetVersion() {
+        return new GetVersion((Client) this);
     }
 
     /**

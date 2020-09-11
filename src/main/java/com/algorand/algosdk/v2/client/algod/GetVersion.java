@@ -1,20 +1,21 @@
-package com.algorand.algosdk.v2.client.indexer;
+package com.algorand.algosdk.v2.client.algod;
 
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.HealthCheck;
+import com.algorand.algosdk.v2.client.model.Version;
 
 
 /**
- * Returns 200 if healthy.
- * /health
+ * Retrieves the supported API versions, binary build versions, and genesis
+ * information.
+ * /versions
  */
-public class MakeHealthCheck extends Query {
+public class GetVersion extends Query {
 
-    public MakeHealthCheck(Client client) {
+    public GetVersion(Client client) {
         super(client, new HttpMethod("get"));
     }
 
@@ -24,9 +25,9 @@ public class MakeHealthCheck extends Query {
     * @throws Exception
     */
     @Override
-    public Response<HealthCheck> execute() throws Exception {
-        Response<HealthCheck> resp = baseExecute();
-        resp.setValueType(HealthCheck.class);
+    public Response<Version> execute() throws Exception {
+        Response<Version> resp = baseExecute();
+        resp.setValueType(Version.class);
         return resp;
     }
 
@@ -39,14 +40,14 @@ public class MakeHealthCheck extends Query {
     * @throws Exception
     */
     @Override
-    public Response<HealthCheck> execute(String[] headers, String[] values) throws Exception {
-        Response<HealthCheck> resp = baseExecute(headers, values);
-        resp.setValueType(HealthCheck.class);
+    public Response<Version> execute(String[] headers, String[] values) throws Exception {
+        Response<Version> resp = baseExecute(headers, values);
+        resp.setValueType(Version.class);
         return resp;
     }
 
     protected QueryData getRequestString() {
-        addPathSegment(String.valueOf("health"));
+        addPathSegment(String.valueOf("versions"));
 
         return qd;
     }

@@ -1,25 +1,14 @@
 package com.algorand.sdkutils.listeners;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import com.algorand.sdkutils.listeners.Publisher.Events;
 import com.algorand.sdkutils.utils.QueryDef;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class GoGenerator implements Subscriber {
 

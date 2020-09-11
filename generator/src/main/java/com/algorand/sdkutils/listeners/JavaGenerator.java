@@ -82,7 +82,7 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event) {
         switch(event) {
         case END_QUERY:
-            javaQueryWriter.finalize();
+            javaQueryWriter.finish();
             break;
         default:
             throw new RuntimeException("Unimplemented event! " + event);
@@ -561,7 +561,7 @@ final class JavaQueryWriter {
         }
     }
 
-    public void finalize() {
+    public void finish() {
 
         javaGen.generatedPathsImports.append("import " + javaGen.queryPackage + "." + className + ";\n");
 
@@ -614,7 +614,7 @@ final class JavaQueryWriter {
         sb.append(Tools.formatComment(discAndPath, "", true));
         sb.append("public class " + className + " extends Query {\n\n");
         sb.append(queryParamsCode);
-        sb.append("\n}");
+        sb.append("\n}\n");
 
         BufferedWriter bw = JavaGenerator.newFile(className, javaGen.queryFilesDirectory);
         JavaGenerator.append(bw, "package " + javaGen.queryPackage + ";\n\n");
@@ -644,12 +644,31 @@ final class JavaQueryWriter {
 
     static String getQueryResponseMethod(String returnType) {
         String ret =
+                "   /**\n" +
+                "    * Execute the query.\n" +
+                "    * @return the query response object.\n" +
+                "    * @throws Exception\n" +
+                "    */\n" +
                 "    @Override\n" +
-                        "    public Response<" + returnType + "> execute() throws Exception {\n" +
-                        "        Response<" + returnType + "> resp = baseExecute();\n" +
-                        "        resp.setValueType(" + returnType + ".class);\n" +
-                        "        return resp;\n" +
-                        "    }\n\n";
+                "    public Response<" + returnType + "> execute() throws Exception {\n" +
+                "        Response<" + returnType + "> resp = baseExecute();\n" +
+                "        resp.setValueType(" + returnType + ".class);\n" +
+                "        return resp;\n" +
+                "    }\n\n" +
+                "   /**\n" +
+                "    * Execute the query with custom headers, there must be an equal number of keys and values\n" +
+                "    * or else an error will be generated.\n" +
+                "    * @param headers an array of header keys\n" +
+                "    * @param values an array of header values\n" +
+                "    * @return the query response object.\n" +
+                "    * @throws Exception\n" +
+                "    */\n" +
+                "    @Override\n" +
+                "    public Response<" + returnType + "> execute(String[] headers, String[] values) throws Exception {\n" +
+                "        Response<" + returnType + "> resp = baseExecute(headers, values);\n" +
+                "        resp.setValueType(" + returnType + ".class);\n" +
+                "        return resp;\n" +
+                "    }\n\n";
         return ret;
     }
 
@@ -747,7 +766,7 @@ final class JavaModelWriter {
 
         if (!modelPropertyAdded) {
             // No file should be generated
-            // There are some alias types in one spec file, which 
+            // There are some alias types in one spec file, which
             // are in contradiction with real types in the other spec file.
             // We don't want the alias type file to corrupt the real type object.
             return;
