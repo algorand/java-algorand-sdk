@@ -1,24 +1,14 @@
 package com.algorand.sdkutils.listeners;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
 import com.algorand.sdkutils.listeners.Publisher.Events;
+import com.algorand.sdkutils.utils.QueryDef;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
+
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
 
 public class GoGenerator implements Subscriber {
 
@@ -194,10 +184,10 @@ public class GoGenerator implements Subscriber {
     }
 
     @Override
-    public void onEvent(Events event, String [] notes) {
+    public void onEvent(Events event, QueryDef query) {
         switch(event) {
         case NEW_QUERY:
-            newQuery(notes[0], notes[1], notes[2], notes[3], notes[4]);
+            newQuery(query);
             break;
         default:
             throw new RuntimeException("Unimplemented event for note! " + event);
@@ -298,40 +288,35 @@ public class GoGenerator implements Subscriber {
 
 
 
-    private void newQuery(
-            String className,
-            String returnTypeName,
-            String path,
-            String desc,
-            String httpMethod) {
+    private void newQuery(QueryDef query) {
 
-        this.pathDesc = path + "\n" + desc;
-        this.path = path;
-        this.httpMethod = httpMethod;
-        currentQueryName = Tools.getCamelCase(className, true);
-        currentQueryReturn = Tools.getCamelCase(returnTypeName, true);
+        this.pathDesc = query.path + "\n" + query.description;
+        this.path = query.path;
+        this.httpMethod = query.method;
+        this.currentQueryName = Tools.getCamelCase(query.name, true);
+        this.currentQueryReturn = Tools.getCamelCase(query.returnType, true);
 
-        pathParameters = new TreeMap<String, String>();
-        bodyParameter = new TreeMap<String, TypeConverter>();
-        queryFunctions = new StringBuilder();
-        imports = new TreeMap<String, Set<String>>();
+        this.pathParameters = new TreeMap<String, String>();
+        this.bodyParameter = new TreeMap<String, TypeConverter>();
+        this.queryFunctions = new StringBuilder();
+        this.imports = new TreeMap<String, Set<String>>();
         
-        setFormatToMsgpack = false;
+        this.setFormatToMsgpack = false;
 
-        if (queryWriter != null) {
+        if (this.queryWriter != null) {
             throw new RuntimeException("Query writer should be closed!");
         }
 
         // Also need to create the struct for the parameters
-        modelWriter.newModel(
+        this.modelWriter.newModel(
                 new StructDef(
-                        currentQueryName + "Params", 
-                        "defines parameters for " + currentQueryName, null, null), 
-                modelsFilePrefix + "filtermodels", "models");
+                        this.currentQueryName + "Params",
+                        "defines parameters for " + this.currentQueryName, null, null),
+                this.modelsFilePrefix + "filtermodels", "models");
 
         // Add the entry into the applicationClient file
-        clientFunction = new StringBuilder();
-        clientFunction.append("func (c *Client) " + currentQueryName + "(");
+        this.clientFunction = new StringBuilder();
+        this.clientFunction.append("func (c *Client) " + this.currentQueryName + "(");
     }
 
     private void addPathParameter(TypeDef type) {

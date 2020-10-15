@@ -18,9 +18,29 @@ public class MakeHealthCheck extends Query {
         super(client, new HttpMethod("get"));
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<HealthCheck> execute() throws Exception {
         Response<HealthCheck> resp = baseExecute();
+        resp.setValueType(HealthCheck.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<HealthCheck> execute(String[] headers, String[] values) throws Exception {
+        Response<HealthCheck> resp = baseExecute(headers, values);
         resp.setValueType(HealthCheck.class);
         return resp;
     }

@@ -24,9 +24,29 @@ public class LookupApplicationByID extends Query {
         this.applicationId = applicationId;
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<ApplicationResponse> execute() throws Exception {
         Response<ApplicationResponse> resp = baseExecute();
+        resp.setValueType(ApplicationResponse.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<ApplicationResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<ApplicationResponse> resp = baseExecute(headers, values);
         resp.setValueType(ApplicationResponse.class);
         return resp;
     }

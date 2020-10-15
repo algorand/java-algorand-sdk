@@ -14,6 +14,7 @@ import java.util.TreeMap;
 
 import com.algorand.sdkutils.generators.Utils;
 import com.algorand.sdkutils.listeners.Publisher.Events;
+import com.algorand.sdkutils.utils.QueryDef;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.Tools;
 import com.algorand.sdkutils.utils.TypeDef;
@@ -81,7 +82,7 @@ public class JavaGenerator implements Subscriber {
     public void onEvent(Events event) {
         switch(event) {
         case END_QUERY:
-            javaQueryWriter.finalize();
+            javaQueryWriter.finish();
             break;
         default:
             throw new RuntimeException("Unimplemented event! " + event);
@@ -89,12 +90,10 @@ public class JavaGenerator implements Subscriber {
     }
 
     @Override
-    public void onEvent(Events event, String [] notes) {
+    public void onEvent(Events event, QueryDef query) {
         switch(event) {
         case NEW_QUERY:
-            javaQueryWriter = new JavaQueryWriter(
-                    notes[0], notes[1], notes[2],
-                    notes[3], notes[4], this);
+            javaQueryWriter = new JavaQueryWriter(query, this);
             break;
         default:
             throw new RuntimeException("Unimplemented event for note! " + event);
@@ -434,47 +433,41 @@ final class JavaQueryWriter {
 
     TreeMap<String, Set<String>> imports;
 
-    public JavaQueryWriter(
-            String methodName,
-            String returnType,
-            String path,
-            String desc,
-            String httpMethod,
-            JavaGenerator javaGenerator) {
+    public JavaQueryWriter(QueryDef query, JavaGenerator javaGenerator) {
 
-        this.className = Tools.getCamelCase(methodName, true);
-        decls = new StringBuilder();
-        builders = new StringBuilder();
-        constructorHeader = new StringBuilder();
-        constructorBody = new StringBuilder();
-        requestMethod = new StringBuilder();
-        constructorComments = new ArrayList<String>();
+        this.className = Tools.getCamelCase(query.name, true);
+        this.decls = new StringBuilder();
+        this.builders = new StringBuilder();
+        this.constructorHeader = new StringBuilder();
+        this.constructorBody = new StringBuilder();
+        this.requestMethod = new StringBuilder();
+        this.constructorComments = new ArrayList<String>();
 
-        generatedPathsEntryBody = new StringBuilder();
-        this.httpMethod = httpMethod;
+        this.generatedPathsEntryBody = new StringBuilder();
+        this.httpMethod = query.method;
 
-        requestMethod.append(getQueryResponseMethod(returnType));
-        requestMethod.append("    protected QueryData getRequestString() {\n");
-        pAdded = false;
-        addFormatMsgpack = false;
+        this.requestMethod.append(getQueryResponseMethod(query.returnType));
+        this.requestMethod.append("    protected QueryData getRequestString() {\n");
+        this.pAdded = false;
+        this.addFormatMsgpack = false;
 
-        this.path = path;
-        discAndPath = desc + "\n" + path;
+        this.path = query.path;
+        this.discAndPath = query.description + "\n" + query.path;
 
         this.javaGen = javaGenerator;
 
-        imports = new TreeMap<String, Set<String>>();
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Client");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.HttpMethod");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Query");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.QueryData");
-        Tools.addImport(imports, "com.algorand.algosdk.v2.client.common.Response");
-        if (needsClassImport(returnType.toLowerCase())) {
-            Tools.addImport(imports, javaGen.modelPackage + "." + returnType);
+        this.imports = new TreeMap<String, Set<String>>();
+        Tools.addImport(this.imports, "com.algorand.algosdk.v2.client.common.Client");
+        Tools.addImport(this.imports, "com.algorand.algosdk.v2.client.common.HttpMethod");
+        Tools.addImport(this.imports, "com.algorand.algosdk.v2.client.common.Query");
+        Tools.addImport(this.imports, "com.algorand.algosdk.v2.client.common.QueryData");
+        Tools.addImport(this.imports, "com.algorand.algosdk.v2.client.common.Response");
+        if (needsClassImport(query.returnType.toLowerCase())) {
+            Tools.addImport(this.imports, this.javaGen.modelPackage + "." + query.returnType);
         }
 
-        javaGen.generatedPathsEntries.append(Tools.formatComment(discAndPath, TAB, true));
-        javaGen.generatedPathsEntries.append("    public " + className + " " + methodName + "(");
+        this.javaGen.generatedPathsEntries.append(Tools.formatComment(this.discAndPath, this.TAB, true));
+        this.javaGen.generatedPathsEntries.append("    public " + this.className + " " + query.name + "(");
     }
 
     public void addQueryProperty(TypeDef propType, boolean inQuery, boolean inPath, boolean inBody) {
@@ -568,7 +561,7 @@ final class JavaQueryWriter {
         }
     }
 
-    public void finalize() {
+    public void finish() {
 
         javaGen.generatedPathsImports.append("import " + javaGen.queryPackage + "." + className + ";\n");
 
@@ -621,7 +614,7 @@ final class JavaQueryWriter {
         sb.append(Tools.formatComment(discAndPath, "", true));
         sb.append("public class " + className + " extends Query {\n\n");
         sb.append(queryParamsCode);
-        sb.append("\n}");
+        sb.append("\n}\n");
 
         BufferedWriter bw = JavaGenerator.newFile(className, javaGen.queryFilesDirectory);
         JavaGenerator.append(bw, "package " + javaGen.queryPackage + ";\n\n");
@@ -651,12 +644,31 @@ final class JavaQueryWriter {
 
     static String getQueryResponseMethod(String returnType) {
         String ret =
+                "   /**\n" +
+                "    * Execute the query.\n" +
+                "    * @return the query response object.\n" +
+                "    * @throws Exception\n" +
+                "    */\n" +
                 "    @Override\n" +
-                        "    public Response<" + returnType + "> execute() throws Exception {\n" +
-                        "        Response<" + returnType + "> resp = baseExecute();\n" +
-                        "        resp.setValueType(" + returnType + ".class);\n" +
-                        "        return resp;\n" +
-                        "    }\n\n";
+                "    public Response<" + returnType + "> execute() throws Exception {\n" +
+                "        Response<" + returnType + "> resp = baseExecute();\n" +
+                "        resp.setValueType(" + returnType + ".class);\n" +
+                "        return resp;\n" +
+                "    }\n\n" +
+                "   /**\n" +
+                "    * Execute the query with custom headers, there must be an equal number of keys and values\n" +
+                "    * or else an error will be generated.\n" +
+                "    * @param headers an array of header keys\n" +
+                "    * @param values an array of header values\n" +
+                "    * @return the query response object.\n" +
+                "    * @throws Exception\n" +
+                "    */\n" +
+                "    @Override\n" +
+                "    public Response<" + returnType + "> execute(String[] headers, String[] values) throws Exception {\n" +
+                "        Response<" + returnType + "> resp = baseExecute(headers, values);\n" +
+                "        resp.setValueType(" + returnType + ".class);\n" +
+                "        return resp;\n" +
+                "    }\n\n";
         return ret;
     }
 
@@ -754,7 +766,7 @@ final class JavaModelWriter {
 
         if (!modelPropertyAdded) {
             // No file should be generated
-            // There are some alias types in one spec file, which 
+            // There are some alias types in one spec file, which
             // are in contradiction with real types in the other spec file.
             // We don't want the alias type file to corrupt the real type object.
             return;

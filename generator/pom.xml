@@ -168,14 +168,14 @@
         <dependency>
             <groupId>com.algorand</groupId>
             <artifactId>algosdk</artifactId>
-            <version>1.5.0</version>
+            <version>1.5.1</version>
         </dependency>
 
         <!-- testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
+            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -231,11 +231,9 @@
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
+              <version>3.8.1</version>
               <configuration>
-                <source>${java.version}</source>
-                <target>${java.version}</target>
-                <testSource>${java.version}</testSource>
-                <testTarget>${java.version}</testTarget>
+                  <release>14</release>
               </configuration>
           </plugin>
           <plugin>

@@ -1,5 +1,8 @@
+# 1.5.1
+- Add custom header option to v2 client, new 'execute' method on each endpoint request.
+
 # 1.5.0
-- Added support for Algorand Smart Contract Applications.
+- Add new execute method to  support for Algorand Smart Contract Applications.
 
 # 1.4.2
 - Accept URI formatting in AlgodClient and IndexerClient to specify connection scheme.

@@ -18,9 +18,29 @@ public class TransactionParams extends Query {
         super(client, new HttpMethod("get"));
     }
 
+   /**
+    * Execute the query.
+    * @return the query response object.
+    * @throws Exception
+    */
     @Override
     public Response<TransactionParametersResponse> execute() throws Exception {
         Response<TransactionParametersResponse> resp = baseExecute();
+        resp.setValueType(TransactionParametersResponse.class);
+        return resp;
+    }
+
+   /**
+    * Execute the query with custom headers, there must be an equal number of keys and values
+    * or else an error will be generated.
+    * @param headers an array of header keys
+    * @param values an array of header values
+    * @return the query response object.
+    * @throws Exception
+    */
+    @Override
+    public Response<TransactionParametersResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<TransactionParametersResponse> resp = baseExecute(headers, values);
         resp.setValueType(TransactionParametersResponse.class);
         return resp;
     }

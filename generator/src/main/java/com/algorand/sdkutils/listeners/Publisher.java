@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import com.algorand.sdkutils.listeners.Publisher.Events;
+import com.algorand.sdkutils.utils.QueryDef;
 import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -64,15 +65,15 @@ public class Publisher {
             }
         }
     }
-    
-    public void publish(Events event, String [] notes) {
+
+    public void publish(Events event, QueryDef query) {
         if (subscribers.get(event) != null) {
             for (Subscriber subscriber : subscribers.get(event)) {
-                subscriber.onEvent(event, notes);
+                subscriber.onEvent(event, query);
             }
         }
     }
-   
+
     public void publish(Events event, StructDef sDef) {
         if (subscribers.get(event) != null) {
             for (Subscriber subscriber : subscribers.get(event)) {
