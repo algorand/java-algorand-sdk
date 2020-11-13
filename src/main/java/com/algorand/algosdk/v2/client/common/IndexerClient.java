@@ -36,6 +36,17 @@ public class IndexerClient extends Client {
     }
 
     /**
+     * Construct an IndexerClient for communicating with the REST API.
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port REST server port.
+     * @param token authentication token.
+     * @param tokenKey authentication token key.
+     */
+    public IndexerClient(String host, int port, String token, String tokenKey) {
+        super(host, port, token, tokenKey);
+    }
+
+    /**
      * Returns 200 if healthy.
      * /health
      */
