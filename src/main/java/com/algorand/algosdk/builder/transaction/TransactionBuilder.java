@@ -102,6 +102,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
 
     /**
      * Initialize fee, genesisID, genesisHash, firstValid and lastValid using {@link TransactionParams}.
+     * Overwrite the above parameters even if they were already set.
+     * It is recommended to call this function first on the transaction builder (before calling any other function).
      * @param params The suggested transaction parameters.
      * @return This builder.
      */
@@ -128,6 +130,8 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
 
     /**
      * Initialize fee, genesisID, genesisHash, firstValid and lastValid using {@link TransactionParametersResponse}.
+     * Overwrite the above parameters even if they were already set.
+     * It is recommended to call this function first on the transaction builder (before calling any other function).
      * @param params The suggested transaction parameters.
      * @return This builder.
      */
