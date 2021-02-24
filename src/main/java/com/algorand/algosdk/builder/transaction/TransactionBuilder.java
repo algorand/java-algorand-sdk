@@ -90,7 +90,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
 
     /**
      * Query the V1 REST API with {@link AlgodApi} for Transaction Parameters:
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParams}.
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid if not already set using {@link TransactionParams}.
      * @param client The backend client connection.
      * @return This builder.
      * @throws ApiException When the client fails to retrieve {@link TransactionParams} from the backend.
@@ -101,16 +101,26 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Initialize fee, genesisID, genesisHash, firstValid and lastValid using {@link TransactionParams}.
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid if not already set using {@link TransactionParams}.
      * @param params The suggested transaction parameters.
      * @return This builder.
      */
     public T suggestedParams(TransactionParams params) {
-        fee(params.getFee());
-        genesisID(params.getGenesisID());
-        genesisHash(params.getGenesishashb64());
-        firstValid(params.getLastRound());
-        lastValid(params.getLastRound().add(BigInteger.valueOf(1000L)));
+        if (this.fee == null) {
+            fee(params.getFee());
+        }
+        if (this.genesisID == null) {
+            genesisID(params.getGenesisID());
+        }
+        if (this.genesisHash == null) {
+            genesisHash(params.getGenesishashb64());
+        }
+        if (this.firstValid == null) {
+            firstValid(params.getLastRound());
+        }
+        if (this.lastValid == null) {
+            lastValid(params.getLastRound().add(BigInteger.valueOf(1000L)));
+        }
         return (T) this;
     }
 
