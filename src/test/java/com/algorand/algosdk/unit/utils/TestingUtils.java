@@ -94,6 +94,15 @@ public class TestingUtils {
         compareNodes("root", expectedNode, actualNode);
     }
 
+    /**
+     * This sort isn't perfect because:
+     * 1. it's possible to have optional keys, like 'auth-addr' which are alphabetically first.
+     * 2. it's technically possible (not in practice currently) for there to be non-unique fields,
+     *    these would require a secondary sort.
+     * TODO: If this ever becomes required one solution would be to check the current key and select
+     *       a known unique key. i.e. global-state -> sort by 'k', accounts -> sort by address, etc.
+     *       Alternatively the sort function could accept both lists and have a secondary sort.
+     */
     private static List<JsonNode> sort(JsonNode array, String field) {
         if (!array.isArray()){
             Assertions.fail("bad input.");
@@ -104,7 +113,20 @@ public class TestingUtils {
         while (elements.hasNext()) {
             list.add(elements.next());
         }
-        list.sort(Comparator.comparing(o -> o.get(field).asText()));
+        try {
+            //list.sort(Comparator.comparing(o -> o.get(field).asText()));
+            list.sort((o1, o2) -> {
+                if (field == null) {
+                    return o1.asText().compareTo(o2.asText());
+                }
+                if (o1.has(field) && o2.has(field)) {
+                    return o1.get(field).asText().compareTo(o2.get(field).asText());
+                }
+                return 0;
+            });
+        } catch (Exception e) {
+            System.out.println("Exception?!");
+        }
 
         return list;
     }
@@ -149,7 +171,16 @@ public class TestingUtils {
                            .isEqualTo(actualSize);
 
                    if (expectedSize > 0) {
-                       String firstField = expected.elements().next().fieldNames().next();
+                       String firstField = null;
+                       JsonNode n = expected.elements().next();
+
+                       // If it is an array of objects, sort by the first field.
+                       // It's possible the array is not an object. By leaving firstField as null the nodes are
+                       // converted to text and compared as strings.
+                       if (n.isObject()) {
+                           firstField = n.fieldNames().next();
+                       }
+
                        List<JsonNode> expectedList = sort(expected, firstField);
                        List<JsonNode> actualList = sort(actual, firstField);
 
