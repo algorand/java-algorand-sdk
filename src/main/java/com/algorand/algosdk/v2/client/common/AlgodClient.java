@@ -33,6 +33,18 @@ public class AlgodClient extends Client {
     public AlgodClient(String host, int port, String token) {
         super(host, port, token, "X-Algo-API-Token");
     }
+
+    /**
+     * Construct an AlgodClient with custom token key for communicating with the REST API.
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port REST server port.
+     * @param token authentication token.
+     * @param tokenKey authentication token key.
+     */
+    public AlgodClient(String host, int port, String token, String tokenKey) {
+        super(host, port, token, tokenKey);
+    }
+
     /**
      * Returns OK if healthy.
      * /health
