@@ -182,14 +182,14 @@ public class Indexer {
     public void searchForAccounts(Integer indexer, Long assetId, Long limit, Long gt, Long lt, String authAddr, Long applicationId, String includeAll, String token) throws Exception {
         SearchForAccounts query = clients.indexerClients.get(indexer).searchForAccounts();
 
-        if (assetId != 0)                       query.assetId(assetId);
-        if (limit != 0)                         query.limit(limit);
-        if (gt != 0)                            query.currencyGreaterThan(gt);
-        if (lt != 0)                            query.currencyLessThan(lt);
-        if (StringUtils.isNotEmpty(token))      query.next(token);
-        if (StringUtils.isNotEmpty(authAddr))   query.authAddr(new Address(authAddr));
-        if (applicationId != 0)                 query.applicationId(applicationId);
-        if (StringUtils.isNotEmpty(includeAll)) query.includeAll(Boolean.parseBoolean(includeAll));
+        if (assetId != 0)                     query.assetId(assetId);
+        if (limit != 0)                       query.limit(limit);
+        if (gt != 0)                          query.currencyGreaterThan(gt);
+        if (lt != 0)                          query.currencyLessThan(lt);
+        if (StringUtils.isNotEmpty(token))    query.next(token);
+        if (StringUtils.isNotEmpty(authAddr)) query.authAddr(new Address(authAddr));
+        if (applicationId != 0)               query.applicationId(applicationId);
+        if (Boolean.parseBoolean(includeAll)) query.includeAll(Boolean.parseBoolean(includeAll));
 
         accountsResponse = query.execute();
         response = accountsResponse;
@@ -459,10 +459,10 @@ public class Indexer {
     public void i_use_to_search_for_applications_with_and_token(Integer indexer, Long limit, Long applicationId, String includeAll, String token) throws Exception {
         SearchForApplications query = clients.indexerClients.get(indexer).searchForApplications();
 
-        if (limit != 0)                         query.limit(limit);
-        if (applicationId != 0)                 query.applicationId(applicationId);
-        if (StringUtils.isNotEmpty(includeAll)) query.includeAll(Boolean.parseBoolean(includeAll));
-        if (StringUtils.isNotEmpty(token))      query.next(token);
+        if (limit != 0)                       query.limit(limit);
+        if (applicationId != 0)               query.applicationId(applicationId);
+        if (Boolean.parseBoolean(includeAll)) query.includeAll(Boolean.parseBoolean(includeAll));
+        if (StringUtils.isNotEmpty(token))    query.next(token);
 
         response = query.execute();
     }
@@ -474,10 +474,11 @@ public class Indexer {
 
     @When("I use {int} to lookup application with {long} and {string}")
     public void i_use_to_lookup_application_with_and(Integer indexer, Long applicationId, String includeAll) throws Exception {
-        response = clients.indexerClients.get(indexer)
-                .lookupApplicationByID(applicationId)
-                .includeAll(Boolean.parseBoolean(includeAll))
-                .execute();
+        LookupApplicationByID query = clients.indexerClients.get(indexer).lookupApplicationByID(applicationId);
+
+        if (Boolean.parseBoolean(includeAll)) query.includeAll(Boolean.parseBoolean(includeAll));
+
+        response = query.execute();
     }
 
     @Then("the parsed response should equal {string}.")
