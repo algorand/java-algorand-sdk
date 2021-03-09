@@ -44,6 +44,15 @@ public class LookupAssetBalances extends Query {
     }
 
     /**
+     * Include all items including closed accounts, deleted applications, destroyed
+     * assets, opted-out asset holdings, and closed-out application localstates.
+     */
+    public LookupAssetBalances includeAll(Boolean includeAll) {
+        addQuery("include-all", String.valueOf(includeAll));
+        return this;
+    }
+
+    /**
      * Maximum number of results to return.
      */
     public LookupAssetBalances limit(Long limit) {

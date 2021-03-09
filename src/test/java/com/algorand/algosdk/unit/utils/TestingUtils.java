@@ -94,6 +94,21 @@ public class TestingUtils {
         compareNodes("root", expectedNode, actualNode);
     }
 
+    private static List<JsonNode> sort(JsonNode array, String field) {
+        if (!array.isArray()){
+            Assertions.fail("bad input.");
+        }
+
+        List<JsonNode> list = new ArrayList<>();
+        Iterator<JsonNode> elements = array.elements();
+        while (elements.hasNext()) {
+            list.add(elements.next());
+        }
+        list.sort(Comparator.comparing(o -> o.get(field).asText()));
+
+        return list;
+    }
+
     private static void compareNodes(String field, JsonNode expected, JsonNode actual) {
         JsonNodeType type = null;
 
@@ -124,8 +139,7 @@ public class TestingUtils {
 
         // Compare primitive types or recurse complex types.
         switch (type) {
-            // Compare each index of the array.
-            // Assume that the arrays are sorted and zip thorugh them.
+            // Compare each index of the array. Sort them then zip through.
             case ARRAY:
                 {
                    int expectedSize = (expected == null) ? 0 : expected.size();
@@ -135,10 +149,14 @@ public class TestingUtils {
                            .isEqualTo(actualSize);
 
                    if (expectedSize > 0) {
-                       Iterator<JsonNode> expectedElements = expected.elements();
-                       Iterator<JsonNode> actualElements = actual.elements();
-                       int index = 0;
+                       String firstField = expected.elements().next().fieldNames().next();
+                       List<JsonNode> expectedList = sort(expected, firstField);
+                       List<JsonNode> actualList = sort(actual, firstField);
 
+                       Iterator<JsonNode> expectedElements = expectedList.iterator();
+                       Iterator<JsonNode> actualElements = actualList.iterator();
+
+                       int index = 0;
                        while (expectedElements.hasNext() && actualElements.hasNext()) {
                            compareNodes(field + "[" + index + "]", expectedElements.next(), actualElements.next());
                            index++;

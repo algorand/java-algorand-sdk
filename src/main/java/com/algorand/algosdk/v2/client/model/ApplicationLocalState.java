@@ -13,6 +13,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ApplicationLocalState extends PathResponse {
 
     /**
+     * Round when account closed out of the application.
+     */
+    @JsonProperty("closed-out-at-round")
+    public java.math.BigInteger closedOutAtRound;
+
+    /**
+     * Whether or not the application local state is currently deleted from its
+     * account.
+     */
+    @JsonProperty("deleted")
+    public Boolean deleted;
+
+    /**
      * The application which this local state is for.
      */
     @JsonProperty("id")
@@ -23,6 +36,12 @@ public class ApplicationLocalState extends PathResponse {
      */
     @JsonProperty("key-value")
     public List<TealKeyValue> keyValue = new ArrayList<TealKeyValue>();
+
+    /**
+     * Round when the account opted into the application.
+     */
+    @JsonProperty("opted-in-at-round")
+    public java.math.BigInteger optedInAtRound;
 
     /**
      * (hsch) schema.
@@ -37,8 +56,11 @@ public class ApplicationLocalState extends PathResponse {
         if (o == null) return false;
 
         ApplicationLocalState other = (ApplicationLocalState) o;
+        if (!Objects.deepEquals(this.closedOutAtRound, other.closedOutAtRound)) return false;
+        if (!Objects.deepEquals(this.deleted, other.deleted)) return false;
         if (!Objects.deepEquals(this.id, other.id)) return false;
         if (!Objects.deepEquals(this.keyValue, other.keyValue)) return false;
+        if (!Objects.deepEquals(this.optedInAtRound, other.optedInAtRound)) return false;
         if (!Objects.deepEquals(this.schema, other.schema)) return false;
 
         return true;
