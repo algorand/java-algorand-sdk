@@ -1,0 +1,82 @@
+#set( $new = "
+" )
+package $package
+
+#foreach( $type in $types )
+#if( $type == "address" )
+import java.security.NoSuchAlgorithmException;
+#elseif( $type == "array" )
+import java.util.ArrayList;
+import java.util.List;
+#end
+#end
+import java.Util.Objects;
+
+#foreach( $type in $types )
+#if( $type == "address" )
+import com.algorand.algosdk.crypto.Address;
+#elseif( $type == "binary" )
+import com.algorand.algosdk.util.Encoder;
+#end
+#end
+import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+/**
+ * $def.doc.replaceAll("$new", "$new * ")
+ */
+public class $def.name extends PathResponse {
+#foreach( $prop in $props )
+#set( $var = $str.kebabToCamel($prop.propertyName) )
+
+    /**
+     * $prop.doc.replaceAll("$new", "$new     * ")
+     */
+    @JsonProperty("$prop.propertyName")
+#if( $prop.type == "array" )
+    public List<$prop.rawTypeName> $var = new ArrayList<$prop.rawTypeName>();
+#elseif( $prop.rawTypeName == "integer" )
+    public Long $var
+#elseif( $prop.rawTypeName == "binary" )
+    public String $var() {
+        return Encoder.encodeToBase64(this.$var);
+    }
+
+    @JsonProperty("$prop.propertyName")
+    public void $var(String base64Encoded) {
+        this.$var = Encoder.decodeFromBase64(base64Encoded);
+    }
+
+    public byte[] $var;
+#elseif( $prop.rawTypeName == "address" )
+    public String $var() {
+        if (this.creator != null) {
+            return this.$var.encodeAsString();
+        } else {
+            return null;
+        }
+    }
+
+    @JsonProperty("$prop.propertyName")
+    public void $var(String creator) throws NoSuchAlgorithmException {
+        this.$var = new Address(creator);
+    }
+
+    public Address $var;
+#else
+    public $prop.rawTypeName $var;
+#end
+#end
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        $def.name other = ($def.name) o;
+#foreach( $prop in $props )
+        if (!Objects.deepEquals(this.$str.kebabToCamel($prop.propertyName), other.$str.kebabToCamel($prop.propertyName))) return false;
+#end
+        return true
+    }
+}

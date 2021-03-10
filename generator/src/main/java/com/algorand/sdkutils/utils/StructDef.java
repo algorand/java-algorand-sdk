@@ -34,4 +34,24 @@ public class StructDef {
                 "required: ['" + String.join("', '", requiredProperties) + "'], " +
                 "mutuallyExclusive: ['" + String.join("', '", mutuallyExclusiveProperties) + "']";
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getAliasOf() {
+        return aliasOf;
+    }
+
+    public String getDoc() {
+        return doc;
+    }
+
+    public Set<String> getRequiredProperties() {
+        return requiredProperties;
+    }
+
+    public Set<String> getMutuallyExclusiveProperties() {
+        return mutuallyExclusiveProperties;
+    }
 }

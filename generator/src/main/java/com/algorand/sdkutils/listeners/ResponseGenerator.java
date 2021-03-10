@@ -30,11 +30,8 @@ public class ResponseGenerator implements Subscriber {
     protected static final Logger logger = LogManager.getLogger();
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    // Called by Main.main
     public static void main(ResponseGeneratorArgs args, JCommander command) throws Exception {
-        // kaizen parser test
-        //OpenApi3 model = new OpenApi3Parser().parse(args.specfile, true);
-        //describeResponses(model);
-
         JsonNode root;
         try (FileInputStream fis = new FileInputStream(args.specfile)) {
             root = Utils.getRoot(fis);
@@ -425,7 +422,7 @@ public class ResponseGenerator implements Subscriber {
         activeList = new ArrayList<>();
         if (event == Publisher.Events.NEW_MODEL) {
             models.put(sDef, activeList);
-        } else if (event == Publisher.Events.NEW_RETURN_TYPE){
+        } else if (event == Publisher.Events.REGISTER_RETURN_TYPE){
             responses.put(sDef, activeList);
         } else {
             logger.info("unhandled event: %s", event);

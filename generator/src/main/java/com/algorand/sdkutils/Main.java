@@ -1,6 +1,7 @@
 package com.algorand.sdkutils;
 
 import com.algorand.sdkutils.listeners.ResponseGenerator;
+import com.algorand.sdkutils.listeners.TemplateGenerator;
 import com.beust.jcommander.*;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.config.Configurator;
@@ -16,6 +17,7 @@ public class Main {
         // Empty argument objects.
         CommonArgs common = new CommonArgs();
         JavaGeneratorArgs java = new JavaGeneratorArgs();
+        TemplateGenerator.TemplateGeneratorArgs template = new TemplateGenerator.TemplateGeneratorArgs();
         ResponseGenerator.ResponseGeneratorArgs responses = new ResponseGenerator.ResponseGeneratorArgs();
 
         // Collect configuration and parse arguments.
@@ -23,6 +25,7 @@ public class Main {
                 .addObject(common)
                 //.addCommand("go", go)
                 .addCommand("java", java)
+                .addCommand("template", template)
                 .addCommand("responses", responses)
                 .build();
         root.parse(argv);
@@ -41,6 +44,10 @@ public class Main {
         String commandName = root.getParsedCommand();
         JCommander command = root.getCommands().get(commandName);
         switch(commandName) {
+            case "template":
+                template.validate(command);
+                TemplateGenerator.main(template, command);
+                return;
             case "java":
                 java.validate(command);
                 javaGenerator(java, command);

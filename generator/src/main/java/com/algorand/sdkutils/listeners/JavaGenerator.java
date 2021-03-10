@@ -127,7 +127,7 @@ public class JavaGenerator implements Subscriber {
         case NEW_MODEL:
             javaModelWriter.newModel(sDef, this.modelPackage);
             break;
-        case NEW_RETURN_TYPE:
+        case REGISTER_RETURN_TYPE:
             // Ignore aliases for now...
             if (sDef.aliasOf == null || sDef.aliasOf != "") {
                 javaModelWriter.newModel(sDef, this.modelPackage);

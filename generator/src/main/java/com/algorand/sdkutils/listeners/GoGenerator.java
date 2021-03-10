@@ -220,7 +220,7 @@ public class GoGenerator implements Subscriber {
         case NEW_MODEL:
             modelWriter.newModel(sDef, modelsFilePrefix + "responsemodels", "models");
             break;
-        case NEW_RETURN_TYPE:
+        case REGISTER_RETURN_TYPE:
             // Ignore aliases for now...
             if (sDef.aliasOf == null || sDef.aliasOf != "") {
                 modelWriter.newModel(sDef, modelsFilePrefix + "responsemodels", "models");

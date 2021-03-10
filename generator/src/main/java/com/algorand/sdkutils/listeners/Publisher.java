@@ -3,6 +3,7 @@ package com.algorand.sdkutils.listeners;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.stream.Stream;
 
 import com.algorand.sdkutils.listeners.Publisher.Events;
 import com.algorand.sdkutils.utils.QueryDef;
@@ -14,9 +15,16 @@ public class Publisher {
     
     public enum Events {
         ALL,
+
+        // Define a model object.
         NEW_MODEL,
         NEW_PROPERTY,
-        NEW_RETURN_TYPE,
+        END_MODEL,
+
+        // register a model reference as a return type.
+        REGISTER_RETURN_TYPE,
+
+        // Define a query
         NEW_QUERY,
         QUERY_PARAMETER,
         PATH_PARAMETER,
@@ -39,14 +47,7 @@ public class Publisher {
     }
 
     public void subscribeAll(Subscriber sub) {
-        subscribe(Events.NEW_MODEL, sub);
-        subscribe(Events.NEW_PROPERTY, sub);
-        subscribe(Events.NEW_RETURN_TYPE, sub);
-        subscribe(Events.NEW_QUERY, sub);
-        subscribe(Events.QUERY_PARAMETER, sub);
-        subscribe(Events.PATH_PARAMETER, sub);
-        subscribe(Events.BODY_CONTENT, sub);
-        subscribe(Events.END_QUERY, sub);
+        Stream.of(Events.values()).forEach(e -> subscribe(e, sub));
     }
 
     public void subscribe(Events event, Subscriber subscriber) {

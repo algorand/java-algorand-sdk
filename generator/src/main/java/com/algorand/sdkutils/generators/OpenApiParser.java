@@ -44,15 +44,15 @@ public class OpenApiParser {
     public void parse() throws Exception {
         // TODO: Verify compatible OpenAPI version.
 
-        logger.info("Parsing definitions.");
+        logger.debug("Parsing definitions.");
         this.generateAlgodIndexerObjects(root);
 
         // Generate classes from the return types which have more than one return element
-        logger.info("Parsing responses.");
+        logger.debug("Parsing responses.");
         this.generateReturnTypes(root);
 
         // Generate the algod methods
-        logger.info("Parsing paths.");
+        logger.debug("Parsing paths.");
         this.generateQueryMethods();
 
         publisher.terminate();
@@ -262,7 +262,7 @@ public class OpenApiParser {
             JsonNode propertiesNode,
             String desc,
             Events event) throws IOException {
-        logger.info("Generating ... %s", className);
+        logger.debug("Generating ... {}", className);
 
         // Collect any required fields for this definition.
         Set<String> requiredProperties = new HashSet<>();
@@ -407,7 +407,7 @@ public class OpenApiParser {
         } else if (spec.has("summary")) {
             desc = spec.get("summary").asText();
         }
-        logger.info("Generating ... %s", className);
+        logger.debug("Generating ... {}", className);
         Iterator<Entry<String, JsonNode>> properties = null;
         if ( paramNode != null) {
             properties = getSortedParameters(paramNode);
@@ -449,8 +449,8 @@ public class OpenApiParser {
                     if (!filterList.isEmpty() && !filterList.contains(className)) {
                         continue;
                     }
-                    writeClass(cls.getKey(), cls.getValue(), cls.getValue().get("properties"),
-                            desc, Events.NEW_MODEL);
+                    writeClass(cls.getKey(), cls.getValue(), cls.getValue().get("properties"), desc, Events.NEW_MODEL);
+                    publisher.publish(Events.END_MODEL);
                 }
     }
 
@@ -472,7 +472,7 @@ public class OpenApiParser {
                     if (rSchema.get("$ref") != null ) {
                         // It refers to a defined class, create an alias
                         String realType = getTypeNameFromRef(rSchema.get("$ref").asText());
-                        publisher.publish(Events.NEW_RETURN_TYPE, new StructDef(rtype.getKey(), realType));
+                        publisher.publish(Events.REGISTER_RETURN_TYPE, new StructDef(rtype.getKey(), realType));
                         continue;
                     }
                     String className = Tools.getCamelCase(rtype.getKey(), true);
@@ -486,7 +486,7 @@ public class OpenApiParser {
                     }
 
                     writeClass(rtype.getKey(), rtype.getValue(), rSchema.get("properties"),
-                            desc, Events.NEW_RETURN_TYPE);
+                            desc, Events.REGISTER_RETURN_TYPE);
                 }
     }
 

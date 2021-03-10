@@ -1,0 +1,171 @@
+#set( $new = "
+" )
+## Converts a parameter type into the SDK specific type.
+#macro ( toSdkType $param )##
+#if ( $param.rawTypeName == "integer" )
+Long##
+#elseif( $param.rawTypeName == "address" )
+Address##
+#elseif( $param.rawTypeName == "binary" )
+[]byte##
+#elseif ( $param.rawTypeName == "string" && $param.type == "enum" )
+Enums.$str.capitalize($param.propertyName)##
+#else
+${param.rawTypeName}##
+#end
+#end
+
+package $package
+
+#foreach( $param in $params )
+#if ( $param.rawTypeName == "address" )
+import com.algorand.algosdk.crypto.Address;
+#end
+#end
+import com.algorand.algosdk.v2.client.common.Client;
+import com.algorand.algosdk.v2.client.common.HttpMethod;
+import com.algorand.algosdk.v2.client.common.Query;
+import com.algorand.algosdk.v2.client.common.QueryData;
+import com.algorand.algosdk.v2.client.common.Response;
+#foreach( $param in $params )
+#if ( $param.rawTypeName == "address" )
+#else
+import com.algorand.algosdk.v2.client.model.Account;
+#end
+#end
+
+/**
+ * $q.description.replaceAll("$new", "$new  * ")
+ * $q.path
+ */
+public class $q.name extends Query {
+
+##
+#################
+## Constructor ##
+#################
+##
+#if( $q.pathParameters.size() == 0 )
+    public ${q.name}(Client client) {
+        super(client, new HttpMethod("$q.method"));
+    }
+#else
+#foreach( $param in $q.pathParameters )
+    private #toSdkType( $param ) $param.propertyName
+#end
+
+    /**
+#foreach( $param in $q.pathParameters )
+     * @param $param.propertyName $param.doc
+#end
+     */
+    public ${q.name}(Client client##
+#foreach( $param in $q.pathParameters )
+, #toSdkType( $param ) ${param.propertyName}##
+#end
+) {
+        super(client, new HttpMethod("$q.method"));
+#foreach( $param in $q.pathParameters )
+        this.$param.propertyName = $param.propertyName;
+#end
+    }
+#end
+##
+######################
+## Query Parameters ##
+######################
+##
+#foreach( $param in $q.queryParameters )
+## We don't want to expose this in the SDK
+#if ( $q.name != "AccountInformation" || $param.propertyName != "format")
+
+    /**
+     * $param.doc.replaceAll("$new", "$new     * ")
+     */
+    public $q.name ${param.propertyName}(#toSdkType( $param ) $param.propertyName) {
+        addQuery("$param.propertyName", String.valueOf($param.propertyName));
+        return this;
+    }
+#end
+#end
+##
+#####################
+## Body Parameters ##
+#####################
+##
+#foreach( $param in $q.bodyParameters )
+## We don't want to expose this in the SDK
+#if ( $q.name != "AccountInformation" || $param.propertyName != "format")
+
+    /**
+     * $param.doc.replaceAll("$new", "$new     * ")
+#if( $param.rawTypeName == "binary" )
+     */
+    public $q.name ${param.propertyName}(#toSdkType( $param ) $param.propertyName) {
+        addToBody($param.propertyName);
+        return this;
+#else
+     * @throws JsonProcessingException
+     */
+    public $q.name ${param.propertyName}(#toSdkType( $param ) $param.propertyName) throws JsonProcessingException {
+        addToBody(com.algorand.algosdk.util.Encoder.encodeToMsgPack($param.propertyName));
+        return this;
+#end
+    }
+#end
+#end
+
+    /**
+     * Execute the query.
+     * @return the query response object.
+     * @throws Exception
+     */
+    @Override
+    public Response<$q.returnType> execute() throws Exception {
+        Response<String> resp = baseExecute();
+        resp.setValueType(${q.returnType}.class);
+        return resp;
+    }
+
+    /**
+     * Execute the query with custom headers, there must be an equal number of keys and values
+     * or else an error will be generated.
+     * @param headers an array of header keys
+     * @param values an array of header values
+     * @return the query response object.
+     * @throws Exception
+     */
+    @Override
+    public Response<String> execute(String[] headers, String[] values) throws Exception {
+        Response<String> resp = baseExecute(headers, values);
+        resp.setValueType(${q.returnType}.class);
+        return resp;
+    }
+
+    protected QueryData getRequestString() {
+## check required fields
+#foreach( $param in $q.queryParameters )
+#if( $param.required )
+        if (this.$param.propertyName == null) {
+            throw new RuntimeException("$param.propertyName is not set. It is a required parameter.");
+        }
+#end
+#end
+#foreach( $param in $q.bodyParameters )
+#if( $param.required )
+        if (qd.bodySegments.isEmpty()) {
+            throw new RuntimeException("$param.propertyName is not set. It is a required parameter.");
+        }
+#end
+#end
+#foreach( $part in $path )
+#if ( $part.matches("\{.*}") )
+        addPathSegment(String.valueOf($str.unwrap($part)));
+#else
+        addPathSegment(String.valueOf("$part"));
+#end
+#end
+
+        return qd;
+    }
+}
