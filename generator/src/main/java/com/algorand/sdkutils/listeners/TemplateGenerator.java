@@ -1,6 +1,6 @@
 package com.algorand.sdkutils.listeners;
 
-import com.algorand.com.algorand.velocity.StringHelpers;
+import com.algorand.velocity.StringHelpers;
 import com.algorand.sdkutils.Main;
 import com.algorand.sdkutils.generators.OpenApiParser;
 import com.algorand.sdkutils.generators.Utils;

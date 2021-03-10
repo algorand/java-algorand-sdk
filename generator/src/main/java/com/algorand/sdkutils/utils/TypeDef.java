@@ -3,19 +3,19 @@ package com.algorand.sdkutils.utils;
 import java.util.List;
 
 /**
- * 
  * TypeDef hold together information about a type
- * @javaTypeName is the generated code type: e.g. List<abc>, or MyEnumClassName
- * @rawTypeName is the type name from the spec file
- * @def is the definition of the type. e.g. the class declaration of the enum class
- * @type is a loosely defined tag used by generator e.g. enum, array, etc.
- * @propertyName is the class/struct member name
- * @goPropertyName, is when provided with x-go-name
- * @doc is the comments associated with the parameter
- * @required indicates if the field is a required field
- * e.g. For enum type, typeName will be enum class name, def will be the enum
+ * e.g. For enum type, typeName will be enum class name
  */
 public class TypeDef {
+    /**
+     * @param javaTypeName is the generated code type: e.g. List<abc>, or MyEnumClassName
+     * @param rawTypeName is the type name from the spec file
+     * @param type is a loosely defined tag used by generator e.g. enum, array, etc.
+     * @param propertyName is the class/struct member name
+     * @param goPropertyName, is when provided with x-go-name
+     * @param doc is the comments associated with the parameter
+     * @param required indicates if the field is a required field
+     */
     public TypeDef(
             String javaTypeName,
             String rawTypeName,
