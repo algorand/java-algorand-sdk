@@ -120,8 +120,8 @@ public class Encoder {
      */
     public static String encodeToBase32StripPad(byte[] bytes) {
         Base32 codec = new Base32((byte)BASE32_PAD_CHAR);
-        String paddedString = codec.encodeToString(bytes);
-        return StringUtils.stripEnd(paddedString, String.valueOf(BASE32_PAD_CHAR));
+        String paddedStr = codec.encodeToString(bytes);
+        return StringUtils.stripEnd(paddedStr, String.valueOf(BASE32_PAD_CHAR));
     }
 
     /**
