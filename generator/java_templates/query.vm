@@ -1,3 +1,4 @@
+#set( $name = "${str.capitalize($q.name)}" )
 #set( $new = "
 " )
 ## Converts a parameter type into the SDK specific type.
@@ -9,7 +10,7 @@ Address##
 #elseif( $param.rawTypeName == "binary" )
 []byte##
 #elseif ( $param.rawTypeName == "string" && $param.type == "enum" )
-Enums.$str.capitalize($param.propertyName)##
+Enums.$str.capitalize($str.kebabToCamel($param.propertyName))##
 #else
 ${param.rawTypeName}##
 #end
@@ -17,9 +18,17 @@ ${param.rawTypeName}##
 
 package $package
 
-#foreach( $param in $params )
-#if ( $param.rawTypeName == "address" )
+#foreach( $type in $types )
+#if ( $type == "time" )
+import java.util.Date;
+#end
+#end
+
+#foreach( $type in $types )
+#if ( $type == "address" )
 import com.algorand.algosdk.crypto.Address;
+#elseif ( $type == "binary" )
+import com.algorand.algosdk.util.Encoder;
 #end
 #end
 import com.algorand.algosdk.v2.client.common.Client;
@@ -27,10 +36,13 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-#foreach( $param in $params )
-#if ( $param.rawTypeName == "address" )
-#else
-import com.algorand.algosdk.v2.client.model.Account;
+#foreach( $type in $types )
+#if ( $type == "enum" )
+import com.algorand.algosdk.v2.client.model.Enums;
+#elseif ( $type == "binary" )
+import com.algorand.algosdk.v2.client.common.Utils;
+#elseif ( $type != "boolean" && $type != "string" && $type != "integer" && $type != "time" && $type != "address" )
+import com.algorand.algosdk.v2.client.model.$type;
 #end
 #end
 
@@ -38,7 +50,7 @@ import com.algorand.algosdk.v2.client.model.Account;
  * $q.description.replaceAll("$new", "$new  * ")
  * $q.path
  */
-public class $q.name extends Query {
+public class $name extends Query {
 
 ##
 #################
@@ -46,27 +58,31 @@ public class $q.name extends Query {
 #################
 ##
 #if( $q.pathParameters.size() == 0 )
-    public ${q.name}(Client client) {
+    public ${name}(Client client) {
         super(client, new HttpMethod("$q.method"));
     }
 #else
 #foreach( $param in $q.pathParameters )
-    private #toSdkType( $param ) $param.propertyName
+#set( $var = $str.kebabToCamel($param.propertyName) )
+    private #toSdkType( $param ) $var
 #end
 
     /**
 #foreach( $param in $q.pathParameters )
-     * @param $param.propertyName $param.doc
+#set( $var = $str.kebabToCamel($param.propertyName) )
+     * @param $var $param.doc
 #end
      */
-    public ${q.name}(Client client##
+    public ${name}(Client client##
 #foreach( $param in $q.pathParameters )
-, #toSdkType( $param ) ${param.propertyName}##
+#set( $var = $str.kebabToCamel($param.propertyName) )
+, #toSdkType( $param ) ${var}##
 #end
 ) {
         super(client, new HttpMethod("$q.method"));
 #foreach( $param in $q.pathParameters )
-        this.$param.propertyName = $param.propertyName;
+#set( $var = $str.kebabToCamel($param.propertyName) )
+        this.$var = $var;
 #end
     }
 #end
@@ -77,13 +93,14 @@ public class $q.name extends Query {
 ##
 #foreach( $param in $q.queryParameters )
 ## We don't want to expose this in the SDK
-#if ( $q.name != "AccountInformation" || $param.propertyName != "format")
+#if ( $name != "AccountInformation" || $param.propertyName != "format")
+#set( $var = $str.kebabToCamel($param.propertyName) )
 
     /**
      * $param.doc.replaceAll("$new", "$new     * ")
      */
-    public $q.name ${param.propertyName}(#toSdkType( $param ) $param.propertyName) {
-        addQuery("$param.propertyName", String.valueOf($param.propertyName));
+    public $name ${var}(#toSdkType( $param ) $var) {
+        addQuery("$var", String.valueOf($var));
         return this;
     }
 #end
@@ -95,20 +112,21 @@ public class $q.name extends Query {
 ##
 #foreach( $param in $q.bodyParameters )
 ## We don't want to expose this in the SDK
-#if ( $q.name != "AccountInformation" || $param.propertyName != "format")
+#if ( $name != "AccountInformation" || $param.propertyName != "format")
+#set( $var = $str.kebabToCamel($param.propertyName) )
 
     /**
      * $param.doc.replaceAll("$new", "$new     * ")
 #if( $param.rawTypeName == "binary" )
      */
-    public $q.name ${param.propertyName}(#toSdkType( $param ) $param.propertyName) {
-        addToBody($param.propertyName);
+    public $name ${var}(#toSdkType( $param ) $var) {
+        addToBody($var);
         return this;
 #else
      * @throws JsonProcessingException
      */
-    public $q.name ${param.propertyName}(#toSdkType( $param ) $param.propertyName) throws JsonProcessingException {
-        addToBody(com.algorand.algosdk.util.Encoder.encodeToMsgPack($param.propertyName));
+    public $name ${var}(#toSdkType( $param ) $var) throws JsonProcessingException {
+        addToBody(com.algorand.algosdk.util.Encoder.encodeToMsgPack($var));
         return this;
 #end
     }
@@ -146,15 +164,17 @@ public class $q.name extends Query {
 ## check required fields
 #foreach( $param in $q.queryParameters )
 #if( $param.required )
-        if (this.$param.propertyName == null) {
-            throw new RuntimeException("$param.propertyName is not set. It is a required parameter.");
+#set( $var = $str.kebabToCamel($param.propertyName) )
+        if (this.$var == null) {
+            throw new RuntimeException("$var is not set. It is a required parameter.");
         }
 #end
 #end
 #foreach( $param in $q.bodyParameters )
 #if( $param.required )
+#set( $var = $str.kebabToCamel($param.propertyName) )
         if (qd.bodySegments.isEmpty()) {
-            throw new RuntimeException("$param.propertyName is not set. It is a required parameter.");
+            throw new RuntimeException("$var is not set. It is a required parameter.");
         }
 #end
 #end

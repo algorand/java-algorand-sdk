@@ -7,9 +7,6 @@ import java.util.regex.Pattern;
 
 public class StringHelpers {
     public String kebabToCamel(String kebab) {
-        if (kebab == null) {
-            return "";
-        }
         return CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, kebab);
     }
 

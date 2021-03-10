@@ -9,7 +9,7 @@ import com.algorand.sdkutils.utils.StructDef;
 import com.algorand.sdkutils.utils.TypeDef;
 import com.beust.jcommander.JCommander;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.logging.log4j.Level;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
@@ -33,11 +33,6 @@ public class TemplateGenerator implements Subscriber {
             root = Utils.getRoot(fis);
         }
 
-        logger.log(Level.WARN, "Helllloooo");
-        logger.warn( "Helllloooo");
-        logger.entry();
-        logger.error("Did it again!");
-        //logger.warn("Starting!");
         Publisher pub = new Publisher();
         TemplateGenerator subscriber = new TemplateGenerator(args, pub);
         OpenApiParser parser = new OpenApiParser(root, pub);
@@ -46,6 +41,18 @@ public class TemplateGenerator implements Subscriber {
 
     @com.beust.jcommander.Parameters(commandDescription = "Generate response test file(s).")
     public static class TemplateGeneratorArgs extends Main.CommonArgs {
+        @com.beust.jcommander.Parameter(required = true, names = {"-c", "--clientOutputDir"}, description = "Directory to write client file(s).")
+        public File clientOutputDirectory;
+
+        @com.beust.jcommander.Parameter(required = false, names = {"--splitModels"}, description = "Whether to write models to a single file or split them into separate files.")
+        public Boolean splitModelFiles = false;
+
+        @com.beust.jcommander.Parameter(required = true, names = {"-q", "--queryOutputDir"}, description = "Directory to write query file(s).")
+        public File queryOutputDirectory;
+
+        @com.beust.jcommander.Parameter(required = true, names = {"-m", "--modelsOutputDir"}, description = "Directory to write model file(s).")
+        public File modelsOutputDirectory;
+
         @com.beust.jcommander.Parameter(required = true, names = {"-t", "--templates"}, description = "Templates directory.")
         public File templatesDirectory;
 
@@ -79,13 +86,6 @@ public class TemplateGenerator implements Subscriber {
     public TemplateGenerator(TemplateGeneratorArgs args, Publisher publisher) {
         this.args =args;
         publisher.subscribeAll(this);
-
-        // Open templates?
-
-        // Templates:
-        // - Client
-        // - Query
-        // - Model
     }
 
     private VelocityContext getContext() {
@@ -106,7 +106,7 @@ public class TemplateGenerator implements Subscriber {
                 }
             }
 
-            // Model package
+            // TODO: Arg to inject model package.
             context.put("package", "com.algorand.algosdk.v2.client.model");
             context.put("def", model.getKey());
             context.put("props", model.getValue());
@@ -115,9 +115,11 @@ public class TemplateGenerator implements Subscriber {
             StringWriter writer = new StringWriter();
             template.merge( context, writer );
 
-            // TODO: Write to files.
+            // TODO: Write to files instead of stdout.
+            System.out.println("====================");
+            System.out.println(StringUtils.capitalize(model.getKey().name) + ".java");
+            System.out.println("====================");
             System.out.println(writer.toString());
-            System.out.println("yey");
         }
     }
 
@@ -131,12 +133,29 @@ public class TemplateGenerator implements Subscriber {
             parameters.addAll(query.pathParameters);
             parameters.addAll(query.bodyParameters);
 
+            // Make it easier to get the types
+            Set<String> types = new HashSet<>();
+            for (TypeDef typeDef: parameters) {
+                types.add(typeDef.rawTypeName);
+                if (typeDef.isOfType("array")) {
+                    types.add("array");
+                }
+                if (typeDef.isOfType("enum")) {
+                    types.add("enum");
+                }
+            }
+            if (query.returnType != "String") {
+                types.add(query.returnType);
+            }
+
             List<String> pathParts = Stream.of(query.path.split("/"))
                             .filter(part -> !part.equals(""))
                             .collect(Collectors.toList());
 
             context.put("params", parameters);
             context.put("path", pathParts);
+            context.put("types", types);
+            // TODO: Arg to inject client package.
             context.put("package", "com.algorand.algosdk.v2.client.algod");
 
             context.put("q", query);
@@ -144,21 +163,19 @@ public class TemplateGenerator implements Subscriber {
             StringWriter writer = new StringWriter();
             t.merge( context, writer );
 
-            // TODO: Write to files.
+            // TODO: Write to files instead of stdout.
             System.out.println("====================");
-            System.out.println(query.name + ".java");
+            System.out.println(StringUtils.capitalize(query.name) + ".java");
             System.out.println("====================");
             System.out.println(writer.toString());
         }
-
     }
 
     @Override
     public void terminate() {
-        logger.info("Done!");
+        logger.info("Generating files.");
 
         VelocityEngine velocityEngine = new VelocityEngine();
-        //velocityEngine.init();
         Properties props = new Properties();
         props.put("file.resource.loader.path", args.templatesDirectory.getAbsolutePath());
         velocityEngine.init(props);
@@ -168,24 +185,6 @@ public class TemplateGenerator implements Subscriber {
 
         Template queryTemplate = velocityEngine.getTemplate("query.vm");
         writeQueryClass(queryTemplate);
-
-
-        // Generate stuff.
-        /*
-        javaModelWriter.close();
-        javaModelWriter = null;
-
-        generateClientFile(
-                clientName,
-                generatedPathsImports,
-                generatedPathsEntries,
-                commonPackage,
-                commonPath,
-                tokenName,
-                tokenOptional);
-
-        generateEnumClasses(this.modelPath, this.modelPackage);
-        */
     }
 
     @Override
@@ -241,7 +240,6 @@ public class TemplateGenerator implements Subscriber {
         }
     }
 
-    //* Unused event.
     @Override
     public void onEvent(Publisher.Events event) {
         switch(event) {
@@ -255,67 +253,4 @@ public class TemplateGenerator implements Subscriber {
                 logger.info("Unhandled event (Events) - {}", event);
         }
     }
-
-    /*
-    @Override
-    public void onEvent(Events event) {
-        switch(event) {
-        case END_QUERY:
-            javaQueryWriter.finish();
-            break;
-        default:
-            throw new RuntimeException("Unimplemented event! " + event);
-        }
-    }
-
-    @Override
-    public void onEvent(Events event, QueryDef query) {
-        switch(event) {
-        case NEW_QUERY:
-            javaQueryWriter = new JavaQueryWriter(query, this);
-            break;
-        default:
-            throw new RuntimeException("Unimplemented event for note! " + event);
-        }
-    }
-
-    @Override
-    public void onEvent(Events event, TypeDef type) {
-
-        switch(event) {
-        case NEW_PROPERTY:
-            javaModelWriter.newProperty(type);
-            break;
-        case QUERY_PARAMETER:
-            javaQueryWriter.addQueryProperty(type, true, false, false);
-            break;
-        case PATH_PARAMETER:
-            javaQueryWriter.addQueryProperty(type, false, true, false);
-            break;
-        case BODY_CONTENT:
-            javaQueryWriter.addQueryProperty(type, false, false, true);
-            break;
-        default:
-            throw new RuntimeException("Unimplemented event for TypeDef! " + event);
-        }
-    }
-
-    @Override
-    public void onEvent(Events event, StructDef sDef) {
-        switch(event) {
-        case NEW_MODEL:
-            javaModelWriter.newModel(sDef, this.modelPackage);
-            break;
-        case NEW_RETURN_TYPE:
-            // Ignore aliases for now...
-            if (sDef.aliasOf == null || sDef.aliasOf != "") {
-                javaModelWriter.newModel(sDef, this.modelPackage);
-            }
-            break;
-        default:
-            throw new RuntimeException("Unemplemented event for StructDef! " + event);
-        }
-
-    }
-     */
 }
