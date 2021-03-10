@@ -9,6 +9,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.StringUtils;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;
@@ -119,28 +120,18 @@ public class Encoder {
      */
     public static String encodeToBase32StripPad(byte[] bytes) {
         Base32 codec = new Base32((byte)BASE32_PAD_CHAR);
-        String paddedStr =  codec.encodeToString(bytes);
-        // strip padding
-        int i = 0;
-        for (; i < paddedStr.length(); i++) {
-            if (paddedStr.charAt(i) == BASE32_PAD_CHAR) {
-                break;
-            }
-        }
-        return paddedStr.substring(0, i);
+        String paddedString = codec.encodeToString(bytes);
+        return StringUtils.stripEnd(paddedString, String.valueOf(BASE32_PAD_CHAR));
     }
 
-    public static byte[] decodeFromBase32StripPad(String bytes) {
+    /**
+     * Convenience method for reading base32 back into bytes
+     * @param base32 input string with optional padding.
+     * @return bytes for base32 data
+     */
+    public static byte[] decodeFromBase32StripPad(String base32) {
         Base32 codec = new Base32((byte)BASE32_PAD_CHAR);
-        byte[] paddedStr =  codec.decode(bytes);
-        // strip padding
-        int i = 0;
-        for (; i < paddedStr.length; i++) {
-            if (paddedStr[i] == BASE32_PAD_CHAR) {
-                break;
-            }
-        }
-        return Arrays.copyOf(paddedStr, i);
+        return codec.decode(base32);
     }
 
     /**
