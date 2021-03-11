@@ -2,7 +2,7 @@
 " )
 package $propFile.model_package;
 
-#foreach( $type in $props.uniqueTypes )
+#foreach( $type in $def.uniqueTypes )
 #if( $type == "address" )
 import java.security.NoSuchAlgorithmException;
 #elseif( $type == "array" )
@@ -12,7 +12,7 @@ import java.util.List;
 #end
 import java.Util.Objects;
 
-#foreach( $type in $props.uniqueTypes )
+#foreach( $type in $def.uniqueTypes )
 #if( $type == "address" )
 import com.algorand.algosdk.crypto.Address;
 #elseif( $type == "binary" )
@@ -51,7 +51,7 @@ public class $def.name extends PathResponse {
 #elseif( $prop.rawTypeName == "address" )
     public String $var() {
         if (this.creator != null) {
-            return this.$var.encodeAsString();
+            return this.${var}.encodeAsString();
         } else {
             return null;
         }

@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -44,13 +45,13 @@ public class TemplateGenerator implements Subscriber {
         @com.beust.jcommander.Parameter(names = {"-p", "--propertyFile"}, description = "Property file to load into the template context for custom configuration.")
         public File propertyFile;
 
-        @com.beust.jcommander.Parameter(required = true, names = {"-c", "--clientOutputDir"}, description = "Directory to write client file(s).")
+        @com.beust.jcommander.Parameter(names = {"-c", "--clientOutputDir"}, description = "Directory to write client file(s).")
         public File clientOutputDirectory;
 
-        @com.beust.jcommander.Parameter(required = true, names = {"-q", "--queryOutputDir"}, description = "Directory to write query file(s).")
+        @com.beust.jcommander.Parameter(names = {"-q", "--queryOutputDir"}, description = "Directory to write query file(s).")
         public File queryOutputDirectory;
 
-        @com.beust.jcommander.Parameter(required = true, names = {"-m", "--modelsOutputDir"}, description = "Directory to write model file(s).")
+        @com.beust.jcommander.Parameter(names = {"-m", "--modelsOutputDir"}, description = "Directory to write model file(s).")
         public File modelsOutputDirectory;
 
         @com.beust.jcommander.Parameter(required = true, names = {"-t", "--templates"}, description = "Templates directory.")
@@ -66,6 +67,8 @@ public class TemplateGenerator implements Subscriber {
             if (this.propertyFile != null && !this.propertyFile.isFile()) {
                 throw new RuntimeException("Property file must be a file: " + this.propertyFile.getAbsolutePath());
             }
+            /*
+            // Make these optional in case to allow implicit partial generation.
             if (!this.clientOutputDirectory.isDirectory()) {
                 throw new RuntimeException("Client output directory must be a valid directory: " + this.clientOutputDirectory.getAbsolutePath());
             }
@@ -75,6 +78,7 @@ public class TemplateGenerator implements Subscriber {
             if (!this.modelsOutputDirectory.isDirectory()) {
                 throw new RuntimeException("Model output directory must be a valid directory: " + this.modelsOutputDirectory.getAbsolutePath());
             }
+             */
             if (!this.templatesDirectory.isDirectory()) {
                 throw new RuntimeException("Templates directory must be a valid directory: " + this.templatesDirectory.getAbsolutePath());
             }
@@ -115,6 +119,8 @@ public class TemplateGenerator implements Subscriber {
         VelocityContext context = new VelocityContext();
         context.put("str", new StringHelpers());
         context.put("propFile", this.properties);
+        context.put("models", models);
+        context.put("queries", queries);
         return context;
     }
 
@@ -124,9 +130,28 @@ public class TemplateGenerator implements Subscriber {
         return writer.toString().trim();
     }
 
-    private void writeModelClass(Template template, Template filenameTemplate) {
+    private void writeClientClass(Template template, Template filenameTemplate) {
+        if(args.modelsOutputDirectory == null || !args.modelsOutputDirectory.isDirectory()) {
+            throw new IllegalArgumentException("Disabling model generation. Provide modelOutputDirectory option to enable.");
+        }
+
         VelocityContext context = getContext();
-        context.put("models", models);
+        String filename = getFilename(filenameTemplate, context);
+        StringWriter writer = new StringWriter();
+        template.merge(context, writer);
+
+        // TODO: Write to file instead of stdout.
+        System.out.println("====================");
+        System.out.println(filename);
+        System.out.println("====================");
+        //System.out.println(writer.toString());
+    }
+
+    private void writeModelClass(Template template, Template filenameTemplate) {
+        if(args.modelsOutputDirectory == null || !args.modelsOutputDirectory.isDirectory()) {
+            throw new IllegalArgumentException("Disabling model generation. Provide modelOutputDirectory option to enable.");
+        }
+        VelocityContext context = getContext();
         String lastFilename = "";
         for (Map.Entry<StructDef, List<TypeDef>> model : models.entrySet()) {
             context.put("def", model.getKey());
@@ -144,15 +169,17 @@ public class TemplateGenerator implements Subscriber {
 
             // TODO: Write to files instead of stdout.
             System.out.println("====================");
-            System.out.println(StringUtils.capitalize(model.getKey().name) + ".java");
+            System.out.println(filename);
             System.out.println("====================");
-            System.out.println(writer.toString());
+            //System.out.println(writer.toString());
         }
     }
 
     private void writeQueryClass(Template template, Template filenameTemplate) {
+        if(args.queryOutputDirectory == null || !args.queryOutputDirectory.isDirectory()) {
+            throw new IllegalArgumentException("Disabling query generation. Provide queryOutputDirectory option to enable.");
+        }
         VelocityContext context = getContext();
-        context.put("queries", queries);
         String lastFilename = "";
         for (QueryDef query : queries) {
             context.put("q", query);
@@ -171,7 +198,7 @@ public class TemplateGenerator implements Subscriber {
             System.out.println("====================");
             System.out.println(filename);
             System.out.println("====================");
-            System.out.println(writer.toString());
+            //System.out.println(writer.toString());
         }
     }
 
@@ -180,18 +207,33 @@ public class TemplateGenerator implements Subscriber {
         logger.info("Generating files.");
 
         VelocityEngine velocityEngine = new VelocityEngine();
-        Properties props = new Properties();
-        props.put("file.resource.loader.path", args.templatesDirectory.getAbsolutePath());
-        velocityEngine.init(props);
+        velocityEngine.setProperty("file.resource.loader.path", args.templatesDirectory.getAbsolutePath());
+        velocityEngine.setProperty("runtime.references.strict", true);
 
-        Template modelTemplate = velocityEngine.getTemplate("model.vm");
-        Template modelFilenameTemplate = velocityEngine.getTemplate("model_filename.vm");
-        writeModelClass(modelTemplate, modelFilenameTemplate);
+        try {
+            Template modelTemplate = velocityEngine.getTemplate("model.vm");
+            Template modelFilenameTemplate = velocityEngine.getTemplate("model_filename.vm");
+            writeModelClass(modelTemplate, modelFilenameTemplate);
+        } catch (Exception e) {
+            logger.warn("Unable to write models: {}", e.getMessage());
+        }
 
-        Template queryTemplate = velocityEngine.getTemplate("query.vm");
-        Template queryFilenameTemplate = velocityEngine.getTemplate("query_filename.vm");
-        writeQueryClass(queryTemplate, queryFilenameTemplate);
-    }
+        try {
+            Template queryTemplate = velocityEngine.getTemplate("query.vm");
+            Template queryFilenameTemplate = velocityEngine.getTemplate("query_filename.vm");
+            writeQueryClass(queryTemplate, queryFilenameTemplate);
+        } catch (Exception e) {
+            logger.warn("Unable to write queries: {}", e.getMessage());
+        }
+
+        try {
+            Template clientTemplate = velocityEngine.getTemplate("client.vm");
+            Template clientFilenameTemplate = velocityEngine.getTemplate("client_filename.vm");
+            writeClientClass(clientTemplate, clientFilenameTemplate);
+        } catch (Exception e) {
+            logger.warn("Unable to write clients: {}", e.getMessage());
+        }
+}
 
     @Override
     public void onEvent(Publisher.Events event, TypeDef type) {
