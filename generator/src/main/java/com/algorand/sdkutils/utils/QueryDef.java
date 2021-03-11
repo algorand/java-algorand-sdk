@@ -1,7 +1,11 @@
 package com.algorand.sdkutils.utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class QueryDef {
     final public String name;
@@ -32,6 +36,39 @@ public class QueryDef {
                 + ", path: " + this.path
                 + ", description: " + this.description
                 + ", method: " + this.method;
+    }
+
+    public List<String> getPathParts() {
+        return Stream.of(this.path.split("/"))
+                .filter(part -> !part.equals(""))
+                .collect(Collectors.toList());
+    }
+
+    public List<TypeDef> getAllParams() {
+        // Make it easier to loop thorugh parameters without caring what they are.
+        List<TypeDef> parameters = new ArrayList<>();
+        parameters.addAll(this.queryParameters);
+        parameters.addAll(this.pathParameters);
+        parameters.addAll(this.bodyParameters);
+        return parameters;
+    }
+
+    public Set<String> getUniqueTypes() {
+        // Make it easier to get the types
+        Set<String> types = new HashSet<>();
+        for (TypeDef typeDef: this.getAllParams()) {
+            types.add(typeDef.rawTypeName);
+            if (typeDef.isOfType("array")) {
+                types.add("array");
+            }
+            if (typeDef.isOfType("enum")) {
+                types.add("enum");
+            }
+        }
+        if (this.returnType != "String") {
+            types.add(this.returnType);
+        }
+        return types;
     }
 
     public String getName() {

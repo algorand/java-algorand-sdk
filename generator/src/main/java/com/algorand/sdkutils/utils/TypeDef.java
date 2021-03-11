@@ -1,6 +1,8 @@
 package com.algorand.sdkutils.utils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * TypeDef hold together information about a type

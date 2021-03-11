@@ -219,15 +219,14 @@ public class OpenApiParser {
     }
 
     // Returns an iterator in sorted order of the properties (json nodes).
-    static Iterator<Entry<String, JsonNode>> getSortedProperties(JsonNode properties) {
+    static Map<String, JsonNode> getSortedProperties(JsonNode properties) {
         Iterator<Entry<String, JsonNode>> props = properties.fields();
         TreeMap<String, JsonNode> propMap = new TreeMap<String, JsonNode>();
         while (props.hasNext()) {
             Entry<String, JsonNode> e = props.next();
             propMap.put(e.getKey(), e.getValue());
         }
-        Iterator<Entry<String, JsonNode>>sortedProps = propMap.entrySet().iterator();
-        return sortedProps;
+        return propMap;
     }
 
     // Returns an iterator in sorted order of the parameters (json nodes).
@@ -284,16 +283,15 @@ public class OpenApiParser {
             }
         }
 
-        publisher.publish(event, new StructDef(className, desc, requiredProperties, mutuallyExclusiveProperties));
-
-        Iterator<Entry<String, JsonNode>> properties = getSortedProperties(propertiesNode);
-
-        while (properties.hasNext()) {
-            Entry<String, JsonNode> prop = properties.next();
+        List<TypeDef> properties = new ArrayList<>();
+        for (Map.Entry<String, JsonNode> prop : getSortedProperties(propertiesNode).entrySet()) {
             String jprop = prop.getKey();
             TypeDef typeObj = getType(prop.getValue(), true, jprop, true);
-            publisher.publish(Events.NEW_PROPERTY, typeObj);
+            properties.add(typeObj);
         }
+
+        publisher.publish(event, new StructDef(className, desc, properties, requiredProperties, mutuallyExclusiveProperties));
+        properties.forEach(p -> publisher.publish(Events.NEW_PROPERTY, p));
     }
 
     static boolean isRequired(JsonNode prop) {

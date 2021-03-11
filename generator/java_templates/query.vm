@@ -15,16 +15,15 @@ Enums.$str.capitalize($str.kebabToCamel($param.propertyName))##
 ${param.rawTypeName}##
 #end
 #end
+package $propFile.query_package;
 
-package $package
-
-#foreach( $type in $types )
+#foreach( $type in $q.uniqueTypes )
 #if ( $type == "time" )
 import java.util.Date;
 #end
 #end
 
-#foreach( $type in $types )
+#foreach( $type in $q.uniqueTypes )
 #if ( $type == "address" )
 import com.algorand.algosdk.crypto.Address;
 #elseif ( $type == "binary" )
@@ -36,7 +35,7 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-#foreach( $type in $types )
+#foreach( $type in $q.uniqueTypes )
 #if ( $type == "enum" )
 import com.algorand.algosdk.v2.client.model.Enums;
 #elseif ( $type == "binary" )
@@ -178,7 +177,7 @@ public class $name extends Query {
         }
 #end
 #end
-#foreach( $part in $path )
+#foreach( $part in $q.pathParts )
 #if ( $part.matches("\{.*}") )
         addPathSegment(String.valueOf($str.unwrap($part)));
 #else

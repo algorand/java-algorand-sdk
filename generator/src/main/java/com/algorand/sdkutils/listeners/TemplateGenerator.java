@@ -16,9 +16,9 @@ import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.StringWriter;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,11 +41,11 @@ public class TemplateGenerator implements Subscriber {
 
     @com.beust.jcommander.Parameters(commandDescription = "Generate response test file(s).")
     public static class TemplateGeneratorArgs extends Main.CommonArgs {
+        @com.beust.jcommander.Parameter(names = {"-p", "--propertyFile"}, description = "Property file to load into the template context for custom configuration.")
+        public File propertyFile;
+
         @com.beust.jcommander.Parameter(required = true, names = {"-c", "--clientOutputDir"}, description = "Directory to write client file(s).")
         public File clientOutputDirectory;
-
-        @com.beust.jcommander.Parameter(required = false, names = {"--splitModels"}, description = "Whether to write models to a single file or split them into separate files.")
-        public Boolean splitModelFiles = false;
 
         @com.beust.jcommander.Parameter(required = true, names = {"-q", "--queryOutputDir"}, description = "Directory to write query file(s).")
         public File queryOutputDirectory;
@@ -63,6 +63,18 @@ public class TemplateGenerator implements Subscriber {
         public void validate(JCommander command) {
             super.validate(command);
 
+            if (this.propertyFile != null && !this.propertyFile.isFile()) {
+                throw new RuntimeException("Property file must be a file: " + this.propertyFile.getAbsolutePath());
+            }
+            if (!this.clientOutputDirectory.isDirectory()) {
+                throw new RuntimeException("Client output directory must be a valid directory: " + this.clientOutputDirectory.getAbsolutePath());
+            }
+            if (!this.queryOutputDirectory.isDirectory()) {
+                throw new RuntimeException("Query class output directory must be a valid directory: " + this.queryOutputDirectory.getAbsolutePath());
+            }
+            if (!this.modelsOutputDirectory.isDirectory()) {
+                throw new RuntimeException("Model output directory must be a valid directory: " + this.modelsOutputDirectory.getAbsolutePath());
+            }
             if (!this.templatesDirectory.isDirectory()) {
                 throw new RuntimeException("Templates directory must be a valid directory: " + this.templatesDirectory.getAbsolutePath());
             }
@@ -81,36 +93,51 @@ public class TemplateGenerator implements Subscriber {
     private QueryDef activeQuery = null;
     private List<QueryDef> queries = new ArrayList<>();
 
+    private Properties properties = new Properties();
     private final TemplateGeneratorArgs args;
 
-    public TemplateGenerator(TemplateGeneratorArgs args, Publisher publisher) {
+    public TemplateGenerator(TemplateGeneratorArgs args, Publisher publisher) throws IOException {
         this.args =args;
+
+        // Initialize property file if provided.
+        if (args.propertyFile != null) {
+            try (InputStream input = new FileInputStream(args.propertyFile)) {
+                properties.load(input);
+            } catch (IOException exception) {
+                throw new RuntimeException("Failed to initialize property file.");
+            }
+        }
+
         publisher.subscribeAll(this);
     }
 
     private VelocityContext getContext() {
         VelocityContext context = new VelocityContext();
         context.put("str", new StringHelpers());
+        context.put("propFile", this.properties);
         return context;
     }
 
-    private void writeModelClass(Template template) {
+    private String getFilename(Template t, VelocityContext c) {
+        StringWriter writer = new StringWriter();
+        t.merge(c, writer);
+        return writer.toString().trim();
+    }
+
+    private void writeModelClass(Template template, Template filenameTemplate) {
+        VelocityContext context = getContext();
+        context.put("models", models);
+        String lastFilename = "";
         for (Map.Entry<StructDef, List<TypeDef>> model : models.entrySet()) {
-            VelocityContext context = getContext();
-
-            Set<String> types = new HashSet<>();
-            for (TypeDef typeDef: model.getValue()) {
-                types.add(typeDef.rawTypeName);
-                if (typeDef.isOfType("array")) {
-                    types.add("array");
-                }
-            }
-
-            // TODO: Arg to inject model package.
-            context.put("package", "com.algorand.algosdk.v2.client.model");
             context.put("def", model.getKey());
             context.put("props", model.getValue());
-            context.put("types", types);
+
+            String filename = getFilename(filenameTemplate, context);
+            // If we see the same filename twice in a row, we're in single-file mode. Return before writing again.
+            if (StringUtils.equals(filename, lastFilename)) {
+                return;
+            }
+            lastFilename = filename;
 
             StringWriter writer = new StringWriter();
             template.merge( context, writer );
@@ -123,49 +150,26 @@ public class TemplateGenerator implements Subscriber {
         }
     }
 
-    private void writeQueryClass(Template t) {
+    private void writeQueryClass(Template template, Template filenameTemplate) {
+        VelocityContext context = getContext();
+        context.put("queries", queries);
+        String lastFilename = "";
         for (QueryDef query : queries) {
-            VelocityContext context = getContext();
-
-            // Make it easier to loop thorugh parameters without caring what they are.
-            List<TypeDef> parameters = new ArrayList<>();
-            parameters.addAll(query.queryParameters);
-            parameters.addAll(query.pathParameters);
-            parameters.addAll(query.bodyParameters);
-
-            // Make it easier to get the types
-            Set<String> types = new HashSet<>();
-            for (TypeDef typeDef: parameters) {
-                types.add(typeDef.rawTypeName);
-                if (typeDef.isOfType("array")) {
-                    types.add("array");
-                }
-                if (typeDef.isOfType("enum")) {
-                    types.add("enum");
-                }
-            }
-            if (query.returnType != "String") {
-                types.add(query.returnType);
-            }
-
-            List<String> pathParts = Stream.of(query.path.split("/"))
-                            .filter(part -> !part.equals(""))
-                            .collect(Collectors.toList());
-
-            context.put("params", parameters);
-            context.put("path", pathParts);
-            context.put("types", types);
-            // TODO: Arg to inject client package.
-            context.put("package", "com.algorand.algosdk.v2.client.algod");
-
             context.put("q", query);
 
+            String filename = getFilename(filenameTemplate, context);
+            // If we see the same filename twice in a row, we're in single-file mode. Return before writing again.
+            if (StringUtils.equals(filename, lastFilename)) {
+                return;
+            }
+            lastFilename = filename;
+
             StringWriter writer = new StringWriter();
-            t.merge( context, writer );
+            template.merge( context, writer );
 
             // TODO: Write to files instead of stdout.
             System.out.println("====================");
-            System.out.println(StringUtils.capitalize(query.name) + ".java");
+            System.out.println(filename);
             System.out.println("====================");
             System.out.println(writer.toString());
         }
@@ -180,11 +184,13 @@ public class TemplateGenerator implements Subscriber {
         props.put("file.resource.loader.path", args.templatesDirectory.getAbsolutePath());
         velocityEngine.init(props);
 
-        //Template modelTemplate = velocityEngine.getTemplate("model.vm");
-        //writeModelClass(modelTemplate);
+        Template modelTemplate = velocityEngine.getTemplate("model.vm");
+        Template modelFilenameTemplate = velocityEngine.getTemplate("model_filename.vm");
+        writeModelClass(modelTemplate, modelFilenameTemplate);
 
         Template queryTemplate = velocityEngine.getTemplate("query.vm");
-        writeQueryClass(queryTemplate);
+        Template queryFilenameTemplate = velocityEngine.getTemplate("query_filename.vm");
+        writeQueryClass(queryTemplate, queryFilenameTemplate);
     }
 
     @Override
