@@ -23,10 +23,11 @@ public class TypeDef {
             // TODO: Remove fields from here (requires refactoring all generators which use them)
             String javaTypeName,
             String rawTypeName,
-            String type, 
-            String propertyName,
-            String goPropertyName,
+            String type,
             // TODO: Until here
+            String propertyName,
+            // TODO: Remove this one too
+            String goPropertyName,
             String doc,
             boolean required,
             // TODO: After removing the above, remove openApi prefix from these.
@@ -84,9 +85,9 @@ public class TypeDef {
     public String doc;
     public List<String> enumValues;
     public boolean required;
-    private final String openApiRefType;
+    public final String openApiRefType;
     public String openApiType;
-    private final String openApiArrayType;
+    public final String openApiArrayType;
     public String openApiFormat;
     public String openApiAlgorandFormat;
     public String openApiAlgorandGoFormat;
@@ -96,6 +97,7 @@ public class TypeDef {
     // For example, "getterSetter,array" if it's an array of special types.
     private String type;
 
+    /*
     public String getJavaTypeName() {
         return javaTypeName;
     }
@@ -104,12 +106,13 @@ public class TypeDef {
         return rawTypeName;
     }
 
-    public String getPropertyName() {
-        return propertyName;
-    }
-
     public String getGoPropertyName() {
         return goPropertyName;
+    }
+    */
+
+    public String getPropertyName() {
+        return propertyName;
     }
 
     public String getDoc() {
@@ -124,27 +127,30 @@ public class TypeDef {
         return required;
     }
 
-    public String getOpenApiType() {
+    public String getType() {
         return openApiType;
     }
 
-    public String getOpenApiFormat() {
+    public String getFormat() {
         return openApiFormat;
     }
 
-    public String getOpenApiAlgorandFormat() {
-        return openApiAlgorandFormat;
-    }
-
-    public String getOpenApiArrayType() {
+    public String getArrayType() {
         return openApiArrayType;
     }
 
-    public String getOpenApiRefType() {
+    public String getRefType() {
+        if ("TealKeyValueStore".equals(openApiRefType)) {
+            System.out.println("break");
+        }
         return openApiRefType;
     }
 
-    public String getOpenApiAlgorandGoFormat() {
+    public String getAlgorandFormat() {
+        return openApiAlgorandFormat;
+    }
+
+    public String getAlgorandGoFormat() {
         return openApiAlgorandGoFormat;
     }
 }

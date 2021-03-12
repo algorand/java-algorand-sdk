@@ -21,6 +21,7 @@ import com.algorand.sdkutils.utils.TypeDef;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,8 +59,9 @@ public class OpenApiParser {
         publisher.terminate();
     }
 
-    static String getTypeNameFromRef(String ref) {
-        StringTokenizer st = new StringTokenizer(ref, "/");
+    static String getTypeNameFromRef(JsonNode ref) {
+        if (ref == null) return null;
+        StringTokenizer st = new StringTokenizer(ref.asText(), "/");
         String ans = "";
         while (st.hasMoreTokens()) {
             ans = st.nextToken();
@@ -107,18 +109,19 @@ public class OpenApiParser {
         if (refNode == null && prop.get("schema") != null) {
             refNode = prop.get("schema").get("$ref");
         }
+        String refType = getTypeNameFromRef(refNode);
 
         // Handle reference type
         if (refNode != null) {
-            String refType = getTypeNameFromRef(refNode.asText());
             // Need to check here if this type does not have a class of its own
             // No C/C++ style typedef in java, and this type could be a class with no properties
             prop = getFromRef(refNode.asText());
             if (desc.isEmpty()) {
                 desc = prop.get("description") == null ? "" : prop.get("description").asText();
             }
+            // TODO: Why does this need to be handled outside the main switch below?
             if (hasProperties(prop)) {
-                return new TypeDef(refType, refType, "", propName, goName, desc, isRequired(prop), refType, "", "", "", "", goName);
+                return new TypeDef(refType, refType, "", propName, goName, desc, isRequired(prop), refType, null, null, null, null, goName);
             }
         }
 
@@ -163,39 +166,50 @@ public class OpenApiParser {
 
                     // getterSetter typeName is only used in path.
                     return new TypeDef("", rawType, "getterSetter,array",
-                            propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+                            propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
                 } else {
                     return new TypeDef("byte[]", "binary", "getterSetter",
-                            propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+                            propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
                 }
             case "AccountID":
                 break;
             case "BlockCertificate":
             case "BlockHeader":
-                return new TypeDef("HashMap<String,Object>", openApiType, "", propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+                return new TypeDef("HashMap<String,Object>", openApiType, "", propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
             }
         }
         switch (openApiType) {
         case "integer":
             String longName = asObject ? "Long" : "long";
-            return new TypeDef(longName, openApiType, "", propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+            return new TypeDef(longName, openApiType, "", propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
         case "object":
-            return new TypeDef("HashMap<String,Object>", openApiType, "", propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+            return new TypeDef("HashMap<String,Object>", openApiType, "", propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
         case "string":
-            return new TypeDef("String", openApiType, "", propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+            return new TypeDef("String", openApiType, "", propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
         case "boolean":
             String boolName = asObject ? "Boolean" : "boolean";
-            return new TypeDef(boolName, openApiType, "", propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+            return new TypeDef(boolName, openApiType, "", propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
         case "array":
+            // Resolve references
             TypeDef typeName = getType(arrayTypeNode, asObject, propName, forModel);
             String oldArrayType = openApiType;
             if (typeName.isOfType("getterSetter")) {
                 oldArrayType += ",getterSetter";
             }
+            String resolvedArrayType = typeName.openApiType;
+            String resolvedArrayFormat = typeName.openApiFormat;
+            String resolvedAlgoFormat = typeName.openApiAlgorandFormat;
+            if (StringUtils.isNotEmpty(typeName.openApiRefType)) {
+                resolvedArrayType = typeName.openApiRefType;
+                // TODO: is this needed?
+                //resolvedArrayFormat = ???
+                //resolvedAlgoFormat = typeName.openApiRefType;
+            }
             return new TypeDef("List<" + typeName.javaTypeName + ">", typeName.rawTypeName,
-                    oldArrayType, propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+                    oldArrayType, propName, goName, desc, isRequired(prop),
+                    refType, openApiType, resolvedArrayType, openApiFormat, resolvedAlgoFormat, goName);
         default:
-            return new TypeDef(openApiType, openApiType, "", propName, goName, desc, isRequired(prop), null, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
+            return new TypeDef(openApiType, openApiType, "", propName, goName, desc, isRequired(prop), refType, openApiType, openApiArrayType, openApiFormat, openApiAlgorandFormat, goName);
         }
     }
 
@@ -407,9 +421,9 @@ public class OpenApiParser {
             returnType = spec.get("responses").get("200").get("$ref").asText();
             JsonNode returnTypeNode = this.getFromRef(returnType);
             if (returnTypeNode.get("schema").get("$ref") != null) {
-                returnType = OpenApiParser.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref").asText());
+                returnType = OpenApiParser.getTypeNameFromRef(returnTypeNode.get("schema").get("$ref"));
             } else {
-                returnType = OpenApiParser.getTypeNameFromRef(returnType);
+                returnType = OpenApiParser.getTypeNameFromRef(spec.get("responses").get("200").get("$ref"));
                 returnType = Tools.getCamelCase(returnType, true);
             }
         }
@@ -483,7 +497,7 @@ public class OpenApiParser {
                     }
                     if (rSchema.get("$ref") != null ) {
                         // It refers to a defined class, create an alias
-                        String realType = getTypeNameFromRef(rSchema.get("$ref").asText());
+                        String realType = getTypeNameFromRef(rSchema.get("$ref"));
                         publisher.publish(Events.REGISTER_RETURN_TYPE, new StructDef(rtype.getKey(), realType));
                         continue;
                     }
