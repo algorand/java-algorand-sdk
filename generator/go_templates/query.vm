@@ -44,10 +44,10 @@ import (
   "github.com/algorand/go-algorand-sdk/client/v2/common"
   "github.com/algorand/go-algorand-sdk/client/v2/common/models"
 )
-
 ## build the query Params type
 #if( $q.queryParameters.size() > 0)
 #set( $paramType = "${str.uncapitalize($q.name)}Params" )
+
 type ${paramType} struct {
 #foreach( $qp in $q.queryParameters)
 
@@ -59,15 +59,17 @@ type ${paramType} struct {
 
 type $queryType struct {
   c *Client
-## path parameters
-## account string
-#if($paramType)
+#foreach( $pp in $q.pathParameters )
+
+  $str.kebabToCamel($pp.propertyName) #toQueryType($pp)
+
+#end
+#if( $q.queryParameters.size() > 0)
 #set( $queryArg = "s.p" )
 
   p $paramType
 #end
 }
-
 #foreach( $qp in $q.queryParameters)
 #set( $paramFunc = ${str.kebabToUpperCamel($qp.propertyName)} )
 #set( $paramArg = $str.uncapitalize($paramFunc) )
@@ -107,9 +109,23 @@ UNHANDLED TYPE
 #end
 #end
 
-## Do function
-func (s *LookupAccountTransactions) Do(ctx context.Context, headers ...*common.Header) (response models.TransactionsResponse, err error) {
-  err = s.c.get(ctx, &response, fmt.Sprintf("/v2/accounts/%s/transactions", s.account), $queryArg, headers)
+## Do function -- Build up path with fmt.Sprintf if there are path parameters.
+#set( $processedPath = """${q.path}""" )
+#if( $str.matches($q.path, ".*\{.*}.*") )
+#set( $processedPath = "fmt.Sprintf(""" )
+#set( $argList = "" )
+#foreach( $part in $q.pathParts )
+#if ( $part.matches("\{.*}") )
+#set( $processedPath = "${processedPath}/%v" )
+#set( $argList = "$argList, s.${str.kebabToCamel($str.unwrap($part))}" )
+#else
+#set( $processedPath = "${processedPath}/$part" )
+#end
+#end
+#set( $processedPath = "${processedPath}""$argList)" )
+#end
+func (s *${queryType}) Do(ctx context.Context, headers ...*common.Header) (response models.${q.returnType}, err error) {
+  err = s.c.get(ctx, &response, $processedPath, $queryArg, headers)
   return
 }
 
