@@ -20,19 +20,34 @@ public class TypeDef {
      * @param required indicates if the field is a required field
      */
     public TypeDef(
+            // TODO: Remove fields from here (requires refactoring all generators which use them)
             String javaTypeName,
             String rawTypeName,
             String type, 
             String propertyName,
             String goPropertyName,
+            // TODO: Until here
             String doc,
-            boolean required) {
+            boolean required,
+            // TODO: After removing the above, remove openApi prefix from these.
+            String openApiRefType,
+            String openApiType,
+            String openApiArrayType,
+            String openApiFormat,
+            String openApiAlgorandFormat,
+            String openApiAlgorandGoFormat) {
         this.javaTypeName = javaTypeName;
         this.rawTypeName = rawTypeName;
         this.type = type;
         this.propertyName = propertyName;
         this.goPropertyName = goPropertyName;
         this.doc = doc;
+        this.openApiRefType = openApiRefType;
+        this.openApiType = openApiType;
+        this.openApiArrayType = openApiArrayType;
+        this.openApiFormat = openApiFormat;
+        this.openApiAlgorandFormat = openApiAlgorandFormat;
+        this.openApiAlgorandGoFormat = openApiAlgorandGoFormat;
         this.enumValues = null;
         this.required = required;
     }
@@ -69,6 +84,12 @@ public class TypeDef {
     public String doc;
     public List<String> enumValues;
     public boolean required;
+    private final String openApiRefType;
+    public String openApiType;
+    private final String openApiArrayType;
+    public String openApiFormat;
+    public String openApiAlgorandFormat;
+    public String openApiAlgorandGoFormat;
 
     // This field is private because it is sometimes (but usually not) a CSV and it's too easy to accidentally
     // use it the wrong way. Use 'isOfType' to compare against specific types.
@@ -101,5 +122,29 @@ public class TypeDef {
 
     public boolean isRequired() {
         return required;
+    }
+
+    public String getOpenApiType() {
+        return openApiType;
+    }
+
+    public String getOpenApiFormat() {
+        return openApiFormat;
+    }
+
+    public String getOpenApiAlgorandFormat() {
+        return openApiAlgorandFormat;
+    }
+
+    public String getOpenApiArrayType() {
+        return openApiArrayType;
+    }
+
+    public String getOpenApiRefType() {
+        return openApiRefType;
+    }
+
+    public String getOpenApiAlgorandGoFormat() {
+        return openApiAlgorandGoFormat;
     }
 }
