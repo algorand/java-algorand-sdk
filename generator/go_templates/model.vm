@@ -1,0 +1,44 @@
+## Converts a parameter type into the SDK specific type.
+#macro ( toSdkType $param )##
+#if ($param.isOfType("array"))[]#end## Add array prefix to arrays...
+#if ( $param.rawTypeName == "integer" )
+uint64##
+#elseif ( $param.rawTypeName == "SignedTransaction" )
+types.SignedTxn##
+#elseif( $param.rawTypeName == "address" )
+string##
+#elseif( $param.rawTypeName == "binary" ||  $param.rawTypeName == "byte" )
+[]byte##
+#elseif ( $param.rawTypeName == "string" && $param.isOfType("enum") )
+Enums.$str.capitalize($str.kebabToCamel($param.propertyName))##
+#else
+${param.rawTypeName}##
+#end
+#end
+#set( $new = "
+" )
+package $propFile.model_package;
+
+#set( $hasTypes = false )
+#foreach( $type in $def.uniqueTypes )
+#if( $type == "SignedTransaction" )
+import "github.com/algorand/go-algorand-sdk/types"
+#set( $hasTypes = true )
+#end
+#end
+#if( $hasTypes )
+
+#end
+#if( $def.doc )
+// $str.formatDoc("$def.name ${str.uncapitalize($def.doc)}", "// ")
+#else
+// $def.name defines a model for ${def.name}.
+#end
+type $def.name struct {
+#foreach( $param in $def.properties )
+#set( $formattedName = $str.kebabToUpperCamel($param.propertyName))
+  // $str.formatDoc("$formattedName ${str.uncapitalize($param.doc)}", "  // ")
+  $formattedName #toSdkType($param) `json:"$param.propertyName#if( !$param.required ),omitempty#end"`
+#if( $foreach.hasNext )$new#end
+#end
+}

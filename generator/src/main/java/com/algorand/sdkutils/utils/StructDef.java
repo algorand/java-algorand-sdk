@@ -64,6 +64,10 @@ public class StructDef {
         return doc;
     }
 
+    public List<TypeDef> getProperties() {
+        return properties;
+    }
+
     public Set<String> getRequiredProperties() {
         return requiredProperties;
     }

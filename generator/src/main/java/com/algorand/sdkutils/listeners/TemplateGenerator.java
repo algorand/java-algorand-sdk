@@ -15,19 +15,18 @@ import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.exception.ResourceNotFoundException;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TemplateGenerator implements Subscriber {
     protected static final Logger logger = LogManager.getLogger(TemplateGenerator.class.getName());
 
-    // Called by Main.main
+    /**
+     * Main function to run the template generator. This should be factored out since every generator does something
+     * identical.
+     */
     public static void main(TemplateGeneratorArgs args, JCommander command) throws Exception {
         JsonNode root;
         try (FileInputStream fis = new FileInputStream(args.specfile)) {
@@ -40,6 +39,9 @@ public class TemplateGenerator implements Subscriber {
         parser.parse();
     }
 
+    /**
+     * Arguments for the TemplateGenerator.
+     */
     @com.beust.jcommander.Parameters(commandDescription = "Generate response test file(s).")
     public static class TemplateGeneratorArgs extends Main.CommonArgs {
         @com.beust.jcommander.Parameter(names = {"-p", "--propertyFile"}, description = "Property file to load into the template context for custom configuration.")
@@ -90,16 +92,28 @@ public class TemplateGenerator implements Subscriber {
 
     /////////////////////////////
 
+    // Return types. Usually aliases to model types.
     private HashMap<StructDef, List<TypeDef>> responses = new HashMap<>();
+
+    // Model definitions.
     private HashMap<StructDef, List<TypeDef>> models = new HashMap<>();
 
-    private List<TypeDef> activeList = null;
-    private QueryDef activeQuery = null;
+    // Query definitions.
     private List<QueryDef> queries = new ArrayList<>();
 
-    private Properties properties = new Properties();
+    // Temporary variables used while building up results from the parser events.
+    private List<TypeDef> activeList = null;
+    private QueryDef activeQuery = null;
+
+    // Properties provided to the generator. Available to templates with '$propFile.<user-defined-property>'
+    private final Properties properties = new Properties();
+
+    // The generator CLI arguments object.
     private final TemplateGeneratorArgs args;
 
+    /**
+     * Constructor.
+     */
     public TemplateGenerator(TemplateGeneratorArgs args, Publisher publisher) throws IOException {
         this.args =args;
 
@@ -115,42 +129,80 @@ public class TemplateGenerator implements Subscriber {
         publisher.subscribeAll(this);
     }
 
+    /**
+     * Create and configure a {@link org.apache.velocity.app.VelocityEngine}.
+     * @return a configured {@link org.apache.velocity.app.VelocityEngine}.
+     */
+    private VelocityEngine getEngine() {
+        VelocityEngine velocityEngine = new VelocityEngine();
+
+        // Tell the engine where templates are located.
+        velocityEngine.setProperty("file.resource.loader.path", args.templatesDirectory.getAbsolutePath());
+
+        // Strict mode causes template generation fail if there is an unknown reference.
+        velocityEngine.setProperty("runtime.references.strict", true);
+
+        return velocityEngine;
+    }
+
+    /**
+     * Create and initialize a {@link org.apache.velocity.VelocityContext}. The context includes the following values:
+     *      - str: ${@link StringHelpers} helper class with string manipulation functions.
+     *      - propFile: Properties file provided when calling the TemplateGenerator.
+     *      - models: Map of model definition / list of it's properties (properties are also in the definition).
+     *      - queries: List of query definitions including the parameters.
+     * @return a configured {@link org.apache.velocity.VelocityContext}.
+     */
     private VelocityContext getContext() {
         VelocityContext context = new VelocityContext();
         context.put("str", new StringHelpers());
         context.put("propFile", this.properties);
         context.put("models", models);
         context.put("queries", queries);
+        context.put("responses", responses);
+
+        Set<String> uniqueTypes = new HashSet<>();
+        for (Map.Entry<StructDef, List<TypeDef>> model : models.entrySet()) {
+            for (TypeDef type : model.getKey().properties) {
+                uniqueTypes.add(type.rawTypeName);
+            }
+        }
+        context.put("uniqueTypes", uniqueTypes);
+
+        // Get all types
         return context;
     }
 
+    /**
+     * Simple wrapper to process a filename template and get the result. The context must be provided because the
+     * current object is needed so the template can derive a filename.
+     * @return filename to use for generation.
+     */
     private String getFilename(Template t, VelocityContext c) {
         StringWriter writer = new StringWriter();
         t.merge(c, writer);
         return writer.toString().trim();
     }
 
-    private void writeClientClass(Template template, Template filenameTemplate) {
+    private void processClassTemplate(Template template, Template filenameTemplate) throws IOException {
         if(args.modelsOutputDirectory == null || !args.modelsOutputDirectory.isDirectory()) {
             throw new IllegalArgumentException("Disabling model generation. Provide modelOutputDirectory option to enable.");
         }
 
         VelocityContext context = getContext();
         String filename = getFilename(filenameTemplate, context);
-        StringWriter writer = new StringWriter();
-        template.merge(context, writer);
-
-        // TODO: Write to file instead of stdout.
-        System.out.println("====================");
-        System.out.println(filename);
-        System.out.println("====================");
-        //System.out.println(writer.toString());
+        logger.info("Writing file: {}", filename);
+        Path target = Path.of(args.modelsOutputDirectory.getAbsolutePath(), filename);
+        try (FileWriter writer = new FileWriter(target.toFile())) {
+            template.merge(context, writer);
+        }
     }
 
-    private void writeModelClass(Template template, Template filenameTemplate) {
+    private void processModelTemplate(Template template, Template filenameTemplate) throws IOException {
         if(args.modelsOutputDirectory == null || !args.modelsOutputDirectory.isDirectory()) {
             throw new IllegalArgumentException("Disabling model generation. Provide modelOutputDirectory option to enable.");
         }
+
         VelocityContext context = getContext();
         String lastFilename = "";
         for (Map.Entry<StructDef, List<TypeDef>> model : models.entrySet()) {
@@ -164,21 +216,19 @@ public class TemplateGenerator implements Subscriber {
             }
             lastFilename = filename;
 
-            StringWriter writer = new StringWriter();
-            template.merge( context, writer );
-
-            // TODO: Write to files instead of stdout.
-            System.out.println("====================");
-            System.out.println(filename);
-            System.out.println("====================");
-            //System.out.println(writer.toString());
+            logger.info("Writing file: {}", filename);
+            Path target = Path.of(args.modelsOutputDirectory.getAbsolutePath(), filename);
+            try (FileWriter writer = new FileWriter(target.toFile())) {
+                template.merge(context, writer);
+            }
         }
     }
 
-    private void writeQueryClass(Template template, Template filenameTemplate) {
+    private void processQueryTemplate(Template template, Template filenameTemplate) throws IOException {
         if(args.queryOutputDirectory == null || !args.queryOutputDirectory.isDirectory()) {
             throw new IllegalArgumentException("Disabling query generation. Provide queryOutputDirectory option to enable.");
         }
+
         VelocityContext context = getContext();
         String lastFilename = "";
         for (QueryDef query : queries) {
@@ -191,14 +241,11 @@ public class TemplateGenerator implements Subscriber {
             }
             lastFilename = filename;
 
-            StringWriter writer = new StringWriter();
-            template.merge( context, writer );
-
-            // TODO: Write to files instead of stdout.
-            System.out.println("====================");
-            System.out.println(filename);
-            System.out.println("====================");
-            //System.out.println(writer.toString());
+            logger.info("Writing file: {}", filename);
+            Path target = Path.of(args.modelsOutputDirectory.getAbsolutePath(), filename);
+            try (FileWriter writer = new FileWriter(target.toFile())) {
+                template.merge(context, writer);
+            }
         }
     }
 
@@ -206,14 +253,12 @@ public class TemplateGenerator implements Subscriber {
     public void terminate() {
         logger.info("Generating files.");
 
-        VelocityEngine velocityEngine = new VelocityEngine();
-        velocityEngine.setProperty("file.resource.loader.path", args.templatesDirectory.getAbsolutePath());
-        velocityEngine.setProperty("runtime.references.strict", true);
+        VelocityEngine velocityEngine = getEngine();
 
         try {
             Template modelTemplate = velocityEngine.getTemplate("model.vm");
             Template modelFilenameTemplate = velocityEngine.getTemplate("model_filename.vm");
-            writeModelClass(modelTemplate, modelFilenameTemplate);
+            processModelTemplate(modelTemplate, modelFilenameTemplate);
         } catch (Exception e) {
             logger.warn("Unable to write models: {}", e.getMessage());
         }
@@ -221,7 +266,7 @@ public class TemplateGenerator implements Subscriber {
         try {
             Template queryTemplate = velocityEngine.getTemplate("query.vm");
             Template queryFilenameTemplate = velocityEngine.getTemplate("query_filename.vm");
-            writeQueryClass(queryTemplate, queryFilenameTemplate);
+            processQueryTemplate(queryTemplate, queryFilenameTemplate);
         } catch (Exception e) {
             logger.warn("Unable to write queries: {}", e.getMessage());
         }
@@ -229,7 +274,7 @@ public class TemplateGenerator implements Subscriber {
         try {
             Template clientTemplate = velocityEngine.getTemplate("client.vm");
             Template clientFilenameTemplate = velocityEngine.getTemplate("client_filename.vm");
-            writeClientClass(clientTemplate, clientFilenameTemplate);
+            processClassTemplate(clientTemplate, clientFilenameTemplate);
         } catch (Exception e) {
             logger.warn("Unable to write clients: {}", e.getMessage());
         }
@@ -264,10 +309,6 @@ public class TemplateGenerator implements Subscriber {
                 models.put(sDef, activeList);
                 return;
             case REGISTER_RETURN_TYPE:
-                // Java isn't handling aliases properly... check for aliases when generating code.
-                if (sDef.aliasOf == null || sDef.aliasOf != "") {
-                    return;
-                }
                 responses.put(sDef, activeList);
                 return;
             default:

@@ -9,7 +9,7 @@ Long##
 Address##
 #elseif( $param.rawTypeName == "binary" )
 []byte##
-#elseif ( $param.rawTypeName == "string" && $param.type == "enum" )
+#elseif ( $param.rawTypeName == "string" && $param.isOfType("enum") )
 Enums.$str.capitalize($str.kebabToCamel($param.propertyName))##
 #else
 ${param.rawTypeName}##

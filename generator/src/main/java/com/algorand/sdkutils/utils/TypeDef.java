@@ -1,5 +1,6 @@
 package com.algorand.sdkutils.utils;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,11 +36,14 @@ public class TypeDef {
         this.enumValues = null;
         this.required = required;
     }
-    public boolean isOfType(String type) {
+    public boolean isOfType(String typeArg) {
         if (this.type == null) {
             return false;
         }
-        return this.type.contains(type);
+        //return this.type.contains(type);
+        boolean match = Arrays.stream(type.split(","))
+                .anyMatch(t -> typeArg.equals(t));
+        return match;
     }
 
     @Override
@@ -68,6 +72,7 @@ public class TypeDef {
 
     // This field is private because it is sometimes (but usually not) a CSV and it's too easy to accidentally
     // use it the wrong way. Use 'isOfType' to compare against specific types.
+    // For example, "getterSetter,array" if it's an array of special types.
     private String type;
 
     public String getJavaTypeName() {
@@ -96,9 +101,5 @@ public class TypeDef {
 
     public boolean isRequired() {
         return required;
-    }
-
-    public String getType() {
-        return type;
     }
 }

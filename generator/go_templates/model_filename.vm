@@ -1,0 +1,1 @@
+${str.upperCamelToUnderscore($def.name)}.go
