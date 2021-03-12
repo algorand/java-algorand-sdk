@@ -1,0 +1,115 @@
+#macro ( toQueryType $param )##
+#if ( $param.algorandFormat == "RFC3339 String" )
+string##
+#elseif ( $param.type == "integer" )
+uint64##
+#elseif ( $param.type == "string" )
+string##
+#elseif ( $param.type == "boolean" )
+bool##
+#elseif( $param.type == "binary" )
+string##
+#else
+UNHANDLED TYPE
+- ref: $!param.refType
+- type: $!param.type
+- array type: $!param.arrayType
+- algorand format: $!param.algorandFormat
+- format: $!param.format
+##$unknown.type ## force a template failure with an unknown type
+#end
+#end
+#set( $queryArg = "nil" )
+#set( $queryType = ${str.capitalize($q.name)} )
+package $propFile.query_package;
+
+import (
+  "context"
+#foreach( $qp in $q.queryParameters)
+#if( $qp.algorandFormat == "base64" )
+  "encoding/base64"
+#break
+#end
+#end
+#if( $str.matches($q.path, ".*\{.*}.*") )
+  "fmt"
+#end
+#foreach( $qp in $q.queryParameters)
+#if( $qp.algorandFormat == "RFC3339 String" )
+  "time"
+#break
+#end
+#end
+
+  "github.com/algorand/go-algorand-sdk/client/v2/common"
+  "github.com/algorand/go-algorand-sdk/client/v2/common/models"
+)
+
+## build the query Params type
+#if( $q.queryParameters.size() > 0)
+#set( $paramType = "${str.uncapitalize($q.name)}Params" )
+type ${paramType} struct {
+#foreach( $qp in $q.queryParameters)
+
+  // $str.formatDoc("$str.kebabToUpperCamel($qp.propertyName) ${str.uncapitalize($qp.doc)}", "  // ")
+  $str.kebabToUpperCamel($qp.propertyName) #toQueryType($qp) `url:"$qp.propertyName,omitempty"`
+#end
+}
+#end
+
+type $queryType struct {
+  c *Client
+## path parameters
+## account string
+#if($paramType)
+#set( $queryArg = "s.p" )
+
+  p $paramType
+#end
+}
+
+#foreach( $qp in $q.queryParameters)
+#set( $paramFunc = ${str.kebabToUpperCamel($qp.propertyName)} )
+#set( $paramArg = $str.uncapitalize($paramFunc) )
+#set( $paramType = "#toQueryType($qp)" )
+
+## Special handling for date fields.
+#if( $qp.algorandFormat == "RFC3339 String" )
+// $str.formatDoc("${paramFunc}String ${str.uncapitalize($qp.doc)}", "// ")
+func (s *$queryType) ${paramFunc}String($paramArg $paramType) *$queryType {
+  s.p.$paramFunc = $paramArg
+  return s
+}
+
+// $str.formatDoc("${paramFunc} ${str.uncapitalize($qp.doc)}", "// ")
+func (s *$queryType) ${paramFunc}($paramArg time.Time) *$queryType {
+  ${paramArg}Str := ${paramArg}.Format(time.RFC3339)
+  return s.${paramFunc}String(${paramArg}Str)
+}
+#else
+// $str.formatDoc("${paramFunc} ${str.uncapitalize($qp.doc)}", "// ")
+func (s *$queryType) ${paramFunc}($paramArg $paramType) *$queryType {
+#if ( $qp.type == "integer" || $qp.type == "string" || $qp.type == "boolean" )
+  s.p.$paramFunc = $paramArg
+#elseif( $param.type == "binary" )
+  s.p.$paramFunc = base64.StdEncoding.EncodeToString($paramArg)
+#else
+UNHANDLED TYPE
+- ref: $!param.refType
+- type: $!param.type
+- array type: $!param.arrayType
+- algorand format: $!param.algorandFormat
+- format: $!param.format
+##$unknown.type ## force a template failure with an unknown type
+#end
+  return s
+}
+#end
+#end
+
+## Do function
+func (s *LookupAccountTransactions) Do(ctx context.Context, headers ...*common.Header) (response models.TransactionsResponse, err error) {
+  err = s.c.get(ctx, &response, fmt.Sprintf("/v2/accounts/%s/transactions", s.account), $queryArg, headers)
+  return
+}
+
