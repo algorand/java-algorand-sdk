@@ -1,1 +1,6 @@
-${q.name}.go
+#set( $skip = $propFile.query_skip.split(",") )
+#set( $type = $str.capitalize($q.name) )
+#set( $name = $str.uncapitalize($q.name) )
+#if ( ! $skip.contains($type) )
+${name}.go
+#end

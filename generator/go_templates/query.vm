@@ -1,3 +1,10 @@
+#macro ( returnType )##
+#if ( ${q.returnType} == "String" )
+string##
+#else
+models.${q.returnType}##
+#end
+#end
 #macro ( toQueryType $param )##
 #if ( $param.algorandFormat == "RFC3339 String" )
 string##
@@ -19,6 +26,7 @@ UNHANDLED TYPE
 ##$unknown.type ## force a template failure with an unknown type
 #end
 #end
+#set( $returnType = "#returnType()" )
 #set( $queryArg = "nil" )
 #set( $queryType = ${str.capitalize($q.name)} )
 package $propFile.query_package;
@@ -42,7 +50,9 @@ import (
 #end
 
   "github.com/algorand/go-algorand-sdk/client/v2/common"
+#if ( $returnType.contains("model") )
   "github.com/algorand/go-algorand-sdk/client/v2/common/models"
+#end
 )
 ## build the query Params type
 #if( $q.queryParameters.size() > 0)
@@ -124,8 +134,36 @@ UNHANDLED TYPE
 #end
 #set( $processedPath = "${processedPath}""$argList)" )
 #end
-func (s *${queryType}) Do(ctx context.Context, headers ...*common.Header) (response models.${q.returnType}, err error) {
+## Return types are not consistent so manually add in the inconsistent functions...
+#if( $queryType == "PendingTransactionInformationByAddress" )
+func (s *PendingTransactionInformationByAddress) Do(ctx context.Context, headers ...*common.Header) (total uint64, topTransactions []types.SignedTxn, err error) {
+  s.p.Format = "msgpack"
+  response := models.PendingTransactionsResponse{}
+  err = s.c.getMsgpack(ctx, &response, fmt.Sprintf("/v2/accounts/%s/transactions/pending", s.address), s.p, headers)
+  total = response.TotalTransactions
+  topTransactions = response.TopTransactions
+  return
+}
+#elseif( $queryType == "PendingTransactionInformation" )
+func (s *PendingTransactionInformation) Do(ctx context.Context, headers ...*common.Header) (response models.PendingTransactionInfoResponse, stxn types.SignedTxn, err error) {
+  s.p.Format = "msgpack"    
+  err = s.c.getMsgpack(ctx, &response, fmt.Sprintf("/v2/transactions/pending/%s", s.txid), s.p, headers)    
+  stxn = response.Transaction    
+  return    
+}
+#elseif( $queryType == "PendingTransactions" )
+func (s *PendingTransactions) Do(ctx context.Context, headers ...*common.Header) (total uint64, topTransactions []types.SignedTxn, err error) {    
+  s.p.Format = "msgpack"    
+  response := models.PendingTransactionsResponse{}    
+  err = s.c.getMsgpack(ctx, &response, "/v2/transactions/pending", s.p, headers)    
+  total = response.TotalTransactions    
+  topTransactions = response.TopTransactions    
+  return    
+}    
+#else ## finally... machine generate the rest
+func (s *${queryType}) Do(ctx context.Context, headers ...*common.Header) (response $returnType, err error) {
   err = s.c.get(ctx, &response, $processedPath, $queryArg, headers)
   return
 }
+#end
 

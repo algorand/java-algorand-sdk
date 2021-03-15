@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.exception.ParseErrorException;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -44,8 +45,8 @@ public class TemplateGenerator implements Subscriber {
      */
     @com.beust.jcommander.Parameters(commandDescription = "Generate response test file(s).")
     public static class TemplateGeneratorArgs extends Main.CommonArgs {
-        @com.beust.jcommander.Parameter(names = {"-p", "--propertyFile"}, description = "Property file to load into the template context for custom configuration.")
-        public File propertyFile;
+        @com.beust.jcommander.Parameter(names = {"-p", "--propertyFiles"}, description = "Property file(s) to load into the template context for custom configuration.")
+        public List<File> propertyFiles;
 
         @com.beust.jcommander.Parameter(names = {"-c", "--clientOutputDir"}, description = "Directory to write client file(s).")
         public File clientOutputDirectory;
@@ -59,15 +60,16 @@ public class TemplateGenerator implements Subscriber {
         @com.beust.jcommander.Parameter(required = true, names = {"-t", "--templates"}, description = "Templates directory.")
         public File templatesDirectory;
 
-        @com.beust.jcommander.Parameter(required = true, names = {"-o", "--output-dir"}, description = "Location to place response objects.")
-        File outputDirectory;
-
         @Override
         public void validate(JCommander command) {
             super.validate(command);
 
-            if (this.propertyFile != null && !this.propertyFile.isFile()) {
-                throw new RuntimeException("Property file must be a file: " + this.propertyFile.getAbsolutePath());
+            if (this.propertyFiles != null) {
+                for (File f : this.propertyFiles) {
+                    if (!f.isFile()) {
+                        throw new RuntimeException("Property file(s) must be a file: " + f.getAbsolutePath());
+                    }
+                }
             }
             /*
             // Make these optional in case to allow implicit partial generation.
@@ -84,16 +86,10 @@ public class TemplateGenerator implements Subscriber {
             if (!this.templatesDirectory.isDirectory()) {
                 throw new RuntimeException("Templates directory must be a valid directory: " + this.templatesDirectory.getAbsolutePath());
             }
-            if (!this.outputDirectory.isDirectory()) {
-                throw new RuntimeException("Output directory must be a valid directory: " + this.outputDirectory.getAbsolutePath());
-            }
         }
     }
 
     /////////////////////////////
-
-    // Return types. Usually aliases to model types.
-    private HashMap<StructDef, List<TypeDef>> responses = new HashMap<>();
 
     // Model definitions.
     private HashMap<StructDef, List<TypeDef>> models = new HashMap<>();
@@ -118,11 +114,13 @@ public class TemplateGenerator implements Subscriber {
         this.args =args;
 
         // Initialize property file if provided.
-        if (args.propertyFile != null) {
-            try (InputStream input = new FileInputStream(args.propertyFile)) {
-                properties.load(input);
-            } catch (IOException exception) {
-                throw new RuntimeException("Failed to initialize property file.");
+        if (args.propertyFiles != null) {
+            for (File f : args.propertyFiles) {
+                try (InputStream input = new FileInputStream(f)) {
+                    properties.load(input);
+                } catch (IOException exception) {
+                    throw new RuntimeException("Failed to initialize property file.");
+                }
             }
         }
 
@@ -159,7 +157,6 @@ public class TemplateGenerator implements Subscriber {
         context.put("propFile", this.properties);
         context.put("models", models);
         context.put("queries", queries);
-        context.put("responses", responses);
 
         Set<String> uniqueTypes = new HashSet<>();
         for (Map.Entry<StructDef, List<TypeDef>> model : models.entrySet()) {
@@ -185,14 +182,14 @@ public class TemplateGenerator implements Subscriber {
     }
 
     private void processClassTemplate(Template template, Template filenameTemplate) throws IOException {
-        if(args.modelsOutputDirectory == null || !args.modelsOutputDirectory.isDirectory()) {
+        if(args.clientOutputDirectory == null || !args.clientOutputDirectory.isDirectory()) {
             throw new IllegalArgumentException("Disabling model generation. Provide modelOutputDirectory option to enable.");
         }
 
         VelocityContext context = getContext();
         String filename = getFilename(filenameTemplate, context);
         logger.info("Writing file: {}", filename);
-        Path target = Path.of(args.modelsOutputDirectory.getAbsolutePath(), filename);
+        Path target = Path.of(args.clientOutputDirectory.getAbsolutePath(), filename);
         try (FileWriter writer = new FileWriter(target.toFile())) {
             template.merge(context, writer);
         }
@@ -210,11 +207,18 @@ public class TemplateGenerator implements Subscriber {
             context.put("props", model.getValue());
 
             String filename = getFilename(filenameTemplate, context);
+            // The template may decide to skip by returning an empty template.
+            if (StringUtils.isEmpty(filename)) {
+                continue;
+            }
             // If we see the same filename twice in a row, we're in single-file mode. Return before writing again.
             if (StringUtils.equals(filename, lastFilename)) {
                 return;
             }
             lastFilename = filename;
+            if (filename == "transaction_application.go") {
+                System.out.println("break");
+            }
 
             logger.info("Writing file: {}", filename);
             Path target = Path.of(args.modelsOutputDirectory.getAbsolutePath(), filename);
@@ -235,6 +239,10 @@ public class TemplateGenerator implements Subscriber {
             context.put("q", query);
 
             String filename = getFilename(filenameTemplate, context);
+            // The template may decide to skip by returning an empty template.
+            if (StringUtils.isEmpty(filename)) {
+                continue;
+            }
             // If we see the same filename twice in a row, we're in single-file mode. Return before writing again.
             if (StringUtils.equals(filename, lastFilename)) {
                 return;
@@ -242,7 +250,7 @@ public class TemplateGenerator implements Subscriber {
             lastFilename = filename;
 
             logger.info("Writing file: {}", filename);
-            Path target = Path.of(args.modelsOutputDirectory.getAbsolutePath(), filename);
+            Path target = Path.of(args.queryOutputDirectory.getAbsolutePath(), filename);
             try (FileWriter writer = new FileWriter(target.toFile())) {
                 template.merge(context, writer);
             }
@@ -259,6 +267,8 @@ public class TemplateGenerator implements Subscriber {
             Template modelTemplate = velocityEngine.getTemplate("model.vm");
             Template modelFilenameTemplate = velocityEngine.getTemplate("model_filename.vm");
             processModelTemplate(modelTemplate, modelFilenameTemplate);
+        } catch (ParseErrorException e) {
+            logger.error("Failed to parse template: {}", e.getMessage(), e);
         } catch (Exception e) {
             logger.warn("Unable to write models: {}", e.getMessage());
         }
@@ -267,6 +277,8 @@ public class TemplateGenerator implements Subscriber {
             Template queryTemplate = velocityEngine.getTemplate("query.vm");
             Template queryFilenameTemplate = velocityEngine.getTemplate("query_filename.vm");
             processQueryTemplate(queryTemplate, queryFilenameTemplate);
+        } catch (ParseErrorException e) {
+            logger.error("Failed to parse template: {}", e.getMessage(), e);
         } catch (Exception e) {
             logger.warn("Unable to write queries: {}", e.getMessage());
         }
@@ -275,6 +287,8 @@ public class TemplateGenerator implements Subscriber {
             Template clientTemplate = velocityEngine.getTemplate("client.vm");
             Template clientFilenameTemplate = velocityEngine.getTemplate("client_filename.vm");
             processClassTemplate(clientTemplate, clientFilenameTemplate);
+        } catch (ParseErrorException e) {
+            logger.error("Failed to parse template: {}", e.getMessage(), e);
         } catch (Exception e) {
             logger.warn("Unable to write clients: {}", e.getMessage());
         }
@@ -306,11 +320,15 @@ public class TemplateGenerator implements Subscriber {
         activeList = new ArrayList<>();
         switch (event) {
             case NEW_MODEL:
+            case REGISTER_RETURN_TYPE:
+            {
+                // Ignore aliases for now...
+                if(StringUtils.isNotEmpty(sDef.aliasOf)){
+                    return;
+                }
                 models.put(sDef, activeList);
                 return;
-            case REGISTER_RETURN_TYPE:
-                responses.put(sDef, activeList);
-                return;
+            }
             default:
                 logger.info("unhandled event (Events, StructDef): {}", event);
         }

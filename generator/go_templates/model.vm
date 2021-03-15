@@ -7,7 +7,7 @@ types.SignedTxn##
 ##string##
 #elseif ( $param.type == "object" )
 *map[string]interface{}##
-#elseif ( $param.type == "integer" )
+#elseif ( $param.type == "integer" || $param.arrayType == "integer" )
 uint64##
 #elseif ( $param.type == "boolean" )
 bool##
