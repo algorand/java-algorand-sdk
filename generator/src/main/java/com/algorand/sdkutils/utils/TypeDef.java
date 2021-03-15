@@ -140,9 +140,6 @@ public class TypeDef {
     }
 
     public String getRefType() {
-        if ("TealKeyValueStore".equals(openApiRefType)) {
-            System.out.println("break");
-        }
         return openApiRefType;
     }
 

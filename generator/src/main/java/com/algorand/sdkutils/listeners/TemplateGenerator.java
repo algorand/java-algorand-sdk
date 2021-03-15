@@ -216,9 +216,6 @@ public class TemplateGenerator implements Subscriber {
                 return;
             }
             lastFilename = filename;
-            if (filename == "transaction_application.go") {
-                System.out.println("break");
-            }
 
             logger.info("Writing file: {}", filename);
             Path target = Path.of(args.modelsOutputDirectory.getAbsolutePath(), filename);
