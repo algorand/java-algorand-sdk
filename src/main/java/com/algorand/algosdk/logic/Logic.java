@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,6 +22,8 @@ public class Logic {
 
     private static final int INTCBLOCK_OPCODE = 32;
     private static final int BYTECBLOCK_OPCODE = 38;
+    private static final int PUSHBYTES_OPCODE = 128;
+    private static final int PUSHINT_OPCODE = 129;
 
     private class LangSpec {
         public int EvalMaxVersion;
@@ -229,6 +232,16 @@ public class Logic {
                         size += bytesBlock.size;
                         bytes.addAll(bytesBlock.results);
                         break;
+                    case PUSHINT_OPCODE:
+                        IntConstBlock pushInt = readPushIntOp(program, pc);
+                        size += pushInt.size;
+                        ints.addAll(pushInt.results);
+                        break;
+                    case PUSHBYTES_OPCODE:
+                        ByteConstBlock pushBytes = readPushByteOp(program, pc);
+                        size += pushBytes.size;
+                        bytes.addAll(pushBytes.results);
+                        break;
                     default:
                         throw new IllegalArgumentException("invalid instruction");
                 }
@@ -338,7 +351,7 @@ public class Logic {
                 );
             }
             size += result.length;
-            if (pc + size >= program.length) {
+            if (pc + size + result.value > program.length) {
                 throw new IllegalArgumentException("byte[] const block exceeds program length");
             }
             byte[] buff = new byte[result.value];
@@ -347,5 +360,39 @@ public class Logic {
             size += result.value;
         }
         return new ByteConstBlock(size, results);
+    }
+
+    protected static IntConstBlock readPushIntOp(byte[] program, int pc) {
+        int size = 1;
+        VarintResult result = getUVarint(program, pc + size);
+        if (result.length <= 0) {
+            throw new IllegalArgumentException(
+                String.format("could not decode push int const at pc=%d", pc)
+            );
+        }
+        size += result.length;
+
+        return new IntConstBlock(size, Collections.singletonList(result.value));
+    }
+
+    protected static ByteConstBlock readPushByteOp(byte[] program, int pc) {
+        int size = 1;
+        VarintResult result = getUVarint(program, pc + size);
+        if (result.length <= 0) {
+            throw new IllegalArgumentException(
+                String.format("could not decode push []byte const size at pc=%d", pc)
+            );
+        }
+
+        size += result.length;
+        if (pc + size + result.value > program.length) {
+            throw new IllegalArgumentException("pushbytes ran past end of program");
+        }
+
+        byte[] buff = new byte[result.value];
+        System.arraycopy(program, pc + size, buff, 0, result.value);
+        size += result.value;
+
+        return new ByteConstBlock(size, Collections.singletonList(buff));
     }
 }
