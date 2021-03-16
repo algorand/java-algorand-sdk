@@ -9,10 +9,11 @@ ${str.capitalize($q.name)}##
 ## Name of function to set a parameter.
 #macro ( setParamVars $param )
 #set( $paramFunc = ${str.kebabToUpperCamel($param.propertyName)} )
+#set( $paramFunc = $paramFunc.replace("Id", "ID") )
 #if ( $queryType == "SearchAccounts" && $paramFunc == "Next" )
 #set( $paramFunc = "NextToken" )
-#elseif ( $queryType != "SearchForApplications" )## Not all functions capitalize ID....
-#set( $paramFunc = $paramFunc.replace("Id", "ID") )
+#elseif ( ($queryType == "SearchAccounts" || $queryType == "SearchForApplications") && $paramFunc == "ApplicationID" )## This class uses ID and Id...
+#set( $paramFunc = "ApplicationId" )
 #end
 #set( $paramArg = $str.uncapitalize($paramFunc) )
 #end
