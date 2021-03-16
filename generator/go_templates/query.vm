@@ -6,11 +6,15 @@ ${str.capitalize($q.name)}##
 #end
 #end
 #set( $queryType = "#queryType()" )
-#macro ( setParamFunc $param )
-#set( $paramFunc = ${str.kebabToUpperCamel($qp.propertyName)} )
+## Name of function to set a parameter.
+#macro ( setParamVars $param )
+#set( $paramFunc = ${str.kebabToUpperCamel($param.propertyName)} )
 #if ( $queryType == "SearchAccounts" && $paramFunc == "Next" )
 #set( $paramFunc = "NextToken" )
+#elseif ( $queryType != "SearchForApplications" )## Not all functions capitalize ID....
+#set( $paramFunc = $paramFunc.replace("Id", "ID") )
 #end
+#set( $paramArg = $str.uncapitalize($paramFunc) )
 #end
 #macro ( returnType )##
 #if ( ${q.returnType} == "String" )
@@ -69,13 +73,14 @@ import (
 )
 ## build the query Params type
 #if( $q.queryParameters.size() > 0)
-#set( $paramTypeName = "${str.uncapitalize($q.name)}Params" )
+#set( $paramsType = "${str.uncapitalize($q.name)}Params" )
 
-type ${paramTypeName} struct {
+type ${paramsType} struct {
 #foreach( $qp in $q.queryParameters)
+#setParamVars($qp)
 
-  // $str.formatDoc("$str.kebabToUpperCamel($qp.propertyName) ${str.uncapitalize($qp.doc)}", "  // ")
-  $str.kebabToUpperCamel($qp.propertyName) #toQueryType($qp) `url:"$qp.propertyName,omitempty"`
+  // $str.formatDoc("$paramArg ${str.uncapitalize($qp.doc)}", "  // ")
+  $paramArg #toQueryType($qp) `url:"$qp.propertyName,omitempty"`
 #end
 }
 #end
@@ -90,20 +95,18 @@ type $queryType struct {
 #if( $q.queryParameters.size() > 0)
 #set( $queryArg = "s.p" )
 
-  p $paramTypeName
+  p $paramsType
 #end
 }
 #foreach( $qp in $q.queryParameters)
-#setParamFunc()##
-##set( $paramFunc = ${str.kebabToUpperCamel($qp.propertyName)} )
-#set( $paramArg = $str.uncapitalize($paramFunc) )
+#setParamVars($qp)
 #set( $paramType = "#toQueryType($qp)" )
 
 ## Special handling for date fields.
 #if( $qp.algorandFormat == "RFC3339 String" )
 // $str.formatDoc("${paramFunc}String ${str.uncapitalize($qp.doc)}", "// ")
 func (s *$queryType) ${paramFunc}String($paramArg $paramType) *$queryType {
-  s.p.$paramFunc = $paramArg
+  s.p.$paramArg = $paramArg
   return s
 }
 
@@ -116,9 +119,9 @@ func (s *$queryType) ${paramFunc}($paramArg time.Time) *$queryType {
 // $str.formatDoc("${paramFunc} ${str.uncapitalize($qp.doc)}", "// ")
 func (s *$queryType) ${paramFunc}($paramArg $paramType) *$queryType {
 #if ( $qp.type == "integer" || $qp.type == "string" || $qp.type == "boolean" )
-  s.p.$paramFunc = $paramArg
+  s.p.$paramArg = $paramArg
 #elseif( $param.type == "binary" )
-  s.p.$paramFunc = base64.StdEncoding.EncodeToString($paramArg)
+  s.p.$paramArg = base64.StdEncoding.EncodeToString($paramArg)
 #else
 UNHANDLED TYPE
 - ref: $!param.refType
