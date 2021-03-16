@@ -1,6 +1,8 @@
 #macro ( queryType )## TODO: If we do another major version, remove these special cases.
 #if ( ${str.capitalize($q.name)} == "SearchForAccounts" )
 SearchAccounts## The hand written client doesn't quite match the spec...
+#elseif ( ${str.capitalize($q.name)} == "GetStatus" )
+Status##
 #else
 ${str.capitalize($q.name)}##
 #end
@@ -10,15 +12,22 @@ ${str.capitalize($q.name)}##
 #macro ( setParamVars $param )
 #set( $paramFunc = ${str.kebabToUpperCamel($param.propertyName)} )
 #set( $paramFunc = $paramFunc.replace("Id", "ID") )
-#if ( $queryType == "SearchAccounts" && $paramFunc == "Next" )
+#if ( $paramFunc == "Format" )
+## ignore Format parameters
+#set( $paramFunc = "" )
+#elseif ( $queryType == "SearchAccounts" && $paramFunc == "Next" )
 #set( $paramFunc = "NextToken" )
 #elseif ( ($queryType == "SearchAccounts" || $queryType == "SearchForApplications") && $paramFunc == "ApplicationID" )## This class uses ID and Id...
 #set( $paramFunc = "ApplicationId" )
+#elseif ( $queryType == "SearchAccounts" && $paramFunc == "AuthAddr" )
+#set( $paramFunc = "AuthAddress" )
 #end
-#set( $paramArg = $str.uncapitalize($paramFunc) )
+#set( $paramArg = $paramFunc )
 #end
 #macro ( returnType )##
-#if ( ${q.returnType} == "String" )
+#if ( ${q.returnType} == "NodeStatusResponse" )
+models.NodeStatus## The hand written code didn't get this one right either.
+#elseif ( ${q.returnType} == "String" )
 string##
 #else
 models.${q.returnType}##
@@ -43,6 +52,15 @@ UNHANDLED TYPE
 - algorand format: $!param.algorandFormat
 - format: $!param.format
 ##$unknown.type ## force a template failure with an unknown type
+#end
+#end
+## initialize hasParams based on the paramFunc macro
+#set( $hasParams = false )
+#foreach( $param in $q.queryParameters )
+#setParamVars($param)
+#if ( $paramFunc && $paramFunc != "" )
+#set( $hasParams = true )
+#break
 #end
 #end
 #set( $returnType = "#returnType()" )
@@ -73,15 +91,17 @@ import (
 #end
 )
 ## build the query Params type
-#if( $q.queryParameters.size() > 0)
-#set( $paramsType = "${str.uncapitalize($q.name)}Params" )
+#if( $hasParams )
+#set( $paramsType = "${queryType}Params" )
 
 type ${paramsType} struct {
 #foreach( $qp in $q.queryParameters)
 #setParamVars($qp)
+#if ( $paramFunc && $paramFunc != "" )
 
   // $str.formatDoc("$paramArg ${str.uncapitalize($qp.doc)}", "  // ")
   $paramArg #toQueryType($qp) `url:"$qp.propertyName,omitempty"`
+#end
 #end
 }
 #end
@@ -93,7 +113,7 @@ type $queryType struct {
   $str.kebabToCamel($pp.propertyName) #toQueryType($pp)
 
 #end
-#if( $q.queryParameters.size() > 0)
+#if( $hasParams )
 #set( $queryArg = "s.p" )
 
   p $paramsType
@@ -101,6 +121,7 @@ type $queryType struct {
 }
 #foreach( $qp in $q.queryParameters)
 #setParamVars($qp)
+#if ( $paramFunc && $paramFunc != "" )
 #set( $paramType = "#toQueryType($qp)" )
 
 ## Special handling for date fields.
@@ -134,6 +155,7 @@ UNHANDLED TYPE
 #end
   return s
 }
+#end
 #end
 #end
 
