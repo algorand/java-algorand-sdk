@@ -1,3 +1,17 @@
+#macro ( queryType )## TODO: If we do another major version, remove these special cases.
+#if ( ${str.capitalize($q.name)} == "SearchForAccounts" )
+SearchAccounts## The hand written client doesn't quite match the spec...
+#else
+${str.capitalize($q.name)}##
+#end
+#end
+#set( $queryType = "#queryType()" )
+#macro ( setParamFunc $param )
+#set( $paramFunc = ${str.kebabToUpperCamel($qp.propertyName)} )
+#if ( $queryType == "SearchAccounts" && $paramFunc == "Next" )
+#set( $paramFunc = "NextToken" )
+#end
+#end
 #macro ( returnType )##
 #if ( ${q.returnType} == "String" )
 string##
@@ -28,7 +42,6 @@ UNHANDLED TYPE
 #end
 #set( $returnType = "#returnType()" )
 #set( $queryArg = "nil" )
-#set( $queryType = ${str.capitalize($q.name)} )
 package $propFile.query_package;
 
 import (
@@ -56,9 +69,9 @@ import (
 )
 ## build the query Params type
 #if( $q.queryParameters.size() > 0)
-#set( $paramType = "${str.uncapitalize($q.name)}Params" )
+#set( $paramTypeName = "${str.uncapitalize($q.name)}Params" )
 
-type ${paramType} struct {
+type ${paramTypeName} struct {
 #foreach( $qp in $q.queryParameters)
 
   // $str.formatDoc("$str.kebabToUpperCamel($qp.propertyName) ${str.uncapitalize($qp.doc)}", "  // ")
@@ -77,11 +90,12 @@ type $queryType struct {
 #if( $q.queryParameters.size() > 0)
 #set( $queryArg = "s.p" )
 
-  p $paramType
+  p $paramTypeName
 #end
 }
 #foreach( $qp in $q.queryParameters)
-#set( $paramFunc = ${str.kebabToUpperCamel($qp.propertyName)} )
+#setParamFunc()##
+##set( $paramFunc = ${str.kebabToUpperCamel($qp.propertyName)} )
 #set( $paramArg = $str.uncapitalize($paramFunc) )
 #set( $paramType = "#toQueryType($qp)" )
 
