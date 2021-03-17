@@ -71,18 +71,6 @@ public class TemplateGenerator implements Subscriber {
                     }
                 }
             }
-            /*
-            // Make these optional in case to allow implicit partial generation.
-            if (!this.clientOutputDirectory.isDirectory()) {
-                throw new RuntimeException("Client output directory must be a valid directory: " + this.clientOutputDirectory.getAbsolutePath());
-            }
-            if (!this.queryOutputDirectory.isDirectory()) {
-                throw new RuntimeException("Query class output directory must be a valid directory: " + this.queryOutputDirectory.getAbsolutePath());
-            }
-            if (!this.modelsOutputDirectory.isDirectory()) {
-                throw new RuntimeException("Model output directory must be a valid directory: " + this.modelsOutputDirectory.getAbsolutePath());
-            }
-             */
             if (!this.templatesDirectory.isDirectory()) {
                 throw new RuntimeException("Templates directory must be a valid directory: " + this.templatesDirectory.getAbsolutePath());
             }

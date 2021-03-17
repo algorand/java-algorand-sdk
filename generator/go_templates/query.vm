@@ -3,6 +3,10 @@
 SearchAccounts## The hand written client doesn't quite match the spec...
 #elseif ( ${str.capitalize($q.name)} == "GetStatus" )
 Status##
+#elseif ( ${str.capitalize($q.name)} == "GetPendingTransactionsByAddress" )
+PendingTransactionInformationByAddress##
+#elseif ( ${str.capitalize($q.name)} == "GetPendingTransactions" )
+PendingTransactions##
 #else
 ${str.capitalize($q.name)}##
 #end
@@ -12,10 +16,7 @@ ${str.capitalize($q.name)}##
 #macro ( setParamVars $param )
 #set( $paramFunc = ${str.kebabToUpperCamel($param.propertyName)} )
 #set( $paramFunc = $paramFunc.replace("Id", "ID") )
-#if ( $paramFunc == "Format" )
-## ignore Format parameters
-#set( $paramFunc = "" )
-#elseif ( $queryType == "SearchAccounts" && $paramFunc == "Next" )
+#if ( $queryType == "SearchAccounts" && $paramFunc == "Next" )
 #set( $paramFunc = "NextToken" )
 #elseif ( ($queryType == "SearchAccounts" || $queryType == "SearchForApplications") && $paramFunc == "ApplicationID" )## This class uses ID and Id...
 #set( $paramFunc = "ApplicationId" )
@@ -24,9 +25,12 @@ ${str.capitalize($q.name)}##
 #end
 #set( $paramArg = $paramFunc )
 #end
+## TODO: Remove the overrides someday.
 #macro ( returnType )##
 #if ( ${q.returnType} == "NodeStatusResponse" )
-models.NodeStatus## The hand written code didn't get this one right either.
+models.NodeStatus##
+#elseif ( ${q.returnType} == "PendingTransactionResponse" )
+models.PendingTransactionInfo##
 #elseif ( ${q.returnType} == "String" )
 string##
 #else
@@ -121,7 +125,7 @@ type $queryType struct {
 }
 #foreach( $qp in $q.queryParameters)
 #setParamVars($qp)
-#if ( $paramFunc && $paramFunc != "" )
+#if ( $paramFunc && ($paramFunc != "" && $paramFunc != "Format") )## No setter for Format
 #set( $paramType = "#toQueryType($qp)" )
 
 ## Special handling for date fields.

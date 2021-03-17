@@ -1,3 +1,13 @@
+## conversion function to map generated name from spec to hand written name
+#macro ( paramName $param )##
+#if( $param.propertyName == "tx-type" )
+Type##
+#elseif( $param.propertyName == "txn" )
+Transaction##
+#else
+$str.kebabToUpperCamel($param.propertyName)##
+#end
+#end
 ## Converts a parameter type into the SDK specific type.
 #macro ( toSdkType $param )##
 #if ($param.arrayType && $param.arrayType != "")[]#end## Add array prefix to arrays...
@@ -56,8 +66,7 @@ import "github.com/algorand/go-algorand-sdk/types"
 #end
 type $def.name struct {
 #foreach( $param in $def.properties )
-#set( $formattedName = $str.kebabToUpperCamel($param.propertyName))
-#if( $formattedName == "TxType" )#set( $formattedName = "Type" )#end ## The hand written code changed this name...
+#set( $formattedName = "#paramName()" )
   // $str.formatDoc("$formattedName ${str.uncapitalize($param.doc)}", "  // ")
   $formattedName #toSdkType($param) `json:"$param.propertyName#if( !$param.required ),omitempty#end"`
 #if( $foreach.hasNext )$new#end
