@@ -193,26 +193,26 @@ func (s *PendingTransactionInformationByAddress) Do(ctx context.Context, headers
 }
 #elseif( $queryType == "PendingTransactionInformation" )
 func (s *PendingTransactionInformation) Do(ctx context.Context, headers ...*common.Header) (response models.PendingTransactionInfoResponse, stxn types.SignedTxn, err error) {
-  s.p.Format = "msgpack"    
-  err = s.c.getMsgpack(ctx, &response, fmt.Sprintf("/v2/transactions/pending/%s", s.txid), s.p, headers)    
-  stxn = response.Transaction    
-  return    
+  s.p.Format = "msgpack"
+  err = s.c.getMsgpack(ctx, &response, fmt.Sprintf("/v2/transactions/pending/%s", s.txid), s.p, headers)
+  stxn = response.Transaction
+  return
 }
 #elseif( $queryType == "PendingTransactions" )
-func (s *PendingTransactions) Do(ctx context.Context, headers ...*common.Header) (total uint64, topTransactions []types.SignedTxn, err error) {    
-  s.p.Format = "msgpack"    
-  response := models.PendingTransactionsResponse{}    
-  err = s.c.getMsgpack(ctx, &response, "/v2/transactions/pending", s.p, headers)    
-  total = response.TotalTransactions    
-  topTransactions = response.TopTransactions    
-  return    
-}    
+func (s *PendingTransactions) Do(ctx context.Context, headers ...*common.Header) (total uint64, topTransactions []types.SignedTxn, err error) {
+  s.p.Format = "msgpack"
+  response := models.PendingTransactionsResponse{}
+  err = s.c.getMsgpack(ctx, &response, "/v2/transactions/pending", s.p, headers)
+  total = response.TotalTransactions
+  topTransactions = response.TopTransactions
+  return
+}
 #elseif( $queryType == "LookupAccountByID" )
 func (s *LookupAccountByID) Do(ctx context.Context, headers ...*common.Header) (validRound uint64, result models.Account, err error) {
-	response := models.LookupAccountByIDResponse{}
-	err = s.c.get(ctx, &response, fmt.Sprintf("/v2/accounts/%s", s.account), s.p, headers)
-	validRound = response.CurrentRound
-	result = response.Account
+  response := models.LookupAccountByIDResponse{}
+  err = s.c.get(ctx, &response, fmt.Sprintf("/v2/accounts/%s", s.accountId), s.p, headers)
+  validRound = response.CurrentRound
+  result = response.Account
   return
 }
 #else ## finally... machine generate the rest
