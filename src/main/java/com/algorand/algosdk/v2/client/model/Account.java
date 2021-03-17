@@ -88,6 +88,12 @@ public class Account extends PathResponse {
     public Address authAddr;
 
     /**
+     * Round during which this account was most recently closed.
+     */
+    @JsonProperty("closed-at-round")
+    public java.math.BigInteger closedAtRound;
+
+    /**
      * (appp) parameters of applications created by this account including app global
      * data.
      * Note: the raw account uses `map[int] -> AppParams` for this type.
@@ -101,6 +107,18 @@ public class Account extends PathResponse {
      */
     @JsonProperty("created-assets")
     public List<Asset> createdAssets = new ArrayList<Asset>();
+
+    /**
+     * Round during which this account first appeared in a transaction.
+     */
+    @JsonProperty("created-at-round")
+    public java.math.BigInteger createdAtRound;
+
+    /**
+     * Whether or not this account is currently closed.
+     */
+    @JsonProperty("deleted")
+    public Boolean deleted;
 
     /**
      * AccountParticipation describes the parameters used by this account in consensus
@@ -169,8 +187,11 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.appsTotalSchema, other.appsTotalSchema)) return false;
         if (!Objects.deepEquals(this.assets, other.assets)) return false;
         if (!Objects.deepEquals(this.authAddr, other.authAddr)) return false;
+        if (!Objects.deepEquals(this.closedAtRound, other.closedAtRound)) return false;
         if (!Objects.deepEquals(this.createdApps, other.createdApps)) return false;
         if (!Objects.deepEquals(this.createdAssets, other.createdAssets)) return false;
+        if (!Objects.deepEquals(this.createdAtRound, other.createdAtRound)) return false;
+        if (!Objects.deepEquals(this.deleted, other.deleted)) return false;
         if (!Objects.deepEquals(this.participation, other.participation)) return false;
         if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;
         if (!Objects.deepEquals(this.rewardBase, other.rewardBase)) return false;

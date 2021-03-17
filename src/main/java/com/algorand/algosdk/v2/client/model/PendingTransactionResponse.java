@@ -28,6 +28,12 @@ public class PendingTransactionResponse extends PathResponse {
     public Long applicationIndex;
 
     /**
+     * The number of the asset's unit that were transferred to the close-to address.
+     */
+    @JsonProperty("asset-closing-amount")
+    public Long assetClosingAmount;
+
+    /**
      * The asset index if the transaction was found and it created an asset.
      */
     @JsonProperty("asset-index")
@@ -100,6 +106,7 @@ public class PendingTransactionResponse extends PathResponse {
 
         PendingTransactionResponse other = (PendingTransactionResponse) o;
         if (!Objects.deepEquals(this.applicationIndex, other.applicationIndex)) return false;
+        if (!Objects.deepEquals(this.assetClosingAmount, other.assetClosingAmount)) return false;
         if (!Objects.deepEquals(this.assetIndex, other.assetIndex)) return false;
         if (!Objects.deepEquals(this.closeRewards, other.closeRewards)) return false;
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;

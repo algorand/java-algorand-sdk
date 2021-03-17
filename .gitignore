@@ -1,3 +1,11 @@
+# java-algorand-sdk stuff
+test-harness/
+*.feature
+src/test/resources/**/*.json
+src/test/resources/**/*.base64
+src/test/resources/**/*.teal
+src/test/resources/**/*.tok
+
 # OS X
 .DS_Store
 

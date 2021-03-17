@@ -24,6 +24,15 @@ public class LookupApplicationByID extends Query {
         this.applicationId = applicationId;
     }
 
+    /**
+     * Include all items including closed accounts, deleted applications, destroyed
+     * assets, opted-out asset holdings, and closed-out application localstates.
+     */
+    public LookupApplicationByID includeAll(Boolean includeAll) {
+        addQuery("include-all", String.valueOf(includeAll));
+        return this;
+    }
+
    /**
     * Execute the query.
     * @return the query response object.
