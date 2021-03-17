@@ -93,6 +93,9 @@ import (
 #if ( $returnType.contains("model") )
   "github.com/algorand/go-algorand-sdk/client/v2/common/models"
 #end
+#if ( $queryType == "PendingTransactionInformationByAddress" || $queryType == "PendingTransactionInformation" || $queryType == "PendingTransactions" )
+  "github.com/algorand/go-algorand-sdk/types"
+#end
 )
 ## build the query Params type
 #if( $hasParams )
@@ -204,6 +207,14 @@ func (s *PendingTransactions) Do(ctx context.Context, headers ...*common.Header)
   topTransactions = response.TopTransactions    
   return    
 }    
+#elseif( $queryType == "LookupAccountByID" )
+func (s *LookupAccountByID) Do(ctx context.Context, headers ...*common.Header) (validRound uint64, result models.Account, err error) {
+	response := models.LookupAccountByIDResponse{}
+	err = s.c.get(ctx, &response, fmt.Sprintf("/v2/accounts/%s", s.account), s.p, headers)
+	validRound = response.CurrentRound
+	result = response.Account
+  return
+}
 #else ## finally... machine generate the rest
 func (s *${queryType}) Do(ctx context.Context, headers ...*common.Header) (response $returnType, err error) {
   err = s.c.get(ctx, &response, $processedPath, $queryArg, headers)
