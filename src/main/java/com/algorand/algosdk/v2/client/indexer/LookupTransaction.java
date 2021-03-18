@@ -12,14 +12,14 @@ import com.algorand.algosdk.v2.client.model.TransactionResponse;
  * Lookup a single transaction.
  * /v2/transactions/{txid}
  */
-public class LookupTransactions extends Query {
+public class LookupTransaction extends Query {
 
     private String txid;
 
     /**
      * @param txid
      */
-    public LookupTransactions(Client client, String txid) {
+    public LookupTransaction(Client client, String txid) {
         super(client, new HttpMethod("get"));
         this.txid = txid;
     }

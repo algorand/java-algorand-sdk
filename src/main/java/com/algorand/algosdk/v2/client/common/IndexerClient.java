@@ -11,7 +11,7 @@ import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetTransactions;
 import com.algorand.algosdk.v2.client.indexer.LookupBlock;
-import com.algorand.algosdk.v2.client.indexer.LookupTransactions;
+import com.algorand.algosdk.v2.client.indexer.LookupTransaction;
 import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 import com.algorand.algosdk.crypto.Address;
 
@@ -139,8 +139,8 @@ public class IndexerClient extends Client {
      * Lookup a single transaction.
      * /v2/transactions/{txid}
      */
-    public LookupTransactions lookupTransactions(String txid) {
-        return new LookupTransactions((Client) this, txid);
+    public LookupTransaction lookupTransaction(String txid) {
+        return new LookupTransaction((Client) this, txid);
     }
 
     /**
