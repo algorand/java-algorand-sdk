@@ -17,7 +17,7 @@
 set -e
 
 rootdir=`dirname $0`
-pushd $rootdir/generator > /dev/null
+pushd $rootdir/../generator > /dev/null
 
 function help {
   echo "Options:"
@@ -64,7 +64,7 @@ if [[ ! -f "$ALGOD_SPEC" ]]; then
   my_exit 1
 fi
 
-mvn clean package
+mvn clean package -DskipTests
 
 java -jar target/generator-*-jar-with-dependencies.jar \
        java \
