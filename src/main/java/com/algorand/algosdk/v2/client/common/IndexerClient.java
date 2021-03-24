@@ -37,7 +37,7 @@ public class IndexerClient extends Client {
     }
 
     /**
-     * Construct an IndexerClient for communicating with the REST API.
+     * Construct an IndexerClient with custom token key for communicating with the REST API.
      * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
      * @param port REST server port.
      * @param token authentication token.
