@@ -76,6 +76,32 @@ public class TestLogic {
     }
 
     @Test
+    public void testParsePushIntOp() throws Exception {
+        byte[] data = {
+            (byte)0x81, (byte)0x80, (byte)0x80, 0x04
+        };
+
+        IntConstBlock results = readPushIntOp(data, 0);
+        assertThat(results.size).isEqualTo(data.length);
+        assertThat(results.results)
+                .containsExactlyElementsOf(ImmutableList.of(65536));
+    }
+
+    @Test
+    public void testParsePushBytesOp() throws Exception {
+        byte[] data = {
+            (byte)0x80, 0x0b, 0x68, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f, 0x72, 0x6c, 0x64
+        };
+        List<byte[]> values = ImmutableList.of(
+                new byte[]{ 'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd' }
+        );
+
+        Logic.ByteConstBlock results = readPushByteOp(data, 0);
+        assertThat(results.size).isEqualTo(data.length);
+        assertThat(results.results).containsExactlyElementsOf(values);
+    }
+
+    @Test
     public void testCheckProgramValid() throws Exception {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
@@ -155,13 +181,13 @@ public class TestLogic {
     @Test
     public void testCheckProgramInvalidOpcode() throws Exception {
         byte[] program = {
-            0x01, 0x20, 0x01, 0x01, (byte)0x81
+            0x01, 0x20, 0x01, 0x01, (byte)0xFF
         };
         ArrayList<byte[]> args = new ArrayList<>();
 
         assertThatThrownBy(() -> checkProgram(program, args))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("invalid instruction: 129");
+                .hasMessage("invalid instruction: 255");
     }
 
     @Test
@@ -191,6 +217,48 @@ public class TestLogic {
             // asset_holding_get
             byte[] program = {
                 0x02, 0x20, 0x01, 0x00, 0x22, 0x70, 0x00  // int 0; int 0; asset_holding_get Balance
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+    }
+
+    @Test
+    public void testCheckProgramTealV3() throws Exception {
+        assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(3);
+        assertThat(getLogicSigVersion()).isGreaterThanOrEqualTo(3);
+
+        {
+            // min_balance
+            byte[] program = {
+                0x03, 0x20, 0x01, 0x00, 0x22, 0x78  // int 0; min_balance
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        // pushbytes
+        {
+            byte[] program = {
+                0x03, 0x20, 0x01, 0x00, 0x22, (byte)0x80, 0x02, 0x68, 0x69, 0x48  // int 0; pushbytes "hi"; pop
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // pushint
+            byte[] program = {
+                0x03, 0x20, 0x01, 0x00, 0x22, (byte)0x81, 0x01, 0x48  // int 0; pushint 1; pop
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // swap
+            byte[] program = {
+                0x03, 0x20, 0x02, 0x00, 0x01, 0x22, 0x23, 0x4c, 0x48  // int 0; int 1; swap; pop
             };
             boolean valid = checkProgram(program, null);
             assertThat(valid).isTrue();
