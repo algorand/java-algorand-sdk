@@ -118,7 +118,7 @@ public class HTLC {
 				Keccak.Digest256 digest = new Keccak.Digest256();
 				byte[] computedImage = digest.digest(Encoder.decodeFromBase64(preImage));
 				if (Arrays.compareUnsigned(computedImage, hashImage) != 0) {
-					throw new RuntimeException("Unable to verify SHA-256 preImage: sha256(preimage) != image");
+					throw new RuntimeException("Unable to verify keccak256 preImage: keccak256(preimage) != image");
 				}
 			} catch (Exception e) {
 				// It's possible that the bouncy castle library is not loaded, in which case skip the validation.
