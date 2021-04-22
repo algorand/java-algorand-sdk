@@ -1166,7 +1166,7 @@ public class Transaction implements Serializable {
         }
 
         @JsonCreator
-        public OnCompletion String(String name) {
+        public static OnCompletion String(String name) {
             for(OnCompletion oc : values()) {
                 if (oc.serializedName.equalsIgnoreCase(name)) {
                     return oc;
@@ -1176,7 +1176,7 @@ public class Transaction implements Serializable {
         }
 
         @JsonCreator
-        public OnCompletion String(int value) {
+        public static OnCompletion forValue(int value) {
             for(OnCompletion oc : values()) {
                 if (oc.serializedValue == value) {
                     return oc;
@@ -1185,9 +1185,13 @@ public class Transaction implements Serializable {
             return null;
         }
 
+        public int getSerializedValue() {
+            return serializedValue;
+        }
+
         @JsonValue
         public int toValue() {
-            return serializedValue;
+            return getSerializedValue();
         }
 
         @Override
