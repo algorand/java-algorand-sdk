@@ -1185,13 +1185,9 @@ public class Transaction implements Serializable {
             return null;
         }
 
-        public int getSerializedValue() {
-            return serializedValue;
-        }
-
         @JsonValue
         public int toValue() {
-            return getSerializedValue();
+            return serializedValue;
         }
 
         @Override
