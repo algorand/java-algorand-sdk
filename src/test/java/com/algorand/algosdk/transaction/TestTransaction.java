@@ -88,7 +88,7 @@ public class TestTransaction {
         final Transaction transaction = objectMapper.readValue(transactionJson, Transaction.class);
         assertEqual(tx, transaction);
         String transactionJson1 = objectMapper.writeValueAsString(transaction);
-        assert(transactionJson.equals(transactionJson1));
+        assertThat(transactionJson).isEqualTo(transactionJson1);
     }
 
     @Test
@@ -107,7 +107,7 @@ public class TestTransaction {
         final Transaction transaction = objectMapper.readValue(transactionJson, Transaction.class);
         assertEqual(tx, transaction);
         String transactionJson1 = objectMapper.writeValueAsString(transaction);
-        assert(transactionJson.equals(transactionJson1));
+        assertThat(transactionJson).isEqualTo(transactionJson1);
     }
 
     @Test
