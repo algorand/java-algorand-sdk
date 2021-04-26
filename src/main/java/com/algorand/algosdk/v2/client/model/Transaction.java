@@ -55,8 +55,9 @@ public class Transaction extends PathResponse {
     public TransactionAssetTransfer assetTransferTransaction;
 
     /**
-     * (sgnr) The address used to sign the transaction. This is used for rekeyed
-     * accounts to indicate that the sender address did not sign the transaction.
+     * (sgnr) this is included with signed transactions when the signing address does
+     * not equal the sender. The backend can use this to ensure that auth addr is equal
+     * to the accounts auth addr.
      */
     @JsonProperty("auth-addr")
     public void authAddr(String authAddr) throws NoSuchAlgorithmException {

@@ -5,6 +5,10 @@ import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -12,6 +16,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -63,6 +68,46 @@ public class TestTransaction {
         Transaction o = (Transaction) in.readObject();
         in.close();
         assertEqual(o, tx);
+    }
+
+    @Test
+    public void testPaymentTransactionJsonSerialization() throws Exception {
+        Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
+        Address to = new Address("CQW2QBBUW5AGFDXMURQBRJN2AM3OHHQWXXI4PEJXRCVTEJ3E5VBTNRTEAE");
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(from)
+                .receiver(to)
+                .amount(100)
+                .firstValid(301)
+                .lastValid(1300)
+                .genesisHash(new Digest())
+                .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String transactionJson = objectMapper.writeValueAsString(tx);
+        final Transaction transaction = objectMapper.readValue(transactionJson, Transaction.class);
+        assertEqual(tx, transaction);
+        String transactionJson1 = objectMapper.writeValueAsString(transaction);
+        assertThat(transactionJson).isEqualTo(transactionJson1);
+    }
+
+    @Test
+    public void testApplicationTransactionJsonSerialization() throws Exception {
+        Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
+        Transaction tx = Transaction.ApplicationUpdateTransactionBuilder()
+                .sender(from)
+                .applicationId(100000L)
+                .firstValid(301)
+                .lastValid(1300)
+                .genesisHash(new Digest())
+                .build();
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String transactionJson = objectMapper.writeValueAsString(tx);
+        final Transaction transaction = objectMapper.readValue(transactionJson, Transaction.class);
+        assertEqual(tx, transaction);
+        String transactionJson1 = objectMapper.writeValueAsString(transaction);
+        assertThat(transactionJson).isEqualTo(transactionJson1);
     }
 
     @Test

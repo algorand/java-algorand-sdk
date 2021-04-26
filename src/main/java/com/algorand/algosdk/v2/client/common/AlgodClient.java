@@ -2,11 +2,13 @@ package com.algorand.algosdk.v2.client.common;
 
 import com.algorand.algosdk.v2.client.algod.HealthCheck;
 import com.algorand.algosdk.v2.client.algod.Metrics;
+import com.algorand.algosdk.v2.client.algod.GetGenesis;
 import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
 import com.algorand.algosdk.v2.client.algod.GetVersion;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
+import com.algorand.algosdk.v2.client.algod.GetProof;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
@@ -31,6 +33,18 @@ public class AlgodClient extends Client {
     public AlgodClient(String host, int port, String token) {
         super(host, port, token, "X-Algo-API-Token");
     }
+
+    /**
+     * Construct an AlgodClient with custom token key for communicating with the REST API.
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port REST server port.
+     * @param token authentication token.
+     * @param tokenKey authentication token key.
+     */
+    public AlgodClient(String host, int port, String token, String tokenKey) {
+        super(host, port, token, tokenKey);
+    }
+
     /**
      * Returns OK if healthy.
      * /health
@@ -45,6 +59,14 @@ public class AlgodClient extends Client {
      */
     public Metrics Metrics() {
         return new Metrics((Client) this);
+    }
+
+    /**
+     * Returns the entire genesis file in json.
+     * /genesis
+     */
+    public GetGenesis GetGenesis() {
+        return new GetGenesis((Client) this);
     }
 
     /**
@@ -89,6 +111,15 @@ public class AlgodClient extends Client {
      */
     public GetBlock GetBlock(Long round) {
         return new GetBlock((Client) this, round);
+    }
+
+    /**
+     * Get a Merkle proof for a transaction in a block.
+     * /v2/blocks/{round}/transactions/{txid}/proof
+     */
+    public GetProof GetProof(Long round,
+            String txid) {
+        return new GetProof((Client) this, round, txid);
     }
 
     /**
@@ -144,9 +175,10 @@ public class AlgodClient extends Client {
     /**
      * Given a transaction id of a recently submitted transaction, it returns
      * information about it. There are several cases when this might succeed:
-     * - transaction committed (committed round > 0) - transaction still in the pool
-     * (committed round = 0, pool error = "") - transaction removed from pool due to
-     * error (committed round = 0, pool error != "")
+     * - transaction committed (committed round > 0)
+     * - transaction still in the pool (committed round = 0, pool error = "")
+     * - transaction removed from pool due to error (committed round = 0, pool error !=
+     * "")
      * Or the transaction may have happened sufficiently long ago that the node no
      * longer remembers it, and this will return an error.
      * /v2/transactions/pending/{txid}
@@ -175,7 +207,8 @@ public class AlgodClient extends Client {
 
     /**
      * Given TEAL source code in plain text, return base64 encoded program bytes and
-     * base32 SHA512_256 hash of program bytes (Address style).
+     * base32 SHA512_256 hash of program bytes (Address style). This endpoint is only
+     * enabled when a node's configureation file sets EnableDeveloperAPI to true.
      * /v2/teal/compile
      */
     public TealCompile TealCompile() {
@@ -184,7 +217,8 @@ public class AlgodClient extends Client {
 
     /**
      * Executes TEAL program(s) in context and returns debugging information about the
-     * execution.
+     * execution. This endpoint is only enabled when a node's configureation file sets
+     * EnableDeveloperAPI to true.
      * /v2/teal/dryrun
      */
     public TealDryrun TealDryrun() {

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Note: This script currently assumes that you are in a java sdk source
+# directory named 'java-algorand-sdk' and that the generator is checked
+# out at '../generator'.
 #
 # Regenerates the client code from the spec files.
 #
@@ -17,7 +20,7 @@
 set -e
 
 rootdir=`dirname $0`
-pushd $rootdir/generator > /dev/null
+pushd $rootdir/../generator > /dev/null
 
 function help {
   echo "Options:"
@@ -64,16 +67,16 @@ if [[ ! -f "$ALGOD_SPEC" ]]; then
   my_exit 1
 fi
 
-mvn clean package
+mvn clean package -DskipTests
 
 java -jar target/generator-*-jar-with-dependencies.jar \
        java \
-       -c  "../src/main/java/com/algorand/algosdk/v2/client/common" \
+       -c  "../java-algorand-sdk/src/main/java/com/algorand/algosdk/v2/client/common" \
        -cp "com.algorand.algosdk.v2.client.common" \
-       -m  "../src/main/java/com/algorand/algosdk/v2/client/model" \
+       -m  "../java-algorand-sdk/src/main/java/com/algorand/algosdk/v2/client/model" \
        -mp "com.algorand.algosdk.v2.client.model" \
        -n  "AlgodClient" \
-       -p  "../src/main/java/com/algorand/algosdk/v2/client/algod" \
+       -p  "../java-algorand-sdk/src/main/java/com/algorand/algosdk/v2/client/algod" \
        -pp "com.algorand.algosdk.v2.client.algod" \
        -t  "X-Algo-API-Token" \
        -tr \
@@ -83,12 +86,12 @@ java -jar target/generator-*-jar-with-dependencies.jar \
 # overwriting the second one.
 java -jar target/generator-*-jar-with-dependencies.jar \
        java \
-       -c  "../src/main/java/com/algorand/algosdk/v2/client/common" \
+       -c  "../java-algorand-sdk/src/main/java/com/algorand/algosdk/v2/client/common" \
        -cp "com.algorand.algosdk.v2.client.common" \
-       -m  "../src/main/java/com/algorand/algosdk/v2/client/model" \
+       -m  "../java-algorand-sdk/src/main/java/com/algorand/algosdk/v2/client/model" \
        -mp "com.algorand.algosdk.v2.client.model" \
        -n  "IndexerClient" \
-       -p  "../src/main/java/com/algorand/algosdk/v2/client/indexer" \
+       -p  "../java-algorand-sdk/src/main/java/com/algorand/algosdk/v2/client/indexer" \
        -pp "com.algorand.algosdk.v2.client.indexer" \
        -t  "X-Indexer-API-Token" \
        -s  "$INDEXER_SPEC"
