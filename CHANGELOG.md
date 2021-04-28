@@ -1,3 +1,20 @@
+# 1.6.0
+- Add static qualifiers to json creators for onCompletion enum serialization. 
+- Bump guava from 28.2-android to 29.0-android in /generator.
+- Bump guava from 28.2-android to 29.0-android.
+- Corrected Exception message for Keccak-256 hash function.
+- Add TEAL 3 support.
+- Regenerated comment.
+- Fix custom token key comment.
+- Update .gitignore.
+- Regenerate Indexer Client.
+- Regenerate client code, implement new cucumber tests.
+- Fix base32 decode bug.
+- Add secure vars and docker login.
+- Don't override values with lookupParams/suggestedParams.
+- New constructors for v2 and Indexer that also accepts tokenKey.
+- Updated README example.
+
 # 1.5.1
 - Add custom header option to v2 client, new 'execute' method on each endpoint request.
 

@@ -33,10 +33,28 @@ public class AssetHolding extends PathResponse {
     public String creator;
 
     /**
+     * Whether or not the asset holding is currently deleted from its account.
+     */
+    @JsonProperty("deleted")
+    public Boolean deleted;
+
+    /**
      * (f) whether or not the holding is frozen.
      */
     @JsonProperty("is-frozen")
     public Boolean isFrozen;
+
+    /**
+     * Round during which the account opted into this asset holding.
+     */
+    @JsonProperty("opted-in-at-round")
+    public java.math.BigInteger optedInAtRound;
+
+    /**
+     * Round during which the account opted out of this asset holding.
+     */
+    @JsonProperty("opted-out-at-round")
+    public java.math.BigInteger optedOutAtRound;
 
     @Override
     public boolean equals(Object o) {
@@ -48,7 +66,10 @@ public class AssetHolding extends PathResponse {
         if (!Objects.deepEquals(this.amount, other.amount)) return false;
         if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
         if (!Objects.deepEquals(this.creator, other.creator)) return false;
+        if (!Objects.deepEquals(this.deleted, other.deleted)) return false;
         if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
+        if (!Objects.deepEquals(this.optedInAtRound, other.optedInAtRound)) return false;
+        if (!Objects.deepEquals(this.optedOutAtRound, other.optedOutAtRound)) return false;
 
         return true;
     }

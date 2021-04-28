@@ -21,7 +21,7 @@ public class NodeStatusResponse extends PathResponse {
     public Long catchpointAcquiredBlocks;
 
     /**
-     * The number of account from the current catchpoint that have been processed so
+     * The number of accounts from the current catchpoint that have been processed so
      * far as part of the catchup
      */
     @JsonProperty("catchpoint-processed-accounts")
@@ -39,6 +39,13 @@ public class NodeStatusResponse extends PathResponse {
      */
     @JsonProperty("catchpoint-total-blocks")
     public Long catchpointTotalBlocks;
+
+    /**
+     * The number of accounts from the current catchpoint that have been verified so
+     * far as part of the catchup
+     */
+    @JsonProperty("catchpoint-verified-accounts")
+    public Long catchpointVerifiedAccounts;
 
     /**
      * CatchupTime in nanoseconds
@@ -108,6 +115,7 @@ public class NodeStatusResponse extends PathResponse {
         if (!Objects.deepEquals(this.catchpointProcessedAccounts, other.catchpointProcessedAccounts)) return false;
         if (!Objects.deepEquals(this.catchpointTotalAccounts, other.catchpointTotalAccounts)) return false;
         if (!Objects.deepEquals(this.catchpointTotalBlocks, other.catchpointTotalBlocks)) return false;
+        if (!Objects.deepEquals(this.catchpointVerifiedAccounts, other.catchpointVerifiedAccounts)) return false;
         if (!Objects.deepEquals(this.catchupTime, other.catchupTime)) return false;
         if (!Objects.deepEquals(this.lastCatchpoint, other.lastCatchpoint)) return false;
         if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;

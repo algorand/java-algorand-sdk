@@ -11,6 +11,24 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Asset extends PathResponse {
 
     /**
+     * Round during which this asset was created.
+     */
+    @JsonProperty("created-at-round")
+    public java.math.BigInteger createdAtRound;
+
+    /**
+     * Whether or not this asset is currently deleted.
+     */
+    @JsonProperty("deleted")
+    public Boolean deleted;
+
+    /**
+     * Round during which this asset was destroyed.
+     */
+    @JsonProperty("destroyed-at-round")
+    public java.math.BigInteger destroyedAtRound;
+
+    /**
      * unique asset identifier
      */
     @JsonProperty("index")
@@ -32,6 +50,9 @@ public class Asset extends PathResponse {
         if (o == null) return false;
 
         Asset other = (Asset) o;
+        if (!Objects.deepEquals(this.createdAtRound, other.createdAtRound)) return false;
+        if (!Objects.deepEquals(this.deleted, other.deleted)) return false;
+        if (!Objects.deepEquals(this.destroyedAtRound, other.destroyedAtRound)) return false;
         if (!Objects.deepEquals(this.index, other.index)) return false;
         if (!Objects.deepEquals(this.params, other.params)) return false;
 

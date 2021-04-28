@@ -5,30 +5,26 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
+import com.algorand.algosdk.v2.client.model.ProofResponse;
 
 
 /**
- * Given a transaction id of a recently submitted transaction, it returns
- * information about it. There are several cases when this might succeed:
- * - transaction committed (committed round > 0)
- * - transaction still in the pool (committed round = 0, pool error = "")
- * - transaction removed from pool due to error (committed round = 0, pool error !=
- * "")
- * Or the transaction may have happened sufficiently long ago that the node no
- * longer remembers it, and this will return an error.
- * /v2/transactions/pending/{txid}
+ * Get a Merkle proof for a transaction in a block.
+ * /v2/blocks/{round}/transactions/{txid}/proof
  */
-public class PendingTransactionInformation extends Query {
+public class GetProof extends Query {
 
+    private Long round;
     private String txid;
 
     /**
-     * @param txid A transaction id
+     * @param round The round in which the transaction appears.
+     * @param txid The transaction ID for which to generate a proof.
      */
-    public PendingTransactionInformation(Client client, String txid) {
+    public GetProof(Client client, Long round, String txid) {
         super(client, new HttpMethod("get"));
         addQuery("format", "msgpack");
+        this.round = round;
         this.txid = txid;
     }
 
@@ -38,9 +34,9 @@ public class PendingTransactionInformation extends Query {
     * @throws Exception
     */
     @Override
-    public Response<PendingTransactionResponse> execute() throws Exception {
-        Response<PendingTransactionResponse> resp = baseExecute();
-        resp.setValueType(PendingTransactionResponse.class);
+    public Response<ProofResponse> execute() throws Exception {
+        Response<ProofResponse> resp = baseExecute();
+        resp.setValueType(ProofResponse.class);
         return resp;
     }
 
@@ -53,20 +49,25 @@ public class PendingTransactionInformation extends Query {
     * @throws Exception
     */
     @Override
-    public Response<PendingTransactionResponse> execute(String[] headers, String[] values) throws Exception {
-        Response<PendingTransactionResponse> resp = baseExecute(headers, values);
-        resp.setValueType(PendingTransactionResponse.class);
+    public Response<ProofResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<ProofResponse> resp = baseExecute(headers, values);
+        resp.setValueType(ProofResponse.class);
         return resp;
     }
 
     protected QueryData getRequestString() {
+        if (this.round == null) {
+            throw new RuntimeException("round is not set. It is a required parameter.");
+        }
         if (this.txid == null) {
             throw new RuntimeException("txid is not set. It is a required parameter.");
         }
         addPathSegment(String.valueOf("v2"));
+        addPathSegment(String.valueOf("blocks"));
+        addPathSegment(String.valueOf(round));
         addPathSegment(String.valueOf("transactions"));
-        addPathSegment(String.valueOf("pending"));
         addPathSegment(String.valueOf(txid));
+        addPathSegment(String.valueOf("proof"));
 
         return qd;
     }

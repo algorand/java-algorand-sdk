@@ -135,6 +135,12 @@ public class ResponsesShared {
                     case "GetPendingTransactionsByAddress":
                         response = algod.GetPendingTransactionsByAddress(new Address()).execute();
                         break;
+                    case "DryRun":
+                        response = algod.TealDryrun().execute();
+                        break;
+                    case "Proof":
+                        response = algod.GetProof(0L, "").execute();
+                        break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
                 }

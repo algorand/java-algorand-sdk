@@ -26,6 +26,15 @@ public class LookupAccountByID extends Query {
     }
 
     /**
+     * Include all items including closed accounts, deleted applications, destroyed
+     * assets, opted-out asset holdings, and closed-out application localstates.
+     */
+    public LookupAccountByID includeAll(Boolean includeAll) {
+        addQuery("include-all", String.valueOf(includeAll));
+        return this;
+    }
+
+    /**
      * Include results for the specified round.
      */
     public LookupAccountByID round(Long round) {

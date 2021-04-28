@@ -11,6 +11,7 @@ import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetTransactions;
 import com.algorand.algosdk.v2.client.indexer.LookupBlock;
+import com.algorand.algosdk.v2.client.indexer.LookupTransaction;
 import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 import com.algorand.algosdk.crypto.Address;
 
@@ -36,7 +37,7 @@ public class IndexerClient extends Client {
     }
 
     /**
-     * Construct an IndexerClient for communicating with the REST API.
+     * Construct an IndexerClient with custom token key for communicating with the REST API.
      * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
      * @param port REST server port.
      * @param token authentication token.
@@ -132,6 +133,14 @@ public class IndexerClient extends Client {
      */
     public LookupBlock lookupBlock(Long roundNumber) {
         return new LookupBlock((Client) this, roundNumber);
+    }
+
+    /**
+     * Lookup a single transaction.
+     * /v2/transactions/{txid}
+     */
+    public LookupTransaction lookupTransaction(String txid) {
+        return new LookupTransaction((Client) this, txid);
     }
 
     /**
