@@ -90,7 +90,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
 
     /**
      * Query the V1 REST API with {@link AlgodApi} for Transaction Parameters:
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid if not already set using {@link TransactionParams}.
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParams} if not already set.
      * @param client The backend client connection.
      * @return This builder.
      * @throws ApiException When the client fails to retrieve {@link TransactionParams} from the backend.
@@ -526,4 +526,3 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return (T) this;
     }
 }
-
