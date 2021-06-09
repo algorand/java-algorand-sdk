@@ -268,7 +268,6 @@ public class TestLogic {
     @Test
     public void testCheckProgramTealV4() throws Exception {
         assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(4);
-        assertThat(getLogicSigVersion()).isGreaterThanOrEqualTo(3);
 
         {
             // divmodw
