@@ -42,9 +42,9 @@ public class TransactionSteps {
         throw new RuntimeException("Unknown error.");
     }
 
-    @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string} app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}")
-    @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}")
-    public void buildApplicationTransactions(String operation, Long applicationId, String sender, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long fee, Long firstValid, Long lastValid, String genesisHash) {
+    @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string} app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}, extra-pages {long}")
+    @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}, extra-pages {long}")
+    public void buildApplicationTransactions(String operation, Long applicationId, String sender, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long fee, Long firstValid, Long lastValid, String genesisHash, Long extraPages) {
         ApplicationBaseTransactionBuilder builder = null;
 
         // Create builder and apply builder-specific parameters
@@ -54,7 +54,8 @@ public class TransactionSteps {
                         .approvalProgram(loadTEALProgramFromFile(approvalProgramFile))
                         .clearStateProgram(loadTEALProgramFromFile(clearProgramFile))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
-                        .localStateSchema(new StateSchema(localInts, localBytes));
+                        .localStateSchema(new StateSchema(localInts, localBytes))
+                        .extraPages(extraPages);
                 break;
             case "update":
                 builder = Transaction.ApplicationUpdateTransactionBuilder()
