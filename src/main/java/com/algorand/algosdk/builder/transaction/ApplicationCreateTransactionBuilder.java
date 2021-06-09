@@ -79,7 +79,7 @@ public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTra
      * memory between approval and clear state programs. extraPages parameter must be an integer between 0 and 3 inclusive.
      */
     public T extraPages(Long extraPages) {
-        if (extraPages < 0 || extraPages > 3) {
+        if (extraPages == null || extraPages < 0 || extraPages > 3) {
             throw new IllegalArgumentException("extraPages must be an integer between 0 and 3 inclusive");
         }
         this.extraPages = extraPages;

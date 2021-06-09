@@ -153,7 +153,6 @@ public class Transaction implements Serializable {
     @JsonProperty("apep")
     public Long extraPages = 0L;
 
-
     /**
      * Create a payment transaction
      * @param fromAddr source address
