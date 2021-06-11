@@ -174,7 +174,7 @@ public class AssetCreateTransactionBuilder<T extends AssetCreateTransactionBuild
      * @return this builder.
      */
     public T url(String url) {
-        if (url.length() > 96) {
+        if (url != null && url.length() > 96) {
             throw new IllegalArgumentException("url length must be between 0 and 96 characters (inclusive).");
         }
         this.url = url;
