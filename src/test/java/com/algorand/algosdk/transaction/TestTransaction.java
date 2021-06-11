@@ -194,6 +194,7 @@ public class TestTransaction {
         Address clawback = addr;
         String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
         String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
+        String normalMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4";
 
         assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
@@ -211,6 +212,21 @@ public class TestTransaction {
             .hasMessageContaining("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded");
 
         assertThatThrownBy(() -> new AssetParams(
+                BigInteger.valueOf(100),
+                3,
+                false,
+                "tst",
+                "testcoin",
+                "websitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsite",
+                normalMetadataHash.getBytes(StandardCharsets.UTF_8),
+                manager,
+                reserve,
+                freeze,
+                clawback))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessageContaining("url length must be between 0 and 96 characters (inclusive).");
+
+            assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
                 3,
                 false,
@@ -235,6 +251,7 @@ public class TestTransaction {
     public void testMakeAssetCreateTxnWithDecimals() throws Exception {
         createAssetTest(1, "gqNzaWfEQCj5xLqNozR5ahB+LNBlTG+d0gl0vWBrGdAXj1ibsCkvAwOsXs5KHZK1YdLgkdJecQiWm4oiZ+pm5Yg0m3KFqgqjdHhuh6RhcGFyiqJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aJkYwGhZsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hbcQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hcsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hdGSidW6jdHN0o2ZlZc0P3KJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
     }
+
 
     @Test
     public void testSerializationAssetConfig() throws Exception {
