@@ -138,6 +138,7 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
         String metadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
+        String url_96 = new String(new char[96]).replace("\0", "w");;
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
                 .sender(sender)
@@ -149,7 +150,7 @@ public class TestTransaction {
                 .assetDecimals(numDecimal)
                 .assetUnitName("tst")
                 .assetName("testcoin")
-                .url("website")
+                .url(url_96)
                 .metadataHashUTF8(metadataHash)
                 .manager(manager)
                 .reserve(reserve)
@@ -163,7 +164,7 @@ public class TestTransaction {
                 false,
                 "tst",
                 "testcoin",
-                "website",
+                url_96,
                 metadataHash.getBytes(StandardCharsets.UTF_8),
                 manager,
                 reserve,
@@ -195,6 +196,7 @@ public class TestTransaction {
         String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
         String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
         String normalMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4";
+        String url_100 = new String(new char[100]).replace("\0", "w");;
 
         assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
@@ -217,7 +219,7 @@ public class TestTransaction {
                 false,
                 "tst",
                 "testcoin",
-                "websitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsitewebsite",
+                url_100,
                 normalMetadataHash.getBytes(StandardCharsets.UTF_8),
                 manager,
                 reserve,
@@ -244,14 +246,13 @@ public class TestTransaction {
 
     @Test
     public void testMakeAssetCreateTxn() throws Exception {
-        createAssetTest(0, "gqNzaWfEQEDd1OMRoQI/rzNlU4iiF50XQXmup3k5czI9hEsNqHT7K4KsfmA/0DUVkbzOwtJdRsHS8trm3Arjpy9r7AXlbAujdHhuh6RhcGFyiaJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aF0ZKJ1bqN0c3SjZmVlzQ+0omZ2zgAE7A+iZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgAE7/ejc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aR0eXBlpGFjZmc=");
+        createAssetTest(0, "gqNzaWfEQF2hf4SoXzT2Wyp5p3CYbMoX2xmrRrKfxxqSa8uhSXv+qDpAIdvFVlQhkNXpz8j7m7M/9xjPBSXSUxnYuzbgvQijdHhuh6RhcGFyiaJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXXZYHd3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d6FjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFmxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFtxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aFyxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aF0ZKJ1bqN0c3SjZmVlzRM4omZ2zgAE7A+iZ2jEIEhjtRiks8hOyBDyLU8QgcsPcfBZp6wg3sYvf3DlCToiomx2zgAE7/ejc25kxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aR0eXBlpGFjZmc=");
     }
 
     @Test
     public void testMakeAssetCreateTxnWithDecimals() throws Exception {
-        createAssetTest(1, "gqNzaWfEQCj5xLqNozR5ahB+LNBlTG+d0gl0vWBrGdAXj1ibsCkvAwOsXs5KHZK1YdLgkdJecQiWm4oiZ+pm5Yg0m3KFqgqjdHhuh6RhcGFyiqJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXWnd2Vic2l0ZaFjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aJkYwGhZsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hbcQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hcsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hdGSidW6jdHN0o2ZlZc0P3KJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
+        createAssetTest(1, "gqNzaWfEQGMrl8xmewPhzZL2aLc7Wt+ZI8Ff1HXxA+xO11kbChe/tPIC5scCHv6M+cgTLl1nG9Z0406ScpoeNoIDpcLPXgujdHhuh6RhcGFyiqJhbcQgZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5RmiiYW6odGVzdGNvaW6iYXXZYHd3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d3d6FjxCAJ+9J2LAj4bFrmv23Xp6kB3mZ111Dgfoxcdphkfbbh/aJkYwGhZsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hbcQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hcsQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2hdGSidW6jdHN0o2ZlZc0TYKJmds4ABOwPomdoxCBIY7UYpLPITsgQ8i1PEIHLD3HwWaesIN7GL39w5Qk6IqJsds4ABO/3o3NuZMQgCfvSdiwI+Gxa5r9t16epAd5mdddQ4H6MXHaYZH224f2kdHlwZaRhY2Zn");
     }
-
 
     @Test
     public void testSerializationAssetConfig() throws Exception {
