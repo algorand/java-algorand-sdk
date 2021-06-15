@@ -150,6 +150,9 @@ public class Transaction implements Serializable {
     @JsonProperty("apsu")
     public TEALProgram clearStateProgram = null;
 
+    @JsonProperty("apep")
+    public Long extraPages = 0L;
+
     /**
      * Create a payment transaction
      * @param fromAddr source address
@@ -272,6 +275,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 
@@ -365,6 +369,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
+                null,
                 null,
                 null,
                 null,
@@ -487,6 +492,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
+                null,
                 null,
                 null,
                 null,
@@ -645,7 +651,8 @@ public class Transaction implements Serializable {
                         @JsonProperty("apgs") StateSchema globalStateSchema,
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
-                        @JsonProperty("apsu") byte[] clearStateProgram
+                        @JsonProperty("apsu") byte[] clearStateProgram,
+                        @JsonProperty("apep") Long extraPages
                         ) throws IOException {
         this(
              type,
@@ -692,7 +699,8 @@ public class Transaction implements Serializable {
              globalStateSchema,
              applicationId,
              localStateSchema,
-             clearStateProgram == null ? null : new TEALProgram(clearStateProgram)
+             clearStateProgram == null ? null : new TEALProgram(clearStateProgram),
+             extraPages
         );
     }
 
@@ -747,7 +755,8 @@ public class Transaction implements Serializable {
                         StateSchema globalStateSchema,
                         Long applicationId,
                         StateSchema localStateSchema,
-                        TEALProgram clearStateProgram
+                        TEALProgram clearStateProgram,
+                        Long extraPages
                         ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
@@ -788,6 +797,7 @@ public class Transaction implements Serializable {
         if (applicationId != null) this.applicationId = applicationId;
         if (localStateSchema != null) this.localStateSchema = globalStateSchema;
         if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
+        if (extraPages != null) this.extraPages = extraPages;
     }
 
     // Used by Jackson to determine "default" values.
@@ -1280,7 +1290,8 @@ public class Transaction implements Serializable {
                 assetFreezeID.equals(that.assetFreezeID) &&
                 freezeState == that.freezeState &&
                 rekeyTo.equals(that.rekeyTo) &&
-                Arrays.equals(lease, ((Transaction) o).lease);
+                Arrays.equals(lease, ((Transaction) o).lease) &&
+                extraPages.equals(that.extraPages);
     }
 
     /**
