@@ -57,7 +57,6 @@ public class Applications {
                         .clearStateProgram(loadTEALProgramFromFile(clearProgramFile))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
                         .localStateSchema(new StateSchema(localInts, localBytes))
-                        .extraPages(extraPages)
                         .optIn(true);
                 break;
             case "update":

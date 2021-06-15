@@ -7,7 +7,7 @@ import com.algorand.algosdk.transaction.Transaction;
 public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTransactionBuilder<T>> extends ApplicationUpdateTransactionBuilder<T> {
     private StateSchema localStateSchema;
     private StateSchema globalStateSchema;
-    private Long extraPages;
+    private Long extraPages = 0L;
 
     /**
      * Initialize a {@link ApplicationCreateTransactionBuilder}.
