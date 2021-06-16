@@ -29,11 +29,11 @@ public class TEALProgram {
     @JsonCreator
     public TEALProgram(byte[] program) {
         if (program == null) return;
-        try {
-            Logic.readProgram(program, null);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        //     Logic.readProgram(program, null);
+        // } catch (Exception e) {
+        //     throw new RuntimeException(e);
+        // }
         this.program = Arrays.copyOf(program, program.length);
     }
 
