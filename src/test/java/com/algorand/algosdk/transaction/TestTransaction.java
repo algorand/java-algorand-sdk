@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTransaction {
     private static Account DEFAULT_ACCOUNT = initializeDefaultAccount();
@@ -766,4 +768,101 @@ public class TestTransaction {
         assertThat(tx.note).isNull();
         assertThat(tx.lease).isNull();
     }
+
+    @Nested
+    class TestFees{
+        @Test
+        public void TxnCannotHaveBothFeeAndFlatFee() throws Exception {
+            Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+            Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
+
+            Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+               Transaction.PaymentTransactionBuilder()
+                        .sender(fromAddr)
+                        .fee(4)
+                        .flatFee(4)
+                        .firstValid(1)
+                        .lastValid(10)
+                        .amount(1)
+                        .genesisHash(new Digest())
+                        .receiver(toAddr)
+                        .note(new byte[]{})
+                        .lease(new byte[]{})
+                        .build();
+            });
+
+            String expected= "Cannot set both fee and flatFee.";
+            String actual = exception.getMessage();
+
+            assertThat(actual.contains(expected));
+        }
+
+        @Test
+        public void TxnUsingFlatFee() throws Exception {
+            Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+            Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
+
+            Transaction tx = Transaction.PaymentTransactionBuilder()
+                        .sender(fromAddr)
+                        .flatFee(1)
+                        .firstValid(1)
+                        .lastValid(10)
+                        .amount(1)
+                        .genesisHash(new Digest())
+                        .receiver(toAddr)
+                        .note(new byte[]{})
+                        .lease(new byte[]{})
+                        .build();
+
+            assertThat(tx.fee).isEqualTo(1);
+        }
+
+        @Test
+        public void TxnZeroFlatFeeNotOverriddenWithMinFee() throws Exception {
+            Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+            Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
+
+            Transaction tx = Transaction.PaymentTransactionBuilder()
+                    .sender(fromAddr)
+                    .flatFee(0)
+                    .firstValid(1)
+                    .lastValid(10)
+                    .amount(1)
+                    .genesisHash(new Digest())
+                    .receiver(toAddr)
+                    .note(new byte[]{})
+                    .lease(new byte[]{})
+                    .build();
+
+            assertThat(tx.fee).isEqualTo(0);
+        }
+
+        @Test
+        public void TxnEstimatedFeeOverridenWithMinFee() throws Exception {
+            Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+            byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+            Address sender = addr;
+            Address recipient = addr;
+            Address closeAssetsTo = addr;
+
+            BigInteger assetIndex = BigInteger.valueOf(1);
+            BigInteger firstValidRound = BigInteger.valueOf(322575);
+            BigInteger lastValidRound = BigInteger.valueOf(323576);
+            BigInteger amountToSend = BigInteger.valueOf(1);
+
+            Transaction tx = Transaction.AssetTransferTransactionBuilder()
+                    .sender(sender)
+                    .assetReceiver(recipient)
+                    .assetCloseTo(closeAssetsTo)
+                    .assetAmount(amountToSend)
+                    .fee(0)
+                    .firstValid(firstValidRound)
+                    .lastValid(lastValidRound)
+                    .genesisHash(gh)
+                    .assetIndex(assetIndex)
+                    .build();
+            assertThat(tx.fee).isEqualTo(1000);
+        }
+    }
+
 }

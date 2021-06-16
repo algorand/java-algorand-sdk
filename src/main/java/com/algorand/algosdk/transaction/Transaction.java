@@ -32,7 +32,8 @@ public class Transaction implements Serializable {
     @JsonProperty("snd")
     public Address sender = new Address();
     @JsonProperty("fee")
-    public BigInteger fee = Account.MIN_TX_FEE_UALGOS;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    public BigInteger fee;
     @JsonProperty("fv")
     public BigInteger firstValid = BigInteger.valueOf(0);
     @JsonProperty("lv")

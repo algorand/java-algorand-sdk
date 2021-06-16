@@ -99,9 +99,9 @@ public class TransactionSteps {
         if (StringUtils.isNotEmpty(appAccounts)) {
             builder.accounts(convertAccounts(appAccounts));
         }
-        if (fee != 0) {
-            builder.flatFee(fee);
-        }
+
+        builder.flatFee(fee);
+
         if (firstValid != 0) {
             builder.firstValid(firstValid);
         }
@@ -120,6 +120,15 @@ public class TransactionSteps {
         signedTransaction = base.signTransaction(applicationTransaction);
     }
 
+    @Then("fee field not in txn")
+    public void fee_field_is_in_txn() throws NoSuchAlgorithmException {
+        signedTransaction = base.signTransaction(applicationTransaction);
+    }
+
+    @Then("fee field is in txn")
+    public void  fee_field_not_in_txn() throws NoSuchAlgorithmException {
+        signedTransaction = base.signTransaction(applicationTransaction);
+    }
     @Then("the base64 encoded signed transaction should equal {string}")
     public void the_base64_encoded_signed_transaction_should_equal(String golden) throws JsonProcessingException {
         String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
