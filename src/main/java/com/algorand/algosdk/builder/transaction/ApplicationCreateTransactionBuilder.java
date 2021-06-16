@@ -7,6 +7,7 @@ import com.algorand.algosdk.transaction.Transaction;
 public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTransactionBuilder<T>> extends ApplicationUpdateTransactionBuilder<T> {
     private StateSchema localStateSchema;
     private StateSchema globalStateSchema;
+    private Long extraPages = 0L;
 
     /**
      * Initialize a {@link ApplicationCreateTransactionBuilder}.
@@ -24,6 +25,7 @@ public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTra
     protected void applyTo(Transaction txn) {
         txn.localStateSchema = localStateSchema;
         txn.globalStateSchema = globalStateSchema;
+        txn.extraPages = extraPages;
 
         super.applyTo(txn);
     }
@@ -69,6 +71,18 @@ public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTra
      */
     public T globalStateSchema(StateSchema globalStateSchema) {
         this.globalStateSchema = globalStateSchema;
+        return (T) this;
+    }
+
+    /**
+     * extraPages allows you to rent extra pages of memory for the application. Each page is 2048 bytes of shared
+     * memory between approval and clear state programs. extraPages parameter must be an integer between 0 and 3 inclusive.
+     */
+    public T extraPages(Long extraPages) {
+        if (extraPages == null || extraPages < 0 || extraPages > 3) {
+            throw new IllegalArgumentException("extraPages must be an integer between 0 and 3 inclusive");
+        }
+        this.extraPages = extraPages;
         return (T) this;
     }
 }

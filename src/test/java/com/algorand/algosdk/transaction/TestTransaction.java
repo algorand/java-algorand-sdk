@@ -138,7 +138,7 @@ public class TestTransaction {
         Address freeze = addr;
         Address clawback = addr;
         String metadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
-        String url_96 = new String(new char[96]).replace("\0", "w");;
+        String url_96 = new String(new char[96]).replace("\0", "w");
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
                 .sender(sender)
@@ -196,7 +196,7 @@ public class TestTransaction {
         String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
         String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
         String normalMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4";
-        String url_100 = new String(new char[100]).replace("\0", "w");;
+        String url_100 = new String(new char[100]).replace("\0", "w");
 
         assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
