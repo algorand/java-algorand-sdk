@@ -99,7 +99,7 @@ public class AssetParams implements Serializable {
         }
 
         if(url != null) {
-            if (url.length() > 32) throw new RuntimeException("asset url cannot be greater than 32 characters");
+            if (url.length() > 96) throw new RuntimeException("url length must be between 0 and 96 characters (inclusive).");
             this.url = url;
         }
 
