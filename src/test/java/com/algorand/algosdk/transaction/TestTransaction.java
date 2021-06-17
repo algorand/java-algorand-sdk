@@ -83,6 +83,7 @@ public class TestTransaction {
                 .firstValid(301)
                 .lastValid(1300)
                 .genesisHash(new Digest())
+                .fee(0)
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -102,6 +103,7 @@ public class TestTransaction {
                 .firstValid(301)
                 .lastValid(1300)
                 .genesisHash(new Digest())
+                .fee(0)
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -123,6 +125,7 @@ public class TestTransaction {
                 .firstValid(301)
                 .lastValid(1300)
                 .genesisHash(new Digest())
+                .fee(0)
                 .build();
 
         byte[] outBytes = Encoder.encodeToMsgPack(tx);
