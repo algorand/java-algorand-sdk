@@ -5,11 +5,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.TransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
 import io.cucumber.java.en.Given;
@@ -22,11 +27,16 @@ public class Rekeying {
     private TransactionBuilder transactionBuilder;
     private SignedTransaction signedTransaction;
     public Account account;
+    SignedTransaction stx;
+    Address pk;
+    Transaction txn;
+    MultisigAddress msig;
 
     @Given("payment transaction parameters {int} {int} {int} {string} {string} {string} {int} {string} {string}")	
     public void payment_transaction_parameters(
             Integer fee, Integer fv, Integer lv, String gh,
             String to, String close, Integer amt, String gen, String note) {
+
 
         transactionBuilder = PaymentTransactionBuilder.Builder()
                 .flatFee(fee)
@@ -69,5 +79,32 @@ public class Rekeying {
     @When("I set the from address to {string}")
     public void i_set_the_from_address_to(String fromAddress) {
         transactionBuilder.sender(fromAddress);
+    }
+
+    @Given("multisig addresses {string}")
+    public void multisig_addresses(String addresses) throws NoSuchAlgorithmException{
+
+        String[] addrs = addresses.split(" ");
+        Ed25519PublicKey[] addrlist = new Ed25519PublicKey[addrs.length];
+        for(int x = 0; x < addrs.length; x++){
+            addrlist[x] = new Ed25519PublicKey((new Address(addrs[x])).getBytes());
+        }
+        msig = new MultisigAddress(1, 2, Arrays.asList(addrlist));
+        pk = new Address(msig.toString());
+    }
+
+    @When("I create the multisig payment transaction")
+    public void i_create_the_multisig_payment_transaction() {
+        txn = transactionBuilder.sender(msig.toString()).build();
+    }
+
+    @When("I create the multisig payment transaction with zero fee")
+    public void i_create_the_multisig_payment_transaction_with_zero_fee() {
+        txn = transactionBuilder.sender(msig.toString()).build();
+    }
+
+    @When("I sign the multisig transaction with the private key")
+    public void i_sign_the_multisig_transaction_with_the_private_key() throws NoSuchAlgorithmException {
+        stx = account.signMultisigTransaction(msig, txn);
     }
 }
