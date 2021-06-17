@@ -264,4 +264,54 @@ public class TestLogic {
             assertThat(valid).isTrue();
         }
     }
+
+    @Test
+    public void testCheckProgramTealV4() throws Exception {
+        assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(4);
+
+        {
+            // divmodw
+            byte[] program = {
+                0x04, 0x20, 0x03, 0x01, 0x00, 0x02, 0x22, (byte) 0x81, (byte) 0xd0, (byte) 0x0f, 0x23, 0x24, 0x1f  // int 1; pushint 2000; int 0; int 2; divmodw
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        // gloads i
+        {
+            byte[] program = {
+                0x04, 0x20, 0x01, 0x00, 0x22, 0x3b, 0x00  // int 0; gloads 0
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // callsub
+            byte[] program = {
+                0x04, 0x20, 0x02, 0x01, 0x02, 0x22, (byte) 0x88, 0x00, 0x02, 0x23, 0x12, 0x49  // int 1; callsub double; int 2; ==; double: dup;
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // b>=
+            byte[] program = {
+                0x04, 0x26, 0x02, 0x01, 0x11, 0x01, 0x10, 0x28, 0x29, (byte) 0xa7  // byte 0x11; byte 0x10; b>=
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // b^
+            byte[] program = {
+                0x04, 0x26, 0x02, 0x01, 0x11, 0x01, 0x10, 0x28, 0x29, (byte) 0xa7  // byte 0x11; byte 0x10; b^; byte 0x01; ==
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+    }
 }
