@@ -210,7 +210,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
 
     /**
      * Set the fee per bytes value. This value is multiplied by the estimated size of the transaction to reach a final transaction fee, or 1000, whichever is higher.
-	 * This field cannot be combined with flatFee.
+     * This field cannot be combined with flatFee.
      * @param fee The fee per byte.
      * @return This builder.
      */
@@ -223,7 +223,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     /**
      * Set the flatFee. This value will be used for the transaction fee.
      * This fee may fall to zero but a group of N atomic transactions must
-	 * still have a fee of at least N*MinTxnFee for the current network protocol.
+     * still have a fee of at least N*MinTxnFee for the current network protocol.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -236,7 +236,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     /**
      * Set the flatFee. This value will be used for the transaction fee.
      * This fee may fall to zero but a group of N atomic transactions must
-	 * still have a fee of at least N*MinTxnFee for the current network protocol.
+     * still have a fee of at least N*MinTxnFee for the current network protocol.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -250,7 +250,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     /**
      * Set the flatFee. This value will be used for the transaction fee.
      * This fee may fall to zero but a group of N atomic transactions must
-	 * still have a fee of at least N*MinTxnFee for the current network protocol.
+     * still have a fee of at least N*MinTxnFee for the current network protocol.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
