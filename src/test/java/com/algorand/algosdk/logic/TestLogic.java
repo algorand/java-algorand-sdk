@@ -178,6 +178,48 @@ public class TestLogic {
                 .hasMessage("program too long");
    }
 
+   @Test
+   public void testCheckProgramCostly() throws Exception {
+
+    byte[] old_versions = {
+        0x1, 0x2, 0x3
+    };
+
+    byte[] versions = {
+        0x4
+    };
+
+    byte[] program = {
+        0x01, 0x26, 0x01, 0x01, 0x01, 0x28, 0x02 // byte 0x01 + keccak256
+    };
+    ArrayList<byte[]> args = new ArrayList<byte[]>();
+    byte[] arg = "a".repeat(10).getBytes();
+    args.add(arg);
+
+    ProgramData programData = readProgram(program, args);
+    assertThat(programData.good).isTrue();
+
+    byte[] keccakx800 = "x\02".repeat(800).getBytes();
+
+    byte[] program2 = new byte[program.length + keccakx800.length];
+    System.arraycopy(program, 0, program2, 0, program.length);
+    System.arraycopy(keccakx800, 0, program2, program.length, keccakx800.length);
+
+    for (byte v : old_versions) {
+        program[0] = v;
+        assertThatThrownBy(() -> readProgram(program, args))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("program too costly for Teal version < 4. consider using v4.");
+    }
+
+    for (byte v : versions) {
+        program[0] = v;
+        programData = readProgram(program, args);
+        assertThat(programData.good).isTrue();
+    }
+    
+}
+
     @Test
     public void testCheckProgramInvalidOpcode() throws Exception {
         byte[] program = {
@@ -309,6 +351,24 @@ public class TestLogic {
             // b^
             byte[] program = {
                 0x04, 0x26, 0x02, 0x01, 0x11, 0x01, 0x10, 0x28, 0x29, (byte) 0xa7  // byte 0x11; byte 0x10; b^; byte 0x01; ==
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // callsub, retsub.
+            byte[] program = {
+                0x04, 0x20, 0x02, 0x01, 0x02, 0x22, (byte) 0x88, 0x00, 0x03, 0x23, 0x12, 0x43, 0x49, 0x08, (byte) 0x89  // int 1; callsub double; int 2; ==; return; double: dup; +; retsub;
+            };
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // loop
+            byte[] program = {
+                0x04, 0x20, 0x04, 0x01, 0x02, 0x0a, 0x10, 0x22, 0x23, 0x0b, 0x49, 0x24, 0x0c, 0x40, (byte) 0xff, (byte) 0xf8, 0x25, 0x12  // int 1; loop: int 2; *; dup; int 10; <; bnz loop; int 16; ==
             };
             boolean valid = checkProgram(program, null);
             assertThat(valid).isTrue();
