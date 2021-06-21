@@ -32,7 +32,7 @@ public class Transaction implements Serializable {
     @JsonProperty("snd")
     public Address sender = new Address();
     @JsonProperty("fee")
-    public BigInteger fee = Account.MIN_TX_FEE_UALGOS;
+    public BigInteger fee = BigInteger.valueOf(0);
     @JsonProperty("fv")
     public BigInteger firstValid = BigInteger.valueOf(0);
     @JsonProperty("lv")
@@ -1065,7 +1065,7 @@ public class Transaction implements Serializable {
         if (fee != null) {
             this.fee = fee;
         } else  {
-            this.fee = Account.MIN_TX_FEE_UALGOS;
+            this.fee = BigInteger.valueOf(0);
         }
 
         /*

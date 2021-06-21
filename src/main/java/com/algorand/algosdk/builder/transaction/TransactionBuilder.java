@@ -77,7 +77,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
             } catch (NoSuchAlgorithmException e) {
                 throw new UnsupportedOperationException(e);
             }
-            if (txn.fee == null || txn.fee == BigInteger.valueOf(0)) {
+            if (txn.fee == null || txn.fee.equals(BigInteger.valueOf(0))) {
                 txn.fee = Account.MIN_TX_FEE_UALGOS;
             }
         }
