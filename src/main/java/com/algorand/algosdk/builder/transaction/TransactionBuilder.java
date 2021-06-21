@@ -71,6 +71,10 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         if(fee != null && flatFee != null) {
             throw new IllegalArgumentException("Cannot set both fee and flatFee.");
         }
+        if(fee == null && flatFee == null){
+            txn.fee = Account.MIN_TX_FEE_UALGOS;
+            return txn;
+        }
         if(fee != null) {
             try {
                 Account.setFeeByFeePerByte(txn, fee);

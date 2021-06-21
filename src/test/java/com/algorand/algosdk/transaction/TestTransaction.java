@@ -863,6 +863,32 @@ public class TestTransaction {
                     .build();
             assertThat(tx.fee).isEqualTo(1000);
         }
+
+        @Test
+        public void TxnEstimatedDefaultFee() throws Exception {
+            Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+            byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+            Address sender = addr;
+            Address recipient = addr;
+            Address closeAssetsTo = addr;
+
+            BigInteger assetIndex = BigInteger.valueOf(1);
+            BigInteger firstValidRound = BigInteger.valueOf(322575);
+            BigInteger lastValidRound = BigInteger.valueOf(323576);
+            BigInteger amountToSend = BigInteger.valueOf(1);
+
+            Transaction tx = Transaction.AssetTransferTransactionBuilder()
+                    .sender(sender)
+                    .assetReceiver(recipient)
+                    .assetCloseTo(closeAssetsTo)
+                    .assetAmount(amountToSend)
+                    .firstValid(firstValidRound)
+                    .lastValid(lastValidRound)
+                    .genesisHash(gh)
+                    .assetIndex(assetIndex)
+                    .build();
+            assertThat(tx.fee).isEqualTo(1000);
+        }
     }
 
 }

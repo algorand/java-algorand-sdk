@@ -1065,7 +1065,7 @@ public class Transaction implements Serializable {
         if (fee != null) {
             this.fee = fee;
         } else  {
-            this.fee = BigInteger.valueOf(0);
+            this.fee = Account.MIN_TX_FEE_UALGOS;
         }
 
         /*
