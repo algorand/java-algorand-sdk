@@ -32,7 +32,6 @@ public class TransactionSteps {
     public Transaction applicationTransaction = null;
     public SignedTransaction signedTransaction = null;
 
-
     public TransactionSteps(Base b) {
         this.base = b;
     }
@@ -91,6 +90,8 @@ public class TransactionSteps {
         }
 
         builder.sender(sender);
+        builder.flatFee(fee);
+
 
         // Shared base fields
         if (applicationId != 0) {
@@ -108,8 +109,6 @@ public class TransactionSteps {
         if (StringUtils.isNotEmpty(appAccounts)) {
             builder.accounts(convertAccounts(appAccounts));
         }
-
-        builder.flatFee(fee);
 
         if (firstValid != 0) {
             builder.firstValid(firstValid);
@@ -135,6 +134,7 @@ public class TransactionSteps {
 
         byte[] encodedTxn = Encoder.encodeToMsgPack(signedTransaction);
         Map<String,Object> sigtxn = Encoder.decodeFromMsgPack(encodedTxn,Map.class);
+        assertThat(sigtxn).isNotNull();
         Map<String,Object> txn = (Map<String,Object>) sigtxn.get("txn");
         assertThat(txn).containsKey("fee");
     }

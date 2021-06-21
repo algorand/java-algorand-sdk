@@ -37,7 +37,6 @@ public class Rekeying {
             Integer fee, Integer fv, Integer lv, String gh,
             String to, String close, Integer amt, String gen, String note) {
 
-
         transactionBuilder = PaymentTransactionBuilder.Builder()
                 .flatFee(fee)
                 .firstValid(fv)
