@@ -1,7 +1,10 @@
 package com.algorand.algosdk.cucumber.shared;
 
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
-import com.algorand.algosdk.crypto.TEALProgram;
+import com.algorand.algosdk.builder.transaction.TransactionBuilder;
+import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -9,12 +12,17 @@ import com.algorand.algosdk.unit.Base;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
+import java.io.IOException;
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Map;
 
 import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,6 +90,8 @@ public class TransactionSteps {
         }
 
         builder.sender(sender);
+        builder.flatFee(fee);
+
 
         // Shared base fields
         if (applicationId != 0) {
@@ -99,9 +109,7 @@ public class TransactionSteps {
         if (StringUtils.isNotEmpty(appAccounts)) {
             builder.accounts(convertAccounts(appAccounts));
         }
-        if (fee != 0) {
-            builder.flatFee(fee);
-        }
+
         if (firstValid != 0) {
             builder.firstValid(firstValid);
         }
@@ -120,9 +128,31 @@ public class TransactionSteps {
         signedTransaction = base.signTransaction(applicationTransaction);
     }
 
+    @Then("fee field is in txn")
+    public void fee_field_is_in_txn() throws IOException {
+        if (signedTransaction == null) return;
+
+        byte[] encodedTxn = Encoder.encodeToMsgPack(signedTransaction);
+        Map<String,Object> sigtxn = Encoder.decodeFromMsgPack(encodedTxn,Map.class);
+        assertThat(sigtxn).isNotNull();
+        Map<String,Object> txn = (Map<String,Object>) sigtxn.get("txn");
+        assertThat(txn).containsKey("fee");
+    }
+
+    @Then("fee field not in txn")
+    public void  fee_field_not_in_txn() throws IOException {
+        if (signedTransaction == null) return;
+
+        byte[] encodedTxn = Encoder.encodeToMsgPack(signedTransaction);
+        Map<String,Object> sigtxn = Encoder.decodeFromMsgPack(encodedTxn,Map.class);
+        assertThat(sigtxn).isNotNull();
+        Map<String,Object> txn = (Map<String,Object>) sigtxn.get("txn");
+        assertThat(txn).doesNotContainKey("fee");
+    }
     @Then("the base64 encoded signed transaction should equal {string}")
     public void the_base64_encoded_signed_transaction_should_equal(String golden) throws JsonProcessingException {
         String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
         assertThat(encoded).isEqualTo(golden);
     }
+
 }

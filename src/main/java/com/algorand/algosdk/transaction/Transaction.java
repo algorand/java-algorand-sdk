@@ -32,7 +32,7 @@ public class Transaction implements Serializable {
     @JsonProperty("snd")
     public Address sender = new Address();
     @JsonProperty("fee")
-    public BigInteger fee = Account.MIN_TX_FEE_UALGOS;
+    public BigInteger fee = BigInteger.ZERO;
     @JsonProperty("fv")
     public BigInteger firstValid = BigInteger.valueOf(0);
     @JsonProperty("lv")
@@ -801,10 +801,7 @@ public class Transaction implements Serializable {
     }
 
     // Used by Jackson to determine "default" values.
-    public Transaction() {
-        // Override the default to 0 so that it will be serialized
-        this.fee = BigInteger.valueOf(0);
-    }
+    public Transaction() {}
 
     /**
      * Base constructor with flat fee for asset xfer/freeze/destroy transactions.

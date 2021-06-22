@@ -71,19 +71,24 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         if(fee != null && flatFee != null) {
             throw new IllegalArgumentException("Cannot set both fee and flatFee.");
         }
+        if(fee == null && flatFee == null){
+            txn.fee = Account.MIN_TX_FEE_UALGOS;
+            return txn;
+        }
         if(fee != null) {
             try {
                 Account.setFeeByFeePerByte(txn, fee);
             } catch (NoSuchAlgorithmException e) {
                 throw new UnsupportedOperationException(e);
             }
+            if (txn.fee == null || txn.fee.equals(BigInteger.valueOf(0))) {
+                txn.fee = Account.MIN_TX_FEE_UALGOS;
+            }
         }
         if (flatFee != null) {
             txn.fee = flatFee;
         }
-        if (txn.fee == null || txn.fee == BigInteger.valueOf(0)) {
-            txn.fee = Account.MIN_TX_FEE_UALGOS;
-        }
+        
 
         return txn;
     }
@@ -220,7 +225,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Set the flatFee. This value will be used for the transaction fee, or 1000, whichever is higher.
+     * Set the flatFee. This value will be used for the transaction fee.
+     * This fee may fall to zero but a group of N atomic transactions must
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -231,7 +238,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Set the flatFee. This value will be used for the transaction fee, or 1000, whichever is higher.
+     * Set the flatFee. This value will be used for the transaction fee.
+     * This fee may fall to zero but a group of N atomic transactions must
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -243,7 +252,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Set the flatFee. This value will be used for the transaction fee, or 1000, whichever is higher.
+     * Set the flatFee. This value will be used for the transaction fee.
+     * This fee may fall to zero but a group of N atomic transactions must
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
