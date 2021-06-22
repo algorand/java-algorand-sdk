@@ -193,31 +193,34 @@ public class TestLogic {
         0x01, 0x26, 0x01, 0x01, 0x01, 0x28, 0x02 // byte 0x01 + keccak256
     };
     ArrayList<byte[]> args = new ArrayList<byte[]>();
-    byte[] arg = "a".repeat(10).getBytes();
+    
+    byte[] arg = "aaaaaaaaaa".getBytes();
     args.add(arg);
 
     ProgramData programData = readProgram(program, args);
     assertThat(programData.good).isTrue();
 
-    byte[] keccakx800 = "x\02".repeat(800).getBytes();
+    byte[] keccakx800 = new byte[800];
+    for (int i = 0; i < keccakx800.length; i++) {
+        keccakx800[i] = 0x02;
+    }
 
     byte[] program2 = new byte[program.length + keccakx800.length];
     System.arraycopy(program, 0, program2, 0, program.length);
     System.arraycopy(keccakx800, 0, program2, program.length, keccakx800.length);
 
     for (byte v : old_versions) {
-        program[0] = v;
-        assertThatThrownBy(() -> readProgram(program, args))
+        program2[0] = v;
+        assertThatThrownBy(() -> readProgram(program2, args))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("program too costly for Teal version < 4. consider using v4.");
     }
 
     for (byte v : versions) {
-        program[0] = v;
-        programData = readProgram(program, args);
+        program2[0] = v;
+        programData = readProgram(program2, args);
         assertThat(programData.good).isTrue();
     }
-    
 }
 
     @Test
