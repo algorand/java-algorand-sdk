@@ -249,9 +249,9 @@ public class Logic {
             pc += size;
         }
         // costs calculated dynamically starting in v4
-	    if (version < 4 && cost > MAX_COST) {
-		   throw new IllegalArgumentException("program too costly for Teal version < 4. consider using v4.");
-	    }
+        if (version < 4 && cost > MAX_COST) {
+            throw new IllegalArgumentException("program too costly for Teal version < 4. consider using v4.");
+        }
         
         return new ProgramData(true, ints, bytes);
     }
