@@ -801,10 +801,7 @@ public class Transaction implements Serializable {
     }
 
     // Used by Jackson to determine "default" values.
-    public Transaction() {
-        // Override the default to 0 so that it will be serialized
-        this.fee = BigInteger.valueOf(0);
-    }
+    public Transaction() {}
 
     /**
      * Base constructor with flat fee for asset xfer/freeze/destroy transactions.
