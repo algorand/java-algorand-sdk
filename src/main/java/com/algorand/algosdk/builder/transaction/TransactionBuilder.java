@@ -227,7 +227,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     /**
      * Set the flatFee. This value will be used for the transaction fee.
      * This fee may fall to zero but a group of N atomic transactions must
-     * still have a fee of at least N*MinTxnFee for the current network protocol.
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -240,7 +240,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     /**
      * Set the flatFee. This value will be used for the transaction fee.
      * This fee may fall to zero but a group of N atomic transactions must
-     * still have a fee of at least N*MinTxnFee for the current network protocol.
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -254,7 +254,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     /**
      * Set the flatFee. This value will be used for the transaction fee.
      * This fee may fall to zero but a group of N atomic transactions must
-     * still have a fee of at least N*MinTxnFee for the current network protocol.
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
