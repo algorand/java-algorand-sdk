@@ -1,5 +1,12 @@
+# 1.7.0
+- Implement dynamic opcode accounting, backward jumps, loops, callsub, retsub
+- Implement ability to pool fees
+- Update asset URL length to 96 bytes
+- Implement ability to pay for extra pages
+- Don't override values with lookupParams/suggestedParams
+
 # 1.6.0
-- Add static qualifiers to json creators for onCompletion enum serialization. 
+- Add static qualifiers to json creators for onCompletion enum serialization.
 - Bump guava from 28.2-android to 29.0-android in /generator.
 - Bump guava from 28.2-android to 29.0-android.
 - Corrected Exception message for Keccak-256 hash function.
