@@ -71,26 +71,31 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         if(fee != null && flatFee != null) {
             throw new IllegalArgumentException("Cannot set both fee and flatFee.");
         }
+        if(fee == null && flatFee == null){
+            txn.fee = Account.MIN_TX_FEE_UALGOS;
+            return txn;
+        }
         if(fee != null) {
             try {
                 Account.setFeeByFeePerByte(txn, fee);
             } catch (NoSuchAlgorithmException e) {
                 throw new UnsupportedOperationException(e);
             }
+            if (txn.fee == null || txn.fee.equals(BigInteger.valueOf(0))) {
+                txn.fee = Account.MIN_TX_FEE_UALGOS;
+            }
         }
         if (flatFee != null) {
             txn.fee = flatFee;
         }
-        if (txn.fee == null || txn.fee == BigInteger.valueOf(0)) {
-            txn.fee = Account.MIN_TX_FEE_UALGOS;
-        }
+        
 
         return txn;
     }
 
     /**
      * Query the V1 REST API with {@link AlgodApi} for Transaction Parameters:
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParams}.
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid by querying algod if not already set.
      * @param client The backend client connection.
      * @return This builder.
      * @throws ApiException When the client fails to retrieve {@link TransactionParams} from the backend.
@@ -101,22 +106,32 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Initialize fee, genesisID, genesisHash, firstValid and lastValid using {@link TransactionParams}.
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParams} if not already set.
      * @param params The suggested transaction parameters.
      * @return This builder.
      */
     public T suggestedParams(TransactionParams params) {
-        fee(params.getFee());
-        genesisID(params.getGenesisID());
-        genesisHash(params.getGenesishashb64());
-        firstValid(params.getLastRound());
-        lastValid(params.getLastRound().add(BigInteger.valueOf(1000L)));
+        if (this.fee == null) {
+            fee(params.getFee());
+        }
+        if (this.genesisID == null) {
+            genesisID(params.getGenesisID());
+        }
+        if (this.genesisHash == null) {
+            genesisHash(params.getGenesishashb64());
+        }
+        if (this.firstValid == null) {
+            firstValid(params.getLastRound());
+        }
+        if (this.lastValid == null) {
+            lastValid(params.getLastRound().add(BigInteger.valueOf(1000L)));
+        }
         return (T) this;
     }
 
     /**
      * Query the V2 REST API with {@link com.algorand.algosdk.v2.client.common.AlgodClient} for Transaction Parameters:
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParametersResponse}.
+     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParametersResponse} if not already set.
      * @param client The backend client connection.
      * @return This builder.
      * @throws ApiException When the client fails to retrieve {@link TransactionParametersResponse} from the backend.
@@ -210,7 +225,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Set the flatFee. This value will be used for the transaction fee, or 1000, whichever is higher.
+     * Set the flatFee. This value will be used for the transaction fee.
+     * This fee may fall to zero but a group of N atomic transactions must
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -221,7 +238,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Set the flatFee. This value will be used for the transaction fee, or 1000, whichever is higher.
+     * Set the flatFee. This value will be used for the transaction fee.
+     * This fee may fall to zero but a group of N atomic transactions must
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -233,7 +252,9 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
     }
 
     /**
-     * Set the flatFee. This value will be used for the transaction fee, or 1000, whichever is higher.
+     * Set the flatFee. This value will be used for the transaction fee.
+     * This fee may fall to zero but a group of N atomic transactions must
+     * still have a fee of at least N*MinTxnFee.
      * This field cannot be combined with fee.
      * @param flatFee The flatFee to use for the transaction.
      * @return This builder.
@@ -516,4 +537,3 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> {
         return (T) this;
     }
 }
-
