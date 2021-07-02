@@ -559,6 +559,16 @@ public class Account {
         return this.tealSign(data, lsig.toAddress());
     }
 
+    /**
+     * 25 word mnemonic is obtained and converted to 32 byte private key.
+     *
+     * @return 32 byte private key
+     */
+    public byte[] toSeed() throws GeneralSecurityException {
+        String mnemonic = toMnemonic();
+        return Mnemonic.toKey(mnemonic);
+    }
+
     // Return a pre-set seed in response to nextBytes or generateSeed
     private static class FixedSecureRandom extends SecureRandom {
         private final byte[] fixedValue;
