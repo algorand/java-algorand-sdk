@@ -7,8 +7,6 @@
 
 # 1.6.0
 - Add static qualifiers to json creators for onCompletion enum serialization.
-- Bump guava from 28.2-android to 29.0-android in /generator.
-- Bump guava from 28.2-android to 29.0-android.
 - Corrected Exception message for Keccak-256 hash function.
 - Add TEAL 3 support.
 - Regenerated comment.
