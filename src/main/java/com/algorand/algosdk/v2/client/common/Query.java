@@ -11,32 +11,21 @@ public abstract class Query {
     private Client client;
     private HttpMethod httpMethod;
     protected QueryData qd;
-    private Map<String,String> headers;
-
 
     protected Query(Client client, HttpMethod httpMethod) {
         this.client = client;
         this.httpMethod = httpMethod;
         this.qd = new QueryData();
-        this.headers = new HashMap<>();
     }
 
     protected abstract QueryData getRequestString();
 
     protected <T>Response<T> baseExecute() throws Exception {
-        String[] headers = new String[1];
-        String[] value = new String[1];
-        headers[0]="Content-Type";
-        value[0]="application/x-binary";
-        return baseExecute(headers, value);
+
+        return baseExecute(null,null);
     }
 
     protected <T>Response<T> baseExecute(String[] headers, String[] values) throws Exception {
-        if (headers.length > 0 && values.length > 0 && headers.length == values.length){
-            for(int i=0; i<headers.length; i++){
-                this.headers.put(headers[i],values[i]);
-            }
-        }
         QueryData qData = this.getRequestString();
         com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod, headers, values);
         if (resp.isSuccessful()) {
@@ -58,9 +47,6 @@ public abstract class Query {
         return Client.getHttpUrl(this.qd, port, host).toString();
     }
 
-    public Map<String,String> getRequestHeaders(){
-        return this.headers;
-    }
     protected void addQuery(String key, String value) {
         qd.addQuery(key, value);
     }
