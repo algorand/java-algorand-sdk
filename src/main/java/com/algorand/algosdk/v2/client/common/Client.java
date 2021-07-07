@@ -103,6 +103,7 @@ public class Client {
                     MediaType.parse("Binary data"),
                     qData.bodySegments.isEmpty() ? new byte[0] : qData.bodySegments.get(0));
             reqBuilder.post(rb);
+            reqBuilder.addHeader("Content-Type","application/x-binary");
             break;
         }
 
