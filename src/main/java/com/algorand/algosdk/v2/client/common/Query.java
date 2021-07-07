@@ -4,9 +4,6 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.model.Account;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public abstract class Query {
     private Client client;
     private HttpMethod httpMethod;
@@ -21,11 +18,11 @@ public abstract class Query {
     protected abstract QueryData getRequestString();
 
     protected <T>Response<T> baseExecute() throws Exception {
-
-        return baseExecute(null,null);
+        return baseExecute(null, null);
     }
 
     protected <T>Response<T> baseExecute(String[] headers, String[] values) throws Exception {
+
         QueryData qData = this.getRequestString();
         com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod, headers, values);
         if (resp.isSuccessful()) {
