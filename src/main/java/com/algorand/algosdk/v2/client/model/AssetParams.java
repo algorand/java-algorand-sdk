@@ -72,10 +72,24 @@ public class AssetParams extends PathResponse {
     public byte[] metadataHash;
 
     /**
-     * (an) Name of this asset, as supplied by the creator.
+     * (an) Name of this asset, as supplied by the creator. Included only when the
+     * asset name is composed of printable utf-8 characters.
      */
     @JsonProperty("name")
     public String name;
+
+    /**
+     * Base64 encoded name of this asset, as supplied by the creator.
+     */
+    @JsonProperty("name-b64")
+    public void nameB64(String base64Encoded) {
+        this.nameB64 = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("name-b64")
+    public String nameB64() {
+        return Encoder.encodeToBase64(this.nameB64);
+    }
+    public byte[] nameB64;
 
     /**
      * (r) Address of account holding reserve (non-minted) units of this asset.
@@ -90,16 +104,44 @@ public class AssetParams extends PathResponse {
     public java.math.BigInteger total;
 
     /**
-     * (un) Name of a unit of this asset, as supplied by the creator.
+     * (un) Name of a unit of this asset, as supplied by the creator. Included only
+     * when the name of a unit of this asset is composed of printable utf-8 characters.
      */
     @JsonProperty("unit-name")
     public String unitName;
 
     /**
-     * (au) URL where more information about the asset can be retrieved.
+     * Base64 encoded name of a unit of this asset, as supplied by the creator.
+     */
+    @JsonProperty("unit-name-b64")
+    public void unitNameB64(String base64Encoded) {
+        this.unitNameB64 = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("unit-name-b64")
+    public String unitNameB64() {
+        return Encoder.encodeToBase64(this.unitNameB64);
+    }
+    public byte[] unitNameB64;
+
+    /**
+     * (au) URL where more information about the asset can be retrieved. Included only
+     * when the URL is composed of printable utf-8 characters.
      */
     @JsonProperty("url")
     public String url;
+
+    /**
+     * Base64 encoded URL where more information about the asset can be retrieved.
+     */
+    @JsonProperty("url-b64")
+    public void urlB64(String base64Encoded) {
+        this.urlB64 = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("url-b64")
+    public String urlB64() {
+        return Encoder.encodeToBase64(this.urlB64);
+    }
+    public byte[] urlB64;
 
     @Override
     public boolean equals(Object o) {
@@ -116,10 +158,13 @@ public class AssetParams extends PathResponse {
         if (!Objects.deepEquals(this.manager, other.manager)) return false;
         if (!Objects.deepEquals(this.metadataHash, other.metadataHash)) return false;
         if (!Objects.deepEquals(this.name, other.name)) return false;
+        if (!Objects.deepEquals(this.nameB64, other.nameB64)) return false;
         if (!Objects.deepEquals(this.reserve, other.reserve)) return false;
         if (!Objects.deepEquals(this.total, other.total)) return false;
         if (!Objects.deepEquals(this.unitName, other.unitName)) return false;
+        if (!Objects.deepEquals(this.unitNameB64, other.unitNameB64)) return false;
         if (!Objects.deepEquals(this.url, other.url)) return false;
+        if (!Objects.deepEquals(this.urlB64, other.urlB64)) return false;
 
         return true;
     }

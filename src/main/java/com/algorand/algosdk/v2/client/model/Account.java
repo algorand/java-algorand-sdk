@@ -54,6 +54,12 @@ public class Account extends PathResponse {
     public List<ApplicationLocalState> appsLocalState = new ArrayList<ApplicationLocalState>();
 
     /**
+     * (teap) the sum of all extra application program pages for this account.
+     */
+    @JsonProperty("apps-total-extra-pages")
+    public Long appsTotalExtraPages;
+
+    /**
      * (tsch) stores the sum of all of the local schemas and global schemas in this
      * account.
      * Note: the raw account uses `StateSchema` for this type.
@@ -184,6 +190,7 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.amount, other.amount)) return false;
         if (!Objects.deepEquals(this.amountWithoutPendingRewards, other.amountWithoutPendingRewards)) return false;
         if (!Objects.deepEquals(this.appsLocalState, other.appsLocalState)) return false;
+        if (!Objects.deepEquals(this.appsTotalExtraPages, other.appsTotalExtraPages)) return false;
         if (!Objects.deepEquals(this.appsTotalSchema, other.appsTotalSchema)) return false;
         if (!Objects.deepEquals(this.assets, other.assets)) return false;
         if (!Objects.deepEquals(this.authAddr, other.authAddr)) return false;

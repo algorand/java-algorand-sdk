@@ -60,6 +60,12 @@ public class ApplicationParams extends PathResponse {
     public Address creator;
 
     /**
+     * (epp) the amount of extra program pages available to this app.
+     */
+    @JsonProperty("extra-program-pages")
+    public Long extraProgramPages;
+
+    /**
      * [\gs) global schema
      */
     @JsonProperty("global-state")
@@ -87,6 +93,7 @@ public class ApplicationParams extends PathResponse {
         if (!Objects.deepEquals(this.approvalProgram, other.approvalProgram)) return false;
         if (!Objects.deepEquals(this.clearStateProgram, other.clearStateProgram)) return false;
         if (!Objects.deepEquals(this.creator, other.creator)) return false;
+        if (!Objects.deepEquals(this.extraProgramPages, other.extraProgramPages)) return false;
         if (!Objects.deepEquals(this.globalState, other.globalState)) return false;
         if (!Objects.deepEquals(this.globalStateSchema, other.globalStateSchema)) return false;
         if (!Objects.deepEquals(this.localStateSchema, other.localStateSchema)) return false;
