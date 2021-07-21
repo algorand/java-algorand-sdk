@@ -98,6 +98,12 @@ public class TransactionApplication extends PathResponse {
     public byte[] clearStateProgram;
 
     /**
+     * (epp) specifies the additional app program len requested in pages.
+     */
+    @JsonProperty("extra-program-pages")
+    public Long extraProgramPages;
+
+    /**
      * (apfa) Lists the applications in addition to the application-id whose global
      * states may be accessed by this application's approval-program and
      * clear-state-program. The access is read-only.
@@ -156,6 +162,7 @@ public class TransactionApplication extends PathResponse {
         if (!Objects.deepEquals(this.applicationId, other.applicationId)) return false;
         if (!Objects.deepEquals(this.approvalProgram, other.approvalProgram)) return false;
         if (!Objects.deepEquals(this.clearStateProgram, other.clearStateProgram)) return false;
+        if (!Objects.deepEquals(this.extraProgramPages, other.extraProgramPages)) return false;
         if (!Objects.deepEquals(this.foreignApps, other.foreignApps)) return false;
         if (!Objects.deepEquals(this.foreignAssets, other.foreignAssets)) return false;
         if (!Objects.deepEquals(this.globalStateSchema, other.globalStateSchema)) return false;
