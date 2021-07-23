@@ -8,4 +8,4 @@ RUN mvn clean package -DskipTests
 FROM algorand-generator
 
 ENV NO_BUILD="true"
-COPY --from builder /repo /repo
+COPY --from=builder /repo /repo
