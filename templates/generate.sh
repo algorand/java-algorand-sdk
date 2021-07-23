@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-curl -o indexer.json https://raw.githubusercontent.com/algorand/indexer/master/api/indexer.oas2.json
+curl -o indexer.json https://raw.githubusercontent.com/bricerisingalgorand/indexer/brice/testGenerator/api/indexer.oas2.json
 curl -o algod.json https://raw.githubusercontent.com/algorand/go-algorand/rel/stable/daemon/algod/api/algod.oas2.json
 
 $GENERATOR \
