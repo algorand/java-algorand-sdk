@@ -67,7 +67,9 @@ if [[ ! -f "$ALGOD_SPEC" ]]; then
   my_exit 1
 fi
 
-mvn clean package -DskipTests
+if [[ -z "${NO_BUILD}" ]]; then
+  mvn clean package -DskipTests
+fi
 
 java -jar target/generator-*-jar-with-dependencies.jar \
        java \

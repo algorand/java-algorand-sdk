@@ -1,5 +1,11 @@
-FROM maven:3.8.1-openjdk-11
+FROM maven:3.8.1-openjdk-11 as builder
 
-COPY . /project
+COPY . /repo
+WORKDIR /repo
 
-ENTRYPOINT []
+RUN mvn clean package -DskipTests
+
+FROM algorand-generator
+
+ENV NO_BUILD="true"
+COPY --from builder /repo /repo
