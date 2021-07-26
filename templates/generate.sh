@@ -5,11 +5,6 @@ set -e
 rootdir=`dirname $0`
 pushd $rootdir/.. > /dev/null
 
-TEMP_DIR=$(mktemp -d /tmp/foo.XXXXXX)
-
-curl -o "${TEMP_DIR}"/indexer.json https://raw.githubusercontent.com/algorand/indexer/master/api/indexer.oas2.json
-curl -o "${TEMP_DIR}"/algod.json https://raw.githubusercontent.com/algorand/go-algorand/rel/stable/daemon/algod/api/algod.oas2.json
-
 $GENERATOR \
        java \
        -c  "src/main/java/com/algorand/algosdk/v2/client/common" \
@@ -21,7 +16,7 @@ $GENERATOR \
        -pp "com.algorand.algosdk.v2.client.algod" \
        -t  "X-Algo-API-Token" \
        -tr \
-       -s  "${TEMP_DIR}/algod.json"
+       -s  "$ALGOD_SPEC"
 
 # There is one enum only defined by indexer. Run this second to avoid
 # overwriting the second one.
@@ -35,4 +30,4 @@ $GENERATOR \
        -p  "src/main/java/com/algorand/algosdk/v2/client/indexer" \
        -pp "com.algorand.algosdk.v2.client.indexer" \
        -t  "X-Indexer-API-Token" \
-       -s  "${TEMP_DIR}/indexer.json"
+       -s  "$INDEXER_SPEC"
