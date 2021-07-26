@@ -7,7 +7,7 @@ pushd $rootdir/.. > /dev/null
 
 TEMP_DIR=$(mktemp -d /tmp/foo.XXXXXX)
 
-curl -o "${TEMP_DIR}"/indexer.json https://raw.githubusercontent.com/bricerisingalgorand/indexer/brice/testGenerator/api/indexer.oas2.json
+curl -o "${TEMP_DIR}"/indexer.json https://raw.githubusercontent.com/algorand/indexer/master/api/indexer.oas2.json
 curl -o "${TEMP_DIR}"/algod.json https://raw.githubusercontent.com/algorand/go-algorand/rel/stable/daemon/algod/api/algod.oas2.json
 
 $GENERATOR \
