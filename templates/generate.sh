@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+# Navigate back to the project directory
+rootdir=`dirname $0`
+pushd $rootdir/.. > /dev/null
+
 TEMP_DIR=$(mktemp -d /tmp/foo.XXXXXX)
 
 curl -o "${TEMP_DIR}"/indexer.json https://raw.githubusercontent.com/bricerisingalgorand/indexer/brice/testGenerator/api/indexer.oas2.json
