@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-curl -o indexer.json https://raw.githubusercontent.com/bricerisingalgorand/indexer/brice/testGenerator/api/indexer.oas2.json
-curl -o algod.json https://raw.githubusercontent.com/algorand/go-algorand/rel/stable/daemon/algod/api/algod.oas2.json
+TEMP_DIR=$(mktemp -d /tmp/foo.XXXXXX)
+
+curl -o "${TEMP_DIR}"/indexer.json https://raw.githubusercontent.com/bricerisingalgorand/indexer/brice/testGenerator/api/indexer.oas2.json
+curl -o "${TEMP_DIR}"/algod.json https://raw.githubusercontent.com/algorand/go-algorand/rel/stable/daemon/algod/api/algod.oas2.json
 
 $GENERATOR \
        java \
@@ -15,7 +17,7 @@ $GENERATOR \
        -pp "com.algorand.algosdk.v2.client.algod" \
        -t  "X-Algo-API-Token" \
        -tr \
-       -s  "algod.json"
+       -s  "${TEMP_DIR}/algod.json"
 
 # There is one enum only defined by indexer. Run this second to avoid
 # overwriting the second one.
@@ -29,4 +31,4 @@ $GENERATOR \
        -p  "src/main/java/com/algorand/algosdk/v2/client/indexer" \
        -pp "com.algorand.algosdk.v2.client.indexer" \
        -t  "X-Indexer-API-Token" \
-       -s  "indexer.json"
+       -s  "${TEMP_DIR}/indexer.json"
