@@ -326,4 +326,12 @@ public class TestAccount {
         }
         assertThat(verified).isTrue();
     }
+
+    @Test
+    void testToSeed() throws Exception {
+        final String FROM_SK = "actress tongue harbor tray suspect odor load topple vocal avoid ignore apple lunch unknown tissue museum once switch captain place lemon sail outdoor absent creek";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account account = new Account(seed);
+        assertThat(account.toSeed()).isEqualTo(seed);
+    }
 }
