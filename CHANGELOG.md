@@ -1,3 +1,8 @@
+# 1.8.0
+- Added toSeed() method in Account.java
+- Regenerate  HTTP Client (Asset b64 fields + App extra pages)
+- Set default header for base execute
+
 # 1.7.0
 - Implement dynamic opcode accounting, backward jumps, loops, callsub, retsub
 - Implement ability to pool fees
