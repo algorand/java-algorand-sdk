@@ -3,10 +3,10 @@
   <groupId>com.algorand</groupId>
   <artifactId>algosdk</artifactId>
   <versioning>
-    <release>1.7.0</release>
+    <release>1.8.0</release>
     <versions>
-      <version>1.7.0</version>
+      <version>1.8.0</version>
     </versions>
-    <lastUpdated>20210624192419</lastUpdated>
+    <lastUpdated>20210803153933</lastUpdated>
   </versioning>
 </metadata>
