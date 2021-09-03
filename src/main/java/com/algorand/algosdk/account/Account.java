@@ -307,10 +307,6 @@ public class Account {
      * @throws NoSuchAlgorithmException if could not sign tx
      */
     public SignedTransaction signMultisigTransaction(MultisigAddress from, Transaction tx) throws NoSuchAlgorithmException {
-        // check that from addr of tx matches multisig preimage
-        if (!tx.sender.toString().equals(from.toString())) {
-            throw new IllegalArgumentException("Transaction sender does not match multisig account");
-        }
         // check that account secret key is in multisig pk list
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myI = from.publicKeys.indexOf(myPK);
@@ -327,7 +323,13 @@ public class Account {
                 mSig.subsigs.add(new MultisigSubsig(from.publicKeys.get(i)));
             }
         }
-        return new SignedTransaction(tx, mSig, txSig.transactionID);
+        // generate signed transaction
+        SignedTransaction stx = new SignedTransaction(tx, mSig, txSig.transactionID);
+        // if the transaction sender address is not multi-sig address
+        // set the auth address as the multi-sig address
+        if (!tx.sender.toString().equals(from.toString()))
+            stx.authAddr = from.toAddress();
+        return stx;
     }
 
     /**
@@ -340,9 +342,8 @@ public class Account {
             throw new IllegalArgumentException("cannot merge a single transaction");
         }
         SignedTransaction merged = txs[0];
-        for (int i = 0; i < txs.length; i++) {
+        for (SignedTransaction tx : txs) {
             // check that multisig parameters match
-            SignedTransaction tx = txs[i];
             if (tx.mSig.version != merged.mSig.version ||
                     tx.mSig.threshold != merged.mSig.threshold) {
                 throw new IllegalArgumentException("transaction msig parameters do not match");

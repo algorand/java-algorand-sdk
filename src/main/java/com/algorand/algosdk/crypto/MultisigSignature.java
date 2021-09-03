@@ -128,10 +128,7 @@ public class MultisigSignature implements Serializable {
                 }
             }
         }
-        if (verifiedCount < this.threshold) {
-            return false;
-        }
-        return true;
+        return verifiedCount >= this.threshold;
     }
 
     @Override
