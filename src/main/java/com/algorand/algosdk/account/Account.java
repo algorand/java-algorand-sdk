@@ -348,6 +348,10 @@ public class Account {
                     tx.mSig.threshold != merged.mSig.threshold) {
                 throw new IllegalArgumentException("transaction msig parameters do not match");
             }
+            // check that authAddr match
+            if (!tx.authAddr.equals(merged.authAddr)) {
+                throw new IllegalArgumentException("transaction msig auth addr do not match");
+            }
             for (int j = 0; j < tx.mSig.subsigs.size(); j++) {
                 MultisigSubsig myMsig = merged.mSig.subsigs.get(j);
                 MultisigSubsig theirMsig = tx.mSig.subsigs.get(j);
