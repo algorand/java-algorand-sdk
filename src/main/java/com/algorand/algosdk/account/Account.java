@@ -523,6 +523,7 @@ public class Account {
      * @return SignedTransaction
      */
     public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
+        // TODO need to rewrite somewhat
         if (!lsig.verify(tx.sender)) {
             throw new IllegalArgumentException("verification failed");
         }

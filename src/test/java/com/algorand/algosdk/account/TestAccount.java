@@ -5,8 +5,11 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
+import com.google.common.primitives.Bytes;
 import org.junit.jupiter.api.Test;
 
+import javax.annotation.Signed;
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
@@ -138,9 +141,13 @@ public class TestAccount {
                 .genesisHash(new Digest())
                 .build();
 
+        // generate an account for address DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA
         byte[] seed = Mnemonic.toKey("auction inquiry lava second expand liberty glass involve ginger illness length room item discover ahead table doctor term tackle cement bonus profit right above catch");
         Account account = new Account(seed);
         SignedTransaction stx = account.signMultisigTransaction(addr, tx);
+        // if we are signing transaction from one of the multi-sig address, no auth address should be assigned
+        assertThat(stx.authAddr).isEqualTo(new Address());
+
         byte[] enc = Encoder.encodeToMsgPack(stx);
 
         // check the bytes convenience function is correct
@@ -149,6 +156,60 @@ public class TestAccount {
         // check main signature is correct
         byte[] golden = Encoder.decodeFromBase64("gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAdvZ3y9GsInBPutdwKc7Jy+an13CcjSV1lcvRAYQKYOxXwfgT5B/mK14R57ueYJTYyoDO8zBY6kQmBalWkm95AIGicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaN0eG6Jo2FtdM0TiKNmZWXOAANPqKJmds4ADtbco2dlbq10ZXN0bmV0LXYzMS4womx2zgAO2sSkbm90ZcQItFF5Ofz60nGjcmN2xCAbfsCwS+pht5aQl+bL9AfhCKcFNR0LyYq+sSIJqKuBeKNzbmTEII2StImQAXOgTfpDWaNmamr86ixCoF3Zwfc+66VHgDfppHR5cGWjcGF5");
         assertThat(enc).isEqualTo(golden);
+
+        // if there is only 1 party signed in multi-sig, verification should be false (less than threshold number)
+        assertThat(stx.mSig.verify(tx.bytesToSign())).isFalse();
+
+        // decode and verify
+        SignedTransaction stxFromBytes = Encoder.decodeFromMsgPack(golden, SignedTransaction.class);
+        assertThat(stxFromBytes.authAddr).isEqualTo(new Address());
+        assertThat(stxFromBytes.tx).isEqualTo(tx);
+        assertThat(stxFromBytes.mSig.verify(tx.bytesToSign())).isFalse();
+    }
+
+    @Test
+    public void testSignMultisigTransactionWithAuthAddr() throws Exception {
+        MultisigAddress ma = makeTestMsigAddr();
+
+        // build unsigned transaction
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU")
+                .flatFee(217000)
+                .firstValid(972508)
+                .lastValid(973508)
+                .noteB64("tFF5Ofz60nE=")
+                .amount(5000)
+                .receiver("DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA")
+                .genesisID("testnet-v31.0")
+                .genesisHash(new Digest())
+                .build();
+
+        // generate an account for address DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA
+        byte[] seed = Mnemonic.toKey("auction inquiry lava second expand liberty glass involve ginger illness length room item discover ahead table doctor term tackle cement bonus profit right above catch");
+        Account signerAccount = new Account(seed);
+        SignedTransaction stx = signerAccount.signMultisigTransaction(ma, tx);
+
+        // send from 47YP... to DN7M..., rekeyed to DN7M's multi-sig address
+        // auth addr should be DN7M's multi-sig address
+        assertThat(stx.authAddr).isEqualTo(ma.toAddress());
+
+        byte[] enc = Encoder.encodeToMsgPack(stx);
+
+        // check the bytes convenience function is correct
+        assertThat(signerAccount.signMultisigTransactionBytes(ma, tx)).isEqualTo(enc);
+
+        // check main signature is correct
+        byte[] golden = Encoder.decodeFromBase64("g6Rtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAPtPyJUVhOEpyylkr18r6Bw4Bsc48LtiMcICnneKI96Kjye6IAAtsLGoHylMiywx4gs1CyXZqcu0/fIpHR6+3AIGicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaRzZ25yxCCNkrSJkAFzoE36Q1mjZmpq/OosQqBd2cH3PuulR4A36aN0eG6Jo2FtdM0TiKNmZWXOAANPqKJmds4ADtbco2dlbq10ZXN0bmV0LXYzMS4womx2zgAO2sSkbm90ZcQItFF5Ofz60nGjcmN2xCAbfsCwS+pht5aQl+bL9AfhCKcFNR0LyYq+sSIJqKuBeKNzbmTEIOfw+E0GgR358xyNh4sRVfRnHVGhhcIAkIZn9ElYcGihpHR5cGWjcGF5");
+        assertThat(enc).isEqualTo(golden);
+
+        // since there is only 1 party signed in multi-sig, verification should be false (less than threshold number)
+        assertThat(stx.mSig.verify(tx.bytesToSign())).isFalse();
+
+        // decode and verify
+        SignedTransaction stxFromBytes = Encoder.decodeFromMsgPack(golden, SignedTransaction.class);
+        assertThat(stxFromBytes.authAddr).isEqualTo(ma.toAddress());
+        assertThat(stxFromBytes.tx).isEqualTo(tx);
+        assertThat(stxFromBytes.mSig.verify(tx.bytesToSign())).isFalse();
     }
 
     @Test
@@ -161,6 +222,42 @@ public class TestAccount {
         byte[] appended = account.appendMultisigTransactionBytes(addr, firstTxBytes);
         byte[] expected = Encoder.decodeFromBase64("gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAdvZ3y9GsInBPutdwKc7Jy+an13CcjSV1lcvRAYQKYOxXwfgT5B/mK14R57ueYJTYyoDO8zBY6kQmBalWkm95AIKicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxoXPEQE4cdVDpoVoVVokXRGz6O9G3Ojljd+kd6d2AahXLPGDPtT/QA9DI1rB4w8cEDTy7gd5Padkn5EZC2pjzGh0McAeBonBrxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaN0aHICoXYBo3R4bomjYW10zROIo2ZlZc4AA0+oomZ2zgAO1tyjZ2VurXRlc3RuZXQtdjMxLjCibHbOAA7axKRub3RlxAi0UXk5/PrScaNyY3bEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4o3NuZMQgjZK0iZABc6BN+kNZo2ZqavzqLEKgXdnB9z7rpUeAN+mkdHlwZaNwYXk=");
         assertThat(appended).isEqualTo(expected);
+
+        // decode and verify
+        SignedTransaction stxFromBytes = Encoder.decodeFromMsgPack(expected, SignedTransaction.class);
+        assertThat(stxFromBytes.authAddr).isEqualTo(new Address());
+        // now it has 2 party signed, reach threshold and should be verified as true
+        byte[] bytesToSign = stxFromBytes.tx.bytesToSign();
+        boolean verified = stxFromBytes.mSig.verify(bytesToSign);
+        assertThat(verified).isTrue();
+        // change fee component in bytes, signature verification cannot match
+        int feeIndex = Bytes.indexOf(bytesToSign, ("fee").getBytes(StandardCharsets.UTF_8));
+        bytesToSign[feeIndex + 4] = 1;
+        assertThat(stxFromBytes.mSig.verify(bytesToSign)).isFalse();
+    }
+
+    @Test
+    public void testAppendMultisigTransactionWithAuthAddr() throws Exception {
+        MultisigAddress addr = makeTestMsigAddr();
+        byte[] firstTxBytes = Encoder.decodeFromBase64("g6Rtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAPtPyJUVhOEpyylkr18r6Bw4Bsc48LtiMcICnneKI96Kjye6IAAtsLGoHylMiywx4gs1CyXZqcu0/fIpHR6+3AIGicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaRzZ25yxCCNkrSJkAFzoE36Q1mjZmpq/OosQqBd2cH3PuulR4A36aN0eG6Jo2FtdM0TiKNmZWXOAANPqKJmds4ADtbco2dlbq10ZXN0bmV0LXYzMS4womx2zgAO2sSkbm90ZcQItFF5Ofz60nGjcmN2xCAbfsCwS+pht5aQl+bL9AfhCKcFNR0LyYq+sSIJqKuBeKNzbmTEIOfw+E0GgR358xyNh4sRVfRnHVGhhcIAkIZn9ElYcGihpHR5cGWjcGF5");
+
+        byte[] seed = Mnemonic.toKey("since during average anxiety protect cherry club long lawsuit loan expand embark forum theory winter park twenty ball kangaroo cram burst board host ability left");
+        Account account = new Account(seed);
+        byte[] appended = account.appendMultisigTransactionBytes(addr, firstTxBytes);
+        byte[] expected = Encoder.decodeFromBase64("g6Rtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAPtPyJUVhOEpyylkr18r6Bw4Bsc48LtiMcICnneKI96Kjye6IAAtsLGoHylMiywx4gs1CyXZqcu0/fIpHR6+3AIKicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxoXPEQJyHbmtNvoe6ok5Ac3OH4umOWy5dJJM8WXIx4C8jBGqhDRZ+hDIWFA6ybwRbup85VBxGWMzEflEuDe6T9uxm+g+BonBrxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaN0aHICoXYBpHNnbnLEII2StImQAXOgTfpDWaNmamr86ixCoF3Zwfc+66VHgDfpo3R4bomjYW10zROIo2ZlZc4AA0+oomZ2zgAO1tyjZ2VurXRlc3RuZXQtdjMxLjCibHbOAA7axKRub3RlxAi0UXk5/PrScaNyY3bEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4o3NuZMQg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGkdHlwZaNwYXk=");
+        assertThat(appended).isEqualTo(expected);
+
+        // decode and verify
+        SignedTransaction stxFromBytes = Encoder.decodeFromMsgPack(expected, SignedTransaction.class);
+        assertThat(stxFromBytes.authAddr).isEqualTo(addr.toAddress());
+        // now it has 2 party signed, reach threshold and should be verified as true
+        byte[] bytesToSign = stxFromBytes.tx.bytesToSign();
+        boolean verified = stxFromBytes.mSig.verify(bytesToSign);
+        assertThat(verified).isTrue();
+        // change fee component in bytes, signature verification cannot match
+        int feeIndex = Bytes.indexOf(bytesToSign, ("fee").getBytes(StandardCharsets.UTF_8));
+        bytesToSign[feeIndex + 4] = 1;
+        assertThat(stxFromBytes.mSig.verify(bytesToSign)).isFalse();
     }
 
     @Test
@@ -200,6 +297,23 @@ public class TestAccount {
         byte[] b = Account.mergeMultisigTransactionBytes(secondAndThird, firstAndThird);
         assertThat(a).isEqualTo(b);
         assertThat(a).isEqualTo(expected);
+
+        SignedTransaction stx = Encoder.decodeFromMsgPack(a, SignedTransaction.class);
+        assertThat(stx.authAddr).isEqualTo(new Address());
+    }
+
+    @Test
+    public void testMergeMultisigTransactionWithAuthAddr() throws Exception {
+        byte[] firstAndThird = Encoder.decodeFromBase64("g6Rtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAPtPyJUVhOEpyylkr18r6Bw4Bsc48LtiMcICnneKI96Kjye6IAAtsLGoHylMiywx4gs1CyXZqcu0/fIpHR6+3AIGicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgqJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGhc8RAtg9YnPSv4sLt8brF1oZxGCK69m+8hHKEuM5a2LEsuj/wBSBE8oL/N4L8tPLZUxjS7FqeXQAoeUFpz8Z/c5mgBKN0aHICoXYBpHNnbnLEII2StImQAXOgTfpDWaNmamr86ixCoF3Zwfc+66VHgDfpo3R4bomjYW10zROIo2ZlZc4AA0+oomZ2zgAO1tyjZ2VurXRlc3RuZXQtdjMxLjCibHbOAA7axKRub3RlxAi0UXk5/PrScaNyY3bEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4o3NuZMQg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGkdHlwZaNwYXk=");
+        byte[] secondAndThird = Encoder.decodeFromBase64("g6Rtc2lng6ZzdWJzaWeTgaJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXiConBrxCAJYzIJU3OJ8HVnEXc5kcfQPhtzyMT1K/av8BqiXPnCcaFzxECch25rTb6HuqJOQHNzh+LpjlsuXSSTPFlyMeAvIwRqoQ0WfoQyFhQOsm8EW7qfOVQcRljMxH5RLg3uk/bsZvoPgqJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGhc8RAtg9YnPSv4sLt8brF1oZxGCK69m+8hHKEuM5a2LEsuj/wBSBE8oL/N4L8tPLZUxjS7FqeXQAoeUFpz8Z/c5mgBKN0aHICoXYBpHNnbnLEII2StImQAXOgTfpDWaNmamr86ixCoF3Zwfc+66VHgDfpo3R4bomjYW10zROIo2ZlZc4AA0+oomZ2zgAO1tyjZ2VurXRlc3RuZXQtdjMxLjCibHbOAA7axKRub3RlxAi0UXk5/PrScaNyY3bEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4o3NuZMQg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGkdHlwZaNwYXk=");
+        byte[] expected = Encoder.decodeFromBase64("g6Rtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAPtPyJUVhOEpyylkr18r6Bw4Bsc48LtiMcICnneKI96Kjye6IAAtsLGoHylMiywx4gs1CyXZqcu0/fIpHR6+3AIKicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxoXPEQJyHbmtNvoe6ok5Ac3OH4umOWy5dJJM8WXIx4C8jBGqhDRZ+hDIWFA6ybwRbup85VBxGWMzEflEuDe6T9uxm+g+ConBrxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaFzxEC2D1ic9K/iwu3xusXWhnEYIrr2b7yEcoS4zlrYsSy6P/AFIETygv83gvy08tlTGNLsWp5dACh5QWnPxn9zmaAEo3RocgKhdgGkc2ducsQgjZK0iZABc6BN+kNZo2ZqavzqLEKgXdnB9z7rpUeAN+mjdHhuiaNhbXTNE4ijZmVlzgADT6iiZnbOAA7W3KNnZW6tdGVzdG5ldC12MzEuMKJsds4ADtrEpG5vdGXECLRReTn8+tJxo3JjdsQgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXijc25kxCDn8PhNBoEd+fMcjYeLEVX0Zx1RoYXCAJCGZ/RJWHBooaR0eXBlo3BheQ==");
+        byte[] a = Account.mergeMultisigTransactionBytes(firstAndThird, secondAndThird);
+        byte[] b = Account.mergeMultisigTransactionBytes(secondAndThird, firstAndThird);
+        assertThat(a).isEqualTo(b);
+        assertThat(a).isEqualTo(expected);
+
+        SignedTransaction stx = Encoder.decodeFromMsgPack(a, SignedTransaction.class);
+        assertThat(stx.authAddr).isEqualTo(makeTestMsigAddr().toAddress());
     }
 
     @Test
