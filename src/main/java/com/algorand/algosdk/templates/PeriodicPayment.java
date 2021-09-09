@@ -22,6 +22,7 @@ import java.util.List;
 
 import static com.algorand.algosdk.templates.ContractTemplate.readAndVerifyContract;
 
+@Deprecated
 public class PeriodicPayment {
     private static String referenceProgram = "ASAHAQoLAAwNDiYCAQYg/ryguxRKWk6ntDikaBrIDmyhBby2B/xWUyXJVpX2ohMxECISMQEjDhAxAiQYJRIQMQQhBDECCBIQMQYoEhAxCTIDEjEHKRIQMQghBRIQMQkpEjEHMgMSEDECIQYNEDEIJRIQERA=";
 

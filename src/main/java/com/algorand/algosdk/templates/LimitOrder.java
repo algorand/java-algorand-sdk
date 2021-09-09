@@ -21,6 +21,7 @@ import java.util.Objects;
 import static com.algorand.algosdk.account.Account.setFeeByFeePerByte;
 import static com.algorand.algosdk.templates.ContractTemplate.*;
 
+@Deprecated
 public class LimitOrder {
     protected static String referenceProgram = "ASAKAAEFAgYEBwgJCiYBIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITMRYiEjEQIxIQMQEkDhAyBCMSQABVMgQlEjEIIQQNEDEJMgMSEDMBECEFEhAzAREhBhIQMwEUKBIQMwETMgMSEDMBEiEHHTUCNQExCCEIHTUENQM0ATQDDUAAJDQBNAMSNAI0BA8QQAAWADEJKBIxAiEJDRAxBzIDEhAxCCISEBA=";
 
