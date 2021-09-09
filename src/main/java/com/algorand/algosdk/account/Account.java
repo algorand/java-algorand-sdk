@@ -73,6 +73,16 @@ public class Account {
         this.address = new Address(Arrays.copyOf(raw, raw.length));
     }
 
+    // Derive an Account object from only keypair: {privateKey, publicKey}
+    public Account(KeyPair pkPair) {
+        if (!pkPair.getPrivate().getAlgorithm().equals(KEY_ALGO)) {
+            throw new IllegalArgumentException("Keypair algorithm do not match with expected " + KEY_ALGO);
+        }
+        this.privateKeyPair = pkPair;
+        byte[] raw = this.getClearTextPublicKey();
+        this.address = new Address(Arrays.copyOf(raw, raw.length));
+    }
+
     /**
      * Convenience method for getting the underlying public key for raw operations.
      * @return the public key as length 32 byte array.
