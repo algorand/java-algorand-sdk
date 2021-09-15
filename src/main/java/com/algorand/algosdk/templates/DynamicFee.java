@@ -25,6 +25,7 @@ import java.util.Objects;
 
 import static com.algorand.algosdk.templates.ContractTemplate.readAndVerifyContract;
 
+@Deprecated
 public class DynamicFee {
     protected static String referenceProgram = "ASAFAgEFBgcmAyD+vKC7FEpaTqe0OKRoGsgObKEFvLYH/FZTJclWlfaiEyDmmpYeby1feshmB5JlUr6YI17TM2PKiJGLuck4qRW2+QEGMgQiEjMAECMSEDMABzEAEhAzAAgxARIQMRYjEhAxECMSEDEHKBIQMQkpEhAxCCQSEDECJRIQMQQhBBIQMQYqEhA=";
 
