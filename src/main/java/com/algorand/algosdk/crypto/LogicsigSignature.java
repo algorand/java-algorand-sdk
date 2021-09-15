@@ -41,10 +41,10 @@ public class LogicsigSignature {
 
     @JsonCreator
     public LogicsigSignature(
-            @JsonProperty("l") byte[] logic,
-            @JsonProperty("arg") List<byte[]> args,
-            @JsonProperty("sig") byte[] sig,
-            @JsonProperty("msig") MultisigSignature msig
+        @JsonProperty("l") byte[] logic,
+        @JsonProperty("arg") List<byte[]> args,
+        @JsonProperty("sig") byte[] sig,
+        @JsonProperty("msig") MultisigSignature msig
     ) {
         this.logic = Objects.requireNonNull(logic, "program must not be null");
         this.args = args;
@@ -63,7 +63,6 @@ public class LogicsigSignature {
 
     /**
      * Unsigned logicsig object.
-     *
      * @param logicsig
      */
     public LogicsigSignature(byte[] logicsig) {
@@ -72,7 +71,6 @@ public class LogicsigSignature {
 
     /**
      * Unsigned logicsig object, and its arguments.
-     *
      * @param logicsig
      * @param args
      */
@@ -90,7 +88,8 @@ public class LogicsigSignature {
 
     /**
      * Calculate escrow address from logic sig program
-     *
+     * NOTE: THIS RETURNS AN ESCROW ACCOUNT OF A LOGIC-SIG (FROM LOGIC ITSELF),
+     *       IT WILL NOT RETURN THE DELEGATED ADDRESS OF THE LOGIC-SIG.
      * @return Address
      * @throws NoSuchAlgorithmException
      */
@@ -101,7 +100,6 @@ public class LogicsigSignature {
 
     /**
      * Return prefixed program as byte array that is ready to sign
-     *
      * @return byte[]
      */
     public byte[] bytesToSign() {
@@ -113,7 +111,6 @@ public class LogicsigSignature {
 
     /**
      * Perform signature verification against the sender address
-     *
      * @param address Address to verify
      * @return boolean
      */

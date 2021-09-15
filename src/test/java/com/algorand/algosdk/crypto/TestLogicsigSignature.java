@@ -169,4 +169,43 @@ public class TestLogicsigSignature {
         assertThat(verified).isTrue();
         TestUtil.serializeDeserializeCheck(lsig2);
     }
+
+    @Test
+    public void testLogicSigAddress() throws Exception {
+        byte[] program = {
+            0x01, 0x20, 0x01, 0x01, 0x22
+        };
+        Address expectedAddress = new Address("6Z3C3LDVWGMX23BMSYMANACQOSINPFIRF77H7N3AWJZYV6OH6GWTJKVMXY");
+
+        // Escrow Logic-sig address compare
+        LogicsigSignature lsig0 = new LogicsigSignature(program);
+        assertThat(lsig0.toAddress()).isEqualTo(expectedAddress);
+
+        Address one = new Address("DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA");
+        Address two = new Address("BFRTECKTOOE7A5LHCF3TTEOH2A7BW46IYT2SX5VP6ANKEXHZYJY77SJTVM");
+        Address three = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+        MultisigAddress ma = new MultisigAddress(
+                1, 2, Arrays.asList(
+                new Ed25519PublicKey(one.getBytes()),
+                new Ed25519PublicKey(two.getBytes()),
+                new Ed25519PublicKey(three.getBytes())
+        )
+        );
+
+        String mn1 = "auction inquiry lava second expand liberty glass involve ginger illness length room item discover ahead table doctor term tackle cement bonus profit right above catch";
+        String mn2 = "since during average anxiety protect cherry club long lawsuit loan expand embark forum theory winter park twenty ball kangaroo cram burst board host ability left";
+        Account acc1 = new Account(mn1);
+        Account acc2 = new Account(mn2);
+
+        // single signed Logic-sig address compare
+        LogicsigSignature lsig1 = new LogicsigSignature(program);
+        acc1.signLogicsig(lsig1);
+        assertThat(lsig1.toAddress()).isEqualTo(expectedAddress);
+
+        // multi-signed Logic-sig address compare
+        LogicsigSignature lsig2 = new LogicsigSignature(program);
+        acc1.signLogicsig(lsig2, ma);
+        acc2.appendToLogicsig(lsig2);
+        assertThat(lsig2.toAddress()).isEqualTo(expectedAddress);
+    }
 }

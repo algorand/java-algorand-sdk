@@ -1,19 +1,28 @@
 package com.algorand.algosdk.account;
 
 import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Encoder;
 import com.google.common.primitives.Bytes;
+import io.cucumber.java.bs.A;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.bouncycastle.math.ec.rfc8032.Ed25519;
+import org.bouncycastle.util.test.FixedSecureRandom;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Signed;
+import javax.crypto.spec.SecretKeySpec;
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.EncodedKeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -96,13 +105,36 @@ public class TestAccount {
     }
 
     @Test
-    public void testKeygen() throws Exception {
+    public void testGenerateAccount() throws Exception {
         for (int i = 0; i < 100; i++) {
             Account account = new Account();
             assertThat(account.getClearTextPublicKey()).isNotEmpty();
             assertThat(account.getAddress()).isNotNull();
             assertThat(account.getClearTextPublicKey()).isEqualTo(account.getAddress().getBytes());
+
+            byte[] testSignMessage = ("some test message").getBytes(StandardCharsets.UTF_8);
+            Signature sig = account.signBytes(testSignMessage);
+            assertThat(account.getAddress().verifyBytes(testSignMessage, sig)).isTrue();
+
+            Account anotherAccount = new Account();
+            assertThat(account.equals(anotherAccount)).isFalse();
         }
+    }
+
+    @Test
+    public void testAccountFromPrivateKey() throws Exception {
+        final String FROM_SK = "olympic cricket tower model share zone grid twist sponsor avoid eight apology patient party success claim famous rapid donor pledge bomb mystery security ability often";
+        byte[] seed = Mnemonic.toKey(FROM_SK);
+        Account exampleAccount = new Account(seed);
+        KeyPairGenerator gen = KeyPairGenerator.getInstance("Ed25519");
+        gen.initialize(256, new FixedSecureRandom(seed));
+        KeyPair kp = gen.generateKeyPair();
+
+        Account ac0 = new Account(kp);
+        assertThat(exampleAccount).isEqualTo(ac0);
+
+        Account ac1 = new Account(kp.getPrivate());
+        assertThat(exampleAccount).isEqualTo(ac1);
     }
 
     @Test

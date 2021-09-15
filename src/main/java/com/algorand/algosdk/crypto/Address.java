@@ -184,11 +184,7 @@ public class Address implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Address && Arrays.equals(this.bytes, ((Address)obj).bytes)) {
-            return true;
-        } else {
-            return false;
-        }
+        return obj instanceof Address && Arrays.equals(this.bytes, ((Address) obj).bytes);
     }
     
     // Compare to an address, with default address considered as empty string

@@ -31,6 +31,8 @@ public class Account {
     private static final String SIGN_ALGO = "EdDSA";
     private static final int PK_SIZE = 32;
     private static final int PK_X509_PREFIX_LENGTH = 12; // Ed25519 specific
+    private static final int SK_PKCS_PREFIX_LENGTH = 16; // Ed25519 specific
+    private static final int SK_SEPARATOR_LENGTH = 3; // separator is 0x81 0x21 0x00
     private static final int SK_SIZE = 32;
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
@@ -75,10 +77,30 @@ public class Account {
 
     // Derive an Account object from only keypair: {privateKey, publicKey}
     public Account(KeyPair pkPair) {
+        CryptoProvider.setupIfNeeded();
         if (!pkPair.getPrivate().getAlgorithm().equals(KEY_ALGO)) {
             throw new IllegalArgumentException("Keypair algorithm do not match with expected " + KEY_ALGO);
         }
         this.privateKeyPair = pkPair;
+        byte[] raw = this.getClearTextPublicKey();
+        this.address = new Address(Arrays.copyOf(raw, raw.length));
+    }
+
+    public Account(PrivateKey pk) throws NoSuchAlgorithmException {
+        CryptoProvider.setupIfNeeded();
+        if (!pk.getAlgorithm().equals(KEY_ALGO))
+            throw new IllegalArgumentException("Account cannot be generated from a non-Ed25519 key");
+
+        if (pk.getEncoded().length != SK_PKCS_PREFIX_LENGTH + SK_SIZE + SK_SEPARATOR_LENGTH + PK_SIZE)
+            throw new RuntimeException("Private Key cannot generate clear private key bytes");
+
+        byte[] clearPrivateKey = new byte[SK_SIZE];
+        System.arraycopy(pk.getEncoded(), SK_PKCS_PREFIX_LENGTH, clearPrivateKey, 0, SK_SIZE);
+
+        KeyPairGenerator gen = KeyPairGenerator.getInstance(KEY_ALGO);
+        gen.initialize(SK_SIZE_BITS, new FixedSecureRandom(clearPrivateKey));
+        this.privateKeyPair = gen.generateKeyPair();
+        // now, convert public key to an address
         byte[] raw = this.getClearTextPublicKey();
         this.address = new Address(Arrays.copyOf(raw, raw.length));
     }
@@ -265,7 +287,7 @@ public class Account {
             // SignTransaction does the signing, but also sets authAddr which is not desired here. 
             long length = Encoder.encodeToMsgPack(
                     new SignedTransaction(
-                            tx, 
+                            tx,
                             new Account().rawSignBytes(
                                     Arrays.copyOf(tx.bytesToSign(), tx.bytesToSign().length)),
                             tx.txID())).length;
@@ -585,8 +607,25 @@ public class Account {
         return Mnemonic.toKey(mnemonic);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Account))
+            return false;
+        Account oAccount = (Account) obj;
+        boolean addressMatch = Arrays.equals(this.address.getBytes(), oAccount.address.getBytes());
+        boolean privateKeyMatch = Arrays.equals(
+                this.privateKeyPair.getPrivate().getEncoded(),
+                oAccount.privateKeyPair.getPrivate().getEncoded()
+        );
+        boolean publicKeyMatch = Arrays.equals(
+                this.privateKeyPair.getPublic().getEncoded(),
+                oAccount.privateKeyPair.getPublic().getEncoded()
+        );
+        return addressMatch && privateKeyMatch && publicKeyMatch;
+    }
+
     // Return a pre-set seed in response to nextBytes or generateSeed
-    private static class FixedSecureRandom extends SecureRandom {
+    public static class FixedSecureRandom extends SecureRandom {
         private final byte[] fixedValue;
         private int index = 0;
 
