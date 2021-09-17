@@ -44,10 +44,6 @@ public class Signature implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Signature && Arrays.equals(this.bytes, ((Signature)obj).bytes)) {
-            return true;
-        } else {
-            return false;
-        }
+        return obj instanceof Signature && Arrays.equals(this.bytes, ((Signature) obj).bytes);
     }
 }
