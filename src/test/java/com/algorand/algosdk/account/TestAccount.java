@@ -5,24 +5,15 @@ import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Encoder;
 import com.google.common.primitives.Bytes;
-import io.cucumber.java.bs.A;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.test.FixedSecureRandom;
 import org.junit.jupiter.api.Test;
 
-import javax.annotation.Signed;
-import javax.crypto.spec.SecretKeySpec;
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
 import java.security.*;
-import java.security.spec.EncodedKeySpec;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -355,7 +346,7 @@ public class TestAccount {
         Account account = new Account();
         Signature signature = account.signBytes(b);
         assertThat(account.getAddress().verifyBytes(b, signature)).isTrue();
-        int firstByte = (int) b[0];
+        int firstByte = b[0];
         firstByte = (firstByte+1) % 256;
         b[0] = (byte) firstByte;
         assertThat(account.getAddress().verifyBytes(b, signature)).isFalse();
@@ -367,7 +358,7 @@ public class TestAccount {
         Signature signature = new Signature(Encoder.decodeFromBase64("COEBmoD+ysVECoyVOAsvMAjFxvKeQVkYld+RSHMnEiHsypqrfj2EdYqhrm4t7dK3ZOeSQh3aXiZK/zqQDTPBBw=="));
         Address address = new Address("DPLD3RTSWC5STVBPZL5DIIVE2OC4BSAWTOYBLFN2X6EFLT2ZNF4SMX64UA");
         assertThat(address.verifyBytes(message, signature)).isTrue();
-        int firstByte = (int) message[0];
+        int firstByte = message[0];
         firstByte = (firstByte+1) % 256;
         message[0] = (byte) firstByte;
         assertThat(address.verifyBytes(message, signature)).isFalse();
@@ -429,7 +420,7 @@ public class TestAccount {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
         };
 
-        ArrayList<byte[]> args = new ArrayList<byte[]>();
+        ArrayList<byte[]> args = new ArrayList<>();
         byte[] arg1 = {49, 50, 51};
         byte[] arg2 = {52, 53, 54};
         args.add(arg1);
@@ -461,7 +452,7 @@ public class TestAccount {
 
         PublicKey pk = acc.getAddress().toVerifyKey();
 
-        boolean verified = false;
+        boolean verified;
         try {
             java.security.Signature sig = java.security.Signature.getInstance("EdDSA");
             sig.initVerify(pk);
