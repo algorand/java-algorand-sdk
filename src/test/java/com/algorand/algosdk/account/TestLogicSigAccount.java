@@ -115,7 +115,7 @@ public class TestLogicSigAccount {
     }
 
     @Test
-    public void testLogicSigAccountFromLogicSig() throws IOException {
+    public void testLogicSigAccountFromLogicSig() throws IOException, NoSuchAlgorithmException {
         // escrow logic-sig account
         LogicsigSignature lsigNoKey = new LogicsigSignature(program, args);
         Assertions.assertThrows(IllegalArgumentException.class, () -> new LogicSigAccount(lsigNoKey, singleDelegateAccount.getEd25519PublicKey()));

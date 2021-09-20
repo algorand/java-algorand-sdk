@@ -60,13 +60,6 @@ public class TestLogicsigSignature {
         outBytes = Encoder.encodeToMsgPack(lsig);
         lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
         assertThat(lsig).isEqualTo(lsig1);
-
-        // check modified program fails on verification
-        program[3] = 2;
-        lsig = new LogicsigSignature(program);
-        verified = lsig.verify(sender);
-        assertThat(verified).isFalse();
-        TestUtil.serializeDeserializeCheck(lsig);
     }
 
     @Test

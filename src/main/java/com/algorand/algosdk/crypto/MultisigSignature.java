@@ -131,6 +131,14 @@ public class MultisigSignature implements Serializable {
         return verifiedCount >= this.threshold;
     }
 
+    public MultisigAddress convertToMultisigAddress() {
+        List<Ed25519PublicKey> pubK = new ArrayList<>();
+        for (MultisigSubsig sig : this.subsigs) {
+            pubK.add(sig.key);
+        }
+        return new MultisigAddress(this.version, this.threshold, pubK);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof MultisigSignature) {

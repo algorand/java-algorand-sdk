@@ -1,6 +1,8 @@
 package com.algorand.algosdk.account;
 
 import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -56,7 +58,8 @@ public class LogicSigAccount {
 
     // The parameter signerPK must appear if LogicSig is delegated and the delegating account is backed by
     // a single private key (i.e., the delegating account is not a multi-sig account).
-    public LogicSigAccount(LogicsigSignature lsig, Ed25519PublicKey signerPk) throws IllegalArgumentException {
+    public LogicSigAccount(LogicsigSignature lsig, Ed25519PublicKey signerPk)
+            throws IllegalArgumentException, NoSuchAlgorithmException {
         boolean hasSig = lsig.sig != null;
         boolean hasMsig = lsig.msig != null;
         if (hasSig && hasMsig)
@@ -99,5 +102,10 @@ public class LogicSigAccount {
             return ma.toAddress();
         }
         return this.lsig.toAddress();
+    }
+
+    public SignedTransaction signLogicSigAccountTransaction(Transaction tx)
+            throws NoSuchAlgorithmException, IOException {
+        return Account.signLogicTransactionWithAddress(this.lsig, this.getAddress(), tx);
     }
 }

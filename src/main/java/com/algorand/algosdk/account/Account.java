@@ -14,6 +14,7 @@ import org.bouncycastle.asn1.ASN1Encodable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 
+import javax.annotation.Signed;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -359,7 +360,7 @@ public class Account {
         SignedTransaction stx = new SignedTransaction(tx, mSig, txSig.transactionID);
         // if the transaction sender address is not multi-sig address
         // set the auth address as the multi-sig address
-        if (!tx.sender.toString().equals(from.toString()))
+        if (!tx.sender.equals(from.toAddress()))
             stx.authAddr = from.toAddress();
         return stx;
     }
@@ -380,6 +381,9 @@ public class Account {
                     tx.mSig.threshold != merged.mSig.threshold) {
                 throw new IllegalArgumentException("transaction msig parameters do not match");
             }
+            // check multi-sig address match
+            if (!tx.mSig.convertToMultisigAddress().equals(merged.mSig.convertToMultisigAddress()))
+                throw new IllegalArgumentException("transaction msig addresses do not match");
             // check that authAddr match
             if (!tx.authAddr.equals(merged.authAddr)) {
                 throw new IllegalArgumentException("transaction msig auth addr do not match");
@@ -551,6 +555,21 @@ public class Account {
 
     }
 
+    public static SignedTransaction signLogicTransactionWithAddress(LogicsigSignature lsig, Address lsigAddr, Transaction tx)
+            throws NoSuchAlgorithmException, IOException {
+        if (!lsig.verify(lsigAddr))
+            throw new IllegalArgumentException("verification failed on logic sig");
+
+        try {
+            SignedTransaction stx = new SignedTransaction(tx, lsig, tx.txID());
+            if (!stx.tx.sender.equals(lsigAddr))
+                stx.authAddr = lsigAddr;
+            return stx;
+        } catch (Exception ex) {
+            throw new IOException("could not encode transactions", ex);
+        }
+    }
+
     /**
      * Creates SignedTransaction from LogicsigSignature and Transaction.
      * LogicsigSignature must be valid and verifiable against transaction sender field.
@@ -558,17 +577,19 @@ public class Account {
      * @param tx Transaction
      * @return SignedTransaction
      */
-    public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
-        // TODO need to rewrite somewhat
-        if (!lsig.verify(tx.sender)) {
-            throw new IllegalArgumentException("verification failed");
+    public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx)
+            throws IllegalArgumentException, IOException, NoSuchAlgorithmException {
+        boolean hasSig = lsig.sig != null;
+        boolean hasMsig = lsig.msig != null;
+        Address lsigAddr;
+        if (hasSig) {
+            lsigAddr = tx.sender;
+        } else if (hasMsig) {
+             lsigAddr = lsig.msig.convertToMultisigAddress().toAddress();
+        } else {
+            lsigAddr = lsig.toAddress();
         }
-
-        try {
-            return new SignedTransaction(tx, lsig, tx.txID());
-        } catch (Exception ex) {
-            throw new IOException("could not encode transactions", ex);
-        }
+        return Account.signLogicTransactionWithAddress(lsig, lsigAddr, tx);
     }
 
     /**

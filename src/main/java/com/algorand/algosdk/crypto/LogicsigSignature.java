@@ -111,10 +111,11 @@ public class LogicsigSignature {
 
     /**
      * Perform signature verification against the sender address
-     * @param address Address to verify
+     * @param singleSigner only used in the case of a delegated LogicSig whose delegating account
+     *                     is backed by a single private key
      * @return boolean
      */
-    public boolean verify(Address address) {
+    public boolean verify(Address singleSigner) throws NoSuchAlgorithmException {
         if (this.logic == null) {
             return false;
         }
@@ -129,17 +130,9 @@ public class LogicsigSignature {
             return false;
         }
 
-        if (this.sig == null && this.msig == null) {
-            try {
-                return address.equals(this.toAddress());
-            } catch (NoSuchAlgorithmException e) {
-                return false;
-            }
-        }
-
         PublicKey pk;
         try {
-            pk = address.toVerifyKey();
+            pk = singleSigner.toVerifyKey();
         } catch (Exception ex) {
             return false;
         }
@@ -155,7 +148,10 @@ public class LogicsigSignature {
             }
         }
 
-        return this.msig.verify(this.bytesToSign());
+        if (this.msig != null)
+            return this.msig.verify(this.bytesToSign());
+
+        return true;
     }
 
     private static boolean nullCheck(Object o1, Object o2) {
