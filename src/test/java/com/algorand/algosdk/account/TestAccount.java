@@ -8,8 +8,11 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 import com.google.common.primitives.Bytes;
 import org.bouncycastle.util.test.FixedSecureRandom;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.ByteBuffer;
@@ -432,6 +435,7 @@ public class TestAccount {
 
         assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx))).isEqualTo(goldenTx);
     }
+
     @Test
     public void testTealSign() throws Exception {
         byte[] data = Encoder.decodeFromBase64("Ux8jntyBJQarjKGF8A==");
@@ -470,5 +474,153 @@ public class TestAccount {
         byte[] seed = Mnemonic.toKey(FROM_SK);
         Account account = new Account(seed);
         assertThat(account.toSeed()).isEqualTo(seed);
+    }
+
+    public static class TestLpgicSigTransaction {
+        byte[] program;
+        ArrayList<byte[]> args;
+        String otherAddrStr, programHash;
+        byte[] note;
+        MultisigAddress ma;
+        KeyPair maKp0, maKp1, maKp2;
+
+        private KeyPair mnemonicToKeyPair(String mnemonic) throws GeneralSecurityException {
+            byte[] seed = Mnemonic.toKey(mnemonic);
+            KeyPairGenerator gen = KeyPairGenerator.getInstance("Ed25519");
+            gen.initialize(256, new FixedSecureRandom(seed));
+            return gen.generateKeyPair();
+        }
+
+        @BeforeEach
+        void setUp() throws GeneralSecurityException {
+            program = new byte[]{0x01, 0x20, 0x01, 0x01, 0x22};
+            args = new ArrayList<>();
+            byte[] arg0 = {0x01};
+            byte[] arg1 = {0x02, 0x03};
+            args.add(arg0);
+            args.add(arg1);
+            note = new byte[]{(byte) 180, 81, 121, 57, (byte) 252, (byte) 250, (byte) 210, 113};
+            otherAddrStr = "WTDCE2FEYM2VB5MKNXKLRSRDTSPR2EFTIGVH4GRW4PHGD6747GFJTBGT2A";
+            programHash = "6Z3C3LDVWGMX23BMSYMANACQOSINPFIRF77H7N3AWJZYV6OH6GWTJKVMXY";
+
+
+            Address one = new Address("DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA");
+            Address two = new Address("BFRTECKTOOE7A5LHCF3TTEOH2A7BW46IYT2SX5VP6ANKEXHZYJY77SJTVM");
+            Address three = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+            ma = new MultisigAddress(1, 2, Arrays.asList(
+                    new Ed25519PublicKey(one.getBytes()),
+                    new Ed25519PublicKey(two.getBytes()),
+                    new Ed25519PublicKey(three.getBytes())
+            ));
+            maKp0 = mnemonicToKeyPair("auction inquiry lava second expand liberty glass involve ginger illness length room item discover ahead table doctor term tackle cement bonus profit right above catch");
+            maKp1 = mnemonicToKeyPair("since during average anxiety protect cherry club long lawsuit loan expand embark forum theory winter park twenty ball kangaroo cram burst board host ability left");
+            maKp2 = mnemonicToKeyPair("advice pudding treat near rule blouse same whisper inner electric quit surface sunny dismiss leader blood seat clown cost exist hospital century reform able sponsor");
+        }
+
+        private void testSign(LogicsigSignature lsig, Address sender, String expectedTxid, Address expectedAuthAddr, byte[] expectedBytes)
+                throws GeneralSecurityException, IOException {
+            Address to = new Address(otherAddrStr);
+
+            BigInteger firstRound = BigInteger.valueOf(972508);
+
+            Transaction tx = Transaction.PaymentTransactionBuilder()
+                    .sender(sender)
+                    .flatFee(BigInteger.valueOf(217000))
+                    .firstValid(firstRound)
+                    .lastValid(firstRound.longValue() + 1000)
+                    .note(note)
+                    .genesisID("testnet-v31.0")
+                    .genesisHash(new Digest())
+                    .amount(BigInteger.valueOf(5000))
+                    .receiver(to)
+                    .build();
+
+            SignedTransaction stx = Account.signLogicsigTransaction(lsig, tx);
+            byte[] stxBytes = Encoder.encodeToMsgPack(stx);
+            assertThat(stxBytes).isEqualTo(expectedBytes);
+            assertThat(stx.transactionID).isEqualTo(expectedTxid);
+            assertThat(stx.authAddr).isEqualTo(expectedAuthAddr);
+            assertThat(stx.lSig).isEqualTo(lsig);
+            assertThat(stx.mSig).isEqualTo(new MultisigSignature());
+            assertThat(stx.sig).isEqualTo(new Signature());
+            assertThat(stx.lSig).isEqualTo(lsig);
+        }
+
+        @Test
+        public void testNoSigContractAddr() throws GeneralSecurityException, IOException {
+            LogicsigSignature lsigNoSig = new LogicsigSignature(program, args);
+            Address programAddr = new Address(programHash);
+            String expectedTxID = "IL5UCKXGWBA2MQ4YYFQKYC3BFCWO2KHZSNZWVDIXOOZS3AWVIQDA";
+            Address expectedAuthAddr = new Address();
+            String expectedByteEncoded = "QKSGY43JM6BKGYLSM6JMIAIBYQBAEA5BNTCAKAJAAEASFI3UPBXITI3BNV2M2E4IUNTGKZOOAABU7KFCMZ3M4AAO23OKGZ3FN2WXIZLTORXGK5BNOYZTCLRQUJWHNTQAB3NMJJDON52GLRAIWRIXSOP47LJHDI3SMN3MIIFUYYRGRJGDGVIPLCTN2S4MUI44T4ORBM2BVJ7BUNXDZZQ7X7HZRKRXG3TEYQQPM5RNVR23DGL5NQWJMGAGQBIHJEGXSUIS77T7W5QLE44K7HD7DLNEOR4XAZNDOBQXS";
+            byte[] expectedBytes = Encoder.decodeFromBase32StripPad(expectedByteEncoded);
+            testSign(lsigNoSig, programAddr, expectedTxID, expectedAuthAddr, expectedBytes);
+        }
+
+        @Test
+        public void testNoSigNotContractAddr() throws GeneralSecurityException, IOException {
+            LogicsigSignature lsigNoSig = new LogicsigSignature(program, args);
+            Address programAddr = new Address(programHash);
+            String expectedTxID = "U4X24Q45MCZ6JSL343QNR3RC6AJO2NUDQXFCTNONIW3SU2AYQJOA";
+            String expectedByteEncoded = "QOSGY43JM6BKGYLSM6JMIAIBYQBAEA5BNTCAKAJAAEASFJDTM5XHFRBA6Z3C3LDVWGMX23BMSYMANACQOSINPFIRF77H7N3AWJZYV6OH6GW2G5DYN2E2GYLNOTGRHCFDMZSWLTQAANH2RITGO3HAADWW3SRWOZLOVV2GK43UNZSXILLWGMYS4MFCNR3M4AAO3LCKI3TPORS4ICFUKF4TT7H22JY2G4TDO3CCBNGGEJUKJQZVKD2YU3OUXDFCHHE7DUILGQNKPYNDNY6OMH57Z6MKUNZW4ZGEEC2MMITIUTBTKUHVRJW5JOGKEOOJ6HIQWNA2U7Q2G3R44YP37T4YVJDUPFYGLI3QMF4Q";
+            byte[] expectedBytes = Encoder.decodeFromBase32StripPad(expectedByteEncoded);
+            testSign(lsigNoSig, new Address(otherAddrStr), expectedTxID, programAddr, expectedBytes);
+        }
+
+        @Test
+        public void testSingleSigContractAddr() throws GeneralSecurityException, IOException {
+            Account acc = new Account("olympic cricket tower model share zone grid twist sponsor avoid eight apology patient party success claim famous rapid donor pledge bomb mystery security ability often");
+            LogicsigSignature lsig = new LogicsigSignature(program, args);
+            acc.signLogicsig(lsig);
+            String expectedTxID = "XPFTYDOV5RCL7K5EGTC32PSTRKFO3ITZIL64CRTYIJEPHXOTCCXA";
+            String expectedByteEncoded = "QKSGY43JM6B2GYLSM6JMIAIBYQBAEA5BNTCAKAJAAEASFI3TNFT4IQB6AU6TSTP3CK6GK6M75IYYU64OUJIYWVJMRK7GZV5HMUW5RMAYPYQQKLNZERRISFXFMF2M2DYZVS4WYRNEFGIZSEI54R6OJ7AS5THAFI3UPBXITI3BNV2M2E4IUNTGKZOOAABU7KFCMZ3M4AAO23OKGZ3FN2WXIZLTORXGK5BNOYZTCLRQUJWHNTQAB3NMJJDON52GLRAIWRIXSOP47LJHDI3SMN3MIIFUYYRGRJGDGVIPLCTN2S4MUI44T4ORBM2BVJ7BUNXDZZQ7X7HZRKRXG3TEYQQF4Z2PDQFO53BXOGEY6YOHN725ESQZPE7CZEP2BBIWEY7DQVZ6UQVEOR4XAZNDOBQXS";
+            byte[] expectedBytes = Encoder.decodeFromBase32StripPad(expectedByteEncoded);
+            testSign(lsig, acc.getAddress(), expectedTxID, new Address(), expectedBytes);
+        }
+
+        @Test
+        public void testSingleSigNotContractAddr() throws GeneralSecurityException, IOException {
+            Account acc = new Account("olympic cricket tower model share zone grid twist sponsor avoid eight apology patient party success claim famous rapid donor pledge bomb mystery security ability often");
+            LogicsigSignature lsig = new LogicsigSignature(program, args);
+            acc.signLogicsig(lsig);
+            Transaction tx = Transaction.PaymentTransactionBuilder()
+                    .sender(new Address(otherAddrStr))
+                    .flatFee(BigInteger.valueOf(217000))
+                    .firstValid(BigInteger.valueOf(972508))
+                    .lastValid(BigInteger.valueOf(973508))
+                    .note(note)
+                    .genesisID("testnet-v31.0")
+                    .genesisHash(new Digest())
+                    .amount(BigInteger.valueOf(5000))
+                    .receiver(new Address(otherAddrStr))
+                    .build();
+            Assertions.assertThrows(IllegalArgumentException.class, () -> Account.signLogicsigTransaction(lsig, tx));
+        }
+
+        @Test
+        public void testMultiSigContractAddr() throws GeneralSecurityException, IOException {
+            LogicsigSignature lsig = new LogicsigSignature(program, args);
+            Account acc0 = new Account(maKp0.getPrivate());
+            acc0.signLogicsig(lsig, ma);
+            Account acc1 = new Account(maKp1.getPrivate());
+            acc1.appendToLogicsig(lsig);
+            String expectedTxID = "2I2QT3MGXNMB5IOTNWEQZWUJCHLJ5QFBYI264X5NWMUDKZXPZ5RA";
+            String expectedByteEncoded = "QKSGY43JM6B2GYLSM6JMIAIBYQBAEA5BNTCAKAJAAEASFJDNONUWPA5GON2WE43JM6JYFITQNPCCAG36YCYEX2TBW6LJBF7GZP2APYIIU4CTKHILZGFL5MJCBGUKXALYUFZ4IQCJCO4ALUM6P4WBBAHWGN7BQVFHZ3VO4EG5XUJWLBF7SO3V6MDDCWI4UIYM5XXSHULUDNJJ3MH7543VJVSG6S2WD7ELXQWXWTTDLS6QFAVCOBV4IIAJMMZASU3TRHYHKZYRO44ZDR6QHYNXHSGE6UV7NL7QDKRFZ6OCOGQXHRCAMS6FLW7NSGREDVBKWZQPPYKKXGMZUUVTWFYVRTX4H5H6PSZCIEKK3KJ5L2CAKAQKC6TGTAYDEJHINI4LNI3MKVF6EBIP7U7OVCZQICMBUJYGXRBA47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ2G5DIOIBKC5QBUN2HQ3UJUNQW25GNCOEKGZTFMXHAAA2PVCRGM5WOAAHNNXFDM5SW5LLUMVZXI3TFOQWXMMZRFYYKE3DWZYAA5WWEURXG65DFYQELIULZHH6PVUTRUNZGG5WEEC2MMITIUTBTKUHVRJW5JOGKEOOJ6HIQWNA2U7Q2G3R44YP37T4YVI3TNZSMIIENSK2ITEABOOQE36SDLGRWM2TK7TVCYQVALXM4D5Z65OSUPABX5GSHI6LQMWRXAYLZ";
+            byte[] expectedBytes = Encoder.decodeFromBase32StripPad(expectedByteEncoded);
+            testSign(lsig, ma.toAddress(), expectedTxID, new Address(), expectedBytes);
+        }
+
+        @Test
+        public void testMultiSigNotContractAddr() throws GeneralSecurityException, IOException {
+            LogicsigSignature lsig = new LogicsigSignature(program, args);
+            Account acc0 = new Account(maKp0.getPrivate());
+            acc0.signLogicsig(lsig, ma);
+            Account acc1 = new Account(maKp1.getPrivate());
+            acc1.appendToLogicsig(lsig);
+            String expectedTxID = "U4X24Q45MCZ6JSL343QNR3RC6AJO2NUDQXFCTNONIW3SU2AYQJOA";
+            String expectedByteEncoded = "QOSGY43JM6B2GYLSM6JMIAIBYQBAEA5BNTCAKAJAAEASFJDNONUWPA5GON2WE43JM6JYFITQNPCCAG36YCYEX2TBW6LJBF7GZP2APYIIU4CTKHILZGFL5MJCBGUKXALYUFZ4IQCJCO4ALUM6P4WBBAHWGN7BQVFHZ3VO4EG5XUJWLBF7SO3V6MDDCWI4UIYM5XXSHULUDNJJ3MH7543VJVSG6S2WD7ELXQWXWTTDLS6QFAVCOBV4IIAJMMZASU3TRHYHKZYRO44ZDR6QHYNXHSGE6UV7NL7QDKRFZ6OCOGQXHRCAMS6FLW7NSGREDVBKWZQPPYKKXGMZUUVTWFYVRTX4H5H6PSZCIEKK3KJ5L2CAKAQKC6TGTAYDEJHINI4LNI3MKVF6EBIP7U7OVCZQICMBUJYGXRBA47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ2G5DIOIBKC5QBURZWO3TSYQQI3EVURGIAC45AJX5EGWNDMZVGV7HKFRBKAXOZYH3T525FI6ADP2NDOR4G5CNDMFWXJTITRCRWMZLFZYAAGT5IUJTHNTQAB3LNZI3HMVXK25DFON2G4ZLUFV3DGMJOGCRGY5WOAAHNVRFENZXXIZOEBC2FC6JZ7T5NE4NDOJRXNRBAWTDCE2FEYM2VB5MKNXKLRSRDTSPR2EFTIGVH4GRW4PHGD6747GFKG43OMTCCBNGGEJUKJQZVKD2YU3OUXDFCHHE7DUILGQNKPYNDNY6OMH57Z6MKUR2HS4DFUNYGC6I";
+            byte[] expectedBytes = Encoder.decodeFromBase32StripPad(expectedByteEncoded);
+            testSign(lsig, new Address(otherAddrStr), expectedTxID, ma.toAddress(), expectedBytes);
+        }
     }
 }

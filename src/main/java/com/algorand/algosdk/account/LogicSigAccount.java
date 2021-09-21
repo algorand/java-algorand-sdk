@@ -104,7 +104,7 @@ public class LogicSigAccount {
         return this.lsig.toAddress();
     }
 
-    public SignedTransaction signLogicSigAccountTransaction(Transaction tx)
+    public SignedTransaction signLogicSigTransaction(Transaction tx)
             throws NoSuchAlgorithmException, IOException {
         return Account.signLogicTransactionWithAddress(this.lsig, this.getAddress(), tx);
     }
