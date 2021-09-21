@@ -87,6 +87,7 @@ public class Account {
         this.address = new Address(Arrays.copyOf(raw, raw.length));
     }
 
+    // Derive an Account from only private key
     public Account(PrivateKey pk) throws NoSuchAlgorithmException {
         CryptoProvider.setupIfNeeded();
         if (!pk.getAlgorithm().equals(KEY_ALGO))
