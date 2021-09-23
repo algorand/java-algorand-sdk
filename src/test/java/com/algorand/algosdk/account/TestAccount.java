@@ -476,7 +476,7 @@ public class TestAccount {
         assertThat(account.toSeed()).isEqualTo(seed);
     }
 
-    public static class TestLpgicSigTransaction {
+    public static class TestLogicSigTransaction {
         byte[] program;
         ArrayList<byte[]> args;
         String otherAddrStr, programHash;

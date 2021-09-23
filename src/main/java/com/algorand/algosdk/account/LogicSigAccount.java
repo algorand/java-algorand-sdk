@@ -16,8 +16,6 @@ public class LogicSigAccount {
 
     /**
      * Creates a new escrow LogicSig Account
-     * This type of LogicSigAccount has the authority to sign transaction on behalf of another account,
-     * or so to say that account delegate the transaction signing to the program.
      * The address of the account is the hash of its program (logic)
      * @param logic the bytes of program
      * @param args the arguments of the program
