@@ -14,10 +14,14 @@ class Uint extends Type {
     }
 
     @Override
-    public String string() { return "uint" + this.bitSize; }
+    public String string() {
+        return "uint" + this.bitSize;
+    }
 
     @Override
-    public boolean isDynamic() { return false; }
+    public boolean isDynamic() {
+        return false;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -27,5 +31,7 @@ class Uint extends Type {
     }
 
     @Override
-    public int hashCode() { return Objects.hash(bitSize); }
+    public int hashCode() {
+        return Objects.hash(bitSize);
+    }
 }

@@ -14,10 +14,14 @@ class ArrayStatic extends Type {
     }
 
     @Override
-    public String string() throws IllegalAccessException { return this.elemType.string() + "[" + this.length + "]"; }
+    public String string() throws IllegalAccessException {
+        return this.elemType.string() + "[" + this.length + "]";
+    }
 
     @Override
-    public boolean isDynamic() throws IllegalAccessException { return this.elemType.isDynamic(); }
+    public boolean isDynamic() throws IllegalAccessException {
+        return this.elemType.isDynamic();
+    }
 
     @Override
     public boolean equals(Object o) {

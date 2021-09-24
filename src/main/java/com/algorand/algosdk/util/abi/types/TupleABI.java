@@ -8,14 +8,16 @@ import java.util.List;
 class TupleABI extends Type {
     public final List<Type> childTypes;
 
-    TupleABI(List<Type> childTypes) { this.childTypes = childTypes; }
+    TupleABI(List<Type> childTypes) {
+        this.childTypes = childTypes;
+    }
 
     @Override
     public String string() throws IllegalAccessException {
         List<String> childStrs = new ArrayList<>();
         for (Type t : this.childTypes)
             childStrs.add(t.string());
-        return  "(" + StringUtil.join(childStrs.toArray(new String[0]), ",") + ")";
+        return "(" + StringUtil.join(childStrs.toArray(new String[0]), ",") + ")";
     }
 
     @Override

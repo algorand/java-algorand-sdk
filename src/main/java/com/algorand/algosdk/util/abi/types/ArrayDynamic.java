@@ -5,13 +5,19 @@ import java.util.Objects;
 class ArrayDynamic extends Type {
     public final Type elemType;
 
-    ArrayDynamic(Type elemType) { this.elemType = elemType; }
+    ArrayDynamic(Type elemType) {
+        this.elemType = elemType;
+    }
 
     @Override
-    public String string() throws IllegalAccessException { return this.elemType.string() + "[]"; }
+    public String string() throws IllegalAccessException {
+        return this.elemType.string() + "[]";
+    }
 
     @Override
-    public boolean isDynamic() { return true; }
+    public boolean isDynamic() {
+        return true;
+    }
 
     @Override
     public boolean equals(Object o) {

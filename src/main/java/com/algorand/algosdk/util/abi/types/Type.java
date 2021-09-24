@@ -1,6 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
@@ -19,9 +20,11 @@ public class Type {
     }
 
     @Override
-    public boolean equals(Object obj) { return false; }
+    public boolean equals(Object obj) {
+        return false;
+    }
 
-    public static Type fromString(String str) throws Exception {
+    public static Type fromString(String str) throws IllegalArgumentException {
         if (str.endsWith("[]")) {
             Type elemType = Type.fromString(str.substring(0, str.length() - 2));
             return new ArrayDynamic(elemType);
@@ -57,11 +60,20 @@ public class Type {
                 tupleTypes.add(Type.fromString(subStr));
             return new TupleABI(tupleTypes);
         } else {
-            throw new IllegalAccessException("Cannot infer type from the string: " + str);
+            throw new IllegalArgumentException("Cannot infer type from the string: " + str);
         }
     }
 
-    private static List<String> parseTupleContent(String str) throws Exception {
+    public static class Segment {
+        public int L, R;
+
+        Segment(int left, int right) {
+            this.L = left;
+            this.R = right;
+        }
+    }
+
+    private static List<String> parseTupleContent(String str) {
         if (str.length() == 0)
             return new ArrayList<>();
 
@@ -72,10 +84,35 @@ public class Type {
             throw new IllegalArgumentException("parsing error: tuple content should not have consecutive commas");
 
         Stack<Integer> parenStack = new Stack<>();
+        List<Segment> parenSegments = new ArrayList<>();
 
-//        List<>
+        for (int i = 0; i < str.length(); i++) {
+            if (str.charAt(i) == '(')
+                parenStack.push(i);
+            else if (str.charAt(i) == ')') {
+                if (!parenStack.empty())
+                    throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
+                int leftParenIndex = parenStack.pop();
+                if (parenStack.empty())
+                    parenSegments.add(new Segment(leftParenIndex, i));
+            }
+        }
+        if (!parenStack.empty())
+            throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
 
+        String strCopied = str;
+        for (int i = parenSegments.size() - 1; i >= 0; i--)
+            strCopied = strCopied.substring(0, parenSegments.get(i).L) + strCopied.substring(parenSegments.get(i).R);
 
-        return new ArrayList<>();
+        String[] tupleSeg = strCopied.split(",");
+        int parenSegCount = 0;
+        for (int i = 0; i < tupleSeg.length; i++) {
+            if (tupleSeg[i].isEmpty()) {
+                tupleSeg[i] = str.substring(parenSegments.get(parenSegCount).L, parenSegments.get(parenSegCount).R + 1);
+                parenSegCount++;
+            }
+        }
+
+        return Arrays.asList(tupleSeg);
     }
 }

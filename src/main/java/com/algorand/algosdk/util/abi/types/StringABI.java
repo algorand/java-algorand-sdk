@@ -1,14 +1,21 @@
 package com.algorand.algosdk.util.abi.types;
 
 class StringABI extends Type {
-    StringABI() {}
+    StringABI() {
+    }
 
     @Override
-    public String string() { return "string"; }
+    public String string() {
+        return "string";
+    }
 
     @Override
-    public boolean isDynamic() { return true; }
+    public boolean isDynamic() {
+        return true;
+    }
 
     @Override
-    public boolean equals(Object obj) { return obj instanceof StringABI; }
+    public boolean equals(Object obj) {
+        return obj instanceof StringABI;
+    }
 }

@@ -18,10 +18,14 @@ class Ufixed extends Type {
     }
 
     @Override
-    public String string() { return "ufixed" + this.bitSize + "x" + this.precision; }
+    public String string() {
+        return "ufixed" + this.bitSize + "x" + this.precision;
+    }
 
     @Override
-    public boolean isDynamic() { return false; }
+    public boolean isDynamic() {
+        return false;
+    }
 
     @Override
     public boolean equals(Object o) {
