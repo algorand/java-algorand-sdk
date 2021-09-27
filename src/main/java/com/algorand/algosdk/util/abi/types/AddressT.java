@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
-class AddressT extends Type {
-    AddressT() {
+public class AddressT extends Type {
+    public AddressT() {
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
-class ByteT extends Type {
-    ByteT() {
+public class ByteT extends Type {
+    public ByteT() {
     }
 
     @Override

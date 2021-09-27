@@ -2,10 +2,10 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-class UintT extends Type {
+public class UintT extends Type {
     public final int bitSize;
 
-    UintT(int size) {
+    public UintT(int size) {
         if (size < 8 || size > 512 || size % 8 != 0)
             throw new IllegalArgumentException(
                     "uint initialize failure: bitSize should be in [8, 512] and bitSize moe 8 = 0"

@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
-class StringT extends Type {
-    StringT() {
+public class StringT extends Type {
+    public StringT() {
     }
 
     @Override

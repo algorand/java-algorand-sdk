@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
-class BoolT extends Type {
-    BoolT() {
+public class BoolT extends Type {
+    public BoolT() {
     }
 
     @Override
