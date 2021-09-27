@@ -2,10 +2,10 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-class ArrayDynamic extends Type {
+class ArrayDynamicT extends Type {
     public final Type elemType;
 
-    ArrayDynamic(Type elemType) {
+    ArrayDynamicT(Type elemType) {
         this.elemType = elemType;
     }
 
@@ -22,12 +22,17 @@ class ArrayDynamic extends Type {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ArrayDynamic)) return false;
-        return this.elemType.equals(((ArrayDynamic) o).elemType);
+        if (!(o instanceof ArrayDynamicT)) return false;
+        return this.elemType.equals(((ArrayDynamicT) o).elemType);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(elemType);
+    }
+
+    @Override
+    public int byteLen() throws IllegalAccessException {
+        throw new IllegalArgumentException("Dynamic type cannot pre-compute byteLen");
     }
 }

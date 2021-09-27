@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
-class StringABI extends Type {
-    StringABI() {
+class StringT extends Type {
+    StringT() {
     }
 
     @Override
@@ -16,6 +16,11 @@ class StringABI extends Type {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof StringABI;
+        return obj instanceof StringT;
+    }
+
+    @Override
+    public int byteLen() throws IllegalAccessException {
+        throw new IllegalArgumentException("Dynamic type cannot pre-compute byteLen");
     }
 }

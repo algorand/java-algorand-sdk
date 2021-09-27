@@ -24,41 +24,45 @@ public class Type {
         return false;
     }
 
+    public int byteLen() throws IllegalAccessException {
+        throw new IllegalAccessException("Should not access base type method: byteLen");
+    }
+
     public static Type fromString(String str) throws IllegalArgumentException {
         if (str.endsWith("[]")) {
             Type elemType = Type.fromString(str.substring(0, str.length() - 2));
-            return new ArrayDynamic(elemType);
+            return new ArrayDynamicT(elemType);
         } else if (str.endsWith("]")) {
             Matcher m = staticArrayPattern.matcher(str);
             if (!m.matches())
                 throw new IllegalArgumentException("static array type ill format: " + str);
             Type elemT = Type.fromString(m.group("elemT"));
             int length = Integer.parseInt(m.group("len"));
-            return new ArrayStatic(elemT, length);
+            return new ArrayStaticT(elemT, length);
         } else if (str.startsWith("uint")) {
             int size = Integer.parseInt(str.substring(4));
-            return new Uint(size);
+            return new UintT(size);
         } else if (str.equals("byte")) {
-            return new Byte();
+            return new ByteT();
         } else if (str.startsWith("ufixed")) {
             Matcher m = ufixedPattern.matcher(str);
             if (!m.matches())
                 throw new IllegalArgumentException("ufixed type ill format: " + str);
             int size = Integer.parseInt(m.group("size"));
             int precision = Integer.parseInt(m.group("precision"));
-            return new Ufixed(size, precision);
+            return new UfixedT(size, precision);
         } else if (str.equals("bool")) {
-            return new Bool();
+            return new BoolT();
         } else if (str.equals("address")) {
-            return new Address();
+            return new AddressT();
         } else if (str.equals("string")) {
-            return new StringABI();
+            return new StringT();
         } else if (str.length() >= 2 && str.charAt(0) == '(' && str.endsWith(")")) {
             List<String> tupleContent = parseTupleContent(str.substring(1, str.length() - 1));
             List<Type> tupleTypes = new ArrayList<>();
             for (String subStr : tupleContent)
                 tupleTypes.add(Type.fromString(subStr));
-            return new TupleABI(tupleTypes);
+            return new TupleT(tupleTypes);
         } else {
             throw new IllegalArgumentException("Cannot infer type from the string: " + str);
         }
@@ -114,5 +118,24 @@ public class Type {
         }
 
         return Arrays.asList(tupleSeg);
+    }
+
+    public static int findBoolLR(Type[] typeArray, int index, int delta) {
+        int until = 0;
+        while (true) {
+            int currentIndex = index + delta * until;
+            if (typeArray[currentIndex] instanceof BoolT) {
+                if (currentIndex != typeArray.length - 1 && delta > 0)
+                    until++;
+                else if (currentIndex != 0 && delta < 0)
+                    until++;
+                else
+                    break;
+            } else {
+                until--;
+                break;
+            }
+        }
+        return until;
     }
 }

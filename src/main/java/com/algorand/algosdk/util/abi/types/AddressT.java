@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
-class Address extends Type {
-    Address() {
+class AddressT extends Type {
+    AddressT() {
     }
 
     @Override
@@ -16,6 +16,11 @@ class Address extends Type {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Address;
+        return obj instanceof AddressT;
+    }
+
+    @Override
+    public int byteLen() throws IllegalAccessException {
+        return 32;
     }
 }

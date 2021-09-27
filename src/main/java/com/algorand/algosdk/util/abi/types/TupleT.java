@@ -5,10 +5,10 @@ import com.algorand.algosdk.algod.client.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-class TupleABI extends Type {
+class TupleT extends Type {
     public final List<Type> childTypes;
 
-    TupleABI(List<Type> childTypes) {
+    TupleT(List<Type> childTypes) {
         this.childTypes = childTypes;
     }
 
@@ -32,7 +32,15 @@ class TupleABI extends Type {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TupleABI)) return false;
-        return this.childTypes.equals(((TupleABI) o).childTypes);
+        if (!(o instanceof TupleT)) return false;
+        return this.childTypes.equals(((TupleT) o).childTypes);
+    }
+
+    @Override
+    public int byteLen() throws IllegalAccessException, IllegalArgumentException {
+        int size = 0;
+        for (Type t : this.childTypes)
+            size += t.byteLen();
+        return size;
     }
 }

@@ -1,12 +1,12 @@
 package com.algorand.algosdk.util.abi.types;
 
-class Byte extends Type {
-    Byte() {
+class BoolT extends Type {
+    BoolT() {
     }
 
     @Override
     public String string() {
-        return "byte";
+        return "bool";
     }
 
     @Override
@@ -16,6 +16,11 @@ class Byte extends Type {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof Byte;
+        return obj instanceof BoolT;
+    }
+
+    @Override
+    public int byteLen() throws IllegalAccessException {
+        return 1;
     }
 }

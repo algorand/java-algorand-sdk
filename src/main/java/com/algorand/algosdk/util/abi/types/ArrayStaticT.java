@@ -2,11 +2,11 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-class ArrayStatic extends Type {
+class ArrayStaticT extends Type {
     public final Type elemType;
     public final int length;
 
-    ArrayStatic(Type elemType, int length) {
+    ArrayStaticT(Type elemType, int length) {
         if (length < 1)
             throw new IllegalArgumentException("static-array initialize failure: array length should be at least 1");
         this.elemType = elemType;
@@ -26,12 +26,17 @@ class ArrayStatic extends Type {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ArrayStatic)) return false;
-        return length == ((ArrayStatic) o).length && this.elemType.equals(((ArrayStatic) o).elemType);
+        if (!(o instanceof ArrayStaticT)) return false;
+        return length == ((ArrayStaticT) o).length && this.elemType.equals(((ArrayStaticT) o).elemType);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(elemType, length);
+    }
+
+    @Override
+    public int byteLen() throws IllegalAccessException {
+        return this.elemType.byteLen() * this.length;
     }
 }

@@ -2,10 +2,10 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-class Uint extends Type {
+class UintT extends Type {
     public final int bitSize;
 
-    Uint(int size) {
+    UintT(int size) {
         if (size < 8 || size > 512 || size % 8 != 0)
             throw new IllegalArgumentException(
                     "uint initialize failure: bitSize should be in [8, 512] and bitSize moe 8 = 0"
@@ -26,12 +26,17 @@ class Uint extends Type {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Uint)) return false;
-        return this.bitSize == ((Uint) o).bitSize;
+        if (!(o instanceof UintT)) return false;
+        return this.bitSize == ((UintT) o).bitSize;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(bitSize);
+    }
+
+    @Override
+    public int byteLen() throws IllegalAccessException {
+        return this.bitSize / 8;
     }
 }
