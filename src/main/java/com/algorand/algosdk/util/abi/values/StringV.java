@@ -18,6 +18,8 @@ public class StringV extends Value {
             throw new IllegalArgumentException("string casted to byte exceeds uint16 maximum, error");
         byte[] res = new byte[bufferLen + 2];
         System.arraycopy(buffer, 0, res, 2, bufferLen);
-
+        res[0] = (byte) (bufferLen >> 8);
+        res[1] = (byte) (bufferLen);
+        return res;
     }
 }

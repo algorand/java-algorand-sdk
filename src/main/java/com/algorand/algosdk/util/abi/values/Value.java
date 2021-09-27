@@ -53,8 +53,14 @@ public class Value {
         } else if (abiType instanceof StringT) {
             if (encoded.length < 2)
                 throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
+            // TODO
+        } else if (abiType instanceof ArrayStaticT) {
+
+        } else if (abiType instanceof ArrayDynamicT) {
+
+        } else if (abiType instanceof TupleT) {
+
         }
-        // TODO implementation
-        return new Value();
+        throw new IllegalArgumentException("abiType cannot be inferred, decode failed");
     }
 }

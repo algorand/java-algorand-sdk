@@ -2,10 +2,10 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-class ArrayDynamicT extends Type {
+public class ArrayDynamicT extends Type {
     public final Type elemType;
 
-    ArrayDynamicT(Type elemType) {
+    public ArrayDynamicT(Type elemType) {
         this.elemType = elemType;
     }
 

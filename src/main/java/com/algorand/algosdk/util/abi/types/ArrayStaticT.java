@@ -2,11 +2,11 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-class ArrayStaticT extends Type {
+public class ArrayStaticT extends Type {
     public final Type elemType;
     public final int length;
 
-    ArrayStaticT(Type elemType, int length) {
+    public ArrayStaticT(Type elemType, int length) {
         if (length < 1)
             throw new IllegalArgumentException("static-array initialize failure: array length should be at least 1");
         this.elemType = elemType;

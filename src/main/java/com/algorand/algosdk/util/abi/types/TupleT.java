@@ -5,10 +5,10 @@ import com.algorand.algosdk.algod.client.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-class TupleT extends Type {
+public class TupleT extends Type {
     public final List<Type> childTypes;
 
-    TupleT(List<Type> childTypes) {
+    public TupleT(List<Type> childTypes) {
         this.childTypes = childTypes;
     }
 
