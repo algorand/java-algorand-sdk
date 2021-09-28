@@ -94,7 +94,7 @@ public class Type {
             if (str.charAt(i) == '(')
                 parenStack.push(i);
             else if (str.charAt(i) == ')') {
-                if (!parenStack.empty())
+                if (parenStack.empty())
                     throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
                 int leftParenIndex = parenStack.pop();
                 if (parenStack.empty())
@@ -106,9 +106,9 @@ public class Type {
 
         String strCopied = str;
         for (int i = parenSegments.size() - 1; i >= 0; i--)
-            strCopied = strCopied.substring(0, parenSegments.get(i).L) + strCopied.substring(parenSegments.get(i).R);
+            strCopied = strCopied.substring(0, parenSegments.get(i).L) + strCopied.substring(parenSegments.get(i).R + 1);
 
-        String[] tupleSeg = strCopied.split(",");
+        String[] tupleSeg = strCopied.split(",", -1);
         int parenSegCount = 0;
         for (int i = 0; i < tupleSeg.length; i++) {
             if (tupleSeg[i].isEmpty()) {
