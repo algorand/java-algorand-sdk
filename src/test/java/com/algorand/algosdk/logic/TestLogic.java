@@ -401,5 +401,15 @@ public class TestLogic {
             boolean valid = checkProgram(program, null);
             assertThat(valid).isTrue();
         }
+
+        {
+            // cover, uncover, log
+            byte[] program = {
+                0x05, (byte) 0x80, 0x01, 0x61, (byte) 0x80, 0x01, 0x62, (byte) 0x80, 0x01, 0x63, 0x4e, 0x02, 0x4f, 0x02, 0x50, 0x50, (byte) 0xb0, (byte) 0x81, 0x01
+            };
+            // byte "a"; byte "b"; byte "c"; cover 2; uncover 2; concat; concat; log; int 1
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
     }
 }
