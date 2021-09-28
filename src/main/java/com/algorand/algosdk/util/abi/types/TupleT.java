@@ -39,8 +39,17 @@ public class TupleT extends Type {
     @Override
     public int byteLen() throws IllegalAccessException, IllegalArgumentException {
         int size = 0;
-        for (Type t : this.childTypes)
-            size += t.byteLen();
+        for (int i = 0; i < this.childTypes.size(); i++) {
+            if (this.childTypes.get(i) instanceof BoolT) {
+                int after = Type.findBoolLR(this.childTypes.toArray(new Type[0]), i, 1);
+                i += after;
+                int boolNumber = after + 1;
+                size += boolNumber / 8;
+                if (boolNumber % 8 != 0)
+                    size++;
+            } else
+                size += this.childTypes.get(i).byteLen();
+        }
         return size;
     }
 }

@@ -5,19 +5,54 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class TestTypes {
     Random rand;
+    List<Type> type_testpool;
+    List<Type> tuple_testpool;
+
+    private TupleT generateRandomTupleType() {
+        int tupleLen = rand.nextInt(20);
+        List<Type> tupleElems = new ArrayList<>();
+        for (int i = 0; i < tupleLen; i++) {
+            int baseOrTuple = rand.nextInt(5);
+            if (baseOrTuple == 1 && tuple_testpool.size() > 0)
+                tupleElems.add(tuple_testpool.get(rand.nextInt(tuple_testpool.size())));
+            else
+                tupleElems.add(type_testpool.get(rand.nextInt(type_testpool.size())));
+        }
+        return new TupleT(tupleElems);
+    }
 
     @BeforeEach
     void setup() {
         rand = new Random();
+        type_testpool = new ArrayList<>(Arrays.asList(
+                new BoolT(),
+                new AddressT(),
+                new StringT(),
+                new ByteT()
+        ));
+        for (int i = 8; i <= 512; i += 8)
+            type_testpool.add(new UintT(i));
+        for (int i = 8; i <= 512; i += 8) {
+            for (int j = 1; j <= 160; j++)
+                type_testpool.add(new UfixedT(i, j));
+        }
+        int currentLength = type_testpool.size();
+        for (int i = 0; i < currentLength; i++) {
+            type_testpool.add(new ArrayDynamicT(type_testpool.get(i)));
+            type_testpool.add(new ArrayStaticT(type_testpool.get(i), 10));
+            type_testpool.add(new ArrayStaticT(type_testpool.get(i), 20));
+        }
+        tuple_testpool = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            TupleT tempTuple = generateRandomTupleType();
+            tuple_testpool.add(tempTuple);
+        }
     }
 
     @Test
@@ -247,5 +282,63 @@ public class TestTypes {
         };
         for (String testcase : testcases)
             Assertions.assertThrows(IllegalArgumentException.class, () -> Type.fromString(testcase));
+    }
+
+    @Test
+    public void TestTupleRoundTrip() throws IllegalAccessException {
+        for (Type t : tuple_testpool) {
+            String encoded = t.string();
+            Type decoded = Type.fromString(encoded);
+            assertThat((TupleT) decoded).isEqualTo(t);
+        }
+    }
+
+    @Test
+    public void TestSelfEquiv() throws IllegalAccessException {
+        for (Type t : type_testpool)
+            assertThat(t).isEqualTo(t);
+        for (Type t : tuple_testpool)
+            assertThat(t).isEqualTo(t);
+        for (int i = 0; i < 1000; i++) {
+            int index0 = rand.nextInt(type_testpool.size());
+            int index1 = rand.nextInt(type_testpool.size());
+            while (type_testpool.get(index0).string().equals(type_testpool.get(index1).string()))
+                index1 = rand.nextInt(type_testpool.size());
+            assertThat(type_testpool.get(index0)).isNotEqualTo(type_testpool.get(index1));
+        }
+        for (int i = 0; i < 1000; i++) {
+            int index0 = rand.nextInt(tuple_testpool.size());
+            int index1 = rand.nextInt(tuple_testpool.size());
+            while (tuple_testpool.get(index0).string().equals(tuple_testpool.get(index1).string()))
+                index1 = rand.nextInt(tuple_testpool.size());
+            assertThat(tuple_testpool.get(index0)).isNotEqualTo(tuple_testpool.get(index1));
+        }
+    }
+
+    @Test
+    public void TestIsDynamic() throws IllegalAccessException {
+        for (Type t : type_testpool) {
+            String encoded = t.string();
+            boolean inferFromString = encoded.contains("[]") || encoded.contains("string");
+            assertThat(inferFromString).isEqualTo(t.isDynamic());
+        }
+        for (Type t : tuple_testpool) {
+            String encoded = t.string();
+            boolean inferFromString = encoded.contains("[]") || encoded.contains("string");
+            assertThat(inferFromString).isEqualTo(t.isDynamic());
+        }
+    }
+
+    @Test
+    public void TestByteLen() throws IllegalAccessException {
+        assertThat(new AddressT().byteLen()).isEqualTo(32);
+        assertThat(new ByteT().byteLen()).isEqualTo(1);
+        for (Type t : type_testpool) {
+            if (t.isDynamic())
+                Assertions.assertThrows(IllegalArgumentException.class, t::byteLen);
+            else {
+                // TODO
+            }
+        }
     }
 }
