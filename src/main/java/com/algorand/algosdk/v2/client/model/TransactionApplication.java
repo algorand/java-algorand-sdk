@@ -57,7 +57,7 @@ public class TransactionApplication extends PathResponse {
          }
          return ret; 
      }
-    public List<byte[]> applicationArgs;
+    public List<byte[]> applicationArgs = new ArrayList<byte[]>();
 
     /**
      * (apid) ID of the application being configured or empty if creating.

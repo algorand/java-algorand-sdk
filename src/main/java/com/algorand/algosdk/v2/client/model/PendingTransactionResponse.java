@@ -90,7 +90,7 @@ public class PendingTransactionResponse extends PathResponse {
          }
          return ret; 
      }
-    public List<byte[]> logs;
+    public List<byte[]> logs = new ArrayList<byte[]>();
 
     /**
      * Indicates that the transaction was kicked out of this node's transaction pool

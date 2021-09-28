@@ -62,7 +62,7 @@ public class DryrunTxnResult extends PathResponse {
          }
          return ret; 
      }
-    public List<byte[]> logs;
+    public List<byte[]> logs = new ArrayList<byte[]>();
 
     @Override
     public boolean equals(Object o) {
