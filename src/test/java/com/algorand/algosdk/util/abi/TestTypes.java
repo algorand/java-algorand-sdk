@@ -336,8 +336,21 @@ public class TestTypes {
         for (Type t : type_testpool) {
             if (t.isDynamic())
                 Assertions.assertThrows(IllegalArgumentException.class, t::byteLen);
+        }
+        for (Type t : tuple_testpool) {
+            if (t.isDynamic())
+                Assertions.assertThrows(IllegalArgumentException.class, t::byteLen);
             else {
-                // TODO
+                int size = 0;
+                Type[] ctList = ((TupleT) t).childTypes.toArray(new Type[0]);
+                for (int i = 0; i < ctList.length; i++) {
+                    if (ctList[i] instanceof BoolT) {
+                        int boolNum = Type.findBoolLR(ctList, i, 1) + 1;
+                        size += boolNum / 8;
+                        size += (boolNum % 8 != 0) ? 1 : 0;
+                    } else size += ctList[i].byteLen();
+                }
+                assertThat(size).isEqualTo(t.byteLen());
             }
         }
     }

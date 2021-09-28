@@ -45,8 +45,7 @@ public class TupleT extends Type {
                 i += after;
                 int boolNumber = after + 1;
                 size += boolNumber / 8;
-                if (boolNumber % 8 != 0)
-                    size++;
+                size += (boolNumber % 8 != 0) ? 1 : 0;
             } else
                 size += this.childTypes.get(i).byteLen();
         }
