@@ -556,9 +556,13 @@ public class Account {
     }
 
     public static SignedTransaction signLogicTransactionWithAddress(LogicsigSignature lsig, Address lsigAddr, Transaction tx)
-            throws NoSuchAlgorithmException, IOException {
-        if (!lsig.verify(lsigAddr))
-            throw new IllegalArgumentException("verification failed on logic sig");
+            throws IllegalArgumentException, IOException {
+        try {
+            if (!lsig.verify(lsigAddr))
+                throw new IllegalArgumentException("verification failed on logic sig");
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IllegalArgumentException("verification failed on logic sig", ex);
+        }
 
         try {
             SignedTransaction stx = new SignedTransaction(tx, lsig, tx.txID());
@@ -578,18 +582,22 @@ public class Account {
      * @return SignedTransaction
      */
     public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx)
-            throws IllegalArgumentException, IOException, NoSuchAlgorithmException {
+            throws IllegalArgumentException, IOException {
         boolean hasSig = lsig.sig != null;
         boolean hasMsig = lsig.msig != null;
         Address lsigAddr;
-        if (hasSig) {
-            lsigAddr = tx.sender;
-        } else if (hasMsig) {
-             lsigAddr = lsig.msig.convertToMultisigAddress().toAddress();
-        } else {
-            lsigAddr = lsig.toAddress();
+        try {
+            if (hasSig) {
+                lsigAddr = tx.sender;
+            } else if (hasMsig) {
+                lsigAddr = lsig.msig.convertToMultisigAddress().toAddress();
+            } else {
+                lsigAddr = lsig.toAddress();
+            }
+            return Account.signLogicTransactionWithAddress(lsig, lsigAddr, tx);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IllegalArgumentException("could not sign transaction", ex);
         }
-        return Account.signLogicTransactionWithAddress(lsig, lsigAddr, tx);
     }
 
     /**
