@@ -10,9 +10,6 @@ public class BoolV extends Value {
 
     @Override
     public byte[] encode() throws IllegalAccessException {
-        if ((boolean) this.value)
-            return new byte[]{(byte) 0x80};
-        else
-            return new byte[]{0x00};
+        return ((boolean) this.value) ? new byte[]{(byte) 0x80} : new byte[]{0x00};
     }
 }

@@ -1,6 +1,7 @@
 package com.algorand.algosdk.util.abi.values;
 
 import com.algorand.algosdk.util.abi.types.Type;
+import com.algorand.algosdk.util.abi.types.UfixedT;
 import com.algorand.algosdk.util.abi.types.UintT;
 
 import java.math.BigInteger;
@@ -17,10 +18,7 @@ public class UintV extends Value {
 
     @Override
     public byte[] encode() throws IllegalAccessException {
-        int uintSize = ((UintT) this.abiType).bitSize;
-        byte[] buffer = new byte[uintSize];
-        byte[] castToBytes = ((BigInteger) this.value).toByteArray();
-        System.arraycopy(castToBytes, 0, buffer, buffer.length - castToBytes.length, castToBytes.length);
-        return buffer;
+        int uintSize = ((UfixedT) this.abiType).bitSize;
+        return Value.encodeUintToBytes(((BigInteger) this.value), uintSize);
     }
 }

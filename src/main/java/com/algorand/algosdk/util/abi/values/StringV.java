@@ -2,6 +2,7 @@ package com.algorand.algosdk.util.abi.values;
 
 import com.algorand.algosdk.util.abi.types.StringT;
 
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
 public class StringV extends Value {
@@ -13,13 +14,12 @@ public class StringV extends Value {
     @Override
     public byte[] encode() throws IllegalAccessException {
         byte[] buffer = ((String) this.value).getBytes(StandardCharsets.UTF_8);
-        int bufferLen = buffer.length;
-        if (bufferLen >= (1 << 16))
+        if (buffer.length >= (1 << 16))
             throw new IllegalArgumentException("string casted to byte exceeds uint16 maximum, error");
-        byte[] res = new byte[bufferLen + 2];
-        System.arraycopy(buffer, 0, res, 2, bufferLen);
-        res[0] = (byte) (bufferLen >> 8);
-        res[1] = (byte) (bufferLen);
+        byte[] lengthEncode = Value.encodeUintToBytes(BigInteger.valueOf((long) buffer.length), 2);
+        byte[] res = new byte[buffer.length + 2];
+        System.arraycopy(lengthEncode, 0, res, 0, 2);
+        System.arraycopy(buffer, 2, res, 0, buffer.length);
         return res;
     }
 }

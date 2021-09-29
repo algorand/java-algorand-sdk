@@ -20,9 +20,6 @@ public class UfixedV extends Value {
     @Override
     public byte[] encode() throws IllegalAccessException {
         int ufixedSize = ((UfixedT) this.abiType).bitSize;
-        byte[] buffer = new byte[ufixedSize];
-        byte[] castToBytes = ((BigInteger) this.value).toByteArray();
-        System.arraycopy(castToBytes, 0, buffer, buffer.length - castToBytes.length, castToBytes.length);
-        return buffer;
+        return Value.encodeUintToBytes(((BigInteger) this.value), ufixedSize);
     }
 }
