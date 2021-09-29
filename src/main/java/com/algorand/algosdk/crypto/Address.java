@@ -3,7 +3,6 @@ package com.algorand.algosdk.crypto;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.Uint64Encoder;
 
 import java.security.KeyFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -22,6 +21,8 @@ import java.security.spec.X509EncodedKeySpec;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -208,14 +209,12 @@ public class Address implements Serializable {
      * @param appID The ID of the application.
      * @return The address corresponding to that application's escrow account.
      * @throws NoSuchAlgorithmException
+     * @throws IOException
      */
-    public static Address forApplication(long appID) throws NoSuchAlgorithmException {
-        byte[] encodedID = Uint64Encoder.encode(appID);
-
-        byte[] toHash = new byte[encodedID.length + APP_ID_PREFIX.length];
-        System.arraycopy(APP_ID_PREFIX, 0, toHash, 0, APP_ID_PREFIX.length);
-        System.arraycopy(encodedID, 0, toHash, APP_ID_PREFIX.length, encodedID.length);
-
-        return new Address(Digester.digest(toHash));
+    public static Address forApplication(long appID) throws NoSuchAlgorithmException, IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(APP_ID_PREFIX);
+        buffer.write(Encoder.encodeUint64(appID));
+        return new Address(Digester.digest(buffer.toByteArray()));
     }
 }
