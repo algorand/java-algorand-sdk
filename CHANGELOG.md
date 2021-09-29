@@ -1,3 +1,14 @@
+# 1.9.0
+- Support AVM 1.0
+  - Update TEAL langspec to v5
+  - Add function to get app address
+  - Regenerate REST API types
+  - Support new cucumber tests
+  - Enable new cucumber tests
+- Allow non-base64 metadata hash and force 32 bytes
+- mark contract templates as @Deprecated
+- Added pretty print option to Object Mapper instance
+
 # 1.8.0
 - Added toSeed() method in Account.java
 - Regenerate  HTTP Client (Asset b64 fields + App extra pages)
