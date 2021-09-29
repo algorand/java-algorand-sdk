@@ -8,7 +8,6 @@
 - Allow non-base64 metadata hash and force 32 bytes
 - mark contract templates as @Deprecated
 - Added pretty print option to Object Mapper instance
-- Delete generator since it has it's own repo now
 
 # 1.8.0
 - Added toSeed() method in Account.java
