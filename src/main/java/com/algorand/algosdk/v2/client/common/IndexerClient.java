@@ -6,6 +6,7 @@ import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
 import com.algorand.algosdk.v2.client.indexer.SearchForApplications;
 import com.algorand.algosdk.v2.client.indexer.LookupApplicationByID;
+import com.algorand.algosdk.v2.client.indexer.LookupApplicationLogsByID;
 import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
@@ -93,6 +94,14 @@ public class IndexerClient extends Client {
      */
     public LookupApplicationByID lookupApplicationByID(Long applicationId) {
         return new LookupApplicationByID((Client) this, applicationId);
+    }
+
+    /**
+     * Lookup application logs.
+     * /v2/applications/{application-id}/logs
+     */
+    public LookupApplicationLogsByID lookupApplicationLogsByID(Long applicationId) {
+        return new LookupApplicationLogsByID((Client) this, applicationId);
     }
 
     /**
