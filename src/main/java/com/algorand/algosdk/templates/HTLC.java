@@ -29,6 +29,7 @@ import javax.annotation.Signed;
 
 import static com.algorand.algosdk.templates.ContractTemplate.readAndVerifyContract;
 
+@Deprecated
 public class HTLC {
 
 	private static String referenceProgram = "ASAEBQEABiYDIP68oLsUSlpOp7Q4pGgayA5soQW8tgf8VlMlyVaV9qITAQYg5pqWHm8tX3rIZgeSZVK+mCNe0zNjyoiRi7nJOKkVtvkxASIOMRAjEhAxBzIDEhAxCCQSEDEJKBItASkSEDEJKhIxAiUNEBEQ";
@@ -41,7 +42,7 @@ public class HTLC {
 	 * More formally, algos can be transfered under only two circumstances:
 	 *     1. To receiver if hash_function(arg_0) = hash_value
 	 *     2. To owner if txn.FirstValid &gt; expiry_round
-	 * 
+	 *
 	 * @param owner an address that can receive the asset after the expiry round
 	 * @param receiver address to receive Algos
 	 * @param hashFunction the hash function to be used (must be either sha256 or keccak256)
@@ -54,9 +55,9 @@ public class HTLC {
 	public static ContractTemplate MakeHTLC(
 			Address owner,
 			Address receiver,
-			String hashFunction, 
-			String hashImage, 
-			int expiryRound, 
+			String hashFunction,
+			String hashImage,
+			int expiryRound,
 			int maxFee) throws NoSuchAlgorithmException {
 
 		int hashInject;

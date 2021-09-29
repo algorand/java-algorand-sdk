@@ -33,7 +33,7 @@ public class TransactionSignatureLogicsig extends PathResponse {
          }
          return ret; 
      }
-    public List<byte[]> args;
+    public List<byte[]> args = new ArrayList<byte[]>();
 
     /**
      * (l) Program signed by a signature or multi signature, or hashed to be the

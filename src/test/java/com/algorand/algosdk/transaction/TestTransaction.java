@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
@@ -28,7 +29,7 @@ public class TestTransaction {
     private static Account initializeDefaultAccount() {
         try {
             String mnemonic = "awful drop leaf tennis indoor begin mandate discover uncle seven only coil atom any hospital uncover make any climb actor armed measure need above hundred";
-           return new Account(mnemonic);
+            return new Account(mnemonic);
         } catch (Exception e) {
             fail("Failed to initialize static default account.");
         }
@@ -131,6 +132,104 @@ public class TestTransaction {
         assertEqual(o, tx);
     }
 
+    @Test
+    public void testMetadaHashBuilderMethods() throws Exception {
+        // Test that the following 3 builder methods returns the same transaction
+        //    metadataHash, metadataHashUTF8, and metadataHashB64
+        // when given as input the same metadata hash
+        // and that it is different when the input is different
+
+        String metadataHashUTF8          = "Hello! This is the metadata hash";
+        String metadataHashUTF8Different = "Hi! I am another metadata hash..";
+        byte[] metadataHashBytes = metadataHashUTF8.getBytes(StandardCharsets.UTF_8);
+        // The value below is the base64 of metadataHashUTF8
+        String metadataHashB64 = "SGVsbG8hIFRoaXMgaXMgdGhlIG1ldGFkYXRhIGhhc2g=";
+
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address manager = addr;
+        Address reserve = addr;
+        Address freeze = addr;
+        Address clawback = addr;
+
+        Transaction txBytes = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHash(metadataHashBytes)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+        Transaction txUTF8 = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashUTF8(metadataHashUTF8)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+        Transaction txUTF8Different = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashUTF8(metadataHashUTF8Different)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+        Transaction txB64 = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+        assertThat(txUTF8).isEqualTo(txBytes);
+        assertThat(txUTF8).isEqualTo(txB64);
+        assertThat(txUTF8).isNotEqualTo(txUTF8Different);
+    }
+
     private void createAssetTest(int numDecimal, String goldenString) throws Exception {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
@@ -139,7 +238,7 @@ public class TestTransaction {
         Address reserve = addr;
         Address freeze = addr;
         Address clawback = addr;
-        String metadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
+        byte[] metadataHash = Base64.getDecoder().decode("ZkFDUE80blJnTzU1ajFuZEFLM1c2U2djNEFQa2N5Rmg=");
         String url_96 = new String(new char[96]).replace("\0", "w");
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
@@ -153,7 +252,7 @@ public class TestTransaction {
                 .assetUnitName("tst")
                 .assetName("testcoin")
                 .url(url_96)
-                .metadataHashUTF8(metadataHash)
+                .metadataHash(metadataHash)
                 .manager(manager)
                 .reserve(reserve)
                 .freeze(freeze)
@@ -167,7 +266,7 @@ public class TestTransaction {
                 "tst",
                 "testcoin",
                 url_96,
-                metadataHash.getBytes(StandardCharsets.UTF_8),
+                metadataHash,
                 manager,
                 reserve,
                 freeze,
@@ -188,16 +287,15 @@ public class TestTransaction {
     }
 
     @Test
-    public void testAssetParamsValidation() throws Exception
-    {
+    public void testAssetParamsValidation() throws Exception {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         Address manager = addr;
         Address reserve = addr;
         Address freeze = addr;
         Address clawback = addr;
-        String badMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF!";
-        String tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh";
-        String normalMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4";
+        byte[] tooShortMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyF".getBytes(StandardCharsets.UTF_8);
+        byte[] tooLongMetadataHash = "fACPO4nRgO55j1ndAK3W6Sgc4APkcyFhfACPO4nRgO55j1ndAK3W6Sgc4APkcyFh".getBytes(StandardCharsets.UTF_8);
+        byte[] normalMetadataHash = Base64.getDecoder().decode("IsHwwbvsnx9X5HMW1U468AXzbvRWk8VffLw0NQrmEq0=");
         String url_100 = new String(new char[100]).replace("\0", "w");
 
         assertThatThrownBy(() -> new AssetParams(
@@ -206,14 +304,14 @@ public class TestTransaction {
                 false,
                 "tst",
                 "testcoin",
-                "website",
-                badMetadataHash.getBytes(StandardCharsets.UTF_8),
+                url_100,
+                normalMetadataHash,
                 manager,
                 reserve,
                 freeze,
                 clawback))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("asset metadataHash '" +  badMetadataHash  + "' is not base64 encoded");
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("url length must be between 0 and 96 characters (inclusive).");
 
         assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
@@ -221,29 +319,29 @@ public class TestTransaction {
                 false,
                 "tst",
                 "testcoin",
-                url_100,
-                normalMetadataHash.getBytes(StandardCharsets.UTF_8),
+                "website",
+                tooShortMetadataHash,
                 manager,
                 reserve,
                 freeze,
                 clawback))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("url length must be between 0 and 96 characters (inclusive).");
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("asset metadataHash must have 32 bytes");
 
-            assertThatThrownBy(() -> new AssetParams(
+        assertThatThrownBy(() -> new AssetParams(
                 BigInteger.valueOf(100),
                 3,
                 false,
                 "tst",
                 "testcoin",
                 "website",
-                tooLongMetadataHash.getBytes(StandardCharsets.UTF_8),
+                tooLongMetadataHash,
                 manager,
                 reserve,
                 freeze,
                 clawback))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageContaining("asset metadataHash cannot be greater than 32 bytes");
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("asset metadataHash must have 32 bytes");
     }
 
     @Test
@@ -292,7 +390,7 @@ public class TestTransaction {
     }
 
     @Test
-    public void testAssetConfigStrictEmptyAddressChecking() throws NoSuchAlgorithmException  {
+    public void testAssetConfigStrictEmptyAddressChecking() throws NoSuchAlgorithmException {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
         byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
         Address sender = addr;
@@ -312,8 +410,8 @@ public class TestTransaction {
                 .freeze(freeze)
                 .clawback(new Address())
                 .build())
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
 
         assertThatThrownBy(() -> Transaction.AssetConfigureTransactionBuilder()
                 .sender(sender)
@@ -327,8 +425,8 @@ public class TestTransaction {
                 .freeze(freeze)
                 .clawback(new Address())
                 .build())
-            .isInstanceOf(RuntimeException.class)
-            .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("strict empty address checking requested but empty or default address supplied to one or more manager addresses");
     }
 
     @Test
@@ -402,11 +500,11 @@ public class TestTransaction {
         assertThat(encodedOutBytes).isEqualTo(goldenString);
         TestUtil.serializeDeserializeCheck(stx);
     }
-    
+
     @Test
     public void testTransactionGroupLimit() throws IOException, NoSuchAlgorithmException {
 
-        Transaction [] txs = new Transaction[TxGroup.MAX_TX_GROUP_SIZE+1];        
+        Transaction[] txs = new Transaction[TxGroup.MAX_TX_GROUP_SIZE + 1];
 
         boolean gotExpectedException = false;
         Digest gid = null;
@@ -420,7 +518,7 @@ public class TestTransaction {
         }
         assertThat(gotExpectedException).isEqualTo(true);
         assertThat(gid == null);
-   
+
     }
 
     @Test
@@ -720,7 +818,7 @@ public class TestTransaction {
         byte[] note = Encoder.decodeFromBase64("6gAVR0Nsv5Y=");
         String genesisID = "devnet-v33.0";
         Digest genesisHash = new Digest(Encoder.decodeFromBase64("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI="));
-        byte [] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
+        byte[] lease = {1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4};
 
         Transaction tx = Transaction.PaymentTransactionBuilder()
                 .sender(fromAddr)
@@ -770,14 +868,14 @@ public class TestTransaction {
     }
 
     @Nested
-    class TestFees{
+    class TestFees {
         @Test
         public void TxnCannotHaveBothFeeAndFlatFee() throws Exception {
             Address fromAddr = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
             Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
 
             Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-               Transaction.PaymentTransactionBuilder()
+                Transaction.PaymentTransactionBuilder()
                         .sender(fromAddr)
                         .fee(4)
                         .flatFee(4)
@@ -791,7 +889,7 @@ public class TestTransaction {
                         .build();
             });
 
-            String expected= "Cannot set both fee and flatFee.";
+            String expected = "Cannot set both fee and flatFee.";
             String actual = exception.getMessage();
 
             assertThat(actual.contains(expected));
@@ -803,16 +901,16 @@ public class TestTransaction {
             Address toAddr = new Address("PNWOET7LLOWMBMLE4KOCELCX6X3D3Q4H2Q4QJASYIEOF7YIPPQBG3YQ5YI");
 
             Transaction tx = Transaction.PaymentTransactionBuilder()
-                        .sender(fromAddr)
-                        .flatFee(1)
-                        .firstValid(1)
-                        .lastValid(10)
-                        .amount(1)
-                        .genesisHash(new Digest())
-                        .receiver(toAddr)
-                        .note(new byte[]{})
-                        .lease(new byte[]{})
-                        .build();
+                    .sender(fromAddr)
+                    .flatFee(1)
+                    .firstValid(1)
+                    .lastValid(10)
+                    .amount(1)
+                    .genesisHash(new Digest())
+                    .receiver(toAddr)
+                    .note(new byte[]{})
+                    .lease(new byte[]{})
+                    .build();
 
             assertThat(tx.fee).isEqualTo(1);
         }

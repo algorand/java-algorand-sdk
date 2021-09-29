@@ -10,6 +10,7 @@ import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.transaction.Lease;
 import com.algorand.algosdk.util.Encoder;
 
+@Deprecated
 public class ContractTemplate {
 
 	/**
@@ -156,7 +157,7 @@ public class ContractTemplate {
 
 		byte [] updatedProgramByteArray = new byte[updatedProgram.size()];
 		for (int x = 0; x < updatedProgram.size(); ++x) {
-			updatedProgramByteArray[x] = updatedProgram.get(x);			
+			updatedProgramByteArray[x] = updatedProgram.get(x);
 		}
 
 		return new ContractTemplate(updatedProgramByteArray);

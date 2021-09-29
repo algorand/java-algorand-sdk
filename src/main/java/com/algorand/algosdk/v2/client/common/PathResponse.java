@@ -14,7 +14,7 @@ public abstract class PathResponse {
     @Override
     public String toString() {
         try {
-            return mapper.writeValueAsString(this);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
             return null;

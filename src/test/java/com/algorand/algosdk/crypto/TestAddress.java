@@ -49,4 +49,12 @@ public class TestAddress {
         assertThat(o).isEqualTo(a);
         assertThat("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ").isEqualTo(o.encodeAsString());
     }
+
+    @Test
+    public void testAddressForApplication() throws Exception {
+        long appID = 77;
+        Address expected = new Address("PCYUFPA2ZTOYWTP43MX2MOX2OWAIAXUDNC2WFCXAGMRUZ3DYD6BWFDL5YM");
+        Address actual = Address.forApplication(appID);
+        assertThat(actual).isEqualTo(expected);
+    }
 }
