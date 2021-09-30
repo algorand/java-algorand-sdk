@@ -9,10 +9,12 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 public class Encoder {
     private static final char BASE32_PAD_CHAR = '=';
@@ -20,6 +22,16 @@ public class Encoder {
     private final static ObjectMapper jsonMapper;
     private final static ObjectMapper msgpMapper;
     private final static ObjectMapper basicMapper = new ObjectMapper();
+
+    /**
+     * The length of an encoded uint64, in bytes.
+     */
+    public static final int UINT64_LENGTH = 8;
+
+    /**
+     * The maximum value that a uint64 can contain.
+     */
+    public static final BigInteger MAX_UINT64 = new BigInteger("FFFFFFFFFFFFFFFF", 16);
 
     static {
         // It is important to sort fields alphabetically to match the Algorand canonical encoding
@@ -151,5 +163,54 @@ public class Encoder {
     public static byte[] decodeFromBase64(String str) {
         Base64 codec = new Base64();
         return codec.decode(str);
+    }
+    
+    /**
+     * Encode an non-negative integer as a big-endian uint64.
+     * @param value The value to encode.
+     * @throws IllegalArgumentException if value is negative.
+     * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
+     */
+    public static byte[] encodeUint64(long value) {
+        return Encoder.encodeUint64(BigInteger.valueOf(value));
+    }
+
+    /**
+     * Encode an non-negative integer as a big-endian uint64.
+     * @param value The value to encode.
+     * @throws IllegalArgumentException if value cannot be represented by a uint64.
+     * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
+     */
+    public static byte[] encodeUint64(BigInteger value) {
+        if (value.compareTo(BigInteger.ZERO) < 0 || value.compareTo(MAX_UINT64) > 0) {
+            throw new IllegalArgumentException("Value cannot be represented by a uint64");
+        }
+
+        byte[] fixedLengthEncoding = new byte[Encoder.UINT64_LENGTH];
+
+        byte[] encodedValue = value.toByteArray();
+        if (encodedValue.length > 0 && encodedValue[0] == 0) {
+            // encodedValue is actually encoded as a signed 2's complement value, so there may be a
+            // leading 0 for some encodings -- ignore it
+            encodedValue = ArrayUtils.subarray(encodedValue, 1, encodedValue.length);
+        }
+
+        System.arraycopy(encodedValue, 0, fixedLengthEncoding, Encoder.UINT64_LENGTH - encodedValue.length, encodedValue.length);
+
+        return fixedLengthEncoding;
+    }
+
+    /**
+     * Decode an encoded big-endian uint64 value.
+     * @param encoded The encoded uint64 value. Its length must be Encoder.UINT64_LENGTH.
+     * @throws IllegalArgumentException if encoded is the wrong length.
+     * @return The decoded value.
+     */
+    public static BigInteger decodeUint64(byte[] encoded) {
+        if (encoded.length != Encoder.UINT64_LENGTH) {
+            throw new IllegalArgumentException("Length of byte array is invalid");
+        }
+
+        return new BigInteger(1, encoded);
     }
 }
