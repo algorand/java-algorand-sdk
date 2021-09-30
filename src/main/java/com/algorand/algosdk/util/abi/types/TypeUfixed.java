@@ -2,11 +2,11 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-public class UfixedT extends Type {
+public class TypeUfixed extends Type {
     public final int bitSize;
     public final int precision;
 
-    public UfixedT(int size, int precision) {
+    public TypeUfixed(int size, int precision) {
         if (size < 8 || size > 512 || size % 8 != 0)
             throw new IllegalArgumentException(
                     "ufixed initialize failure: bitSize should be in [8, 512] and bitSize moe 8 = 0"
@@ -30,8 +30,8 @@ public class UfixedT extends Type {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof UfixedT)) return false;
-        return bitSize == ((UfixedT) o).bitSize && precision == ((UfixedT) o).precision;
+        if (!(o instanceof TypeUfixed)) return false;
+        return bitSize == ((TypeUfixed) o).bitSize && precision == ((TypeUfixed) o).precision;
     }
 
     @Override

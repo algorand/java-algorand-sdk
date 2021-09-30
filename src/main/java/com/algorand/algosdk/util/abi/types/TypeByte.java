@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
-public class ByteT extends Type {
-    public ByteT() {
+public class TypeByte extends Type {
+    public TypeByte() {
     }
 
     @Override
@@ -16,7 +16,7 @@ public class ByteT extends Type {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ByteT;
+        return obj instanceof TypeByte;
     }
 
     @Override

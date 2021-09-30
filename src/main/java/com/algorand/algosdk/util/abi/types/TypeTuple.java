@@ -5,10 +5,10 @@ import com.algorand.algosdk.algod.client.StringUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TupleT extends Type {
+public class TypeTuple extends Type {
     public final List<Type> childTypes;
 
-    public TupleT(List<Type> childTypes) {
+    public TypeTuple(List<Type> childTypes) {
         this.childTypes = childTypes;
     }
 
@@ -32,15 +32,15 @@ public class TupleT extends Type {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TupleT)) return false;
-        return this.childTypes.equals(((TupleT) o).childTypes);
+        if (!(o instanceof TypeTuple)) return false;
+        return this.childTypes.equals(((TypeTuple) o).childTypes);
     }
 
     @Override
     public int byteLen() throws IllegalAccessException, IllegalArgumentException {
         int size = 0;
         for (int i = 0; i < this.childTypes.size(); i++) {
-            if (this.childTypes.get(i) instanceof BoolT) {
+            if (this.childTypes.get(i) instanceof TypeBool) {
                 int after = Type.findBoolLR(this.childTypes.toArray(new Type[0]), i, 1);
                 i += after;
                 int boolNumber = after + 1;

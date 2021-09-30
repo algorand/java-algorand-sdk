@@ -2,10 +2,10 @@ package com.algorand.algosdk.util.abi.types;
 
 import java.util.Objects;
 
-public class ArrayDynamicT extends Type {
+public class TypeArrayDynamic extends Type {
     public final Type elemType;
 
-    public ArrayDynamicT(Type elemType) {
+    public TypeArrayDynamic(Type elemType) {
         this.elemType = elemType;
     }
 
@@ -22,8 +22,8 @@ public class ArrayDynamicT extends Type {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ArrayDynamicT)) return false;
-        return this.elemType.equals(((ArrayDynamicT) o).elemType);
+        if (!(o instanceof TypeArrayDynamic)) return false;
+        return this.elemType.equals(((TypeArrayDynamic) o).elemType);
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.algorand.algosdk.util.abi.values;
 
-import com.algorand.algosdk.util.abi.types.BoolT;
+import com.algorand.algosdk.util.abi.types.TypeBool;
 
-public class BoolV extends Value {
-    public BoolV(boolean tf) {
-        this.abiType = new BoolT();
+public class ValueBool extends Value {
+    public ValueBool(boolean tf) {
+        this.abiType = new TypeBool();
         this.value = tf;
     }
 

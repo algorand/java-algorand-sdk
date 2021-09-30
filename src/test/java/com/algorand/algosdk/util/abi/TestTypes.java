@@ -14,7 +14,7 @@ public class TestTypes {
     List<Type> type_testpool;
     List<Type> tuple_testpool;
 
-    private TupleT generateRandomTupleType() {
+    private TypeTuple generateRandomTupleType() {
         int tupleLen = rand.nextInt(20);
         List<Type> tupleElems = new ArrayList<>();
         for (int i = 0; i < tupleLen; i++) {
@@ -24,33 +24,33 @@ public class TestTypes {
             else
                 tupleElems.add(type_testpool.get(rand.nextInt(type_testpool.size())));
         }
-        return new TupleT(tupleElems);
+        return new TypeTuple(tupleElems);
     }
 
     @BeforeEach
     void setup() {
         rand = new Random();
         type_testpool = new ArrayList<>(Arrays.asList(
-                new BoolT(),
-                new AddressT(),
-                new StringT(),
-                new ByteT()
+                new TypeBool(),
+                new TypeAddress(),
+                new TypeString(),
+                new TypeByte()
         ));
         for (int i = 8; i <= 512; i += 8)
-            type_testpool.add(new UintT(i));
+            type_testpool.add(new TypeUint(i));
         for (int i = 8; i <= 512; i += 8) {
             for (int j = 1; j <= 160; j++)
-                type_testpool.add(new UfixedT(i, j));
+                type_testpool.add(new TypeUfixed(i, j));
         }
         int currentLength = type_testpool.size();
         for (int i = 0; i < currentLength; i++) {
-            type_testpool.add(new ArrayDynamicT(type_testpool.get(i)));
-            type_testpool.add(new ArrayStaticT(type_testpool.get(i), 10));
-            type_testpool.add(new ArrayStaticT(type_testpool.get(i), 20));
+            type_testpool.add(new TypeArrayDynamic(type_testpool.get(i)));
+            type_testpool.add(new TypeArrayStatic(type_testpool.get(i), 10));
+            type_testpool.add(new TypeArrayStatic(type_testpool.get(i), 20));
         }
         tuple_testpool = new ArrayList<>();
         for (int i = 0; i < 100; i++) {
-            TupleT tempTuple = generateRandomTupleType();
+            TypeTuple tempTuple = generateRandomTupleType();
             tuple_testpool.add(tempTuple);
         }
     }
@@ -58,7 +58,7 @@ public class TestTypes {
     @Test
     public void TestUintValid() {
         for (int i = 8; i <= 512; i += 8) {
-            UintT uintT = new UintT(i);
+            TypeUint uintT = new TypeUint(i);
             assertThat(uintT.string()).isEqualTo("uint" + i);
         }
     }
@@ -70,7 +70,7 @@ public class TestTypes {
             while (size_rand % 8 == 0 && size_rand <= 512 && size_rand >= 8)
                 size_rand = rand.nextInt(1000);
             final int finalSize_rand = size_rand;
-            Assertions.assertThrows(IllegalArgumentException.class, () -> new UintT(finalSize_rand));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> new TypeUint(finalSize_rand));
         }
     }
 
@@ -78,7 +78,7 @@ public class TestTypes {
     public void TestUfixedValid() {
         for (int i = 8; i <= 512; i += 8) {
             for (int j = 1; j <= 160; j++) {
-                UfixedT ufixedT = new UfixedT(i, j);
+                TypeUfixed ufixedT = new TypeUfixed(i, j);
                 assertThat(ufixedT.string()).isEqualTo("ufixed" + i + "x" + j);
             }
         }
@@ -97,46 +97,46 @@ public class TestTypes {
                 precision_rand = rand.nextInt(1024);
             final int final_rand_precision = precision_rand;
 
-            Assertions.assertThrows(IllegalArgumentException.class, () -> new UfixedT(final_rand_size, final_rand_precision));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> new TypeUfixed(final_rand_size, final_rand_precision));
         }
     }
 
     @Test
     public void TestSimpleTypesValid() {
-        assertThat(new ByteT().string()).isEqualTo("byte");
-        assertThat(new StringT().string()).isEqualTo("string");
-        assertThat(new AddressT().string()).isEqualTo("address");
-        assertThat(new BoolT().string()).isEqualTo("bool");
+        assertThat(new TypeByte().string()).isEqualTo("byte");
+        assertThat(new TypeString().string()).isEqualTo("string");
+        assertThat(new TypeAddress().string()).isEqualTo("address");
+        assertThat(new TypeBool().string()).isEqualTo("bool");
     }
 
     @Test
     public void TestTypeToStringValid() throws IllegalAccessException {
-        assertThat(new ArrayDynamicT(new UintT(32)).string()).isEqualTo("uint32[]");
-        assertThat(new ArrayDynamicT(new ArrayDynamicT(new ByteT())).string()).isEqualTo("byte[][]");
-        assertThat(new ArrayStaticT(new UfixedT(128, 10), 100).string()).isEqualTo("ufixed128x10[100]");
-        assertThat(new ArrayStaticT(new ArrayStaticT(new BoolT(), 128), 256).string()).isEqualTo("bool[128][256]");
+        assertThat(new TypeArrayDynamic(new TypeUint(32)).string()).isEqualTo("uint32[]");
+        assertThat(new TypeArrayDynamic(new TypeArrayDynamic(new TypeByte())).string()).isEqualTo("byte[][]");
+        assertThat(new TypeArrayStatic(new TypeUfixed(128, 10), 100).string()).isEqualTo("ufixed128x10[100]");
+        assertThat(new TypeArrayStatic(new TypeArrayStatic(new TypeBool(), 128), 256).string()).isEqualTo("bool[128][256]");
         assertThat(
-                new TupleT(
+                new TypeTuple(
                         Arrays.asList(
-                                new UintT(32),
-                                new TupleT(Arrays.asList(
-                                        new AddressT(),
-                                        new ByteT(),
-                                        new ArrayStaticT(new BoolT(), 10),
-                                        new ArrayDynamicT(new UfixedT(256, 10))
+                                new TypeUint(32),
+                                new TypeTuple(Arrays.asList(
+                                        new TypeAddress(),
+                                        new TypeByte(),
+                                        new TypeArrayStatic(new TypeBool(), 10),
+                                        new TypeArrayDynamic(new TypeUfixed(256, 10))
                                 ))
                         )
                 ).string()
         ).isEqualTo("(uint32,(address,byte,bool[10],ufixed256x10[]))");
-        assertThat(new TupleT(new ArrayList<>()).string()).isEqualTo("()");
+        assertThat(new TypeTuple(new ArrayList<>()).string()).isEqualTo("()");
     }
 
     @Test
     public void TestUintFromStringValid() {
         for (int i = 8; i <= 512; i += 8) {
             String encoded = "uint" + i;
-            UintT uintT = new UintT(i);
-            assertThat((UintT) Type.fromString(encoded)).isEqualTo(uintT);
+            TypeUint uintT = new TypeUint(i);
+            assertThat((TypeUint) Type.fromString(encoded)).isEqualTo(uintT);
         }
     }
 
@@ -156,8 +156,8 @@ public class TestTypes {
         for (int i = 8; i <= 512; i += 8) {
             for (int j = 1; j <= 160; j++) {
                 String encoded = "ufixed" + i + "x" + j;
-                UfixedT ufixedT = new UfixedT(i, j);
-                assertThat((UfixedT) Type.fromString(encoded)).isEqualTo(ufixedT);
+                TypeUfixed ufixedT = new TypeUfixed(i, j);
+                assertThat((TypeUfixed) Type.fromString(encoded)).isEqualTo(ufixedT);
             }
         }
     }
@@ -180,60 +180,60 @@ public class TestTypes {
 
     @Test
     public void TestSimpleTypeFromStringValid() {
-        assertThat(Type.fromString("address")).isEqualTo(new AddressT());
-        assertThat(Type.fromString("byte")).isEqualTo(new ByteT());
-        assertThat(Type.fromString("bool")).isEqualTo(new BoolT());
-        assertThat(Type.fromString("string")).isEqualTo(new StringT());
+        assertThat(Type.fromString("address")).isEqualTo(new TypeAddress());
+        assertThat(Type.fromString("byte")).isEqualTo(new TypeByte());
+        assertThat(Type.fromString("bool")).isEqualTo(new TypeBool());
+        assertThat(Type.fromString("string")).isEqualTo(new TypeString());
     }
 
     @Test
     public void TestTypeFromStringValid() {
-        assertThat(Type.fromString("uint256[]")).isEqualTo(new ArrayDynamicT(new UintT(256)));
-        assertThat(Type.fromString("ufixed256x64[]")).isEqualTo(new ArrayDynamicT(new UfixedT(256, 64)));
+        assertThat(Type.fromString("uint256[]")).isEqualTo(new TypeArrayDynamic(new TypeUint(256)));
+        assertThat(Type.fromString("ufixed256x64[]")).isEqualTo(new TypeArrayDynamic(new TypeUfixed(256, 64)));
         assertThat(Type.fromString("byte[][][][]")).isEqualTo(
-                new ArrayDynamicT(new ArrayDynamicT(new ArrayDynamicT(new ArrayDynamicT(new ByteT())))));
-        assertThat(Type.fromString("address[100]")).isEqualTo(new ArrayStaticT(new AddressT(), 100));
-        assertThat(Type.fromString("uint64[][100]")).isEqualTo(new ArrayStaticT(new ArrayDynamicT(new UintT(64)), 100));
-        assertThat(Type.fromString("()")).isEqualTo(new TupleT(new ArrayList<>()));
+                new TypeArrayDynamic(new TypeArrayDynamic(new TypeArrayDynamic(new TypeArrayDynamic(new TypeByte())))));
+        assertThat(Type.fromString("address[100]")).isEqualTo(new TypeArrayStatic(new TypeAddress(), 100));
+        assertThat(Type.fromString("uint64[][100]")).isEqualTo(new TypeArrayStatic(new TypeArrayDynamic(new TypeUint(64)), 100));
+        assertThat(Type.fromString("()")).isEqualTo(new TypeTuple(new ArrayList<>()));
         assertThat(Type.fromString("(uint32,(address,byte,bool[10],ufixed256x10[]),byte[])")).isEqualTo(
-                new TupleT(
+                new TypeTuple(
                         Arrays.asList(
-                                new UintT(32),
-                                new TupleT(Arrays.asList(
-                                        new AddressT(),
-                                        new ByteT(),
-                                        new ArrayStaticT(new BoolT(), 10),
-                                        new ArrayDynamicT(new UfixedT(256, 10))
+                                new TypeUint(32),
+                                new TypeTuple(Arrays.asList(
+                                        new TypeAddress(),
+                                        new TypeByte(),
+                                        new TypeArrayStatic(new TypeBool(), 10),
+                                        new TypeArrayDynamic(new TypeUfixed(256, 10))
                                 )),
-                                new ArrayDynamicT(new ByteT())
+                                new TypeArrayDynamic(new TypeByte())
                         )
                 )
         );
         assertThat(Type.fromString("(uint32,(address,byte,bool[10],(ufixed256x10[])))")).isEqualTo(
-                new TupleT(
+                new TypeTuple(
                         Arrays.asList(
-                                new UintT(32),
-                                new TupleT(Arrays.asList(
-                                        new AddressT(),
-                                        new ByteT(),
-                                        new ArrayStaticT(new BoolT(), 10),
-                                        new TupleT(Collections.singletonList(
-                                                new ArrayDynamicT(new UfixedT(256, 10))
+                                new TypeUint(32),
+                                new TypeTuple(Arrays.asList(
+                                        new TypeAddress(),
+                                        new TypeByte(),
+                                        new TypeArrayStatic(new TypeBool(), 10),
+                                        new TypeTuple(Collections.singletonList(
+                                                new TypeArrayDynamic(new TypeUfixed(256, 10))
                                         ))
                                 ))
                         )
                 )
         );
         assertThat(Type.fromString("((uint32),(address,(byte,bool[10],ufixed256x10[])))")).isEqualTo(
-                new TupleT(
+                new TypeTuple(
                         Arrays.asList(
-                                new TupleT(Collections.singletonList(new UintT(32))),
-                                new TupleT(Arrays.asList(
-                                        new AddressT(),
-                                        new TupleT(Arrays.asList(
-                                                new ByteT(),
-                                                new ArrayStaticT(new BoolT(), 10),
-                                                new ArrayDynamicT(new UfixedT(256, 10))
+                                new TypeTuple(Collections.singletonList(new TypeUint(32))),
+                                new TypeTuple(Arrays.asList(
+                                        new TypeAddress(),
+                                        new TypeTuple(Arrays.asList(
+                                                new TypeByte(),
+                                                new TypeArrayStatic(new TypeBool(), 10),
+                                                new TypeArrayDynamic(new TypeUfixed(256, 10))
                                         ))
                                 ))
                         )
@@ -289,7 +289,7 @@ public class TestTypes {
         for (Type t : tuple_testpool) {
             String encoded = t.string();
             Type decoded = Type.fromString(encoded);
-            assertThat((TupleT) decoded).isEqualTo(t);
+            assertThat((TypeTuple) decoded).isEqualTo(t);
         }
     }
 
@@ -331,8 +331,8 @@ public class TestTypes {
 
     @Test
     public void TestByteLen() throws IllegalAccessException {
-        assertThat(new AddressT().byteLen()).isEqualTo(32);
-        assertThat(new ByteT().byteLen()).isEqualTo(1);
+        assertThat(new TypeAddress().byteLen()).isEqualTo(32);
+        assertThat(new TypeByte().byteLen()).isEqualTo(1);
         for (Type t : type_testpool) {
             if (t.isDynamic())
                 Assertions.assertThrows(IllegalArgumentException.class, t::byteLen);
@@ -342,9 +342,9 @@ public class TestTypes {
                 Assertions.assertThrows(IllegalArgumentException.class, t::byteLen);
             else {
                 int size = 0;
-                Type[] ctList = ((TupleT) t).childTypes.toArray(new Type[0]);
+                Type[] ctList = ((TypeTuple) t).childTypes.toArray(new Type[0]);
                 for (int i = 0; i < ctList.length; i++) {
-                    if (ctList[i] instanceof BoolT) {
+                    if (ctList[i] instanceof TypeBool) {
                         int boolNum = Type.findBoolLR(ctList, i, 1) + 1;
                         size += boolNum / 8;
                         size += (boolNum % 8 != 0) ? 1 : 0;

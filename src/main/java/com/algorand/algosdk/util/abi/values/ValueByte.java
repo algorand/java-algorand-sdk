@@ -1,10 +1,10 @@
 package com.algorand.algosdk.util.abi.values;
 
-import com.algorand.algosdk.util.abi.types.ByteT;
+import com.algorand.algosdk.util.abi.types.TypeByte;
 
-public class ByteV extends Value {
-    public ByteV(byte b) {
-        this.abiType = new ByteT();
+public class ValueByte extends Value {
+    public ValueByte(byte b) {
+        this.abiType = new TypeByte();
         this.value = b;
     }
 

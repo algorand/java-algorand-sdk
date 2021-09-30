@@ -1,11 +1,11 @@
 package com.algorand.algosdk.util.abi.values;
 
-import com.algorand.algosdk.util.abi.types.UfixedT;
+import com.algorand.algosdk.util.abi.types.TypeUfixed;
 
 import java.math.BigInteger;
 
-public class UfixedV extends Value {
-    public UfixedV(UfixedT ufixedT, BigInteger value) {
+public class ValueUfixed extends Value {
+    public ValueUfixed(TypeUfixed ufixedT, BigInteger value) {
         BigInteger upperLimit = BigInteger.ONE.shiftLeft(ufixedT.bitSize);
         if (value.compareTo(upperLimit) >= 0)
             throw new IllegalArgumentException("cannot construct ABI ufixed value: passed in value larger than ufixed size");
@@ -13,13 +13,13 @@ public class UfixedV extends Value {
         this.value = value;
     }
 
-    public UfixedV(int size, int precision, BigInteger value) {
-        this(new UfixedT(size, precision), value);
+    public ValueUfixed(int size, int precision, BigInteger value) {
+        this(new TypeUfixed(size, precision), value);
     }
 
     @Override
     public byte[] encode() throws IllegalAccessException {
-        int ufixedSize = ((UfixedT) this.abiType).bitSize;
+        int ufixedSize = ((TypeUfixed) this.abiType).bitSize;
         return Value.encodeUintToBytes(((BigInteger) this.value), ufixedSize);
     }
 }

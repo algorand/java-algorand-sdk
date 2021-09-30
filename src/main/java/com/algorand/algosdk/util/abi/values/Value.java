@@ -54,32 +54,32 @@ public class Value {
     }
 
     public static Value decode(byte[] encoded, Type abiType) {
-        if (abiType instanceof UintT) {
-            if (encoded.length != ((UintT) abiType).bitSize / 8)
+        if (abiType instanceof TypeUint) {
+            if (encoded.length != ((TypeUint) abiType).bitSize / 8)
                 throw new IllegalArgumentException("encoded byte size not match with uint byte size");
-            return new UintV(((UintT) abiType).bitSize, Value.decodeBytesToUint(encoded));
-        } else if (abiType instanceof UfixedT) {
-            if (encoded.length != ((UfixedT) abiType).bitSize / 8)
+            return new ValueUint(((TypeUint) abiType).bitSize, Value.decodeBytesToUint(encoded));
+        } else if (abiType instanceof TypeUfixed) {
+            if (encoded.length != ((TypeUfixed) abiType).bitSize / 8)
                 throw new IllegalArgumentException("encoded byte size not match with ufixed byte size");
-            return new UfixedV((UfixedT) abiType, Value.decodeBytesToUint(encoded));
-        } else if (abiType instanceof AddressT) {
+            return new ValueUfixed((TypeUfixed) abiType, Value.decodeBytesToUint(encoded));
+        } else if (abiType instanceof TypeAddress) {
             if (encoded.length != 32)
                 throw new IllegalArgumentException("encode byte size not match with address byte size");
-            return new AddressV(encoded);
-        } else if (abiType instanceof BoolT) {
+            return new ValueAddress(encoded);
+        } else if (abiType instanceof TypeBool) {
             if (encoded.length != 1)
                 throw new IllegalArgumentException("encode byte size not match with bool byte size");
             if (encoded[0] == 0x00)
-                return new BoolV(false);
+                return new ValueBool(false);
             else if (encoded[0] == (byte) 0x80)
-                return new BoolV(true);
+                return new ValueBool(true);
             else
                 throw new IllegalArgumentException("encoded byte for bool is not either 0x80 or 0x00");
-        } else if (abiType instanceof ByteT) {
+        } else if (abiType instanceof TypeByte) {
             if (encoded.length != 1)
                 throw new IllegalArgumentException("encode byte size not match with byteT byte size");
-            return new ByteV(encoded[0]);
-        } else if (abiType instanceof StringT) {
+            return new ValueByte(encoded[0]);
+        } else if (abiType instanceof TypeString) {
             if (encoded.length < 2)
                 throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
             byte[] encodedLength = new byte[2];
@@ -88,12 +88,12 @@ public class Value {
             System.arraycopy(encoded, 2, encodedString, 0, encoded.length - 2);
             if (!Value.decodeBytesToUint(encodedLength).equals(BigInteger.valueOf(encodedString.length)))
                 throw new IllegalArgumentException("string decode failure: encoded bytes do not match with length header");
-            return new StringV(new String(encodedString, StandardCharsets.UTF_8));
-        } else if (abiType instanceof ArrayStaticT) {
+            return new ValueString(new String(encodedString, StandardCharsets.UTF_8));
+        } else if (abiType instanceof TypeArrayStatic) {
 
-        } else if (abiType instanceof ArrayDynamicT) {
+        } else if (abiType instanceof TypeArrayDynamic) {
 
-        } else if (abiType instanceof TupleT) {
+        } else if (abiType instanceof TypeTuple) {
 
         }
         throw new IllegalArgumentException("abiType cannot be inferred, decode failed");

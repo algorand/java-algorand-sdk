@@ -1,26 +1,26 @@
 package com.algorand.algosdk.util.abi.types;
 
-public class BoolT extends Type {
-    public BoolT() {
+public class TypeString extends Type {
+    public TypeString() {
     }
 
     @Override
     public String string() {
-        return "bool";
+        return "string";
     }
 
     @Override
     public boolean isDynamic() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof BoolT;
+        return obj instanceof TypeString;
     }
 
     @Override
     public int byteLen() throws IllegalAccessException {
-        return 1;
+        throw new IllegalArgumentException("Dynamic type cannot pre-compute byteLen");
     }
 }

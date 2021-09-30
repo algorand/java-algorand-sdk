@@ -31,38 +31,38 @@ public class Type {
     public static Type fromString(String str) throws IllegalArgumentException {
         if (str.endsWith("[]")) {
             Type elemType = Type.fromString(str.substring(0, str.length() - 2));
-            return new ArrayDynamicT(elemType);
+            return new TypeArrayDynamic(elemType);
         } else if (str.endsWith("]")) {
             Matcher m = staticArrayPattern.matcher(str);
             if (!m.matches())
                 throw new IllegalArgumentException("static array type ill format: " + str);
             Type elemT = Type.fromString(m.group("elemT"));
             int length = Integer.parseInt(m.group("len"));
-            return new ArrayStaticT(elemT, length);
+            return new TypeArrayStatic(elemT, length);
         } else if (str.startsWith("uint")) {
             int size = Integer.parseInt(str.substring(4));
-            return new UintT(size);
+            return new TypeUint(size);
         } else if (str.equals("byte")) {
-            return new ByteT();
+            return new TypeByte();
         } else if (str.startsWith("ufixed")) {
             Matcher m = ufixedPattern.matcher(str);
             if (!m.matches())
                 throw new IllegalArgumentException("ufixed type ill format: " + str);
             int size = Integer.parseInt(m.group("size"));
             int precision = Integer.parseInt(m.group("precision"));
-            return new UfixedT(size, precision);
+            return new TypeUfixed(size, precision);
         } else if (str.equals("bool")) {
-            return new BoolT();
+            return new TypeBool();
         } else if (str.equals("address")) {
-            return new AddressT();
+            return new TypeAddress();
         } else if (str.equals("string")) {
-            return new StringT();
+            return new TypeString();
         } else if (str.length() >= 2 && str.charAt(0) == '(' && str.endsWith(")")) {
             List<String> tupleContent = parseTupleContent(str.substring(1, str.length() - 1));
             List<Type> tupleTypes = new ArrayList<>();
             for (String subStr : tupleContent)
                 tupleTypes.add(Type.fromString(subStr));
-            return new TupleT(tupleTypes);
+            return new TypeTuple(tupleTypes);
         } else {
             throw new IllegalArgumentException("Cannot infer type from the string: " + str);
         }
@@ -124,7 +124,7 @@ public class Type {
         int until = 0;
         while (true) {
             int currentIndex = index + delta * until;
-            if (typeArray[currentIndex] instanceof BoolT) {
+            if (typeArray[currentIndex] instanceof TypeBool) {
                 if (currentIndex != typeArray.length - 1 && delta > 0)
                     until++;
                 else if (currentIndex != 0 && delta < 0)

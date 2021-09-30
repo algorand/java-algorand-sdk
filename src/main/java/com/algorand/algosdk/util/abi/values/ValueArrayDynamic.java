@@ -2,8 +2,8 @@ package com.algorand.algosdk.util.abi.values;
 
 import com.algorand.algosdk.util.abi.types.Type;
 
-public class ArrayDynamicV extends Value {
-    public ArrayDynamicV(Value[] val, Type elemType) {
+public class ValueArrayDynamic extends Value {
+    public ValueArrayDynamic(Value[] val, Type elemType) {
         if (val.length >= (1 << 16))
             throw new IllegalArgumentException("Cannot build dynamic array: array length >= 2^16");
         for (Value v : val) {

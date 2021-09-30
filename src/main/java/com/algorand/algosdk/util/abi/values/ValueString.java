@@ -1,13 +1,13 @@
 package com.algorand.algosdk.util.abi.values;
 
-import com.algorand.algosdk.util.abi.types.StringT;
+import com.algorand.algosdk.util.abi.types.TypeString;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
-public class StringV extends Value {
-    public StringV(String str) {
-        this.abiType = new StringT();
+public class ValueString extends Value {
+    public ValueString(String str) {
+        this.abiType = new TypeString();
         this.value = str;
     }
 

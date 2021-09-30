@@ -1,9 +1,9 @@
 package com.algorand.algosdk.util.abi.values;
 
-import com.algorand.algosdk.util.abi.types.ArrayStaticT;
+import com.algorand.algosdk.util.abi.types.TypeArrayStatic;
 
-public class ArrayStaticV extends Value {
-    public ArrayStaticV(Value[] val) {
+public class ValueArrayStatic extends Value {
+    public ValueArrayStatic(Value[] val) {
         if (val.length >= (1 << 16))
             throw new IllegalArgumentException("Cannot build static array: array length >= 2^16");
         if (val.length == 0)
@@ -13,7 +13,7 @@ public class ArrayStaticV extends Value {
                 throw new IllegalArgumentException("Cannot build static array: array element type not matching");
         }
         this.value = val;
-        this.abiType = new ArrayStaticT(val[0].abiType, val.length);
+        this.abiType = new TypeArrayStatic(val[0].abiType, val.length);
     }
 
     @Override
