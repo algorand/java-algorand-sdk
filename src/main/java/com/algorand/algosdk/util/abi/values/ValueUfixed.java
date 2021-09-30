@@ -1,5 +1,6 @@
 package com.algorand.algosdk.util.abi.values;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.abi.types.TypeUfixed;
 
 import java.math.BigInteger;
@@ -19,6 +20,6 @@ public class ValueUfixed extends Value {
 
     public byte[] encode() {
         int ufixedSize = ((TypeUfixed) this.abiType).bitSize;
-        return Value.encodeUintToBytes(((BigInteger) this.value), ufixedSize);
+        return Encoder.encodeUintToBytes(((BigInteger) this.value), ufixedSize);
     }
 }

@@ -1,10 +1,10 @@
 package com.algorand.algosdk.util.abi.values;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.abi.types.*;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 public abstract class Value {
     public Type abiType;
@@ -24,37 +24,15 @@ public abstract class Value {
         this(Value.decode(encoded, abiType));
     }
 
-    public static byte[] encodeUintToBytes(BigInteger var, int byteNum) {
-        if (var.compareTo(BigInteger.ZERO) < 0)
-            throw new IllegalArgumentException("Encode int to byte: input BigInteger < 0");
-        if (var.compareTo(BigInteger.ONE.shiftLeft(byteNum * 8)) <= 0)
-            throw new IllegalArgumentException("Encode int to byte: integer size exceeds the given byte number");
-
-        byte[] buffer = new byte[byteNum];
-        byte[] encoded = var.toByteArray();
-        // in case number >= 2^(byteNum * 8 - 1), the 2's complement representation will extend 1 byte header of 0's
-        if (encoded.length == byteNum + 1)
-            encoded = Arrays.copyOfRange(encoded, 1, encoded.length);
-
-        for (int i = 0; i < encoded.length; i++)
-            buffer[buffer.length - 1 - i] = encoded[encoded.length - 1 - i];
-
-        return buffer;
-    }
-
-    public static BigInteger decodeBytesToUint(byte[] encoded) {
-        return new BigInteger(1, encoded);
-    }
-
     public static Value decode(byte[] encoded, Type abiType) {
         if (abiType instanceof TypeUint) {
             if (encoded.length != ((TypeUint) abiType).bitSize / 8)
                 throw new IllegalArgumentException("encoded byte size not match with uint byte size");
-            return new ValueUint(((TypeUint) abiType).bitSize, Value.decodeBytesToUint(encoded));
+            return new ValueUint(((TypeUint) abiType).bitSize, Encoder.decodeBytesToUint(encoded));
         } else if (abiType instanceof TypeUfixed) {
             if (encoded.length != ((TypeUfixed) abiType).bitSize / 8)
                 throw new IllegalArgumentException("encoded byte size not match with ufixed byte size");
-            return new ValueUfixed((TypeUfixed) abiType, Value.decodeBytesToUint(encoded));
+            return new ValueUfixed((TypeUfixed) abiType, Encoder.decodeBytesToUint(encoded));
         } else if (abiType instanceof TypeAddress) {
             if (encoded.length != 32)
                 throw new IllegalArgumentException("encode byte size not match with address byte size");
@@ -79,7 +57,7 @@ public abstract class Value {
             byte[] encodedString = new byte[encoded.length - 2];
             System.arraycopy(encoded, 0, encodedLength, 0, 2);
             System.arraycopy(encoded, 2, encodedString, 0, encoded.length - 2);
-            if (!Value.decodeBytesToUint(encodedLength).equals(BigInteger.valueOf(encodedString.length)))
+            if (!Encoder.decodeBytesToUint(encodedLength).equals(BigInteger.valueOf(encodedString.length)))
                 throw new IllegalArgumentException("string decode failure: encoded bytes do not match with length header");
             return new ValueString(new String(encodedString, StandardCharsets.UTF_8));
         } else if (abiType instanceof TypeArrayStatic) {

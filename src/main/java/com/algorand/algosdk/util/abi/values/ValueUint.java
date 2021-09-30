@@ -1,5 +1,6 @@
 package com.algorand.algosdk.util.abi.values;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.abi.types.Type;
 import com.algorand.algosdk.util.abi.types.TypeUfixed;
 import com.algorand.algosdk.util.abi.types.TypeUint;
@@ -39,6 +40,6 @@ public class ValueUint extends Value {
 
     public byte[] encode() {
         int uintSize = ((TypeUfixed) this.abiType).bitSize;
-        return Value.encodeUintToBytes(((BigInteger) this.value), uintSize);
+        return Encoder.encodeUintToBytes(((BigInteger) this.value), uintSize);
     }
 }
