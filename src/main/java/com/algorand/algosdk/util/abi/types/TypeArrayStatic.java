@@ -14,12 +14,11 @@ public class TypeArrayStatic extends Type {
     }
 
     @Override
-    public String string() throws IllegalAccessException {
-        return this.elemType.string() + "[" + this.length + "]";
+    public String toString() {
+        return this.elemType.toString() + "[" + this.length + "]";
     }
 
-    @Override
-    public boolean isDynamic() throws IllegalAccessException {
+    public boolean isDynamic() {
         return this.elemType.isDynamic();
     }
 
@@ -35,8 +34,7 @@ public class TypeArrayStatic extends Type {
         return Objects.hash(elemType, length);
     }
 
-    @Override
-    public int byteLen() throws IllegalAccessException {
+    public int byteLen() {
         return this.elemType.byteLen() * this.length;
     }
 }

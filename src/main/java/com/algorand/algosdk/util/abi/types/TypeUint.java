@@ -14,11 +14,10 @@ public class TypeUint extends Type {
     }
 
     @Override
-    public String string() {
+    public String toString() {
         return "uint" + this.bitSize;
     }
 
-    @Override
     public boolean isDynamic() {
         return false;
     }
@@ -35,8 +34,7 @@ public class TypeUint extends Type {
         return Objects.hash(bitSize);
     }
 
-    @Override
-    public int byteLen() throws IllegalAccessException {
+    public int byteLen() {
         return this.bitSize / 8;
     }
 }

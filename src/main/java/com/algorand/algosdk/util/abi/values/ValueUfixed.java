@@ -17,8 +17,7 @@ public class ValueUfixed extends Value {
         this(new TypeUfixed(size, precision), value);
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         int ufixedSize = ((TypeUfixed) this.abiType).bitSize;
         return Value.encodeUintToBytes(((BigInteger) this.value), ufixedSize);
     }

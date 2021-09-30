@@ -16,8 +16,7 @@ public class ValueTuple extends Value {
         this.value = val;
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         // TODO
         return new byte[]{};
     }

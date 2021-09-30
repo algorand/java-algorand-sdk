@@ -6,7 +6,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-public class Value {
+public abstract class Value {
     public Type abiType;
     public Object value;
 
@@ -18,15 +18,13 @@ public class Value {
         this.value = o.value;
     }
 
-    public byte[] encode() throws IllegalAccessException {
-        throw new IllegalAccessException("Should not access to base value method: encode");
-    }
+    public abstract byte[] encode();
 
-    public Value(byte[] encoded, Type abiType) throws IllegalArgumentException {
+    public Value(byte[] encoded, Type abiType) {
         this(Value.decode(encoded, abiType));
     }
 
-    public static byte[] encodeUintToBytes(BigInteger var, int byteNum) throws IllegalArgumentException {
+    public static byte[] encodeUintToBytes(BigInteger var, int byteNum) {
         if (var.compareTo(BigInteger.ZERO) < 0)
             throw new IllegalArgumentException("Encode int to byte: input BigInteger < 0");
         if (var.compareTo(BigInteger.ONE.shiftLeft(byteNum * 8)) <= 0)
@@ -45,12 +43,7 @@ public class Value {
     }
 
     public static BigInteger decodeBytesToUint(byte[] encoded) {
-        BigInteger res = BigInteger.ZERO;
-        for (byte b : encoded) {
-            res = res.shiftLeft(8);
-            res = res.add(BigInteger.valueOf(b));
-        }
-        return res;
+        return new BigInteger(1, encoded);
     }
 
     public static Value decode(byte[] encoded, Type abiType) {

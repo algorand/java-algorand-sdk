@@ -13,15 +13,14 @@ public class TypeTuple extends Type {
     }
 
     @Override
-    public String string() throws IllegalAccessException {
+    public String toString() {
         List<String> childStrs = new ArrayList<>();
         for (Type t : this.childTypes)
-            childStrs.add(t.string());
+            childStrs.add(t.toString());
         return "(" + StringUtil.join(childStrs.toArray(new String[0]), ",") + ")";
     }
 
-    @Override
-    public boolean isDynamic() throws IllegalAccessException {
+    public boolean isDynamic() {
         for (Type t : this.childTypes) {
             if (t.isDynamic())
                 return true;
@@ -36,8 +35,7 @@ public class TypeTuple extends Type {
         return this.childTypes.equals(((TypeTuple) o).childTypes);
     }
 
-    @Override
-    public int byteLen() throws IllegalAccessException, IllegalArgumentException {
+    public int byteLen() {
         int size = 0;
         for (int i = 0; i < this.childTypes.size(); i++) {
             if (this.childTypes.get(i) instanceof TypeBool) {

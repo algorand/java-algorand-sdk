@@ -11,8 +11,7 @@ public class ValueString extends Value {
         this.value = str;
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         byte[] buffer = ((String) this.value).getBytes(StandardCharsets.UTF_8);
         if (buffer.length >= (1 << 16))
             throw new IllegalArgumentException("string casted to byte exceeds uint16 maximum, error");

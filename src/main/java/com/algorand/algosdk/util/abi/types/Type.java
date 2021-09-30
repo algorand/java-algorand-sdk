@@ -7,28 +7,20 @@ import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Type {
+public abstract class Type {
     private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>[1-9][\\d]*)]$");
     private static final Pattern ufixedPattern = Pattern.compile("^ufixed(?<size>[1-9][\\d]*)x(?<precision>[1-9][\\d]*)$");
 
-    public String string() throws IllegalAccessException {
-        throw new IllegalAccessException("Should not access base type method: string");
-    }
-
-    public boolean isDynamic() throws IllegalAccessException {
-        throw new IllegalAccessException("Should not access base type method: isDynamic");
-    }
+    public abstract boolean isDynamic();
 
     @Override
     public boolean equals(Object obj) {
         return false;
     }
 
-    public int byteLen() throws IllegalAccessException {
-        throw new IllegalAccessException("Should not access base type method: byteLen");
-    }
+    public abstract int byteLen();
 
-    public static Type fromString(String str) throws IllegalArgumentException {
+    public static Type fromString(String str) {
         if (str.endsWith("[]")) {
             Type elemType = Type.fromString(str.substring(0, str.length() - 2));
             return new TypeArrayDynamic(elemType);

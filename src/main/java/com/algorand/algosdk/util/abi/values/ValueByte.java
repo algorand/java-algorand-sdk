@@ -8,8 +8,7 @@ public class ValueByte extends Value {
         this.value = b;
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         return new byte[]{(byte) this.value};
     }
 }

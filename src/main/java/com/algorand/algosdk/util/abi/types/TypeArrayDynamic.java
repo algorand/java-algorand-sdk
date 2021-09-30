@@ -10,11 +10,10 @@ public class TypeArrayDynamic extends Type {
     }
 
     @Override
-    public String string() throws IllegalAccessException {
-        return this.elemType.string() + "[]";
+    public String toString() {
+        return this.elemType.toString() + "[]";
     }
 
-    @Override
     public boolean isDynamic() {
         return true;
     }
@@ -31,8 +30,7 @@ public class TypeArrayDynamic extends Type {
         return Objects.hash(elemType);
     }
 
-    @Override
-    public int byteLen() throws IllegalAccessException {
+    public int byteLen() {
         throw new IllegalArgumentException("Dynamic type cannot pre-compute byteLen");
     }
 }

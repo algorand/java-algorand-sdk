@@ -8,8 +8,7 @@ public class ValueBool extends Value {
         this.value = tf;
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         return ((boolean) this.value) ? new byte[]{(byte) 0x80} : new byte[]{0x00};
     }
 }

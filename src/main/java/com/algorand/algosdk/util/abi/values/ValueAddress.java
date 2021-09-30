@@ -10,8 +10,7 @@ public class ValueAddress extends Value {
         this.value = address;
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         return (byte[]) this.value;
     }
 }

@@ -5,11 +5,10 @@ public class TypeAddress extends Type {
     }
 
     @Override
-    public String string() {
+    public String toString() {
         return "address";
     }
 
-    @Override
     public boolean isDynamic() {
         return false;
     }
@@ -19,8 +18,7 @@ public class TypeAddress extends Type {
         return obj instanceof TypeAddress;
     }
 
-    @Override
-    public int byteLen() throws IllegalAccessException {
+    public int byteLen() {
         return 32;
     }
 }

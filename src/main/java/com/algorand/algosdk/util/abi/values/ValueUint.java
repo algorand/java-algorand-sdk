@@ -16,8 +16,7 @@ public class ValueUint extends Value {
         this.value = value;
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         int uintSize = ((TypeUfixed) this.abiType).bitSize;
         return Value.encodeUintToBytes(((BigInteger) this.value), uintSize);
     }

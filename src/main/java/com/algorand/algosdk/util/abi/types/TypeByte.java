@@ -5,11 +5,10 @@ public class TypeByte extends Type {
     }
 
     @Override
-    public String string() {
+    public String toString() {
         return "byte";
     }
 
-    @Override
     public boolean isDynamic() {
         return false;
     }
@@ -19,8 +18,7 @@ public class TypeByte extends Type {
         return obj instanceof TypeByte;
     }
 
-    @Override
-    public int byteLen() throws IllegalAccessException {
+    public int byteLen() {
         return 1;
     }
 }

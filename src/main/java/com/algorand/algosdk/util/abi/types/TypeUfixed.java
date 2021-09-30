@@ -18,11 +18,10 @@ public class TypeUfixed extends Type {
     }
 
     @Override
-    public String string() {
+    public String toString() {
         return "ufixed" + this.bitSize + "x" + this.precision;
     }
 
-    @Override
     public boolean isDynamic() {
         return false;
     }
@@ -39,8 +38,7 @@ public class TypeUfixed extends Type {
         return Objects.hash(bitSize, precision);
     }
 
-    @Override
-    public int byteLen() throws IllegalAccessException {
+    public int byteLen() {
         return this.bitSize / 8;
     }
 }

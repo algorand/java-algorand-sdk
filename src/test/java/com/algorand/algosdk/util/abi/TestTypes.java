@@ -59,7 +59,7 @@ public class TestTypes {
     public void TestUintValid() {
         for (int i = 8; i <= 512; i += 8) {
             TypeUint uintT = new TypeUint(i);
-            assertThat(uintT.string()).isEqualTo("uint" + i);
+            assertThat(uintT.toString()).isEqualTo("uint" + i);
         }
     }
 
@@ -79,7 +79,7 @@ public class TestTypes {
         for (int i = 8; i <= 512; i += 8) {
             for (int j = 1; j <= 160; j++) {
                 TypeUfixed ufixedT = new TypeUfixed(i, j);
-                assertThat(ufixedT.string()).isEqualTo("ufixed" + i + "x" + j);
+                assertThat(ufixedT.toString()).isEqualTo("ufixed" + i + "x" + j);
             }
         }
     }
@@ -103,18 +103,18 @@ public class TestTypes {
 
     @Test
     public void TestSimpleTypesValid() {
-        assertThat(new TypeByte().string()).isEqualTo("byte");
-        assertThat(new TypeString().string()).isEqualTo("string");
-        assertThat(new TypeAddress().string()).isEqualTo("address");
-        assertThat(new TypeBool().string()).isEqualTo("bool");
+        assertThat(new TypeByte().toString()).isEqualTo("byte");
+        assertThat(new TypeString().toString()).isEqualTo("string");
+        assertThat(new TypeAddress().toString()).isEqualTo("address");
+        assertThat(new TypeBool().toString()).isEqualTo("bool");
     }
 
     @Test
     public void TestTypeToStringValid() throws IllegalAccessException {
-        assertThat(new TypeArrayDynamic(new TypeUint(32)).string()).isEqualTo("uint32[]");
-        assertThat(new TypeArrayDynamic(new TypeArrayDynamic(new TypeByte())).string()).isEqualTo("byte[][]");
-        assertThat(new TypeArrayStatic(new TypeUfixed(128, 10), 100).string()).isEqualTo("ufixed128x10[100]");
-        assertThat(new TypeArrayStatic(new TypeArrayStatic(new TypeBool(), 128), 256).string()).isEqualTo("bool[128][256]");
+        assertThat(new TypeArrayDynamic(new TypeUint(32)).toString()).isEqualTo("uint32[]");
+        assertThat(new TypeArrayDynamic(new TypeArrayDynamic(new TypeByte())).toString()).isEqualTo("byte[][]");
+        assertThat(new TypeArrayStatic(new TypeUfixed(128, 10), 100).toString()).isEqualTo("ufixed128x10[100]");
+        assertThat(new TypeArrayStatic(new TypeArrayStatic(new TypeBool(), 128), 256).toString()).isEqualTo("bool[128][256]");
         assertThat(
                 new TypeTuple(
                         Arrays.asList(
@@ -126,9 +126,9 @@ public class TestTypes {
                                         new TypeArrayDynamic(new TypeUfixed(256, 10))
                                 ))
                         )
-                ).string()
+                ).toString()
         ).isEqualTo("(uint32,(address,byte,bool[10],ufixed256x10[]))");
-        assertThat(new TypeTuple(new ArrayList<>()).string()).isEqualTo("()");
+        assertThat(new TypeTuple(new ArrayList<>()).toString()).isEqualTo("()");
     }
 
     @Test
@@ -287,7 +287,7 @@ public class TestTypes {
     @Test
     public void TestTupleRoundTrip() throws IllegalAccessException {
         for (Type t : tuple_testpool) {
-            String encoded = t.string();
+            String encoded = t.toString();
             Type decoded = Type.fromString(encoded);
             assertThat((TypeTuple) decoded).isEqualTo(t);
         }
@@ -302,14 +302,14 @@ public class TestTypes {
         for (int i = 0; i < 1000; i++) {
             int index0 = rand.nextInt(type_testpool.size());
             int index1 = rand.nextInt(type_testpool.size());
-            while (type_testpool.get(index0).string().equals(type_testpool.get(index1).string()))
+            while (type_testpool.get(index0).toString().equals(type_testpool.get(index1).toString()))
                 index1 = rand.nextInt(type_testpool.size());
             assertThat(type_testpool.get(index0)).isNotEqualTo(type_testpool.get(index1));
         }
         for (int i = 0; i < 1000; i++) {
             int index0 = rand.nextInt(tuple_testpool.size());
             int index1 = rand.nextInt(tuple_testpool.size());
-            while (tuple_testpool.get(index0).string().equals(tuple_testpool.get(index1).string()))
+            while (tuple_testpool.get(index0).toString().equals(tuple_testpool.get(index1).toString()))
                 index1 = rand.nextInt(tuple_testpool.size());
             assertThat(tuple_testpool.get(index0)).isNotEqualTo(tuple_testpool.get(index1));
         }
@@ -318,12 +318,12 @@ public class TestTypes {
     @Test
     public void TestIsDynamic() throws IllegalAccessException {
         for (Type t : type_testpool) {
-            String encoded = t.string();
+            String encoded = t.toString();
             boolean inferFromString = encoded.contains("[]") || encoded.contains("string");
             assertThat(inferFromString).isEqualTo(t.isDynamic());
         }
         for (Type t : tuple_testpool) {
-            String encoded = t.string();
+            String encoded = t.toString();
             boolean inferFromString = encoded.contains("[]") || encoded.contains("string");
             assertThat(inferFromString).isEqualTo(t.isDynamic());
         }

@@ -16,8 +16,7 @@ public class ValueArrayStatic extends Value {
         this.abiType = new TypeArrayStatic(val[0].abiType, val.length);
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         // TODO
         return new byte[]{};
     }

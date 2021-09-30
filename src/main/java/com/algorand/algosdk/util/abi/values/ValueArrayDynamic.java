@@ -14,8 +14,7 @@ public class ValueArrayDynamic extends Value {
         this.abiType = elemType;
     }
 
-    @Override
-    public byte[] encode() throws IllegalAccessException {
+    public byte[] encode() {
         // TODO
         return  new byte[]{};
     }
