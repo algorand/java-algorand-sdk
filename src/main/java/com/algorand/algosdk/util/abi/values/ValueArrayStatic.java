@@ -17,7 +17,6 @@ public class ValueArrayStatic extends Value {
     }
 
     public byte[] encode() {
-        // TODO
-        return new byte[]{};
+        return new ValueTuple((Value[]) this.value).encode();
     }
 }

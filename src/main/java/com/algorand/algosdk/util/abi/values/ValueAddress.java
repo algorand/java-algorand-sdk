@@ -2,6 +2,8 @@ package com.algorand.algosdk.util.abi.values;
 
 import com.algorand.algosdk.util.abi.types.TypeAddress;
 
+import java.io.IOException;
+
 public class ValueAddress extends Value {
     public ValueAddress(byte[] address) {
         this.abiType = new TypeAddress();
@@ -11,6 +13,10 @@ public class ValueAddress extends Value {
     }
 
     public byte[] encode() {
-        return (byte[]) this.value;
+        Value[] values = new Value[32];
+        for (int i = 0; i < 32; i++)
+            values[i] = new ValueByte(((byte[]) this.value)[i]);
+        Value casted = new ValueTuple(values);
+        return casted.encode();
     }
 }

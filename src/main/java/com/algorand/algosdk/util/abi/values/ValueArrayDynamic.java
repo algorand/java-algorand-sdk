@@ -1,6 +1,10 @@
 package com.algorand.algosdk.util.abi.values;
 
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.abi.types.Type;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 
 public class ValueArrayDynamic extends Value {
     public ValueArrayDynamic(Value[] val, Type elemType) {
@@ -15,7 +19,11 @@ public class ValueArrayDynamic extends Value {
     }
 
     public byte[] encode() {
-        // TODO
-        return  new byte[]{};
+        byte[] castedEncode = new ValueTuple((Value[]) this.value).encode();
+        ByteBuffer bf = ByteBuffer.allocate(castedEncode.length + 2);
+        byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(((Value[]) this.value).length), 2);
+        bf.put(lengthEncode);
+        bf.put(castedEncode);
+        return bf.array();
     }
 }
