@@ -594,7 +594,7 @@ public class Account {
                 lsigAddr = lsig.toAddress();
             }
             return Account.signLogicTransactionWithAddress(lsig, lsigAddr, tx);
-        } catch (NoSuchAlgorithmException ex) {
+        } catch (Exception ex) {
             throw new IOException("could not sign transaction", ex);
         }
     }
