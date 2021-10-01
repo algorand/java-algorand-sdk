@@ -128,10 +128,15 @@ public class MultisigSignature implements Serializable {
                 }
             }
         }
-        if (verifiedCount < this.threshold) {
-            return false;
+        return verifiedCount >= this.threshold;
+    }
+
+    public MultisigAddress convertToMultisigAddress() {
+        List<Ed25519PublicKey> pubK = new ArrayList<>();
+        for (MultisigSubsig sig : this.subsigs) {
+            pubK.add(sig.key);
         }
-        return true;
+        return new MultisigAddress(this.version, this.threshold, pubK);
     }
 
     @Override
