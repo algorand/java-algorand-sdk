@@ -581,8 +581,7 @@ public class Account {
      * @param tx Transaction
      * @return SignedTransaction
      */
-    public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx)
-            throws IllegalArgumentException, IOException {
+    public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
         boolean hasSig = lsig.sig != null;
         boolean hasMsig = lsig.msig != null;
         Address lsigAddr;
@@ -596,7 +595,7 @@ public class Account {
             }
             return Account.signLogicTransactionWithAddress(lsig, lsigAddr, tx);
         } catch (NoSuchAlgorithmException ex) {
-            throw new IllegalArgumentException("could not sign transaction", ex);
+            throw new IOException("could not sign transaction", ex);
         }
     }
 
