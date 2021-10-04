@@ -110,7 +110,7 @@ public class TestTypes {
     }
 
     @Test
-    public void TestTypeToStringValid() throws IllegalAccessException {
+    public void TestTypeToStringValid() {
         assertThat(new TypeArrayDynamic(new TypeUint(32)).toString()).isEqualTo("uint32[]");
         assertThat(new TypeArrayDynamic(new TypeArrayDynamic(new TypeByte())).toString()).isEqualTo("byte[][]");
         assertThat(new TypeArrayStatic(new TypeUfixed(128, 10), 100).toString()).isEqualTo("ufixed128x10[100]");
@@ -285,7 +285,7 @@ public class TestTypes {
     }
 
     @Test
-    public void TestTupleRoundTrip() throws IllegalAccessException {
+    public void TestTupleRoundTrip() {
         for (Type t : tuple_testpool) {
             String encoded = t.toString();
             Type decoded = Type.fromString(encoded);
@@ -294,7 +294,7 @@ public class TestTypes {
     }
 
     @Test
-    public void TestSelfEquiv() throws IllegalAccessException {
+    public void TestSelfEquiv() {
         for (Type t : type_testpool)
             assertThat(t).isEqualTo(t);
         for (Type t : tuple_testpool)
@@ -316,7 +316,7 @@ public class TestTypes {
     }
 
     @Test
-    public void TestIsDynamic() throws IllegalAccessException {
+    public void TestIsDynamic() {
         for (Type t : type_testpool) {
             String encoded = t.toString();
             boolean inferFromString = encoded.contains("[]") || encoded.contains("string");
@@ -330,7 +330,7 @@ public class TestTypes {
     }
 
     @Test
-    public void TestByteLen() throws IllegalAccessException {
+    public void TestByteLen() {
         assertThat(new TypeAddress().byteLen()).isEqualTo(32);
         assertThat(new TypeByte().byteLen()).isEqualTo(1);
         for (Type t : type_testpool) {
