@@ -6,6 +6,7 @@ import com.algorand.algosdk.util.abi.types.TypeArrayDynamic;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 public class ValueArrayDynamic extends Value {
     public ValueArrayDynamic(Value[] val, Type elemType) {
@@ -26,5 +27,14 @@ public class ValueArrayDynamic extends Value {
         bf.put(lengthEncode);
         bf.put(castedEncode);
         return bf.array();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ValueArrayDynamic))
+            return false;
+        if (!this.abiType.equals(((ValueArrayDynamic) obj).abiType))
+            return false;
+        return Arrays.equals((Value[]) this.value, (Value[]) ((ValueArrayDynamic) obj).value);
     }
 }

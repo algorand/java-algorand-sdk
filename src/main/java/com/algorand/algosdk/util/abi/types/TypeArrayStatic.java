@@ -1,5 +1,7 @@
 package com.algorand.algosdk.util.abi.types;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class TypeArrayStatic extends Type {
@@ -35,6 +37,13 @@ public class TypeArrayStatic extends Type {
     }
 
     public int byteLen() {
+        if (this.elemType instanceof TypeBool) {
+            List<Type> castedTupleElems = new ArrayList<>();
+            for (int i = 0; i < this.length; i++)
+                castedTupleElems.add(new TypeBool());
+            TypeTuple casted = new TypeTuple(castedTupleElems);
+            return casted.byteLen();
+        }
         return this.elemType.byteLen() * this.length;
     }
 }

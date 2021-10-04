@@ -41,4 +41,15 @@ public class ValueUint extends Value {
         int uintSize = ((TypeUint) this.abiType).bitSize;
         return Encoder.encodeUintToBytes(((BigInteger) this.value), uintSize / Byte.SIZE);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ValueUint))
+            return false;
+        if (!((ValueUint) obj).abiType.equals(this.abiType))
+            return false;
+        BigInteger thisVal = (BigInteger) this.value;
+        BigInteger otherVal = (BigInteger) ((ValueUint) obj).value;
+        return thisVal.equals(otherVal);
+    }
 }

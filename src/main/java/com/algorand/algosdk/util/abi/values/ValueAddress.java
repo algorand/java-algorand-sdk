@@ -2,7 +2,7 @@ package com.algorand.algosdk.util.abi.values;
 
 import com.algorand.algosdk.util.abi.types.TypeAddress;
 
-import java.io.IOException;
+import java.util.Arrays;
 
 public class ValueAddress extends Value {
     public ValueAddress(byte[] address) {
@@ -18,5 +18,17 @@ public class ValueAddress extends Value {
             values[i] = new ValueByte(((byte[]) this.value)[i]);
         Value casted = new ValueTuple(values);
         return casted.encode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ValueAddress))
+            return false;
+        if (!this.abiType.equals(((ValueAddress) obj).abiType))
+            return false;
+        return Arrays.equals(
+                (byte[]) this.value,
+                (byte[]) ((ValueAddress) obj).value
+        );
     }
 }

@@ -11,4 +11,13 @@ public class ValueByte extends Value {
     public byte[] encode() {
         return new byte[]{(byte) this.value};
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ValueByte))
+            return false;
+        if (!this.abiType.equals(((ValueByte) obj).abiType))
+            return false;
+        return this.value.equals(((ValueByte) obj).value);
+    }
 }

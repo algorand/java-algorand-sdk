@@ -91,4 +91,11 @@ public class ValueTuple extends Value {
             bf.put(t);
         return bf.array();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ValueTuple))
+            return false;
+        return Arrays.equals((Value[]) this.value, (Value[]) ((ValueTuple) obj).value);
+    }
 }

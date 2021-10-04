@@ -28,4 +28,13 @@ public class ValueString extends Value {
         bf.put(castedBytes);
         return bf.array();
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof ValueString))
+            return false;
+        if (!this.abiType.equals(((ValueString) obj).abiType))
+            return false;
+        return this.value.equals(((ValueString) obj).value);
+    }
 }

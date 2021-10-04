@@ -61,15 +61,13 @@ public abstract class Value {
         } else if (abiType instanceof TypeArrayStatic) {
             TypeTuple castedTuple = castToTuple(((TypeArrayStatic) abiType).length, ((TypeArrayStatic) abiType).elemType);
             Value decodedCasted = Value.tupleDecoding(encoded, castedTuple);
-            decodedCasted.abiType = abiType;
-            return decodedCasted;
+            return new ValueArrayStatic((Value[]) decodedCasted.value);
         } else if (abiType instanceof TypeArrayDynamic) {
             byte[] encodedLength = Value.getLengthEncoded(encoded);
             byte[] encodedArray = Value.getContentEncoded(encoded);
             TypeTuple castedTuple = Value.castToTuple(Encoder.decodeBytesToUint(encodedLength).intValue(), ((TypeArrayDynamic) abiType).elemType);
             Value decodedCasted = Value.tupleDecoding(encodedArray, castedTuple);
-            decodedCasted.abiType = abiType;
-            return decodedCasted;
+            return new ValueArrayDynamic((Value[]) decodedCasted.value, ((TypeArrayDynamic) abiType).elemType);
         } else if (abiType instanceof TypeTuple) {
             return Value.tupleDecoding(encoded, (TypeTuple) abiType);
         }
@@ -109,7 +107,7 @@ public abstract class Value {
                 if (iterIndex + 2 > encoded.length)
                     throw new IllegalArgumentException("ill formed tuple dynamic typed element encoding: not enough bytes for index");
                 byte[] encodedIndex = new byte[2];
-                System.arraycopy(encodedIndex, iterIndex, encodedIndex, 0, 2);
+                System.arraycopy(encoded, iterIndex, encodedIndex, 0, 2);
                 int index = Encoder.decodeBytesToUint(encodedIndex).intValue();
                 dynamicSeg.add(index);
                 valuePartition.add(new byte[]{});
@@ -123,7 +121,7 @@ public abstract class Value {
                 after = Math.min(after, 7);
                 for (int boolIndex = 0; boolIndex <= after; boolIndex++) {
                     byte boolMask = (byte) (0x80 >> boolIndex);
-                    byte append = ((encoded[iterIndex] & boolMask) > 0) ? (byte) 0x80 : 0x00;
+                    byte append = ((encoded[iterIndex] & boolMask) != 0) ? (byte) 0x80 : 0x00;
                     valuePartition.add(new byte[]{append});
                 }
                 i += after;
@@ -140,8 +138,10 @@ public abstract class Value {
             if (i != castedType.childTypes.size() - 1 && iterIndex >= encoded.length)
                 throw new IllegalArgumentException("input bytes not enough to decode");
         }
-        if (dynamicSeg.size() > 0)
+        if (dynamicSeg.size() > 0) {
             dynamicSeg.add(encoded.length);
+            iterIndex = encoded.length;
+        }
         if (iterIndex < encoded.length)
             throw new IllegalArgumentException("input bytes not fully consumed");
 
