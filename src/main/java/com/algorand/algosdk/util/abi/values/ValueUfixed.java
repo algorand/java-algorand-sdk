@@ -20,6 +20,6 @@ public class ValueUfixed extends Value {
 
     public byte[] encode() {
         int ufixedSize = ((TypeUfixed) this.abiType).bitSize;
-        return Encoder.encodeUintToBytes(((BigInteger) this.value), ufixedSize);
+        return Encoder.encodeUintToBytes(((BigInteger) this.value), ufixedSize / Byte.SIZE);
     }
 }

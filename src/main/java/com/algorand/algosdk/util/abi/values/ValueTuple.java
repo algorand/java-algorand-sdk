@@ -4,10 +4,7 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.abi.types.TypeBool;
 import com.algorand.algosdk.util.abi.types.TypeTuple;
 import com.algorand.algosdk.util.abi.types.Type;
-import com.google.common.primitives.Bytes;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -34,6 +31,10 @@ public class ValueTuple extends Value {
 
         List<byte[]> heads = new ArrayList<>(tupleTypes.length);
         List<byte[]> tails = new ArrayList<>(tupleTypes.length);
+        for (int i = 0; i < tupleTypes.length; i++) {
+            heads.add(new byte[]{});
+            tails.add(new byte[]{});
+        }
         Set<Integer> dynamicIndex = new HashSet<>();
 
         for (int i = 0; i < tupleTypes.length; i++) {
@@ -65,8 +66,8 @@ public class ValueTuple extends Value {
                 currHead = currValue.encode();
                 currTail = new byte[]{};
             }
-            heads.add(currHead);
-            tails.add(currTail);
+            heads.set(i, currHead);
+            tails.set(i, currTail);
         }
 
         int headLength = 0;

@@ -115,8 +115,9 @@ public abstract class Value {
                 valuePartition.add(new byte[]{});
                 iterIndex += 2;
             } else if (castedType.childTypes.get(i) instanceof TypeBool) {
-                int before = Type.findBoolLR(castedType.childTypes.toArray(new Type[0]), i, -1);
-                int after = Type.findBoolLR(castedType.childTypes.toArray(new Type[0]), i, 1);
+                Type[] childTypeArr = castedType.childTypes.toArray(new Type[0]);
+                int before = Type.findBoolLR(childTypeArr, i, -1);
+                int after = Type.findBoolLR(childTypeArr, i, 1);
                 if (before % 8 != 0)
                     throw new IllegalArgumentException("expected bool number mod 8 == 0");
                 after = Math.min(after, 7);

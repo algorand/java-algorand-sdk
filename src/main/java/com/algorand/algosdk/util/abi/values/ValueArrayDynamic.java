@@ -2,6 +2,7 @@ package com.algorand.algosdk.util.abi.values;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.abi.types.Type;
+import com.algorand.algosdk.util.abi.types.TypeArrayDynamic;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -15,7 +16,7 @@ public class ValueArrayDynamic extends Value {
                 throw new IllegalArgumentException("Cannot build dynamic array: array element type not matching");
         }
         this.value = val;
-        this.abiType = elemType;
+        this.abiType = new TypeArrayDynamic(elemType);
     }
 
     public byte[] encode() {
