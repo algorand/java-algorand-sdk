@@ -231,7 +231,8 @@ public class TestDecode {
         byte[] encoded = new byte[]{
                 (byte) 0b11000000,
                 0x00, 0x03,
-                0x00, 0x02, (byte) 0b11000000};
+                0x00, 0x02, (byte) 0b11000000
+        };
         assertThat(Value.decode(encoded, new TypeTuple(
                 new ArrayList<>(
                         Arrays.asList(
