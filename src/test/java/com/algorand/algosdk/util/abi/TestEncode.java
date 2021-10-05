@@ -95,7 +95,7 @@ public class TestEncode {
         for (int length = 1; length <= 400; length++) {
             for (int i = 0; i < 10; i++) {
                 byte[] array = new byte[length];
-                new Random().nextBytes(array);
+                rand.nextBytes(array);
                 String genStrings = new String(array, StandardCharsets.UTF_8);
                 ValueString valueString = new ValueString(genStrings);
 
