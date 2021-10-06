@@ -8,7 +8,7 @@ public class TypeUint extends Type {
     public TypeUint(int size) {
         if (size < 8 || size > 512 || size % 8 != 0)
             throw new IllegalArgumentException(
-                    "uint initialize failure: bitSize should be in [8, 512] and bitSize moe 8 = 0"
+                    "uint initialize failure: bitSize should be in [8, 512] and bitSize mod 8 == 0"
             );
         this.bitSize = size;
     }
