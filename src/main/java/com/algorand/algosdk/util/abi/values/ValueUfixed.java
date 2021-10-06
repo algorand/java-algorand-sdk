@@ -18,6 +18,14 @@ public class ValueUfixed extends Value {
         this(new TypeUfixed(size, precision), value);
     }
 
+    public ValueUfixed(int size, int precision, byte[] encoded) {
+        this(new TypeUfixed(size, precision), Encoder.decodeBytesToUint(encoded));
+    }
+
+    public ValueUfixed(TypeUfixed ufixed, byte[] encoded) {
+        this(ufixed, Encoder.decodeBytesToUint(encoded));
+    }
+
     public byte[] encode() {
         int ufixedSize = ((TypeUfixed) this.abiType).bitSize;
         return Encoder.encodeUintToBytes(((BigInteger) this.value), ufixedSize / Byte.SIZE);

@@ -17,6 +17,14 @@ public class ValueUint extends Value {
         this.value = value;
     }
 
+    public ValueUint(int size, byte[] encoded) {
+        this(size, Encoder.decodeBytesToUint(encoded));
+    }
+
+    public ValueUint(TypeUint uintT, byte[] encoded) {
+        this(uintT.bitSize, Encoder.decodeBytesToUint(encoded));
+    }
+
     public ValueUint(byte val) {
         this.abiType = new TypeUint(8);
         this.value = new BigInteger(1, new byte[]{val});

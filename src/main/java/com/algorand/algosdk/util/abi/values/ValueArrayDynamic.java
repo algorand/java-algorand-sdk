@@ -3,6 +3,7 @@ package com.algorand.algosdk.util.abi.values;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.abi.types.Type;
 import com.algorand.algosdk.util.abi.types.TypeArrayDynamic;
+import com.algorand.algosdk.util.abi.types.TypeTuple;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -18,6 +19,15 @@ public class ValueArrayDynamic extends Value {
         }
         this.value = val;
         this.abiType = new TypeArrayDynamic(elemType);
+    }
+
+    public ValueArrayDynamic(Type elemT, byte[] encoded) {
+        byte[] encodedLength = Value.getLengthEncoded(encoded);
+        byte[] encodedArray = Value.getContentEncoded(encoded);
+        TypeTuple castedTuple = Value.castToTupleType(Encoder.decodeBytesToUint(encodedLength).intValue(), elemT);
+        ValueTuple decodedCasted = new ValueTuple(castedTuple, encodedArray);
+        this.abiType = new TypeArrayDynamic(elemT);
+        this.value = decodedCasted.value;
     }
 
     public byte[] encode() {

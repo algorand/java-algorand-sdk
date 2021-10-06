@@ -1,6 +1,8 @@
 package com.algorand.algosdk.util.abi.values;
 
+import com.algorand.algosdk.util.abi.types.Type;
 import com.algorand.algosdk.util.abi.types.TypeArrayStatic;
+import com.algorand.algosdk.util.abi.types.TypeTuple;
 
 import java.util.Arrays;
 
@@ -16,6 +18,17 @@ public class ValueArrayStatic extends Value {
         }
         this.value = val;
         this.abiType = new TypeArrayStatic(val[0].abiType, val.length);
+    }
+
+    public ValueArrayStatic(Type elemT, int size, byte[] encoded) {
+        TypeTuple castedTuple = castToTupleType(size, elemT);
+        ValueTuple casted = new ValueTuple(castedTuple, encoded);
+        this.value = casted.value;
+        this.abiType = new TypeArrayStatic(elemT, size);
+    }
+
+    public ValueArrayStatic(TypeArrayStatic staticArrT, byte[] encoded) {
+        this(staticArrT.elemType, staticArrT.length, encoded);
     }
 
     public byte[] encode() {

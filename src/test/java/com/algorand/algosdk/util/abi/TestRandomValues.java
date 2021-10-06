@@ -1,6 +1,7 @@
 package com.algorand.algosdk.util.abi;
 
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.abi.types.TypeTuple;
 import com.algorand.algosdk.util.abi.values.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -144,7 +145,7 @@ public class TestRandomValues {
     public void TestRandomElemRoundTrip() {
         for (Value v : testValuePool.get(8)) {
             byte[] encoded = v.encode();
-            Value decoded = Value.decode(encoded, v.abiType);
+            Value decoded = new ValueTuple((TypeTuple) v.abiType, encoded);
             assertThat(decoded).isEqualTo(v);
         }
     }

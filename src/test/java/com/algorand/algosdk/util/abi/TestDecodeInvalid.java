@@ -14,28 +14,28 @@ public class TestDecodeInvalid {
     public void TestBoolArray0() {
         byte[] input = new byte[]{(byte) 0xff};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(input, new TypeArrayStatic(new TypeBool(), 9)));
+                () -> new ValueArrayStatic(new TypeBool(), 9, input));
     }
 
     @Test
     public void TestBoolArray1() {
         byte[] input = new byte[]{(byte) 0xff, 0x00};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(input, new TypeArrayStatic(new TypeBool(), 8)));
+                () -> new ValueArrayStatic(new TypeBool(), 8, input));
     }
 
     @Test
     public void TestBoolArray2() {
         byte[] input = new byte[]{0x00, 0x0A, (byte) 0b10101010};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(input, new TypeArrayDynamic(new TypeBool())));
+                () -> new ValueArrayDynamic(new TypeBool(), input));
     }
 
     @Test
     public void TestBoolArray3() {
         byte[] input = new byte[]{0x00, 0x05, (byte) 0b10100000, 0x00};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(input, new TypeArrayDynamic(new TypeBool())));
+                () -> new ValueArrayDynamic(new TypeBool(), input));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(input, new TypeArrayStatic(new TypeBool(), 10)));
+                () -> new ValueArrayStatic(new TypeUint(64), 10, input));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(input, new TypeArrayStatic(new TypeUint(64), 6)));
+                () -> new ValueArrayStatic(new TypeUint(64), 6, input));
     }
 
     @Test
@@ -78,7 +78,7 @@ public class TestDecodeInvalid {
                 0x00, 0x03, (byte) 'D', (byte) 'E', (byte) 'F',
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(input, new TypeTuple(new ArrayList<>(
+                () -> new ValueTuple(new TypeTuple(new ArrayList<>(
                         Arrays.asList(
                                 new TypeString(),
                                 new TypeBool(),
@@ -87,7 +87,7 @@ public class TestDecodeInvalid {
                                 new TypeBool(),
                                 new TypeString()
                         )
-                )))
+                )), input)
         );
     }
 
@@ -96,19 +96,19 @@ public class TestDecodeInvalid {
         byte[] encode0 = new byte[]{(byte) 0b11000000, (byte) 0b11000000, 0x00};
         byte[] encode1 = new byte[]{(byte) 0b11000000};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(encode0, new TypeTuple(new ArrayList<>(
+                () -> new ValueTuple(new TypeTuple(new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayStatic(new TypeBool(), 2),
                                 new TypeArrayStatic(new TypeBool(), 2)
                         )
-                ))));
+                )), encode0));
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(encode1, new TypeTuple(new ArrayList<>(
+                () -> new ValueTuple(new TypeTuple(new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayStatic(new TypeBool(), 2),
                                 new TypeArrayStatic(new TypeBool(), 2)
                         )
-                ))));
+                )), encode1));
     }
 
     @Test
@@ -119,13 +119,13 @@ public class TestDecodeInvalid {
                 0x00, 0x02, (byte) 0b11000000
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(encoded, new TypeTuple(
+                () -> new ValueTuple(new TypeTuple(
                 new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayStatic(new TypeBool(), 2),
                                 new TypeArrayDynamic(new TypeBool())
                         )
-                ))));
+                )), encoded));
     }
 
     @Test
@@ -136,13 +136,13 @@ public class TestDecodeInvalid {
                 0x00, 0x02, (byte) 0b11000000
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(encoded, new TypeTuple(
+                () -> new ValueTuple(new TypeTuple(
                 new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayDynamic(new TypeBool()),
                                 new TypeArrayDynamic(new TypeBool())
                         )
-                ))));
+                )), encoded));
     }
 
     @Test
@@ -152,21 +152,21 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Value.decode(encoded, new TypeTuple(
+                () -> new ValueTuple(new TypeTuple(
                 new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayDynamic(new TypeBool()),
                                 new TypeArrayDynamic(new TypeBool())
                         )
                 )
-        )));
+        ), encoded));
     }
 
     @Test
     public void TestEmptyTuple() {
         Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> Value.decode(new byte[]{0x0F}, new TypeTuple(new ArrayList<>()))
+                () -> new ValueTuple(new TypeTuple(new ArrayList<>()), new byte[]{0x0F})
         );
     }
 }

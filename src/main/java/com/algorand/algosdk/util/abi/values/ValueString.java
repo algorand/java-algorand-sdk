@@ -13,6 +13,15 @@ public class ValueString extends Value {
         this.value = str;
     }
 
+    public ValueString(byte[] encoded) {
+        byte[] encodedLength = Value.getLengthEncoded(encoded);
+        byte[] encodedString = Value.getContentEncoded(encoded);
+        if (!Encoder.decodeBytesToUint(encodedLength).equals(BigInteger.valueOf(encodedString.length)))
+            throw new IllegalArgumentException("string decode failure: encoded bytes do not match with length header");
+        this.abiType = new TypeString();
+        this.value = new String(encodedString, StandardCharsets.UTF_8);
+    }
+
     public byte[] encode() {
         byte[] buffer = ((String) this.value).getBytes(StandardCharsets.UTF_8);
         if (buffer.length >= (1 << 16))

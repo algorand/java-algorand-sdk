@@ -8,6 +8,13 @@ public class ValueByte extends Value {
         this.value = b;
     }
 
+    public ValueByte(byte[] encoded) {
+        if (encoded.length != 1)
+            throw new IllegalArgumentException("encode byte size not match with byteT byte size");
+        this.abiType = new TypeByte();
+        this.value = encoded[0];
+    }
+
     public byte[] encode() {
         return new byte[]{(byte) this.value};
     }

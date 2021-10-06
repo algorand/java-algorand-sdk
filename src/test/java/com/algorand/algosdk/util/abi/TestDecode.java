@@ -32,14 +32,14 @@ public class TestDecode {
                     bigRand = new BigInteger(bitSize, rand);
                 ValueUint uint = new ValueUint(bitSize, bigRand);
                 byte[] encodedUint = uint.encode();
-                assertThat(Value.decode(encodedUint, new TypeUint(bitSize))).isEqualTo(uint);
+                assertThat(new ValueUint(bitSize, encodedUint)).isEqualTo(uint);
             }
             // 2^[bitSize] - 1
             BigInteger upperLimit = BigInteger.ONE.shiftLeft(bitSize).add(BigInteger.ONE.negate());
             byte[] expected = new byte[bitSize / Byte.SIZE];
             for (int i = 0; i < bitSize / Byte.SIZE; i++)
                 expected[i] = (byte) 0xff;
-            assertThat(Value.decode(expected, new TypeUint(bitSize))).isEqualTo(new ValueUint(bitSize, upperLimit));
+            assertThat(new ValueUint(bitSize, expected)).isEqualTo(new ValueUint(bitSize, upperLimit));
         }
     }
 
@@ -57,9 +57,9 @@ public class TestDecode {
                         bigRand = new BigInteger(bitSize, rand);
                     ValueUfixed ufixed = new ValueUfixed(bitSize, precision, bigRand);
                     byte[] encodedUfixed = ufixed.encode();
-                    assertThat(Value.decode(encodedUfixed, new TypeUfixed(bitSize, precision))).isEqualTo(ufixed);
+                    assertThat(new ValueUfixed(bitSize, precision, encodedUfixed)).isEqualTo(ufixed);
                 }
-                assertThat(Value.decode(expected, new TypeUfixed(bitSize, precision)))
+                assertThat(new ValueUfixed(bitSize, precision, expected))
                         .isEqualTo(new ValueUfixed(bitSize, precision, upperLimit));
             }
         }
@@ -74,16 +74,16 @@ public class TestDecode {
             while (bigRand.compareTo(BigInteger.ONE.shiftLeft(256)) >= 0)
                 bigRand = new BigInteger(256, rand);
             byte[] addrEncode = Encoder.encodeUintToBytes(bigRand, 32);
-            assertThat(Value.decode(addrEncode, new TypeAddress())).isEqualTo(new ValueAddress(addrEncode));
+            assertThat(new ValueAddress(addrEncode)).isEqualTo(new ValueAddress(addrEncode));
         }
-        assertThat(Value.decode(upperEncoded, new TypeAddress())).isEqualTo(new ValueAddress(upperEncoded));
+        assertThat(new ValueAddress(upperEncoded)).isEqualTo(new ValueAddress(upperEncoded));
     }
 
     @Test
     public void TestBoolValid() {
         for (int i = 0; i < 2; i++) {
             ValueBool boolV = new ValueBool(i == 0);
-            assertThat(Value.decode(new byte[]{(i == 0) ? (byte) 0x80 : 0x00}, new TypeBool())).isEqualTo(boolV);
+            assertThat(new ValueBool(new byte[]{(i == 0) ? (byte) 0x80 : 0x00})).isEqualTo(boolV);
         }
     }
 
@@ -91,7 +91,7 @@ public class TestDecode {
     public void TestByteValid() {
         for (int i = 0; i < (1 << 8); i++) {
             ValueByte byteV = new ValueByte((byte) i);
-            assertThat(Value.decode(new byte[]{(byte) i}, new TypeByte())).isEqualTo(byteV);
+            assertThat(new ValueByte(new byte[]{(byte) i})).isEqualTo(byteV);
         }
     }
 
@@ -108,7 +108,7 @@ public class TestDecode {
                 ByteBuffer bf = ByteBuffer.allocate(2 + genBytes.length);
                 bf.put(Encoder.encodeUintToBytes(BigInteger.valueOf(genBytes.length), 2));
                 bf.put(genBytes);
-                assertThat(Value.decode(bf.array(), new TypeString())).isEqualTo(valueString);
+                assertThat(new ValueString(bf.array())).isEqualTo(valueString);
             }
         }
     }
@@ -120,7 +120,7 @@ public class TestDecode {
         for (int i = 0; i < 5; i++)
             arrayElems[i] = new ValueBool(inputs[i]);
         ValueArrayStatic boolArray = new ValueArrayStatic(arrayElems);
-        Value decoded = Value.decode(new byte[]{(byte) 0b10011000}, new TypeArrayStatic(new TypeBool(), 5));
+        Value decoded = new ValueArrayStatic(new TypeBool(), 5, new byte[]{(byte) 0b10011000});
         assertThat(decoded).isEqualTo(boolArray);
     }
 
@@ -131,7 +131,7 @@ public class TestDecode {
         for (int i = 0; i < 11; i++)
             arrayElems[i] = new ValueBool(inputs[i]);
         ValueArrayStatic boolArray = new ValueArrayStatic(arrayElems);
-        Value decoded = Value.decode(new byte[]{0b00011010, (byte) 0b10100000}, new TypeArrayStatic(new TypeBool(), 11));
+        Value decoded = new ValueArrayStatic(new TypeBool(), 11, new byte[]{0b00011010, (byte) 0b10100000});
         assertThat(decoded).isEqualTo(boolArray);
     }
 
@@ -142,7 +142,7 @@ public class TestDecode {
         for (int i = 0; i < 11; i++)
             arrayElems[i] = new ValueBool(inputs[i]);
         ValueArrayDynamic boolArray = new ValueArrayDynamic(arrayElems, new TypeBool());
-        Value decode = Value.decode(new byte[]{0x00, 0x0B, 0b00011010, (byte) 0b10100000}, new TypeArrayDynamic(new TypeBool()));
+        Value decode = new ValueArrayDynamic(new TypeBool(), new byte[]{0x00, 0x0B, 0b00011010, (byte) 0b10100000});
         assertThat(decode).isEqualTo(boolArray);
     }
 
@@ -153,35 +153,35 @@ public class TestDecode {
         for (int i = 0; i < 8; i++)
             arrayElems[i] = new ValueUint(inputs[i]);
         ValueArrayStatic uintArray = new ValueArrayStatic(arrayElems);
-        Value decoded = Value.decode(new byte[]{
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
-                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
-        }, new TypeArrayStatic(new TypeUint(64), 8));
+        Value decoded = new ValueArrayStatic(new TypeUint(64), 8,
+                new byte[]{
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
+                        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
+                });
         assertThat(decoded).isEqualTo(uintArray);
     }
 
     @Test
     public void TestTuple0() {
-        Value decoded = Value.decode(new byte[]{
-                0x00, 0x05, (byte) 0b10100000, 0x00, 0x0A,
-                0x00, 0x03, (byte) 'A', (byte) 'B', (byte) 'C',
-                0x00, 0x03, (byte) 'D', (byte) 'E', (byte) 'F',
-        }, new TypeTuple(new ArrayList<>(
-                Arrays.asList(
+        Value decoded = new ValueTuple(
+                new Type[]{
                         new TypeString(),
                         new TypeBool(),
                         new TypeBool(),
                         new TypeBool(),
                         new TypeBool(),
                         new TypeString()
-                )
-        )));
+                }, new byte[]{
+                0x00, 0x05, (byte) 0b10100000, 0x00, 0x0A,
+                0x00, 0x03, (byte) 'A', (byte) 'B', (byte) 'C',
+                0x00, 0x03, (byte) 'D', (byte) 'E', (byte) 'F',
+        });
         ValueTuple tuple = new ValueTuple(new Value[]{
                 new ValueString("ABC"),
                 new ValueBool(true),
@@ -207,12 +207,12 @@ public class TestDecode {
         };
         Value tuple = new ValueTuple(elements);
         byte[] expected = new byte[]{(byte) 0b11000000, (byte) 0b11000000};
-        assertThat(Value.decode(expected, new TypeTuple(new ArrayList<>(
+        assertThat(new ValueTuple(new TypeTuple(new ArrayList<>(
                 Arrays.asList(
                         new TypeArrayStatic(new TypeBool(), 2),
                         new TypeArrayStatic(new TypeBool(), 2)
                 )
-        )))).isEqualTo(tuple);
+        )), expected)).isEqualTo(tuple);
     }
 
     @Test
@@ -233,14 +233,14 @@ public class TestDecode {
                 0x00, 0x03,
                 0x00, 0x02, (byte) 0b11000000
         };
-        assertThat(Value.decode(encoded, new TypeTuple(
+        assertThat(new ValueTuple(new TypeTuple(
                 new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayStatic(new TypeBool(), 2),
                                 new TypeArrayDynamic(new TypeBool())
                         )
                 )
-        ))).isEqualTo(tuple);
+        ), encoded)).isEqualTo(tuple);
     }
 
     @Test
@@ -261,14 +261,14 @@ public class TestDecode {
                 0x00, 0x02, (byte) 0b11000000,
                 0x00, 0x02, (byte) 0b11000000
         };
-        assertThat(Value.decode(encoded, new TypeTuple(
+        assertThat(new ValueTuple(new TypeTuple(
                 new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayDynamic(new TypeBool()),
                                 new TypeArrayDynamic(new TypeBool())
                         )
                 )
-        ))).isEqualTo(tuple);
+        ), encoded)).isEqualTo(tuple);
     }
 
     @Test
@@ -282,19 +282,19 @@ public class TestDecode {
                 0x00, 0x04, 0x00, 0x06,
                 0x00, 0x00, 0x00, 0x00
         };
-        assertThat(Value.decode(encoded, new TypeTuple(
+        assertThat(new ValueTuple(new TypeTuple(
                 new ArrayList<>(
                         Arrays.asList(
                                 new TypeArrayDynamic(new TypeBool()),
                                 new TypeArrayDynamic(new TypeBool())
                         )
                 )
-        ))).isEqualTo(tuple);
+        ), encoded)).isEqualTo(tuple);
     }
 
     @Test
     public void TestEmptyTuple() {
         Value tuple = new ValueTuple(new Value[0]);
-        assertThat(Value.decode(new byte[0], new TypeTuple(new ArrayList<>()))).isEqualTo(tuple);
+        assertThat(new ValueTuple(new Type[0], new byte[0])).isEqualTo(tuple);
     }
 }
