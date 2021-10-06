@@ -1,9 +1,7 @@
 package com.algorand.algosdk.util.abi.values;
 
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.abi.types.TypeBool;
-import com.algorand.algosdk.util.abi.types.TypeTuple;
-import com.algorand.algosdk.util.abi.types.Type;
+import com.algorand.algosdk.util.abi.types.*;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -92,7 +90,7 @@ public class ValueTuple extends Value {
         }
         Value[] values = new Value[tupleT.childTypes.size()];
         for (int i = 0; i < tupleT.childTypes.size(); i++)
-            values[i] = Value.decode(valuePartition.get(i), tupleT.childTypes.get(i));
+            values[i] = decodeMethodSelector(valuePartition.get(i), tupleT.childTypes.get(i));
 
         this.value = values;
         this.abiType = tupleT;
@@ -168,6 +166,28 @@ public class ValueTuple extends Value {
         for (byte[] t : tails)
             bf.put(t);
         return bf.array();
+    }
+
+    private static Value decodeMethodSelector(byte[] encoded, Type abiType) {
+        if (abiType instanceof TypeUint)
+            return new ValueUint((TypeUint) abiType, encoded);
+        else if (abiType instanceof TypeUfixed)
+            return new ValueUfixed((TypeUfixed) abiType, encoded);
+        else if (abiType instanceof TypeAddress)
+            return new ValueAddress(encoded);
+        else if (abiType instanceof TypeBool)
+            return new ValueBool(encoded);
+        else if (abiType instanceof TypeByte)
+            return new ValueByte(encoded);
+        else if (abiType instanceof TypeString)
+            return new ValueString(encoded);
+        else if (abiType instanceof TypeArrayStatic)
+            return new ValueArrayStatic((TypeArrayStatic) abiType, encoded);
+        else if (abiType instanceof TypeArrayDynamic)
+            return new ValueArrayDynamic(((TypeArrayDynamic) abiType).elemType, encoded);
+        else if (abiType instanceof TypeTuple)
+            return new ValueTuple((TypeTuple) abiType, encoded);
+        throw new IllegalArgumentException("abiType cannot be inferred, decode failed");
     }
 
     @Override

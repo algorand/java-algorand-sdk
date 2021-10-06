@@ -14,28 +14,6 @@ public abstract class Value {
 
     public abstract byte[] encode();
 
-    public static Value decode(byte[] encoded, Type abiType) {
-        if (abiType instanceof TypeUint)
-            return new ValueUint((TypeUint) abiType, encoded);
-        else if (abiType instanceof TypeUfixed)
-            return new ValueUfixed((TypeUfixed) abiType, encoded);
-        else if (abiType instanceof TypeAddress)
-            return new ValueAddress(encoded);
-        else if (abiType instanceof TypeBool)
-            return new ValueBool(encoded);
-        else if (abiType instanceof TypeByte)
-            return new ValueByte(encoded);
-        else if (abiType instanceof TypeString)
-            return new ValueString(encoded);
-        else if (abiType instanceof TypeArrayStatic)
-            return new ValueArrayStatic((TypeArrayStatic) abiType, encoded);
-        else if (abiType instanceof TypeArrayDynamic)
-            return new ValueArrayDynamic(((TypeArrayDynamic) abiType).elemType, encoded);
-        else if (abiType instanceof TypeTuple)
-            return new ValueTuple((TypeTuple) abiType, encoded);
-        throw new IllegalArgumentException("abiType cannot be inferred, decode failed");
-    }
-
     public static byte[] getLengthEncoded(byte[] encoded) {
         if (encoded.length < 2)
             throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
