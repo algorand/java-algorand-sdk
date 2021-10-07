@@ -20,6 +20,7 @@ public class TypeTuple extends Type {
         return "(" + StringUtil.join(childStrs.toArray(new String[0]), ",") + ")";
     }
 
+    @Override
     public boolean isDynamic() {
         for (Type t : this.childTypes) {
             if (t.isDynamic())
@@ -30,11 +31,11 @@ public class TypeTuple extends Type {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (!(o instanceof TypeTuple)) return false;
         return this.childTypes.equals(((TypeTuple) o).childTypes);
     }
 
+    @Override
     public int byteLen() {
         int size = 0;
         for (int i = 0; i < this.childTypes.size(); i++) {

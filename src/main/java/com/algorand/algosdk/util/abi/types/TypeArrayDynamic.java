@@ -14,22 +14,18 @@ public class TypeArrayDynamic extends Type {
         return this.elemType.toString() + "[]";
     }
 
+    @Override
     public boolean isDynamic() {
         return true;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (!(o instanceof TypeArrayDynamic)) return false;
         return this.elemType.equals(((TypeArrayDynamic) o).elemType);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(elemType);
-    }
-
     public int byteLen() {
         throw new IllegalArgumentException("Dynamic type cannot pre-compute byteLen");
     }

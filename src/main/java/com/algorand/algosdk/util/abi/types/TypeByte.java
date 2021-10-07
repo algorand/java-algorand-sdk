@@ -9,6 +9,7 @@ public class TypeByte extends Type {
         return "byte";
     }
 
+    @Override
     public boolean isDynamic() {
         return false;
     }
@@ -18,6 +19,7 @@ public class TypeByte extends Type {
         return obj instanceof TypeByte;
     }
 
+    @Override
     public int byteLen() {
         return 1;
     }

@@ -9,6 +9,7 @@ public class TypeString extends Type {
         return "string";
     }
 
+    @Override
     public boolean isDynamic() {
         return true;
     }
@@ -18,6 +19,7 @@ public class TypeString extends Type {
         return obj instanceof TypeString;
     }
 
+    @Override
     public int byteLen() {
         throw new IllegalArgumentException("Dynamic type cannot pre-compute byteLen");
     }

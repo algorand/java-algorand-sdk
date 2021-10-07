@@ -1,7 +1,5 @@
 package com.algorand.algosdk.util.abi.types;
 
-import java.util.Objects;
-
 public class TypeArrayStatic extends Type {
     public final Type elemType;
     public final int length;
@@ -18,25 +16,21 @@ public class TypeArrayStatic extends Type {
         return this.elemType.toString() + "[" + this.length + "]";
     }
 
+    @Override
     public boolean isDynamic() {
         return this.elemType.isDynamic();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (!(o instanceof TypeArrayStatic)) return false;
         return length == ((TypeArrayStatic) o).length && this.elemType.equals(((TypeArrayStatic) o).elemType);
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(elemType, length);
-    }
-
     public int byteLen() {
         if (this.elemType instanceof TypeBool)
-            return this.length / 8 + ((this.length % 8 != 0) ? 1 : 0);
+            return (this.length + 7) / 8;
         return this.elemType.byteLen() * this.length;
     }
 }

@@ -1,7 +1,5 @@
 package com.algorand.algosdk.util.abi.types;
 
-import java.util.Objects;
-
 public class TypeUfixed extends Type {
     public final int bitSize;
     public final int precision;
@@ -22,22 +20,18 @@ public class TypeUfixed extends Type {
         return "ufixed" + this.bitSize + "x" + this.precision;
     }
 
+    @Override
     public boolean isDynamic() {
         return false;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (!(o instanceof TypeUfixed)) return false;
         return bitSize == ((TypeUfixed) o).bitSize && precision == ((TypeUfixed) o).precision;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(bitSize, precision);
-    }
-
     public int byteLen() {
         return this.bitSize / 8;
     }

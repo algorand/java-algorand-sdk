@@ -9,6 +9,7 @@ public class TypeBool extends Type {
         return "bool";
     }
 
+    @Override
     public boolean isDynamic() {
         return false;
     }
@@ -18,6 +19,7 @@ public class TypeBool extends Type {
         return obj instanceof TypeBool;
     }
 
+    @Override
     public int byteLen() {
         return 1;
     }

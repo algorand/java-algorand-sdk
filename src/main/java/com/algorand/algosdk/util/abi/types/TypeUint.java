@@ -1,7 +1,5 @@
 package com.algorand.algosdk.util.abi.types;
 
-import java.util.Objects;
-
 public class TypeUint extends Type {
     public final int bitSize;
 
@@ -18,22 +16,18 @@ public class TypeUint extends Type {
         return "uint" + this.bitSize;
     }
 
+    @Override
     public boolean isDynamic() {
         return false;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (!(o instanceof TypeUint)) return false;
         return this.bitSize == ((TypeUint) o).bitSize;
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(bitSize);
-    }
-
     public int byteLen() {
         return this.bitSize / 8;
     }

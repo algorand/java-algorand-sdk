@@ -13,10 +13,7 @@ public abstract class Type {
 
     public abstract boolean isDynamic();
 
-    @Override
-    public boolean equals(Object obj) {
-        return false;
-    }
+    public abstract boolean equals(Object obj);
 
     public abstract int byteLen();
 
@@ -60,7 +57,7 @@ public abstract class Type {
         }
     }
 
-    public static class Segment {
+    private static class Segment {
         public int L, R;
 
         Segment(int left, int right) {
