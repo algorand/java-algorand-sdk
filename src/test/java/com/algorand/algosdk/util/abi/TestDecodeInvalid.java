@@ -1,12 +1,7 @@
 package com.algorand.algosdk.util.abi;
 
-import com.algorand.algosdk.util.abi.types.*;
-import com.algorand.algosdk.util.abi.values.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class TestDecodeInvalid {
 
@@ -14,28 +9,28 @@ public class TestDecodeInvalid {
     public void TestBoolArray0() {
         byte[] input = new byte[]{(byte) 0xff};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueArrayStatic(new TypeBool(), 9, input));
+                () -> Type.fromString("bool[9]").decode(input));
     }
 
     @Test
     public void TestBoolArray1() {
         byte[] input = new byte[]{(byte) 0xff, 0x00};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueArrayStatic(new TypeBool(), 8, input));
+                () -> Type.fromString("bool[8]").decode(input));
     }
 
     @Test
     public void TestBoolArray2() {
         byte[] input = new byte[]{0x00, 0x0A, (byte) 0b10101010};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueArrayDynamic(new TypeBool(), input));
+                () -> Type.fromString("bool[]").decode(input));
     }
 
     @Test
     public void TestBoolArray3() {
         byte[] input = new byte[]{0x00, 0x05, (byte) 0b10100000, 0x00};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueArrayDynamic(new TypeBool(), input));
+                () -> Type.fromString("bool[]").decode(input));
     }
 
     @Test
@@ -51,7 +46,7 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueArrayStatic(new TypeUint(64), 10, input));
+                () -> Type.fromString("uint64[10]").decode(input));
     }
 
     @Test
@@ -67,7 +62,7 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueArrayStatic(new TypeUint(64), 6, input));
+                () -> Type.fromString("uint64[6]").decode(input));
     }
 
     @Test
@@ -78,16 +73,7 @@ public class TestDecodeInvalid {
                 0x00, 0x03, (byte) 'D', (byte) 'E', (byte) 'F',
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueTuple(new TypeTuple(new ArrayList<>(
-                        Arrays.asList(
-                                new TypeString(),
-                                new TypeBool(),
-                                new TypeBool(),
-                                new TypeBool(),
-                                new TypeBool(),
-                                new TypeString()
-                        )
-                )), input)
+                () -> Type.fromString("(string,bool,bool,bool,bool,string)").decode(input)
         );
     }
 
@@ -96,19 +82,9 @@ public class TestDecodeInvalid {
         byte[] encode0 = new byte[]{(byte) 0b11000000, (byte) 0b11000000, 0x00};
         byte[] encode1 = new byte[]{(byte) 0b11000000};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueTuple(new TypeTuple(new ArrayList<>(
-                        Arrays.asList(
-                                new TypeArrayStatic(new TypeBool(), 2),
-                                new TypeArrayStatic(new TypeBool(), 2)
-                        )
-                )), encode0));
+                () -> Type.fromString("(bool[2],bool[2])").decode(encode0));
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueTuple(new TypeTuple(new ArrayList<>(
-                        Arrays.asList(
-                                new TypeArrayStatic(new TypeBool(), 2),
-                                new TypeArrayStatic(new TypeBool(), 2)
-                        )
-                )), encode1));
+                () -> Type.fromString("(bool[2],bool[2])").decode(encode1));
     }
 
     @Test
@@ -119,13 +95,8 @@ public class TestDecodeInvalid {
                 0x00, 0x02, (byte) 0b11000000
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueTuple(new TypeTuple(
-                new ArrayList<>(
-                        Arrays.asList(
-                                new TypeArrayStatic(new TypeBool(), 2),
-                                new TypeArrayDynamic(new TypeBool())
-                        )
-                )), encoded));
+                () -> Type.fromString("(bool[2],bool[])").decode(encoded));
+
     }
 
     @Test
@@ -136,13 +107,7 @@ public class TestDecodeInvalid {
                 0x00, 0x02, (byte) 0b11000000
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueTuple(new TypeTuple(
-                new ArrayList<>(
-                        Arrays.asList(
-                                new TypeArrayDynamic(new TypeBool()),
-                                new TypeArrayDynamic(new TypeBool())
-                        )
-                )), encoded));
+                () -> Type.fromString("(bool[],bool[])").decode(encoded));
     }
 
     @Test
@@ -152,21 +117,14 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new ValueTuple(new TypeTuple(
-                new ArrayList<>(
-                        Arrays.asList(
-                                new TypeArrayDynamic(new TypeBool()),
-                                new TypeArrayDynamic(new TypeBool())
-                        )
-                )
-        ), encoded));
+                () -> Type.fromString("(bool[],bool[])").decode(encoded));
     }
 
     @Test
     public void TestEmptyTuple() {
         Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> new ValueTuple(new TypeTuple(new ArrayList<>()), new byte[]{0x0F})
+                () -> Type.fromString("()").decode(new byte[]{0x0F})
         );
     }
 }

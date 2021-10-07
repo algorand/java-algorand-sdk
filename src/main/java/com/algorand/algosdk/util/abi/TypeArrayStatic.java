@@ -1,4 +1,4 @@
-package com.algorand.algosdk.util.abi.types;
+package com.algorand.algosdk.util.abi;
 
 public class TypeArrayStatic extends Type {
     public final Type elemType;
@@ -25,6 +25,21 @@ public class TypeArrayStatic extends Type {
     public boolean equals(Object o) {
         if (!(o instanceof TypeArrayStatic)) return false;
         return length == ((TypeArrayStatic) o).length && this.elemType.equals(((TypeArrayStatic) o).elemType);
+    }
+
+    @Override
+    public byte[] encode(Object o) {
+        if (!o.getClass().isArray())
+            throw new IllegalArgumentException("cannot infer type for abi static array type encode");
+        Object[] objArray = (Object[]) o;
+        if (objArray.length != this.length)
+            throw new IllegalArgumentException("cannot encode abi static array: length of value != length in array type");
+        return Type.castToTupleType(this.length, this.elemType).encode(objArray);
+    }
+
+    @Override
+    public Object decode(byte[] encoded) {
+        return Type.castToTupleType(this.length, this.elemType).decode(encoded);
     }
 
     @Override

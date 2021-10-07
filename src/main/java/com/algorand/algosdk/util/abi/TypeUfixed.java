@@ -1,4 +1,8 @@
-package com.algorand.algosdk.util.abi.types;
+package com.algorand.algosdk.util.abi;
+
+import com.algorand.algosdk.util.Encoder;
+
+import java.math.BigInteger;
 
 public class TypeUfixed extends Type {
     public final int bitSize;
@@ -29,6 +33,20 @@ public class TypeUfixed extends Type {
     public boolean equals(Object o) {
         if (!(o instanceof TypeUfixed)) return false;
         return bitSize == ((TypeUfixed) o).bitSize && precision == ((TypeUfixed) o).precision;
+    }
+
+    @Override
+    public byte[] encode(Object o) {
+        if (!(o instanceof BigInteger))
+            throw new IllegalArgumentException("cannot infer type for ufixed value encode");
+        return Encoder.encodeUintToBytes((BigInteger) o, this.bitSize / Byte.SIZE);
+    }
+
+    @Override
+    public Object decode(byte[] encoded) {
+        if (encoded.length != bitSize / Byte.SIZE)
+            throw new IllegalArgumentException("cannot decode for abi ufixed value, byte length not matching");
+        return Encoder.decodeBytesToUint(encoded);
     }
 
     @Override

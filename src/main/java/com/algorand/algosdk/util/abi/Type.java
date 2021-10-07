@@ -1,9 +1,6 @@
-package com.algorand.algosdk.util.abi.types;
+package com.algorand.algosdk.util.abi;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +13,10 @@ public abstract class Type {
     public abstract boolean equals(Object obj);
 
     public abstract int byteLen();
+
+    public abstract byte[] encode(Object obj);
+
+    public abstract Object decode(byte[] encoded);
 
     public static Type fromString(String str) {
         if (str.endsWith("[]")) {
@@ -76,21 +77,21 @@ public abstract class Type {
         if (str.contains(",,"))
             throw new IllegalArgumentException("parsing error: tuple content should not have consecutive commas");
 
-        Stack<Integer> parenStack = new Stack<>();
+        ArrayDeque<Integer> parenStack = new ArrayDeque<>();
         List<Segment> parenSegments = new ArrayList<>();
 
         for (int i = 0; i < str.length(); i++) {
             if (str.charAt(i) == '(')
                 parenStack.push(i);
             else if (str.charAt(i) == ')') {
-                if (parenStack.empty())
+                if (parenStack.isEmpty())
                     throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
                 int leftParenIndex = parenStack.pop();
-                if (parenStack.empty())
+                if (parenStack.isEmpty())
                     parenSegments.add(new Segment(leftParenIndex, i));
             }
         }
-        if (!parenStack.empty())
+        if (!parenStack.isEmpty())
             throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
 
         String strCopied = str;
@@ -126,5 +127,28 @@ public abstract class Type {
             }
         }
         return until;
+    }
+
+    public static byte[] getLengthEncoded(byte[] encoded) {
+        if (encoded.length < 2)
+            throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
+        byte[] encodedLength = new byte[2];
+        System.arraycopy(encoded, 0, encodedLength, 0, 2);
+        return encodedLength;
+    }
+
+    public static byte[] getContentEncoded(byte[] encoded) {
+        if (encoded.length < 2)
+            throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
+        byte[] encodedString = new byte[encoded.length - 2];
+        System.arraycopy(encoded, 2, encodedString, 0, encoded.length - 2);
+        return encodedString;
+    }
+
+    public static TypeTuple castToTupleType(int size, Type t) {
+        List<Type> tupleTypes = new ArrayList<>();
+        for (int i = 0; i < size; i++)
+            tupleTypes.add(t);
+        return new TypeTuple(tupleTypes);
     }
 }

@@ -1,6 +1,5 @@
 package com.algorand.algosdk.util.abi;
 
-import com.algorand.algosdk.util.abi.types.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
