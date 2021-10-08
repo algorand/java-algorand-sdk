@@ -116,7 +116,7 @@ public class TestEncode {
 
     @Test
     public void TestBoolArray1() {
-        Boolean[] inputs = new Boolean[]{false, false, false, true, true, false, true, false, true, false, true};
+        boolean[] inputs = new boolean[]{false, false, false, true, true, false, true, false, true, false, true};
         byte[] expected = new byte[]{0b00011010, (byte) 0b10100000};
         assertThat(new TypeArrayStatic(new TypeBool(), 11).encode(inputs)).isEqualTo(expected);
 
@@ -129,7 +129,7 @@ public class TestEncode {
 
     @Test
     public void TestBoolArray2() {
-        Boolean[] inputs = new Boolean[]{false, false, false, true, true, false, true, false, true, false, true};
+        boolean[] inputs = new boolean[]{false, false, false, true, true, false, true, false, true, false, true};
         byte[] expected = new byte[]{0x00, 0x0B, 0b00011010, (byte) 0b10100000};
         assertThat(new TypeArrayDynamic(new TypeBool()).encode(inputs)).isEqualTo(expected);
 
@@ -138,6 +138,41 @@ public class TestEncode {
 
         List<Object> listInputs = Arrays.asList(objInputs);
         assertThat(new TypeArrayDynamic(new TypeBool()).encode(listInputs)).isEqualTo(expected);
+    }
+
+    @Test
+    public void TestUintArray() {
+        long[] inputs = new long[]{1, 2, 3, 4, 5, 6, 7, 8};
+        byte[] expected = new byte[]{
+                0x00, 0x08,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x05,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
+                0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
+        };
+        assertThat(Type.fromString("uint64[]").encode(inputs)).isEqualTo(expected);
+
+        int[] inputsInt = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
+        assertThat(Type.fromString("uint64[]").encode(inputsInt)).isEqualTo(expected);
+
+        short[] inputsShort = new short[]{1, 2, 3, 4, 5, 6, 7, 8};
+        assertThat(Type.fromString("uint64[]").encode(inputsShort)).isEqualTo(expected);
+
+        byte[] inputsByte = new byte[]{1, 2, 3, 4, 5, 6, 7, 8};
+        assertThat(Type.fromString("uint64[]").encode(inputsByte)).isEqualTo(expected);
+
+        Integer[] inputIntegers = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8};
+        assertThat(Type.fromString("uint64[]").encode(inputIntegers)).isEqualTo(expected);
+
+        Object[] objInputs = Type.unifyToArrayOfObjects(inputs);
+        assertThat(Type.fromString("uint64[]").encode(objInputs)).isEqualTo(expected);
+
+        List<Object> listInputs = Arrays.asList(objInputs);
+        assertThat(Type.fromString("uint64[]").encode(listInputs)).isEqualTo(expected);
     }
 
     @Test
