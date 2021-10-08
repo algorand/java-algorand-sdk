@@ -1,5 +1,6 @@
 package com.algorand.algosdk.util.abi;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -111,7 +112,7 @@ public abstract class Type {
         return Arrays.asList(tupleSeg);
     }
 
-    public static int findBoolLR(Type[] typeArray, int index, int delta) {
+    static int findBoolLR(Type[] typeArray, int index, int delta) {
         int until = 0;
         while (true) {
             int currentIndex = index + delta * until;
@@ -128,6 +129,21 @@ public abstract class Type {
             }
         }
         return until;
+    }
+
+    static Object[] unifyToArrayOfObjects(Object val) {
+        if (val.getClass().isArray()) {
+            if (val instanceof Object[])
+                return (Object[]) val;
+            int length = Array.getLength(val);
+            Object[] outputArray = new Object[length];
+            for (int i = 0; i < length; ++i)
+                outputArray[i] = Array.get(val, i);
+            return outputArray;
+        } else if (val instanceof List<?>)
+            return ((List<?>) val).toArray(new Object[0]);
+        else
+            throw new IllegalArgumentException("cannot infer type for unify array/list-like object to object array");
     }
 
     public static byte[] getLengthEncoded(byte[] encoded) {

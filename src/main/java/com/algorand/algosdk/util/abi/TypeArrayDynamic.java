@@ -30,9 +30,7 @@ public class TypeArrayDynamic extends Type {
 
     @Override
     public byte[] encode(Object o) {
-        if (!(o instanceof Object[]))
-            throw new IllegalArgumentException("cannot infer type for abi dynamic array encode");
-        Object[] objArray = (Object[]) o;
+        Object[] objArray = Type.unifyToArrayOfObjects(o);
 
         byte[] castedEncode = Type.castToTupleType(objArray.length, this.elemType).encode(objArray);
         byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(objArray.length), ABI_DYNAMIC_HEAD_BYTE_LEN);

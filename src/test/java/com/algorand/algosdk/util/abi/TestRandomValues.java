@@ -1,5 +1,6 @@
 package com.algorand.algosdk.util.abi;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -138,7 +139,7 @@ public class TestRandomValues {
         for (int i = 0; i < 500; i++) {
             BigInteger tempAddressInt = this.genRandInt(256);
             byte[] addressEncode = Encoder.encodeUintToBytes(tempAddressInt, 32);
-            testValuePool.get(4).add(new RawValueWithABIType(new TypeAddress().toString(), addressEncode));
+            testValuePool.get(4).add(new RawValueWithABIType(new TypeAddress().toString(), new Address(addressEncode)));
         }
 
         for (int i = 1; i < 100; i++) {

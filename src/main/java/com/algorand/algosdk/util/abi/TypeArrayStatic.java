@@ -29,9 +29,7 @@ public class TypeArrayStatic extends Type {
 
     @Override
     public byte[] encode(Object o) {
-        if (!o.getClass().isArray())
-            throw new IllegalArgumentException("cannot infer type for abi static array type encode");
-        Object[] objArray = (Object[]) o;
+        Object[] objArray = Type.unifyToArrayOfObjects(o);
         if (objArray.length != this.length)
             throw new IllegalArgumentException("cannot encode abi static array: length of value != length in array type");
         return Type.castToTupleType(this.length, this.elemType).encode(objArray);

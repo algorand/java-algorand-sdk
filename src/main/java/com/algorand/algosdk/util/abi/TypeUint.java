@@ -38,13 +38,15 @@ public class TypeUint extends Type {
         if (obj instanceof BigInteger)
             value = (BigInteger) obj;
         else if (obj instanceof Short)
-            value = new BigInteger(1, ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort((short) obj).array());
+            value = BigInteger.valueOf((short) obj);
         else if (obj instanceof Integer)
-            value = new BigInteger(1, ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putInt((int) obj).array());
+            value = BigInteger.valueOf((int) obj);
         else if (obj instanceof Long)
-            value = new BigInteger(1, ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putLong((long) obj).array());
+            value = BigInteger.valueOf((long) obj);
+        else if (obj instanceof Byte)
+            value = BigInteger.valueOf((byte) obj);
         else
-            throw new IllegalArgumentException("cannot infer type for Uint value encode");
+            throw new IllegalArgumentException("cannot infer type for uint value encode");
         return Encoder.encodeUintToBytes(value, this.bitSize / Byte.SIZE);
     }
 

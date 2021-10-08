@@ -3,6 +3,7 @@ package com.algorand.algosdk.util.abi;
 import com.algorand.algosdk.algod.client.StringUtil;
 import com.algorand.algosdk.util.Encoder;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -42,13 +43,7 @@ public class TypeTuple extends Type {
 
     @Override
     public byte[] encode(Object o) {
-        Object[] tupleValues;
-        if (o.getClass().isArray())
-            tupleValues = (Object[]) o;
-        else if (o instanceof List<?>)
-            tupleValues = ((List<?>) o).toArray(new Object[0]);
-        else
-            throw new IllegalArgumentException("cannot infer type for abi tuple encode");
+        Object[] tupleValues = Type.unifyToArrayOfObjects(o);
 
         if (tupleValues.length != this.childTypes.size())
             throw new IllegalArgumentException("abi tuple child type size != abi tuple element value size");

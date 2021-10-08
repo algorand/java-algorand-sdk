@@ -1,5 +1,6 @@
 package com.algorand.algosdk.util.abi;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,16 +62,16 @@ public class TestDecode {
 
     @Test
     public void TestAddressValid() {
-        BigInteger upperLimit = BigInteger.ONE.shiftLeft(256).add(BigInteger.ONE.negate());
-        byte[] upperEncoded = Encoder.encodeUintToBytes(upperLimit, 32);
+        BigInteger upperLimit = BigInteger.ONE.shiftLeft(Address.LEN_BYTES * 8).add(BigInteger.ONE.negate());
+        byte[] upperEncoded = Encoder.encodeUintToBytes(upperLimit, Address.LEN_BYTES);
         for (int i = 0; i < 1000; i++) {
-            BigInteger bigRand = new BigInteger(256, rand);
-            while (bigRand.compareTo(BigInteger.ONE.shiftLeft(256)) >= 0)
-                bigRand = new BigInteger(256, rand);
-            byte[] addrEncode = Encoder.encodeUintToBytes(bigRand, 32);
-            assertThat(new TypeAddress().decode(addrEncode)).isEqualTo(addrEncode);
+            BigInteger bigRand = new BigInteger(Address.LEN_BYTES * 8, rand);
+            while (bigRand.compareTo(BigInteger.ONE.shiftLeft(Address.LEN_BYTES * 8)) >= 0)
+                bigRand = new BigInteger(Address.LEN_BYTES * 8, rand);
+            byte[] addrEncode = Encoder.encodeUintToBytes(bigRand, Address.LEN_BYTES);
+            assertThat(new TypeAddress().decode(addrEncode)).isEqualTo(new Address(addrEncode));
         }
-        assertThat(new TypeAddress().decode(upperEncoded)).isEqualTo(upperEncoded);
+        assertThat(new TypeAddress().decode(upperEncoded)).isEqualTo(new Address(upperEncoded));
     }
 
     @Test
@@ -94,8 +95,8 @@ public class TestDecode {
                 String genStrings = new String(array, StandardCharsets.UTF_8);
 
                 byte[] genBytes = genStrings.getBytes(StandardCharsets.UTF_8);
-                ByteBuffer bf = ByteBuffer.allocate(2 + genBytes.length);
-                bf.put(Encoder.encodeUintToBytes(BigInteger.valueOf(genBytes.length), 2));
+                ByteBuffer bf = ByteBuffer.allocate(Type.ABI_DYNAMIC_HEAD_BYTE_LEN + genBytes.length);
+                bf.put(Encoder.encodeUintToBytes(BigInteger.valueOf(genBytes.length), Type.ABI_DYNAMIC_HEAD_BYTE_LEN));
                 bf.put(genBytes);
                 assertThat(new TypeString().decode(bf.array())).isEqualTo(genStrings);
             }

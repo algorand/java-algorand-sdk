@@ -36,10 +36,21 @@ public class TypeUfixed extends Type {
     }
 
     @Override
-    public byte[] encode(Object o) {
-        if (!(o instanceof BigInteger))
+    public byte[] encode(Object obj) {
+        BigInteger value;
+        if (obj instanceof BigInteger)
+            value = (BigInteger) obj;
+        else if (obj instanceof Short)
+            value = BigInteger.valueOf((short) obj);
+        else if (obj instanceof Integer)
+            value = BigInteger.valueOf((int) obj);
+        else if (obj instanceof Long)
+            value = BigInteger.valueOf((long) obj);
+        else if (obj instanceof Byte)
+            value = BigInteger.valueOf((byte) obj);
+        else
             throw new IllegalArgumentException("cannot infer type for ufixed value encode");
-        return Encoder.encodeUintToBytes((BigInteger) o, this.bitSize / Byte.SIZE);
+        return Encoder.encodeUintToBytes(value, this.bitSize / Byte.SIZE);
     }
 
     @Override

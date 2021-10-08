@@ -164,15 +164,25 @@ public class Encoder {
         Base64 codec = new Base64();
         return codec.decode(str);
     }
-    
+
     /**
-     * Encode an non-negative integer as a big-endian uint64.
+     * Encode an non-negative integer as a big-endian uint64 value.
+     * @param value The value to encode.
+     * @throws IllegalArgumentException if value is negative.
+     * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
+     */
+    public static byte[] encodeUint64(BigInteger value) {
+        return Encoder.encodeUintToBytes(value, UINT64_LENGTH);
+    }
+
+    /**
+     * Encode an non-negative integer as a big-endian uint64 value.
      * @param value The value to encode.
      * @throws IllegalArgumentException if value is negative.
      * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
      */
     public static byte[] encodeUint64(long value) {
-        return Encoder.encodeUintToBytes(BigInteger.valueOf(value), 8);
+        return Encoder.encodeUintToBytes(BigInteger.valueOf(value), UINT64_LENGTH);
     }
 
     /**
@@ -189,27 +199,25 @@ public class Encoder {
     }
 
     /**
-     * Encode an non-negative integer as a big-endian uint64.
-     * @param var The value to encode.
+     * Encode an non-negative integer as a big-endian general uint value.
+     * @param value The value to encode.
      * @param byteNum The size of output bytes.
-     * @throws IllegalArgumentException if value cannot be represented by a uint64.
-     * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
+     * @throws IllegalArgumentException if value cannot be represented by the byte array of length byteNum.
+     * @return A byte array containing the big-endian encoding of the value. Its length will be byteNum.
      */
-    public static byte[] encodeUintToBytes(BigInteger var, int byteNum) {
-        if (var.compareTo(BigInteger.ZERO) < 0)
+    public static byte[] encodeUintToBytes(BigInteger value, int byteNum) {
+        if (value.compareTo(BigInteger.ZERO) < 0)
             throw new IllegalArgumentException("Encode int to byte: input BigInteger < 0");
-        if (var.compareTo(BigInteger.ONE.shiftLeft(byteNum * 8)) >= 0)
+        if (value.compareTo(BigInteger.ONE.shiftLeft(byteNum * 8)) >= 0)
             throw new IllegalArgumentException("Encode int to byte: integer size exceeds the given byte number");
 
         byte[] buffer = new byte[byteNum];
-        byte[] encoded = var.toByteArray();
+        byte[] encoded = value.toByteArray();
         // in case number >= 2^(byteNum * 8 - 1), the 2's complement representation will extend 1 byte header of 0's
         if (encoded.length == byteNum + 1)
             encoded = Arrays.copyOfRange(encoded, 1, encoded.length);
 
-        for (int i = 0; i < encoded.length; i++)
-            buffer[buffer.length - 1 - i] = encoded[encoded.length - 1 - i];
-
+        System.arraycopy(encoded, 0, buffer, buffer.length - encoded.length, encoded.length);
         return buffer;
     }
 

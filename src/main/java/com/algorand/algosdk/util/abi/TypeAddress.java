@@ -25,25 +25,25 @@ public class TypeAddress extends Type {
     @Override
     public byte[] encode(Object obj) {
         byte[] values;
-        if (obj instanceof byte[] && ((byte[]) obj).length == 32)
+        if (obj instanceof byte[] && ((byte[]) obj).length == Address.LEN_BYTES)
             values = (byte[]) obj;
         else if (obj instanceof Address)
             values = ((Address) obj).getBytes();
         else
             throw new IllegalArgumentException("cannot infer type for abi encoding in address");
 
-        return Type.castToTupleType(32, new TypeByte()).encode(ArrayUtils.toObject(values));
+        return Type.castToTupleType(Address.LEN_BYTES, new TypeByte()).encode(ArrayUtils.toObject(values));
     }
 
     @Override
     public Object decode(byte[] encoded) {
-        if (encoded.length != 32)
+        if (encoded.length != Address.LEN_BYTES)
             throw new IllegalArgumentException("cannot decode abi address, address byte length should be 32");
-        return encoded;
+        return new Address(encoded);
     }
 
     @Override
     public int byteLen() {
-        return 32;
+        return Address.LEN_BYTES;
     }
 }
