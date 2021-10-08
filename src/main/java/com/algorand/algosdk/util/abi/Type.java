@@ -10,16 +10,43 @@ public abstract class Type {
     private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>[1-9][\\d]*)]$");
     private static final Pattern ufixedPattern = Pattern.compile("^ufixed(?<size>[1-9][\\d]*)x(?<precision>[1-9][\\d]*)$");
 
+    /**
+     * Check if this ABI type is a dynamic type.
+     * @return boolean decision if the ABI type is dynamic.
+     */
     public abstract boolean isDynamic();
 
     public abstract boolean equals(Object obj);
 
+    /**
+     * Precompute the byte size of the static ABI typed value
+     * @return the byte size of the ABI value
+     * @throws IllegalArgumentException if the ABI type is dynamic typed
+     */
     public abstract int byteLen();
 
+    /**
+     * Encode JAVA values with ABI rules based on the ABI type schemes
+     * @param obj JAVA values
+     * @return byte[] of ABI encoding
+     * @throws IllegalArgumentException if encoder cannot infer the type from obj
+     */
     public abstract byte[] encode(Object obj);
 
+    /**
+     * Decode ABI encoded byte array to JAVA values from ABI type schemes
+     * @param encoded byte array of ABI encoding
+     * @return JAVA object of corresponding values
+     * @throws IllegalArgumentException if encoded byte array cannot match with ABI encoding rules
+     */
     public abstract Object decode(byte[] encoded);
 
+    /**
+     * Deserialize ABI type scheme from string
+     * @param str string representation of ABI type schemes
+     * @return ABI type scheme object
+     * @throws IllegalArgumentException if ABI type serialization strings are corrupted
+     */
     public static Type fromString(String str) {
         if (str.endsWith("[]")) {
             Type elemType = Type.fromString(str.substring(0, str.length() - 2));
@@ -146,6 +173,13 @@ public abstract class Type {
             throw new IllegalArgumentException("cannot infer type for unify array/list-like object to object array");
     }
 
+    /**
+     * Take the first 2 bytes in the byte array
+     * (consider the byte array to be an encoding for ABI dynamic typed value)
+     * @param encoded an ABI encoding byte array
+     * @return the first 2 bytes of the ABI encoding byte array
+     * @throws IllegalArgumentException if the encoded byte array has length < 2
+     */
     public static byte[] getLengthEncoded(byte[] encoded) {
         if (encoded.length < ABI_DYNAMIC_HEAD_BYTE_LEN)
             throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
@@ -154,6 +188,13 @@ public abstract class Type {
         return encodedLength;
     }
 
+    /**
+     * Take the bytes after the first 2 bytes in the byte array
+     * (consider the byte array to be an encoding for ABI dynamic typed value)
+     * @param encoded an ABI encoding byte array
+     * @return the tailing bytes after the first 2 bytes of the ABI encoding byte array
+     * @throws IllegalArgumentException if the encoded byte array has length < 2
+     */
     public static byte[] getContentEncoded(byte[] encoded) {
         if (encoded.length < ABI_DYNAMIC_HEAD_BYTE_LEN)
             throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
@@ -162,6 +203,12 @@ public abstract class Type {
         return encodedString;
     }
 
+    /**
+     * Cast a dynamic/static array to ABI tuple type
+     * @param size length of the ABI array
+     * @param t ABI type of the element of the ABI array
+     * @return a type-cast from ABI array to an ABI tuple type
+     */
     public static TypeTuple castToTupleType(int size, Type t) {
         List<Type> tupleTypes = new ArrayList<>();
         for (int i = 0; i < size; i++)
