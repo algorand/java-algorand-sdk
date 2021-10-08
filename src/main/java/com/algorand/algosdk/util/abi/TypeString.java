@@ -33,10 +33,10 @@ public class TypeString extends Type {
         byte[] buffer = ((String) o).getBytes(StandardCharsets.UTF_8);
         if (buffer.length >= (1 << 16))
             throw new IllegalArgumentException("string casted to byte exceeds uint16 maximum, error");
-        byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(buffer.length), 2);
+        byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(buffer.length), ABI_DYNAMIC_HEAD_BYTE_LEN);
         byte[] castedBytes = Type.castToTupleType(buffer.length, new TypeByte()).encode(ArrayUtils.toObject(buffer));
 
-        ByteBuffer bf = ByteBuffer.allocate(castedBytes.length + 2);
+        ByteBuffer bf = ByteBuffer.allocate(castedBytes.length + ABI_DYNAMIC_HEAD_BYTE_LEN);
         bf.put(lengthEncode);
         bf.put(castedBytes);
         return bf.array();

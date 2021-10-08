@@ -35,9 +35,9 @@ public class TypeArrayDynamic extends Type {
         Object[] objArray = (Object[]) o;
 
         byte[] castedEncode = Type.castToTupleType(objArray.length, this.elemType).encode(objArray);
-        byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(objArray.length), 2);
+        byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(objArray.length), ABI_DYNAMIC_HEAD_BYTE_LEN);
 
-        ByteBuffer bf = ByteBuffer.allocate(castedEncode.length + 2);
+        ByteBuffer bf = ByteBuffer.allocate(castedEncode.length + ABI_DYNAMIC_HEAD_BYTE_LEN);
         bf.put(lengthEncode);
         bf.put(castedEncode);
         return bf.array();

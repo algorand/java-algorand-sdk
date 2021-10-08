@@ -5,6 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public abstract class Type {
+    public static final int ABI_DYNAMIC_HEAD_BYTE_LEN = 2;
     private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>[1-9][\\d]*)]$");
     private static final Pattern ufixedPattern = Pattern.compile("^ufixed(?<size>[1-9][\\d]*)x(?<precision>[1-9][\\d]*)$");
 
@@ -130,18 +131,18 @@ public abstract class Type {
     }
 
     public static byte[] getLengthEncoded(byte[] encoded) {
-        if (encoded.length < 2)
+        if (encoded.length < ABI_DYNAMIC_HEAD_BYTE_LEN)
             throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
-        byte[] encodedLength = new byte[2];
-        System.arraycopy(encoded, 0, encodedLength, 0, 2);
+        byte[] encodedLength = new byte[ABI_DYNAMIC_HEAD_BYTE_LEN];
+        System.arraycopy(encoded, 0, encodedLength, 0, ABI_DYNAMIC_HEAD_BYTE_LEN);
         return encodedLength;
     }
 
     public static byte[] getContentEncoded(byte[] encoded) {
-        if (encoded.length < 2)
+        if (encoded.length < ABI_DYNAMIC_HEAD_BYTE_LEN)
             throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
-        byte[] encodedString = new byte[encoded.length - 2];
-        System.arraycopy(encoded, 2, encodedString, 0, encoded.length - 2);
+        byte[] encodedString = new byte[encoded.length - ABI_DYNAMIC_HEAD_BYTE_LEN];
+        System.arraycopy(encoded, ABI_DYNAMIC_HEAD_BYTE_LEN, encodedString, 0, encoded.length - ABI_DYNAMIC_HEAD_BYTE_LEN);
         return encodedString;
     }
 

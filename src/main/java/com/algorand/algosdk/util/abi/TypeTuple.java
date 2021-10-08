@@ -106,7 +106,7 @@ public class TypeTuple extends Type {
                 int headValue = headLength + tailCurrLength;
                 if (headValue >= (1 << 16))
                     throw new IllegalArgumentException("encoding error: byte length >= 2^16");
-                heads.set(i, Encoder.encodeUintToBytes(BigInteger.valueOf(headValue), 2));
+                heads.set(i, Encoder.encodeUintToBytes(BigInteger.valueOf(headValue), ABI_DYNAMIC_HEAD_BYTE_LEN));
             }
             tailCurrLength += tails.get(i).length;
         }
@@ -126,14 +126,14 @@ public class TypeTuple extends Type {
 
         for (int i = 0; i < this.childTypes.size(); i++) {
             if (this.childTypes.get(i).isDynamic()) {
-                if (iterIndex + 2 > encoded.length)
+                if (iterIndex + ABI_DYNAMIC_HEAD_BYTE_LEN > encoded.length)
                     throw new IllegalArgumentException("ill formed tuple dynamic typed element encoding: not enough bytes for index");
-                byte[] encodedIndex = new byte[2];
-                System.arraycopy(encoded, iterIndex, encodedIndex, 0, 2);
+                byte[] encodedIndex = new byte[ABI_DYNAMIC_HEAD_BYTE_LEN];
+                System.arraycopy(encoded, iterIndex, encodedIndex, 0, ABI_DYNAMIC_HEAD_BYTE_LEN);
                 int index = Encoder.decodeBytesToUint(encodedIndex).intValue();
                 dynamicSeg.add(index);
                 valuePartition.add(new byte[]{});
-                iterIndex += 2;
+                iterIndex += ABI_DYNAMIC_HEAD_BYTE_LEN;
             } else if (this.childTypes.get(i) instanceof TypeBool) {
                 Type[] childTypeArr = this.childTypes.toArray(new Type[0]);
                 int before = Type.findBoolLR(childTypeArr, i, -1);
