@@ -1,4 +1,4 @@
-package com.algorand.algosdk.util.abi;
+package com.algorand.algosdk.abi;
 
 import java.lang.reflect.Array;
 import java.util.*;
