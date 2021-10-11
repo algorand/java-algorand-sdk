@@ -1,9 +1,8 @@
-package com.algorand.algosdk.util.abi;
+package com.algorand.algosdk.abi;
 
 import com.algorand.algosdk.algod.client.StringUtil;
 import com.algorand.algosdk.util.Encoder;
 
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
