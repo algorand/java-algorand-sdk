@@ -1,4 +1,4 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 import com.algorand.algosdk.crypto.Address;
 import org.apache.commons.lang3.ArrayUtils;

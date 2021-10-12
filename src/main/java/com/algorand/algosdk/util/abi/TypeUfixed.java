@@ -1,23 +1,27 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;
 
-public class TypeUint extends Type {
+public class TypeUfixed extends Type {
     public final int bitSize;
+    public final int precision;
 
-    public TypeUint(int size) {
+    public TypeUfixed(int size, int precision) {
         if (size < 8 || size > 512 || size % 8 != 0)
             throw new IllegalArgumentException(
-                    "uint initialize failure: bitSize should be in [8, 512] and bitSize mod 8 == 0"
+                    "ufixed initialize failure: bitSize should be in [8, 512] and bitSize mod 8 == 0"
             );
+        if (precision < 1 || precision > 160)
+            throw new IllegalArgumentException("ufixed initialize failure: precision should be in [1, 160]");
         this.bitSize = size;
+        this.precision = precision;
     }
 
     @Override
     public String toString() {
-        return "uint" + this.bitSize;
+        return "ufixed" + this.bitSize + "x" + this.precision;
     }
 
     @Override
@@ -27,8 +31,8 @@ public class TypeUint extends Type {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof TypeUint)) return false;
-        return this.bitSize == ((TypeUint) o).bitSize;
+        if (!(o instanceof TypeUfixed)) return false;
+        return bitSize == ((TypeUfixed) o).bitSize && precision == ((TypeUfixed) o).precision;
     }
 
     @Override
@@ -45,14 +49,14 @@ public class TypeUint extends Type {
         else if (obj instanceof Byte)
             value = BigInteger.valueOf((byte) obj);
         else
-            throw new IllegalArgumentException("cannot infer type for uint value encode");
+            throw new IllegalArgumentException("cannot infer type for ufixed value encode");
         return Encoder.encodeUintToBytes(value, this.bitSize / Byte.SIZE);
     }
 
     @Override
     public Object decode(byte[] encoded) {
         if (encoded.length != bitSize / Byte.SIZE)
-            throw new IllegalArgumentException("cannot decode for abi uint value, byte length not matching");
+            throw new IllegalArgumentException("cannot decode for abi ufixed value, byte length not matching");
         return Encoder.decodeBytesToUint(encoded);
     }
 

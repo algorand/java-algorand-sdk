@@ -1,4 +1,4 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 import com.algorand.algosdk.util.Encoder;
 import org.apache.commons.lang3.ArrayUtils;

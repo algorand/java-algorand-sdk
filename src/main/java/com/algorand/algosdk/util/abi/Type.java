@@ -1,4 +1,4 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -139,7 +139,7 @@ public abstract class Type {
         return Arrays.asList(tupleSeg);
     }
 
-    protected static int findBoolLR(Type[] typeArray, int index, int delta) {
+    static int findBoolLR(Type[] typeArray, int index, int delta) {
         int until = 0;
         while (true) {
             int currentIndex = index + delta * until;
@@ -158,13 +158,7 @@ public abstract class Type {
         return until;
     }
 
-    /**
-     * Given an array/list-like object, infer an array of objects
-     * @param val an array/list-like object
-     * @return inferred array of objects
-     * @throws IllegalArgumentException if it cannot infer if the object is list or array
-     */
-    protected static Object[] unifyToArrayOfObjects(Object val) {
+    static Object[] unifyToArrayOfObjects(Object val) {
         if (val.getClass().isArray()) {
             if (val instanceof Object[])
                 return (Object[]) val;
@@ -186,7 +180,7 @@ public abstract class Type {
      * @return the first 2 bytes of the ABI encoding byte array
      * @throws IllegalArgumentException if the encoded byte array has length < 2
      */
-    protected static byte[] getLengthEncoded(byte[] encoded) {
+    public static byte[] getLengthEncoded(byte[] encoded) {
         if (encoded.length < ABI_DYNAMIC_HEAD_BYTE_LEN)
             throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
         byte[] encodedLength = new byte[ABI_DYNAMIC_HEAD_BYTE_LEN];
@@ -201,7 +195,7 @@ public abstract class Type {
      * @return the tailing bytes after the first 2 bytes of the ABI encoding byte array
      * @throws IllegalArgumentException if the encoded byte array has length < 2
      */
-    protected static byte[] getContentEncoded(byte[] encoded) {
+    public static byte[] getContentEncoded(byte[] encoded) {
         if (encoded.length < ABI_DYNAMIC_HEAD_BYTE_LEN)
             throw new IllegalArgumentException("encode byte size too small, less than 2 bytes");
         byte[] encodedString = new byte[encoded.length - ABI_DYNAMIC_HEAD_BYTE_LEN];
@@ -215,7 +209,7 @@ public abstract class Type {
      * @param t ABI type of the element of the ABI array
      * @return a type-cast from ABI array to an ABI tuple type
      */
-    protected static TypeTuple castToTupleType(int size, Type t) {
+    public static TypeTuple castToTupleType(int size, Type t) {
         List<Type> tupleTypes = new ArrayList<>();
         for (int i = 0; i < size; i++)
             tupleTypes.add(t);

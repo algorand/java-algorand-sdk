@@ -1,4 +1,4 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 public class TypeBool extends Type {
     public TypeBool() {

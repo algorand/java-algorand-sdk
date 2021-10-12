@@ -1,4 +1,4 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;

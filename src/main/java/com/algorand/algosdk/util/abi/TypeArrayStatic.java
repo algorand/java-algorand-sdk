@@ -1,4 +1,4 @@
-package com.algorand.algosdk.abi;
+package com.algorand.algosdk.util.abi;
 
 public class TypeArrayStatic extends Type {
     public final Type elemType;
