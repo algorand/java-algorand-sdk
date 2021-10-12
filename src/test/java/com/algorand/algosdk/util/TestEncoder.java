@@ -1,14 +1,14 @@
 package com.algorand.algosdk.util;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.math.BigInteger;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
-import static org.assertj.core.api.Assertions.*;
+import java.math.BigInteger;
 
 public class TestEncoder {
     @ParameterizedTest
@@ -46,7 +46,7 @@ public class TestEncoder {
             long input = inputs[i];
             byte[] expected = expectedItems[i];
 
-            byte[] actual = Encoder.encodeUintToBytes(BigInteger.valueOf(input), 8);
+            byte[] actual = Encoder.encodeUint64(input);
             assertThat(actual).isEqualTo(expected);
         }
         
@@ -55,9 +55,12 @@ public class TestEncoder {
             Long.MIN_VALUE,
         };
 
-        for (long input : invalidInputs)
-            Assertions.assertThrows(IllegalArgumentException.class,
-                    () -> Encoder.encodeUintToBytes(BigInteger.valueOf(input), 8));
+        for (int i = 0; i < invalidInputs.length; i++) {
+            long input = invalidInputs[i];
+            assertThatCode(() -> Encoder.encodeUint64(input))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Value cannot be represented by a uint64");
+        }
     }
     
     @Test
@@ -82,7 +85,7 @@ public class TestEncoder {
             BigInteger input = inputs[i];
             byte[] expected = expectedItems[i];
 
-            byte[] actual = Encoder.encodeUintToBytes(input, 8);
+            byte[] actual = Encoder.encodeUint64(input);
             assertThat(actual).isEqualTo(expected);
         }
         
@@ -91,8 +94,12 @@ public class TestEncoder {
             Encoder.MAX_UINT64.add(BigInteger.valueOf(1))
         };
 
-        for (BigInteger input : invalidInputs)
-            Assertions.assertThrows(IllegalArgumentException.class, () -> Encoder.encodeUintToBytes(input, 8));
+        for (int i = 0; i < invalidInputs.length; i++) {
+            BigInteger input = invalidInputs[i];
+            assertThatCode(() -> Encoder.encodeUint64(input))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Value cannot be represented by a uint64");
+        }
     }
 
     @Test
@@ -122,13 +129,16 @@ public class TestEncoder {
         }
         
         byte[][] invalidInputs = {
-            new byte[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+            new byte[] {},
+            new byte[] {0, 0, 0, 0, 0, 0, 0},
             new byte[] {0, 0, 0, 0, 0, 0, 0, 0, 0},
         };
 
-        for (byte[] input : invalidInputs)
+        for (int i = 0; i < invalidInputs.length; i++) {
+            byte[] input = invalidInputs[i];
             assertThatCode(() -> Encoder.decodeUint64(input))
-                    .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("Length of byte array is invalid");
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Length of byte array is invalid");
+        }
     }
 }

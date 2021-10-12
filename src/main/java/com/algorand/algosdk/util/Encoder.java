@@ -9,12 +9,12 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Arrays;
 
 public class Encoder {
     private static final char BASE32_PAD_CHAR = '=';
@@ -164,25 +164,40 @@ public class Encoder {
         Base64 codec = new Base64();
         return codec.decode(str);
     }
-
+    
     /**
-     * Encode an non-negative integer as a big-endian uint64 value.
-     * @param value The value to encode.
-     * @throws IllegalArgumentException if value is negative.
-     * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
-     */
-    public static byte[] encodeUint64(BigInteger value) {
-        return Encoder.encodeUintToBytes(value, UINT64_LENGTH);
-    }
-
-    /**
-     * Encode an non-negative integer as a big-endian uint64 value.
+     * Encode an non-negative integer as a big-endian uint64.
      * @param value The value to encode.
      * @throws IllegalArgumentException if value is negative.
      * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
      */
     public static byte[] encodeUint64(long value) {
-        return Encoder.encodeUintToBytes(BigInteger.valueOf(value), UINT64_LENGTH);
+        return Encoder.encodeUint64(BigInteger.valueOf(value));
+    }
+
+    /**
+     * Encode an non-negative integer as a big-endian uint64.
+     * @param value The value to encode.
+     * @throws IllegalArgumentException if value cannot be represented by a uint64.
+     * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
+     */
+    public static byte[] encodeUint64(BigInteger value) {
+        if (value.compareTo(BigInteger.ZERO) < 0 || value.compareTo(MAX_UINT64) > 0) {
+            throw new IllegalArgumentException("Value cannot be represented by a uint64");
+        }
+
+        byte[] fixedLengthEncoding = new byte[Encoder.UINT64_LENGTH];
+
+        byte[] encodedValue = value.toByteArray();
+        if (encodedValue.length > 0 && encodedValue[0] == 0) {
+            // encodedValue is actually encoded as a signed 2's complement value, so there may be a
+            // leading 0 for some encodings -- ignore it
+            encodedValue = ArrayUtils.subarray(encodedValue, 1, encodedValue.length);
+        }
+
+        System.arraycopy(encodedValue, 0, fixedLengthEncoding, Encoder.UINT64_LENGTH - encodedValue.length, encodedValue.length);
+
+        return fixedLengthEncoding;
     }
 
     /**
@@ -192,41 +207,10 @@ public class Encoder {
      * @return The decoded value.
      */
     public static BigInteger decodeUint64(byte[] encoded) {
-        if (encoded.length > Encoder.UINT64_LENGTH)
+        if (encoded.length != Encoder.UINT64_LENGTH) {
             throw new IllegalArgumentException("Length of byte array is invalid");
+        }
 
-        return new BigInteger(1, encoded);
-    }
-
-    /**
-     * Encode an non-negative integer as a big-endian general uint value.
-     * @param value The value to encode.
-     * @param byteNum The size of output bytes.
-     * @throws IllegalArgumentException if value cannot be represented by the byte array of length byteNum.
-     * @return A byte array containing the big-endian encoding of the value. Its length will be byteNum.
-     */
-    public static byte[] encodeUintToBytes(BigInteger value, int byteNum) {
-        if (value.compareTo(BigInteger.ZERO) < 0)
-            throw new IllegalArgumentException("Encode int to byte: input BigInteger < 0");
-        if (value.compareTo(BigInteger.ONE.shiftLeft(byteNum * 8)) >= 0)
-            throw new IllegalArgumentException("Encode int to byte: integer size exceeds the given byte number");
-
-        byte[] buffer = new byte[byteNum];
-        byte[] encoded = value.toByteArray();
-        // in case number >= 2^(byteNum * 8 - 1), the 2's complement representation will extend 1 byte header of 0's
-        if (encoded.length == byteNum + 1)
-            encoded = Arrays.copyOfRange(encoded, 1, encoded.length);
-
-        System.arraycopy(encoded, 0, buffer, buffer.length - encoded.length, encoded.length);
-        return buffer;
-    }
-
-    /**
-     * Decode an encoded big-endian uint value.
-     * @param encoded The encoded bytes for the value.
-     * @return A byte array containing the big-endian encoding of the value. Its length will be Encoder.UINT64_LENGTH.
-     */
-    public static BigInteger decodeBytesToUint(byte[] encoded) {
         return new BigInteger(1, encoded);
     }
 }
