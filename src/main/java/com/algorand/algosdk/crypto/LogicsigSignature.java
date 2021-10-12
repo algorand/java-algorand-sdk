@@ -55,7 +55,7 @@ public class LogicsigSignature {
             throw new IllegalArgumentException("invalid program", ex);
         }
 
-        assert verified == true;
+        assert verified;
 
         if (sig != null) this.sig = new Signature(sig);
         this.msig = msig;
@@ -88,6 +88,8 @@ public class LogicsigSignature {
 
     /**
      * Calculate escrow address from logic sig program
+     * NOTE: THIS RETURNS AN ESCROW ACCOUNT OF A LOGIC-SIG (FROM LOGIC ITSELF),
+     *       IT WILL NOT RETURN THE DELEGATED ADDRESS OF THE LOGIC-SIG.
      * @return Address
      * @throws NoSuchAlgorithmException
      */
@@ -109,10 +111,11 @@ public class LogicsigSignature {
 
     /**
      * Perform signature verification against the sender address
-     * @param address Address to verify
+     * @param singleSigner only used in the case of a delegated LogicSig whose delegating account
+     *                     is backed by a single private key
      * @return boolean
      */
-    public boolean verify(Address address) {
+    public boolean verify(Address singleSigner) throws NoSuchAlgorithmException {
         if (this.logic == null) {
             return false;
         }
@@ -127,17 +130,9 @@ public class LogicsigSignature {
             return false;
         }
 
-        if (this.sig == null && this.msig == null) {
-            try {
-                return address.equals(this.toAddress());
-            } catch (NoSuchAlgorithmException e) {
-                return false;
-            }
-        }
-
         PublicKey pk;
         try {
-            pk = address.toVerifyKey();
+            pk = singleSigner.toVerifyKey();
         } catch (Exception ex) {
             return false;
         }
@@ -153,14 +148,15 @@ public class LogicsigSignature {
             }
         }
 
-        return this.msig.verify(this.bytesToSign());
+        if (this.msig != null)
+            return this.msig.verify(this.bytesToSign());
+
+        return true;
     }
 
     private static boolean nullCheck(Object o1, Object o2) {
         if (o1 == null && o2 == null) return true;
-        if (o1 == null && o2 != null) return false;
-        if (o1 != null && o2 == null) return false;
-        return true;
+        else return o1 != null && o2 != null;
     }
 
     @Override
@@ -183,9 +179,7 @@ public class LogicsigSignature {
             if (this.sig != null && !this.sig.equals(actual.sig)) return false;
 
             if (!LogicsigSignature.nullCheck(this.msig, actual.msig)) return false;
-            if (this.msig != null && !this.msig.equals(actual.msig)) return false;
-
-            return true;
+            return this.msig == null || this.msig.equals(actual.msig);
         } else {
             return false;
         }

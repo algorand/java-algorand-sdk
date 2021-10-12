@@ -44,10 +44,6 @@ public class Ed25519PublicKey implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Ed25519PublicKey && Arrays.equals(this.bytes, ((Ed25519PublicKey)obj).bytes)) {
-            return true;
-        } else {
-            return false;
-        }
+        return obj instanceof Ed25519PublicKey && Arrays.equals(this.bytes, ((Ed25519PublicKey) obj).bytes);
     }
 }

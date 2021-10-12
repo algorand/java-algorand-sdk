@@ -1,3 +1,7 @@
+# 1.10.0
+- Feature/sign rekey lsig msig (#250)
+- Support parsing msgpack with numeric key (#262)
+
 # 1.9.0
 - Support AVM 1.0
   - Update TEAL langspec to v5

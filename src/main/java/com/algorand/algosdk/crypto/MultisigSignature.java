@@ -56,6 +56,7 @@ public class MultisigSignature implements Serializable {
      * Serializable multisig sub-signature
      */
     @JsonPropertyOrder(alphabetic=true)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class MultisigSubsig {
         @JsonProperty("pk")
         public Ed25519PublicKey key = new Ed25519PublicKey();
@@ -128,10 +129,15 @@ public class MultisigSignature implements Serializable {
                 }
             }
         }
-        if (verifiedCount < this.threshold) {
-            return false;
+        return verifiedCount >= this.threshold;
+    }
+
+    public MultisigAddress convertToMultisigAddress() {
+        List<Ed25519PublicKey> pubK = new ArrayList<>();
+        for (MultisigSubsig sig : this.subsigs) {
+            pubK.add(sig.key);
         }
-        return true;
+        return new MultisigAddress(this.version, this.threshold, pubK);
     }
 
     @Override
