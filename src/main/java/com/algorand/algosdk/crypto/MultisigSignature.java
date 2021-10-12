@@ -56,6 +56,7 @@ public class MultisigSignature implements Serializable {
      * Serializable multisig sub-signature
      */
     @JsonPropertyOrder(alphabetic=true)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class MultisigSubsig {
         @JsonProperty("pk")
         public Ed25519PublicKey key = new Ed25519PublicKey();
