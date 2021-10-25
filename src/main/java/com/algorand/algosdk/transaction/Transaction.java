@@ -76,7 +76,10 @@ public class Transaction implements Serializable {
     // voteKeyDilution
     @JsonProperty("votekd")
     public BigInteger voteKeyDilution = BigInteger.valueOf(0);
-    
+    // stateProofKey
+    @JsonProperty("sprfkey")
+    public Verifier stateProofKey = new Verifier();
+
     /* asset creation and configuration fields *********************************/
     @JsonProperty("apar")
     public AssetParams assetParams = new AssetParams();
@@ -254,6 +257,7 @@ public class Transaction implements Serializable {
                 null,
                 // voteKeyDilution
                 null,
+                null,
                 // asset creation and configuration
                 null,
                 null,
@@ -357,6 +361,7 @@ public class Transaction implements Serializable {
                 voteLast,
                 // voteKeyDilution
                 voteKeyDilution,
+                null,
                 // asset creation and configuration
                 null,
                 null,
@@ -479,6 +484,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 // voteKeyDilution
+                null,
                 null,
                 // asset creation and configuration
                 params,
@@ -628,6 +634,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("votefst") BigInteger voteFirst,
                         @JsonProperty("votelst") BigInteger voteLast,
                         @JsonProperty("votekd") BigInteger voteKeyDilution,
+                        @JsonProperty("sprfkey") Verifier stateProofKey,
                         // asset creation and configuration
                         @JsonProperty("apar") AssetParams assetParams,
                         @JsonProperty("caid") BigInteger assetIndex,
@@ -677,6 +684,7 @@ public class Transaction implements Serializable {
              voteFirst,
              voteLast,
              voteKeyDilution,
+             stateProofKey,
              // asset creation and configuration
              assetParams,
              assetIndex,
@@ -733,6 +741,7 @@ public class Transaction implements Serializable {
                         BigInteger voteLast,
                         // voteKeyDilution
                         BigInteger voteKeyDilution,
+                        Verifier stateProofKey,
                         // asset creation and configuration
                         AssetParams assetParams,
                         BigInteger assetIndex,
@@ -777,6 +786,7 @@ public class Transaction implements Serializable {
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
+        if (stateProofKey !=null) this.stateProofKey = stateProofKey;
         if (assetParams != null) this.assetParams = assetParams;
         if (assetIndex != null) this.assetIndex = assetIndex;
         if (xferAsset != null) this.xferAsset = xferAsset;
@@ -1276,6 +1286,7 @@ public class Transaction implements Serializable {
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
+                stateProofKey.equals(that.stateProofKey) &&
                 assetParams.equals(that.assetParams) &&
                 assetIndex.equals(that.assetIndex) &&
                 xferAsset.equals(that.xferAsset) &&

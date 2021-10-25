@@ -333,6 +333,43 @@ public class Stepdefs {
                 .build();
     }
 
+    @Given("default V2 key registration transaction {string}")
+    public void  default_v2_key_registration_transaction(String type) throws NoSuchAlgorithmException, JsonProcessingException, IOException{
+        getParams();
+        votepk=new ParticipationPublicKey(Encoder.decodeFromBase64("9mr13Ri8rFepxN3ghIUrZNui6LqqM5hEzB45Rri5lkU="));
+        vrfpk = new VRFPublicKey(Encoder.decodeFromBase64("dx717L3uOIIb/jr9OIyls1l5Ei00NFgRa380w7TnPr4="));
+        votefst = BigInteger.valueOf(0);
+        votelst = BigInteger.valueOf(2000);
+        votekd = BigInteger.valueOf(10);
+        pk = getAddress(0);
+
+        if(type.equals("online")){
+            byte[] root = new byte[64];
+            Arrays.fill(root, (byte) 1 );
+            txn = Transaction.KeyRegistrationTransactionBuilder()
+                    .sender(pk)
+                    .participationPublicKey(votepk)
+                    .selectionPublicKey(vrfpk)
+                    .voteFirst(votefst)
+                    .voteLast(votelst)
+                    .voteKeyDilution(votekd)
+                    .stateProofKey(new Verifier(root,true))
+                    .suggestedParams(this.params)
+                    .build();
+        }else if(type.equals("offline")){
+            txn = Transaction.KeyRegistrationTransactionBuilder()
+                    .sender(pk)
+                    .suggestedParams(this.params)
+                    .build();
+        }else if(type.equals("nonparticipation")){
+            txn = Transaction.KeyRegistrationTransactionBuilder()
+                    .sender(pk)
+                    .suggestedParams(this.params)
+                    .nonparticipation(true)
+                    .build();
+        }
+    }
+
     @Given("multisig addresses {string}")
     public void msig_addresses(String addresses) throws NoSuchAlgorithmException {
         String[] addrs = addresses.split(" ");
