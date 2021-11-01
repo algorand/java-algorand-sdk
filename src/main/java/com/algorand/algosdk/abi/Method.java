@@ -46,12 +46,13 @@ public class Method {
     public Method(String method) {
         List<String> parsedMethod = Method.methodParse(method);
         this.name = parsedMethod.get(0);
-        TypeTuple argTupleType = (TypeTuple) Type.Of(parsedMethod.get(1));
+
         this.args = new ArrayList<>();
-        for (int i = 0; i < argTupleType.childTypes.size(); i++) {
-            Arg tempArg = new Method.Arg("arg" + i, argTupleType.childTypes.get(i).toString(), null);
-            this.args.add(tempArg);
-        }
+        String argTuple = parsedMethod.get(1);
+        List<String> parsedMethodArgs = Type.parseTupleContent(argTuple.substring(1, argTuple.length() - 1));
+        for (int i = 0; i < parsedMethodArgs.size(); i++)
+            this.args.add(new Method.Arg("arg" + i, parsedMethodArgs.get(i), null));
+
         this.returns = new Returns(Type.Of(parsedMethod.get(2)).toString(), null);
     }
 
@@ -107,7 +108,7 @@ public class Method {
                 @JsonProperty("type") String type,
                 @JsonProperty("desc") String desc
         ) {
-            this.type = Objects.requireNonNull(type, "type must not be null");
+            this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
             this.desc = desc;
         }
 
@@ -133,7 +134,7 @@ public class Method {
         ) {
             this.name = Objects.requireNonNull(name, "name must not be null");
             this.desc = desc;
-            this.type = Objects.requireNonNull(type, "type must not be null");
+            this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
         }
 
         // default values for serializer to ignore

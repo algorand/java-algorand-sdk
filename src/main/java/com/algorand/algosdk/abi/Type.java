@@ -96,7 +96,7 @@ public abstract class Type {
         }
     }
 
-    private static List<String> parseTupleContent(String str) {
+    public static List<String> parseTupleContent(String str) {
         if (str.length() == 0)
             return new ArrayList<>();
 
