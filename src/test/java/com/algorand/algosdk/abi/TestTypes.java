@@ -135,7 +135,7 @@ public class TestTypes {
         for (int i = 8; i <= 512; i += 8) {
             String encoded = "uint" + i;
             TypeUint uintT = new TypeUint(i);
-            assertThat((TypeUint) Type.fromString(encoded)).isEqualTo(uintT);
+            assertThat((TypeUint) Type.Of(encoded)).isEqualTo(uintT);
         }
     }
 
@@ -146,7 +146,7 @@ public class TestTypes {
             while (size_rand % 8 == 0 && size_rand <= 512 && size_rand >= 8)
                 size_rand = rand.nextInt(65536);
             String encoded = "uint" + size_rand;
-            Assertions.assertThrows(IllegalArgumentException.class, () -> Type.fromString(encoded));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> Type.Of(encoded));
         }
     }
 
@@ -156,7 +156,7 @@ public class TestTypes {
             for (int j = 1; j <= 160; j++) {
                 String encoded = "ufixed" + i + "x" + j;
                 TypeUfixed ufixedT = new TypeUfixed(i, j);
-                assertThat((TypeUfixed) Type.fromString(encoded)).isEqualTo(ufixedT);
+                assertThat((TypeUfixed) Type.Of(encoded)).isEqualTo(ufixedT);
             }
         }
     }
@@ -173,28 +173,28 @@ public class TestTypes {
                 precision_rand = rand.nextInt(1024);
 
             String encoded = "ufixed" + size_rand + "x" + precision_rand;
-            Assertions.assertThrows(IllegalArgumentException.class, () -> Type.fromString(encoded));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> Type.Of(encoded));
         }
     }
 
     @Test
     public void TestSimpleTypeFromStringValid() {
-        assertThat(Type.fromString("address")).isEqualTo(new TypeAddress());
-        assertThat(Type.fromString("byte")).isEqualTo(new TypeByte());
-        assertThat(Type.fromString("bool")).isEqualTo(new TypeBool());
-        assertThat(Type.fromString("string")).isEqualTo(new TypeString());
+        assertThat(Type.Of("address")).isEqualTo(new TypeAddress());
+        assertThat(Type.Of("byte")).isEqualTo(new TypeByte());
+        assertThat(Type.Of("bool")).isEqualTo(new TypeBool());
+        assertThat(Type.Of("string")).isEqualTo(new TypeString());
     }
 
     @Test
     public void TestTypeFromStringValid() {
-        assertThat(Type.fromString("uint256[]")).isEqualTo(new TypeArrayDynamic(new TypeUint(256)));
-        assertThat(Type.fromString("ufixed256x64[]")).isEqualTo(new TypeArrayDynamic(new TypeUfixed(256, 64)));
-        assertThat(Type.fromString("byte[][][][]")).isEqualTo(
+        assertThat(Type.Of("uint256[]")).isEqualTo(new TypeArrayDynamic(new TypeUint(256)));
+        assertThat(Type.Of("ufixed256x64[]")).isEqualTo(new TypeArrayDynamic(new TypeUfixed(256, 64)));
+        assertThat(Type.Of("byte[][][][]")).isEqualTo(
                 new TypeArrayDynamic(new TypeArrayDynamic(new TypeArrayDynamic(new TypeArrayDynamic(new TypeByte())))));
-        assertThat(Type.fromString("address[100]")).isEqualTo(new TypeArrayStatic(new TypeAddress(), 100));
-        assertThat(Type.fromString("uint64[][100]")).isEqualTo(new TypeArrayStatic(new TypeArrayDynamic(new TypeUint(64)), 100));
-        assertThat(Type.fromString("()")).isEqualTo(new TypeTuple(new ArrayList<>()));
-        assertThat(Type.fromString("(uint32,(address,byte,bool[10],ufixed256x10[]),byte[])")).isEqualTo(
+        assertThat(Type.Of("address[100]")).isEqualTo(new TypeArrayStatic(new TypeAddress(), 100));
+        assertThat(Type.Of("uint64[][100]")).isEqualTo(new TypeArrayStatic(new TypeArrayDynamic(new TypeUint(64)), 100));
+        assertThat(Type.Of("()")).isEqualTo(new TypeTuple(new ArrayList<>()));
+        assertThat(Type.Of("(uint32,(address,byte,bool[10],ufixed256x10[]),byte[])")).isEqualTo(
                 new TypeTuple(
                         Arrays.asList(
                                 new TypeUint(32),
@@ -208,7 +208,7 @@ public class TestTypes {
                         )
                 )
         );
-        assertThat(Type.fromString("(uint32,(address,byte,bool[10],(ufixed256x10[])))")).isEqualTo(
+        assertThat(Type.Of("(uint32,(address,byte,bool[10],(ufixed256x10[])))")).isEqualTo(
                 new TypeTuple(
                         Arrays.asList(
                                 new TypeUint(32),
@@ -223,7 +223,7 @@ public class TestTypes {
                         )
                 )
         );
-        assertThat(Type.fromString("((uint32),(address,(byte,bool[10],ufixed256x10[])))")).isEqualTo(
+        assertThat(Type.Of("((uint32),(address,(byte,bool[10],ufixed256x10[])))")).isEqualTo(
                 new TypeTuple(
                         Arrays.asList(
                                 new TypeTuple(Collections.singletonList(new TypeUint(32))),
@@ -280,14 +280,14 @@ public class TestTypes {
                 "((byte),,(byte))",
         };
         for (String testcase : testcases)
-            Assertions.assertThrows(IllegalArgumentException.class, () -> Type.fromString(testcase));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> Type.Of(testcase));
     }
 
     @Test
     public void TestTupleRoundTrip() {
         for (Type t : tuple_testpool) {
             String encoded = t.toString();
-            Type decoded = Type.fromString(encoded);
+            Type decoded = Type.Of(encoded);
             assertThat((TypeTuple) decoded).isEqualTo(t);
         }
     }

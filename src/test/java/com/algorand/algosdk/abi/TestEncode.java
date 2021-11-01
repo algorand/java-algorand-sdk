@@ -154,25 +154,25 @@ public class TestEncode {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         };
-        assertThat(Type.fromString("uint64[]").encode(inputs)).isEqualTo(expected);
+        assertThat(Type.Of("uint64[]").encode(inputs)).isEqualTo(expected);
 
         int[] inputsInt = new int[]{1, 2, 3, 4, 5, 6, 7, 8};
-        assertThat(Type.fromString("uint64[]").encode(inputsInt)).isEqualTo(expected);
+        assertThat(Type.Of("uint64[]").encode(inputsInt)).isEqualTo(expected);
 
         short[] inputsShort = new short[]{1, 2, 3, 4, 5, 6, 7, 8};
-        assertThat(Type.fromString("uint64[]").encode(inputsShort)).isEqualTo(expected);
+        assertThat(Type.Of("uint64[]").encode(inputsShort)).isEqualTo(expected);
 
         byte[] inputsByte = new byte[]{1, 2, 3, 4, 5, 6, 7, 8};
-        assertThat(Type.fromString("uint64[]").encode(inputsByte)).isEqualTo(expected);
+        assertThat(Type.Of("uint64[]").encode(inputsByte)).isEqualTo(expected);
 
         Integer[] inputIntegers = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8};
-        assertThat(Type.fromString("uint64[]").encode(inputIntegers)).isEqualTo(expected);
+        assertThat(Type.Of("uint64[]").encode(inputIntegers)).isEqualTo(expected);
 
         Object[] objInputs = Type.unifyToArrayOfObjects(inputs);
-        assertThat(Type.fromString("uint64[]").encode(objInputs)).isEqualTo(expected);
+        assertThat(Type.Of("uint64[]").encode(objInputs)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(objInputs);
-        assertThat(Type.fromString("uint64[]").encode(listInputs)).isEqualTo(expected);
+        assertThat(Type.Of("uint64[]").encode(listInputs)).isEqualTo(expected);
     }
 
     @Test
@@ -190,10 +190,10 @@ public class TestEncode {
                 0x00, 0x03, (byte) 'A', (byte) 'B', (byte) 'C',
                 0x00, 0x03, (byte) 'D', (byte) 'E', (byte) 'F',
         };
-        assertThat(Type.fromString("(string,bool,bool,bool,bool,string)").encode(elements)).isEqualTo(expected);
+        assertThat(Type.Of("(string,bool,bool,bool,bool,string)").encode(elements)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(elements);
-        assertThat(Type.fromString("(string,bool,bool,bool,bool,string)").encode(listInputs)).isEqualTo(expected);
+        assertThat(Type.Of("(string,bool,bool,bool,bool,string)").encode(listInputs)).isEqualTo(expected);
     }
 
     @Test
@@ -203,10 +203,10 @@ public class TestEncode {
                 new Object[]{true, true},
         };
         byte[] expected = new byte[]{(byte) 0b11000000, (byte) 0b11000000};
-        assertThat(Type.fromString("(bool[2],bool[2])").encode(elements)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[2],bool[2])").encode(elements)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(elements);
-        assertThat(Type.fromString("(bool[2],bool[2])").encode(listInputs)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[2],bool[2])").encode(listInputs)).isEqualTo(expected);
     }
 
     @Test
@@ -219,10 +219,10 @@ public class TestEncode {
                 (byte) 0b11000000,
                 0x00, 0x03,
                 0x00, 0x02, (byte) 0b11000000};
-        assertThat(Type.fromString("(bool[2],bool[])").encode(elements)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[2],bool[])").encode(elements)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(elements);
-        assertThat(Type.fromString("(bool[2],bool[])").encode(listInputs)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[2],bool[])").encode(listInputs)).isEqualTo(expected);
     }
 
     @Test
@@ -236,10 +236,10 @@ public class TestEncode {
                 0x00, 0x02, (byte) 0b11000000,
                 0x00, 0x02, (byte) 0b11000000
         };
-        assertThat(Type.fromString("(bool[],bool[])").encode(elements)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[],bool[])").encode(elements)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(elements);
-        assertThat(Type.fromString("(bool[],bool[])").encode(listInputs)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[],bool[])").encode(listInputs)).isEqualTo(expected);
     }
 
     @Test
@@ -252,18 +252,18 @@ public class TestEncode {
                 0x00, 0x04, 0x00, 0x06,
                 0x00, 0x00, 0x00, 0x00
         };
-        assertThat(Type.fromString("(bool[],bool[])").encode(elements)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[],bool[])").encode(elements)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(elements);
-        assertThat(Type.fromString("(bool[],bool[])").encode(listInputs)).isEqualTo(expected);
+        assertThat(Type.Of("(bool[],bool[])").encode(listInputs)).isEqualTo(expected);
     }
 
     @Test
     public void TestEmptyTuple() {
         Object[] elements = new Object[0];
-        assertThat(Type.fromString("()").encode(elements)).isEqualTo(new byte[0]);
+        assertThat(Type.Of("()").encode(elements)).isEqualTo(new byte[0]);
 
         List<Object> listInputs = Arrays.asList(elements);
-        assertThat(Type.fromString("()").encode(listInputs)).isEqualTo(new byte[0]);
+        assertThat(Type.Of("()").encode(listInputs)).isEqualTo(new byte[0]);
     }
 }

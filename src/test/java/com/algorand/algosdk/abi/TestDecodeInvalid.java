@@ -9,28 +9,28 @@ public class TestDecodeInvalid {
     public void TestBoolArray0() {
         byte[] input = new byte[]{(byte) 0xff};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("bool[9]").decode(input));
+                () -> Type.Of("bool[9]").decode(input));
     }
 
     @Test
     public void TestBoolArray1() {
         byte[] input = new byte[]{(byte) 0xff, 0x00};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("bool[8]").decode(input));
+                () -> Type.Of("bool[8]").decode(input));
     }
 
     @Test
     public void TestBoolArray2() {
         byte[] input = new byte[]{0x00, 0x0A, (byte) 0b10101010};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("bool[]").decode(input));
+                () -> Type.Of("bool[]").decode(input));
     }
 
     @Test
     public void TestBoolArray3() {
         byte[] input = new byte[]{0x00, 0x05, (byte) 0b10100000, 0x00};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("bool[]").decode(input));
+                () -> Type.Of("bool[]").decode(input));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("uint64[10]").decode(input));
+                () -> Type.Of("uint64[10]").decode(input));
     }
 
     @Test
@@ -62,7 +62,7 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x08,
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("uint64[6]").decode(input));
+                () -> Type.Of("uint64[6]").decode(input));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class TestDecodeInvalid {
                 0x00, 0x03, (byte) 'D', (byte) 'E', (byte) 'F',
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("(string,bool,bool,bool,bool,string)").decode(input)
+                () -> Type.Of("(string,bool,bool,bool,bool,string)").decode(input)
         );
     }
 
@@ -82,9 +82,9 @@ public class TestDecodeInvalid {
         byte[] encode0 = new byte[]{(byte) 0b11000000, (byte) 0b11000000, 0x00};
         byte[] encode1 = new byte[]{(byte) 0b11000000};
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("(bool[2],bool[2])").decode(encode0));
+                () -> Type.Of("(bool[2],bool[2])").decode(encode0));
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("(bool[2],bool[2])").decode(encode1));
+                () -> Type.Of("(bool[2],bool[2])").decode(encode1));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class TestDecodeInvalid {
                 0x00, 0x02, (byte) 0b11000000
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("(bool[2],bool[])").decode(encoded));
+                () -> Type.Of("(bool[2],bool[])").decode(encoded));
 
     }
 
@@ -107,7 +107,7 @@ public class TestDecodeInvalid {
                 0x00, 0x02, (byte) 0b11000000
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("(bool[],bool[])").decode(encoded));
+                () -> Type.Of("(bool[],bool[])").decode(encoded));
     }
 
     @Test
@@ -117,14 +117,14 @@ public class TestDecodeInvalid {
                 0x00, 0x00, 0x00, 0x00
         };
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> Type.fromString("(bool[],bool[])").decode(encoded));
+                () -> Type.Of("(bool[],bool[])").decode(encoded));
     }
 
     @Test
     public void TestEmptyTuple() {
         Assertions.assertThrows(
                 IllegalArgumentException.class,
-                () -> Type.fromString("()").decode(new byte[]{0x0F})
+                () -> Type.Of("()").decode(new byte[]{0x0F})
         );
     }
 }
