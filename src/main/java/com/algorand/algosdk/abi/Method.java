@@ -77,8 +77,9 @@ public class Method {
     }
 
     public String getSignature() {
-        String[] argStrings = this.args.stream().map(arg -> arg.type).toArray(String[]::new);
-        return this.name + "(" + StringUtil.join(argStrings, ",") + ")" + this.returns.type;
+        List<String> argStringList = new ArrayList<>();
+        for (Arg value : this.args) argStringList.add(value.type);
+        return this.name + "(" + StringUtil.join(argStringList.toArray(new String[0]), ",") + ")" + this.returns.type;
     }
 
     public byte[] getSelector() {
