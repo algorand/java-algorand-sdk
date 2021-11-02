@@ -56,7 +56,7 @@ public class ProofResponse extends PathResponse {
         if (o == null) return false;
 
         ProofResponse other = (ProofResponse) o;
-        if (!Objects.deepEquals(this.hashtype, other.hashtype)) return false;
+//        if (!Objects.deepEquals(this.hashtype, other.hashtype)) return false;
         if (!Objects.deepEquals(this.idx, other.idx)) return false;
         if (!Objects.deepEquals(this.proof, other.proof)) return false;
         if (!Objects.deepEquals(this.stibhash, other.stibhash)) return false;
