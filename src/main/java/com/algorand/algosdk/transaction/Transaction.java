@@ -644,6 +644,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("votefst") BigInteger voteFirst,
                         @JsonProperty("votelst") BigInteger voteLast,
                         @JsonProperty("votekd") BigInteger voteKeyDilution,
+                        @JsonProperty("nonpart") boolean nonpart,
                         // asset creation and configuration
                         @JsonProperty("apar") AssetParams assetParams,
                         @JsonProperty("caid") BigInteger assetIndex,
@@ -694,7 +695,7 @@ public class Transaction implements Serializable {
                 voteFirst,
              voteLast,
              voteKeyDilution,
-             false,
+             nonpart,
              // asset creation and configuration
              assetParams,
              assetIndex,
