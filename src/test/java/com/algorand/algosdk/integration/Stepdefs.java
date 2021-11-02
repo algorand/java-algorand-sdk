@@ -100,6 +100,7 @@ public class Stepdefs {
     BigInteger paramsFee;
     ParticipationPublicKey votepk;
     VRFPublicKey vrfpk;
+    String sprfpk;
     BigInteger votefst;
     BigInteger votelst;
     BigInteger votekd;
@@ -344,8 +345,7 @@ public class Stepdefs {
         pk = getAddress(0);
 
         if(type.equals("online")){
-            byte[] root = new byte[64];
-            Arrays.fill(root, (byte) 1 );
+            sprfpk = "mYR0GVEObMTSNdsKM6RwYywHYPqVDqg3E4JFzxZOreH9NU8B+tKzUanyY8AQ144hETgSMX7fXWwjBdHz6AWk9w==";
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
                     .participationPublicKey(votepk)
@@ -353,19 +353,21 @@ public class Stepdefs {
                     .voteFirst(votefst)
                     .voteLast(votelst)
                     .voteKeyDilution(votekd)
-                    .stateProofKey(new Verifier(root,true))
+                    .stateProofKeyBase64(sprfpk)
                     .suggestedParams(this.params)
                     .build();
         }else if(type.equals("offline")){
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
                     .suggestedParams(this.params)
+                    .stateProofKey(null)
                     .build();
         }else if(type.equals("nonparticipation")){
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
                     .suggestedParams(this.params)
                     .nonparticipation(true)
+                    .stateProofKey(null)
                     .build();
         }
     }

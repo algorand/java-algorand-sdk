@@ -66,6 +66,11 @@ public class Transaction implements Serializable {
     // selectionPK is the VRF public key used in key registration transactions
     @JsonProperty("selkey")
     public VRFPublicKey selectionPK = new VRFPublicKey();
+
+    // stateProofKey
+    @JsonProperty("sprfkey")
+    public MerkleVerifier stateProofKey = null;
+
     // voteFirst is the first round this keyreg tx is valid for
     @JsonProperty("votefst")
     public BigInteger voteFirst = BigInteger.valueOf(0);
@@ -76,9 +81,6 @@ public class Transaction implements Serializable {
     // voteKeyDilution
     @JsonProperty("votekd")
     public BigInteger voteKeyDilution = BigInteger.valueOf(0);
-    // stateProofKey
-    @JsonProperty("sprfkey")
-    public Verifier stateProofKey = new Verifier();
 
     /* asset creation and configuration fields *********************************/
     @JsonProperty("apar")
@@ -323,7 +325,7 @@ public class Transaction implements Serializable {
     public static Transaction createKeyRegistrationTransaction(Address sender, BigInteger fee, BigInteger firstValid,
                                                                BigInteger lastValid, byte[] note, String genesisID,
                                                                Digest genesisHash, ParticipationPublicKey votePK,
-                                                               VRFPublicKey vrfPK, BigInteger voteFirst,
+                                                               VRFPublicKey vrfPK, MerkleVerifier sprfpk, BigInteger voteFirst,
                                                                BigInteger voteLast, BigInteger voteKeyDilution) {
         Objects.requireNonNull(sender, "sender is required");
         Objects.requireNonNull(firstValid, "firstValid is required");
@@ -357,13 +359,13 @@ public class Transaction implements Serializable {
                 // keyreg fields
                 votePK,
                 vrfPK,
+                sprfpk,
                 voteFirst,
                 voteLast,
                 // voteKeyDilution
                 voteKeyDilution,
                 null,
                 // asset creation and configuration
-                null,
                 null,
                 // asset transfer fields
                 null,
@@ -631,10 +633,10 @@ public class Transaction implements Serializable {
                         // keyreg fields
                         @JsonProperty("votekey") byte[] votePK,
                         @JsonProperty("selkey") byte[] vrfPK,
+                        @JsonProperty("sprfkey") byte[] stateProofKey,
                         @JsonProperty("votefst") BigInteger voteFirst,
                         @JsonProperty("votelst") BigInteger voteLast,
                         @JsonProperty("votekd") BigInteger voteKeyDilution,
-                        @JsonProperty("sprfkey") Verifier stateProofKey,
                         // asset creation and configuration
                         @JsonProperty("apar") AssetParams assetParams,
                         @JsonProperty("caid") BigInteger assetIndex,
@@ -681,10 +683,10 @@ public class Transaction implements Serializable {
              // keyreg fields
              new ParticipationPublicKey(votePK),
              new VRFPublicKey(vrfPK),
-             voteFirst,
+             new MerkleVerifier(stateProofKey),
+                voteFirst,
              voteLast,
              voteKeyDilution,
-             stateProofKey,
              // asset creation and configuration
              assetParams,
              assetIndex,
@@ -737,11 +739,11 @@ public class Transaction implements Serializable {
                         // keyreg fields
                         ParticipationPublicKey votePK,
                         VRFPublicKey vrfPK,
+                        MerkleVerifier stateProofKey,
                         BigInteger voteFirst,
                         BigInteger voteLast,
                         // voteKeyDilution
                         BigInteger voteKeyDilution,
-                        Verifier stateProofKey,
                         // asset creation and configuration
                         AssetParams assetParams,
                         BigInteger assetIndex,
@@ -786,7 +788,6 @@ public class Transaction implements Serializable {
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
-        if (stateProofKey !=null) this.stateProofKey = stateProofKey;
         if (assetParams != null) this.assetParams = assetParams;
         if (assetIndex != null) this.assetIndex = assetIndex;
         if (xferAsset != null) this.xferAsset = xferAsset;
@@ -1286,7 +1287,6 @@ public class Transaction implements Serializable {
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
-                stateProofKey.equals(that.stateProofKey) &&
                 assetParams.equals(that.assetParams) &&
                 assetIndex.equals(that.assetIndex) &&
                 xferAsset.equals(that.xferAsset) &&

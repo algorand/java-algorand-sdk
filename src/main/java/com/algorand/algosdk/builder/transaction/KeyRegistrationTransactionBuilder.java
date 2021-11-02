@@ -1,8 +1,8 @@
 package com.algorand.algosdk.builder.transaction;
 
+import com.algorand.algosdk.crypto.MerkleVerifier;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
-import com.algorand.algosdk.crypto.Verifier;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
@@ -46,7 +46,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     // voteKeyDilution
     protected BigInteger voteKeyDilution = BigInteger.valueOf(0);
     // stateProofKey
-    protected Verifier stateProofKey = new Verifier();
+    protected MerkleVerifier stateProofKey = new MerkleVerifier();
 
     /**
      * Initialize a {@link KeyRegistrationTransactionBuilder}.
@@ -232,12 +232,32 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
 
     /**
      * Set the stateProofKey value. This is used to identify a state proof
-     * @param stprf The voteKeyDilution value.
+     * @param stprf The stateProofKey value.
      * @return This builder.
      */
 
-    public T stateProofKey(Verifier stprf) {
+    public T stateProofKey(MerkleVerifier stprf) {
         this.stateProofKey = stprf;
+        return (T) this;
+    }
+
+    /**
+     * Set the stateProofKey value. This is used to identify a state proof
+     * @param stprf The stateProofKey value.
+     * @return This builder.
+     */
+    public T stateProofKeyByte(byte[] stprf) {
+        this.stateProofKey = new MerkleVerifier(stprf);
+        return (T) this;
+    }
+
+    /**
+     * Set the stateProofKey value. This is used to identify a state proof
+     * @param stprf The stateProofKey value.
+     * @return This builder.
+     */
+    public T stateProofKeyBase64(String stprf) {
+        this.stateProofKey = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
         return (T) this;
     }
 
