@@ -34,6 +34,8 @@ public class Method {
             @JsonProperty("returns") Returns returns
     ) {
         this.name = Objects.requireNonNull(name, "name must not be null");
+        if (this.name.isEmpty())
+            throw new IllegalArgumentException("name must not be empty string");
         this.desc = desc;
         this.args = Objects.requireNonNull(args, "args must not be null");
         this.returns = returns;
@@ -46,6 +48,8 @@ public class Method {
     public Method(String method) {
         List<String> parsedMethod = Method.methodParse(method);
         this.name = parsedMethod.get(0);
+        if (this.name.isEmpty())
+            throw new IllegalArgumentException("name must not be empty string");
 
         this.args = new ArrayList<>();
         String argTuple = parsedMethod.get(1);
@@ -133,8 +137,13 @@ public class Method {
                 @JsonProperty("desc") String desc
         ) {
             this.name = Objects.requireNonNull(name, "name must not be null");
+            if (this.name.isEmpty())
+                throw new IllegalArgumentException("name must not be empty string");
             this.desc = desc;
-            this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
+            if (type.equals("void"))
+                this.type = type;
+            else
+                this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
         }
 
         // default values for serializer to ignore
