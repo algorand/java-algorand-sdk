@@ -13,12 +13,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Map;
 
 import static com.algorand.algosdk.util.ConversionUtils.*;
@@ -58,7 +59,7 @@ public class TransactionSteps {
 
     @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
     public void suggested_transaction_parameters(Integer fee, String flatFee, Integer firstValid, Integer lastValid, String genesisHash, String genesisId) {
-        assertThat(flatFee).isIn(List.of("true", "false"));
+        assertThat(flatFee).isIn(Arrays.asList("true", "false"));
         
         suggestedFee = fee;
         suggestedFlatFee = flatFee.equals("true");
@@ -70,7 +71,7 @@ public class TransactionSteps {
 
     @When("I build a keyreg transaction with sender {string}, nonparticipation {string}, vote first {int}, vote last {int}, key dilution {int}, vote public key {string}, selection public key {string}, and state proof public key {string}")
     public void buildKeyregTransaction(String sender, String nonpart, Integer voteFirst, Integer voteLast, Integer keyDilution, String votePk, String selectionPk, String stateProofPk) {
-        assertThat(nonpart).isIn(List.of("true", "false"));
+        assertThat(nonpart).isIn(Arrays.asList("true", "false"));
 
         KeyRegistrationTransactionBuilder<?> builder = Transaction.KeyRegistrationTransactionBuilder();
 
