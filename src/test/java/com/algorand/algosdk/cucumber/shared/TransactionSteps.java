@@ -93,8 +93,9 @@ public class TransactionSteps {
             .voteKeyDilution(keyDilution)
             .participationPublicKeyBase64(votePk)
             .selectionPublicKeyBase64(selectionPk)
-            // TODO: .stateProofKeyBase64(stateProofPk)
+            .stateProofKeyBase64(stateProofPk)
             .build();
+//        System.out.println(transaction);
     }
 
     @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}, extra-pages {long}")

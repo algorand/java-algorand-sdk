@@ -72,6 +72,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
         if (voteLast != null) txn.voteLast = voteLast;
         if (voteKeyDilution != null) txn.voteKeyDilution = voteKeyDilution;
         if (stateProofKey != null) txn.stateProofKey = stateProofKey;
+        txn.nonpart = nonparticipation;
     }
 
     /**
@@ -100,8 +101,11 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T participationPublicKeyBase64(String pk) {
-        this.votePK = new ParticipationPublicKey(Encoder.decodeFromBase64(pk));
+        if(!pk.isEmpty()){
+            this.votePK = new ParticipationPublicKey(Encoder.decodeFromBase64(pk));
+        }
         return (T) this;
+
     }
 
     /**
@@ -130,7 +134,9 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T selectionPublicKeyBase64(String pk) {
-        this.selectionPK = new VRFPublicKey(Encoder.decodeFromBase64(pk));
+        if(!pk.isEmpty()){
+            this.selectionPK = new VRFPublicKey(Encoder.decodeFromBase64(pk));
+        }
         return (T) this;
     }
 
@@ -257,9 +263,14 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T stateProofKeyBase64(String stprf) {
-        this.stateProofKey = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
+        if(!stprf.isEmpty()){
+            this.stateProofKey = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
+        }else{
+            this.stateProofKey = null;
+        }
         return (T) this;
     }
+
 
     /**
      * Set the nonparticipation value. This is used to mark a key registration transaction participating/nonparticipating

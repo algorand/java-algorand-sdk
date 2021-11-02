@@ -71,6 +71,9 @@ public class Transaction implements Serializable {
     @JsonProperty("sprfkey")
     public MerkleVerifier stateProofKey = null;
 
+    @JsonProperty("nonpart")
+    public boolean nonpart = false;
+
     // voteFirst is the first round this keyreg tx is valid for
     @JsonProperty("votefst")
     public BigInteger voteFirst = BigInteger.valueOf(0);
@@ -260,6 +263,7 @@ public class Transaction implements Serializable {
                 // voteKeyDilution
                 null,
                 null,
+                false,
                 // asset creation and configuration
                 null,
                 null,
@@ -364,6 +368,7 @@ public class Transaction implements Serializable {
                 voteLast,
                 // voteKeyDilution
                 voteKeyDilution,
+                false,
                 null,
                 // asset creation and configuration
                 null,
@@ -488,6 +493,7 @@ public class Transaction implements Serializable {
                 // voteKeyDilution
                 null,
                 null,
+                false,
                 // asset creation and configuration
                 params,
                 null,
@@ -687,6 +693,7 @@ public class Transaction implements Serializable {
                 voteFirst,
              voteLast,
              voteKeyDilution,
+             false,
              // asset creation and configuration
              assetParams,
              assetIndex,
@@ -744,6 +751,7 @@ public class Transaction implements Serializable {
                         BigInteger voteLast,
                         // voteKeyDilution
                         BigInteger voteKeyDilution,
+                        boolean nonpart,
                         // asset creation and configuration
                         AssetParams assetParams,
                         BigInteger assetIndex,
@@ -788,6 +796,7 @@ public class Transaction implements Serializable {
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
+        this.nonpart = nonpart;
         if (assetParams != null) this.assetParams = assetParams;
         if (assetIndex != null) this.assetIndex = assetIndex;
         if (xferAsset != null) this.xferAsset = xferAsset;
@@ -1287,6 +1296,7 @@ public class Transaction implements Serializable {
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
+                nonpart==that.nonpart &&
                 assetParams.equals(that.assetParams) &&
                 assetIndex.equals(that.assetIndex) &&
                 xferAsset.equals(that.xferAsset) &&
