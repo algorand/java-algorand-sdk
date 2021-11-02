@@ -278,6 +278,8 @@ public class TestTypes {
                 "((uint32)",
                 "(byte,,byte)",
                 "((byte),,(byte))",
+                // some random stuffs
+                "",
         };
         for (String testcase : testcases)
             Assertions.assertThrows(IllegalArgumentException.class, () -> Type.Of(testcase));

@@ -11,11 +11,15 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Method {
     @JsonIgnore
     private static final String HASH_ALG = "SHA-512/256";
+
+    @JsonIgnore
+    private static final Pattern validName = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*$");
 
     @JsonProperty("name")
     public String name;
@@ -33,12 +37,17 @@ public class Method {
             @JsonProperty("args") List<Arg> args,
             @JsonProperty("returns") Returns returns
     ) {
-        this.name = Objects.requireNonNull(name, "name must not be null");
-        if (this.name.isEmpty())
-            throw new IllegalArgumentException("name must not be empty string");
+        this.name = Method.nameChecker(name);
         this.desc = desc;
         this.args = Objects.requireNonNull(args, "args must not be null");
         this.returns = returns;
+    }
+
+    private static String nameChecker(String name) {
+        String nameStr = Objects.requireNonNull(name, "name must not be null");
+        if (nameStr.isEmpty() || !Method.validName.matcher(nameStr).matches())
+            throw new IllegalArgumentException("name must not be an empty string");
+        return nameStr;
     }
 
     // default values for serializer to ignore
@@ -47,9 +56,7 @@ public class Method {
 
     public Method(String method) {
         List<String> parsedMethod = Method.methodParse(method);
-        this.name = parsedMethod.get(0);
-        if (this.name.isEmpty())
-            throw new IllegalArgumentException("name must not be empty string");
+        this.name = Method.nameChecker(parsedMethod.get(0));
 
         this.args = new ArrayList<>();
         String argTuple = parsedMethod.get(1);
@@ -57,7 +64,7 @@ public class Method {
         for (int i = 0; i < parsedMethodArgs.size(); i++)
             this.args.add(new Method.Arg("arg" + i, parsedMethodArgs.get(i), null));
 
-        this.returns = new Returns(Type.Of(parsedMethod.get(2)).toString(), null);
+        this.returns = new Returns(parsedMethod.get(2), null);
     }
 
     private static List<String> methodParse(String method) {
@@ -70,6 +77,8 @@ public class Method {
                 if (parenStack.isEmpty())
                     break;
                 int leftParenIndex = parenStack.pop();
+                if (parenStack.size() > 0)
+                    continue;
                 List<String> res = new ArrayList<>();
                 res.add(method.substring(0, leftParenIndex));
                 res.add(method.substring(leftParenIndex, i + 1));
@@ -112,7 +121,8 @@ public class Method {
                 @JsonProperty("type") String type,
                 @JsonProperty("desc") String desc
         ) {
-            this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
+            this.type = type.equals("void") ?
+                    type : Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
             this.desc = desc;
         }
 
@@ -136,14 +146,9 @@ public class Method {
                 @JsonProperty("type") String type,
                 @JsonProperty("desc") String desc
         ) {
-            this.name = Objects.requireNonNull(name, "name must not be null");
-            if (this.name.isEmpty())
-                throw new IllegalArgumentException("name must not be empty string");
+            this.name = Method.nameChecker(name);
             this.desc = desc;
-            if (type.equals("void"))
-                this.type = type;
-            else
-                this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
+            this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
         }
 
         // default values for serializer to ignore
