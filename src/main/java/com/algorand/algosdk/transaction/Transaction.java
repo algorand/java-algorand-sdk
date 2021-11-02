@@ -71,6 +71,7 @@ public class Transaction implements Serializable {
     @JsonProperty("sprfkey")
     public MerkleVerifier stateProofKey = null;
 
+    // nonparticiation mark
     @JsonProperty("nonpart")
     public boolean nonpart = false;
 

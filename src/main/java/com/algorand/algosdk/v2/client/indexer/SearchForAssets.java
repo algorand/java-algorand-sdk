@@ -44,7 +44,8 @@ public class SearchForAssets extends Query {
     }
 
     /**
-     * Maximum number of results to return.
+     * Maximum number of results to return. There could be additional pages even if the
+     * limit is not reached.
      */
     public SearchForAssets limit(Long limit) {
         addQuery("limit", String.valueOf(limit));

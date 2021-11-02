@@ -54,10 +54,11 @@ public class Enums {
     }
 
     /**
-     * SigType filters just results using the specified type of signature:
-     *   sig - Standard
-     *   msig - MultiSig
-     *   lsig - LogicSig
+     * Indicates what type of signature is used by this account, must be one of:
+     *   sig
+     *   msig
+     *   lsig
+     *   or null if unknown
      */
     public enum SigType {
         @JsonProperty("sig") SIG("sig"),
