@@ -1,9 +1,7 @@
 package com.algorand.algosdk.cucumber.shared;
 
-import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
-import com.algorand.algosdk.builder.transaction.TransactionBuilder;
+import com.algorand.algosdk.builder.transaction.KeyRegistrationTransactionBuilder;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -15,11 +13,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Map;
@@ -29,7 +27,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionSteps {
     private final Base base;
-    public Transaction applicationTransaction = null;
+    
+    // The Java SDK does not have a comprehensive suggested params object, so all fields are defined here individually
+    public Integer suggestedFee;
+    public Boolean suggestedFlatFee;
+    public Integer suggestedFirstValid;
+    public Integer suggestedLastValid;
+    public String suggestedGenesisHashB64;
+    public String suggestedGenesisId;
+
+    public Transaction transaction = null;
     public SignedTransaction signedTransaction = null;
 
     public TransactionSteps(Base b) {
@@ -50,9 +57,49 @@ public class TransactionSteps {
         throw new RuntimeException("Unknown error.");
     }
 
+    @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
+    public void suggested_transaction_parameters(Integer fee, String flatFee, Integer firstValid, Integer lastValid, String genesisHash, String genesisId) {
+        assertThat(flatFee).isIn(Arrays.asList("true", "false"));
+        
+        suggestedFee = fee;
+        suggestedFlatFee = flatFee.equals("true");
+        suggestedFirstValid = firstValid;
+        suggestedLastValid = lastValid;
+        suggestedGenesisHashB64 = genesisHash;
+        suggestedGenesisId = genesisId;
+    }
+
+    @When("I build a keyreg transaction with sender {string}, nonparticipation {string}, vote first {int}, vote last {int}, key dilution {int}, vote public key {string}, selection public key {string}, and state proof public key {string}")
+    public void buildKeyregTransaction(String sender, String nonpart, Integer voteFirst, Integer voteLast, Integer keyDilution, String votePk, String selectionPk, String stateProofPk) {
+        assertThat(nonpart).isIn(Arrays.asList("true", "false"));
+
+        KeyRegistrationTransactionBuilder<?> builder = Transaction.KeyRegistrationTransactionBuilder();
+
+        if (suggestedFlatFee) {
+            builder = builder.flatFee(suggestedFee);
+        } else {
+            builder = builder.fee(suggestedFee);
+        }
+        
+        transaction = builder
+            .firstValid(suggestedFirstValid)
+            .lastValid(suggestedLastValid)
+            .genesisHashB64(suggestedGenesisHashB64)
+            .genesisID(suggestedGenesisId)
+            .sender(sender)
+            .nonparticipation(nonpart.equals("true"))
+            .voteFirst(voteFirst)
+            .voteLast(voteLast)
+            .voteKeyDilution(keyDilution)
+            .participationPublicKeyBase64(votePk)
+            .selectionPublicKeyBase64(selectionPk)
+            // TODO: .stateProofKeyBase64(stateProofPk)
+            .build();
+    }
+
     @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}, extra-pages {long}")
     public void buildApplicationTransactions(String operation, Long applicationId, String sender, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long fee, Long firstValid, Long lastValid, String genesisHash, Long extraPages) {
-        ApplicationBaseTransactionBuilder builder = null;
+        ApplicationBaseTransactionBuilder<?> builder = null;
 
         // Create builder and apply builder-specific parameters
         switch (operation) {
@@ -120,12 +167,12 @@ public class TransactionSteps {
             builder.genesisHashB64(genesisHash);
         }
 
-        applicationTransaction = builder.build();
+        transaction = builder.build();
     }
 
     @When("sign the transaction")
     public void sign_the_transaction() throws NoSuchAlgorithmException {
-        signedTransaction = base.signTransaction(applicationTransaction);
+        signedTransaction = base.signTransaction(transaction);
     }
 
     @Then("fee field is in txn")
@@ -149,10 +196,18 @@ public class TransactionSteps {
         Map<String,Object> txn = (Map<String,Object>) sigtxn.get("txn");
         assertThat(txn).doesNotContainKey("fee");
     }
+
     @Then("the base64 encoded signed transaction should equal {string}")
     public void the_base64_encoded_signed_transaction_should_equal(String golden) throws JsonProcessingException {
         String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
         assertThat(encoded).isEqualTo(golden);
+    }
+
+    @Then("the decoded transaction should equal the original")
+    public void the_decoded_transaction_should_equal_the_original() throws JsonProcessingException, IOException {
+        String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
+        SignedTransaction decoded = Encoder.decodeFromMsgPack(encoded, SignedTransaction.class);
+        assertThat(decoded.tx).isEqualTo(transaction);
     }
 
 }
