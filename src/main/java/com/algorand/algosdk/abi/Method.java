@@ -26,7 +26,7 @@ public class Method {
     @JsonProperty("desc")
     public String desc;
     @JsonProperty("args")
-    public List<Arg> args;
+    public List<Arg> args = new ArrayList<>();
     @JsonProperty("returns")
     public Returns returns;
 
@@ -39,7 +39,7 @@ public class Method {
     ) {
         this.name = Method.nameChecker(name);
         this.desc = desc;
-        this.args = Objects.requireNonNull(args, "args must not be null");
+        if (args != null) this.args = args;
         this.returns = returns;
     }
 
@@ -48,10 +48,6 @@ public class Method {
         if (nameStr.isEmpty() || !Method.validName.matcher(nameStr).matches())
             throw new IllegalArgumentException("name must not be an empty string");
         return nameStr;
-    }
-
-    // default values for serializer to ignore
-    public Method() {
     }
 
     public Method(String method) {
@@ -90,12 +86,14 @@ public class Method {
         throw new IllegalArgumentException("method string parentheses unbalanced: " + method);
     }
 
+    @JsonIgnore
     public String getSignature() {
         List<String> argStringList = new ArrayList<>();
         for (Arg value : this.args) argStringList.add(value.type);
         return this.name + "(" + StringUtil.join(argStringList.toArray(new String[0]), ",") + ")" + this.returns.type;
     }
 
+    @JsonIgnore
     public byte[] getSelector() {
         try {
             CryptoProvider.setupIfNeeded();
@@ -107,6 +105,13 @@ public class Method {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Method method = (Method) o;
+        return Objects.equals(name, method.name) && Objects.equals(desc, method.desc) && Objects.equals(args, method.args) && Objects.equals(returns, method.returns);
     }
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
@@ -126,8 +131,11 @@ public class Method {
             this.desc = desc;
         }
 
-        // default values for serializer to ignore
-        public Returns() {
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            Returns returns = (Returns) o;
+            return Objects.equals(type, returns.type) && Objects.equals(desc, returns.desc);
         }
     }
 
@@ -151,8 +159,11 @@ public class Method {
             this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
         }
 
-        // default values for serializer to ignore
-        public Arg() {
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            Arg arg = (Arg) o;
+            return Objects.equals(name, arg.name) && Objects.equals(type, arg.type) && Objects.equals(desc, arg.desc);
         }
     }
 }
