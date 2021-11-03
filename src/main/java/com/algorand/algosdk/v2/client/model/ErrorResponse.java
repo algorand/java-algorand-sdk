@@ -1,17 +1,18 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * An error response with optional data field.
+ * Response for errors
  */
 public class ErrorResponse extends PathResponse {
 
     @JsonProperty("data")
-    public String data;
+    public HashMap<String,Object> data;
 
     @JsonProperty("message")
     public String message;
