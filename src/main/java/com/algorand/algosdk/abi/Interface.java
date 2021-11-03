@@ -1,9 +1,11 @@
 package com.algorand.algosdk.abi;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,7 +14,7 @@ public class Interface {
     @JsonProperty("name")
     public String name;
     @JsonProperty("methods")
-    public List<Method> methods;
+    public List<Method> methods = new ArrayList<>();
 
     @JsonCreator
     public Interface(
@@ -20,10 +22,23 @@ public class Interface {
             @JsonProperty("methods") List<Method> methods
     ) {
         this.name = Objects.requireNonNull(name, "name must not be null");
-        this.methods = Objects.requireNonNull(methods, "methods must not be null");
+        if (methods != null) this.methods = methods;
     }
 
-    // default values for serializer to ignore
-    public Interface() {
+    @JsonIgnore
+    public String getName() {
+        return this.name;
+    }
+
+    @JsonIgnore
+    public Method getMethodByIndex(int index) {
+        return this.methods.get(index);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Interface that = (Interface) o;
+        return Objects.equals(name, that.name) && Objects.equals(methods, that.methods);
     }
 }

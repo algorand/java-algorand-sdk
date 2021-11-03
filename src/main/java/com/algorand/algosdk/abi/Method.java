@@ -28,7 +28,7 @@ public class Method {
     @JsonProperty("args")
     public List<Arg> args = new ArrayList<>();
     @JsonProperty("returns")
-    public Returns returns;
+    public Returns returns = new Returns("void", null);
 
     @JsonCreator
     public Method(
@@ -40,7 +40,7 @@ public class Method {
         this.name = Method.nameChecker(name);
         this.desc = desc;
         if (args != null) this.args = args;
-        this.returns = returns;
+        if (returns != null) this.returns = returns;
     }
 
     private static String nameChecker(String name) {
@@ -111,7 +111,8 @@ public class Method {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Method method = (Method) o;
-        return Objects.equals(name, method.name) && Objects.equals(desc, method.desc) && Objects.equals(args, method.args) && Objects.equals(returns, method.returns);
+        return Objects.equals(name, method.name) && Objects.equals(desc, method.desc) &&
+                Objects.equals(args, method.args) && Objects.equals(returns, method.returns);
     }
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
