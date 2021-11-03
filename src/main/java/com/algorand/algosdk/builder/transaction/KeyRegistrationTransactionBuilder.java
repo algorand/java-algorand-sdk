@@ -247,7 +247,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @param stprf The stateProofKey value.
      * @return This builder.
      */
-    public T stateProofKeyByte(byte[] stprf) {
+    public T stateProofKey(byte[] stprf) {
         this.stateProofKey = new MerkleVerifier(stprf);
         return (T) this;
     }
@@ -258,11 +258,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T stateProofKeyBase64(String stprf) {
-        if(!stprf.isEmpty()){
-            this.stateProofKey = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
-        }else{
-            this.stateProofKey = null;
-        }
+        this.stateProofKey = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
         return (T) this;
     }
 

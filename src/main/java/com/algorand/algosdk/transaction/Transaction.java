@@ -69,7 +69,7 @@ public class Transaction implements Serializable {
 
     // stateProofKey
     @JsonProperty("sprfkey")
-    public MerkleVerifier stateProofKey = null;
+    public MerkleVerifier stateProofKey = new MerkleVerifier();
 
     // nonparticiation mark
     @JsonProperty("nonpart")
@@ -889,6 +889,7 @@ public class Transaction implements Serializable {
         if (closeRemainderTo != null) this.closeRemainderTo = closeRemainderTo;
         if (votePK != null) this.votePK = votePK;
         if (vrfPK != null) this.selectionPK = vrfPK;
+        if (stateProofKey != null) this.stateProofKey = stateProofKey;
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
@@ -1389,7 +1390,7 @@ public class Transaction implements Serializable {
                 closeRemainderTo.equals(that.closeRemainderTo) &&
                 votePK.equals(that.votePK) &&
                 selectionPK.equals(that.selectionPK) &&
-                stateProofKey == stateProofKey &&
+                stateProofKey.equals(that.stateProofKey) &&
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
