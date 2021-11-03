@@ -21,11 +21,11 @@ public class MerkleVerifier implements Serializable {
 
     @JsonCreator
     public MerkleVerifier(byte[] bytes) {
-        if (bytes == null) {
+        if (bytes == null || bytes.length == 0) {
             return;
         }
         if (bytes.length != KEY_LEN_BYTES ) {
-            throw new IllegalArgumentException("vrf key wrong length");
+            throw new IllegalArgumentException("state proof key wrong length");
         }
         System.arraycopy(bytes, 0, this.bytes, 0, KEY_LEN_BYTES);
     }

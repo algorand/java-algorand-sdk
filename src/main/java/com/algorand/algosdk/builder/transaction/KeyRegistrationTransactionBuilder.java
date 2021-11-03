@@ -101,9 +101,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T participationPublicKeyBase64(String pk) {
-        if(!pk.isEmpty()){
-            this.votePK = new ParticipationPublicKey(Encoder.decodeFromBase64(pk));
-        }
+        this.votePK = new ParticipationPublicKey(Encoder.decodeFromBase64(pk));
         return (T) this;
 
     }
@@ -134,9 +132,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T selectionPublicKeyBase64(String pk) {
-        if(!pk.isEmpty()){
-            this.selectionPK = new VRFPublicKey(Encoder.decodeFromBase64(pk));
-        }
+        this.selectionPK = new VRFPublicKey(Encoder.decodeFromBase64(pk));
         return (T) this;
     }
 
@@ -241,7 +237,6 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @param stprf The stateProofKey value.
      * @return This builder.
      */
-
     public T stateProofKey(MerkleVerifier stprf) {
         this.stateProofKey = stprf;
         return (T) this;
@@ -271,13 +266,11 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
         return (T) this;
     }
 
-
     /**
      * Set the nonparticipation value. This is used to mark a key registration transaction participating/nonparticipating
      * @param nonpart The nonparticipation mark.
      * @return This builder.
      */
-
     public T nonparticipation(boolean nonpart) {
         this.nonparticipation = nonpart;
         return (T) this;

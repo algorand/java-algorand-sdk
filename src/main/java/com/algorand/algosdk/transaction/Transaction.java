@@ -330,7 +330,7 @@ public class Transaction implements Serializable {
     public static Transaction createKeyRegistrationTransaction(Address sender, BigInteger fee, BigInteger firstValid,
                                                                BigInteger lastValid, byte[] note, String genesisID,
                                                                Digest genesisHash, ParticipationPublicKey votePK,
-                                                               VRFPublicKey vrfPK, MerkleVerifier sprfpk, BigInteger voteFirst,
+                                                               VRFPublicKey vrfPK, BigInteger voteFirst,
                                                                BigInteger voteLast, BigInteger voteKeyDilution) {
         Objects.requireNonNull(sender, "sender is required");
         Objects.requireNonNull(firstValid, "firstValid is required");
@@ -364,12 +364,10 @@ public class Transaction implements Serializable {
                 // keyreg fields
                 votePK,
                 vrfPK,
-                sprfpk,
                 voteFirst,
                 voteLast,
                 // voteKeyDilution
                 voteKeyDilution,
-                false,
                 null,
                 // asset creation and configuration
                 null,
@@ -724,7 +722,103 @@ public class Transaction implements Serializable {
     }
 
     /**
-     * Constructor which takes all the fields of Transaction.
+     * Constructor which takes all the fields of Transaction except for nonpart and state proof.
+     * For details about which fields to use with different transaction types, refer to the developer documentation:
+     * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
+     */
+    public Transaction(
+            Type type,
+            //header fields
+            Address sender,
+            BigInteger fee,
+            BigInteger firstValid,
+            BigInteger lastValid,
+            byte[] note,
+            String genesisID,
+            Digest genesisHash,
+            byte[] lease,
+            Address rekeyTo,
+            Digest group,
+            // payment fields
+            BigInteger amount,
+            Address receiver,
+            Address closeRemainderTo,
+            // keyreg fields
+            ParticipationPublicKey votePK,
+            VRFPublicKey vrfPK,
+            BigInteger voteFirst,
+            BigInteger voteLast,
+            // voteKeyDilution
+            BigInteger voteKeyDilution,
+            // asset creation and configuration
+            AssetParams assetParams,
+            BigInteger assetIndex,
+            // asset transfer fields
+            BigInteger xferAsset,
+            BigInteger assetAmount,
+            Address assetSender,
+            Address assetReceiver,
+            Address assetCloseTo,
+            Address freezeTarget,
+            BigInteger assetFreezeID,
+            boolean freezeState,
+            // application fields
+            List<byte[]> applicationArgs,
+            OnCompletion onCompletion,
+            TEALProgram approvalProgram,
+            List<Address> accounts,
+            List<Long> foreignApps,
+            List<Long> foreignAssets,
+            StateSchema globalStateSchema,
+            Long applicationId,
+            StateSchema localStateSchema,
+            TEALProgram clearStateProgram,
+            Long extraPages
+    ) {
+        if (type != null) this.type = type;
+        if (sender != null) this.sender = sender;
+        setFee(fee);
+        if (firstValid != null) this.firstValid = firstValid;
+        if (lastValid != null) this.lastValid = lastValid;
+        setNote(note);
+        if (genesisID != null) this.genesisID = genesisID;
+        if (genesisHash != null) this.genesisHash = genesisHash;
+        setLease(lease);
+        if (rekeyTo != null) this.rekeyTo = rekeyTo;
+        if (group != null) this.group = group;
+        if (amount != null) this.amount = amount;
+        if (receiver != null) this.receiver = receiver;
+        if (closeRemainderTo != null) this.closeRemainderTo = closeRemainderTo;
+        if (votePK != null) this.votePK = votePK;
+        if (vrfPK != null) this.selectionPK = vrfPK;
+        if (voteFirst != null) this.voteFirst = voteFirst;
+        if (voteLast != null) this.voteLast = voteLast;
+        if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
+        if (assetParams != null) this.assetParams = assetParams;
+        if (assetIndex != null) this.assetIndex = assetIndex;
+        if (xferAsset != null) this.xferAsset = xferAsset;
+        if (assetAmount != null) this.assetAmount = assetAmount;
+        if (assetSender != null) this.assetSender = assetSender;
+        if (assetReceiver != null) this.assetReceiver = assetReceiver;
+        if (assetCloseTo != null) this.assetCloseTo = assetCloseTo;
+        if (freezeTarget != null) this.freezeTarget = freezeTarget;
+        if (assetFreezeID != null) this.assetFreezeID = assetFreezeID;
+        this.freezeState = freezeState;
+        if (applicationArgs != null) this.applicationArgs = applicationArgs;
+        if (onCompletion != null) this.onCompletion = onCompletion;
+        if (approvalProgram != null) this.approvalProgram = approvalProgram;
+        if (accounts != null) this.accounts = accounts;
+        if (foreignApps != null) this.foreignApps = foreignApps;
+        if (foreignAssets != null) this.foreignAssets = foreignAssets;
+        if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
+        if (applicationId != null) this.applicationId = applicationId;
+        if (localStateSchema != null) this.localStateSchema = globalStateSchema;
+        if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
+        if (extraPages != null) this.extraPages = extraPages;
+    }
+
+    /**
+     * Constructor which takes all the fields of Transaction including nonpart and state proof.
      * For details about which fields to use with different transaction types, refer to the developer documentation:
      * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
      */
@@ -1295,6 +1389,7 @@ public class Transaction implements Serializable {
                 closeRemainderTo.equals(that.closeRemainderTo) &&
                 votePK.equals(that.votePK) &&
                 selectionPK.equals(that.selectionPK) &&
+                stateProofKey == stateProofKey &&
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&

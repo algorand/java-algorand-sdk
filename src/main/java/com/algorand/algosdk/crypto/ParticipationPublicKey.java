@@ -21,7 +21,7 @@ public class ParticipationPublicKey implements Serializable {
      */
     @JsonCreator
     public ParticipationPublicKey(byte[] bytes) {
-        if (bytes == null) {
+        if (bytes == null || bytes.length ==0) {
             return;
         }
         if (bytes.length != KEY_LEN_BYTES) {
