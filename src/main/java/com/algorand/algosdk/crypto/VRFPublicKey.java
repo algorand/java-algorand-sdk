@@ -24,7 +24,7 @@ public class VRFPublicKey implements Serializable {
      */
     @JsonCreator
     public VRFPublicKey(byte[] bytes) {
-        if (bytes == null || bytes.length ==0) {
+        if (bytes == null) {
             return;
         }
         if (bytes.length != KEY_LEN_BYTES) {

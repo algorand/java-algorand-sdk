@@ -21,7 +21,7 @@ public class MerkleVerifier implements Serializable {
 
     @JsonCreator
     public MerkleVerifier(byte[] bytes) {
-        if (bytes == null || bytes.length == 0) {
+        if (bytes == null) {
             return;
         }
         if (bytes.length != KEY_LEN_BYTES ) {
