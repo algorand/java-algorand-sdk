@@ -690,7 +690,7 @@ public class Transaction implements Serializable {
              new ParticipationPublicKey(votePK),
              new VRFPublicKey(vrfPK),
              new MerkleVerifier(stateProofKey),
-                voteFirst,
+             voteFirst,
              voteLast,
              voteKeyDilution,
              nonpart,
@@ -726,6 +726,7 @@ public class Transaction implements Serializable {
      * For details about which fields to use with different transaction types, refer to the developer documentation:
      * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
      */
+    @Deprecated
     public Transaction(
             Type type,
             //header fields
@@ -775,46 +776,56 @@ public class Transaction implements Serializable {
             TEALProgram clearStateProgram,
             Long extraPages
     ) {
-        if (type != null) this.type = type;
-        if (sender != null) this.sender = sender;
-        setFee(fee);
-        if (firstValid != null) this.firstValid = firstValid;
-        if (lastValid != null) this.lastValid = lastValid;
-        setNote(note);
-        if (genesisID != null) this.genesisID = genesisID;
-        if (genesisHash != null) this.genesisHash = genesisHash;
-        setLease(lease);
-        if (rekeyTo != null) this.rekeyTo = rekeyTo;
-        if (group != null) this.group = group;
-        if (amount != null) this.amount = amount;
-        if (receiver != null) this.receiver = receiver;
-        if (closeRemainderTo != null) this.closeRemainderTo = closeRemainderTo;
-        if (votePK != null) this.votePK = votePK;
-        if (vrfPK != null) this.selectionPK = vrfPK;
-        if (voteFirst != null) this.voteFirst = voteFirst;
-        if (voteLast != null) this.voteLast = voteLast;
-        if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
-        if (assetParams != null) this.assetParams = assetParams;
-        if (assetIndex != null) this.assetIndex = assetIndex;
-        if (xferAsset != null) this.xferAsset = xferAsset;
-        if (assetAmount != null) this.assetAmount = assetAmount;
-        if (assetSender != null) this.assetSender = assetSender;
-        if (assetReceiver != null) this.assetReceiver = assetReceiver;
-        if (assetCloseTo != null) this.assetCloseTo = assetCloseTo;
-        if (freezeTarget != null) this.freezeTarget = freezeTarget;
-        if (assetFreezeID != null) this.assetFreezeID = assetFreezeID;
-        this.freezeState = freezeState;
-        if (applicationArgs != null) this.applicationArgs = applicationArgs;
-        if (onCompletion != null) this.onCompletion = onCompletion;
-        if (approvalProgram != null) this.approvalProgram = approvalProgram;
-        if (accounts != null) this.accounts = accounts;
-        if (foreignApps != null) this.foreignApps = foreignApps;
-        if (foreignAssets != null) this.foreignAssets = foreignAssets;
-        if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
-        if (applicationId != null) this.applicationId = applicationId;
-        if (localStateSchema != null) this.localStateSchema = globalStateSchema;
-        if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
-        if (extraPages != null) this.extraPages = extraPages;
+        this(
+                type,
+                //header fields
+                sender,
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                genesisHash,
+                lease,
+                rekeyTo,
+                group,
+                // payment fields
+                amount,
+                receiver,
+                closeRemainderTo,
+                // keyreg fields
+                votePK,
+                vrfPK,
+                new MerkleVerifier(),
+                voteFirst,
+                voteLast,
+                voteKeyDilution,
+                false,
+                // asset creation and configuration
+                assetParams,
+                assetIndex,
+                // asset transfer fields
+                xferAsset,
+                assetAmount,
+                assetSender,
+                assetReceiver,
+                assetCloseTo,
+                freezeTarget,
+                assetFreezeID,
+                freezeState,
+                // application fields
+                applicationArgs,
+                onCompletion,
+                approvalProgram == null ? null : approvalProgram,
+                accounts,
+                foreignApps,
+                foreignAssets,
+                globalStateSchema,
+                applicationId,
+                localStateSchema,
+                clearStateProgram == null ? null : clearStateProgram,
+                extraPages
+        );
     }
 
     /**

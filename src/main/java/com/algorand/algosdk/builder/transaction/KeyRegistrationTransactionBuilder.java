@@ -46,7 +46,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     // voteKeyDilution
     protected BigInteger voteKeyDilution = BigInteger.valueOf(0);
     // stateProofKey
-    protected MerkleVerifier stateProofKey = new MerkleVerifier();
+    protected MerkleVerifier stateProofPk = new MerkleVerifier();
 
     /**
      * Initialize a {@link KeyRegistrationTransactionBuilder}.
@@ -71,7 +71,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
         if (voteFirst != null) txn.voteFirst = voteFirst;
         if (voteLast != null) txn.voteLast = voteLast;
         if (voteKeyDilution != null) txn.voteKeyDilution = voteKeyDilution;
-        if (stateProofKey != null) txn.stateProofKey = stateProofKey;
+        if (stateProofPk != null) txn.stateProofKey = stateProofPk;
         txn.nonpart = nonparticipation;
     }
 
@@ -238,7 +238,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T stateProofKey(MerkleVerifier stprf) {
-        this.stateProofKey = stprf;
+        stateProofPk = stprf;
         return (T) this;
     }
 
@@ -248,7 +248,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T stateProofKey(byte[] stprf) {
-        this.stateProofKey = new MerkleVerifier(stprf);
+        stateProofPk = new MerkleVerifier(stprf);
         return (T) this;
     }
 
@@ -258,7 +258,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
      * @return This builder.
      */
     public T stateProofKeyBase64(String stprf) {
-        this.stateProofKey = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
+        stateProofPk = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
         return (T) this;
     }
 

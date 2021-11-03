@@ -360,14 +360,12 @@ public class Stepdefs {
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
                     .suggestedParams(this.params)
-                    .stateProofKey(null)
                     .build();
         }else if(type.equals("nonparticipation")){
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
                     .suggestedParams(this.params)
                     .nonparticipation(true)
-                    .stateProofKey(null)
                     .build();
         }
     }
