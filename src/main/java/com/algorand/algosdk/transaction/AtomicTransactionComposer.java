@@ -52,8 +52,12 @@ public class AtomicTransactionComposer {
      * BUILDING, so additional transactions may be added to it.
      */
     public AtomicTransactionComposer cloneNewTxComposer() {
-        // TODO
-        return null;
+        AtomicTransactionComposer newAtc = new AtomicTransactionComposer();
+        newAtc.signedTxns = this.signedTxns;
+        newAtc.methodList = this.methodList;
+        newAtc.transactionList = this.transactionList;
+        newAtc.txIds = this.txIds;
+        return newAtc;
     }
 
     /**
@@ -110,9 +114,18 @@ public class AtomicTransactionComposer {
      *
      * @return an array of signed transactions.
      */
-    public byte[][] gatherSignatures() {
-        // TODO
-        return null;
+    public List<SignedTransaction> gatherSignatures() throws IOException, NoSuchAlgorithmException {
+        if (this.status.compareTo(AtomicTxComposerStatus.SIGNED) >= 0)
+            return this.signedTxns;
+
+        List<TransactionWithSigner> txnAndSignerList = this.buildGroup();
+        for (TransactionWithSigner tws : txnAndSignerList) {
+            SignedTransaction stxn = tws.signer.signTxn(tws.txn);
+            this.signedTxns.add(stxn);
+        }
+
+        this.status = AtomicTxComposerStatus.SIGNED;
+        return this.signedTxns;
     }
 
     /**
@@ -201,7 +214,7 @@ public class AtomicTransactionComposer {
             return signedTxns.toArray(new SignedTransaction[0]);
         }
 
-        protected SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException {
+        public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException {
             if (this.signedBy == SignedBy.BasicAccount) {
                 return acc.signTransaction(txn);
             } else if (this.signedBy == SignedBy.LogicSigAccount) {
