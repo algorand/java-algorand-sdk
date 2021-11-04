@@ -1,6 +1,7 @@
 package com.algorand.algosdk.abi;
 
 import com.algorand.algosdk.algod.client.StringUtil;
+import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,6 +17,18 @@ import java.util.regex.Pattern;
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Method {
     @JsonIgnore
+    private static final Set<String> TxArgTypes = new HashSet<>(
+            Arrays.asList(
+                    Transaction.Type.Payment.toValue(),
+                    Transaction.Type.KeyRegistration.toValue(),
+                    Transaction.Type.AssetConfig.toValue(),
+                    Transaction.Type.AssetTransfer.toValue(),
+                    Transaction.Type.AssetFreeze.toValue(),
+                    Transaction.Type.ApplicationCall.toValue()
+            )
+    );
+
+    @JsonIgnore
     private static final String HASH_ALG = "SHA-512/256";
 
     @JsonIgnore
@@ -29,6 +42,8 @@ public class Method {
     public List<Arg> args = new ArrayList<>();
     @JsonProperty("returns")
     public Returns returns = new Returns("void", null);
+    @JsonIgnore
+    private int txnCallCount = 1;
 
     @JsonCreator
     public Method(
@@ -41,6 +56,9 @@ public class Method {
         this.desc = desc;
         if (args != null) this.args = args;
         if (returns != null) this.returns = returns;
+        for (Arg arg : this.args)
+            if (TxArgTypes.contains(arg.type))
+                this.txnCallCount++;
     }
 
     private static String nameChecker(String name) {
@@ -105,6 +123,11 @@ public class Method {
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @JsonIgnore
+    public int getTxnCallCount() {
+        return this.txnCallCount;
     }
 
     @Override

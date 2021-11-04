@@ -1,13 +1,19 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.abi.Method;
+import com.algorand.algosdk.abi.Type;
+import com.algorand.algosdk.abi.TypeTuple;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.account.LogicSigAccount;
+import com.algorand.algosdk.algod.client.model.TransactionParams;
+import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -81,8 +87,55 @@ public class AtomicTransactionComposer {
      * causes the current group to exceed MAX_GROUP_SIZE, or if the provided arguments are invalid
      * for the given method.
      */
-    public void addMethodCall( /* TODO */ ) {
-        // TODO
+    public void addMethodCall(MethodCallOption methodCall) {
+        if (this.status.compareTo(AtomicTxComposerStatus.BUILDING) != 0)
+            throw new IllegalArgumentException("Atomic Transaction Composer must be in BUILDING stage");
+        if (this.transactionList.size() + methodCall.method.getTxnCallCount() > MAX_GROUP_SIZE)
+            throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE = 16 transactions");
+
+        List<byte[]> encodedABIArgs = new ArrayList<>();
+        encodedABIArgs.add(methodCall.method.getSelector());
+
+        List<ABIValue> abiValues = new ArrayList<>();
+        for (MethodArgument arg : methodCall.methodArgs) {
+            if (arg instanceof ABIValue) {
+                abiValues.add((ABIValue) arg);
+            } else if (arg instanceof TransactionWithSigner) {
+                this.addTransaction((TransactionWithSigner) arg);
+            } else
+                throw new IllegalArgumentException("MethodArgument should only be ABI value or transaction with signer");
+        }
+
+        if (abiValues.size() > 14) {
+            List<Type> abiTypes = new ArrayList<>();
+            List<Object> values = new ArrayList<>();
+
+            for (int i = 14; i < abiValues.size(); i++) {
+                abiTypes.add(abiValues.get(i).abiType);
+                values.add(abiValues.get(i).value);
+            }
+
+            TypeTuple tupleT = new TypeTuple(abiTypes);
+            abiValues = abiValues.subList(0, 14);
+            abiValues.add(new ABIValue(tupleT, values));
+        }
+
+        for (ABIValue v : abiValues)
+            encodedABIArgs.add(v.abiType.encode(v.value));
+
+        Transaction tx = ApplicationCallTransactionBuilder.Builder()
+                .sender(methodCall.sender)
+                .suggestedParams(methodCall.suggestedParams)
+                .applicationId(methodCall.appID)
+                .args(encodedABIArgs)
+                .rekey(methodCall.rekeyTo)
+                .note(ArrayUtils.toPrimitive(methodCall.note))
+                .lease(ArrayUtils.toPrimitive(methodCall.lease))
+                .build();
+        tx.onCompletion = methodCall.onCompletion;
+
+        this.transactionList.add(new TransactionWithSigner(tx, methodCall.signer));
+        this.methodList.add(methodCall.method);
     }
 
     /**
@@ -173,7 +226,22 @@ public class AtomicTransactionComposer {
      * one element for each method call transaction in this group. If a method has no return value
      * (void), then the method results array will contain null for that method's return value.
      */
-    public ExecuteResult execute(AlgodClient client) {
+    public ExecuteResult execute(AlgodClient client) throws Exception {
+        if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) > 0)
+            throw new IllegalArgumentException("status shows this is already committed");
+        this.submit(client);
+
+        boolean done = false;
+        while (!done) {
+            Response<PendingTransactionResponse> txInfo = client.PendingTransactionInformation(this.getTxIDs().get(0)).execute();
+            if (!txInfo.isSuccessful()) {
+                throw new RuntimeException("Failed to check on tx progress");
+            }
+            if (txInfo.body().confirmedRound != null) {
+                done = true;
+            }
+        }
+
         // TODO
         return null;
     }
@@ -181,9 +249,9 @@ public class AtomicTransactionComposer {
     public static class ExecuteResult {
         public int confirmedRound;
         public List<String> txIDs;
-        public Object[] methodResults;
+        public List<ABIValue> methodResults;
 
-        public ExecuteResult(int confirmedRound, List<String> txIDs, Object[] methodResults) {
+        public ExecuteResult(int confirmedRound, List<String> txIDs, List<ABIValue> methodResults) {
             this.confirmedRound = confirmedRound;
             this.txIDs = txIDs;
             this.methodResults = methodResults;
@@ -243,13 +311,126 @@ public class AtomicTransactionComposer {
         }
     }
 
-    public static class TransactionWithSigner {
+    public interface MethodArgument {}
+
+    public static class ABIValue implements MethodArgument {
+        Type abiType;
+        Object value;
+
+        public ABIValue(Type abiType, Object value) {
+            abiType.encode(value);
+            this.abiType = abiType;
+            this.value = value;
+        }
+    }
+
+    public static class TransactionWithSigner implements MethodArgument {
         public Transaction txn;
         public TransactionSigner signer;
 
         public TransactionWithSigner(Transaction txn, TransactionSigner signer) {
             this.txn = txn;
             this.signer = signer;
+        }
+    }
+
+    public static class MethodCallOption {
+        public Long appID;
+        public Method method;
+        public List<MethodArgument> methodArgs;
+        public String sender, rekeyTo;
+        public Transaction.OnCompletion onCompletion;
+        public Byte[] note, lease;
+        TransactionSigner signer;
+        TransactionParams suggestedParams;
+
+        private MethodCallOption(Long appID, Method method, List<MethodArgument> methodArgs, String sender,
+                                TransactionParams sp, Transaction.OnCompletion onCompletion, Byte[] note, Byte[] lease,
+                                String rekeyTo, TransactionSigner signer) {
+            if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
+                throw new IllegalArgumentException("Method call builder error: some required field not added");
+            if (method.args.size() != methodArgs.size())
+                throw new IllegalArgumentException("Method call error: incorrect method arg number provided");
+            this.appID = appID;
+            this.method = method;
+            this.methodArgs = methodArgs;
+            this.sender = sender;
+            this.suggestedParams = sp;
+            this.onCompletion = onCompletion;
+            this.note = note;
+            this.lease = lease;
+            this.rekeyTo = rekeyTo;
+            this.signer = signer;
+        }
+
+        public static class MethodCallOptionBuilder {
+            public Long appID;
+            public Method method;
+            public List<MethodArgument> methodArgs;
+            public String sender, rekeyTo;
+            public Transaction.OnCompletion onCompletion;
+            public Byte[] note, lease;
+            TransactionSigner signer;
+            TransactionParams sp;
+
+            public MethodCallOptionBuilder() {
+                this.onCompletion = Transaction.OnCompletion.NoOpOC;
+                this.methodArgs = new ArrayList<>();
+            }
+
+            public MethodCallOptionBuilder setAppID(Long appID) {
+                this.appID = appID;
+                return this;
+            }
+
+            public MethodCallOptionBuilder setMethod(Method method) {
+                this.method = method;
+                return this;
+            }
+
+            public MethodCallOptionBuilder addMethodArgs(MethodArgument ma) {
+                this.methodArgs.add(ma);
+                return this;
+            }
+
+            public MethodCallOptionBuilder setSender(String sender) {
+                this.sender = sender;
+                return this;
+            }
+
+            public MethodCallOptionBuilder setSuggestedParams(TransactionParams sp) {
+                this.sp = sp;
+                return this;
+            }
+
+            public MethodCallOptionBuilder setOnComplete(Transaction.OnCompletion op) {
+                this.onCompletion = op;
+                return this;
+            }
+
+            public MethodCallOptionBuilder setNote(Byte[] note) {
+                this.note = note;
+                return this;
+            }
+
+            public MethodCallOptionBuilder setLease(Byte[] lease) {
+                this.lease = lease;
+                return this;
+            }
+
+            public MethodCallOptionBuilder setRekeyTo(String rekeyTo) {
+                this.rekeyTo = rekeyTo;
+                return this;
+            }
+
+            public MethodCallOptionBuilder setSigner(TransactionSigner signer) {
+                this.signer = signer;
+                return this;
+            }
+
+            public MethodCallOption build() {
+                return new MethodCallOption(appID, method, methodArgs, sender, sp, onCompletion, note, lease, rekeyTo, signer);
+            }
         }
     }
 }
