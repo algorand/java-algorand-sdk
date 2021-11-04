@@ -3,6 +3,7 @@ package com.algorand.algosdk.transaction;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.account.LogicSigAccount;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 
@@ -42,9 +43,8 @@ public class AtomicTransactionComposer {
     /**
      * Get the number of transactions currently in this atomic group.
      */
-    public int count() {
-        // TODO
-        return -1;
+    public int getCount() {
+        return this.transactionList.size();
     }
 
     /**
@@ -63,7 +63,11 @@ public class AtomicTransactionComposer {
      * causes the current group to exceed MAX_GROUP_SIZE.
      */
     public void addTransaction(TransactionWithSigner txnAndSigner) {
-
+        if (this.status != AtomicTxComposerStatus.BUILDING)
+            throw new IllegalArgumentException("Atomic Transaction Composer only add transaction in BUILDING stage");
+        if (this.transactionList.size() == MAX_GROUP_SIZE)
+            throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE == 16 transactions");
+        this.transactionList.add(txnAndSigner);
     }
 
     /**
@@ -82,9 +86,18 @@ public class AtomicTransactionComposer {
      *
      * The composer's status will be at least BUILT after executing this method.
      */
-    public TransactionWithSigner[] buildGroup() {
-        // TODO
-        return null;
+    public List<TransactionWithSigner> buildGroup() throws IOException {
+        if (this.status.compareTo(AtomicTxComposerStatus.BUILT) >= 0)
+            return this.transactionList;
+
+        List<Transaction> groupTxns = new ArrayList<>();
+        for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
+        Digest groupID = TxGroup.computeGroupID(groupTxns.toArray(new Transaction[0]));
+        for (TransactionWithSigner transactionWithSigner : this.transactionList)
+            transactionWithSigner.txn.assignGroupID(groupID);
+
+        this.status = AtomicTxComposerStatus.BUILT;
+        return this.transactionList;
     }
 
     /**
@@ -150,7 +163,7 @@ public class AtomicTransactionComposer {
         }
     }
 
-    public static class AtomicTransactionSigner {
+    public static class TransactionSigner {
         protected enum SignedBy {
             BasicAccount,
             LogicSigAccount,
@@ -158,28 +171,26 @@ public class AtomicTransactionComposer {
             Unknown
         }
 
-        protected AtomicTransactionSigner.SignedBy signedBy;
+        protected TransactionSigner.SignedBy signedBy;
         protected Account acc;
         protected LogicSigAccount lsa;
-        protected List<Account> msigAccounts;
+        protected List<Account> msigAccounts = new ArrayList<>();
         protected MultisigAddress msigAddr;
 
-        public AtomicTransactionSigner(Account acc) {
+        public TransactionSigner(Account acc) {
             this.signedBy = SignedBy.BasicAccount;
             this.acc = acc;
         }
 
-        public AtomicTransactionSigner(LogicSigAccount lsa) {
+        public TransactionSigner(LogicSigAccount lsa) {
             this.signedBy = SignedBy.LogicSigAccount;
             this.lsa = lsa;
         }
 
-        public AtomicTransactionSigner(MultisigAddress msigAddr, byte[][] sks) throws NoSuchAlgorithmException {
+        public TransactionSigner(MultisigAddress msigAddr, byte[][] sks) throws NoSuchAlgorithmException {
             this.signedBy = SignedBy.MultiSigAccount;
             this.msigAddr = msigAddr;
-            this.msigAccounts = new ArrayList<>();
-            for (byte[] sk : sks)
-                this.msigAccounts.add(new Account(sk));
+            for (byte[] sk : sks) this.msigAccounts.add(new Account(sk));
         }
 
         public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
@@ -207,9 +218,9 @@ public class AtomicTransactionComposer {
 
     public static class TransactionWithSigner {
         public Transaction txn;
-        public AtomicTransactionSigner signer;
+        public TransactionSigner signer;
 
-        public TransactionWithSigner(Transaction txn, AtomicTransactionSigner signer) {
+        public TransactionWithSigner(Transaction txn, TransactionSigner signer) {
             this.txn = txn;
             this.signer = signer;
         }
