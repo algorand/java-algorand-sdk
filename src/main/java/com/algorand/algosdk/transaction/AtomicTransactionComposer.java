@@ -5,7 +5,9 @@ import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.account.LogicSigAccount;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.MultisigAddress;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.Response;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -27,7 +29,6 @@ public class AtomicTransactionComposer {
     public List<Method> methodList;
     public List<TransactionWithSigner> transactionList;
     public List<SignedTransaction> signedTxns;
-    public List<String> txIds;
 
     public AtomicTransactionComposer() {
         this.status = AtomicTxComposerStatus.BUILDING;
@@ -56,7 +57,6 @@ public class AtomicTransactionComposer {
         newAtc.signedTxns = this.signedTxns;
         newAtc.methodList = this.methodList;
         newAtc.transactionList = this.transactionList;
-        newAtc.txIds = this.txIds;
         return newAtc;
     }
 
@@ -128,6 +128,12 @@ public class AtomicTransactionComposer {
         return this.signedTxns;
     }
 
+    protected List<String> getTxIDs() {
+        List<String> txids = new ArrayList<>();
+        for (SignedTransaction stxn : this.signedTxns) txids.add(stxn.transactionID);
+        return txids;
+    }
+
     /**
      * Send the transaction group to the network, but don't wait for it to be committed to a block. An
      * error will be thrown if submission fails.
@@ -139,9 +145,17 @@ public class AtomicTransactionComposer {
      *
      * @return If the submission is successful, resolves to a list of TxIDs of the submitted transactions.
      */
-    public String[] submit(AlgodClient client) {
-        // TODO
-        return null;
+    public List<String> submit(AlgodClient client) throws Exception {
+        if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) > 0)
+            throw new IllegalArgumentException("Atomic Transaction Composer cannot submit committed transaction");
+        else if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) == 0)
+            return this.getTxIDs();
+
+        List<SignedTransaction> stxn = this.gatherSignatures();
+        client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stxn)).execute();
+
+        this.status = AtomicTxComposerStatus.SUBMITTED;
+        return this.getTxIDs();
     }
 
     /**
@@ -166,10 +180,10 @@ public class AtomicTransactionComposer {
 
     public static class ExecuteResult {
         public int confirmedRound;
-        public String[] txIDs;
+        public List<String> txIDs;
         public Object[] methodResults;
 
-        public ExecuteResult(int confirmedRound, String[] txIDs, Object[] methodResults) {
+        public ExecuteResult(int confirmedRound, List<String> txIDs, Object[] methodResults) {
             this.confirmedRound = confirmedRound;
             this.txIDs = txIDs;
             this.methodResults = methodResults;
