@@ -247,14 +247,26 @@ public class AtomicTransactionComposer {
     }
 
     public static class ExecuteResult {
-        public int confirmedRound;
+        public Long confirmedRound;
         public List<String> txIDs;
-        public List<ABIValue> methodResults;
+        public List<ReturnValue> methodResults;
 
-        public ExecuteResult(int confirmedRound, List<String> txIDs, List<ABIValue> methodResults) {
+        public ExecuteResult(Long confirmedRound, List<String> txIDs, List<ReturnValue> methodResults) {
             this.confirmedRound = confirmedRound;
             this.txIDs = txIDs;
             this.methodResults = methodResults;
+        }
+    }
+
+    public static class ReturnValue {
+        public byte[] rawValue;
+        public ABIValue value;
+        public Exception parseError;
+
+        public ReturnValue(byte[] rawValue, ABIValue value, Exception parseError) {
+            this.rawValue = rawValue;
+            this.value = value;
+            this.parseError = parseError;
         }
     }
 
