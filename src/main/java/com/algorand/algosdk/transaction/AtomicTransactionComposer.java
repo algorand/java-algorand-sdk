@@ -5,7 +5,6 @@ import com.algorand.algosdk.abi.Type;
 import com.algorand.algosdk.abi.TypeTuple;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.account.LogicSigAccount;
-import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.MultisigAddress;
@@ -343,106 +342,6 @@ public class AtomicTransactionComposer {
         public TransactionWithSigner(Transaction txn, TransactionSigner signer) {
             this.txn = txn;
             this.signer = signer;
-        }
-    }
-
-    public static class MethodCallOption {
-        public Long appID;
-        public Method method;
-        public List<MethodArgument> methodArgs;
-        public String sender, rekeyTo;
-        public Transaction.OnCompletion onCompletion;
-        public Byte[] note, lease;
-        TransactionSigner signer;
-        TransactionParams suggestedParams;
-
-        private MethodCallOption(Long appID, Method method, List<MethodArgument> methodArgs, String sender,
-                                TransactionParams sp, Transaction.OnCompletion onCompletion, Byte[] note, Byte[] lease,
-                                String rekeyTo, TransactionSigner signer) {
-            if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
-                throw new IllegalArgumentException("Method call builder error: some required field not added");
-            if (method.args.size() != methodArgs.size())
-                throw new IllegalArgumentException("Method call error: incorrect method arg number provided");
-            this.appID = appID;
-            this.method = method;
-            this.methodArgs = methodArgs;
-            this.sender = sender;
-            this.suggestedParams = sp;
-            this.onCompletion = onCompletion;
-            this.note = note;
-            this.lease = lease;
-            this.rekeyTo = rekeyTo;
-            this.signer = signer;
-        }
-
-        public static class MethodCallOptionBuilder {
-            public Long appID;
-            public Method method;
-            public List<MethodArgument> methodArgs;
-            public String sender, rekeyTo;
-            public Transaction.OnCompletion onCompletion;
-            public Byte[] note, lease;
-            TransactionSigner signer;
-            TransactionParams sp;
-
-            public MethodCallOptionBuilder() {
-                this.onCompletion = Transaction.OnCompletion.NoOpOC;
-                this.methodArgs = new ArrayList<>();
-            }
-
-            public MethodCallOptionBuilder setAppID(Long appID) {
-                this.appID = appID;
-                return this;
-            }
-
-            public MethodCallOptionBuilder setMethod(Method method) {
-                this.method = method;
-                return this;
-            }
-
-            public MethodCallOptionBuilder addMethodArgs(MethodArgument ma) {
-                this.methodArgs.add(ma);
-                return this;
-            }
-
-            public MethodCallOptionBuilder setSender(String sender) {
-                this.sender = sender;
-                return this;
-            }
-
-            public MethodCallOptionBuilder setSuggestedParams(TransactionParams sp) {
-                this.sp = sp;
-                return this;
-            }
-
-            public MethodCallOptionBuilder setOnComplete(Transaction.OnCompletion op) {
-                this.onCompletion = op;
-                return this;
-            }
-
-            public MethodCallOptionBuilder setNote(Byte[] note) {
-                this.note = note;
-                return this;
-            }
-
-            public MethodCallOptionBuilder setLease(Byte[] lease) {
-                this.lease = lease;
-                return this;
-            }
-
-            public MethodCallOptionBuilder setRekeyTo(String rekeyTo) {
-                this.rekeyTo = rekeyTo;
-                return this;
-            }
-
-            public MethodCallOptionBuilder setSigner(TransactionSigner signer) {
-                this.signer = signer;
-                return this;
-            }
-
-            public MethodCallOption build() {
-                return new MethodCallOption(appID, method, methodArgs, sender, sp, onCompletion, note, lease, rekeyTo, signer);
-            }
         }
     }
 }
