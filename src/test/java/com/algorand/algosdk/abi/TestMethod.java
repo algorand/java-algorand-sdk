@@ -24,7 +24,8 @@ public class TestMethod {
                 "pseudoRandomGenerator()uint256",
                 "add(uint64,uint64)uint128",
                 "someEffectOnTheOtherSide___(uint64,(ufixed256x10,bool))void",
-                "returnATuple(address)(byte[32],bool)"
+                "returnATuple(address)(byte[32],bool)",
+                "methodWithTxType(axfer,uint32,pay,bool)void"
         };
     }
 

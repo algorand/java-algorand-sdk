@@ -180,7 +180,11 @@ public class Method {
         ) {
             this.name = Method.nameChecker(name);
             this.desc = desc;
-            this.type = Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
+            String typeStr = Objects.requireNonNull(type, "type must not be null");
+            if (Method.TxArgTypes.contains(typeStr))
+                this.type = typeStr;
+            else
+                this.type = Type.Of(typeStr).toString();
         }
 
         @Override
