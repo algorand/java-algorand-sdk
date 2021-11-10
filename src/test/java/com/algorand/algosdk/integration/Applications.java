@@ -1,21 +1,19 @@
 package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
-import com.algorand.algosdk.cucumber.shared.Utils;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.*;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.algorand.algosdk.cucumber.shared.TransactionSteps.loadTEALProgramFromFile;
@@ -130,7 +128,7 @@ public class Applications {
 
     @Given("I wait for the transaction to be confirmed.")
     public void waitForTransactionToBeConfirmed() throws Exception {
-        Utils.waitForConfirmation(clients.v2Client, txId);
+        Utils.waitForConfirmation(clients.v2Client, txId, 4);
     }
 
     // TODO: Use V2 Pending Transaction endpoint when it is available.
