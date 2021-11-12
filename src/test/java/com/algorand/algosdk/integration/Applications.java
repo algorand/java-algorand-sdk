@@ -128,7 +128,7 @@ public class Applications {
 
     @Given("I wait for the transaction to be confirmed.")
     public void waitForTransactionToBeConfirmed() throws Exception {
-        Utils.waitForConfirmation(clients.v2Client, txId, 4);
+        Utils.waitForConfirmation(clients.v2Client, txId, 5);
     }
 
     // TODO: Use V2 Pending Transaction endpoint when it is available.
