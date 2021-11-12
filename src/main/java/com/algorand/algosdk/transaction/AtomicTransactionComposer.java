@@ -1,7 +1,7 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.abi.Method;
-import com.algorand.algosdk.abi.Type;
+import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.TypeTuple;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.account.LogicSigAccount;
@@ -11,16 +11,14 @@ import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class AtomicTransactionComposer {
     public enum AtomicTxComposerStatus {
@@ -124,7 +122,7 @@ public class AtomicTransactionComposer {
         }
 
         if (abiValues.size() > 14) {
-            List<Type> abiTypes = new ArrayList<>();
+            List<ABIType> abiTypes = new ArrayList<>();
             List<Object> values = new ArrayList<>();
 
             for (int i = 14; i < abiValues.size(); i++) {
@@ -251,18 +249,67 @@ public class AtomicTransactionComposer {
         this.submit(client);
         PendingTransactionResponse txInfo =
                 Utils.waitForConfirmation(client, this.transactionList.get(0).txn.txID(), waitRounds);
-        ExecuteResult execRes = new ExecuteResult(txInfo.confirmedRound, new ArrayList<>(), new ArrayList<>());
+        List<ReturnValue> retList = new ArrayList<>();
 
         for (int i = 0; i < this.transactionList.size(); i++) {
             if (!this.methodMap.containsKey(i))
                 continue;
             if (this.methodMap.get(i).returns.equals(new Method.Returns("void", null))) {
-
+                retList.add(new ReturnValue(
+                        this.transactionList.get(i).txn.txID(),
+                        new byte[]{},
+                        null,
+                        null
+                ));
+                continue;
             }
-            // ...
+            Response<PendingTransactionResponse> resp =
+                    client.PendingTransactionInformation(this.transactionList.get(i).txn.txID()).execute();
+            if (!resp.isSuccessful())
+                throw new IllegalArgumentException("cannot get response from client");
+
+            PendingTransactionResponse respBody = resp.body();
+            List<byte[]> logs = respBody.logs;
+            byte[] retLine = null;
+            for (int logIndex = logs.size() - 1; logIndex >= 0; logIndex--) {
+                byte[] line = logs.get(logIndex);
+                if (!checkLogRet(line))
+                    continue;
+                retLine = line;
+                break;
+            }
+            if (retLine == null)
+                throw new IllegalArgumentException("expected to find logged return value, got none");
+
+            byte[] abiEncoded = Arrays.copyOfRange(retLine, 4, retLine.length);
+            ABIValue decoded = null;
+            Exception parseError = null;
+            try {
+                ABIType ABIType = com.algorand.algosdk.abi.ABIType.Of(this.methodMap.get(i).returns.type);
+                Object decodedVar = ABIType.decode(abiEncoded);
+                decoded = new ABIValue(ABIType, decodedVar);
+            } catch (Exception e) {
+                parseError = e;
+            }
+            retList.add(new ReturnValue(
+                    this.transactionList.get(i).txn.txID(),
+                    abiEncoded,
+                    decoded,
+                    parseError
+            ));
         }
 
-        return execRes;
+        return new ExecuteResult(txInfo.confirmedRound, this.getTxIDs(), retList);
+    }
+
+    private static boolean checkLogRet(byte[] logLine) {
+        if (logLine.length < 4)
+            return false;
+        for (int i = 0; i < 4; i++) {
+            if (logLine[i] != ABI_RET_HASH[i])
+                return false;
+        }
+        return true;
     }
 
     public static class ExecuteResult {
@@ -346,10 +393,10 @@ public class AtomicTransactionComposer {
     public interface MethodArgument {}
 
     public static class ABIValue implements MethodArgument {
-        Type abiType;
+        ABIType abiType;
         Object value;
 
-        public ABIValue(Type abiType, Object value) {
+        public ABIValue(ABIType abiType, Object value) {
             abiType.encode(value);
             this.abiType = abiType;
             this.value = value;

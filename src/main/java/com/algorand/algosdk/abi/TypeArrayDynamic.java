@@ -5,10 +5,10 @@ import com.algorand.algosdk.util.Encoder;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 
-public class TypeArrayDynamic extends Type {
-    public final Type elemType;
+public class TypeArrayDynamic extends ABIType {
+    public final ABIType elemType;
 
-    public TypeArrayDynamic(Type elemType) {
+    public TypeArrayDynamic(ABIType elemType) {
         this.elemType = elemType;
     }
 
@@ -30,9 +30,9 @@ public class TypeArrayDynamic extends Type {
 
     @Override
     public byte[] encode(Object o) {
-        Object[] objArray = Type.unifyToArrayOfObjects(o);
+        Object[] objArray = ABIType.unifyToArrayOfObjects(o);
 
-        byte[] castedEncode = Type.castToTupleType(objArray.length, this.elemType).encode(objArray);
+        byte[] castedEncode = ABIType.castToTupleType(objArray.length, this.elemType).encode(objArray);
         byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(objArray.length), ABI_DYNAMIC_HEAD_BYTE_LEN);
 
         ByteBuffer bf = ByteBuffer.allocate(castedEncode.length + ABI_DYNAMIC_HEAD_BYTE_LEN);
@@ -43,9 +43,9 @@ public class TypeArrayDynamic extends Type {
 
     @Override
     public Object decode(byte[] encoded) {
-        byte[] encodedLength = Type.getLengthEncoded(encoded);
-        byte[] encodedArray = Type.getContentEncoded(encoded);
-        return Type.castToTupleType(Encoder.decodeBytesToUint(encodedLength).intValue(), this.elemType).decode(encodedArray);
+        byte[] encodedLength = ABIType.getLengthEncoded(encoded);
+        byte[] encodedArray = ABIType.getContentEncoded(encoded);
+        return ABIType.castToTupleType(Encoder.decodeBytesToUint(encodedLength).intValue(), this.elemType).decode(encodedArray);
     }
 
     @Override

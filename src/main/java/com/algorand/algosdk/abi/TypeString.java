@@ -7,7 +7,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-public class TypeString extends Type {
+public class TypeString extends ABIType {
     public TypeString() {
     }
 
@@ -34,7 +34,7 @@ public class TypeString extends Type {
         if (buffer.length >= (1 << 16))
             throw new IllegalArgumentException("string casted to byte exceeds uint16 maximum, error");
         byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(buffer.length), ABI_DYNAMIC_HEAD_BYTE_LEN);
-        byte[] castedBytes = Type.castToTupleType(buffer.length, new TypeByte()).encode(ArrayUtils.toObject(buffer));
+        byte[] castedBytes = ABIType.castToTupleType(buffer.length, new TypeByte()).encode(ArrayUtils.toObject(buffer));
 
         ByteBuffer bf = ByteBuffer.allocate(castedBytes.length + ABI_DYNAMIC_HEAD_BYTE_LEN);
         bf.put(lengthEncode);
@@ -44,8 +44,8 @@ public class TypeString extends Type {
 
     @Override
     public Object decode(byte[] encoded) {
-        byte[] encodedLength = Type.getLengthEncoded(encoded);
-        byte[] encodedString = Type.getContentEncoded(encoded);
+        byte[] encodedLength = ABIType.getLengthEncoded(encoded);
+        byte[] encodedString = ABIType.getContentEncoded(encoded);
         if (!Encoder.decodeBytesToUint(encodedLength).equals(BigInteger.valueOf(encodedString.length)))
             throw new IllegalArgumentException("string decode failure: encoded bytes do not match with length header");
         return new String(encodedString, StandardCharsets.UTF_8);

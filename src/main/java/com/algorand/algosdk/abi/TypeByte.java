@@ -1,6 +1,6 @@
 package com.algorand.algosdk.abi;
 
-public class TypeByte extends Type {
+public class TypeByte extends ABIType {
     public TypeByte() {
     }
 

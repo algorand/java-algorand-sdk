@@ -1,10 +1,10 @@
 package com.algorand.algosdk.abi;
 
-public class TypeArrayStatic extends Type {
-    public final Type elemType;
+public class TypeArrayStatic extends ABIType {
+    public final ABIType elemType;
     public final int length;
 
-    public TypeArrayStatic(Type elemType, int length) {
+    public TypeArrayStatic(ABIType elemType, int length) {
         if (length < 1)
             throw new IllegalArgumentException("static-array initialize failure: array length should be at least 1");
         this.elemType = elemType;
@@ -29,15 +29,15 @@ public class TypeArrayStatic extends Type {
 
     @Override
     public byte[] encode(Object o) {
-        Object[] objArray = Type.unifyToArrayOfObjects(o);
+        Object[] objArray = ABIType.unifyToArrayOfObjects(o);
         if (objArray.length != this.length)
             throw new IllegalArgumentException("cannot encode abi static array: length of value != length in array type");
-        return Type.castToTupleType(this.length, this.elemType).encode(objArray);
+        return ABIType.castToTupleType(this.length, this.elemType).encode(objArray);
     }
 
     @Override
     public Object decode(byte[] encoded) {
-        return Type.castToTupleType(this.length, this.elemType).decode(encoded);
+        return ABIType.castToTupleType(this.length, this.elemType).decode(encoded);
     }
 
     @Override

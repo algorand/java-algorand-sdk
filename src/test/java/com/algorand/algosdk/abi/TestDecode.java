@@ -95,8 +95,8 @@ public class TestDecode {
                 String genStrings = new String(array, StandardCharsets.UTF_8);
 
                 byte[] genBytes = genStrings.getBytes(StandardCharsets.UTF_8);
-                ByteBuffer bf = ByteBuffer.allocate(Type.ABI_DYNAMIC_HEAD_BYTE_LEN + genBytes.length);
-                bf.put(Encoder.encodeUintToBytes(BigInteger.valueOf(genBytes.length), Type.ABI_DYNAMIC_HEAD_BYTE_LEN));
+                ByteBuffer bf = ByteBuffer.allocate(ABIType.ABI_DYNAMIC_HEAD_BYTE_LEN + genBytes.length);
+                bf.put(Encoder.encodeUintToBytes(BigInteger.valueOf(genBytes.length), ABIType.ABI_DYNAMIC_HEAD_BYTE_LEN));
                 bf.put(genBytes);
                 assertThat(new TypeString().decode(bf.array())).isEqualTo(genStrings);
             }
@@ -106,19 +106,19 @@ public class TestDecode {
     @Test
     public void TestBoolArray0() {
         Boolean[] inputs = new Boolean[]{true, false, false, true, true};
-        assertThat(Type.Of("bool[5]").decode(new byte[]{(byte) 0b10011000})).isEqualTo(inputs);
+        assertThat(ABIType.Of("bool[5]").decode(new byte[]{(byte) 0b10011000})).isEqualTo(inputs);
     }
 
     @Test
     public void TestBoolArray1() {
         Boolean[] inputs = new Boolean[]{false, false, false, true, true, false, true, false, true, false, true};
-        assertThat(Type.Of("bool[11]").decode(new byte[]{0b00011010, (byte) 0b10100000})).isEqualTo(inputs);
+        assertThat(ABIType.Of("bool[11]").decode(new byte[]{0b00011010, (byte) 0b10100000})).isEqualTo(inputs);
     }
 
     @Test
     public void TestBoolArray2() {
         Boolean[] inputs = new Boolean[]{false, false, false, true, true, false, true, false, true, false, true};
-        assertThat(Type.Of("bool[]").decode(new byte[]{0x00, 0x0B, 0b00011010, (byte) 0b10100000})).isEqualTo(inputs);
+        assertThat(ABIType.Of("bool[]").decode(new byte[]{0x00, 0x0B, 0b00011010, (byte) 0b10100000})).isEqualTo(inputs);
     }
 
     @Test
@@ -126,7 +126,7 @@ public class TestDecode {
         BigInteger[] inputs = new BigInteger[8];
         for (int i = 1; i <= 8; i++)
             inputs[i - 1] = BigInteger.valueOf(i);
-        assertThat(Type.Of("uint64[8]").decode(new byte[]{
+        assertThat(ABIType.Of("uint64[8]").decode(new byte[]{
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02,
                 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03,
@@ -148,7 +148,7 @@ public class TestDecode {
                 false,
                 "DEF"
         };
-        assertThat(Type.Of("(string,bool,bool,bool,bool,string)").decode(new byte[]{
+        assertThat(ABIType.Of("(string,bool,bool,bool,bool,string)").decode(new byte[]{
                 0x00, 0x05, (byte) 0b10100000, 0x00, 0x0A,
                 0x00, 0x03, (byte) 'A', (byte) 'B', (byte) 'C',
                 0x00, 0x03, (byte) 'D', (byte) 'E', (byte) 'F',
@@ -162,7 +162,7 @@ public class TestDecode {
                 new Object[]{true, true},
         };
         byte[] expected = new byte[]{(byte) 0b11000000, (byte) 0b11000000};
-        assertThat(Type.Of("(bool[2],bool[2])").decode(expected)).isEqualTo(elements);
+        assertThat(ABIType.Of("(bool[2],bool[2])").decode(expected)).isEqualTo(elements);
     }
 
     @Test
@@ -176,7 +176,7 @@ public class TestDecode {
                 0x00, 0x03,
                 0x00, 0x02, (byte) 0b11000000
         };
-        assertThat(Type.Of("(bool[2],bool[])").decode(encoded)).isEqualTo(elements);
+        assertThat(ABIType.Of("(bool[2],bool[])").decode(encoded)).isEqualTo(elements);
     }
 
     @Test
@@ -190,7 +190,7 @@ public class TestDecode {
                 0x00, 0x02, (byte) 0b11000000,
                 0x00, 0x02, (byte) 0b11000000
         };
-        assertThat(Type.Of("(bool[],bool[])").decode(encoded)).isEqualTo(elements);
+        assertThat(ABIType.Of("(bool[],bool[])").decode(encoded)).isEqualTo(elements);
     }
 
     @Test
@@ -203,11 +203,11 @@ public class TestDecode {
                 0x00, 0x04, 0x00, 0x06,
                 0x00, 0x00, 0x00, 0x00
         };
-        assertThat(Type.Of("(bool[],bool[])").decode(encoded)).isEqualTo(elements);
+        assertThat(ABIType.Of("(bool[],bool[])").decode(encoded)).isEqualTo(elements);
     }
 
     @Test
     public void TestEmptyTuple() {
-        assertThat(Type.Of("()").decode(new byte[0])).isEqualTo(new Object[0]);
+        assertThat(ABIType.Of("()").decode(new byte[0])).isEqualTo(new Object[0]);
     }
 }

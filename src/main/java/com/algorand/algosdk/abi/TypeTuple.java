@@ -10,24 +10,24 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class TypeTuple extends Type {
-    public final List<Type> childTypes;
+public class TypeTuple extends ABIType {
+    public final List<ABIType> childTypes;
 
-    public TypeTuple(List<Type> childTypes) {
+    public TypeTuple(List<ABIType> childTypes) {
         this.childTypes = childTypes;
     }
 
     @Override
     public String toString() {
         List<String> childStrs = new ArrayList<>();
-        for (Type t : this.childTypes)
+        for (ABIType t : this.childTypes)
             childStrs.add(t.toString());
         return "(" + StringUtil.join(childStrs.toArray(new String[0]), ",") + ")";
     }
 
     @Override
     public boolean isDynamic() {
-        for (Type t : this.childTypes) {
+        for (ABIType t : this.childTypes) {
             if (t.isDynamic())
                 return true;
         }
@@ -42,12 +42,12 @@ public class TypeTuple extends Type {
 
     @Override
     public byte[] encode(Object o) {
-        Object[] tupleValues = Type.unifyToArrayOfObjects(o);
+        Object[] tupleValues = ABIType.unifyToArrayOfObjects(o);
 
         if (tupleValues.length != this.childTypes.size())
             throw new IllegalArgumentException("abi tuple child type size != abi tuple element value size");
 
-        Type[] tupleTypes = this.childTypes.toArray(new Type[0]);
+        ABIType[] tupleTypes = this.childTypes.toArray(new ABIType[0]);
 
         List<byte[]> heads = new ArrayList<>(tupleTypes.length);
         List<byte[]> tails = new ArrayList<>(tupleTypes.length);
@@ -58,7 +58,7 @@ public class TypeTuple extends Type {
         Set<Integer> dynamicIndex = new HashSet<>();
 
         for (int i = 0; i < tupleTypes.length; i++) {
-            Type currType = tupleTypes[i];
+            ABIType currType = tupleTypes[i];
             Object currValue = tupleValues[i];
             byte[] currHead, currTail;
 
@@ -67,8 +67,8 @@ public class TypeTuple extends Type {
                 currTail = currType.encode(currValue);
                 dynamicIndex.add(i);
             } else if (currType instanceof TypeBool) {
-                int before = Type.findBoolLR(tupleTypes, i, -1);
-                int after = Type.findBoolLR(tupleTypes, i, 1);
+                int before = ABIType.findBoolLR(tupleTypes, i, -1);
+                int after = ABIType.findBoolLR(tupleTypes, i, 1);
                 if (before % 8 != 0)
                     throw new IllegalArgumentException("expected before has number of bool mod 8 == 0");
                 after = Math.min(after, 7);
@@ -129,9 +129,9 @@ public class TypeTuple extends Type {
                 valuePartition.add(new byte[]{});
                 iterIndex += ABI_DYNAMIC_HEAD_BYTE_LEN;
             } else if (this.childTypes.get(i) instanceof TypeBool) {
-                Type[] childTypeArr = this.childTypes.toArray(new Type[0]);
-                int before = Type.findBoolLR(childTypeArr, i, -1);
-                int after = Type.findBoolLR(childTypeArr, i, 1);
+                ABIType[] childTypeArr = this.childTypes.toArray(new ABIType[0]);
+                int before = ABIType.findBoolLR(childTypeArr, i, -1);
+                int after = ABIType.findBoolLR(childTypeArr, i, 1);
                 if (before % 8 != 0)
                     throw new IllegalArgumentException("expected bool number mod 8 == 0");
                 after = Math.min(after, 7);
@@ -190,7 +190,7 @@ public class TypeTuple extends Type {
         int size = 0;
         for (int i = 0; i < this.childTypes.size(); i++) {
             if (this.childTypes.get(i) instanceof TypeBool) {
-                int after = Type.findBoolLR(this.childTypes.toArray(new Type[0]), i, 1);
+                int after = ABIType.findBoolLR(this.childTypes.toArray(new ABIType[0]), i, 1);
                 i += after;
                 int boolNumber = after + 1;
                 size += boolNumber / 8;

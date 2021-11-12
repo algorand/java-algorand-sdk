@@ -4,7 +4,7 @@ import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;
 
-public class TypeUint extends Type {
+public class TypeUint extends ABIType {
     public final int bitSize;
 
     public TypeUint(int size) {

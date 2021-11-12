@@ -83,7 +83,7 @@ public class Method {
 
         this.args = new ArrayList<>();
         String argTuple = parsedMethod.get(1);
-        List<String> parsedMethodArgs = Type.parseTupleContent(argTuple.substring(1, argTuple.length() - 1));
+        List<String> parsedMethodArgs = ABIType.parseTupleContent(argTuple.substring(1, argTuple.length() - 1));
         for (int i = 0; i < parsedMethodArgs.size(); i++)
             this.args.add(new Method.Arg("arg" + i, parsedMethodArgs.get(i), null));
 
@@ -160,7 +160,7 @@ public class Method {
                 @JsonProperty("desc") String desc
         ) {
             this.type = type.equals("void") ?
-                    type : Type.Of(Objects.requireNonNull(type, "type must not be null")).toString();
+                    type : ABIType.Of(Objects.requireNonNull(type, "type must not be null")).toString();
             this.desc = desc;
         }
 
@@ -197,7 +197,7 @@ public class Method {
             if (Method.TxArgTypes.contains(typeStr))
                 this.type = typeStr;
             else
-                this.type = Type.Of(typeStr).toString();
+                this.type = ABIType.Of(typeStr).toString();
         }
 
         public Arg(Arg otherArg) {
