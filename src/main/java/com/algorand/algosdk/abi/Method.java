@@ -61,6 +61,15 @@ public class Method {
                 this.txnCallCount++;
     }
 
+    public Method(Method other) {
+        this.name = other.name;
+        this.desc = other.desc;
+        this.returns = new Returns(other.returns);
+        for (Arg oArgs : other.args)
+            this.args.add(new Arg(oArgs));
+        this.txnCallCount = other.txnCallCount;
+    }
+
     private static String nameChecker(String name) {
         String nameStr = Objects.requireNonNull(name, "name must not be null");
         if (nameStr.isEmpty() || !Method.validName.matcher(nameStr).matches())
@@ -155,6 +164,10 @@ public class Method {
             this.desc = desc;
         }
 
+        public Returns(Returns otherRet) {
+            this(otherRet.type, otherRet.desc);
+        }
+
         @Override
         public boolean equals(Object o) {
             if (o == null || getClass() != o.getClass()) return false;
@@ -178,13 +191,17 @@ public class Method {
                 @JsonProperty("type") String type,
                 @JsonProperty("desc") String desc
         ) {
-            this.name = Method.nameChecker(name);
+            this.name = name;
             this.desc = desc;
             String typeStr = Objects.requireNonNull(type, "type must not be null");
             if (Method.TxArgTypes.contains(typeStr))
                 this.type = typeStr;
             else
                 this.type = Type.Of(typeStr).toString();
+        }
+
+        public Arg(Arg otherArg) {
+            this(otherArg.name, otherArg.type, otherArg.desc);
         }
 
         @Override

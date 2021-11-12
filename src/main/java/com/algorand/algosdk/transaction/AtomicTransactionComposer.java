@@ -10,6 +10,7 @@ import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
@@ -59,15 +60,21 @@ public class AtomicTransactionComposer {
      * Create a new composer with the same underlying transactions. The new composer's status will be
      * BUILDING, so additional transactions may be added to it.
      */
-    @Override
-    public AtomicTransactionComposer clone() throws CloneNotSupportedException {
-        AtomicTransactionComposer clone = (AtomicTransactionComposer) super.clone();
-        clone.status = AtomicTxComposerStatus.BUILDING;
-        clone.signedTxns = new ArrayList<>();
-
-        // TODO need deep copy
-        for (TransactionWithSigner ts : clone.transactionList) ts.txn.group = new Digest();
-        return clone;
+    public AtomicTransactionComposer cloneAtomicTxnComposer() throws IOException {
+        AtomicTransactionComposer cloned = new AtomicTransactionComposer();
+        cloned.signedTxns = new ArrayList<>();
+        for (Map.Entry<Integer, Method> entry : this.methodMap.entrySet())
+            cloned.methodMap.put(entry.getKey(), new Method(entry.getValue()));
+        ObjectMapper om = new ObjectMapper();
+        for (TransactionWithSigner txWithSigner : this.transactionList) {
+            byte[] txSerialized = om.writeValueAsBytes(txWithSigner.txn);
+            Transaction tx = om.readValue(txSerialized, Transaction.class);
+            tx.group = new Digest();
+            // We might need the same signer, so I wonder if the signer should be shallow copied...
+            TransactionWithSigner newTxWithSigner = new TransactionWithSigner(tx, txWithSigner.signer);
+            cloned.transactionList.add(newTxWithSigner);
+        }
+        return cloned;
     }
 
     /**
