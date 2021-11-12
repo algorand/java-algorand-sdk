@@ -9,7 +9,9 @@ import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilde
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -241,13 +243,26 @@ public class AtomicTransactionComposer {
      * one element for each method call transaction in this group. If a method has no return value
      * (void), then the method results array will contain null for that method's return value.
      */
-    public ExecuteResult execute(AlgodClient client) throws Exception {
+    public ExecuteResult execute(AlgodClient client, int waitRounds) throws Exception {
         if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) > 0)
             throw new IllegalArgumentException("status shows this is already committed");
+        if (waitRounds < 0)
+            throw new IllegalArgumentException("wait round for execute should be non-negative");
         this.submit(client);
+        PendingTransactionResponse txInfo =
+                Utils.waitForConfirmation(client, this.transactionList.get(0).txn.txID(), waitRounds);
+        ExecuteResult execRes = new ExecuteResult(txInfo.confirmedRound, new ArrayList<>(), new ArrayList<>());
 
-        // TODO
-        return null;
+        for (int i = 0; i < this.transactionList.size(); i++) {
+            if (!this.methodMap.containsKey(i))
+                continue;
+            if (this.methodMap.get(i).returns.equals(new Method.Returns("void", null))) {
+
+            }
+            // ...
+        }
+
+        return execRes;
     }
 
     public static class ExecuteResult {
@@ -263,11 +278,13 @@ public class AtomicTransactionComposer {
     }
 
     public static class ReturnValue {
+        public String txID;
         public byte[] rawValue;
         public ABIValue value;
         public Exception parseError;
 
-        public ReturnValue(byte[] rawValue, ABIValue value, Exception parseError) {
+        public ReturnValue(String txID, byte[] rawValue, ABIValue value, Exception parseError) {
+            this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;
             this.parseError = parseError;
