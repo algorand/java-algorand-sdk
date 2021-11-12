@@ -10,14 +10,14 @@ import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
-import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AtomicTransactionComposer {
     public enum AtomicTxComposerStatus {
@@ -30,10 +30,12 @@ public class AtomicTransactionComposer {
 
     private static final int MAX_GROUP_SIZE = 16;
 
+    private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
+
     public AtomicTxComposerStatus status;
-    public List<Method> methodList;
-    public List<TransactionWithSigner> transactionList;
-    public List<SignedTransaction> signedTxns;
+    public Map<Integer, Method> methodMap = new HashMap<>();
+    public List<TransactionWithSigner> transactionList = new ArrayList<>();
+    public List<SignedTransaction> signedTxns = new ArrayList<>();
 
     public AtomicTransactionComposer() {
         this.status = AtomicTxComposerStatus.BUILDING;
@@ -57,12 +59,15 @@ public class AtomicTransactionComposer {
      * Create a new composer with the same underlying transactions. The new composer's status will be
      * BUILDING, so additional transactions may be added to it.
      */
-    public AtomicTransactionComposer cloneNewTxComposer() {
-        AtomicTransactionComposer newAtc = new AtomicTransactionComposer();
-        newAtc.signedTxns = this.signedTxns;
-        newAtc.methodList = this.methodList;
-        newAtc.transactionList = this.transactionList;
-        return newAtc;
+    @Override
+    public AtomicTransactionComposer clone() throws CloneNotSupportedException {
+        AtomicTransactionComposer clone = (AtomicTransactionComposer) super.clone();
+        clone.status = AtomicTxComposerStatus.BUILDING;
+        clone.signedTxns = new ArrayList<>();
+
+        // TODO need deep copy
+        for (TransactionWithSigner ts : clone.transactionList) ts.txn.group = new Digest();
+        return clone;
     }
 
     /**
@@ -72,6 +77,10 @@ public class AtomicTransactionComposer {
      * causes the current group to exceed MAX_GROUP_SIZE.
      */
     public void addTransaction(TransactionWithSigner txnAndSigner) {
+        for (byte b : txnAndSigner.txn.group.getBytes()) {
+            if (b != 0)
+                throw new IllegalArgumentException("Atomic Transaction Composer must not be non-zero");
+        }
         if (this.status != AtomicTxComposerStatus.BUILDING)
             throw new IllegalArgumentException("Atomic Transaction Composer only add transaction in BUILDING stage");
         if (this.transactionList.size() == MAX_GROUP_SIZE)
@@ -134,7 +143,7 @@ public class AtomicTransactionComposer {
         tx.onCompletion = methodCall.onCompletion;
 
         this.transactionList.add(new TransactionWithSigner(tx, methodCall.signer));
-        this.methodList.add(methodCall.method);
+        this.methodMap.put(this.transactionList.size() - 1, methodCall.method);
     }
 
     /**
@@ -230,17 +239,6 @@ public class AtomicTransactionComposer {
             throw new IllegalArgumentException("status shows this is already committed");
         this.submit(client);
 
-        boolean done = false;
-        while (!done) {
-            Response<PendingTransactionResponse> txInfo = client.PendingTransactionInformation(this.getTxIDs().get(0)).execute();
-            if (!txInfo.isSuccessful()) {
-                throw new RuntimeException("Failed to check on tx progress");
-            }
-            if (txInfo.body().confirmedRound != null) {
-                done = true;
-            }
-        }
-
         // TODO
         return null;
     }
@@ -273,8 +271,7 @@ public class AtomicTransactionComposer {
         protected enum SignedBy {
             BasicAccount,
             LogicSigAccount,
-            MultiSigAccount,
-            Unknown
+            MultiSigAccount
         }
 
         protected TransactionSigner.SignedBy signedBy;
