@@ -14,7 +14,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Pattern;
 
-@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Method {
     @JsonIgnore
     private static final Set<String> TxArgTypes = new HashSet<>(
@@ -84,8 +84,10 @@ public class Method {
         this.args = new ArrayList<>();
         String argTuple = parsedMethod.get(1);
         List<String> parsedMethodArgs = ABIType.parseTupleContent(argTuple.substring(1, argTuple.length() - 1));
-        for (int i = 0; i < parsedMethodArgs.size(); i++)
-            this.args.add(new Method.Arg("arg" + i, parsedMethodArgs.get(i), null));
+        for (String parsedMethodArg : parsedMethodArgs) this.args.add(new Arg(null, parsedMethodArg, null));
+        for (Arg arg : this.args)
+            if (TxArgTypes.contains(arg.type))
+                this.txnCallCount++;
 
         this.returns = new Returns(parsedMethod.get(2), null);
     }

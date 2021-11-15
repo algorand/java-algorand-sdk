@@ -1,5 +1,7 @@
 package com.algorand.algosdk.unit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.algorand.algosdk.abi.Contract;
 import com.algorand.algosdk.abi.Interface;
 import com.algorand.algosdk.abi.Method;
@@ -11,24 +13,31 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
 public class ABIJson {
+    private enum CHECK_FIELD {
+        METHOD,
+        INTERFACE,
+        CONTRACT
+    }
+
     Method method = null;
     String jsonMethod = null;
     Interface interfaceObj = null;
     String jsonInterface = null;
     Contract contract = null;
     String jsonContract = null;
-
-    public ABIJson() {
-    }
+    CHECK_FIELD state = null;
 
     @When("I create the Method object from method signature {string}")
     public void i_create_the_method_object_from_method_signature(String string) {
         this.method = new Method(string);
+        this.state = CHECK_FIELD.METHOD;
     }
 
     @When("I serialize the Method object into json")
@@ -37,23 +46,13 @@ public class ABIJson {
         this.jsonMethod = om.writeValueAsString(this.method);
     }
 
-    @Then("the produced json should equal {string} loaded from {string}")
-    public void the_produced_json_should_equal_loaded_from(String string, String string2) {
-        assert this.jsonMethod.equals(string);
-    }
-
     @When("I create the Method object with name {string} first argument type {string} second argument type {string} and return type {string}")
     public void i_create_the_method_object_with_name_first_argument_type_second_argument_type_and_return_type(String string, String string2, String string3, String string4) {
         Method.Arg arg0 = new Method.Arg(null, string2, null);
         Method.Arg arg1 = new Method.Arg(null, string3, null);
         Method.Returns ret = new Method.Returns(string4, null);
         this.method = new Method(string, null, new ArrayList<>(Arrays.asList(arg0, arg1)), ret);
-    }
-
-    @Then("the deserialized json should equal the original Method object")
-    public void the_deserialized_json_should_equal_the_original_method_object() throws IOException {
-        Method deserialized = new ObjectMapper().readValue(this.jsonMethod, Method.class);
-        assert this.method == deserialized;
+        this.state = CHECK_FIELD.METHOD;
     }
 
     @When("I create the Method object with name {string} first argument name {string} first argument type {string} second argument name {string} second argument type {string} and return type {string}")
@@ -62,6 +61,7 @@ public class ABIJson {
         Method.Arg arg1 = new Method.Arg(string4, string5, null);
         Method.Returns ret = new Method.Returns(string6, null);
         this.method = new Method(string, null, new ArrayList<>(Arrays.asList(arg0, arg1)), ret);
+        this.state = CHECK_FIELD.METHOD;
     }
 
     @When("I create the Method object with name {string} method description {string} first argument type {string} first argument description {string} second argument type {string} second argument description {string} and return type {string}")
@@ -70,22 +70,13 @@ public class ABIJson {
         Method.Arg arg1 = new Method.Arg(null, string5, string6);
         Method.Returns ret = new Method.Returns(string7, null);
         this.method = new Method(string, string2, new ArrayList<>(Arrays.asList(arg0, arg1)), ret);
-    }
-
-    @Then("the txn count should be {int}")
-    public void the_txn_count_should_be(Integer int1) {
-        assert this.method.getTxnCallCount() == int1;
-    }
-
-    @Then("the method selector should be {string}")
-    public void the_method_selector_should_be(String string) throws DecoderException {
-        byte[] decodedSelector = Hex.decodeHex(string);
-        assert Arrays.equals(this.method.getSelector(), decodedSelector);
+        this.state = CHECK_FIELD.METHOD;
     }
 
     @When("I create an Interface object from the Method object with name {string}")
     public void i_create_an_interface_object_from_the_method_object_with_name(String string) {
-        this.interfaceObj = new Interface(string, new ArrayList<>(Collections.singletonList(this.method)));
+        this.interfaceObj = new Interface(string, Collections.singletonList(this.method));
+        this.state = CHECK_FIELD.INTERFACE;
     }
 
     @When("I serialize the Interface object into json")
@@ -93,15 +84,10 @@ public class ABIJson {
         this.jsonInterface = new ObjectMapper().writeValueAsString(this.interfaceObj);
     }
 
-    @Then("the deserialized json should equal the original Interface object")
-    public void the_deserialized_json_should_equal_the_original_interface_object() throws IOException {
-        Interface deserialized = new ObjectMapper().readValue(this.jsonInterface, Interface.class);
-        assert deserialized.equals(this.interfaceObj);
-    }
-
     @When("I create a Contract object from the Method object with name {string} and appId {int}")
     public void i_create_a_contract_object_from_the_method_object_with_name_and_app_id(String string, Integer int1) {
-        this.contract = new Contract(string, int1, new ArrayList<>(Collections.singletonList(this.method)));
+        this.contract = new Contract(string, int1, Collections.singletonList(this.method));
+        this.state = CHECK_FIELD.CONTRACT;
     }
 
     @When("I serialize the Contract object into json")
@@ -109,9 +95,51 @@ public class ABIJson {
         this.jsonContract = new ObjectMapper().writeValueAsString(this.contract);
     }
 
+    @Then("the txn count should be {int}")
+    public void the_txn_count_should_be(Integer int1) {
+        assertThat(this.method.getTxnCallCount()).isEqualTo(int1);
+    }
+
+    @Then("the method selector should be {string}")
+    public void the_method_selector_should_be(String string) throws DecoderException {
+        byte[] decodedSelector = Hex.decodeHex(string);
+        assertThat(this.method.getSelector()).isEqualTo(decodedSelector);
+    }
+
+    static public String getUnitTestFileAsString(String dir, String file) throws IOException {
+        String location = "src/test/resources/com/algorand/algosdk/unit/" + dir + "/" + file;
+        byte[] res = Files.readAllBytes(Paths.get(location));
+        return new String(res);
+    }
+
+    @Then("the produced json should equal {string} loaded from {string}")
+    public void the_produced_json_should_equal_loaded_from(String string, String string2) throws IOException {
+        String jsonStr = getUnitTestFileAsString(string2, string);
+        if (this.state == CHECK_FIELD.METHOD)
+            assertThat(this.jsonMethod).isEqualTo(jsonStr);
+        else if (this.state == CHECK_FIELD.INTERFACE)
+            assertThat(this.jsonInterface).isEqualTo(jsonStr);
+        else if (this.state == CHECK_FIELD.CONTRACT)
+            assertThat(this.jsonContract).isEqualTo(jsonStr);
+        else
+            throw new IllegalArgumentException("did not decide which state of checking in");
+    }
+
+    @Then("the deserialized json should equal the original Method object")
+    public void the_deserialized_json_should_equal_the_original_method_object() throws IOException {
+        Method deserialized = new ObjectMapper().readValue(this.jsonMethod, Method.class);
+        assertThat(this.method).isEqualTo(deserialized);
+    }
+
+    @Then("the deserialized json should equal the original Interface object")
+    public void the_deserialized_json_should_equal_the_original_interface_object() throws IOException {
+        Interface deserialized = new ObjectMapper().readValue(this.jsonInterface, Interface.class);
+        assertThat(this.interfaceObj).isEqualTo(deserialized);
+    }
+
     @Then("the deserialized json should equal the original Contract object")
     public void the_deserialized_json_should_equal_the_original_contract_object() throws IOException {
         Contract deserialized = new ObjectMapper().readValue(this.jsonContract, Contract.class);
-        assert deserialized.equals(this.contract);
+        assertThat(this.contract).isEqualTo(deserialized);
     }
 }
