@@ -404,8 +404,8 @@ public class AtomicTransactionComposer {
     }
 
     public static class ABIValue implements MethodArgument {
-        ABIType abiType;
-        Object value;
+        public ABIType abiType;
+        public Object value;
 
         public ABIValue(ABIType abiType, Object value) {
             abiType.encode(value);

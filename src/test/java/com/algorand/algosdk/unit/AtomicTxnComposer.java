@@ -7,6 +7,12 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.kmd.client.KmdClient;
+import com.algorand.algosdk.kmd.client.api.KmdApi;
+import com.algorand.algosdk.kmd.client.model.APIV1Wallet;
+import com.algorand.algosdk.kmd.client.model.InitWalletHandleTokenRequest;
+import com.algorand.algosdk.kmd.client.model.ListKeysRequest;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.MethodCallOption;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -26,7 +32,18 @@ import java.util.List;
 public class AtomicTxnComposer {
     public static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     public static Integer algodPort = 60000;
+    public static Integer kmdPort = 60001;
+
     AlgodClient aclv2;
+    KmdClient kmdClient;
+    KmdApi kcl;
+    String walletName;
+    String walletPswd;
+    String walletID;
+    String handle;
+    List<String> addresses;
+    Address pk;
+
     Base base;
     ABIJson methodABI;
     AtomicTransactionComposer atc;
@@ -37,11 +54,13 @@ public class AtomicTxnComposer {
     byte[] genesisHash;
     String genesisID;
     Account signingAccount;
+    Account transientAccount;
     AtomicTransactionComposer.TransactionSigner txnSigner;
     List<SignedTransaction> signedTxnsGathered;
     Transaction paymentTxn;
     AtomicTransactionComposer.TransactionWithSigner txnWithSigner;
     MethodCallOption.MethodCallOptionBuilder optionBuilder;
+    AtomicTransactionComposer.ExecuteResult executeResult;
 
     public AtomicTxnComposer(Base b, ABIJson methodABI_) {
         base = b;
@@ -53,6 +72,57 @@ public class AtomicTxnComposer {
         aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
                 "http://localhost", algodPort, token
         );
+    }
+
+    @Given("a kmd client")
+    public void kClient() {
+        kmdClient = new KmdClient();
+        kmdClient.setConnectTimeout(30000);
+        kmdClient.setReadTimeout(30000);
+        kmdClient.setWriteTimeout(30000);
+        kmdClient.setApiKey(token);
+        kmdClient.setBasePath("http://localhost:" + kmdPort);
+        kcl = new KmdApi(kmdClient);
+    }
+
+    protected Address getAddress(int i) {
+        if (addresses == null) {
+            throw new RuntimeException("Addresses not initialized, must use given 'wallet information'");
+        }
+        if (addresses.size() < i || addresses.size() == 0) {
+            throw new RuntimeException("Not enough addresses, you may need to update the network template.");
+        }
+        try {
+            return new Address(addresses.get(i));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Given("wallet information")
+    public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException {
+        walletName = "unencrypted-default-wallet";
+        walletPswd = "";
+        List<APIV1Wallet> wallets = kcl.listWallets().getWallets();
+        for (APIV1Wallet w: wallets){
+            if (w.getName().equals(walletName)){
+                walletID = w.getId();
+            }
+        }
+        InitWalletHandleTokenRequest tokenreq = new InitWalletHandleTokenRequest();
+        tokenreq.setWalletId(walletID);
+        tokenreq.setWalletPassword(walletPswd);
+        handle = kcl.initWalletHandleToken(tokenreq).getWalletHandleToken();
+        ListKeysRequest req = new ListKeysRequest();
+        req.setWalletHandleToken(handle);
+        addresses = kcl.listKeysInWallet(req).getAddresses();
+        pk = getAddress(0);
+    }
+
+    @Given("suggested transaction parameters from the algod v2 client")
+    public void suggestedParamsFromAlgodV2Client() {
+        // TODO
+        throw new io.cucumber.java.PendingException();
     }
 
     @Given("a new AtomicTransactionComposer")
@@ -85,6 +155,12 @@ public class AtomicTxnComposer {
         txnSigner = new AtomicTransactionComposer.TransactionSigner(signingAccount);
     }
 
+    @When("I make a transaction signer for the transient account.")
+    public void i_make_a_transaction_signer_for_the_transient_account() throws NoSuchAlgorithmException {
+        transientAccount = new Account();
+        txnSigner = new AtomicTransactionComposer.TransactionSigner(transientAccount);
+    }
+
     @When("I build a payment transaction with sender {string}, receiver {string}, amount {int}, close remainder to {string}")
     public void i_build_a_payment_transaction_with_sender_receiver_amount_close_remainder_to(String string, String string2, Integer int1, String string3) {
         PaymentTransactionBuilder<?> builder = PaymentTransactionBuilder.Builder();
@@ -110,6 +186,11 @@ public class AtomicTxnComposer {
     @When("I append the current transaction with signer to the method arguments array.")
     public void i_append_the_current_transaction_with_signer_to_the_method_arguments_array() {
         this.optionBuilder.addMethodArgs(this.txnWithSigner);
+    }
+
+    @When("I add the current transaction with signer to the composer.")
+    public void i_add_the_current_transaction_with_signer_to_the_composer() {
+        this.atc.addTransaction(this.txnWithSigner);
     }
 
     private List<AtomicTransactionComposer.ABIValue> splitAndProcessABIArgs(String str) {
@@ -154,6 +235,23 @@ public class AtomicTxnComposer {
         atc.addMethodCall(optionBuild);
     }
 
+    @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
+    public void i_add_a_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String string) {
+        optionBuilder
+                .setOnComplete(Transaction.OnCompletion.String(string))
+                .setSender(transientAccount.getAddress().toString())
+                .setSigner(txnSigner)
+                .setAppID(appID.longValue())
+                .setMethod(methodABI.method)
+                .setSuggestedParams(suggestedParams)
+                .setFirstValid(fv)
+                .setLastValid(lv)
+                .setFee(fee)
+                .setFlatFee(flatFee);
+        MethodCallOption optionBuild = optionBuilder.build();
+        atc.addMethodCall(optionBuild);
+    }
+
     @When("I build the transaction group with the composer. If there is an error it is {string}.")
     public void i_build_the_transaction_group_with_the_composer_if_there_is_an_error_it_is(String string) {
         String errStr = "";
@@ -183,6 +281,32 @@ public class AtomicTxnComposer {
             SignedTransaction decodedMsgPack = Encoder.decodeFromMsgPack(subStr, SignedTransaction.class);
             SignedTransaction actual = signedTxnsGathered.get(i);
             assertThat(actual).isEqualTo(decodedMsgPack);
+        }
+    }
+
+    @Then("I execute the current transaction group with the composer.")
+    public void i_execute_the_current_transaction_group_with_the_composer() throws Exception {
+        executeResult = this.atc.execute(this.aclv2, 10);
+    }
+
+    @Then("I clone the composer.")
+    public void clone_atomic_transaction_composer() throws IOException {
+        atc = atc.cloneAtomicTxnComposer();
+    }
+
+    @Then("The app should have returned {string}.")
+    public void the_app_should_have_returned(String str) {
+        String[] expectedToken = str.split(",");
+        assertThat(expectedToken.length).isEqualTo(executeResult.methodResults.size());
+
+        for (int i = 0; i < expectedToken.length; i++) {
+            AtomicTransactionComposer.ReturnValue retOnI = executeResult.methodResults.get(i);
+            // TODO if i-th is null(?) jump over it and check against expected token is
+            byte[] encodedABIres = Encoder.decodeFromBase64(expectedToken[i]);
+            Object decodedValue = retOnI.value.abiType.decode(encodedABIres);
+            assertThat(decodedValue).isEqualTo(retOnI.value.value);
+            assertThat(encodedABIres).isEqualTo(retOnI.rawValue);
+            assertThat(retOnI.parseError).isNull();
         }
     }
 }
