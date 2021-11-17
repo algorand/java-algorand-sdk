@@ -63,7 +63,7 @@ public class AtomicTxnComposer {
     @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
     public void suggested_transaction_parameters_fee_flat_fee_first_valid_last_valid_genesis_hash_genesis_id(Integer int1, String string, Integer int2, Integer int3, String string2, String string3) {
         isFlatFee = Boolean.parseBoolean(string);
-        fee = isFlatFee ? null : Account.MIN_TX_FEE_UALGOS;
+        fee = isFlatFee ? null : BigInteger.valueOf(int1);
         flatFee = isFlatFee ? BigInteger.valueOf(int1) : null;
 
         genesisHash = Encoder.decodeFromBase64(string2);
@@ -89,6 +89,7 @@ public class AtomicTxnComposer {
     public void i_build_a_payment_transaction_with_sender_receiver_amount_close_remainder_to(String string, String string2, Integer int1, String string3) {
         PaymentTransactionBuilder<?> builder = PaymentTransactionBuilder.Builder();
         builder.sender(string).receiver(string2).amount(int1)
+                .fee(fee).flatFee(flatFee)
                 .firstValid(fv).lastValid(lv)
                 .genesisHash(genesisHash).genesisID(genesisID);
         if (!string3.isEmpty())
@@ -180,7 +181,8 @@ public class AtomicTxnComposer {
         for (int i = 0; i < splitStr.length; i++) {
             String subStr = splitStr[i];
             SignedTransaction decodedMsgPack = Encoder.decodeFromMsgPack(subStr, SignedTransaction.class);
-            assertThat(signedTxnsGathered.get(i)).isEqualTo(decodedMsgPack);
+            SignedTransaction actual = signedTxnsGathered.get(i);
+            assertThat(actual).isEqualTo(decodedMsgPack);
         }
     }
 }
