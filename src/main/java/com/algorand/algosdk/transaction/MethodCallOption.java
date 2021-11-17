@@ -3,6 +3,7 @@ package com.algorand.algosdk.transaction;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +14,13 @@ public class MethodCallOption {
     public String sender, rekeyTo;
     public Transaction.OnCompletion onCompletion;
     public Byte[] note, lease;
+    public BigInteger fv, lv, fee, flatFee;
     AtomicTransactionComposer.TransactionSigner signer;
     TransactionParams suggestedParams;
 
-    private MethodCallOption(Long appID, Method method, List<AtomicTransactionComposer.MethodArgument> methodArgs, String sender,
+    public MethodCallOption(Long appID, Method method, List<AtomicTransactionComposer.MethodArgument> methodArgs, String sender,
                              TransactionParams sp, Transaction.OnCompletion onCompletion, Byte[] note, Byte[] lease,
+                             BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
                              String rekeyTo, AtomicTransactionComposer.TransactionSigner signer) {
         if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
             throw new IllegalArgumentException("Method call builder error: some required field not added");
@@ -31,6 +34,10 @@ public class MethodCallOption {
         this.onCompletion = onCompletion;
         this.note = note;
         this.lease = lease;
+        this.fv = fv;
+        this.lv = lv;
+        this.fee = fee;
+        this.flatFee = flatFee;
         this.rekeyTo = rekeyTo;
         this.signer = signer;
     }
@@ -42,6 +49,7 @@ public class MethodCallOption {
         public String sender, rekeyTo;
         public Transaction.OnCompletion onCompletion;
         public Byte[] note, lease;
+        public BigInteger fv, lv, fee, flatFee;
         AtomicTransactionComposer.TransactionSigner signer;
         TransactionParams sp;
 
@@ -100,8 +108,28 @@ public class MethodCallOption {
             return this;
         }
 
+        public MethodCallOption.MethodCallOptionBuilder setFirstValid(BigInteger fv) {
+            this.fv = fv;
+            return this;
+        }
+
+        public MethodCallOption.MethodCallOptionBuilder setLastValid(BigInteger lv) {
+            this.lv = lv;
+            return this;
+        }
+
+        public MethodCallOption.MethodCallOptionBuilder setFee(BigInteger fee) {
+            this.fee = fee;
+            return this;
+        }
+
+        public MethodCallOption.MethodCallOptionBuilder setFlatFee(BigInteger flatFee) {
+            this.flatFee = flatFee;
+            return this;
+        }
+
         public MethodCallOption build() {
-            return new MethodCallOption(appID, method, methodArgs, sender, sp, onCompletion, note, lease, rekeyTo, signer);
+            return new MethodCallOption(appID, method, methodArgs, sender, sp, onCompletion, note, lease, fv, lv, fee, flatFee, rekeyTo, signer);
         }
     }
 }

@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Method {
     @JsonIgnore
-    private static final Set<String> TxArgTypes = new HashSet<>(
+    public static final Set<String> TxArgTypes = new HashSet<>(
             Arrays.asList(
                     Transaction.Type.Payment.toValue(),
                     Transaction.Type.KeyRegistration.toValue(),

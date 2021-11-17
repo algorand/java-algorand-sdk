@@ -79,7 +79,7 @@ public class AtomicTransactionComposer {
 
     /**
      * Add a transaction to this atomic group.
-     *
+     * <p>
      * An error will be thrown if the composer's status is not BUILDING, or if adding this transaction
      * causes the current group to exceed MAX_GROUP_SIZE.
      */
@@ -97,7 +97,7 @@ public class AtomicTransactionComposer {
 
     /**
      * Add a smart contract method call to this atomic group.
-     *
+     * <p>
      * An error will be thrown if the composer's status is not BUILDING, if adding this transaction
      * causes the current group to exceed MAX_GROUP_SIZE, or if the provided arguments are invalid
      * for the given method.
@@ -138,15 +138,25 @@ public class AtomicTransactionComposer {
         for (ABIValue v : abiValues)
             encodedABIArgs.add(v.abiType.encode(v.value));
 
-        Transaction tx = ApplicationCallTransactionBuilder.Builder()
-                .sender(methodCall.sender)
+        ApplicationCallTransactionBuilder<?> txBuilder = ApplicationCallTransactionBuilder.Builder();
+
+        txBuilder
                 .suggestedParams(methodCall.suggestedParams)
+                .firstValid(methodCall.fv)
+                .lastValid(methodCall.lv)
+                .fee(methodCall.fee)
+                .sender(methodCall.sender)
+                .flatFee(methodCall.flatFee)
                 .applicationId(methodCall.appID)
                 .args(encodedABIArgs)
-                .rekey(methodCall.rekeyTo)
                 .note(ArrayUtils.toPrimitive(methodCall.note))
-                .lease(ArrayUtils.toPrimitive(methodCall.lease))
-                .build();
+                .lease(ArrayUtils.toPrimitive(methodCall.lease));
+
+        if (methodCall.rekeyTo != null)
+            txBuilder.rekey(methodCall.rekeyTo);
+
+        Transaction tx = txBuilder.build();
+
         tx.onCompletion = methodCall.onCompletion;
 
         this.transactionList.add(new TransactionWithSigner(tx, methodCall.signer));
@@ -155,7 +165,7 @@ public class AtomicTransactionComposer {
 
     /**
      * Finalize the transaction group and returned the finalized transactions.
-     *
+     * <p>
      * The composer's status will be at least BUILT after executing this method.
      */
     public List<TransactionWithSigner> buildGroup() throws IOException {
@@ -175,9 +185,9 @@ public class AtomicTransactionComposer {
     /**
      * Obtain signatures for each transaction in this group. If signatures have already been obtained,
      * this method will return cached versions of the signatures.
-     *
+     * <p>
      * The composer's status will be at least SIGNED after executing this method.
-     *
+     * <p>
      * An error will be thrown if signing any of the transactions fails.
      *
      * @return an array of signed transactions.
@@ -205,10 +215,10 @@ public class AtomicTransactionComposer {
     /**
      * Send the transaction group to the network, but don't wait for it to be committed to a block. An
      * error will be thrown if submission fails.
-     *
+     * <p>
      * The composer's status must be SUBMITTED or lower before calling this method. If submission is
      * successful, this composer's status will update to SUBMITTED.
-     *
+     * <p>
      * Note: a group can only be submitted again if it fails.
      *
      * @return If the submission is successful, resolves to a list of TxIDs of the submitted transactions.
@@ -229,11 +239,11 @@ public class AtomicTransactionComposer {
     /**
      * Send the transaction group to the network and wait until it's committed to a block. An error
      * will be thrown if submission or execution fails.
-     *
+     * <p>
      * The composer's status must be SUBMITTED or lower before calling this method, since execution is
      * only allowed once. If submission is successful, this composer's status will update to SUBMITTED.
      * If the execution is also successful, this composer's status will update to COMMITTED.
-     *
+     * <p>
      * Note: a group can only be submitted again if it fails.
      *
      * @return If the execution is successful, resolves to an object containing the confirmed round for
@@ -390,7 +400,8 @@ public class AtomicTransactionComposer {
         }
     }
 
-    public interface MethodArgument {}
+    public interface MethodArgument {
+    }
 
     public static class ABIValue implements MethodArgument {
         ABIType abiType;

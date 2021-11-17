@@ -87,7 +87,7 @@ public abstract class ABIType {
         }
     }
 
-    public static class Segment {
+    private static class Segment {
         public int L, R;
 
         Segment(int left, int right) {
