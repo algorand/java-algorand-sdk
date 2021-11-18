@@ -172,6 +172,9 @@ public class AtomicTransactionComposer {
         if (this.status.compareTo(AtomicTxComposerStatus.BUILT) >= 0)
             return this.transactionList;
 
+        if (this.transactionList.size() == 0)
+            throw new IllegalArgumentException("should not build transaction group with 0 transaction in composer");
+
         List<Transaction> groupTxns = new ArrayList<>();
         for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
         Digest groupID = TxGroup.computeGroupID(groupTxns.toArray(new Transaction[0]));
