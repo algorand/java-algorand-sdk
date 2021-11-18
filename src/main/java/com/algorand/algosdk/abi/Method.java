@@ -19,6 +19,7 @@ public class Method {
     @JsonIgnore
     public static final Set<String> TxArgTypes = new HashSet<>(
             Arrays.asList(
+                    "txn",
                     Transaction.Type.Payment.toValue(),
                     Transaction.Type.KeyRegistration.toValue(),
                     Transaction.Type.AssetConfig.toValue(),
@@ -82,8 +83,7 @@ public class Method {
         this.name = Method.nameChecker(parsedMethod.get(0));
 
         this.args = new ArrayList<>();
-        String argTuple = parsedMethod.get(1);
-        List<String> parsedMethodArgs = ABIType.parseTupleContent(argTuple.substring(1, argTuple.length() - 1));
+        List<String> parsedMethodArgs = ABIType.parseTupleContent(parsedMethod.get(1));
         for (String parsedMethodArg : parsedMethodArgs) this.args.add(new Arg(null, parsedMethodArg, null));
         for (Arg arg : this.args)
             if (TxArgTypes.contains(arg.type))
@@ -106,7 +106,10 @@ public class Method {
                     continue;
                 List<String> res = new ArrayList<>();
                 res.add(method.substring(0, leftParenIndex));
-                res.add(method.substring(leftParenIndex, i + 1));
+                if (leftParenIndex + 1 == i)
+                    res.add("");
+                else
+                    res.add(method.substring(leftParenIndex + 1, i));
                 res.add(method.substring(i + 1));
                 return res;
             }

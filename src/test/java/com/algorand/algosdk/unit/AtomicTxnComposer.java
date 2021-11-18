@@ -8,6 +8,7 @@ import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.integration.TransientAccount;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
 import com.algorand.algosdk.kmd.client.model.APIV1Wallet;
@@ -19,6 +20,8 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -54,7 +57,7 @@ public class AtomicTxnComposer {
     byte[] genesisHash;
     String genesisID;
     Account signingAccount;
-    Account transientAccount;
+    TransientAccount transientAccount;
     AtomicTransactionComposer.TransactionSigner txnSigner;
     List<SignedTransaction> signedTxnsGathered;
     Transaction paymentTxn;
@@ -62,9 +65,10 @@ public class AtomicTxnComposer {
     MethodCallOption.MethodCallOptionBuilder optionBuilder;
     AtomicTransactionComposer.ExecuteResult executeResult;
 
-    public AtomicTxnComposer(Base b, ABIJson methodABI_) {
+    public AtomicTxnComposer(Base b, ABIJson methodABI_, TransientAccount ta) {
         base = b;
         methodABI = methodABI_;
+        transientAccount = ta;
     }
 
     @Given("an algod v2 client")
@@ -120,7 +124,9 @@ public class AtomicTxnComposer {
     }
 
     @Given("suggested transaction parameters from the algod v2 client")
-    public void suggestedParamsFromAlgodV2Client() {
+    public void suggestedParamsFromAlgodV2Client() throws Exception {
+        Response<TransactionParametersResponse> v2Params = aclv2.TransactionParams().execute();
+        fee = BigInteger.valueOf(v2Params.body().fee);
         // TODO
         throw new io.cucumber.java.PendingException();
     }
@@ -156,9 +162,8 @@ public class AtomicTxnComposer {
     }
 
     @When("I make a transaction signer for the transient account.")
-    public void i_make_a_transaction_signer_for_the_transient_account() throws NoSuchAlgorithmException {
-        transientAccount = new Account();
-        txnSigner = new AtomicTransactionComposer.TransactionSigner(transientAccount);
+    public void i_make_a_transaction_signer_for_the_transient_account() {
+        txnSigner = new AtomicTransactionComposer.TransactionSigner(transientAccount.transientAccount);
     }
 
     @When("I build a payment transaction with sender {string}, receiver {string}, amount {int}, close remainder to {string}")
@@ -239,7 +244,7 @@ public class AtomicTxnComposer {
     public void i_add_a_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String string) {
         optionBuilder
                 .setOnComplete(Transaction.OnCompletion.String(string))
-                .setSender(transientAccount.getAddress().toString())
+                .setSender(transientAccount.transientAccount.getAddress().toString())
                 .setSigner(txnSigner)
                 .setAppID(appID.longValue())
                 .setMethod(methodABI.method)

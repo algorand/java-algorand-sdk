@@ -86,9 +86,9 @@ public class AtomicTransactionComposer {
     public void addTransaction(TransactionWithSigner txnAndSigner) {
         for (byte b : txnAndSigner.txn.group.getBytes()) {
             if (b != 0)
-                throw new IllegalArgumentException("Atomic Transaction Composer must not be non-zero");
+                throw new IllegalArgumentException("Atomic Transaction Composer group field must be zero");
         }
-        if (this.status != AtomicTxComposerStatus.BUILDING)
+        if (!this.status.equals(AtomicTxComposerStatus.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer only add transaction in BUILDING stage");
         if (this.transactionList.size() == MAX_GROUP_SIZE)
             throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE == 16 transactions");
@@ -103,7 +103,7 @@ public class AtomicTransactionComposer {
      * for the given method.
      */
     public void addMethodCall(MethodCallOption methodCall) {
-        if (this.status.compareTo(AtomicTxComposerStatus.BUILDING) != 0)
+        if (!this.status.equals(AtomicTxComposerStatus.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer must be in BUILDING stage");
         if (this.transactionList.size() + methodCall.method.getTxnCallCount() > MAX_GROUP_SIZE)
             throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE = 16 transactions");
@@ -226,7 +226,7 @@ public class AtomicTransactionComposer {
     public List<String> submit(AlgodClient client) throws Exception {
         if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) > 0)
             throw new IllegalArgumentException("Atomic Transaction Composer cannot submit committed transaction");
-        else if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) == 0)
+        else if (this.status.equals(AtomicTxComposerStatus.SUBMITTED))
             return this.getTxIDs();
 
         List<SignedTransaction> stxn = this.gatherSignatures();
