@@ -232,8 +232,8 @@ public class AtomicTransactionComposer {
         else if (this.status.equals(AtomicTxComposerStatus.SUBMITTED))
             return this.getTxIDs();
 
-        List<SignedTransaction> stxn = this.gatherSignatures();
-        client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stxn)).execute();
+        this.gatherSignatures();
+        client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(this.signedTxns)).execute();
 
         this.status = AtomicTxComposerStatus.SUBMITTED;
         return this.getTxIDs();
@@ -261,7 +261,7 @@ public class AtomicTransactionComposer {
             throw new IllegalArgumentException("wait round for execute should be non-negative");
         this.submit(client);
         PendingTransactionResponse txInfo =
-                Utils.waitForConfirmation(client, this.transactionList.get(0).txn.txID(), waitRounds);
+                Utils.waitForConfirmation(client, this.signedTxns.get(0).transactionID, waitRounds);
         List<ReturnValue> retList = new ArrayList<>();
 
         for (int i = 0; i < this.transactionList.size(); i++) {

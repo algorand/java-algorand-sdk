@@ -4,6 +4,7 @@ import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.integration.TransientAccount;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -29,6 +30,7 @@ public class TransactionSteps {
     public Base base;
     public Transaction builtTransaction = null;
     public SignedTransaction signedTransaction = null;
+    public TransientAccount transAcc;
 
     public TransactionParams suggestedParams;
     public BigInteger fee, flatFee, fv, lv;
@@ -145,11 +147,11 @@ public class TransactionSteps {
     public void i_build_a_payment_transaction_with_sender_receiver_amount_close_remainder_to(String string, String string2, Integer int1, String string3) {
         PaymentTransactionBuilder<?> builder = PaymentTransactionBuilder.Builder();
         if (string.equals("transient"))
-            builder.sender(new Address());
+            builder.sender(transAcc.transientAccount.getAddress());
         else
             builder.sender(string);
         if (string2.equals("transient"))
-            builder.receiver(new Address());
+            builder.receiver(transAcc.transientAccount.getAddress());
         else
             builder.receiver(string2);
         builder.amount(int1)
