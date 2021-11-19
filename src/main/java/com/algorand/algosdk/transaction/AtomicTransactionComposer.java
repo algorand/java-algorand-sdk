@@ -39,7 +39,6 @@ public class AtomicTransactionComposer {
     public Map<Integer, Method> methodMap = new HashMap<>();
     public List<TransactionWithSigner> transactionList = new ArrayList<>();
     public List<SignedTransaction> signedTxns = new ArrayList<>();
-    public String txID;
 
     public AtomicTransactionComposer() {
         this.status = AtomicTxComposerStatus.BUILDING;
@@ -252,7 +251,7 @@ public class AtomicTransactionComposer {
 
         if (!rPost.isSuccessful())
             throw new Exception("transaction should be submitted successfully");
-        this.txID = rPost.body().txId;
+
         this.status = AtomicTxComposerStatus.SUBMITTED;
         return this.getTxIDs();
     }
@@ -299,6 +298,7 @@ public class AtomicTransactionComposer {
             if (!resp.isSuccessful())
                 throw new IllegalArgumentException("cannot get response from client");
 
+            // question why it is not replying anything in log?
             PendingTransactionResponse respBody = resp.body();
             List<byte[]> logs = respBody.logs;
             byte[] retLine = null;
