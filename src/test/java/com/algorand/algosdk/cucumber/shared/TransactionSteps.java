@@ -1,9 +1,8 @@
 package com.algorand.algosdk.cucumber.shared;
 
-import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
-import com.algorand.algosdk.builder.transaction.TransactionBuilder;
+import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -21,16 +20,21 @@ import org.assertj.core.api.Assertions;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Map;
 
 import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionSteps {
-    private final Base base;
-    public Transaction applicationTransaction = null;
+    public Base base;
+    public Transaction builtTransaction = null;
     public SignedTransaction signedTransaction = null;
+
+    public TransactionParams suggestedParams;
+    public BigInteger fee, flatFee, fv, lv;
+    public boolean isFlatFee;
+    public byte[] genesisHash;
+    public String genesisID;
 
     public TransactionSteps(Base b) {
         this.base = b;
@@ -120,12 +124,46 @@ public class TransactionSteps {
             builder.genesisHashB64(genesisHash);
         }
 
-        applicationTransaction = builder.build();
+        builtTransaction = builder.build();
+    }
+
+    @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
+    public void suggested_transaction_parameters_fee_flat_fee_first_valid_last_valid_genesis_hash_genesis_id(Integer int1, String string, Integer int2, Integer int3, String string2, String string3) {
+        isFlatFee = Boolean.parseBoolean(string);
+        fee = isFlatFee ? null : BigInteger.valueOf(int1);
+        flatFee = isFlatFee ? BigInteger.valueOf(int1) : null;
+
+        genesisHash = Encoder.decodeFromBase64(string2);
+        genesisID = string3;
+        fv = BigInteger.valueOf(int2);
+        lv = BigInteger.valueOf(int3);
+
+        suggestedParams = new TransactionParams().genesishashb64(genesisHash).genesisID(genesisID).lastRound(fv);
+    }
+
+    @When("I build a payment transaction with sender {string}, receiver {string}, amount {int}, close remainder to {string}")
+    public void i_build_a_payment_transaction_with_sender_receiver_amount_close_remainder_to(String string, String string2, Integer int1, String string3) {
+        PaymentTransactionBuilder<?> builder = PaymentTransactionBuilder.Builder();
+        if (string.equals("transient"))
+            builder.sender(new Address());
+        else
+            builder.sender(string);
+        if (string2.equals("transient"))
+            builder.receiver(new Address());
+        else
+            builder.receiver(string2);
+        builder.amount(int1)
+                .fee(fee).flatFee(flatFee)
+                .firstValid(fv).lastValid(lv)
+                .genesisHash(genesisHash).genesisID(genesisID);
+        if (!string3.isEmpty())
+            builder.closeRemainderTo(string3);
+        builtTransaction = builder.build();
     }
 
     @When("sign the transaction")
     public void sign_the_transaction() throws NoSuchAlgorithmException {
-        signedTransaction = base.signTransaction(applicationTransaction);
+        signedTransaction = base.signTransaction(builtTransaction);
     }
 
     @Then("fee field is in txn")
@@ -153,6 +191,13 @@ public class TransactionSteps {
     public void the_base64_encoded_signed_transaction_should_equal(String golden) throws JsonProcessingException {
         String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
         assertThat(encoded).isEqualTo(golden);
+    }
+
+    @Then("the decoded transaction should equal the original")
+    public void the_decoded_transaction_should_equal_the_original() throws IOException {
+        String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
+        SignedTransaction decoded = Encoder.decodeFromMsgPack(encoded, SignedTransaction.class);
+        assertThat(decoded.tx).isEqualTo(builtTransaction);
     }
 
 }

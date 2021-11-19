@@ -21,9 +21,9 @@ import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Applications {
-    private final Clients clients;
-    private final Stepdefs base;
-    private final TransientAccount transientAccount;
+    public Clients clients;
+    public Stepdefs base;
+    public TransientAccount transientAccount;
 
     public Transaction transaction;
     public String txId = null;

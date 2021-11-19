@@ -11,8 +11,8 @@ import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import io.cucumber.java.en.Given;
 
 public class TransientAccount {
-    private final Clients clients;
-    private final Stepdefs base;
+    public Clients clients;
+    public Stepdefs base;
 
     public Account transientAccount = null;
 

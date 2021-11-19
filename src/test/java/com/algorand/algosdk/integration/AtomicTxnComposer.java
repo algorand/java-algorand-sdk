@@ -1,61 +1,87 @@
-package com.algorand.algosdk.unit;
+package com.algorand.algosdk.integration;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import com.algorand.algosdk.abi.ABIType;
-import com.algorand.algosdk.abi.Method;
-import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
-import com.algorand.algosdk.transaction.MethodCallOption;
-import com.algorand.algosdk.transaction.SignedTransaction;
-import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AtomicTxnComposer {
-    public static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-    public static Integer algodPort = 60000;
 
-    AlgodClient aclv2;
-
-    Base base;
-    ABIJson methodABI;
+    Stepdefs base;
+    Applications applications;
     AtomicTransactionComposer atc;
-    Integer appID;
-
     TransactionSteps transSteps;
-    Account signingAccount;
-    AtomicTransactionComposer.TransactionSigner txnSigner;
-    List<SignedTransaction> signedTxnsGathered;
 
-    AtomicTransactionComposer.TransactionWithSigner txnWithSigner;
-    MethodCallOption.MethodCallOptionBuilder optionBuilder;
-
-    public AtomicTxnComposer(Base b, ABIJson methodABI_, TransactionSteps steps) {
-        base = b;
-        methodABI = methodABI_;
+    public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
+        base = stepdefs;
+        applications = apps;
+        applications.transientAccount.clients.v2Client = base.aclv2;
+        applications.transientAccount.base = base;
         transSteps = steps;
     }
 
-    @Given("an algod v2 client")
-    public void an_algod_v2_client() {
-        aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
-                "http://localhost", algodPort, token
-        );
+    @Given("suggested transaction parameters from the algod v2 client")
+    public void suggested_transaction_parameters_from_the_algod_v2_client() {
+        Clients clientsForTransientAccount = new Clients();
+        clientsForTransientAccount.v2Client = base.aclv2;
     }
 
     @Given("a new AtomicTransactionComposer")
     public void a_new_atomic_transaction_composer() {
         this.atc = new AtomicTransactionComposer();
+    }
+
+    @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
+    public void i_add_a_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @When("I make a transaction signer for the transient account.")
+    public void i_make_a_transaction_signer_for_the_transient_account() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("I clone the composer.")
+    public void i_clone_the_composer() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("I execute the current transaction group with the composer.")
+    public void i_execute_the_current_transaction_group_with_the_composer() {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("The app should have returned {string}.")
+    public void the_app_should_have_returned(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("The composer should have a status of {string}.")
+    public void the_composer_should_have_a_status_of(String string) {
+        assertThat(atc.status).isEqualTo(AtomicTransactionComposer.AtomicTxComposerStatus.valueOf(string));
+    }
+
+    /*
+    @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
+    public void suggested_transaction_parameters_fee_flat_fee_first_valid_last_valid_genesis_hash_genesis_id(Integer int1, String string, Integer int2, Integer int3, String string2, String string3) {
+        isFlatFee = Boolean.parseBoolean(string);
+        fee = isFlatFee ? null : BigInteger.valueOf(int1);
+        flatFee = isFlatFee ? BigInteger.valueOf(int1) : null;
+
+        genesisHash = Encoder.decodeFromBase64(string2);
+        genesisID = string3;
+        fv = BigInteger.valueOf(int2);
+        lv = BigInteger.valueOf(int3);
+
+        suggestedParams = new TransactionParams().genesishashb64(genesisHash).genesisID(genesisID).lastRound(fv);
     }
 
     @Given("an application id {int}")
@@ -69,9 +95,21 @@ public class AtomicTxnComposer {
         txnSigner = new AtomicTransactionComposer.TransactionSigner(signingAccount);
     }
 
+    @When("I build a payment transaction with sender {string}, receiver {string}, amount {int}, close remainder to {string}")
+    public void i_build_a_payment_transaction_with_sender_receiver_amount_close_remainder_to(String string, String string2, Integer int1, String string3) {
+        PaymentTransactionBuilder<?> builder = PaymentTransactionBuilder.Builder();
+        builder.sender(string).receiver(string2).amount(int1)
+                .fee(fee).flatFee(flatFee)
+                .firstValid(fv).lastValid(lv)
+                .genesisHash(genesisHash).genesisID(genesisID);
+        if (!string3.isEmpty())
+            builder.closeRemainderTo(string3);
+        paymentTxn = builder.build();
+    }
+
     @When("I create a transaction with signer with the current transaction.")
     public void i_create_a_transaction_with_signer_with_the_current_transaction() {
-        this.txnWithSigner = new AtomicTransactionComposer.TransactionWithSigner(this.transSteps.builtTransaction, this.txnSigner);
+        this.txnWithSigner = new AtomicTransactionComposer.TransactionWithSigner(this.paymentTxn, this.txnSigner);
     }
 
     @When("I create a new method arguments array.")
@@ -122,11 +160,11 @@ public class AtomicTxnComposer {
                 .setSigner(txnSigner)
                 .setAppID(appID.longValue())
                 .setMethod(methodABI.method)
-                .setSuggestedParams(this.transSteps.suggestedParams)
-                .setFirstValid(this.transSteps.fv)
-                .setLastValid(this.transSteps.lv)
-                .setFee(this.transSteps.fee)
-                .setFlatFee(this.transSteps.flatFee);
+                .setSuggestedParams(suggestedParams)
+                .setFirstValid(fv)
+                .setLastValid(lv)
+                .setFee(fee)
+                .setFlatFee(flatFee);
         MethodCallOption optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
@@ -140,11 +178,6 @@ public class AtomicTxnComposer {
             errStr = e.getMessage();
         }
         assertThat(errStr).isEqualTo(string);
-    }
-
-    @Then("The composer should have a status of {string}.")
-    public void the_composer_should_have_a_status_of(String string) {
-        assertThat(atc.status).isEqualTo(AtomicTransactionComposer.AtomicTxComposerStatus.valueOf(string));
     }
 
     @Then("I gather signatures with the composer.")
@@ -162,4 +195,5 @@ public class AtomicTxnComposer {
             assertThat(actual).isEqualTo(decodedMsgPack);
         }
     }
+    */
 }
