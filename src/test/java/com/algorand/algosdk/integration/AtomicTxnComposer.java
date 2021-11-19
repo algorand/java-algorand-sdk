@@ -1,10 +1,21 @@
 package com.algorand.algosdk.integration;
 
+import com.algorand.algosdk.abi.ABIType;
+import com.algorand.algosdk.abi.Method;
+import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
+import com.algorand.algosdk.transaction.MethodCallOption;
+import com.algorand.algosdk.util.Encoder;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,6 +25,10 @@ public class AtomicTxnComposer {
     Applications applications;
     AtomicTransactionComposer atc;
     TransactionSteps transSteps;
+    AtomicTransactionComposer.TransactionSigner transSigner;
+    AtomicTransactionComposer.TransactionWithSigner transWithSigner;
+    Method method;
+    MethodCallOption.MethodCallOptionBuilder optionBuilder;
 
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
         base = stepdefs;
@@ -24,9 +39,18 @@ public class AtomicTxnComposer {
     }
 
     @Given("suggested transaction parameters from the algod v2 client")
-    public void suggested_transaction_parameters_from_the_algod_v2_client() {
+    public void suggested_transaction_parameters_from_the_algod_v2_client() throws IOException {
         Clients clientsForTransientAccount = new Clients();
         clientsForTransientAccount.v2Client = base.aclv2;
+        base.aClient();
+        base.getParams();
+
+        transSteps.suggestedParams = base.params;
+        transSteps.genesisHash = transSteps.suggestedParams.getGenesishashb64();
+        transSteps.genesisID = transSteps.suggestedParams.getGenesisID();
+        transSteps.fee = transSteps.suggestedParams.getFee();
+        transSteps.fv = transSteps.suggestedParams.getLastRound();
+        transSteps.lv = transSteps.fv.add(BigInteger.valueOf(1000));
     }
 
     @Given("a new AtomicTransactionComposer")
@@ -41,16 +65,71 @@ public class AtomicTxnComposer {
     }
 
     @When("I make a transaction signer for the transient account.")
-    public void i_make_a_transaction_signer_for_the_transient_account() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    public void i_make_a_transaction_signer_for_the_transient_account() throws NoSuchAlgorithmException {
+        transSigner = new AtomicTransactionComposer.TransactionSigner(new Account());
+    }
+
+    @When("I create a transaction with signer with the current transaction.")
+    public void i_create_a_transaction_with_signer_with_the_current_transaction() {
+        transWithSigner = new AtomicTransactionComposer.TransactionWithSigner(transSteps.builtTransaction, transSigner);
+    }
+
+    @When("I add the current transaction with signer to the composer.")
+    public void i_add_the_current_transaction_with_signer_to_the_composer() {
+        atc.addTransaction(transWithSigner);
     }
 
     @Then("I clone the composer.")
-    public void i_clone_the_composer() {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    public void i_clone_the_composer() throws IOException {
+        atc = atc.cloneAtomicTxnComposer();
     }
+
+    @Then("I gather signatures with the composer.")
+    public void i_gather_signatures_with_the_composer() throws IOException, NoSuchAlgorithmException {
+        atc.gatherSignatures();
+    }
+
+    @When("I create the Method object from method signature {string}")
+    public void i_create_the_method_object_from_method_signature(String string) {
+        method = new Method(string);
+    }
+
+    @When("I create a new method arguments array.")
+    public void i_create_a_new_method_arguments_array() {
+         optionBuilder = new MethodCallOption.MethodCallOptionBuilder();
+    }
+
+
+    @When("I append the current transaction with signer to the method arguments array.")
+    public void i_append_the_current_transaction_with_signer_to_the_method_arguments_array() {
+        this.optionBuilder.addMethodArgs(this.transWithSigner);
+    }
+
+    private List<AtomicTransactionComposer.ABIValue> splitAndProcessABIArgs(String str) {
+        String[] argTokens = str.split(",");
+        List<AtomicTransactionComposer.ABIValue> res = new ArrayList<>();
+
+        int argTokenIndex = 0;
+        for (Method.Arg argType : method.args) {
+            if (Method.TxArgTypes.contains(argType.type))
+                continue;
+            ABIType abiT = ABIType.Of(argType.type);
+            byte[] abiEncoded = Encoder.decodeFromBase64(argTokens[argTokenIndex]);
+            Object decodedValue = abiT.decode(abiEncoded);
+            argTokenIndex++;
+            res.add(new AtomicTransactionComposer.ABIValue(abiT, decodedValue));
+        }
+
+        return res;
+    }
+
+    @When("I append the encoded arguments {string} to the method arguments array.")
+    public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
+        List<AtomicTransactionComposer.ABIValue> processedABIArgs = splitAndProcessABIArgs(string);
+        for (AtomicTransactionComposer.ABIValue arg : processedABIArgs)
+            this.optionBuilder.addMethodArgs(arg);
+    }
+
 
     @Then("I execute the current transaction group with the composer.")
     public void i_execute_the_current_transaction_group_with_the_composer() {
