@@ -42,8 +42,6 @@ public class AtomicTxnComposer {
 
     @Given("suggested transaction parameters from the algod v2 client")
     public void suggested_transaction_parameters_from_the_algod_v2_client() throws IOException {
-        Clients clientsForTransientAccount = new Clients();
-        clientsForTransientAccount.v2Client = base.aclv2;
         base.aClient();
         base.getParams();
 
@@ -127,7 +125,7 @@ public class AtomicTxnComposer {
 
     @Then("I execute the current transaction group with the composer.")
     public void i_execute_the_current_transaction_group_with_the_composer() throws Exception {
-        execRes = atc.execute(base.aclv2, 20);
+        execRes = atc.execute(base.aclv2, 5);
     }
 
     @Then("The app should have returned {string}.")

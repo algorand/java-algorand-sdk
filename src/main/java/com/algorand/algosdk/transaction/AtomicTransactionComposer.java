@@ -13,10 +13,12 @@ import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
+import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
@@ -37,6 +39,7 @@ public class AtomicTransactionComposer {
     public Map<Integer, Method> methodMap = new HashMap<>();
     public List<TransactionWithSigner> transactionList = new ArrayList<>();
     public List<SignedTransaction> signedTxns = new ArrayList<>();
+    public String txID;
 
     public AtomicTransactionComposer() {
         this.status = AtomicTxComposerStatus.BUILDING;
@@ -233,8 +236,23 @@ public class AtomicTransactionComposer {
             return this.getTxIDs();
 
         this.gatherSignatures();
-        client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(this.signedTxns)).execute();
 
+        List<byte[]> encodings = new ArrayList<>();
+        int lengthEncoded = 0;
+        for (SignedTransaction stx : this.signedTxns) {
+            byte[] temp = Encoder.encodeToMsgPack(stx);
+            encodings.add(temp);
+            lengthEncoded += temp.length;
+        }
+        ByteBuffer bf = ByteBuffer.allocate(lengthEncoded);
+        for (byte[] subEncode : encodings)
+            bf.put(subEncode);
+        byte[] encoded = bf.array();
+        Response<PostTransactionsResponse> rPost = client.RawTransaction().rawtxn(encoded).execute();
+
+        if (!rPost.isSuccessful())
+            throw new Exception("transaction should be submitted successfully");
+        this.txID = rPost.body().txId;
         this.status = AtomicTxComposerStatus.SUBMITTED;
         return this.getTxIDs();
     }
@@ -311,6 +329,8 @@ public class AtomicTransactionComposer {
                     parseError
             ));
         }
+
+        this.status = AtomicTxComposerStatus.COMMITTED;
 
         return new ExecuteResult(txInfo.confirmedRound, this.getTxIDs(), retList);
     }
