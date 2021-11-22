@@ -34,13 +34,16 @@ public class AtomicTransactionComposer {
 
     private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
 
-    public Status status;
-    public Map<Integer, Method> methodMap = new HashMap<>();
-    public List<TransactionWithSigner> transactionList = new ArrayList<>();
-    public List<SignedTransaction> signedTxns = new ArrayList<>();
+    private Status status;
+    private final Map<Integer, Method> methodMap;
+    private final List<TransactionWithSigner> transactionList;
+    private List<SignedTransaction> signedTxns;
 
     public AtomicTransactionComposer() {
         this.status = Status.BUILDING;
+        this.methodMap = new HashMap<>();
+        this.transactionList = new ArrayList<>();
+        this.signedTxns = new ArrayList<>();
     }
 
     /**

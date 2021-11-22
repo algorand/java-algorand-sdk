@@ -144,7 +144,7 @@ public class AtomicTxnComposer {
 
     @Then("The composer should have a status of {string}.")
     public void the_composer_should_have_a_status_of(String string) {
-        assertThat(atc.status).isEqualTo(AtomicTransactionComposer.Status.valueOf(string));
+        assertThat(atc.getStatus()).isEqualTo(AtomicTransactionComposer.Status.valueOf(string));
     }
 
     @Then("I gather signatures with the composer.")
