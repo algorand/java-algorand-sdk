@@ -10,7 +10,7 @@ import java.util.List;
 public class MethodCalParams {
     public Long appID;
     public Method method;
-    public List<AtomicTransactionComposer.MethodArgument> methodArgs;
+    public List<Object> methodArgs;
     public String sender, rekeyTo;
     public Transaction.OnCompletion onCompletion;
     public byte[] note, lease;
@@ -18,7 +18,7 @@ public class MethodCalParams {
     AtomicTransactionComposer.TxnSigner signer;
     TransactionParams suggestedParams;
 
-    public MethodCalParams(Long appID, Method method, List<AtomicTransactionComposer.MethodArgument> methodArgs, String sender,
+    public MethodCalParams(Long appID, Method method, List<Object> methodArgs, String sender,
                            TransactionParams sp, Transaction.OnCompletion onCompletion, byte[] note, byte[] lease,
                            BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
                            String rekeyTo, AtomicTransactionComposer.TxnSigner signer) {
@@ -45,7 +45,7 @@ public class MethodCalParams {
     public static class Builder {
         public Long appID;
         public Method method;
-        public List<AtomicTransactionComposer.MethodArgument> methodArgs;
+        public List<Object> methodArgs;
         public String sender, rekeyTo;
         public Transaction.OnCompletion onCompletion;
         public byte[] note, lease;
@@ -68,7 +68,7 @@ public class MethodCalParams {
             return this;
         }
 
-        public Builder addMethodArgs(AtomicTransactionComposer.MethodArgument ma) {
+        public Builder addMethodArgs(Object ma) {
             this.methodArgs.add(ma);
             return this;
         }

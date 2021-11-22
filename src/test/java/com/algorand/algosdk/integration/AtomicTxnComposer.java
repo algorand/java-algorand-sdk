@@ -98,9 +98,9 @@ public class AtomicTxnComposer {
         this.optionBuilder.addMethodArgs(this.transWithSigner);
     }
 
-    private List<AtomicTransactionComposer.ABIValue> splitAndProcessABIArgs(String str) {
+    private List<Object> splitAndProcessABIArgs(String str) {
         String[] argTokens = str.split(",");
-        List<AtomicTransactionComposer.ABIValue> res = new ArrayList<>();
+        List<Object> res = new ArrayList<>();
 
         int argTokenIndex = 0;
         for (Method.Arg argType : method.args) {
@@ -108,9 +108,8 @@ public class AtomicTxnComposer {
                 continue;
             ABIType abiT = ABIType.valueOf(argType.type);
             byte[] abiEncoded = Encoder.decodeFromBase64(argTokens[argTokenIndex]);
-            Object decodedValue = abiT.decode(abiEncoded);
+            res.add(abiT.decode(abiEncoded));
             argTokenIndex++;
-            res.add(new AtomicTransactionComposer.ABIValue(abiT, decodedValue));
         }
 
         return res;
@@ -118,8 +117,8 @@ public class AtomicTxnComposer {
 
     @When("I append the encoded arguments {string} to the method arguments array.")
     public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
-        List<AtomicTransactionComposer.ABIValue> processedABIArgs = splitAndProcessABIArgs(string);
-        for (AtomicTransactionComposer.ABIValue arg : processedABIArgs)
+        List<Object> processedABIArgs = splitAndProcessABIArgs(string);
+        for (Object arg : processedABIArgs)
             this.optionBuilder.addMethodArgs(arg);
     }
 

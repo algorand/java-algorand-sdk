@@ -72,7 +72,6 @@ public class AtomicTransactionComposer {
             byte[] txSerialized = om.writeValueAsBytes(txWithSigner.txn);
             Transaction tx = om.readValue(txSerialized, Transaction.class);
             tx.group = new Digest();
-            // We might need the same signer, so I wonder if the signer should be shallow copied...
             TransactionWithSigner newTxWithSigner = new TransactionWithSigner(tx, txWithSigner.signer);
             cloned.transactionList.add(newTxWithSigner);
         }
@@ -111,32 +110,38 @@ public class AtomicTransactionComposer {
         List<byte[]> encodedABIArgs = new ArrayList<>();
         encodedABIArgs.add(methodCall.method.getSelector());
 
-        List<ABIValue> abiValues = new ArrayList<>();
-        for (MethodArgument arg : methodCall.methodArgs) {
-            if (arg instanceof ABIValue) {
-                abiValues.add((ABIValue) arg);
-            } else if (arg instanceof TransactionWithSigner) {
-                this.addTransaction((TransactionWithSigner) arg);
-            } else
-                throw new IllegalArgumentException("MethodArgument should only be ABI value or transaction with signer");
+        List<Object> methodArgs = new ArrayList<>();
+        List<ABIType> methodABIts = new ArrayList<>();
+
+        for (int i = 0; i < methodCall.method.args.size(); i++) {
+            Method.Arg argT = methodCall.method.args.get(i);
+            Object methodArg = methodCall.methodArgs.get(i);
+            if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
+                transactionList.add((TransactionWithSigner) methodArg);
+            } else {
+                methodArgs.add(methodArg);
+                methodABIts.add(argT.parsedType);
+            }
         }
 
-        if (abiValues.size() > 14) {
-            List<ABIType> abiTypes = new ArrayList<>();
-            List<Object> values = new ArrayList<>();
+        if (methodArgs.size() > 14) {
+            List<ABIType> wrappedABITypes = new ArrayList<>();
+            List<Object> wrappedValues = new ArrayList<>();
 
-            for (int i = 14; i < abiValues.size(); i++) {
-                abiTypes.add(abiValues.get(i).abiType);
-                values.add(abiValues.get(i).value);
+            for (int i = 14; i < methodArgs.size(); i++) {
+                wrappedABITypes.add(methodABIts.get(i));
+                wrappedValues.add(methodArgs.get(i));
             }
 
-            TypeTuple tupleT = new TypeTuple(abiTypes);
-            abiValues = abiValues.subList(0, 14);
-            abiValues.add(new ABIValue(tupleT, values));
+            TypeTuple tupleT = new TypeTuple(wrappedABITypes);
+            methodABIts = methodABIts.subList(0, 14);
+            methodABIts.add(tupleT);
+            methodArgs = methodArgs.subList(0, 14);
+            methodArgs.add(wrappedValues);
         }
 
-        for (ABIValue v : abiValues)
-            encodedABIArgs.add(v.abiType.encode(v.value));
+        for (int i = 0; i < methodArgs.size(); i++)
+            encodedABIArgs.add(methodABIts.get(i).encode(methodArgs.get(i)));
 
         ApplicationCallTransactionBuilder<?> txBuilder = ApplicationCallTransactionBuilder.Builder();
 
@@ -294,18 +299,31 @@ public class AtomicTransactionComposer {
      * (void), then the method results array will contain null for that method's return value.
      */
     public ExecuteResult execute(AlgodClient client, int waitRounds) throws Exception {
-        if (this.status.compareTo(Status.SUBMITTED) > 0)
+        if (this.status == Status.COMMITTED)
             throw new IllegalArgumentException("status shows this is already committed");
         if (waitRounds < 0)
             throw new IllegalArgumentException("wait round for execute should be non-negative");
         this.submit(client);
+
+        int firstMethodCallIndex = -1;
+        for (int i = 0; i < this.signedTxns.size(); i++) {
+            if (this.signedTxns.get(i).tx.type.equals(Transaction.Type.ApplicationCall)) {
+                firstMethodCallIndex = i;
+                break;
+            }
+        }
+        firstMethodCallIndex = (firstMethodCallIndex == -1) ? 0 : firstMethodCallIndex;
+
         PendingTransactionResponse txInfo =
-                Utils.waitForConfirmation(client, this.signedTxns.get(0).transactionID, waitRounds);
+                Utils.waitForConfirmation(client, this.signedTxns.get(firstMethodCallIndex).transactionID, waitRounds);
         List<ReturnValue> retList = new ArrayList<>();
+
+        this.status = Status.COMMITTED;
 
         for (int i = 0; i < this.transactionList.size(); i++) {
             if (!this.methodMap.containsKey(i))
                 continue;
+
             if (this.methodMap.get(i).returns.type.equals("void")) {
                 retList.add(new ReturnValue(
                         this.transactionList.get(i).txn.txID(),
@@ -349,12 +367,11 @@ public class AtomicTransactionComposer {
             }
 
             byte[] abiEncoded = Arrays.copyOfRange(retLine, 4, retLine.length);
-            ABIValue decoded = null;
+            Object decoded = null;
             String parseError = null;
             try {
                 ABIType ABIType = this.methodMap.get(i).returns.parsedType;
-                Object decodedVar = ABIType.decode(abiEncoded);
-                decoded = new ABIValue(ABIType, decodedVar);
+                decoded = ABIType.decode(abiEncoded);
             } catch (Exception e) {
                 parseError = e.getMessage();
             }
@@ -365,8 +382,6 @@ public class AtomicTransactionComposer {
                     parseError
             ));
         }
-
-        this.status = Status.COMMITTED;
 
         return new ExecuteResult(txInfo.confirmedRound, this.getTxIDs(), retList);
     }
@@ -396,10 +411,10 @@ public class AtomicTransactionComposer {
     public static class ReturnValue {
         public String txID;
         public byte[] rawValue;
-        public ABIValue value;
+        public Object value;
         public String parseError;
 
-        public ReturnValue(String txID, byte[] rawValue, ABIValue value, String parseError) {
+        public ReturnValue(String txID, byte[] rawValue, Object value, String parseError) {
             this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;
@@ -416,21 +431,7 @@ public class AtomicTransactionComposer {
                 throws NoSuchAlgorithmException, IOException;
     }
 
-    public interface MethodArgument {
-    }
-
-    public static class ABIValue implements MethodArgument {
-        public ABIType abiType;
-        public Object value;
-
-        public ABIValue(ABIType abiType, Object value) {
-            abiType.encode(value);
-            this.abiType = abiType;
-            this.value = value;
-        }
-    }
-
-    public static class TransactionWithSigner implements MethodArgument {
+    public static class TransactionWithSigner {
         public Transaction txn;
         public TxnSigner signer;
 
