@@ -13,6 +13,7 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.annotation.Signed;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
@@ -199,6 +200,11 @@ public class AtomicTransactionComposer {
             return this.signedTxns;
 
         List<TransactionWithSigner> txnAndSignerList = this.buildGroup();
+
+        // TODO how to setup a map from transactionSigner to indices
+        Map<TxnSigner, List<Integer>> transSignerToIndices = new HashMap<>();
+        List<SignedTransaction> tempSignedTxns = new ArrayList<>();
+
         for (TransactionWithSigner tws : txnAndSignerList) {
             SignedTransaction stxn = tws.signer.signTxn(tws.txn);
             this.signedTxns.add(stxn);
@@ -279,7 +285,7 @@ public class AtomicTransactionComposer {
         for (int i = 0; i < this.transactionList.size(); i++) {
             if (!this.methodMap.containsKey(i))
                 continue;
-            if (this.methodMap.get(i).returns.equals(new Method.Returns("void", null))) {
+            if (this.methodMap.get(i).returns.type.equals("void")) {
                 retList.add(new ReturnValue(
                         this.transactionList.get(i).txn.txID(),
                         new byte[]{},
@@ -290,8 +296,15 @@ public class AtomicTransactionComposer {
             }
             Response<PendingTransactionResponse> resp =
                     client.PendingTransactionInformation(this.transactionList.get(i).txn.txID()).execute();
-            if (!resp.isSuccessful())
-                throw new IllegalArgumentException("cannot get response from client");
+            if (!resp.isSuccessful()) {
+                retList.add(new ReturnValue(
+                        null,
+                        null,
+                        null,
+                        resp.message()
+                ));
+                continue;
+            }
 
             // question why it is not replying anything in log?
             PendingTransactionResponse respBody = resp.body();
@@ -309,13 +322,13 @@ public class AtomicTransactionComposer {
 
             byte[] abiEncoded = Arrays.copyOfRange(retLine, 4, retLine.length);
             ABIValue decoded = null;
-            Exception parseError = null;
+            String parseError = null;
             try {
                 ABIType ABIType = com.algorand.algosdk.abi.ABIType.valueOf(this.methodMap.get(i).returns.type);
                 Object decodedVar = ABIType.decode(abiEncoded);
                 decoded = new ABIValue(ABIType, decodedVar);
             } catch (Exception e) {
-                parseError = e;
+                parseError = e.getMessage();
             }
             retList.add(new ReturnValue(
                     this.transactionList.get(i).txn.txID(),
@@ -356,9 +369,9 @@ public class AtomicTransactionComposer {
         public String txID;
         public byte[] rawValue;
         public ABIValue value;
-        public Exception parseError;
+        public String parseError;
 
-        public ReturnValue(String txID, byte[] rawValue, ABIValue value, Exception parseError) {
+        public ReturnValue(String txID, byte[] rawValue, ABIValue value, String parseError) {
             this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;
