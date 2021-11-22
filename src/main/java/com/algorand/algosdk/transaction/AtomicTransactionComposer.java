@@ -317,8 +317,15 @@ public class AtomicTransactionComposer {
                 retLine = line;
                 break;
             }
-            if (retLine == null)
-                throw new IllegalArgumentException("expected to find logged return value, got none");
+            if (retLine == null) {
+                retList.add(new ReturnValue(
+                        null,
+                        null,
+                        null,
+                        "expected to find logged return value, got none"
+                ));
+                continue;
+            }
 
             byte[] abiEncoded = Arrays.copyOfRange(retLine, 4, retLine.length);
             ABIValue decoded = null;
