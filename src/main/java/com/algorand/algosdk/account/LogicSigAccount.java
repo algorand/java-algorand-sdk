@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LogicSigAccount {
     public final Ed25519PublicKey sigKey;
@@ -163,6 +164,11 @@ public class LogicSigAccount {
         final LogicSigAccount self = this;
 
         return new AtomicTransactionComposer.TxnSigner() {
+            @Override
+            public int hashCode() {
+                return Objects.hash(2, self);
+            }
+
             @Override
             public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException {
                 return self.signLogicSigTransaction(txn);

@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.
@@ -688,6 +689,11 @@ public class Account {
         final Account self = this;
 
         return new AtomicTransactionComposer.TxnSigner() {
+            @Override
+            public int hashCode() {
+                return Objects.hash(1, self);
+            }
+
             @Override
             public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException {
                 return self.signTransaction(txn);

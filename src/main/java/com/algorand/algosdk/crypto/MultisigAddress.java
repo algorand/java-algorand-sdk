@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.*;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -118,12 +119,17 @@ public class MultisigAddress implements Serializable {
         return Objects.hash(version, threshold, publicKeys);
     }
 
-    public AtomicTransactionComposer.TxnSigner getTransactionSigner(byte[][] sks) throws NoSuchAlgorithmException {
+    public AtomicTransactionComposer.TxnSigner getTransactionSigner(final byte[][] sks) throws NoSuchAlgorithmException {
         final MultisigAddress self = this;
         final List<Account> msigAccounts = new ArrayList<>();
         for (byte[] sk : sks) msigAccounts.add(new Account(sk));
 
         return new AtomicTransactionComposer.TxnSigner() {
+            @Override
+            public int hashCode() {
+                return Objects.hash(3, self, Arrays.deepHashCode(sks));
+            }
+
             @Override
             public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException {
                 final List<SignedTransaction> multiStxns = new ArrayList<>();

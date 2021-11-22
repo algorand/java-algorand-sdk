@@ -12,8 +12,8 @@ import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.ArrayUtils;
 
-import javax.annotation.Signed;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
@@ -201,15 +201,35 @@ public class AtomicTransactionComposer {
 
         List<TransactionWithSigner> txnAndSignerList = this.buildGroup();
 
-        // TODO how to setup a map from transactionSigner to indices
-        Map<TxnSigner, List<Integer>> transSignerToIndices = new HashMap<>();
-        List<SignedTransaction> tempSignedTxns = new ArrayList<>();
+        HashMap<TxnSigner, List<Integer>> transSignerToIndices = new HashMap<>();
+        List<SignedTransaction> tempSignedTxns = new ArrayList<>(Collections.nCopies(txnAndSignerList.size(), null));
 
-        for (TransactionWithSigner tws : txnAndSignerList) {
-            SignedTransaction stxn = tws.signer.signTxn(tws.txn);
-            this.signedTxns.add(stxn);
+        for (int i = 0; i < txnAndSignerList.size(); i++) {
+            TransactionWithSigner tws = txnAndSignerList.get(i);
+            if (transSignerToIndices.containsKey(tws.signer)) {
+                List<Integer> curr = transSignerToIndices.get(tws.signer);
+                curr.add(i);
+                transSignerToIndices.put(tws.signer, curr);
+            } else {
+                List<Integer> init = new ArrayList<>();
+                init.add(i);
+                transSignerToIndices.put(tws.signer, init);
+            }
         }
 
+        Transaction[] txnGroup = new Transaction[txnAndSignerList.size()];
+        for (int i = 0; i < txnAndSignerList.size(); i++)
+            txnGroup[i] = txnAndSignerList.get(i).txn;
+
+        for (TxnSigner txnSigner : transSignerToIndices.keySet()) {
+            List<Integer> indices = transSignerToIndices.get(txnSigner);
+            int[] indicesPrimitive = ArrayUtils.toPrimitive(indices.toArray(new Integer[0]));
+            SignedTransaction[] signed = txnSigner.signTxnGroup(txnGroup, indicesPrimitive);
+            for (int i = 0; i < indicesPrimitive.length; i++)
+                tempSignedTxns.set(indicesPrimitive[i], signed[i]);
+        }
+
+        this.signedTxns = tempSignedTxns;
         this.status = Status.SIGNED;
         return this.signedTxns;
     }
@@ -387,6 +407,8 @@ public class AtomicTransactionComposer {
     }
 
     public interface TxnSigner {
+        int hashCode();
+
         SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException;
 
         SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
