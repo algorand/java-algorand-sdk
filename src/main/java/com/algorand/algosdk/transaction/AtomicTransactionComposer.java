@@ -64,7 +64,6 @@ public class AtomicTransactionComposer {
      */
     public AtomicTransactionComposer cloneAtomicTxnComposer() throws IOException {
         AtomicTransactionComposer cloned = new AtomicTransactionComposer();
-        cloned.signedTxns = new ArrayList<>();
         for (Map.Entry<Integer, Method> entry : this.methodMap.entrySet())
             cloned.methodMap.put(entry.getKey(), new Method(entry.getValue()));
         ObjectMapper om = new ObjectMapper();
