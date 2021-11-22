@@ -15,7 +15,6 @@ import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -23,7 +22,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class AtomicTransactionComposer {
-    public enum AtomicTxComposerStatus {
+    public enum Status {
         BUILDING,
         BUILT,
         SIGNED,
@@ -31,23 +30,23 @@ public class AtomicTransactionComposer {
         COMMITTED
     }
 
-    private static final int MAX_GROUP_SIZE = 16;
+    public static final int MAX_GROUP_SIZE = 16;
 
     private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
 
-    public AtomicTxComposerStatus status;
+    public Status status;
     public Map<Integer, Method> methodMap = new HashMap<>();
     public List<TransactionWithSigner> transactionList = new ArrayList<>();
     public List<SignedTransaction> signedTxns = new ArrayList<>();
 
     public AtomicTransactionComposer() {
-        this.status = AtomicTxComposerStatus.BUILDING;
+        this.status = Status.BUILDING;
     }
 
     /**
      * Get the status of this composer's transaction group.
      */
-    public AtomicTxComposerStatus getStatus() {
+    public Status getStatus() {
         return this.status;
     }
 
@@ -90,7 +89,7 @@ public class AtomicTransactionComposer {
             if (b != 0)
                 throw new IllegalArgumentException("Atomic Transaction Composer group field must be zero");
         }
-        if (!this.status.equals(AtomicTxComposerStatus.BUILDING))
+        if (!this.status.equals(Status.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer only add transaction in BUILDING stage");
         if (this.transactionList.size() == MAX_GROUP_SIZE)
             throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE == 16 transactions");
@@ -104,8 +103,8 @@ public class AtomicTransactionComposer {
      * causes the current group to exceed MAX_GROUP_SIZE, or if the provided arguments are invalid
      * for the given method.
      */
-    public void addMethodCall(MethodCallOption methodCall) {
-        if (!this.status.equals(AtomicTxComposerStatus.BUILDING))
+    public void addMethodCall(MethodCalParams methodCall) {
+        if (!this.status.equals(Status.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer must be in BUILDING stage");
         if (this.transactionList.size() + methodCall.method.getTxnCallCount() > MAX_GROUP_SIZE)
             throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE = 16 transactions");
@@ -151,8 +150,8 @@ public class AtomicTransactionComposer {
                 .flatFee(methodCall.flatFee)
                 .applicationId(methodCall.appID)
                 .args(encodedABIArgs)
-                .note(ArrayUtils.toPrimitive(methodCall.note))
-                .lease(ArrayUtils.toPrimitive(methodCall.lease));
+                .note(methodCall.note)
+                .lease(methodCall.lease);
 
         if (methodCall.rekeyTo != null)
             txBuilder.rekey(methodCall.rekeyTo);
@@ -171,7 +170,7 @@ public class AtomicTransactionComposer {
      * The composer's status will be at least BUILT after executing this method.
      */
     public List<TransactionWithSigner> buildGroup() throws IOException {
-        if (this.status.compareTo(AtomicTxComposerStatus.BUILT) >= 0)
+        if (this.status.compareTo(Status.BUILT) >= 0)
             return this.transactionList;
 
         if (this.transactionList.size() == 0)
@@ -183,7 +182,7 @@ public class AtomicTransactionComposer {
         for (TransactionWithSigner transactionWithSigner : this.transactionList)
             transactionWithSigner.txn.assignGroupID(groupID);
 
-        this.status = AtomicTxComposerStatus.BUILT;
+        this.status = Status.BUILT;
         return this.transactionList;
     }
 
@@ -198,7 +197,7 @@ public class AtomicTransactionComposer {
      * @return an array of signed transactions.
      */
     public List<SignedTransaction> gatherSignatures() throws IOException, NoSuchAlgorithmException {
-        if (this.status.compareTo(AtomicTxComposerStatus.SIGNED) >= 0)
+        if (this.status.compareTo(Status.SIGNED) >= 0)
             return this.signedTxns;
 
         List<TransactionWithSigner> txnAndSignerList = this.buildGroup();
@@ -207,7 +206,7 @@ public class AtomicTransactionComposer {
             this.signedTxns.add(stxn);
         }
 
-        this.status = AtomicTxComposerStatus.SIGNED;
+        this.status = Status.SIGNED;
         return this.signedTxns;
     }
 
@@ -229,9 +228,9 @@ public class AtomicTransactionComposer {
      * @return If the submission is successful, resolves to a list of TxIDs of the submitted transactions.
      */
     public List<String> submit(AlgodClient client) throws Exception {
-        if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) > 0)
+        if (this.status.compareTo(Status.SUBMITTED) > 0)
             throw new IllegalArgumentException("Atomic Transaction Composer cannot submit committed transaction");
-        else if (this.status.equals(AtomicTxComposerStatus.SUBMITTED))
+        else if (this.status.equals(Status.SUBMITTED))
             return this.getTxIDs();
 
         this.gatherSignatures();
@@ -252,7 +251,7 @@ public class AtomicTransactionComposer {
         if (!rPost.isSuccessful())
             throw new Exception("transaction should be submitted successfully");
 
-        this.status = AtomicTxComposerStatus.SUBMITTED;
+        this.status = Status.SUBMITTED;
         return this.getTxIDs();
     }
 
@@ -272,7 +271,7 @@ public class AtomicTransactionComposer {
      * (void), then the method results array will contain null for that method's return value.
      */
     public ExecuteResult execute(AlgodClient client, int waitRounds) throws Exception {
-        if (this.status.compareTo(AtomicTxComposerStatus.SUBMITTED) > 0)
+        if (this.status.compareTo(Status.SUBMITTED) > 0)
             throw new IllegalArgumentException("status shows this is already committed");
         if (waitRounds < 0)
             throw new IllegalArgumentException("wait round for execute should be non-negative");
@@ -330,7 +329,7 @@ public class AtomicTransactionComposer {
             ));
         }
 
-        this.status = AtomicTxComposerStatus.COMMITTED;
+        this.status = Status.COMMITTED;
 
         return new ExecuteResult(txInfo.confirmedRound, this.getTxIDs(), retList);
     }

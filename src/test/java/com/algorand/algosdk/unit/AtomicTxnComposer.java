@@ -7,7 +7,7 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
-import com.algorand.algosdk.transaction.MethodCallOption;
+import com.algorand.algosdk.transaction.MethodCalParams;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
@@ -38,7 +38,7 @@ public class AtomicTxnComposer {
     List<SignedTransaction> signedTxnsGathered;
 
     AtomicTransactionComposer.TransactionWithSigner txnWithSigner;
-    MethodCallOption.MethodCallOptionBuilder optionBuilder;
+    MethodCalParams.Builder optionBuilder;
 
     public AtomicTxnComposer(Base b, ABIJson methodABI_, TransactionSteps steps) {
         base = b;
@@ -76,7 +76,7 @@ public class AtomicTxnComposer {
 
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
-        this.optionBuilder = new MethodCallOption.MethodCallOptionBuilder();
+        this.optionBuilder = new MethodCalParams.Builder();
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
@@ -127,7 +127,7 @@ public class AtomicTxnComposer {
                 .setLastValid(this.transSteps.lv)
                 .setFee(this.transSteps.fee)
                 .setFlatFee(this.transSteps.flatFee);
-        MethodCallOption optionBuild = optionBuilder.build();
+        MethodCalParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
 
@@ -144,7 +144,7 @@ public class AtomicTxnComposer {
 
     @Then("The composer should have a status of {string}.")
     public void the_composer_should_have_a_status_of(String string) {
-        assertThat(atc.status).isEqualTo(AtomicTransactionComposer.AtomicTxComposerStatus.valueOf(string));
+        assertThat(atc.status).isEqualTo(AtomicTransactionComposer.Status.valueOf(string));
     }
 
     @Then("I gather signatures with the composer.")

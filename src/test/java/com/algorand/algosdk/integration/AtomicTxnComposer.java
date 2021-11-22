@@ -4,7 +4,7 @@ import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
-import com.algorand.algosdk.transaction.MethodCallOption;
+import com.algorand.algosdk.transaction.MethodCalParams;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 import io.cucumber.java.en.Given;
@@ -28,7 +28,7 @@ public class AtomicTxnComposer {
     AtomicTransactionComposer.TransactionSigner transSigner;
     AtomicTransactionComposer.TransactionWithSigner transWithSigner;
     Method method;
-    MethodCallOption.MethodCallOptionBuilder optionBuilder;
+    MethodCalParams.Builder optionBuilder;
     AtomicTransactionComposer.ExecuteResult execRes;
 
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
@@ -90,7 +90,7 @@ public class AtomicTxnComposer {
 
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
-         optionBuilder = new MethodCallOption.MethodCallOptionBuilder();
+         optionBuilder = new MethodCalParams.Builder();
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
@@ -137,7 +137,7 @@ public class AtomicTxnComposer {
 
     @Then("The composer should have a status of {string}.")
     public void the_composer_should_have_a_status_of(String string) {
-        assertThat(atc.status).isEqualTo(AtomicTransactionComposer.AtomicTxComposerStatus.valueOf(string));
+        assertThat(atc.status).isEqualTo(AtomicTransactionComposer.Status.valueOf(string));
     }
 
     @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
@@ -153,7 +153,7 @@ public class AtomicTxnComposer {
                 .setFirstValid(transSteps.fv)
                 .setLastValid(transSteps.lv)
                 .setFee(transSteps.fee);
-        MethodCallOption optionBuild = optionBuilder.build();
+        MethodCalParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
 
