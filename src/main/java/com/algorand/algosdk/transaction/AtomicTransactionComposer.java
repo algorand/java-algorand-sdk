@@ -202,7 +202,8 @@ public class AtomicTransactionComposer {
         List<TransactionWithSigner> txnAndSignerList = this.buildGroup();
 
         HashMap<TxnSigner, List<Integer>> transSignerToIndices = new HashMap<>();
-        List<SignedTransaction> tempSignedTxns = new ArrayList<>(Collections.nCopies(txnAndSignerList.size(), null));
+        List<SignedTransaction> tempSignedTxns = new ArrayList<>();
+        for (int i = 0; i < txnAndSignerList.size(); i++) tempSignedTxns.add(null);
 
         for (int i = 0; i < txnAndSignerList.size(); i++) {
             TransactionWithSigner tws = txnAndSignerList.get(i);
@@ -351,7 +352,7 @@ public class AtomicTransactionComposer {
             ABIValue decoded = null;
             String parseError = null;
             try {
-                ABIType ABIType = com.algorand.algosdk.abi.ABIType.valueOf(this.methodMap.get(i).returns.type);
+                ABIType ABIType = this.methodMap.get(i).returns.parsedType;
                 Object decodedVar = ABIType.decode(abiEncoded);
                 decoded = new ABIValue(ABIType, decodedVar);
             } catch (Exception e) {

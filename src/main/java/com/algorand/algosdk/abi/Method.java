@@ -154,19 +154,23 @@ public class Method {
         public String type;
         @JsonProperty("desc")
         public String desc;
+        @JsonIgnore
+        public ABIType parsedType;
 
         @JsonCreator
         public Returns(
                 @JsonProperty("type") String type,
                 @JsonProperty("desc") String desc
         ) {
-            this.type = type.equals("void") ?
-                    type : ABIType.valueOf(Objects.requireNonNull(type, "type must not be null")).toString();
+            String typeStr = Objects.requireNonNull(type, "type must not be null");
+            this.parsedType = typeStr.equals("void") ? null : ABIType.valueOf(typeStr);
+            this.type = typeStr;
             this.desc = desc;
         }
 
         public Returns(Returns otherRet) {
             this(otherRet.type, otherRet.desc);
+            this.parsedType = otherRet.parsedType;
         }
 
         @Override
@@ -185,6 +189,8 @@ public class Method {
         public String type;
         @JsonProperty("desc")
         public String desc;
+        @JsonIgnore
+        public ABIType parsedType;
 
         @JsonCreator
         public Arg(
@@ -195,14 +201,13 @@ public class Method {
             this.name = name;
             this.desc = desc;
             String typeStr = Objects.requireNonNull(type, "type must not be null");
-            if (Method.TxArgTypes.contains(typeStr))
-                this.type = typeStr;
-            else
-                this.type = ABIType.valueOf(typeStr).toString();
+            this.parsedType = Method.TxArgTypes.contains(typeStr) ? null : ABIType.valueOf(typeStr);
+            this.type = typeStr;
         }
 
         public Arg(Arg otherArg) {
             this(otherArg.name, otherArg.type, otherArg.desc);
+            this.parsedType = otherArg.parsedType;
         }
 
         @Override
