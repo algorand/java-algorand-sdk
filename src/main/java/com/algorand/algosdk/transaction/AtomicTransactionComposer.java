@@ -85,10 +85,8 @@ public class AtomicTransactionComposer {
      * causes the current group to exceed MAX_GROUP_SIZE.
      */
     public void addTransaction(TransactionWithSigner txnAndSigner) {
-        for (byte b : txnAndSigner.txn.group.getBytes()) {
-            if (b != 0)
-                throw new IllegalArgumentException("Atomic Transaction Composer group field must be zero");
-        }
+        if (!txnAndSigner.txn.group.equals(new Digest()))
+            throw new IllegalArgumentException("Atomic Transaction Composer group field must be zero");
         if (!this.status.equals(Status.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer only add transaction in BUILDING stage");
         if (this.transactionList.size() == MAX_GROUP_SIZE)
@@ -230,8 +228,6 @@ public class AtomicTransactionComposer {
     public List<String> submit(AlgodClient client) throws Exception {
         if (this.status.compareTo(Status.SUBMITTED) > 0)
             throw new IllegalArgumentException("Atomic Transaction Composer cannot submit committed transaction");
-        else if (this.status.equals(Status.SUBMITTED))
-            return this.getTxIDs();
 
         this.gatherSignatures();
 
