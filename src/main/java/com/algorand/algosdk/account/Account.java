@@ -6,6 +6,7 @@ import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
 import com.algorand.algosdk.mnemonic.Mnemonic;
+import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.CryptoProvider;
@@ -681,6 +682,26 @@ public class Account {
             this.nextBytes(bytes);
             return bytes;
         }
+    }
+
+    public AtomicTransactionComposer.TxnSigner getTransactionSigner() {
+        final Account self = this;
+
+        return new AtomicTransactionComposer.TxnSigner() {
+            @Override
+            public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException {
+                return self.signTransaction(txn);
+            }
+
+            @Override
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
+                    throws NoSuchAlgorithmException {
+                SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
+                for (int i = 0; i < indicesToSign.length; i++)
+                    sTxn[i] = self.signTransaction(txnGroup[indicesToSign[i]]);
+                return sTxn;
+            }
+        };
     }
 
 }

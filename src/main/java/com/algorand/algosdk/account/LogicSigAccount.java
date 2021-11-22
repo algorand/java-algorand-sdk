@@ -1,6 +1,7 @@
 package com.algorand.algosdk.account;
 
 import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 
@@ -156,5 +157,25 @@ public class LogicSigAccount {
     public SignedTransaction signLogicSigTransaction(Transaction tx)
             throws NoSuchAlgorithmException, IOException {
         return Account.signLogicTransactionWithAddress(this.lsig, this.getAddress(), tx);
+    }
+
+    public AtomicTransactionComposer.TxnSigner getTransactionSigner() {
+        final LogicSigAccount self = this;
+
+        return new AtomicTransactionComposer.TxnSigner() {
+            @Override
+            public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException {
+                return self.signLogicSigTransaction(txn);
+            }
+
+            @Override
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
+                    throws NoSuchAlgorithmException, IOException {
+                SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
+                for (int i = 0; i < indicesToSign.length; i++)
+                    sTxn[i] = self.signLogicSigTransaction(txnGroup[indicesToSign[i]]);
+                return sTxn;
+            }
+        };
     }
 }

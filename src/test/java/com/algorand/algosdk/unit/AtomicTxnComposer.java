@@ -34,7 +34,7 @@ public class AtomicTxnComposer {
 
     TransactionSteps transSteps;
     Account signingAccount;
-    AtomicTransactionComposer.TransactionSigner txnSigner;
+    AtomicTransactionComposer.TxnSigner txnSigner;
     List<SignedTransaction> signedTxnsGathered;
 
     AtomicTransactionComposer.TransactionWithSigner txnWithSigner;
@@ -66,7 +66,7 @@ public class AtomicTxnComposer {
     @When("I make a transaction signer for the signing account.")
     public void i_make_a_transaction_signer_for_the_signing_account() {
         signingAccount = base.signingAccounts.values().iterator().next();
-        txnSigner = new AtomicTransactionComposer.TransactionSigner(signingAccount);
+        txnSigner = signingAccount.getTransactionSigner();
     }
 
     @When("I create a transaction with signer with the current transaction.")

@@ -3,11 +3,8 @@ package com.algorand.algosdk.transaction;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.TypeTuple;
-import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.account.LogicSigAccount;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Digest;
-import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
@@ -369,56 +366,11 @@ public class AtomicTransactionComposer {
         }
     }
 
-    public static class TransactionSigner {
-        protected enum SignedBy {
-            BasicAccount,
-            LogicSigAccount,
-            MultiSigAccount
-        }
+    public interface TxnSigner {
+        SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException;
 
-        protected TransactionSigner.SignedBy signedBy;
-        protected Account acc;
-        protected LogicSigAccount lsa;
-        protected List<Account> msigAccounts = new ArrayList<>();
-        protected MultisigAddress msigAddr;
-
-        public TransactionSigner(Account acc) {
-            this.signedBy = SignedBy.BasicAccount;
-            this.acc = acc;
-        }
-
-        public TransactionSigner(LogicSigAccount lsa) {
-            this.signedBy = SignedBy.LogicSigAccount;
-            this.lsa = lsa;
-        }
-
-        public TransactionSigner(MultisigAddress msigAddr, byte[][] sks) throws NoSuchAlgorithmException {
-            this.signedBy = SignedBy.MultiSigAccount;
-            this.msigAddr = msigAddr;
-            for (byte[] sk : sks) this.msigAccounts.add(new Account(sk));
-        }
-
-        public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
-                throws NoSuchAlgorithmException, IOException {
-            List<SignedTransaction> signedTxns = new ArrayList<>();
-            for (int index : indicesToSign)
-                signedTxns.add(this.signTxn(txnGroup[index]));
-            return signedTxns.toArray(new SignedTransaction[0]);
-        }
-
-        public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException {
-            if (this.signedBy == SignedBy.BasicAccount) {
-                return acc.signTransaction(txn);
-            } else if (this.signedBy == SignedBy.LogicSigAccount) {
-                return lsa.signLogicSigTransaction(txn);
-            } else if (this.signedBy == SignedBy.MultiSigAccount) {
-                List<SignedTransaction> multiStxns = new ArrayList<>();
-                for (Account acc : this.msigAccounts)
-                    multiStxns.add(acc.signMultisigTransaction(this.msigAddr, txn));
-                return Account.mergeMultisigTransactions(multiStxns.toArray(new SignedTransaction[0]));
-            } else
-                throw new IllegalArgumentException("atomic transaction signer cannot infer sign transaction by who");
-        }
+        SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
+                throws NoSuchAlgorithmException, IOException;
     }
 
     public interface MethodArgument {
@@ -437,9 +389,9 @@ public class AtomicTransactionComposer {
 
     public static class TransactionWithSigner implements MethodArgument {
         public Transaction txn;
-        public TransactionSigner signer;
+        public TxnSigner signer;
 
-        public TransactionWithSigner(Transaction txn, TransactionSigner signer) {
+        public TransactionWithSigner(Transaction txn, TxnSigner signer) {
             this.txn = txn;
             this.signer = signer;
         }

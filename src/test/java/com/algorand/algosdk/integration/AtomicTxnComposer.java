@@ -25,7 +25,7 @@ public class AtomicTxnComposer {
     Applications applications;
     AtomicTransactionComposer atc;
     TransactionSteps transSteps;
-    AtomicTransactionComposer.TransactionSigner transSigner;
+    AtomicTransactionComposer.TxnSigner transSigner;
     AtomicTransactionComposer.TransactionWithSigner transWithSigner;
     Method method;
     MethodCalParams.Builder optionBuilder;
@@ -60,7 +60,7 @@ public class AtomicTxnComposer {
 
     @When("I make a transaction signer for the transient account.")
     public void i_make_a_transaction_signer_for_the_transient_account() {
-        transSigner = new AtomicTransactionComposer.TransactionSigner(applications.transientAccount.transientAccount);
+        transSigner = applications.transientAccount.transientAccount.getTransactionSigner();
     }
 
     @When("I create a transaction with signer with the current transaction.")
