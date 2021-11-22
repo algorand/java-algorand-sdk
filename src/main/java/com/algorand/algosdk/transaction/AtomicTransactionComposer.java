@@ -316,7 +316,7 @@ public class AtomicTransactionComposer {
             ABIValue decoded = null;
             Exception parseError = null;
             try {
-                ABIType ABIType = com.algorand.algosdk.abi.ABIType.Of(this.methodMap.get(i).returns.type);
+                ABIType ABIType = com.algorand.algosdk.abi.ABIType.valueOf(this.methodMap.get(i).returns.type);
                 Object decodedVar = ABIType.decode(abiEncoded);
                 decoded = new ABIValue(ABIType, decodedVar);
             } catch (Exception e) {

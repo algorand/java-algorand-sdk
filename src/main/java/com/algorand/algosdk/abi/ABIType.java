@@ -47,15 +47,15 @@ public abstract class ABIType {
      * @return ABI type scheme object
      * @throws IllegalArgumentException if ABI type serialization strings are corrupted
      */
-    public static ABIType Of(String str) {
+    public static ABIType valueOf(String str) {
         if (str.endsWith("[]")) {
-            ABIType elemType = ABIType.Of(str.substring(0, str.length() - 2));
+            ABIType elemType = ABIType.valueOf(str.substring(0, str.length() - 2));
             return new TypeArrayDynamic(elemType);
         } else if (str.endsWith("]")) {
             Matcher m = staticArrayPattern.matcher(str);
             if (!m.matches())
                 throw new IllegalArgumentException("static array type ill format: " + str);
-            ABIType elemT = ABIType.Of(m.group("elemT"));
+            ABIType elemT = ABIType.valueOf(m.group("elemT"));
             int length = Integer.parseInt(m.group("len"));
             return new TypeArrayStatic(elemT, length);
         } else if (str.startsWith("uint")) {
@@ -80,7 +80,7 @@ public abstract class ABIType {
             List<String> tupleContent = parseTupleContent(str.substring(1, str.length() - 1));
             List<ABIType> tupleTypes = new ArrayList<>();
             for (String subStr : tupleContent)
-                tupleTypes.add(ABIType.Of(subStr));
+                tupleTypes.add(ABIType.valueOf(subStr));
             return new TypeTuple(tupleTypes);
         } else {
             throw new IllegalArgumentException("Cannot infer type from the string: " + str);

@@ -40,7 +40,7 @@ public class TestRandomValues {
             Object[] valueArr = new Object[20];
             for (int cnt = 0; cnt < 20; cnt++)
                 valueArr[cnt] = testValuePool.get(0).get(i + cnt).rawValue;
-            ABIType elemT = ABIType.Of(testValuePool.get(0).get(i).abiT);
+            ABIType elemT = ABIType.valueOf(testValuePool.get(0).get(i).abiT);
             testValuePool.get(6).add(
                     new RawValueWithABIType(new TypeArrayStatic(elemT, 20).toString(), valueArr));
         }
@@ -73,7 +73,7 @@ public class TestRandomValues {
             Object[] valueArr = new Object[20];
             for (int cnt = 0; cnt < 20; cnt++)
                 valueArr[cnt] = testValuePool.get(0).get(i + cnt).rawValue;
-            ABIType elemT = ABIType.Of(testValuePool.get(0).get(i).abiT);
+            ABIType elemT = ABIType.valueOf(testValuePool.get(0).get(i).abiT);
             testValuePool.get(7).add(new RawValueWithABIType(new TypeArrayDynamic(elemT).toString(), valueArr));
         }
 
@@ -109,7 +109,7 @@ public class TestRandomValues {
                 int valueTypeSlot = rand.nextInt(index + 1);
                 int valueIndex = rand.nextInt(testValuePool.get(valueTypeSlot).size());
                 tupleValues[j] = testValuePool.get(valueTypeSlot).get(valueIndex).rawValue;
-                tupleTypes[j] = ABIType.Of(testValuePool.get(valueTypeSlot).get(valueIndex).abiT);
+                tupleTypes[j] = ABIType.valueOf(testValuePool.get(valueTypeSlot).get(valueIndex).abiT);
             }
             String abiT = new TypeTuple(Arrays.asList(tupleTypes)).toString();
             testValuePool.get(8).add(new RawValueWithABIType(abiT, tupleValues));
@@ -160,8 +160,8 @@ public class TestRandomValues {
     @Test
     public void TestRandomElemRoundTrip() {
         for (RawValueWithABIType v : testValuePool.get(8)) {
-            byte[] encoded = ABIType.Of(v.abiT).encode(v.rawValue);
-            assertThat(ABIType.Of(v.abiT).decode(encoded)).isEqualTo(v.rawValue);
+            byte[] encoded = ABIType.valueOf(v.abiT).encode(v.rawValue);
+            assertThat(ABIType.valueOf(v.abiT).decode(encoded)).isEqualTo(v.rawValue);
         }
     }
 }

@@ -135,7 +135,7 @@ public class TestTypes {
         for (int i = 8; i <= 512; i += 8) {
             String encoded = "uint" + i;
             TypeUint uintT = new TypeUint(i);
-            assertThat((TypeUint) ABIType.Of(encoded)).isEqualTo(uintT);
+            assertThat((TypeUint) ABIType.valueOf(encoded)).isEqualTo(uintT);
         }
     }
 
@@ -146,7 +146,7 @@ public class TestTypes {
             while (size_rand % 8 == 0 && size_rand <= 512 && size_rand >= 8)
                 size_rand = rand.nextInt(65536);
             String encoded = "uint" + size_rand;
-            Assertions.assertThrows(IllegalArgumentException.class, () -> ABIType.Of(encoded));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> ABIType.valueOf(encoded));
         }
     }
 
@@ -156,7 +156,7 @@ public class TestTypes {
             for (int j = 1; j <= 160; j++) {
                 String encoded = "ufixed" + i + "x" + j;
                 TypeUfixed ufixedT = new TypeUfixed(i, j);
-                assertThat((TypeUfixed) ABIType.Of(encoded)).isEqualTo(ufixedT);
+                assertThat((TypeUfixed) ABIType.valueOf(encoded)).isEqualTo(ufixedT);
             }
         }
     }
@@ -173,28 +173,28 @@ public class TestTypes {
                 precision_rand = rand.nextInt(1024);
 
             String encoded = "ufixed" + size_rand + "x" + precision_rand;
-            Assertions.assertThrows(IllegalArgumentException.class, () -> ABIType.Of(encoded));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> ABIType.valueOf(encoded));
         }
     }
 
     @Test
     public void TestSimpleTypeFromStringValid() {
-        assertThat(ABIType.Of("address")).isEqualTo(new TypeAddress());
-        assertThat(ABIType.Of("byte")).isEqualTo(new TypeByte());
-        assertThat(ABIType.Of("bool")).isEqualTo(new TypeBool());
-        assertThat(ABIType.Of("string")).isEqualTo(new TypeString());
+        assertThat(ABIType.valueOf("address")).isEqualTo(new TypeAddress());
+        assertThat(ABIType.valueOf("byte")).isEqualTo(new TypeByte());
+        assertThat(ABIType.valueOf("bool")).isEqualTo(new TypeBool());
+        assertThat(ABIType.valueOf("string")).isEqualTo(new TypeString());
     }
 
     @Test
     public void TestTypeFromStringValid() {
-        assertThat(ABIType.Of("uint256[]")).isEqualTo(new TypeArrayDynamic(new TypeUint(256)));
-        assertThat(ABIType.Of("ufixed256x64[]")).isEqualTo(new TypeArrayDynamic(new TypeUfixed(256, 64)));
-        assertThat(ABIType.Of("byte[][][][]")).isEqualTo(
+        assertThat(ABIType.valueOf("uint256[]")).isEqualTo(new TypeArrayDynamic(new TypeUint(256)));
+        assertThat(ABIType.valueOf("ufixed256x64[]")).isEqualTo(new TypeArrayDynamic(new TypeUfixed(256, 64)));
+        assertThat(ABIType.valueOf("byte[][][][]")).isEqualTo(
                 new TypeArrayDynamic(new TypeArrayDynamic(new TypeArrayDynamic(new TypeArrayDynamic(new TypeByte())))));
-        assertThat(ABIType.Of("address[100]")).isEqualTo(new TypeArrayStatic(new TypeAddress(), 100));
-        assertThat(ABIType.Of("uint64[][100]")).isEqualTo(new TypeArrayStatic(new TypeArrayDynamic(new TypeUint(64)), 100));
-        assertThat(ABIType.Of("()")).isEqualTo(new TypeTuple(new ArrayList<>()));
-        assertThat(ABIType.Of("(uint32,(address,byte,bool[10],ufixed256x10[]),byte[])")).isEqualTo(
+        assertThat(ABIType.valueOf("address[100]")).isEqualTo(new TypeArrayStatic(new TypeAddress(), 100));
+        assertThat(ABIType.valueOf("uint64[][100]")).isEqualTo(new TypeArrayStatic(new TypeArrayDynamic(new TypeUint(64)), 100));
+        assertThat(ABIType.valueOf("()")).isEqualTo(new TypeTuple(new ArrayList<>()));
+        assertThat(ABIType.valueOf("(uint32,(address,byte,bool[10],ufixed256x10[]),byte[])")).isEqualTo(
                 new TypeTuple(
                         Arrays.asList(
                                 new TypeUint(32),
@@ -208,7 +208,7 @@ public class TestTypes {
                         )
                 )
         );
-        assertThat(ABIType.Of("(uint32,(address,byte,bool[10],(ufixed256x10[])))")).isEqualTo(
+        assertThat(ABIType.valueOf("(uint32,(address,byte,bool[10],(ufixed256x10[])))")).isEqualTo(
                 new TypeTuple(
                         Arrays.asList(
                                 new TypeUint(32),
@@ -223,7 +223,7 @@ public class TestTypes {
                         )
                 )
         );
-        assertThat(ABIType.Of("((uint32),(address,(byte,bool[10],ufixed256x10[])))")).isEqualTo(
+        assertThat(ABIType.valueOf("((uint32),(address,(byte,bool[10],ufixed256x10[])))")).isEqualTo(
                 new TypeTuple(
                         Arrays.asList(
                                 new TypeTuple(Collections.singletonList(new TypeUint(32))),
@@ -282,14 +282,14 @@ public class TestTypes {
                 "",
         };
         for (String testcase : testcases)
-            Assertions.assertThrows(IllegalArgumentException.class, () -> ABIType.Of(testcase));
+            Assertions.assertThrows(IllegalArgumentException.class, () -> ABIType.valueOf(testcase));
     }
 
     @Test
     public void TestTupleRoundTrip() {
         for (ABIType t : tuple_testpool) {
             String encoded = t.toString();
-            ABIType decoded = ABIType.Of(encoded);
+            ABIType decoded = ABIType.valueOf(encoded);
             assertThat((TypeTuple) decoded).isEqualTo(t);
         }
     }

@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Method {
@@ -31,9 +30,6 @@ public class Method {
 
     @JsonIgnore
     private static final String HASH_ALG = "SHA-512/256";
-
-    @JsonIgnore
-    private static final Pattern validName = Pattern.compile("^[a-zA-Z][a-zA-Z0-9_]*$");
 
     @JsonProperty("name")
     public String name;
@@ -73,7 +69,7 @@ public class Method {
 
     private static String nameChecker(String name) {
         String nameStr = Objects.requireNonNull(name, "name must not be null");
-        if (nameStr.isEmpty() || !Method.validName.matcher(nameStr).matches())
+        if (nameStr.isEmpty())
             throw new IllegalArgumentException("name must not be an empty string");
         return nameStr;
     }
@@ -146,7 +142,7 @@ public class Method {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (getClass() != o.getClass()) return false;
         Method method = (Method) o;
         return Objects.equals(name, method.name) && Objects.equals(desc, method.desc) &&
                 Objects.equals(args, method.args) && Objects.equals(returns, method.returns);
@@ -165,7 +161,7 @@ public class Method {
                 @JsonProperty("desc") String desc
         ) {
             this.type = type.equals("void") ?
-                    type : ABIType.Of(Objects.requireNonNull(type, "type must not be null")).toString();
+                    type : ABIType.valueOf(Objects.requireNonNull(type, "type must not be null")).toString();
             this.desc = desc;
         }
 
@@ -175,7 +171,7 @@ public class Method {
 
         @Override
         public boolean equals(Object o) {
-            if (o == null || getClass() != o.getClass()) return false;
+            if (getClass() != o.getClass()) return false;
             Returns returns = (Returns) o;
             return Objects.equals(type, returns.type) && Objects.equals(desc, returns.desc);
         }
@@ -202,7 +198,7 @@ public class Method {
             if (Method.TxArgTypes.contains(typeStr))
                 this.type = typeStr;
             else
-                this.type = ABIType.Of(typeStr).toString();
+                this.type = ABIType.valueOf(typeStr).toString();
         }
 
         public Arg(Arg otherArg) {

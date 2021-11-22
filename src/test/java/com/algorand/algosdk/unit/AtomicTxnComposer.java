@@ -97,7 +97,7 @@ public class AtomicTxnComposer {
         for (Method.Arg argType : methodABI.method.args) {
             if (Method.TxArgTypes.contains(argType.type))
                 continue;
-            ABIType abiT = ABIType.Of(argType.type);
+            ABIType abiT = ABIType.valueOf(argType.type);
             byte[] abiEncoded = Encoder.decodeFromBase64(argTokens[argTokenIndex]);
             Object decodedValue = abiT.decode(abiEncoded);
             argTokenIndex++;
