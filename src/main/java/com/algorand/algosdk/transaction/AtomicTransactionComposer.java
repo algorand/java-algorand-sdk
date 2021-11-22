@@ -113,11 +113,13 @@ public class AtomicTransactionComposer {
         List<Object> methodArgs = new ArrayList<>();
         List<ABIType> methodABIts = new ArrayList<>();
 
+        List<TransactionWithSigner> tempTransWithSigner = new ArrayList<>();
+
         for (int i = 0; i < methodCall.method.args.size(); i++) {
             Method.Arg argT = methodCall.method.args.get(i);
             Object methodArg = methodCall.methodArgs.get(i);
             if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
-                transactionList.add((TransactionWithSigner) methodArg);
+                tempTransWithSigner.add((TransactionWithSigner) methodArg);
             } else {
                 methodArgs.add(methodArg);
                 methodABIts.add(argT.parsedType);
@@ -164,6 +166,7 @@ public class AtomicTransactionComposer {
 
         tx.onCompletion = methodCall.onCompletion;
 
+        this.transactionList.addAll(tempTransWithSigner);
         this.transactionList.add(new TransactionWithSigner(tx, methodCall.signer));
         this.methodMap.put(this.transactionList.size() - 1, methodCall.method);
     }
