@@ -185,8 +185,7 @@ public class AtomicTransactionComposer {
         List<Transaction> groupTxns = new ArrayList<>();
         for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
         Digest groupID = TxGroup.computeGroupID(groupTxns.toArray(new Transaction[0]));
-        for (TransactionWithSigner transactionWithSigner : this.transactionList)
-            transactionWithSigner.txn.assignGroupID(groupID);
+        for (TransactionWithSigner tws : this.transactionList) tws.txn.group = groupID;
 
         this.status = Status.BUILT;
         return this.transactionList;

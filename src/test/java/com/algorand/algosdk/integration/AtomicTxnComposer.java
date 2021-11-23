@@ -124,7 +124,7 @@ public class AtomicTxnComposer {
 
     @Then("I execute the current transaction group with the composer.")
     public void i_execute_the_current_transaction_group_with_the_composer() throws Exception {
-        execRes = atc.execute(base.aclv2, 5);
+        execRes = atc.execute(applications.base.aclv2, 5);
     }
 
     @Then("The app should have returned {string}.")
@@ -140,7 +140,7 @@ public class AtomicTxnComposer {
     }
 
     @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
-    public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String string) throws NoSuchAlgorithmException {
+    public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String string) {
         String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
         optionBuilder
                 .setOnComplete(Transaction.OnCompletion.String(string))
