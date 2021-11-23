@@ -7,7 +7,7 @@ import java.util.Objects;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 /**
  * Details about a pending transaction. If the transaction was recently confirmed,
@@ -77,11 +77,27 @@ public class PendingTransactionResponse extends PathResponse {
      */
     @JsonProperty("logs")
     public List<byte[]> logs = new ArrayList<byte[]>();
+    @JsonIgnore
+    public void logs(List<String> base64Encoded) {
+        this.logs = new ArrayList<byte[]>();
+        for (String val : base64Encoded) {
+            this.logs.add(Encoder.decodeFromBase64(val));
+        }
+    }
+    @JsonIgnore
+    public List<String> logs() {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (byte[] val : this.logs) {
+            ret.add(Encoder.encodeToBase64(val));
+        }
+        return ret; 
+    }
 
     /**
      * Indicates that the transaction was kicked out of this node's transaction pool
      * (and specifies why that happened). An empty string indicates the transaction
      * wasn't kicked out of this node's txpool due to an error.
+     *
      */
     @JsonProperty("pool-error")
     public String poolError;

@@ -72,7 +72,8 @@ public class SearchForAccounts extends Query {
     }
 
     /**
-     * Maximum number of results to return.
+     * Maximum number of results to return. There could be additional pages even if the
+     * limit is not reached.
      */
     public SearchForAccounts limit(Long limit) {
         addQuery("limit", String.valueOf(limit));

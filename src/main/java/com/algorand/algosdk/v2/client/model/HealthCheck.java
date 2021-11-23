@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 /**
  * A health check response.
@@ -31,6 +31,12 @@ public class HealthCheck extends PathResponse {
     @JsonProperty("round")
     public Long round;
 
+    /**
+     * Current version.
+     */
+    @JsonProperty("version")
+    public String version;
+
     @Override
     public boolean equals(Object o) {
 
@@ -44,6 +50,7 @@ public class HealthCheck extends PathResponse {
         if (!Objects.deepEquals(this.isMigrating, other.isMigrating)) return false;
         if (!Objects.deepEquals(this.message, other.message)) return false;
         if (!Objects.deepEquals(this.round, other.round)) return false;
+        if (!Objects.deepEquals(this.version, other.version)) return false;
 
         return true;
     }
