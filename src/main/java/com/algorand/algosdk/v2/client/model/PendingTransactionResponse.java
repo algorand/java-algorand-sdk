@@ -76,20 +76,6 @@ public class PendingTransactionResponse extends PathResponse {
      * (lg) Logs for the application being executed by this transaction.
      */
     @JsonProperty("logs")
-    public void logs(List<String> base64Encoded) {
-         this.logs = new ArrayList<byte[]>();
-         for (String val : base64Encoded) {
-             this.logs.add(Encoder.decodeFromBase64(val));
-         }
-     }
-     @JsonProperty("logs")
-     public List<String> logs() {
-         ArrayList<String> ret = new ArrayList<String>();
-         for (byte[] val : this.logs) {
-             ret.add(Encoder.encodeToBase64(val));
-         }
-         return ret; 
-     }
     public List<byte[]> logs = new ArrayList<byte[]>();
 
     /**
