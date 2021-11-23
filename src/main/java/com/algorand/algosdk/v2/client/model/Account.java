@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
 /**
  * Account information at a given round.
@@ -164,6 +164,7 @@ public class Account extends PathResponse {
      *   sig
      *   msig
      *   lsig
+     *   or null if unknown
      */
     @JsonProperty("sig-type")
     public Enums.SigType sigType;
