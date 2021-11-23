@@ -129,9 +129,15 @@ public class AtomicTxnComposer {
 
     @Then("The app should have returned {string}.")
     public void the_app_should_have_returned(String string) {
-        // TODO
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+        assertThat(execRes.methodResults.size()).isEqualTo(1);
+
+        if (string.isEmpty()) {
+            assertThat(this.method.returns.type).isEqualTo("void");
+            return;
+        }
+        Object parsed = this.execRes.methodResults.get(0).value;
+        Object idealRes = this.method.returns.parsedType.decode(Encoder.decodeFromBase64(string));
+        assertThat(parsed).isEqualTo(idealRes);
     }
 
     @Then("The composer should have a status of {string}.")

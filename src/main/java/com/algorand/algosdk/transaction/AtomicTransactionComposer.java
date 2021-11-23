@@ -346,7 +346,6 @@ public class AtomicTransactionComposer {
                 continue;
             }
 
-            // question why it is not replying anything in log?
             PendingTransactionResponse respBody = resp.body();
             List<byte[]> logs = respBody.logs;
             byte[] retLine = null;
