@@ -1,6 +1,6 @@
 package com.algorand.algosdk.util;
 
-import com.algorand.algosdk.abi.Type;
+import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -84,9 +84,9 @@ public class TestPendingTxnResponse {
         System.arraycopy(retLog, LOG_RET_PREFIX.length, retVal, 0, retLog.length -  LOG_RET_PREFIX.length);
 
         if (retVal.length == 1) {
-            assertThat(Type.fromString("bool").decode(retVal)).isEqualTo(true);
+            assertThat(ABIType.valueOf("bool").decode(retVal)).isEqualTo(true);
         } else {
-            assertThat(Type.fromString("uint64").decode(retVal)).isEqualTo(BigInteger.valueOf(2));
+            assertThat(ABIType.valueOf("uint64").decode(retVal)).isEqualTo(BigInteger.valueOf(2));
         }
     }
 }
