@@ -23,12 +23,12 @@ public class TestContract {
                         Arrays.asList(
                                 new Method.Arg("a", "uint64", "..."),
                                 new Method.Arg("b", "uint64", "...")
-                        ), null),
+                        ), new Method.Returns("void", null)),
                 new Method("multiply", null,
                         Arrays.asList(
                                 new Method.Arg("a", "uint64", "..."),
                                 new Method.Arg("b", "uint64", "...")
-                        ), null)
+                        ), new Method.Returns("void", null))
         );
     }
 
