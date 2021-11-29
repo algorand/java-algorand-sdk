@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * AccountParticipation describes the parameters used by this account in consensus
