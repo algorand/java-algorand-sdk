@@ -6,7 +6,7 @@ import java.util.Objects;
 
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Request data type for dryrun endpoint. Given the Transactions and simulated
