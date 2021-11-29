@@ -131,11 +131,14 @@ public class AtomicTxnComposer {
     public void the_app_should_have_returned(String string) {
         assertThat(execRes.methodResults.size()).isEqualTo(1);
 
+        AtomicTransactionComposer.ReturnValue execRetVal = execRes.methodResults.get(0);
+        assertThat(execRetVal.parseError).isNullOrEmpty();
+
         if (string.isEmpty()) {
             assertThat(this.method.returns.type).isEqualTo("void");
             return;
         }
-        Object parsed = this.execRes.methodResults.get(0).value;
+        Object parsed = execRetVal.value;
         Object idealRes = this.method.returns.parsedType.decode(Encoder.decodeFromBase64(string));
         assertThat(parsed).isEqualTo(idealRes);
     }
