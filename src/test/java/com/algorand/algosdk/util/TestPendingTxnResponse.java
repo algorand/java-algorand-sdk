@@ -12,6 +12,9 @@ import static org.assertj.core.api.Assertions.*;
 
 public class TestPendingTxnResponse {
 
+    static public byte[] LOG_RET_PREFIX = new byte[]{0x15, 0x1f, 0x7c, 0x75};
+    static public int LOG_RET_NUM = 1;
+
     /**
      * {
      *   "confirmed-round" : 14738,
@@ -70,16 +73,15 @@ public class TestPendingTxnResponse {
 
         PendingTransactionResponse decoded =
                 Encoder.decodeFromMsgPack(decodedBytes, PendingTransactionResponse.class);
-        assertThat(decoded.logs.size()).isEqualTo(1);
+        assertThat(decoded.logs.size()).isEqualTo(LOG_RET_NUM);
 
-        byte[] retLog = decoded.logs.get(0);
-        assertThat(retLog.length).isGreaterThan(4);
-        byte[] retPrefix = new byte[]{0x15, 0x1f, 0x7c, 0x75};
-        for (int i = 0; i < 4; i++)
-            assertThat(retLog[i]).isEqualTo(retPrefix[i]);
+        byte[] retLog = decoded.logs.get(LOG_RET_NUM - 1);
+        assertThat(retLog.length).isGreaterThan(LOG_RET_PREFIX.length);
+        for (int i = 0; i < LOG_RET_PREFIX.length; i++)
+            assertThat(retLog[i]).isEqualTo(LOG_RET_PREFIX[i]);
 
-        byte[] retVal = new byte[retLog.length - 4];
-        System.arraycopy(retLog, 4, retVal, 0, retLog.length -  4);
+        byte[] retVal = new byte[retLog.length - LOG_RET_PREFIX.length];
+        System.arraycopy(retLog, LOG_RET_PREFIX.length, retVal, 0, retLog.length -  LOG_RET_PREFIX.length);
 
         if (retVal.length == 1) {
             assertThat(Type.fromString("bool").decode(retVal)).isEqualTo(true);
