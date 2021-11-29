@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.*;
 
 public class TestPendingTxnResponse {
 
-    static public byte[] LOG_RET_PREFIX = new byte[]{0x15, 0x1f, 0x7c, 0x75};
-    static public int LOG_RET_NUM = 1;
+    static final public byte[] LOG_RET_PREFIX = new byte[]{0x15, 0x1f, 0x7c, 0x75};
+    static final public int LOG_RET_NUM = 1;
 
     /**
      * {
