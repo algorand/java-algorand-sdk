@@ -100,7 +100,7 @@ public class AtomicTransactionComposer {
      * causes the current group to exceed MAX_GROUP_SIZE, or if the provided arguments are invalid
      * for the given method.
      */
-    public void addMethodCall(MethodCalParams methodCall) {
+    public void addMethodCall(MethodCallParams methodCall) {
         if (!this.status.equals(Status.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer must be in BUILDING stage");
         if (this.transactionList.size() + methodCall.method.getTxnCallCount() > MAX_GROUP_SIZE)

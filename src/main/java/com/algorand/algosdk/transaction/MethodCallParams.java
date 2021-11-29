@@ -7,7 +7,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MethodCalParams {
+public class MethodCallParams {
     public Long appID;
     public Method method;
     public List<Object> methodArgs;
@@ -18,10 +18,10 @@ public class MethodCalParams {
     AtomicTransactionComposer.TxnSigner signer;
     TransactionParams suggestedParams;
 
-    public MethodCalParams(Long appID, Method method, List<Object> methodArgs, String sender,
-                           TransactionParams sp, Transaction.OnCompletion onCompletion, byte[] note, byte[] lease,
-                           BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
-                           String rekeyTo, AtomicTransactionComposer.TxnSigner signer) {
+    public MethodCallParams(Long appID, Method method, List<Object> methodArgs, String sender,
+                            TransactionParams sp, Transaction.OnCompletion onCompletion, byte[] note, byte[] lease,
+                            BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
+                            String rekeyTo, AtomicTransactionComposer.TxnSigner signer) {
         if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
             throw new IllegalArgumentException("Method call builder error: some required field not added");
         if (method.args.size() != methodArgs.size())
@@ -128,8 +128,8 @@ public class MethodCalParams {
             return this;
         }
 
-        public MethodCalParams build() {
-            return new MethodCalParams(appID, method, methodArgs, sender, sp, onCompletion, note, lease, fv, lv, fee, flatFee, rekeyTo, signer);
+        public MethodCallParams build() {
+            return new MethodCallParams(appID, method, methodArgs, sender, sp, onCompletion, note, lease, fv, lv, fee, flatFee, rekeyTo, signer);
         }
     }
 }

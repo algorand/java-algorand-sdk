@@ -4,7 +4,7 @@ import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
-import com.algorand.algosdk.transaction.MethodCalParams;
+import com.algorand.algosdk.transaction.MethodCallParams;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 import io.cucumber.java.en.Given;
@@ -28,7 +28,7 @@ public class AtomicTxnComposer {
     AtomicTransactionComposer.TxnSigner transSigner;
     AtomicTransactionComposer.TransactionWithSigner transWithSigner;
     Method method;
-    MethodCalParams.Builder optionBuilder;
+    MethodCallParams.Builder optionBuilder;
     AtomicTransactionComposer.ExecuteResult execRes;
 
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
@@ -90,7 +90,7 @@ public class AtomicTxnComposer {
 
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
-         optionBuilder = new MethodCalParams.Builder();
+         optionBuilder = new MethodCallParams.Builder();
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
@@ -158,7 +158,7 @@ public class AtomicTxnComposer {
                 .setFirstValid(transSteps.fv)
                 .setLastValid(transSteps.lv)
                 .setFee(transSteps.fee);
-        MethodCalParams optionBuild = optionBuilder.build();
+        MethodCallParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
 
