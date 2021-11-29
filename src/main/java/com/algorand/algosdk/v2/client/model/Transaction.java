@@ -8,7 +8,8 @@ import java.util.Objects;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Contains all fields common to all transactions and serves as an envelope to all
