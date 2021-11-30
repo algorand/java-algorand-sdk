@@ -207,34 +207,30 @@ public class AtomicTransactionComposer {
 
         List<TransactionWithSigner> txnAndSignerList = this.buildGroup();
 
-        HashMap<TxnSigner, List<Integer>> transSignerToIndices = new HashMap<>();
+        HashMap<TxnSigner, List<Integer>> txnSignerToIndices = new HashMap<>();
         List<SignedTransaction> tempSignedTxns = new ArrayList<>();
         for (int i = 0; i < txnAndSignerList.size(); i++) tempSignedTxns.add(null);
 
         for (int i = 0; i < txnAndSignerList.size(); i++) {
             TransactionWithSigner tws = txnAndSignerList.get(i);
-            if (transSignerToIndices.containsKey(tws.signer)) {
-                List<Integer> curr = transSignerToIndices.get(tws.signer);
-                curr.add(i);
-                transSignerToIndices.put(tws.signer, curr);
-            } else {
-                List<Integer> init = new ArrayList<>();
-                init.add(i);
-                transSignerToIndices.put(tws.signer, init);
-            }
+            if (!txnSignerToIndices.containsKey(tws.signer))
+                txnSignerToIndices.put(tws.signer, new ArrayList<Integer>());
+            txnSignerToIndices.get(tws.signer).add(i);
         }
 
         Transaction[] txnGroup = new Transaction[txnAndSignerList.size()];
         for (int i = 0; i < txnAndSignerList.size(); i++)
             txnGroup[i] = txnAndSignerList.get(i).txn;
 
-        for (TxnSigner txnSigner : transSignerToIndices.keySet()) {
-            List<Integer> indices = transSignerToIndices.get(txnSigner);
+        for (TxnSigner txnSigner : txnSignerToIndices.keySet()) {
+            List<Integer> indices = txnSignerToIndices.get(txnSigner);
             int[] indicesPrimitive = ArrayUtils.toPrimitive(indices.toArray(new Integer[0]));
             SignedTransaction[] signed = txnSigner.signTxnGroup(txnGroup, indicesPrimitive);
             for (int i = 0; i < indicesPrimitive.length; i++)
                 tempSignedTxns.set(indicesPrimitive[i], signed[i]);
         }
+        if (tempSignedTxns.contains(null))
+            throw new IllegalArgumentException("some signer did not sign the transaction");
 
         this.signedTxns = tempSignedTxns;
         this.status = Status.SIGNED;
