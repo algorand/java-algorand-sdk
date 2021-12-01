@@ -5,6 +5,7 @@ import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.crypto.Address;
 
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +50,18 @@ public class MethodCallParams {
         this.foreignAccounts = fAccounts;
         this.foreignAssets = fAssets;
         this.foreignApps = fApps;
+
+        Address senderAddr;
+        try {
+            senderAddr = new Address(this.sender);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("sender mnemonic cannot generate an address");
+        }
+        this.foreignAccounts.remove(senderAddr);
+        this.foreignAccounts.add(0, senderAddr);
+
+        this.foreignApps.remove(this.appID);
+        this.foreignApps.add(0, this.appID);
     }
 
     public static class Builder {

@@ -133,7 +133,7 @@ public class AtomicTransactionComposer {
                     if (foreignAccounts.contains(accountAddr)) {
                         index = foreignAccounts.indexOf(accountAddr);
                     } else {
-                        index = foreignAccounts.size() + 1;
+                        index = foreignAccounts.size();
                         foreignAccounts.add(accountAddr);
                     }
                 } else if (argT.type.equals("asset") && methodArg instanceof Long) {
@@ -145,12 +145,11 @@ public class AtomicTransactionComposer {
                         foreignAssets.add(assetID);
                     }
                 } else if (argT.type.equals("application") && methodArg instanceof Long) {
-                    // TODO sender's appID should be pointed to the 0th index?
                     Long appID = (Long) methodArg;
                     if (foreignApps.contains(appID)) {
                         index = foreignApps.indexOf(appID);
                     } else {
-                        index = foreignApps.size() + 1;
+                        index = foreignApps.size();
                         foreignApps.add(appID);
                     }
                 } else
