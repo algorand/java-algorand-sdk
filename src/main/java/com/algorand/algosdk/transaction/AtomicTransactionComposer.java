@@ -128,7 +128,6 @@ public class AtomicTransactionComposer {
                 ABIType currType = new TypeUint(8);
                 int index;
                 if (argT.type.equals("account") && methodArg instanceof Address) {
-                    // TODO sender should be pointed to the 0th index?
                     Address accountAddr = (Address) methodArg;
                     if (foreignAccounts.contains(accountAddr)) {
                         index = foreignAccounts.indexOf(accountAddr);
