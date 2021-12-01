@@ -58,10 +58,8 @@ public class MethodCallParams {
             throw new IllegalArgumentException("sender mnemonic cannot generate an address");
         }
         this.foreignAccounts.remove(senderAddr);
-        this.foreignAccounts.add(0, senderAddr);
 
         this.foreignApps.remove(this.appID);
-        this.foreignApps.add(0, this.appID);
     }
 
     public static class Builder {

@@ -130,9 +130,11 @@ public class AtomicTransactionComposer {
                 if (argT.type.equals("account") && methodArg instanceof Address) {
                     Address accountAddr = (Address) methodArg;
                     if (foreignAccounts.contains(accountAddr)) {
-                        index = foreignAccounts.indexOf(accountAddr);
+                        index = foreignAccounts.indexOf(accountAddr) + 1;
+                    } else if (accountAddr.toString().equals(methodCall.sender)) {
+                        index = 0;
                     } else {
-                        index = foreignAccounts.size();
+                        index = foreignAccounts.size() + 1;
                         foreignAccounts.add(accountAddr);
                     }
                 } else if (argT.type.equals("asset") && methodArg instanceof Long) {
@@ -146,9 +148,11 @@ public class AtomicTransactionComposer {
                 } else if (argT.type.equals("application") && methodArg instanceof Long) {
                     Long appID = (Long) methodArg;
                     if (foreignApps.contains(appID)) {
-                        index = foreignApps.indexOf(appID);
+                        index = foreignApps.indexOf(appID) + 1;
+                    } else if (appID.equals(methodCall.appID)) {
+                        index = 0;
                     } else {
-                        index = foreignApps.size();
+                        index = foreignApps.size() + 1;
                         foreignApps.add(appID);
                     }
                 } else
