@@ -3,7 +3,9 @@ package com.algorand.algosdk.transaction;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.TypeTuple;
+import com.algorand.algosdk.abi.TypeUint;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
@@ -113,16 +115,40 @@ public class AtomicTransactionComposer {
         List<ABIType> methodABIts = new ArrayList<>();
 
         List<TransactionWithSigner> tempTransWithSigner = new ArrayList<>();
+        List<Address> foreignAccounts = new ArrayList<>();
+        List<Long> foreignAssets = new ArrayList<>();
+        List<Long> foreignApps = new ArrayList<>();
 
         for (int i = 0; i < methodCall.method.args.size(); i++) {
             Method.Arg argT = methodCall.method.args.get(i);
             Object methodArg = methodCall.methodArgs.get(i);
             if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
-            } else {
+            } else if (Method.ForeignArrayArgs.contains(argT.type)) {
+                ABIType currType = new TypeUint(8);
+                int index;
+                if (argT.type.equals("account") && methodArg instanceof Address) {
+                    index = foreignAccounts.size() + 1;
+                    foreignAccounts.add((Address) methodArg);
+                } else if (argT.type.equals("asset") && methodArg instanceof Long) {
+                    index = foreignAssets.size();
+                    foreignAssets.add((Long) methodArg);
+                } else if (argT.type.equals("application") && methodArg instanceof Long) {
+                    index = foreignApps.size() + 1;
+                    foreignApps.add((Long) methodArg);
+                } else
+                    throw new IllegalArgumentException(
+                            "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
+                    );
+                methodArgs.add(index);
+                methodABIts.add(currType);
+            } else if (argT.parsedType != null) {
                 methodArgs.add(methodArg);
                 methodABIts.add(argT.parsedType);
-            }
+            } else
+                throw new IllegalArgumentException(
+                        "cannot add method call in AtomicTransactionComposer: cannot infer methodArg type"
+                );
         }
 
         if (methodArgs.size() > 14) {
@@ -156,7 +182,10 @@ public class AtomicTransactionComposer {
                 .applicationId(methodCall.appID)
                 .args(encodedABIArgs)
                 .note(methodCall.note)
-                .lease(methodCall.lease);
+                .lease(methodCall.lease)
+                .accounts(foreignAccounts)
+                .foreignApps(foreignApps)
+                .foreignAssets(foreignAssets);
 
         if (methodCall.rekeyTo != null)
             txBuilder.rekey(methodCall.rekeyTo);
