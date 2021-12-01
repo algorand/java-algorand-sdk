@@ -2,9 +2,11 @@ package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
+import com.algorand.algosdk.crypto.Address;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class MethodCallParams {
@@ -16,12 +18,16 @@ public class MethodCallParams {
     public byte[] note, lease;
     public BigInteger fv, lv, fee, flatFee;
     AtomicTransactionComposer.TxnSigner signer;
-    TransactionParams suggestedParams;
+    public TransactionParams suggestedParams;
+    public List<Address> foreignAccounts;
+    public List<Long> foreignAssets;
+    public List<Long> foreignApps;
 
     public MethodCallParams(Long appID, Method method, List<Object> methodArgs, String sender,
                             TransactionParams sp, Transaction.OnCompletion onCompletion, byte[] note, byte[] lease,
                             BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
-                            String rekeyTo, AtomicTransactionComposer.TxnSigner signer) {
+                            String rekeyTo, AtomicTransactionComposer.TxnSigner signer,
+                            List<Address> fAccounts, List<Long> fAssets, List<Long> fApps) {
         if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
             throw new IllegalArgumentException("Method call builder error: some required field not added");
         if (method.args.size() != methodArgs.size())
@@ -40,6 +46,9 @@ public class MethodCallParams {
         this.flatFee = flatFee;
         this.rekeyTo = rekeyTo;
         this.signer = signer;
+        this.foreignAccounts = fAccounts;
+        this.foreignAssets = fAssets;
+        this.foreignApps = fApps;
     }
 
     public static class Builder {
@@ -51,7 +60,10 @@ public class MethodCallParams {
         public byte[] note, lease;
         public BigInteger fv, lv, fee, flatFee;
         AtomicTransactionComposer.TxnSigner signer;
-        TransactionParams sp;
+        public TransactionParams sp;
+        public List<Address> foreignAccounts = new ArrayList<>();
+        public List<Long> foreignAssets = new ArrayList<>();
+        public List<Long> foreignApps = new ArrayList<>();
 
         public Builder() {
             this.onCompletion = Transaction.OnCompletion.NoOpOC;
@@ -128,8 +140,29 @@ public class MethodCallParams {
             return this;
         }
 
+        public Builder setForeignAccounts(List<Address> fAccounts) {
+            if (fAccounts == null) return this;
+            this.foreignAccounts = new ArrayList<>(new HashSet<>(fAccounts));
+            return this;
+        }
+
+        public Builder setForeignAssets(List<Long> fAssets) {
+            if (fAssets == null) return this;
+            this.foreignAssets = new ArrayList<>(new HashSet<>(fAssets));
+            return this;
+        }
+
+        public Builder setForeignApps(List<Long> fApps) {
+            if (fApps == null) return this;
+            this.foreignApps = new ArrayList<>(new HashSet<>(fApps));
+            return this;
+        }
+
         public MethodCallParams build() {
-            return new MethodCallParams(appID, method, methodArgs, sender, sp, onCompletion, note, lease, fv, lv, fee, flatFee, rekeyTo, signer);
+            return new MethodCallParams(
+                    appID, method, methodArgs, sender, sp, onCompletion, note, lease,
+                    fv, lv, fee, flatFee, rekeyTo, signer, foreignAccounts, foreignAssets, foreignApps
+            );
         }
     }
 }

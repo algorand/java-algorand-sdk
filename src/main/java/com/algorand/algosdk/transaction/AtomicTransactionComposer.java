@@ -115,9 +115,9 @@ public class AtomicTransactionComposer {
         List<ABIType> methodABIts = new ArrayList<>();
 
         List<TransactionWithSigner> tempTransWithSigner = new ArrayList<>();
-        List<Address> foreignAccounts = new ArrayList<>();
-        List<Long> foreignAssets = new ArrayList<>();
-        List<Long> foreignApps = new ArrayList<>();
+        List<Address> foreignAccounts = methodCall.foreignAccounts;
+        List<Long> foreignAssets = methodCall.foreignAssets;
+        List<Long> foreignApps = methodCall.foreignApps;
 
         for (int i = 0; i < methodCall.method.args.size(); i++) {
             Method.Arg argT = methodCall.method.args.get(i);
@@ -128,14 +128,31 @@ public class AtomicTransactionComposer {
                 ABIType currType = new TypeUint(8);
                 int index;
                 if (argT.type.equals("account") && methodArg instanceof Address) {
-                    index = foreignAccounts.size() + 1;
-                    foreignAccounts.add((Address) methodArg);
+                    // TODO sender should be pointed to the 0th index?
+                    Address accountAddr = (Address) methodArg;
+                    if (foreignAccounts.contains(accountAddr)) {
+                        index = foreignAccounts.indexOf(accountAddr);
+                    } else {
+                        index = foreignAccounts.size() + 1;
+                        foreignAccounts.add(accountAddr);
+                    }
                 } else if (argT.type.equals("asset") && methodArg instanceof Long) {
-                    index = foreignAssets.size();
-                    foreignAssets.add((Long) methodArg);
+                    Long assetID = (Long) methodArg;
+                    if (foreignAssets.contains(assetID)) {
+                        index = foreignAssets.indexOf(assetID);
+                    } else {
+                        index = foreignAssets.size();
+                        foreignAssets.add(assetID);
+                    }
                 } else if (argT.type.equals("application") && methodArg instanceof Long) {
-                    index = foreignApps.size() + 1;
-                    foreignApps.add((Long) methodArg);
+                    // TODO sender's appID should be pointed to the 0th index?
+                    Long appID = (Long) methodArg;
+                    if (foreignApps.contains(appID)) {
+                        index = foreignApps.indexOf(appID);
+                    } else {
+                        index = foreignApps.size() + 1;
+                        foreignApps.add(appID);
+                    }
                 } else
                     throw new IllegalArgumentException(
                             "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
@@ -150,6 +167,11 @@ public class AtomicTransactionComposer {
                         "cannot add method call in AtomicTransactionComposer: cannot infer methodArg type"
                 );
         }
+
+        if (foreignAccounts.size() > 4)
+            throw new IllegalArgumentException("error: foreign accounts number > 4");
+        else if (foreignApps.size() + foreignAssets.size() + foreignAccounts.size() > 8)
+            throw new IllegalArgumentException("error: total foreign object array number > 8");
 
         if (methodArgs.size() > 14) {
             List<ABIType> wrappedABITypes = new ArrayList<>();
