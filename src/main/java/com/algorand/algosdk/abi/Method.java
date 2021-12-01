@@ -29,6 +29,13 @@ public class Method {
     );
 
     @JsonIgnore
+    public static final Set<String> ForeignArrayArgs = new HashSet<>(Arrays.asList("account", "asset", "application"));
+
+    static boolean isTxnArgOrForeignArrayArgs(String str) {
+        return TxArgTypes.contains(str) || ForeignArrayArgs.contains(str);
+    }
+
+    @JsonIgnore
     private static final String HASH_ALG = "SHA-512/256";
 
     @JsonProperty("name")
@@ -201,7 +208,7 @@ public class Method {
             this.name = name;
             this.desc = desc;
             String typeStr = Objects.requireNonNull(type, "type must not be null");
-            this.parsedType = Method.TxArgTypes.contains(typeStr) ? null : ABIType.valueOf(typeStr);
+            this.parsedType = isTxnArgOrForeignArrayArgs(typeStr) ? null : ABIType.valueOf(typeStr);
             this.type = typeStr;
         }
 
