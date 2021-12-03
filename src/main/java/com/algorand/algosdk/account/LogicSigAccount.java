@@ -1,7 +1,6 @@
 package com.algorand.algosdk.account;
 
 import com.algorand.algosdk.crypto.*;
-import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxnSigner;

@@ -31,6 +31,9 @@ public class AtomicTransactionComposer {
 
     public static final int MAX_GROUP_SIZE = 16;
 
+    private static final int FOREIGN_ARRAY_NUM_LIMIT = 4;
+    private static final int FOREIGN_OBJ_NUM_LIMIT = 8;
+
     private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
 
     private Status status;
@@ -168,9 +171,9 @@ public class AtomicTransactionComposer {
                 );
         }
 
-        if (foreignAccounts.size() > 4)
+        if (foreignAccounts.size() > FOREIGN_ARRAY_NUM_LIMIT)
             throw new IllegalArgumentException("error: foreign accounts number > 4");
-        else if (foreignApps.size() + foreignAssets.size() + foreignAccounts.size() > 8)
+        else if (foreignApps.size() + foreignAssets.size() + foreignAccounts.size() > FOREIGN_OBJ_NUM_LIMIT)
             throw new IllegalArgumentException("error: total foreign object array number > 8");
 
         if (methodArgs.size() > 14) {
