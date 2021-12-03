@@ -4,6 +4,7 @@ import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxnSigner;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -160,18 +161,13 @@ public class LogicSigAccount {
         return Account.signLogicTransactionWithAddress(this.lsig, this.getAddress(), tx);
     }
 
-    public AtomicTransactionComposer.TxnSigner getTransactionSigner() {
+    public TxnSigner getTransactionSigner() {
         final LogicSigAccount self = this;
 
-        return new AtomicTransactionComposer.TxnSigner() {
+        return new TxnSigner() {
             @Override
             public int hashCode() {
                 return Objects.hash(2, self);
-            }
-
-            @Override
-            public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException {
-                return self.signLogicSigTransaction(txn);
             }
 
             @Override

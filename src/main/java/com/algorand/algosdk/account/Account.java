@@ -9,6 +9,7 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxnSigner;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Encoder;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -685,23 +686,17 @@ public class Account {
         }
     }
 
-    public AtomicTransactionComposer.TxnSigner getTransactionSigner() {
+    public TxnSigner getTransactionSigner() {
         final Account self = this;
 
-        return new AtomicTransactionComposer.TxnSigner() {
+        return new TxnSigner() {
             @Override
             public int hashCode() {
                 return Objects.hash(1, self);
             }
 
             @Override
-            public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException {
-                return self.signTransaction(txn);
-            }
-
-            @Override
-            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
-                    throws NoSuchAlgorithmException {
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign) throws Exception {
                 SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
                 for (int i = 0; i < indicesToSign.length; i++)
                     sTxn[i] = self.signTransaction(txnGroup[indicesToSign[i]]);

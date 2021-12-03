@@ -5,9 +5,10 @@ import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.crypto.Address;
 
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MethodCallParams {
@@ -18,7 +19,7 @@ public class MethodCallParams {
     public Transaction.OnCompletion onCompletion;
     public byte[] note, lease;
     public BigInteger fv, lv, fee, flatFee;
-    AtomicTransactionComposer.TxnSigner signer;
+    TxnSigner signer;
     public TransactionParams suggestedParams;
     public List<Address> foreignAccounts;
     public List<Long> foreignAssets;
@@ -27,7 +28,7 @@ public class MethodCallParams {
     public MethodCallParams(Long appID, Method method, List<Object> methodArgs, String sender,
                             TransactionParams sp, Transaction.OnCompletion onCompletion, byte[] note, byte[] lease,
                             BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
-                            String rekeyTo, AtomicTransactionComposer.TxnSigner signer,
+                            String rekeyTo, TxnSigner signer,
                             List<Address> fAccounts, List<Long> fAssets, List<Long> fApps) {
         if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
             throw new IllegalArgumentException("Method call builder error: some required field not added");
@@ -70,7 +71,7 @@ public class MethodCallParams {
         public Transaction.OnCompletion onCompletion;
         public byte[] note, lease;
         public BigInteger fv, lv, fee, flatFee;
-        AtomicTransactionComposer.TxnSigner signer;
+        TxnSigner signer;
         public TransactionParams sp;
         public List<Address> foreignAccounts = new ArrayList<>();
         public List<Long> foreignAssets = new ArrayList<>();
@@ -126,7 +127,7 @@ public class MethodCallParams {
             return this;
         }
 
-        public Builder setSigner(AtomicTransactionComposer.TxnSigner signer) {
+        public Builder setSigner(TxnSigner signer) {
             this.signer = signer;
             return this;
         }

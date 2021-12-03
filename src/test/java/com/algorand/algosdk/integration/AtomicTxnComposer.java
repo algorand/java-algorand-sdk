@@ -3,9 +3,7 @@ package com.algorand.algosdk.integration;
 import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
-import com.algorand.algosdk.transaction.AtomicTransactionComposer;
-import com.algorand.algosdk.transaction.MethodCallParams;
-import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.Encoder;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -13,7 +11,6 @@ import io.cucumber.java.en.When;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +22,8 @@ public class AtomicTxnComposer {
     Applications applications;
     AtomicTransactionComposer atc;
     TransactionSteps transSteps;
-    AtomicTransactionComposer.TxnSigner transSigner;
-    AtomicTransactionComposer.TransactionWithSigner transWithSigner;
+    TxnSigner transSigner;
+    TransactionWithSigner transWithSigner;
     Method method;
     MethodCallParams.Builder optionBuilder;
     AtomicTransactionComposer.ExecuteResult execRes;
@@ -65,7 +62,7 @@ public class AtomicTxnComposer {
 
     @When("I create a transaction with signer with the current transaction.")
     public void i_create_a_transaction_with_signer_with_the_current_transaction() {
-        transWithSigner = new AtomicTransactionComposer.TransactionWithSigner(transSteps.builtTransaction, transSigner);
+        transWithSigner = new TransactionWithSigner(transSteps.builtTransaction, transSigner);
     }
 
     @When("I add the current transaction with signer to the composer.")
@@ -75,11 +72,11 @@ public class AtomicTxnComposer {
 
     @Then("I clone the composer.")
     public void i_clone_the_composer() throws IOException {
-        atc = atc.cloneAtomicTxnComposer();
+        atc = atc.cloneComposer();
     }
 
     @Then("I gather signatures with the composer.")
-    public void i_gather_signatures_with_the_composer() throws IOException, NoSuchAlgorithmException {
+    public void i_gather_signatures_with_the_composer() throws Exception {
         atc.gatherSignatures();
     }
 
@@ -132,7 +129,7 @@ public class AtomicTxnComposer {
         assertThat(execRes.methodResults.size()).isEqualTo(1);
 
         AtomicTransactionComposer.ReturnValue execRetVal = execRes.methodResults.get(0);
-        assertThat(execRetVal.parseError).isNullOrEmpty();
+        assertThat(execRetVal.parseError).isNull();
 
         if (string.isEmpty()) {
             assertThat(this.method.returns.type).isEqualTo("void");

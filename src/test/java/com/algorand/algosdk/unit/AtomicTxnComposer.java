@@ -6,10 +6,7 @@ import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
-import com.algorand.algosdk.transaction.AtomicTransactionComposer;
-import com.algorand.algosdk.transaction.MethodCallParams;
-import com.algorand.algosdk.transaction.SignedTransaction;
-import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.Given;
@@ -17,7 +14,6 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +30,10 @@ public class AtomicTxnComposer {
 
     TransactionSteps transSteps;
     Account signingAccount;
-    AtomicTransactionComposer.TxnSigner txnSigner;
+    TxnSigner txnSigner;
     List<SignedTransaction> signedTxnsGathered;
 
-    AtomicTransactionComposer.TransactionWithSigner txnWithSigner;
+    TransactionWithSigner txnWithSigner;
     MethodCallParams.Builder optionBuilder;
 
     public AtomicTxnComposer(Base b, ABIJson methodABI_, TransactionSteps steps) {
@@ -71,7 +67,7 @@ public class AtomicTxnComposer {
 
     @When("I create a transaction with signer with the current transaction.")
     public void i_create_a_transaction_with_signer_with_the_current_transaction() {
-        this.txnWithSigner = new AtomicTransactionComposer.TransactionWithSigner(this.transSteps.builtTransaction, this.txnSigner);
+        this.txnWithSigner = new TransactionWithSigner(this.transSteps.builtTransaction, this.txnSigner);
     }
 
     @When("I create a new method arguments array.")
@@ -147,7 +143,7 @@ public class AtomicTxnComposer {
     }
 
     @Then("I gather signatures with the composer.")
-    public void i_gather_signatures_with_the_composer() throws IOException, NoSuchAlgorithmException {
+    public void i_gather_signatures_with_the_composer() throws Exception {
         signedTxnsGathered = atc.gatherSignatures();
     }
 
