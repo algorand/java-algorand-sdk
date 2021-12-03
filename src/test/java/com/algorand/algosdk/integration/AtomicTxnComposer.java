@@ -72,7 +72,7 @@ public class AtomicTxnComposer {
 
     @Then("I clone the composer.")
     public void i_clone_the_composer() throws IOException {
-        atc = atc.cloneAtomicTxnComposer();
+        atc = atc.cloneComposer();
     }
 
     @Then("I gather signatures with the composer.")

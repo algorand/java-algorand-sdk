@@ -61,10 +61,9 @@ public class AtomicTransactionComposer {
      * Create a new composer with the same underlying transactions. The new composer's status will be
      * BUILDING, so additional transactions may be added to it.
      */
-    public AtomicTransactionComposer cloneAtomicTxnComposer() throws IOException {
+    public AtomicTransactionComposer cloneComposer() throws IOException {
         AtomicTransactionComposer cloned = new AtomicTransactionComposer();
-        for (Map.Entry<Integer, Method> entry : this.methodMap.entrySet())
-            cloned.methodMap.put(entry.getKey(), new Method(entry.getValue()));
+        cloned.methodMap.putAll(this.methodMap);
         ObjectMapper om = new ObjectMapper();
         for (TransactionWithSigner txWithSigner : this.transactionList) {
             byte[] txSerialized = om.writeValueAsBytes(txWithSigner.txn);
@@ -118,10 +117,13 @@ public class AtomicTransactionComposer {
             Object methodArg = methodCall.methodArgs.get(i);
             if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
-            } else {
+            } else if (argT.parsedType != null) {
                 methodArgs.add(methodArg);
                 methodABIts.add(argT.parsedType);
-            }
+            } else
+                throw new IllegalArgumentException(
+                        "error: the type of method argument is a transaction-type, but no transaction-with-signer provided"
+                );
         }
 
         if (methodArgs.size() > 14) {
@@ -301,17 +303,8 @@ public class AtomicTransactionComposer {
             throw new IllegalArgumentException("wait round for execute should be non-negative");
         this.submit(client);
 
-        int firstMethodCallIndex = -1;
-        for (int i = 0; i < this.signedTxns.size(); i++) {
-            if (this.signedTxns.get(i).tx.type.equals(Transaction.Type.ApplicationCall)) {
-                firstMethodCallIndex = i;
-                break;
-            }
-        }
-        firstMethodCallIndex = (firstMethodCallIndex == -1) ? 0 : firstMethodCallIndex;
-
         PendingTransactionResponse txInfo =
-                Utils.waitForConfirmation(client, this.signedTxns.get(firstMethodCallIndex).transactionID, waitRounds);
+                Utils.waitForConfirmation(client, this.signedTxns.get(0).transactionID, waitRounds);
         List<ReturnValue> retList = new ArrayList<>();
 
         this.status = Status.COMMITTED;
