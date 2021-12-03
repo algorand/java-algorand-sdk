@@ -1,6 +1,6 @@
 package com.algorand.algosdk.abi;
 
-public class TypeBool extends Type {
+public class TypeBool extends ABIType {
     public TypeBool() {
     }
 

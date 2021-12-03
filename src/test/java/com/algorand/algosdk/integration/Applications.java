@@ -21,9 +21,9 @@ import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Applications {
-    private final Clients clients;
-    private final Stepdefs base;
-    private final TransientAccount transientAccount;
+    public Clients clients;
+    public Stepdefs base;
+    public TransientAccount transientAccount;
 
     public Transaction transaction;
     public String txId = null;
@@ -128,7 +128,7 @@ public class Applications {
 
     @Given("I wait for the transaction to be confirmed.")
     public void waitForTransactionToBeConfirmed() throws Exception {
-        Utils.waitForConfirmation(clients.v2Client, txId, 4);
+        Utils.waitForConfirmation(clients.v2Client, txId, 5);
     }
 
     // TODO: Use V2 Pending Transaction endpoint when it is available.

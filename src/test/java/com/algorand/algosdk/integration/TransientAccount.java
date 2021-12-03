@@ -11,8 +11,8 @@ import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import io.cucumber.java.en.Given;
 
 public class TransientAccount {
-    private final Clients clients;
-    private final Stepdefs base;
+    public Clients clients;
+    public Stepdefs base;
 
     public Account transientAccount = null;
 
@@ -38,7 +38,7 @@ public class TransientAccount {
         SignedTransaction stx = base.signWithAddress(tx, sender);
 
         Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
-        Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 4);
+        Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 5);
     }
 
 }

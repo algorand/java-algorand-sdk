@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class Type {
+public abstract class ABIType {
     public static final int ABI_DYNAMIC_HEAD_BYTE_LEN = 2;
     private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>[1-9][\\d]*)]$");
     private static final Pattern ufixedPattern = Pattern.compile("^ufixed(?<size>[1-9][\\d]*)x(?<precision>[1-9][\\d]*)$");
@@ -47,15 +47,15 @@ public abstract class Type {
      * @return ABI type scheme object
      * @throws IllegalArgumentException if ABI type serialization strings are corrupted
      */
-    public static Type fromString(String str) {
+    public static ABIType valueOf(String str) {
         if (str.endsWith("[]")) {
-            Type elemType = Type.fromString(str.substring(0, str.length() - 2));
+            ABIType elemType = ABIType.valueOf(str.substring(0, str.length() - 2));
             return new TypeArrayDynamic(elemType);
         } else if (str.endsWith("]")) {
             Matcher m = staticArrayPattern.matcher(str);
             if (!m.matches())
                 throw new IllegalArgumentException("static array type ill format: " + str);
-            Type elemT = Type.fromString(m.group("elemT"));
+            ABIType elemT = ABIType.valueOf(m.group("elemT"));
             int length = Integer.parseInt(m.group("len"));
             return new TypeArrayStatic(elemT, length);
         } else if (str.startsWith("uint")) {
@@ -78,9 +78,9 @@ public abstract class Type {
             return new TypeString();
         } else if (str.length() >= 2 && str.charAt(0) == '(' && str.endsWith(")")) {
             List<String> tupleContent = parseTupleContent(str.substring(1, str.length() - 1));
-            List<Type> tupleTypes = new ArrayList<>();
+            List<ABIType> tupleTypes = new ArrayList<>();
             for (String subStr : tupleContent)
-                tupleTypes.add(Type.fromString(subStr));
+                tupleTypes.add(ABIType.valueOf(subStr));
             return new TypeTuple(tupleTypes);
         } else {
             throw new IllegalArgumentException("Cannot infer type from the string: " + str);
@@ -96,7 +96,7 @@ public abstract class Type {
         }
     }
 
-    private static List<String> parseTupleContent(String str) {
+    public static List<String> parseTupleContent(String str) {
         if (str.length() == 0)
             return new ArrayList<>();
 
@@ -139,7 +139,7 @@ public abstract class Type {
         return Arrays.asList(tupleSeg);
     }
 
-    protected static int findBoolLR(Type[] typeArray, int index, int delta) {
+    protected static int findBoolLR(ABIType[] typeArray, int index, int delta) {
         int until = 0;
         while (true) {
             int currentIndex = index + delta * until;
@@ -215,8 +215,8 @@ public abstract class Type {
      * @param t ABI type of the element of the ABI array
      * @return a type-cast from ABI array to an ABI tuple type
      */
-    protected static TypeTuple castToTupleType(int size, Type t) {
-        List<Type> tupleTypes = new ArrayList<>();
+    protected static TypeTuple castToTupleType(int size, ABIType t) {
+        List<ABIType> tupleTypes = new ArrayList<>();
         for (int i = 0; i < size; i++)
             tupleTypes.add(t);
         return new TypeTuple(tupleTypes);

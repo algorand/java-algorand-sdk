@@ -3,7 +3,7 @@ package com.algorand.algosdk.abi;
 import com.algorand.algosdk.crypto.Address;
 import org.apache.commons.lang3.ArrayUtils;
 
-public class TypeAddress extends Type {
+public class TypeAddress extends ABIType {
     public TypeAddress() {
     }
 
@@ -32,7 +32,7 @@ public class TypeAddress extends Type {
         else
             throw new IllegalArgumentException("cannot infer type for abi encoding in address");
 
-        return Type.castToTupleType(Address.LEN_BYTES, new TypeByte()).encode(ArrayUtils.toObject(values));
+        return ABIType.castToTupleType(Address.LEN_BYTES, new TypeByte()).encode(ArrayUtils.toObject(values));
     }
 
     @Override

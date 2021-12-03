@@ -4,7 +4,7 @@ import com.algorand.algosdk.util.Encoder;
 
 import java.math.BigInteger;
 
-public class TypeUfixed extends Type {
+public class TypeUfixed extends ABIType {
     public final int bitSize;
     public final int precision;
 
