@@ -1,9 +1,9 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxnSigner;
 import com.algorand.algosdk.util.Digester;
 import com.fasterxml.jackson.annotation.*;
 
@@ -119,19 +119,18 @@ public class MultisigAddress implements Serializable {
         return Objects.hash(version, threshold, publicKeys);
     }
 
-    public AtomicTransactionComposer.TxnSigner getTransactionSigner(final byte[][] sks) throws NoSuchAlgorithmException {
+    public TxnSigner getTransactionSigner(final byte[][] sks) throws NoSuchAlgorithmException {
         final MultisigAddress self = this;
         final List<Account> msigAccounts = new ArrayList<>();
         for (byte[] sk : sks) msigAccounts.add(new Account(sk));
 
-        return new AtomicTransactionComposer.TxnSigner() {
+        return new TxnSigner() {
             @Override
             public int hashCode() {
                 return Objects.hash(3, self, Arrays.deepHashCode(sks));
             }
 
-            @Override
-            public SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException {
+            private SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException {
                 final List<SignedTransaction> multiStxns = new ArrayList<>();
                 for (Account acc : msigAccounts)
                     multiStxns.add(acc.signMultisigTransaction(self, txn));

@@ -15,13 +15,13 @@ public class MethodCallParams {
     public Transaction.OnCompletion onCompletion;
     public byte[] note, lease;
     public BigInteger fv, lv, fee, flatFee;
-    AtomicTransactionComposer.TxnSigner signer;
-    TransactionParams suggestedParams;
+    TxnSigner signer;
+    public TransactionParams suggestedParams;
 
     public MethodCallParams(Long appID, Method method, List<Object> methodArgs, String sender,
                             TransactionParams sp, Transaction.OnCompletion onCompletion, byte[] note, byte[] lease,
                             BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
-                            String rekeyTo, AtomicTransactionComposer.TxnSigner signer) {
+                            String rekeyTo, TxnSigner signer) {
         if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
             throw new IllegalArgumentException("Method call builder error: some required field not added");
         if (method.args.size() != methodArgs.size())
@@ -50,8 +50,8 @@ public class MethodCallParams {
         public Transaction.OnCompletion onCompletion;
         public byte[] note, lease;
         public BigInteger fv, lv, fee, flatFee;
-        AtomicTransactionComposer.TxnSigner signer;
-        TransactionParams sp;
+        TxnSigner signer;
+        public TransactionParams sp;
 
         public Builder() {
             this.onCompletion = Transaction.OnCompletion.NoOpOC;
@@ -103,7 +103,7 @@ public class MethodCallParams {
             return this;
         }
 
-        public Builder setSigner(AtomicTransactionComposer.TxnSigner signer) {
+        public Builder setSigner(TxnSigner signer) {
             this.signer = signer;
             return this;
         }

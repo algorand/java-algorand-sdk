@@ -16,7 +16,6 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class AtomicTransactionComposer {
@@ -201,7 +200,7 @@ public class AtomicTransactionComposer {
      *
      * @return an array of signed transactions.
      */
-    public List<SignedTransaction> gatherSignatures() throws IOException, NoSuchAlgorithmException {
+    public List<SignedTransaction> gatherSignatures() throws Exception {
         if (this.status.compareTo(Status.SIGNED) >= 0)
             return this.signedTxns;
 
@@ -337,7 +336,7 @@ public class AtomicTransactionComposer {
                         null,
                         null,
                         null,
-                        resp.message()
+                        new Exception(resp.message())
                 ));
                 continue;
             }
@@ -357,19 +356,19 @@ public class AtomicTransactionComposer {
                         null,
                         null,
                         null,
-                        "expected to find logged return value, got none"
+                        new Exception("expected to find logged return value, got none")
                 ));
                 continue;
             }
 
             byte[] abiEncoded = Arrays.copyOfRange(retLine, 4, retLine.length);
             Object decoded = null;
-            String parseError = null;
+            Exception parseError = null;
             try {
-                ABIType ABIType = this.methodMap.get(i).returns.parsedType;
-                decoded = ABIType.decode(abiEncoded);
+                ABIType methodRetType = this.methodMap.get(i).returns.parsedType;
+                decoded = methodRetType.decode(abiEncoded);
             } catch (Exception e) {
-                parseError = e.getMessage();
+                parseError = e;
             }
             retList.add(new ReturnValue(
                     this.transactionList.get(i).txn.txID(),
@@ -408,32 +407,13 @@ public class AtomicTransactionComposer {
         public String txID;
         public byte[] rawValue;
         public Object value;
-        public String parseError;
+        public Exception parseError;
 
-        public ReturnValue(String txID, byte[] rawValue, Object value, String parseError) {
+        public ReturnValue(String txID, byte[] rawValue, Object value, Exception parseError) {
             this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;
             this.parseError = parseError;
-        }
-    }
-
-    public interface TxnSigner {
-        int hashCode();
-
-        SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException, IOException;
-
-        SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
-                throws NoSuchAlgorithmException, IOException;
-    }
-
-    public static class TransactionWithSigner {
-        public Transaction txn;
-        public TxnSigner signer;
-
-        public TransactionWithSigner(Transaction txn, TxnSigner signer) {
-            this.txn = txn;
-            this.signer = signer;
         }
     }
 }
