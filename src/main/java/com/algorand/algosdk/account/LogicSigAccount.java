@@ -3,12 +3,14 @@ package com.algorand.algosdk.account;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxnSigner;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class LogicSigAccount {
     public final Ed25519PublicKey sigKey;
@@ -156,5 +158,25 @@ public class LogicSigAccount {
     public SignedTransaction signLogicSigTransaction(Transaction tx)
             throws NoSuchAlgorithmException, IOException {
         return Account.signLogicTransactionWithAddress(this.lsig, this.getAddress(), tx);
+    }
+
+    public TxnSigner getTransactionSigner() {
+        final LogicSigAccount self = this;
+
+        return new TxnSigner() {
+            @Override
+            public int hashCode() {
+                return Objects.hash(2, self);
+            }
+
+            @Override
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
+                    throws NoSuchAlgorithmException, IOException {
+                SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
+                for (int i = 0; i < indicesToSign.length; i++)
+                    sTxn[i] = self.signLogicSigTransaction(txnGroup[indicesToSign[i]]);
+                return sTxn;
+            }
+        };
     }
 }

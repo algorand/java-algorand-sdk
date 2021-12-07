@@ -1,11 +1,16 @@
 package com.algorand.algosdk.crypto;
 
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxnSigner;
 import com.algorand.algosdk.util.Digester;
 import com.fasterxml.jackson.annotation.*;
 
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -112,5 +117,34 @@ public class MultisigAddress implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hash(version, threshold, publicKeys);
+    }
+
+    public TxnSigner getTransactionSigner(final byte[][] sks) throws NoSuchAlgorithmException {
+        final MultisigAddress self = this;
+        final List<Account> msigAccounts = new ArrayList<>();
+        for (byte[] sk : sks) msigAccounts.add(new Account(sk));
+
+        return new TxnSigner() {
+            @Override
+            public int hashCode() {
+                return Objects.hash(3, self, Arrays.deepHashCode(sks));
+            }
+
+            private SignedTransaction signTxn(Transaction txn) throws NoSuchAlgorithmException {
+                final List<SignedTransaction> multiStxns = new ArrayList<>();
+                for (Account acc : msigAccounts)
+                    multiStxns.add(acc.signMultisigTransaction(self, txn));
+                return Account.mergeMultisigTransactions(multiStxns.toArray(new SignedTransaction[0]));
+            }
+
+            @Override
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
+                    throws NoSuchAlgorithmException {
+                SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
+                for (int i = 0; i < indicesToSign.length; i++)
+                    sTxn[i] = this.signTxn(txnGroup[indicesToSign[i]]);
+                return sTxn;
+            }
+        };
     }
 }

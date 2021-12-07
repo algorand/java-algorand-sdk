@@ -8,6 +8,7 @@ import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxnSigner;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Encoder;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -20,6 +21,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.
@@ -681,6 +683,26 @@ public class Account {
             this.nextBytes(bytes);
             return bytes;
         }
+    }
+
+    public TxnSigner getTransactionSigner() {
+        final Account self = this;
+
+        return new TxnSigner() {
+            @Override
+            public int hashCode() {
+                return Objects.hash(1, self);
+            }
+
+            @Override
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
+                    throws Exception {
+                SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
+                for (int i = 0; i < indicesToSign.length; i++)
+                    sTxn[i] = self.signTransaction(txnGroup[indicesToSign[i]]);
+                return sTxn;
+            }
+        };
     }
 
 }

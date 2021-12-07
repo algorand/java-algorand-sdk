@@ -164,6 +164,7 @@ public class Account extends PathResponse {
      *   sig
      *   msig
      *   lsig
+     *   or null if unknown
      */
     @JsonProperty("sig-type")
     public Enums.SigType sigType;
