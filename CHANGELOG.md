@@ -1,3 +1,11 @@
+# 1.11.0-beta-1
+- Bump bcprov-jdk15to18 to 1.69 (#267)
+- ABI Interaction Support for JAVA SDK (#268)
+- Add keyreg txn encoding tests (#269)
+- Stop empty state proof key from being encoded in txn (#270)
+- Add WaitForConfirmation function (#274)
+- Bug fix for logs on PendingTransactionResponse (#275)
+
 # 1.10.0
 - Feature/sign rekey lsig msig (#250)
 - Support parsing msgpack with numeric key (#262)
