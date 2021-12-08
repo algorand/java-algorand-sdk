@@ -1,3 +1,4 @@
+com.algorand.algosdk.abi
 com.algorand.algosdk.account
 com.algorand.algosdk.algod.client
 com.algorand.algosdk.algod.client.api
@@ -17,6 +18,7 @@ com.algorand.algosdk.mnemonic
 com.algorand.algosdk.templates
 com.algorand.algosdk.transaction
 com.algorand.algosdk.util
+com.algorand.algosdk.v2.client
 com.algorand.algosdk.v2.client.algod
 com.algorand.algosdk.v2.client.common
 com.algorand.algosdk.v2.client.indexer
