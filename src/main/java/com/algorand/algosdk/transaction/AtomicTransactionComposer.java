@@ -28,6 +28,8 @@ public class AtomicTransactionComposer {
     }
 
     public static final int MAX_GROUP_SIZE = 16;
+    // if the abi type argument number > 15, then the abi types after 14th should be wrapped in a tuple
+    private static final int MAX_ABI_ARG_TYPE_LEN = 15;
 
     private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
 
@@ -126,20 +128,20 @@ public class AtomicTransactionComposer {
                 );
         }
 
-        if (methodArgs.size() > 14) {
-            List<ABIType> wrappedABITypes = new ArrayList<>();
-            List<Object> wrappedValues = new ArrayList<>();
+        if (methodArgs.size() > MAX_ABI_ARG_TYPE_LEN) {
+            List<ABIType> wrappedABITypeList = new ArrayList<>();
+            List<Object> wrappedValueList = new ArrayList<>();
 
-            for (int i = 14; i < methodArgs.size(); i++) {
-                wrappedABITypes.add(methodABIts.get(i));
-                wrappedValues.add(methodArgs.get(i));
+            for (int i = MAX_ABI_ARG_TYPE_LEN - 1; i < methodArgs.size(); i++) {
+                wrappedABITypeList.add(methodABIts.get(i));
+                wrappedValueList.add(methodArgs.get(i));
             }
 
-            TypeTuple tupleT = new TypeTuple(wrappedABITypes);
-            methodABIts = methodABIts.subList(0, 14);
+            TypeTuple tupleT = new TypeTuple(wrappedABITypeList);
+            methodABIts = methodABIts.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
             methodABIts.add(tupleT);
-            methodArgs = methodArgs.subList(0, 14);
-            methodArgs.add(wrappedValues);
+            methodArgs = methodArgs.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
+            methodArgs.add(wrappedValueList);
         }
 
         for (int i = 0; i < methodArgs.size(); i++)
