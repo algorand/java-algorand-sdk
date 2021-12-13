@@ -2,6 +2,7 @@ package com.algorand.algosdk.v2.client;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,12 +42,15 @@ public class Utils {
      * @throws Exception if transaction is rejected or the transaction is not
      *                   confirmed before wait round
      */
+    public static DryrunRequest createDryrun(AlgodClient client, List<SignedTransaction> txns) throws Exception {
+        return Utils.createDryrun(client, txns, "", 0L, 0L);
+    }
 
-    public static DryrunRequest creatDryrun(AlgodClient client, SignedTransaction[] txns, String protocol_version,
+    public static DryrunRequest createDryrun(AlgodClient client, List<SignedTransaction> txns, String protocol_version,
             Long latest_timestamp, Long round)
             throws Exception {
 
-        if (client == null || txns.length == 0) {
+        if (client == null || txns.size() == 0) {
             throw new IllegalArgumentException("Bad arguments for createDryrun.");
         }
 
@@ -112,24 +116,30 @@ public class Utils {
 
         for (Long asset : assets) {
             Response<Asset> ar = client.GetAssetByID(asset).execute();
-            Asset a = ar.body();
-            accts.add(a.params.creator);
+            if(ar.isSuccessful()){
+                Asset a = ar.body();
+                accts.add(a.params.creator);
+            }
         }
 
         for (Long app : apps) {
             Response<Application> ar = client.GetApplicationByID(app).execute();
-            app_infos.add(ar.body());
+            if(ar.isSuccessful()){
+                app_infos.add(ar.body());
+            }
         }
 
         for (String acct : accts) {
             Response<Account> ar = client.AccountInformation(new Address(acct)).execute();
-            acct_infos.add(ar.body());
+            if(ar.isSuccessful()){
+                acct_infos.add(ar.body());
+            }
         }
 
         DryrunRequest drr = new DryrunRequest();
         drr.accounts = acct_infos;
         drr.apps = app_infos;
-        drr.txns = Arrays.asList(txns);
+        drr.txns = txns;
         drr.protocolVersion = protocol_version;
         drr.latestTimestamp = latest_timestamp;
         drr.round = BigInteger.valueOf(round);
