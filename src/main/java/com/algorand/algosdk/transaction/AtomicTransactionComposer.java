@@ -138,7 +138,6 @@ public class AtomicTransactionComposer {
             if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
             } else if (Method.RefArgTypes.contains(argT.type)) {
-                ABIType currType = new TypeUint(8);
                 int index;
                 if (argT.type.equals("account") && methodArg instanceof Address) {
                     Address accountAddr = (Address) methodArg;
@@ -160,7 +159,7 @@ public class AtomicTransactionComposer {
                             "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
                     );
                 methodArgs.add(index);
-                methodABIts.add(currType);
+                methodABIts.add( new TypeUint(8));
             } else if (argT.parsedType != null) {
                 methodArgs.add(methodArg);
                 methodABIts.add(argT.parsedType);
