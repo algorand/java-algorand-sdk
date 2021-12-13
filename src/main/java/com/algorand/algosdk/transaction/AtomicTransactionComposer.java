@@ -18,6 +18,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class AtomicTransactionComposer {
@@ -96,6 +97,17 @@ public class AtomicTransactionComposer {
         this.transactionList.add(txnAndSigner);
     }
 
+    private static<T> int populateForeignArrayIndex(T objectToBeAdded, List<T> objectArray, T zerothObject) {
+        if (objectToBeAdded.equals(zerothObject))
+            return 0;
+        int startFrom = zerothObject == null ? 0 : 1;
+        int searchInListIndex = objectArray.indexOf(objectToBeAdded);
+        if (searchInListIndex != -1)
+            return startFrom + searchInListIndex;
+        objectArray.add(objectToBeAdded);
+        return objectArray.size() - 1 + startFrom;
+    }
+
     /**
      * Add a smart contract method call to this atomic group.
      * <p>
@@ -130,32 +142,19 @@ public class AtomicTransactionComposer {
                 int index;
                 if (argT.type.equals("account") && methodArg instanceof Address) {
                     Address accountAddr = (Address) methodArg;
-                    if (foreignAccounts.contains(accountAddr)) {
-                        index = foreignAccounts.indexOf(accountAddr) + 1;
-                    } else if (accountAddr.toString().equals(methodCall.sender)) {
-                        index = 0;
-                    } else {
-                        index = foreignAccounts.size() + 1;
-                        foreignAccounts.add(accountAddr);
+                    Address senderAddr;
+                    try {
+                        senderAddr = new Address(methodCall.sender);
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new IllegalArgumentException(e);
                     }
+                    index = populateForeignArrayIndex(accountAddr, foreignAccounts, senderAddr);
                 } else if (argT.type.equals("asset") && methodArg instanceof Long) {
                     Long assetID = (Long) methodArg;
-                    if (foreignAssets.contains(assetID)) {
-                        index = foreignAssets.indexOf(assetID);
-                    } else {
-                        index = foreignAssets.size();
-                        foreignAssets.add(assetID);
-                    }
+                    index = populateForeignArrayIndex(assetID, foreignAssets, null);
                 } else if (argT.type.equals("application") && methodArg instanceof Long) {
                     Long appID = (Long) methodArg;
-                    if (foreignApps.contains(appID)) {
-                        index = foreignApps.indexOf(appID) + 1;
-                    } else if (appID.equals(methodCall.appID)) {
-                        index = 0;
-                    } else {
-                        index = foreignApps.size() + 1;
-                        foreignApps.add(appID);
-                    }
+                    index = populateForeignArrayIndex(appID, foreignApps, methodCall.appID);
                 } else
                     throw new IllegalArgumentException(
                             "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
