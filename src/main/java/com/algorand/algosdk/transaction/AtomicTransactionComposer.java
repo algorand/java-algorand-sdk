@@ -125,7 +125,7 @@ public class AtomicTransactionComposer {
             Object methodArg = methodCall.methodArgs.get(i);
             if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
-            } else if (Method.ForeignArrayArgs.contains(argT.type)) {
+            } else if (Method.RefArgTypes.contains(argT.type)) {
                 ABIType currType = new TypeUint(8);
                 int index;
                 if (argT.type.equals("account") && methodArg instanceof Address) {

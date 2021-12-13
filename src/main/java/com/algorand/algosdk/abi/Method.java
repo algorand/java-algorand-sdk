@@ -29,10 +29,10 @@ public class Method {
     );
 
     @JsonIgnore
-    public static final Set<String> ForeignArrayArgs = new HashSet<>(Arrays.asList("account", "asset", "application"));
+    public static final Set<String> RefArgTypes = new HashSet<>(Arrays.asList("account", "asset", "application"));
 
     static boolean isTxnArgOrForeignArrayArgs(String str) {
-        return TxArgTypes.contains(str) || ForeignArrayArgs.contains(str);
+        return TxArgTypes.contains(str) || RefArgTypes.contains(str);
     }
 
     @JsonIgnore
