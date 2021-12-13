@@ -49,7 +49,12 @@ public class Contract {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Contract contract = (Contract) o;
-        return Objects.equals(name, contract.name) && Objects.equals(networks, contract.networks) && Objects.equals(methods, contract.methods);
+        if (!contract.networks.keySet().equals(this.networks.keySet())) return false;
+        for (String networkHash : this.networks.keySet()) {
+            if (!contract.getAppIDbyHash(networkHash).equals(this.getAppIDbyHash(networkHash)))
+                return false;
+        }
+        return Objects.equals(name, contract.name) && Objects.equals(methods, contract.methods);
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -60,6 +65,13 @@ public class Contract {
         @JsonCreator
         public AppID(@JsonProperty("appID") Integer appID) {
             this.appID = Objects.requireNonNull(appID, "appID must not be null");
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == null || o.getClass() != getClass()) return false;
+            AppID otherAppID = (AppID) o;
+            return Objects.equals(appID, otherAppID.appID);
         }
     }
 }
