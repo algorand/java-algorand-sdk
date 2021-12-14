@@ -25,11 +25,10 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 public class Utils {
 
     // https://github.com/algorand/go-algorand/blob/e466aa18d4d963868d6d15279b1c881977fa603f/libgoal/libgoal.go#L1089-L1090
-    public static Long defaultAppId = 1380011588L;
+    private static Long defaultAppId = 1380011588L;
 
     /**
-     * Wait until a transaction has been confirmed or rejected by the network
-     * or wait until waitRound fully elapsed
+     * Construct a DryruynRequest object from a set of transactions
      * 
      * @param client           an Algod v2 client
      * @param txns             the array of SignedTransactions that should be used
