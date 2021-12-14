@@ -97,7 +97,7 @@ public class AtomicTransactionComposer {
         this.transactionList.add(txnAndSigner);
     }
 
-    private static<T> int populateForeignArrayIndex(T objectToBeAdded, List<T> objectArray, T zerothObject) {
+    private static <T> int populateForeignArrayIndex(T objectToBeAdded, List<T> objectArray, T zerothObject) {
         if (objectToBeAdded.equals(zerothObject))
             return 0;
         int startFrom = zerothObject == null ? 0 : 1;
@@ -159,7 +159,7 @@ public class AtomicTransactionComposer {
                             "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
                     );
                 methodArgs.add(index);
-                methodABIts.add( new TypeUint(8));
+                methodABIts.add(new TypeUint(8));
             } else if (argT.parsedType != null) {
                 methodArgs.add(methodArg);
                 methodABIts.add(argT.parsedType);
