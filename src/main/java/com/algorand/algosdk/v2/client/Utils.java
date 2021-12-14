@@ -36,7 +36,7 @@ public class Utils {
      * @param client           an Algod v2 client
      * @param txns             the array of SignedTransactions that should be used
      *                         to generate the DryrunRequest
-     * @return DryrunRequest of the confirmed transaction
+     * @return DryrunRequest to be submitted to TealDryrun endpoint 
      * @throws Exception if transaction is rejected or the transaction is not
      *                   confirmed before wait round
      *
@@ -58,7 +58,7 @@ public class Utils {
      * @param latest_timestamp The latest timestamp the dryrun should include
      * @param round            The agreement round or block height the dryrun should
      *                         include
-     * @return DryrunRequest of the confirmed transaction
+     * @return DryrunRequest to be submitted to TealDryrun endpoint 
      * @throws Exception if transaction is rejected or the transaction is not
      *                   confirmed before wait round
      */
