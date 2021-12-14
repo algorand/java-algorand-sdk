@@ -32,12 +32,11 @@ public class Utils {
      * A DryrunRequest is composed of static balance information.  This function uses the ApplicationCall transaction 
      * parameters to infer what Application State and Account balance information to query using the client and adds it to the DryrunRequest object. 
      * If foreign assets are passed, it will also add the creators balance information to the DryrunRequest. 
-     * For additional details refer to {@link #createDryrun(AlgodClient, List, String, Long, Long)}.
      * 
      * @param client           an Algod v2 client
      * @param txns             the array of SignedTransactions that should be used
      *                         to generate the DryrunRequest
-     * @return TransactionResponse of the confirmed transaction
+     * @return DryrunRequest of the confirmed transaction
      * @throws Exception if transaction is rejected or the transaction is not
      *                   confirmed before wait round
      *
@@ -59,7 +58,7 @@ public class Utils {
      * @param latest_timestamp The latest timestamp the dryrun should include
      * @param round            The agreement round or block height the dryrun should
      *                         include
-     * @return TransactionResponse of the confirmed transaction
+     * @return DryrunRequest of the confirmed transaction
      * @throws Exception if transaction is rejected or the transaction is not
      *                   confirmed before wait round
      */
