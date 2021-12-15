@@ -113,6 +113,7 @@ public class Utils {
                 app_infos.add(app);
             } else {
                 apps.add(tx.applicationId);
+                accts.add(Address.forApplication(tx.applicationId).toString());
             }
 
             if (tx.foreignApps.size() > 0) {
