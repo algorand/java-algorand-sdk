@@ -171,6 +171,11 @@ public class AtomicTransactionComposer {
                 );
         }
 
+        if (foreignAccounts.size() > FOREIGN_ARRAY_NUM_LIMIT)
+            throw new IllegalArgumentException("error: foreign accounts number > 4");
+        else if (foreignApps.size() + foreignAssets.size() + foreignAccounts.size() > FOREIGN_OBJ_NUM_LIMIT)
+            throw new IllegalArgumentException("error: total foreign object array number > 8");
+
         if (methodArgs.size() > MAX_ABI_ARG_TYPE_LEN) {
             List<ABIType> wrappedABITypeList = new ArrayList<>();
             List<Object> wrappedValueList = new ArrayList<>();
