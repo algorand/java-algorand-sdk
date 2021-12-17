@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 
 public class ABIJson {
     private enum CHECK_FIELD {
@@ -84,10 +85,16 @@ public class ABIJson {
         this.jsonInterface = new ObjectMapper().writeValueAsString(this.interfaceObj);
     }
 
-    @When("I create a Contract object from the Method object with name {string} and appId {int}")
-    public void i_create_a_contract_object_from_the_method_object_with_name_and_app_id(String string, Integer int1) {
-        this.contract = new Contract(string, int1, Collections.singletonList(this.method));
+    @When("I create a Contract object from the Method object with name {string}")
+    public void i_create_a_contract_object_from_the_method_object_with_name_and_app_id(String string) {
+        this.contract = new Contract(string, null, Collections.singletonList(this.method));
+        this.contract.networks = new HashMap<>();
         this.state = CHECK_FIELD.CONTRACT;
+    }
+
+    @When("I set the Contract's appID to <network1-app-id> for the network <network1>")
+    public void i_set_the_contracts_appid_to(Integer appID, String network) {
+        this.contract.networks.put(network, new Contract.AppID(appID));
     }
 
     @When("I serialize the Contract object into json")

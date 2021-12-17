@@ -31,6 +31,8 @@ public class AtomicTransactionComposer {
     }
 
     public static final int MAX_GROUP_SIZE = 16;
+    // if the abi type argument number > 15, then the abi types after 14th should be wrapped in a tuple
+    private static final int MAX_ABI_ARG_TYPE_LEN = 15;
 
     private static final int FOREIGN_ARRAY_NUM_LIMIT = 4;
     private static final int FOREIGN_OBJ_NUM_LIMIT = 8;
@@ -169,25 +171,20 @@ public class AtomicTransactionComposer {
                 );
         }
 
-        if (foreignAccounts.size() > FOREIGN_ARRAY_NUM_LIMIT)
-            throw new IllegalArgumentException("error: foreign accounts number > 4");
-        else if (foreignApps.size() + foreignAssets.size() + foreignAccounts.size() > FOREIGN_OBJ_NUM_LIMIT)
-            throw new IllegalArgumentException("error: total foreign object array number > 8");
+        if (methodArgs.size() > MAX_ABI_ARG_TYPE_LEN) {
+            List<ABIType> wrappedABITypeList = new ArrayList<>();
+            List<Object> wrappedValueList = new ArrayList<>();
 
-        if (methodArgs.size() > 14) {
-            List<ABIType> wrappedABITypes = new ArrayList<>();
-            List<Object> wrappedValues = new ArrayList<>();
-
-            for (int i = 14; i < methodArgs.size(); i++) {
-                wrappedABITypes.add(methodABIts.get(i));
-                wrappedValues.add(methodArgs.get(i));
+            for (int i = MAX_ABI_ARG_TYPE_LEN - 1; i < methodArgs.size(); i++) {
+                wrappedABITypeList.add(methodABIts.get(i));
+                wrappedValueList.add(methodArgs.get(i));
             }
 
-            TypeTuple tupleT = new TypeTuple(wrappedABITypes);
-            methodABIts = methodABIts.subList(0, 14);
+            TypeTuple tupleT = new TypeTuple(wrappedABITypeList);
+            methodABIts = methodABIts.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
             methodABIts.add(tupleT);
-            methodArgs = methodArgs.subList(0, 14);
-            methodArgs.add(wrappedValues);
+            methodArgs = methodArgs.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
+            methodArgs.add(wrappedValueList);
         }
 
         for (int i = 0; i < methodArgs.size(); i++)
@@ -233,11 +230,12 @@ public class AtomicTransactionComposer {
 
         if (this.transactionList.size() == 0)
             throw new IllegalArgumentException("should not build transaction group with 0 transaction in composer");
-
-        List<Transaction> groupTxns = new ArrayList<>();
-        for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
-        Digest groupID = TxGroup.computeGroupID(groupTxns.toArray(new Transaction[0]));
-        for (TransactionWithSigner tws : this.transactionList) tws.txn.group = groupID;
+        else if (this.transactionList.size() > 1) {
+            List<Transaction> groupTxns = new ArrayList<>();
+            for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
+            Digest groupID = TxGroup.computeGroupID(groupTxns.toArray(new Transaction[0]));
+            for (TransactionWithSigner tws : this.transactionList) tws.txn.group = groupID;
+        }
 
         this.status = Status.BUILT;
         return this.transactionList;
