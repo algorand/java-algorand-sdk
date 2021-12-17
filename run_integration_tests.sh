@@ -6,7 +6,7 @@ pushd $rootdir
 
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
-TEST_BRANCH=master
+TEST_BRANCH=more-abi-tests
 
 function help {
   echo "Options:"

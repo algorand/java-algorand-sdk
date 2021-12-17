@@ -229,7 +229,7 @@ public class AtomicTransactionComposer {
             return this.transactionList;
 
         if (this.transactionList.size() == 0)
-            throw new IllegalArgumentException("should not build transaction group with 0 transaction in composer");
+            throw new IllegalArgumentException("zero group size error");
         else if (this.transactionList.size() > 1) {
             List<Transaction> groupTxns = new ArrayList<>();
             for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
