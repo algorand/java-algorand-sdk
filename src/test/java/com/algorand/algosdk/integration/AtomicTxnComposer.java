@@ -1,17 +1,16 @@
 package com.algorand.algosdk.integration;
 
-import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.SplitAndProcessABIArgs;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +26,7 @@ public class AtomicTxnComposer {
     Method method;
     MethodCallParams.Builder optionBuilder;
     AtomicTransactionComposer.ExecuteResult execRes;
+    SplitAndProcessABIArgs abiArgProcessor;
 
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
         base = stepdefs;
@@ -88,6 +88,7 @@ public class AtomicTxnComposer {
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
          optionBuilder = new MethodCallParams.Builder();
+         abiArgProcessor = new SplitAndProcessABIArgs(method);
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
@@ -95,26 +96,9 @@ public class AtomicTxnComposer {
         this.optionBuilder.addMethodArgs(this.transWithSigner);
     }
 
-    private List<Object> splitAndProcessABIArgs(String str) {
-        String[] argTokens = str.split(",");
-        List<Object> res = new ArrayList<>();
-
-        int argTokenIndex = 0;
-        for (Method.Arg argType : method.args) {
-            if (Method.TxArgTypes.contains(argType.type))
-                continue;
-            ABIType abiT = ABIType.valueOf(argType.type);
-            byte[] abiEncoded = Encoder.decodeFromBase64(argTokens[argTokenIndex]);
-            res.add(abiT.decode(abiEncoded));
-            argTokenIndex++;
-        }
-
-        return res;
-    }
-
     @When("I append the encoded arguments {string} to the method arguments array.")
     public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
-        List<Object> processedABIArgs = splitAndProcessABIArgs(string);
+        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessABIArgs(string);
         for (Object arg : processedABIArgs)
             this.optionBuilder.addMethodArgs(arg);
     }

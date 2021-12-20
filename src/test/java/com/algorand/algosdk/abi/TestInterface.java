@@ -34,10 +34,11 @@ public class TestInterface {
 
     @Test
     public void TestInterfaceClassMethods() throws IOException {
-        String testJSON = "{\"name\": \"Calculator\",\"methods\": [{ \"name\": \"add\", \"args\": [ { \"name\": \"a\", \"type\": \"uint64\", \"desc\": \"...\" },{ \"name\": \"b\", \"type\": \"uint64\", \"desc\": \"...\" } ] },{ \"name\": \"multiply\", \"args\": [ { \"name\": \"a\", \"type\": \"uint64\", \"desc\": \"...\" },{ \"name\": \"b\", \"type\": \"uint64\", \"desc\": \"...\" } ] }]}";
+        String testJSON = "{\"name\": \"Calculator\",\"desc\":\"example description\",\"methods\": [{ \"name\": \"add\", \"args\": [ { \"name\": \"a\", \"type\": \"uint64\", \"desc\": \"...\" },{ \"name\": \"b\", \"type\": \"uint64\", \"desc\": \"...\" } ] },{ \"name\": \"multiply\", \"args\": [ { \"name\": \"a\", \"type\": \"uint64\", \"desc\": \"...\" },{ \"name\": \"b\", \"type\": \"uint64\", \"desc\": \"...\" } ] }]}";
         Interface readInterface = objMapper.readValue(testJSON.getBytes(StandardCharsets.UTF_8), Interface.class);
         assertThat(readInterface).isEqualTo(new Interface(
                 "Calculator",
+                "example description",
                 methodList
         ));
         assertThat(readInterface.getName()).isEqualTo("Calculator");

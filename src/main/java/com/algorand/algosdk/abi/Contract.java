@@ -14,6 +14,8 @@ import java.util.Objects;
 public class Contract {
     @JsonProperty("name")
     public String name;
+    @JsonProperty("desc")
+    public String description;
     @JsonProperty("networks")
     public Map<String, AppID> networks;
     @JsonProperty("methods")
@@ -22,10 +24,12 @@ public class Contract {
     @JsonCreator
     public Contract(
             @JsonProperty("name") String name,
+            @JsonProperty("desc") String description,
             @JsonProperty("networks") Map<String, AppID> networks,
             @JsonProperty("methods") List<Method> methods
     ) {
         this.name = Objects.requireNonNull(name, "name must not be null");
+        this.description = description;
         this.networks = networks;
         if (methods != null) this.methods = methods;
     }
@@ -33,6 +37,11 @@ public class Contract {
     @JsonIgnore
     public String getName() {
         return this.name;
+    }
+
+    @JsonIgnore
+    public String getDescription() {
+        return this.description;
     }
 
     @JsonIgnore
@@ -54,7 +63,7 @@ public class Contract {
             if (!contract.getAppIDbyHash(networkHash).equals(this.getAppIDbyHash(networkHash)))
                 return false;
         }
-        return Objects.equals(name, contract.name) && Objects.equals(methods, contract.methods);
+        return Objects.equals(name, contract.name) && Objects.equals(methods, contract.methods) && Objects.equals(description, contract.description);
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

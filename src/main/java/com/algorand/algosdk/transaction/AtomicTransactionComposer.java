@@ -7,6 +7,7 @@ import com.algorand.algosdk.abi.TypeUint;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -150,12 +152,12 @@ public class AtomicTransactionComposer {
                         throw new IllegalArgumentException(e);
                     }
                     index = populateForeignArrayIndex(accountAddr, foreignAccounts, senderAddr);
-                } else if (argT.type.equals("asset") && methodArg instanceof Long) {
-                    Long assetID = (Long) methodArg;
-                    index = populateForeignArrayIndex(assetID, foreignAssets, null);
-                } else if (argT.type.equals("application") && methodArg instanceof Long) {
-                    Long appID = (Long) methodArg;
-                    index = populateForeignArrayIndex(appID, foreignApps, methodCall.appID);
+                } else if (argT.type.equals("asset") && methodArg instanceof BigInteger) {
+                    BigInteger assetID = (BigInteger) methodArg;
+                    index = populateForeignArrayIndex(assetID.longValue(), foreignAssets, null);
+                } else if (argT.type.equals("application") && methodArg instanceof BigInteger) {
+                    BigInteger appID = (BigInteger) methodArg;
+                    index = populateForeignArrayIndex(appID.longValue(), foreignApps, methodCall.appID);
                 } else
                     throw new IllegalArgumentException(
                             "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
@@ -218,6 +220,17 @@ public class AtomicTransactionComposer {
         Transaction tx = txBuilder.build();
 
         tx.onCompletion = methodCall.onCompletion;
+        tx.approvalProgram = methodCall.approvalProgram;
+        tx.clearStateProgram = methodCall.clearProgram;
+
+        if (methodCall.globalInts != null && methodCall.globalBytes != null)
+            tx.globalStateSchema = new StateSchema(methodCall.globalInts, methodCall.globalBytes);
+
+        if (methodCall.localInts != null && methodCall.globalBytes != null)
+            tx.localStateSchema = new StateSchema(methodCall.localInts, methodCall.localBytes);
+
+        if (methodCall.extraPages != null)
+            tx.extraPages = methodCall.extraPages;
 
         this.transactionList.addAll(tempTransWithSigner);
         this.transactionList.add(new TransactionWithSigner(tx, methodCall.signer));
@@ -389,26 +402,13 @@ public class AtomicTransactionComposer {
             }
 
             PendingTransactionResponse respBody = resp.body();
-            List<byte[]> logs = respBody.logs;
-            byte[] retLine = null;
-            for (int logIndex = logs.size() - 1; logIndex >= 0; logIndex--) {
-                byte[] line = logs.get(logIndex);
-                if (!checkLogRet(line))
-                    continue;
-                retLine = line;
-                break;
-            }
-            if (retLine == null) {
-                retList.add(new ReturnValue(
-                        null,
-                        null,
-                        null,
-                        new Exception("expected to find logged return value, got none")
-                ));
-                continue;
-            }
+            if (respBody.logs.size() == 0)
+                throw new IllegalArgumentException("App call transaction did not log a return value");
+            byte[] retLine = respBody.logs.get(respBody.logs.size() - 1);
+            if (!checkLogRet(retLine))
+                throw new IllegalArgumentException("App call transaction did not log a return value");
 
-            byte[] abiEncoded = Arrays.copyOfRange(retLine, 4, retLine.length);
+            byte[] abiEncoded = Arrays.copyOfRange(retLine, ABI_RET_HASH.length, retLine.length);
             Object decoded = null;
             Exception parseError = null;
             try {

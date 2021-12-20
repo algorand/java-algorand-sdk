@@ -13,21 +13,30 @@ import java.util.Objects;
 public class Interface {
     @JsonProperty("name")
     public String name;
+    @JsonProperty("desc")
+    public String description;
     @JsonProperty("methods")
     public List<Method> methods = new ArrayList<>();
 
     @JsonCreator
     public Interface(
             @JsonProperty("name") String name,
+            @JsonProperty("desc") String description,
             @JsonProperty("methods") List<Method> methods
     ) {
         this.name = Objects.requireNonNull(name, "name must not be null");
+        this.description = description;
         if (methods != null) this.methods = methods;
     }
 
     @JsonIgnore
     public String getName() {
         return this.name;
+    }
+
+    @JsonIgnore
+    public String getDescription() {
+        return this.description;
     }
 
     @JsonIgnore
