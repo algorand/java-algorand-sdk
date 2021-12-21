@@ -98,7 +98,7 @@ public class Applications {
         // Send with transient account, suggested params and current application
         builder.sender(this.transientAccount.transientAccount.getAddress());
         builder.lookupParams(this.clients.v2Client);
-        if (this.appId != 0) {
+        if (this.appId != 0 && !operation.equals("create")) {
             builder.applicationId(appId);
         }
 
