@@ -94,7 +94,7 @@ public class ABIJson {
 
     @When("I set the Contract's appID to {int} for the network {string}")
     public void i_set_the_contract_s_app_id_to_for_the_network(Integer appID, String network) {
-        this.contract.networks.put(network, new Contract.AppID(appID));
+        this.contract.networks.put(network, new Contract.NetworkInfo(appID));
     }
 
     @When("I serialize the Contract object into json")

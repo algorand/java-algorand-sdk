@@ -17,7 +17,7 @@ public class Contract {
     @JsonProperty("desc")
     public String description;
     @JsonProperty("networks")
-    public Map<String, AppID> networks;
+    public Map<String, NetworkInfo> networks;
     @JsonProperty("methods")
     public List<Method> methods = new ArrayList<>();
 
@@ -25,7 +25,7 @@ public class Contract {
     public Contract(
             @JsonProperty("name") String name,
             @JsonProperty("desc") String description,
-            @JsonProperty("networks") Map<String, AppID> networks,
+            @JsonProperty("networks") Map<String, NetworkInfo> networks,
             @JsonProperty("methods") List<Method> methods
     ) {
         this.name = Objects.requireNonNull(name, "name must not be null");
@@ -67,20 +67,20 @@ public class Contract {
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    static public class AppID {
+    static public class NetworkInfo {
         @JsonProperty("appID")
         public Integer appID;
 
         @JsonCreator
-        public AppID(@JsonProperty("appID") Integer appID) {
+        public NetworkInfo(@JsonProperty("appID") Integer appID) {
             this.appID = Objects.requireNonNull(appID, "appID must not be null");
         }
 
         @Override
         public boolean equals(Object o) {
             if (o == null || o.getClass() != getClass()) return false;
-            AppID otherAppID = (AppID) o;
-            return Objects.equals(appID, otherAppID.appID);
+            NetworkInfo other = (NetworkInfo) o;
+            return Objects.equals(appID, other.appID);
         }
     }
 }

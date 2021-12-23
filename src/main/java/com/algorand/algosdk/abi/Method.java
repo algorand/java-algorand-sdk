@@ -16,9 +16,12 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Method {
     @JsonIgnore
+    public static final String TxnAnyType = "txn";
+
+    @JsonIgnore
     public static final Set<String> TxArgTypes = new HashSet<>(
             Arrays.asList(
-                    "txn",
+                    TxnAnyType,
                     Transaction.Type.Payment.toValue(),
                     Transaction.Type.KeyRegistration.toValue(),
                     Transaction.Type.AssetConfig.toValue(),

@@ -101,6 +101,19 @@ public class AtomicTransactionComposer {
         this.transactionList.add(txnAndSigner);
     }
 
+    /**
+     * Add a value to an application call's foreign array. The addition will be as compact as possible,
+     * and this function will return an index that can be used to reference `objectToBeAdded` in `objectArray`.
+     *
+     * @param objectToBeAdded - The value to add to the array. If this value is already present in the array,
+     *   it will not be added again. Instead, the existing index will be returned.
+     * @param objectArray - The existing foreign array. This input may be modified to append `valueToAdd`.
+     * @param zerothObject - If provided, this value indicated two things: the 0 value is special for this
+     *   array, so all indexes into `objectArray` must start at 1; additionally, if `objectToBeAdded` equals
+     *   `zerothValue`, then `objectToBeAdded` will not be added to the array, and instead the 0 indexes will
+     *   be returned.
+     * @return An index that can be used to reference `valueToAdd` in `array`.
+     */
     private static <T> int populateForeignArrayIndex(T objectToBeAdded, List<T> objectArray, T zerothObject) {
         if (objectToBeAdded.equals(zerothObject))
             return 0;
@@ -110,6 +123,11 @@ public class AtomicTransactionComposer {
             return startFrom + searchInListIndex;
         objectArray.add(objectToBeAdded);
         return objectArray.size() - 1 + startFrom;
+    }
+
+    private static boolean checkTransactionType(TransactionWithSigner tws, String txnType) {
+        if (txnType.equals(Method.TxnAnyType)) return true;
+        return tws.txn.type.toValue().equals(txnType);
     }
 
     /**
@@ -140,6 +158,12 @@ public class AtomicTransactionComposer {
             Method.Arg argT = methodCall.method.args.get(i);
             Object methodArg = methodCall.methodArgs.get(i);
             if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
+                TransactionWithSigner twsConverted = (TransactionWithSigner) methodArg;
+                if (!checkTransactionType(twsConverted, argT.type))
+                    throw new IllegalArgumentException(
+                            "expected transaction type " + argT.type
+                                    + " not match with given " + twsConverted.txn.type.toValue()
+                    );
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
             } else if (Method.RefArgTypes.contains(argT.type)) {
                 int index;
