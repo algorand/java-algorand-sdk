@@ -36,8 +36,6 @@ public class AtomicTransactionComposer {
     // if the abi type argument number > 15, then the abi types after 14th should be wrapped in a tuple
     private static final int MAX_ABI_ARG_TYPE_LEN = 15;
 
-    private static final int FOREIGN_ARRAY_NUM_LIMIT = 4;
-    private static final int FOREIGN_OBJ_NUM_LIMIT = 8;
     private static final int FOREIGN_OBJ_ABI_UINT_SIZE = 8;
 
     private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
@@ -199,11 +197,6 @@ public class AtomicTransactionComposer {
                         "error: the type of method argument is a transaction-type, but no transaction-with-signer provided"
                 );
         }
-
-        if (foreignAccounts.size() > FOREIGN_ARRAY_NUM_LIMIT)
-            throw new IllegalArgumentException("error: foreign accounts number > " + FOREIGN_ARRAY_NUM_LIMIT);
-        else if (foreignApps.size() + foreignAssets.size() + foreignAccounts.size() > FOREIGN_OBJ_NUM_LIMIT)
-            throw new IllegalArgumentException("error: total foreign object array number > " + FOREIGN_OBJ_NUM_LIMIT);
 
         if (methodArgs.size() > MAX_ABI_ARG_TYPE_LEN) {
             List<ABIType> wrappedABITypeList = new ArrayList<>();
