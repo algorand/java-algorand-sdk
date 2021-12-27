@@ -397,8 +397,16 @@ public class AtomicTransactionComposer {
             throw new IllegalArgumentException("wait round for execute should be non-negative");
         this.submit(client);
 
+        int indexToWait = 0;
+        for (int i = 0; i < this.signedTxns.size(); i++) {
+            if (this.methodMap.containsKey(i)) {
+                indexToWait = i;
+                break;
+            }
+        }
+
         PendingTransactionResponse txInfo =
-                Utils.waitForConfirmation(client, this.signedTxns.get(0).transactionID, waitRounds);
+                Utils.waitForConfirmation(client, this.signedTxns.get(indexToWait).transactionID, waitRounds);
         List<ReturnValue> retList = new ArrayList<>();
 
         this.status = Status.COMMITTED;
