@@ -32,7 +32,18 @@ public class Method {
     );
 
     @JsonIgnore
-    public static final Set<String> RefArgTypes = new HashSet<>(Arrays.asList("account", "asset", "application"));
+    public static final String RefTypeAccount = "account";
+
+    @JsonIgnore
+    public static final String RefTypeAsset = "asset";
+
+    @JsonIgnore
+    public static final String RefTypeApplication = "application";
+
+    @JsonIgnore
+    public static final Set<String> RefArgTypes = new HashSet<>(
+            Arrays.asList(RefTypeAccount, RefTypeAsset, RefTypeApplication)
+    );
 
     static boolean isTxnArgOrForeignArrayArgs(String str) {
         return TxArgTypes.contains(str) || RefArgTypes.contains(str);
@@ -48,7 +59,7 @@ public class Method {
     @JsonProperty("args")
     public List<Arg> args = new ArrayList<>();
     @JsonProperty("returns")
-    public Returns returns = new Returns("void", null);
+    public Returns returns = new Returns(Returns.VoidRetType, null);
     @JsonIgnore
     private int txnCallCount = 1;
 
@@ -160,6 +171,9 @@ public class Method {
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class Returns {
+        @JsonIgnore
+        public static final String VoidRetType = "void";
+
         @JsonProperty("type")
         public String type;
         @JsonProperty("desc")

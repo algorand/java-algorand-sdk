@@ -38,6 +38,7 @@ public class AtomicTransactionComposer {
 
     private static final int FOREIGN_ARRAY_NUM_LIMIT = 4;
     private static final int FOREIGN_OBJ_NUM_LIMIT = 8;
+    private static final int FOREIGN_OBJ_ABI_UINT_SIZE = 8;
 
     private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
 
@@ -167,7 +168,7 @@ public class AtomicTransactionComposer {
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
             } else if (Method.RefArgTypes.contains(argT.type)) {
                 int index;
-                if (argT.type.equals("account") && methodArg instanceof Address) {
+                if (argT.type.equals(Method.RefTypeAccount) && methodArg instanceof Address) {
                     Address accountAddr = (Address) methodArg;
                     Address senderAddr;
                     try {
@@ -176,10 +177,10 @@ public class AtomicTransactionComposer {
                         throw new IllegalArgumentException(e);
                     }
                     index = populateForeignArrayIndex(accountAddr, foreignAccounts, senderAddr);
-                } else if (argT.type.equals("asset") && methodArg instanceof BigInteger) {
+                } else if (argT.type.equals(Method.RefTypeAsset) && methodArg instanceof BigInteger) {
                     BigInteger assetID = (BigInteger) methodArg;
                     index = populateForeignArrayIndex(assetID.longValue(), foreignAssets, null);
-                } else if (argT.type.equals("application") && methodArg instanceof BigInteger) {
+                } else if (argT.type.equals(Method.RefTypeApplication) && methodArg instanceof BigInteger) {
                     BigInteger appID = (BigInteger) methodArg;
                     index = populateForeignArrayIndex(appID.longValue(), foreignApps, methodCall.appID);
                 } else
@@ -187,7 +188,7 @@ public class AtomicTransactionComposer {
                             "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
                     );
                 methodArgs.add(index);
-                methodABIts.add(new TypeUint(8));
+                methodABIts.add(new TypeUint(FOREIGN_OBJ_ABI_UINT_SIZE));
             } else if (argT.parsedType != null) {
                 methodArgs.add(methodArg);
                 methodABIts.add(argT.parsedType);
@@ -404,7 +405,7 @@ public class AtomicTransactionComposer {
             if (!this.methodMap.containsKey(i))
                 continue;
 
-            if (this.methodMap.get(i).returns.type.equals("void")) {
+            if (this.methodMap.get(i).returns.type.equals(Method.Returns.VoidRetType)) {
                 retList.add(new ReturnValue(
                         this.transactionList.get(i).txn.txID(),
                         new byte[]{},
@@ -453,9 +454,9 @@ public class AtomicTransactionComposer {
     }
 
     private static boolean checkLogRet(byte[] logLine) {
-        if (logLine.length < 4)
+        if (logLine.length < ABI_RET_HASH.length)
             return false;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < ABI_RET_HASH.length; i++) {
             if (logLine[i] != ABI_RET_HASH[i])
                 return false;
         }
