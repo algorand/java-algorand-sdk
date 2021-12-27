@@ -131,7 +131,7 @@ public class AtomicTxnComposer {
             assertThat(execRetVal.parseError).isNull();
 
             if (splitEncoding[i].isEmpty()) {
-                assertThat(currMethod.returns.type).isEqualTo("void");
+                assertThat(currMethod.returns.type).isEqualTo(Method.Returns.VoidRetType);
                 continue;
             }
 
