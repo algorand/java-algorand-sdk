@@ -142,7 +142,9 @@ public class AtomicTransactionComposer {
         if (!this.status.equals(Status.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer must be in BUILDING stage");
         if (this.transactionList.size() + methodCall.method.getTxnCallCount() > MAX_GROUP_SIZE)
-            throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE = 16 transactions");
+            throw new IllegalArgumentException(
+                    "Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE = " + MAX_GROUP_SIZE + " transactions"
+            );
 
         List<byte[]> encodedABIArgs = new ArrayList<>();
         encodedABIArgs.add(methodCall.method.getSelector());
@@ -199,9 +201,9 @@ public class AtomicTransactionComposer {
         }
 
         if (foreignAccounts.size() > FOREIGN_ARRAY_NUM_LIMIT)
-            throw new IllegalArgumentException("error: foreign accounts number > 4");
+            throw new IllegalArgumentException("error: foreign accounts number > " + FOREIGN_ARRAY_NUM_LIMIT);
         else if (foreignApps.size() + foreignAssets.size() + foreignAccounts.size() > FOREIGN_OBJ_NUM_LIMIT)
-            throw new IllegalArgumentException("error: total foreign object array number > 8");
+            throw new IllegalArgumentException("error: total foreign object array number > " + FOREIGN_OBJ_NUM_LIMIT);
 
         if (methodArgs.size() > MAX_ABI_ARG_TYPE_LEN) {
             List<ABIType> wrappedABITypeList = new ArrayList<>();
