@@ -1,10 +1,14 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.abi.Method;
-import com.algorand.algosdk.abi.ABIType;
+import com.algorand.algosdk.abi.TypeAddress;
+import com.algorand.algosdk.abi.TypeUint;
 import com.algorand.algosdk.abi.TypeTuple;
+import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
@@ -15,8 +19,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 public class AtomicTransactionComposer {
     public enum Status {
@@ -28,6 +38,10 @@ public class AtomicTransactionComposer {
     }
 
     public static final int MAX_GROUP_SIZE = 16;
+    // if the abi type argument number > 15, then the abi types after 14th should be wrapped in a tuple
+    private static final int MAX_ABI_ARG_TYPE_LEN = 15;
+
+    private static final int FOREIGN_OBJ_ABI_UINT_SIZE = 8;
 
     private static final byte[] ABI_RET_HASH = new byte[]{0x15, 0x1f, 0x7c, 0x75};
 
@@ -92,6 +106,35 @@ public class AtomicTransactionComposer {
     }
 
     /**
+     * Add a value to an application call's foreign array. The addition will be as compact as possible,
+     * and this function will return an index that can be used to reference `objectToBeAdded` in `objectArray`.
+     *
+     * @param objectToBeAdded - The value to add to the array. If this value is already present in the array,
+     *   it will not be added again. Instead, the existing index will be returned.
+     * @param objectArray - The existing foreign array. This input may be modified to append `valueToAdd`.
+     * @param zerothObject - If provided, this value indicated two things: the 0 value is special for this
+     *   array, so all indexes into `objectArray` must start at 1; additionally, if `objectToBeAdded` equals
+     *   `zerothValue`, then `objectToBeAdded` will not be added to the array, and instead the 0 indexes will
+     *   be returned.
+     * @return An index that can be used to reference `valueToAdd` in `array`.
+     */
+    private static <T> int populateForeignArrayIndex(T objectToBeAdded, List<T> objectArray, T zerothObject) {
+        if (objectToBeAdded.equals(zerothObject))
+            return 0;
+        int startFrom = zerothObject == null ? 0 : 1;
+        int searchInListIndex = objectArray.indexOf(objectToBeAdded);
+        if (searchInListIndex != -1)
+            return startFrom + searchInListIndex;
+        objectArray.add(objectToBeAdded);
+        return objectArray.size() - 1 + startFrom;
+    }
+
+    private static boolean checkTransactionType(TransactionWithSigner tws, String txnType) {
+        if (txnType.equals(Method.TxAnyType)) return true;
+        return tws.txn.type.toValue().equals(txnType);
+    }
+
+    /**
      * Add a smart contract method call to this atomic group.
      * <p>
      * An error will be thrown if the composer's status is not BUILDING, if adding this transaction
@@ -102,7 +145,9 @@ public class AtomicTransactionComposer {
         if (!this.status.equals(Status.BUILDING))
             throw new IllegalArgumentException("Atomic Transaction Composer must be in BUILDING stage");
         if (this.transactionList.size() + methodCall.method.getTxnCallCount() > MAX_GROUP_SIZE)
-            throw new IllegalArgumentException("Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE = 16 transactions");
+            throw new IllegalArgumentException(
+                    "Atomic Transaction Composer cannot exceed MAX_GROUP_SIZE = " + MAX_GROUP_SIZE + " transactions"
+            );
 
         List<byte[]> encodedABIArgs = new ArrayList<>();
         encodedABIArgs.add(methodCall.method.getSelector());
@@ -111,12 +156,48 @@ public class AtomicTransactionComposer {
         List<ABIType> methodABIts = new ArrayList<>();
 
         List<TransactionWithSigner> tempTransWithSigner = new ArrayList<>();
+        List<Address> foreignAccounts = methodCall.foreignAccounts;
+        List<Long> foreignAssets = methodCall.foreignAssets;
+        List<Long> foreignApps = methodCall.foreignApps;
+
+        Address senderAddress;
+        try {
+            senderAddress = new Address(methodCall.sender);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
+        }
 
         for (int i = 0; i < methodCall.method.args.size(); i++) {
             Method.Arg argT = methodCall.method.args.get(i);
             Object methodArg = methodCall.methodArgs.get(i);
             if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
+                TransactionWithSigner twsConverted = (TransactionWithSigner) methodArg;
+                if (!checkTransactionType(twsConverted, argT.type))
+                    throw new IllegalArgumentException(
+                            "expected transaction type " + argT.type
+                                    + " not match with given " + twsConverted.txn.type.toValue()
+                    );
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
+            } else if (Method.RefArgTypes.contains(argT.type)) {
+                int index;
+                if (argT.type.equals(Method.RefTypeAccount)) {
+                    TypeAddress abiAddressT = new TypeAddress();
+                    Address accountAddress = (Address) abiAddressT.decode(abiAddressT.encode(methodArg));
+                    index = populateForeignArrayIndex(accountAddress, foreignAccounts, senderAddress);
+                } else if (argT.type.equals(Method.RefTypeAsset) && methodArg instanceof BigInteger) {
+                    TypeUint abiUintT = new TypeUint(64);
+                    BigInteger assetID = (BigInteger) abiUintT.decode(abiUintT.encode(methodArg));
+                    index = populateForeignArrayIndex(assetID.longValue(), foreignAssets, null);
+                } else if (argT.type.equals(Method.RefTypeApplication) && methodArg instanceof BigInteger) {
+                    TypeUint abiUintT = new TypeUint(64);
+                    BigInteger appID = (BigInteger) abiUintT.decode(abiUintT.encode(methodArg));
+                    index = populateForeignArrayIndex(appID.longValue(), foreignApps, methodCall.appID);
+                } else
+                    throw new IllegalArgumentException(
+                            "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
+                    );
+                methodArgs.add(index);
+                methodABIts.add(new TypeUint(FOREIGN_OBJ_ABI_UINT_SIZE));
             } else if (argT.parsedType != null) {
                 methodArgs.add(methodArg);
                 methodABIts.add(argT.parsedType);
@@ -126,20 +207,20 @@ public class AtomicTransactionComposer {
                 );
         }
 
-        if (methodArgs.size() > 14) {
-            List<ABIType> wrappedABITypes = new ArrayList<>();
-            List<Object> wrappedValues = new ArrayList<>();
+        if (methodArgs.size() > MAX_ABI_ARG_TYPE_LEN) {
+            List<ABIType> wrappedABITypeList = new ArrayList<>();
+            List<Object> wrappedValueList = new ArrayList<>();
 
-            for (int i = 14; i < methodArgs.size(); i++) {
-                wrappedABITypes.add(methodABIts.get(i));
-                wrappedValues.add(methodArgs.get(i));
+            for (int i = MAX_ABI_ARG_TYPE_LEN - 1; i < methodArgs.size(); i++) {
+                wrappedABITypeList.add(methodABIts.get(i));
+                wrappedValueList.add(methodArgs.get(i));
             }
 
-            TypeTuple tupleT = new TypeTuple(wrappedABITypes);
-            methodABIts = methodABIts.subList(0, 14);
+            TypeTuple tupleT = new TypeTuple(wrappedABITypeList);
+            methodABIts = methodABIts.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
             methodABIts.add(tupleT);
-            methodArgs = methodArgs.subList(0, 14);
-            methodArgs.add(wrappedValues);
+            methodArgs = methodArgs.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
+            methodArgs.add(wrappedValueList);
         }
 
         for (int i = 0; i < methodArgs.size(); i++)
@@ -157,7 +238,10 @@ public class AtomicTransactionComposer {
                 .applicationId(methodCall.appID)
                 .args(encodedABIArgs)
                 .note(methodCall.note)
-                .lease(methodCall.lease);
+                .lease(methodCall.lease)
+                .accounts(foreignAccounts)
+                .foreignApps(foreignApps)
+                .foreignAssets(foreignAssets);
 
         if (methodCall.rekeyTo != null)
             txBuilder.rekey(methodCall.rekeyTo);
@@ -165,6 +249,17 @@ public class AtomicTransactionComposer {
         Transaction tx = txBuilder.build();
 
         tx.onCompletion = methodCall.onCompletion;
+        tx.approvalProgram = methodCall.approvalProgram;
+        tx.clearStateProgram = methodCall.clearProgram;
+
+        if (methodCall.globalInts != null && methodCall.globalBytes != null)
+            tx.globalStateSchema = new StateSchema(methodCall.globalInts, methodCall.globalBytes);
+
+        if (methodCall.localInts != null && methodCall.globalBytes != null)
+            tx.localStateSchema = new StateSchema(methodCall.localInts, methodCall.localBytes);
+
+        if (methodCall.extraPages != null)
+            tx.extraPages = methodCall.extraPages;
 
         this.transactionList.addAll(tempTransWithSigner);
         this.transactionList.add(new TransactionWithSigner(tx, methodCall.signer));
@@ -182,11 +277,12 @@ public class AtomicTransactionComposer {
 
         if (this.transactionList.size() == 0)
             throw new IllegalArgumentException("should not build transaction group with 0 transaction in composer");
-
-        List<Transaction> groupTxns = new ArrayList<>();
-        for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
-        Digest groupID = TxGroup.computeGroupID(groupTxns.toArray(new Transaction[0]));
-        for (TransactionWithSigner tws : this.transactionList) tws.txn.group = groupID;
+        else if (this.transactionList.size() > 1) {
+            List<Transaction> groupTxns = new ArrayList<>();
+            for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
+            Digest groupID = TxGroup.computeGroupID(groupTxns.toArray(new Transaction[0]));
+            for (TransactionWithSigner tws : this.transactionList) tws.txn.group = groupID;
+        }
 
         this.status = Status.BUILT;
         return this.transactionList;
@@ -303,8 +399,16 @@ public class AtomicTransactionComposer {
             throw new IllegalArgumentException("wait round for execute should be non-negative");
         this.submit(client);
 
+        int indexToWait = 0;
+        for (int i = 0; i < this.signedTxns.size(); i++) {
+            if (this.methodMap.containsKey(i)) {
+                indexToWait = i;
+                break;
+            }
+        }
+
         PendingTransactionResponse txInfo =
-                Utils.waitForConfirmation(client, this.signedTxns.get(0).transactionID, waitRounds);
+                Utils.waitForConfirmation(client, this.signedTxns.get(indexToWait).transactionID, waitRounds);
         List<ReturnValue> retList = new ArrayList<>();
 
         this.status = Status.COMMITTED;
@@ -313,7 +417,7 @@ public class AtomicTransactionComposer {
             if (!this.methodMap.containsKey(i))
                 continue;
 
-            if (this.methodMap.get(i).returns.type.equals("void")) {
+            if (this.methodMap.get(i).returns.type.equals(Method.Returns.VoidRetType)) {
                 retList.add(new ReturnValue(
                         this.transactionList.get(i).txn.txID(),
                         new byte[]{},
@@ -322,39 +426,31 @@ public class AtomicTransactionComposer {
                 ));
                 continue;
             }
-            Response<PendingTransactionResponse> resp =
-                    client.PendingTransactionInformation(this.transactionList.get(i).txn.txID()).execute();
-            if (!resp.isSuccessful()) {
-                retList.add(new ReturnValue(
-                        null,
-                        null,
-                        null,
-                        new Exception(resp.message())
-                ));
-                continue;
-            }
 
-            PendingTransactionResponse respBody = resp.body();
-            List<byte[]> logs = respBody.logs;
-            byte[] retLine = null;
-            for (int logIndex = logs.size() - 1; logIndex >= 0; logIndex--) {
-                byte[] line = logs.get(logIndex);
-                if (!checkLogRet(line))
+            PendingTransactionResponse respBody = txInfo;
+
+            if (i != indexToWait) {
+                Response<PendingTransactionResponse> resp =
+                        client.PendingTransactionInformation(this.transactionList.get(i).txn.txID()).execute();
+                if (!resp.isSuccessful()) {
+                    retList.add(new ReturnValue(
+                            null,
+                            null,
+                            null,
+                            new Exception(resp.message())
+                    ));
                     continue;
-                retLine = line;
-                break;
-            }
-            if (retLine == null) {
-                retList.add(new ReturnValue(
-                        null,
-                        null,
-                        null,
-                        new Exception("expected to find logged return value, got none")
-                ));
-                continue;
+                }
+                respBody = resp.body();
             }
 
-            byte[] abiEncoded = Arrays.copyOfRange(retLine, 4, retLine.length);
+            if (respBody.logs.size() == 0)
+                throw new IllegalArgumentException("App call transaction did not log a return value");
+            byte[] retLine = respBody.logs.get(respBody.logs.size() - 1);
+            if (!checkLogRet(retLine))
+                throw new IllegalArgumentException("App call transaction did not log a return value");
+
+            byte[] abiEncoded = Arrays.copyOfRange(retLine, ABI_RET_HASH.length, retLine.length);
             Object decoded = null;
             Exception parseError = null;
             try {
@@ -375,9 +471,9 @@ public class AtomicTransactionComposer {
     }
 
     private static boolean checkLogRet(byte[] logLine) {
-        if (logLine.length < 4)
+        if (logLine.length < ABI_RET_HASH.length)
             return false;
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < ABI_RET_HASH.length; i++) {
             if (logLine[i] != ABI_RET_HASH[i])
                 return false;
         }
