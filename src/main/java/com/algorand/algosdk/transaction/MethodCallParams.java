@@ -81,16 +81,6 @@ public class MethodCallParams {
         this.foreignAccounts = fAccounts;
         this.foreignAssets = fAssets;
         this.foreignApps = fApps;
-
-        Address senderAddr;
-        try {
-            senderAddr = new Address(this.sender);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("sender mnemonic cannot generate an address");
-        }
-        this.foreignAccounts.remove(senderAddr);
-
-        this.foreignApps.remove(this.appID);
         this.approvalProgram = approvalProgram;
         this.clearProgram = clearProgram;
         this.globalBytes = globalBytes;
