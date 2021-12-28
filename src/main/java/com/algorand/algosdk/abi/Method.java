@@ -43,8 +43,10 @@ public class Method {
     public static final String RefTypeApplication = "application";
 
     @JsonIgnore
-    public static final Set<String> RefArgTypes = new HashSet<>(
-            Arrays.asList(RefTypeAccount, RefTypeAsset, RefTypeApplication)
+    public static final Set<String> RefArgTypes = Collections.unmodifiableSet(
+            new HashSet<>(
+                    Arrays.asList(RefTypeAccount, RefTypeAsset, RefTypeApplication)
+            )
     );
 
     static boolean isTxnArgOrForeignArrayArgs(String str) {
