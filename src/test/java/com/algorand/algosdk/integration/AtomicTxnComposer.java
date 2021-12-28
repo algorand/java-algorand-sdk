@@ -236,7 +236,9 @@ public class AtomicTxnComposer {
         String errStr = "";
         try {
             atc.buildGroup();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            errStr = "zero group size error";
+        } catch (IOException e) {
             errStr = e.getMessage();
         }
         assertThat(errStr).isEqualTo(string);

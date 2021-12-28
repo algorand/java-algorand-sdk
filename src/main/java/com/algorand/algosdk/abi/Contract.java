@@ -4,11 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.graph.Network;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Contract {
@@ -30,7 +28,7 @@ public class Contract {
     ) {
         this.name = Objects.requireNonNull(name, "name must not be null");
         this.description = description;
-        this.networks = networks;
+        this.networks = Objects.requireNonNull(networks, "networks must not be null");
         if (methods != null) this.methods = methods;
     }
 
@@ -45,8 +43,8 @@ public class Contract {
     }
 
     @JsonIgnore
-    public Integer getAppIDbyHash(String genesisHash) {
-        return this.networks.get(genesisHash).appID;
+    public NetworkInfo getNetworkInfo(String genesisHash) {
+        return this.networks.get(genesisHash);
     }
 
     @JsonIgnore
@@ -58,21 +56,17 @@ public class Contract {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Contract contract = (Contract) o;
-        if (!contract.networks.keySet().equals(this.networks.keySet())) return false;
-        for (String networkHash : this.networks.keySet()) {
-            if (!contract.getAppIDbyHash(networkHash).equals(this.getAppIDbyHash(networkHash)))
-                return false;
-        }
-        return Objects.equals(name, contract.name) && Objects.equals(methods, contract.methods) && Objects.equals(description, contract.description);
+        return Objects.equals(name, contract.name) && Objects.equals(methods, contract.methods) &&
+                Objects.equals(description, contract.description) && Objects.equals(networks, contract.networks);
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     static public class NetworkInfo {
         @JsonProperty("appID")
-        public Integer appID;
+        public Long appID;
 
         @JsonCreator
-        public NetworkInfo(@JsonProperty("appID") Integer appID) {
+        public NetworkInfo(@JsonProperty("appID") Long appID) {
             this.appID = Objects.requireNonNull(appID, "appID must not be null");
         }
 

@@ -87,14 +87,14 @@ public class ABIJson {
 
     @When("I create a Contract object from the Method object with name {string} and description {string}")
     public void i_create_a_contract_object_from_the_method_object_with_name_and_description(String string, String string2) {
-        this.contract = new Contract(string, string2,null, Collections.singletonList(this.method));
+        this.contract = new Contract(string, string2, new HashMap<>(), Collections.singletonList(this.method));
         this.contract.networks = new HashMap<>();
         this.state = CHECK_FIELD.CONTRACT;
     }
 
     @When("I set the Contract's appID to {int} for the network {string}")
     public void i_set_the_contract_s_app_id_to_for_the_network(Integer appID, String network) {
-        this.contract.networks.put(network, new Contract.NetworkInfo(appID));
+        this.contract.networks.put(network, new Contract.NetworkInfo(appID.longValue()));
     }
 
     @When("I serialize the Contract object into json")

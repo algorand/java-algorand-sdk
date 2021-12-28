@@ -16,18 +16,20 @@ import java.util.*;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Method {
     @JsonIgnore
-    public static final String TxnAnyType = "txn";
+    public static final String TxAnyType = "txn";
 
     @JsonIgnore
-    public static final Set<String> TxArgTypes = new HashSet<>(
-            Arrays.asList(
-                    TxnAnyType,
-                    Transaction.Type.Payment.toValue(),
-                    Transaction.Type.KeyRegistration.toValue(),
-                    Transaction.Type.AssetConfig.toValue(),
-                    Transaction.Type.AssetTransfer.toValue(),
-                    Transaction.Type.AssetFreeze.toValue(),
-                    Transaction.Type.ApplicationCall.toValue()
+    public static final Set<String> TxArgTypes = Collections.unmodifiableSet(
+            new HashSet<>(
+                    Arrays.asList(
+                            TxAnyType,
+                            Transaction.Type.Payment.toValue(),
+                            Transaction.Type.KeyRegistration.toValue(),
+                            Transaction.Type.AssetConfig.toValue(),
+                            Transaction.Type.AssetTransfer.toValue(),
+                            Transaction.Type.AssetFreeze.toValue(),
+                            Transaction.Type.ApplicationCall.toValue()
+                    )
             )
     );
 

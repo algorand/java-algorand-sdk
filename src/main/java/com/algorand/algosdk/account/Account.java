@@ -6,7 +6,6 @@ import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
 import com.algorand.algosdk.mnemonic.Mnemonic;
-import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxnSigner;

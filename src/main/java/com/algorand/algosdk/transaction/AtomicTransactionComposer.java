@@ -1,9 +1,6 @@
 package com.algorand.algosdk.transaction;
 
-import com.algorand.algosdk.abi.Method;
-import com.algorand.algosdk.abi.ABIType;
-import com.algorand.algosdk.abi.TypeTuple;
-import com.algorand.algosdk.abi.TypeUint;
+import com.algorand.algosdk.abi.*;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
@@ -125,7 +122,7 @@ public class AtomicTransactionComposer {
     }
 
     private static boolean checkTransactionType(TransactionWithSigner tws, String txnType) {
-        if (txnType.equals(Method.TxnAnyType)) return true;
+        if (txnType.equals(Method.TxAnyType)) return true;
         return tws.txn.type.toValue().equals(txnType);
     }
 
@@ -155,6 +152,13 @@ public class AtomicTransactionComposer {
         List<Long> foreignAssets = methodCall.foreignAssets;
         List<Long> foreignApps = methodCall.foreignApps;
 
+        Address senderAddress;
+        try {
+            senderAddress = new Address(methodCall.sender);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(e);
+        }
+
         for (int i = 0; i < methodCall.method.args.size(); i++) {
             Method.Arg argT = methodCall.method.args.get(i);
             Object methodArg = methodCall.methodArgs.get(i);
@@ -168,20 +172,17 @@ public class AtomicTransactionComposer {
                 tempTransWithSigner.add((TransactionWithSigner) methodArg);
             } else if (Method.RefArgTypes.contains(argT.type)) {
                 int index;
-                if (argT.type.equals(Method.RefTypeAccount) && methodArg instanceof Address) {
-                    Address accountAddr = (Address) methodArg;
-                    Address senderAddr;
-                    try {
-                        senderAddr = new Address(methodCall.sender);
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new IllegalArgumentException(e);
-                    }
-                    index = populateForeignArrayIndex(accountAddr, foreignAccounts, senderAddr);
+                if (argT.type.equals(Method.RefTypeAccount)) {
+                    TypeAddress abiAddressT = new TypeAddress();
+                    Address accountAddress = (Address) abiAddressT.decode(abiAddressT.encode(methodArg));
+                    index = populateForeignArrayIndex(accountAddress, foreignAccounts, senderAddress);
                 } else if (argT.type.equals(Method.RefTypeAsset) && methodArg instanceof BigInteger) {
-                    BigInteger assetID = (BigInteger) methodArg;
+                    TypeUint abiUintT = new TypeUint(64);
+                    BigInteger assetID = (BigInteger) abiUintT.decode(abiUintT.encode(methodArg));
                     index = populateForeignArrayIndex(assetID.longValue(), foreignAssets, null);
                 } else if (argT.type.equals(Method.RefTypeApplication) && methodArg instanceof BigInteger) {
-                    BigInteger appID = (BigInteger) methodArg;
+                    TypeUint abiUintT = new TypeUint(64);
+                    BigInteger appID = (BigInteger) abiUintT.decode(abiUintT.encode(methodArg));
                     index = populateForeignArrayIndex(appID.longValue(), foreignApps, methodCall.appID);
                 } else
                     throw new IllegalArgumentException(
@@ -267,7 +268,7 @@ public class AtomicTransactionComposer {
             return this.transactionList;
 
         if (this.transactionList.size() == 0)
-            throw new IllegalArgumentException("zero group size error");
+            throw new IllegalArgumentException("should not build transaction group with 0 transaction in composer");
         else if (this.transactionList.size() > 1) {
             List<Transaction> groupTxns = new ArrayList<>();
             for (TransactionWithSigner t : this.transactionList) groupTxns.add(t.txn);
@@ -417,19 +418,24 @@ public class AtomicTransactionComposer {
                 ));
                 continue;
             }
-            Response<PendingTransactionResponse> resp =
-                    client.PendingTransactionInformation(this.transactionList.get(i).txn.txID()).execute();
-            if (!resp.isSuccessful()) {
-                retList.add(new ReturnValue(
-                        null,
-                        null,
-                        null,
-                        new Exception(resp.message())
-                ));
-                continue;
+
+            PendingTransactionResponse respBody = txInfo;
+
+            if (i != indexToWait) {
+                Response<PendingTransactionResponse> resp =
+                        client.PendingTransactionInformation(this.transactionList.get(i).txn.txID()).execute();
+                if (!resp.isSuccessful()) {
+                    retList.add(new ReturnValue(
+                            null,
+                            null,
+                            null,
+                            new Exception(resp.message())
+                    ));
+                    continue;
+                }
+                respBody = resp.body();
             }
 
-            PendingTransactionResponse respBody = resp.body();
             if (respBody.logs.size() == 0)
                 throw new IllegalArgumentException("App call transaction did not log a return value");
             byte[] retLine = respBody.logs.get(respBody.logs.size() - 1);
