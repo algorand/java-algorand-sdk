@@ -87,7 +87,7 @@ public class ABIJson {
 
     @When("I create a Contract object from the Method object with name {string} and description {string}")
     public void i_create_a_contract_object_from_the_method_object_with_name_and_description(String string, String string2) {
-        this.contract = new Contract(string, string2, new HashMap<>(), Collections.singletonList(this.method));
+        this.contract = new Contract(string, string2, null, Collections.singletonList(this.method));
         this.contract.networks = new HashMap<>();
         this.state = CHECK_FIELD.CONTRACT;
     }

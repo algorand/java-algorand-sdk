@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.graph.Network;
 
 import java.util.*;
 
@@ -15,7 +14,7 @@ public class Contract {
     @JsonProperty("desc")
     public String description;
     @JsonProperty("networks")
-    public Map<String, NetworkInfo> networks;
+    public Map<String, NetworkInfo> networks = new HashMap<>();
     @JsonProperty("methods")
     public List<Method> methods = new ArrayList<>();
 
@@ -28,7 +27,7 @@ public class Contract {
     ) {
         this.name = Objects.requireNonNull(name, "name must not be null");
         this.description = description;
-        this.networks = Objects.requireNonNull(networks, "networks must not be null");
+        if (networks != null) this.networks = networks;
         if (methods != null) this.methods = methods;
     }
 
