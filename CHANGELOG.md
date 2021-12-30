@@ -1,3 +1,7 @@
+# 1.11.0-beta-2
+- Support Foreign objects as ABI arguments (#283)
+- Upgrade `jackson` packages to resolve PRs on vulnerability (#281)
+
 # 1.11.0-beta-1
 - ABI Interaction Support for JAVA SDK (#268)
 - Bug fix for `logs` on `PendingTransactionResponse` (#275)
