@@ -11,22 +11,54 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Set;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Method {
     @JsonIgnore
-    public static final Set<String> TxArgTypes = new HashSet<>(
-            Arrays.asList(
-                    "txn",
-                    Transaction.Type.Payment.toValue(),
-                    Transaction.Type.KeyRegistration.toValue(),
-                    Transaction.Type.AssetConfig.toValue(),
-                    Transaction.Type.AssetTransfer.toValue(),
-                    Transaction.Type.AssetFreeze.toValue(),
-                    Transaction.Type.ApplicationCall.toValue()
+    public static final String TxAnyType = "txn";
+
+    @JsonIgnore
+    public static final Set<String> TxArgTypes = Collections.unmodifiableSet(
+            new HashSet<>(
+                    Arrays.asList(
+                            TxAnyType,
+                            Transaction.Type.Payment.toValue(),
+                            Transaction.Type.KeyRegistration.toValue(),
+                            Transaction.Type.AssetConfig.toValue(),
+                            Transaction.Type.AssetTransfer.toValue(),
+                            Transaction.Type.AssetFreeze.toValue(),
+                            Transaction.Type.ApplicationCall.toValue()
+                    )
             )
     );
+
+    @JsonIgnore
+    public static final String RefTypeAccount = "account";
+
+    @JsonIgnore
+    public static final String RefTypeAsset = "asset";
+
+    @JsonIgnore
+    public static final String RefTypeApplication = "application";
+
+    @JsonIgnore
+    public static final Set<String> RefArgTypes = Collections.unmodifiableSet(
+            new HashSet<>(
+                    Arrays.asList(RefTypeAccount, RefTypeAsset, RefTypeApplication)
+            )
+    );
+
+    static boolean isTxnArgOrForeignArrayArgs(String str) {
+        return TxArgTypes.contains(str) || RefArgTypes.contains(str);
+    }
 
     @JsonIgnore
     private static final String HASH_ALG = "SHA-512/256";
@@ -38,7 +70,7 @@ public class Method {
     @JsonProperty("args")
     public List<Arg> args = new ArrayList<>();
     @JsonProperty("returns")
-    public Returns returns = new Returns("void", null);
+    public Returns returns = new Returns(Returns.VoidRetType, null);
     @JsonIgnore
     private int txnCallCount = 1;
 
@@ -150,6 +182,9 @@ public class Method {
 
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class Returns {
+        @JsonIgnore
+        public static final String VoidRetType = "void";
+
         @JsonProperty("type")
         public String type;
         @JsonProperty("desc")
@@ -201,7 +236,7 @@ public class Method {
             this.name = name;
             this.desc = desc;
             String typeStr = Objects.requireNonNull(type, "type must not be null");
-            this.parsedType = Method.TxArgTypes.contains(typeStr) ? null : ABIType.valueOf(typeStr);
+            this.parsedType = isTxnArgOrForeignArrayArgs(typeStr) ? null : ABIType.valueOf(typeStr);
             this.type = typeStr;
         }
 

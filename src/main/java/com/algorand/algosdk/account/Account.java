@@ -695,8 +695,7 @@ public class Account {
             }
 
             @Override
-            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign)
-                    throws Exception {
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign) throws Exception {
                 SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
                 for (int i = 0; i < indicesToSign.length; i++)
                     sTxn[i] = self.signTransaction(txnGroup[indicesToSign[i]]);
