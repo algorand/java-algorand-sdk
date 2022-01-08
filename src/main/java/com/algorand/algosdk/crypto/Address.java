@@ -3,6 +3,7 @@ package com.algorand.algosdk.crypto;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
+
 import java.security.KeyFactory;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -20,6 +21,8 @@ import java.security.spec.X509EncodedKeySpec;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
@@ -43,6 +46,8 @@ public class Address implements Serializable {
     private static final String KEY_ALGO = "Ed25519";
     // prefix for signing bytes
     private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
+    // prefix for hashing application ID
+    private static final byte[] APP_ID_PREFIX = ("appID").getBytes(StandardCharsets.UTF_8);
 
 
     /**
@@ -184,11 +189,7 @@ public class Address implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Address && Arrays.equals(this.bytes, ((Address)obj).bytes)) {
-            return true;
-        } else {
-            return false;
-        }
+        return obj instanceof Address && Arrays.equals(this.bytes, ((Address) obj).bytes);
     }
     
     // Compare to an address, with default address considered as empty string
@@ -197,5 +198,19 @@ public class Address implements Serializable {
             return address.isEmpty();
         }
         return this.toString().equals(address);
+    }
+
+    /**
+     * Get the escrow address of an application.
+     * @param appID The ID of the application.
+     * @return The address corresponding to that application's escrow account.
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     */
+    public static Address forApplication(long appID) throws NoSuchAlgorithmException, IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(APP_ID_PREFIX);
+        buffer.write(Encoder.encodeUint64(appID));
+        return new Address(Digester.digest(buffer.toByteArray()));
     }
 }

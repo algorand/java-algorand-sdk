@@ -15,7 +15,7 @@ public class TransactionResponse extends PathResponse {
 
     /**
      * Contains all fields common to all transactions and serves as an envelope to all
-     * transactions type.
+     * transactions type. Represents both regular and inner transactions.
      * Definition:
      * data/transactions/signedtxn.go : SignedTxn
      * data/transactions/transaction.go : Transaction

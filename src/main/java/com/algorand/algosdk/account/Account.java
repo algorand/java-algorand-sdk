@@ -8,6 +8,7 @@ import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TxnSigner;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.algorand.algosdk.util.Encoder;
 import org.bouncycastle.asn1.ASN1Encodable;
@@ -20,6 +21,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * Create and manage secrets, and perform account-based work such as signing transactions.
@@ -31,6 +33,8 @@ public class Account {
     private static final String SIGN_ALGO = "EdDSA";
     private static final int PK_SIZE = 32;
     private static final int PK_X509_PREFIX_LENGTH = 12; // Ed25519 specific
+    private static final int SK_PKCS_PREFIX_LENGTH = 16; // Ed25519 specific
+    private static final int SK_SEPARATOR_LENGTH = 3; // separator is 0x81 0x21 0x00
     private static final int SK_SIZE = 32;
     private static final int SK_SIZE_BITS = SK_SIZE * 8;
     private static final byte[] BID_SIGN_PREFIX = ("aB").getBytes(StandardCharsets.UTF_8);
@@ -67,6 +71,37 @@ public class Account {
         if (randomSrc != null) {
             gen.initialize(SK_SIZE_BITS, randomSrc);
         }
+        this.privateKeyPair = gen.generateKeyPair();
+        // now, convert public key to an address
+        byte[] raw = this.getClearTextPublicKey();
+        this.address = new Address(Arrays.copyOf(raw, raw.length));
+    }
+
+    // Derive an Account object from only keypair: {privateKey, publicKey}
+    public Account(KeyPair pkPair) {
+        CryptoProvider.setupIfNeeded();
+        if (!pkPair.getPrivate().getAlgorithm().equals(KEY_ALGO)) {
+            throw new IllegalArgumentException("Keypair algorithm do not match with expected " + KEY_ALGO);
+        }
+        this.privateKeyPair = pkPair;
+        byte[] raw = this.getClearTextPublicKey();
+        this.address = new Address(Arrays.copyOf(raw, raw.length));
+    }
+
+    // Derive an Account from only private key
+    public Account(PrivateKey pk) throws NoSuchAlgorithmException {
+        CryptoProvider.setupIfNeeded();
+        if (!pk.getAlgorithm().equals(KEY_ALGO))
+            throw new IllegalArgumentException("Account cannot be generated from a non-Ed25519 key");
+
+        if (pk.getEncoded().length != SK_PKCS_PREFIX_LENGTH + SK_SIZE + SK_SEPARATOR_LENGTH + PK_SIZE)
+            throw new RuntimeException("Private Key cannot generate clear private key bytes");
+
+        byte[] clearPrivateKey = new byte[SK_SIZE];
+        System.arraycopy(pk.getEncoded(), SK_PKCS_PREFIX_LENGTH, clearPrivateKey, 0, SK_SIZE);
+
+        KeyPairGenerator gen = KeyPairGenerator.getInstance(KEY_ALGO);
+        gen.initialize(SK_SIZE_BITS, new FixedSecureRandom(clearPrivateKey));
         this.privateKeyPair = gen.generateKeyPair();
         // now, convert public key to an address
         byte[] raw = this.getClearTextPublicKey();
@@ -255,7 +290,7 @@ public class Account {
             // SignTransaction does the signing, but also sets authAddr which is not desired here. 
             long length = Encoder.encodeToMsgPack(
                     new SignedTransaction(
-                            tx, 
+                            tx,
                             new Account().rawSignBytes(
                                     Arrays.copyOf(tx.bytesToSign(), tx.bytesToSign().length)),
                             tx.txID())).length;
@@ -307,10 +342,6 @@ public class Account {
      * @throws NoSuchAlgorithmException if could not sign tx
      */
     public SignedTransaction signMultisigTransaction(MultisigAddress from, Transaction tx) throws NoSuchAlgorithmException {
-        // check that from addr of tx matches multisig preimage
-        if (!tx.sender.toString().equals(from.toString())) {
-            throw new IllegalArgumentException("Transaction sender does not match multisig account");
-        }
         // check that account secret key is in multisig pk list
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myI = from.publicKeys.indexOf(myPK);
@@ -327,7 +358,13 @@ public class Account {
                 mSig.subsigs.add(new MultisigSubsig(from.publicKeys.get(i)));
             }
         }
-        return new SignedTransaction(tx, mSig, txSig.transactionID);
+        // generate signed transaction
+        SignedTransaction stx = new SignedTransaction(tx, mSig, txSig.transactionID);
+        // if the transaction sender address is not multi-sig address
+        // set the auth address as the multi-sig address
+        if (!tx.sender.equals(from.toAddress()))
+            stx.authAddr = from.toAddress();
+        return stx;
     }
 
     /**
@@ -340,12 +377,18 @@ public class Account {
             throw new IllegalArgumentException("cannot merge a single transaction");
         }
         SignedTransaction merged = txs[0];
-        for (int i = 0; i < txs.length; i++) {
+        for (SignedTransaction tx : txs) {
             // check that multisig parameters match
-            SignedTransaction tx = txs[i];
             if (tx.mSig.version != merged.mSig.version ||
                     tx.mSig.threshold != merged.mSig.threshold) {
                 throw new IllegalArgumentException("transaction msig parameters do not match");
+            }
+            // check multi-sig address match
+            if (!tx.mSig.convertToMultisigAddress().equals(merged.mSig.convertToMultisigAddress()))
+                throw new IllegalArgumentException("transaction msig addresses do not match");
+            // check that authAddr match
+            if (!tx.authAddr.equals(merged.authAddr)) {
+                throw new IllegalArgumentException("transaction msig auth addr do not match");
             }
             for (int j = 0; j < tx.mSig.subsigs.size(); j++) {
                 MultisigSubsig myMsig = merged.mSig.subsigs.get(j);
@@ -514,6 +557,25 @@ public class Account {
 
     }
 
+    public static SignedTransaction signLogicTransactionWithAddress(LogicsigSignature lsig, Address lsigAddr, Transaction tx)
+            throws IllegalArgumentException, IOException {
+        try {
+            if (!lsig.verify(lsigAddr))
+                throw new IllegalArgumentException("verification failed on logic sig");
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IllegalArgumentException("verification failed on logic sig", ex);
+        }
+
+        try {
+            SignedTransaction stx = new SignedTransaction(tx, lsig, tx.txID());
+            if (!stx.tx.sender.equals(lsigAddr))
+                stx.authAddr = lsigAddr;
+            return stx;
+        } catch (Exception ex) {
+            throw new IOException("could not encode transactions", ex);
+        }
+    }
+
     /**
      * Creates SignedTransaction from LogicsigSignature and Transaction.
      * LogicsigSignature must be valid and verifiable against transaction sender field.
@@ -522,14 +584,20 @@ public class Account {
      * @return SignedTransaction
      */
     public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
-        if (!lsig.verify(tx.sender)) {
-            throw new IllegalArgumentException("verification failed");
-        }
-
+        boolean hasSig = lsig.sig != null;
+        boolean hasMsig = lsig.msig != null;
+        Address lsigAddr;
         try {
-            return new SignedTransaction(tx, lsig, tx.txID());
+            if (hasSig) {
+                lsigAddr = tx.sender;
+            } else if (hasMsig) {
+                lsigAddr = lsig.msig.convertToMultisigAddress().toAddress();
+            } else {
+                lsigAddr = lsig.toAddress();
+            }
+            return Account.signLogicTransactionWithAddress(lsig, lsigAddr, tx);
         } catch (Exception ex) {
-            throw new IOException("could not encode transactions", ex);
+            throw new IOException("could not sign transaction", ex);
         }
     }
 
@@ -569,8 +637,25 @@ public class Account {
         return Mnemonic.toKey(mnemonic);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Account))
+            return false;
+        Account oAccount = (Account) obj;
+        boolean addressMatch = Arrays.equals(this.address.getBytes(), oAccount.address.getBytes());
+        boolean privateKeyMatch = Arrays.equals(
+                this.privateKeyPair.getPrivate().getEncoded(),
+                oAccount.privateKeyPair.getPrivate().getEncoded()
+        );
+        boolean publicKeyMatch = Arrays.equals(
+                this.privateKeyPair.getPublic().getEncoded(),
+                oAccount.privateKeyPair.getPublic().getEncoded()
+        );
+        return addressMatch && privateKeyMatch && publicKeyMatch;
+    }
+
     // Return a pre-set seed in response to nextBytes or generateSeed
-    private static class FixedSecureRandom extends SecureRandom {
+    public static class FixedSecureRandom extends SecureRandom {
         private final byte[] fixedValue;
         private int index = 0;
 
@@ -598,6 +683,25 @@ public class Account {
             this.nextBytes(bytes);
             return bytes;
         }
+    }
+
+    public TxnSigner getTransactionSigner() {
+        final Account self = this;
+
+        return new TxnSigner() {
+            @Override
+            public int hashCode() {
+                return Objects.hash(1, self);
+            }
+
+            @Override
+            public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign) throws Exception {
+                SignedTransaction[] sTxn = new SignedTransaction[indicesToSign.length];
+                for (int i = 0; i < indicesToSign.length; i++)
+                    sTxn[i] = self.signTransaction(txnGroup[indicesToSign[i]]);
+                return sTxn;
+            }
+        };
     }
 
 }

@@ -5,18 +5,14 @@ import java.util.List;
 import java.util.Objects;
 
 import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Given a transaction id of a recently submitted transaction, it returns
- * information about it. There are several cases when this might succeed:
- * - transaction committed (committed round > 0)
- * - transaction still in the pool (committed round = 0, pool error = "")
- * - transaction removed from pool due to error (committed round = 0, pool error !=
- * "")
- * Or the transaction may have happened sufficiently long ago that the node no
- * longer remembers it, and this will return an error.
+ * Details about a pending transaction. If the transaction was recently confirmed,
+ * includes confirmation details like the round and reward details.
  */
 public class PendingTransactionResponse extends PathResponse {
 
@@ -65,11 +61,38 @@ public class PendingTransactionResponse extends PathResponse {
     public List<EvalDeltaKeyValue> globalStateDelta = new ArrayList<EvalDeltaKeyValue>();
 
     /**
+     * Inner transactions produced by application execution.
+     */
+    @JsonProperty("inner-txns")
+    public List<PendingTransactionResponse> innerTxns = new ArrayList<PendingTransactionResponse>();
+
+    /**
      * (ld) Local state key/value changes for the application being executed by this
      * transaction.
      */
     @JsonProperty("local-state-delta")
     public List<AccountStateDelta> localStateDelta = new ArrayList<AccountStateDelta>();
+
+    /**
+     * (lg) Logs for the application being executed by this transaction.
+     */
+    @JsonProperty("logs")
+    public List<byte[]> logs = new ArrayList<byte[]>();
+    @JsonIgnore
+    public void logs(List<String> base64Encoded) {
+        this.logs = new ArrayList<byte[]>();
+        for (String val : base64Encoded) {
+            this.logs.add(Encoder.decodeFromBase64(val));
+        }
+    }
+    @JsonIgnore
+    public List<String> logs() {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (byte[] val : this.logs) {
+            ret.add(Encoder.encodeToBase64(val));
+        }
+        return ret; 
+    }
 
     /**
      * Indicates that the transaction was kicked out of this node's transaction pool
@@ -112,7 +135,9 @@ public class PendingTransactionResponse extends PathResponse {
         if (!Objects.deepEquals(this.closingAmount, other.closingAmount)) return false;
         if (!Objects.deepEquals(this.confirmedRound, other.confirmedRound)) return false;
         if (!Objects.deepEquals(this.globalStateDelta, other.globalStateDelta)) return false;
+        if (!Objects.deepEquals(this.innerTxns, other.innerTxns)) return false;
         if (!Objects.deepEquals(this.localStateDelta, other.localStateDelta)) return false;
+        if (!Objects.deepEquals(this.logs, other.logs)) return false;
         if (!Objects.deepEquals(this.poolError, other.poolError)) return false;
         if (!Objects.deepEquals(this.receiverRewards, other.receiverRewards)) return false;
         if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;

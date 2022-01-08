@@ -1,3 +1,30 @@
+# 1.11.0-beta-2
+- Support Foreign objects as ABI arguments (#283)
+- Upgrade `jackson` packages to resolve PRs on vulnerability (#281)
+
+# 1.11.0-beta-1
+- ABI Interaction Support for JAVA SDK (#268)
+- Bug fix for `logs` on `PendingTransactionResponse` (#275)
+- Add WaitForConfirmation function (#274)
+- Better error message on encoding exception. (#258)
+- Revert "Revert "Fix ABI source code position for ABI feature (#260)""
+- Revert "Revert "Add ABI encoding support (#255)""
+
+# 1.10.0
+- Feature/sign rekey lsig msig (#250)
+- Support parsing msgpack with numeric key (#262)
+
+# 1.9.0
+- Support AVM 1.0
+  - Update TEAL langspec to v5
+  - Add function to get app address
+  - Regenerate REST API types
+  - Support new cucumber tests
+  - Enable new cucumber tests
+- Allow non-base64 metadata hash and force 32 bytes
+- mark contract templates as @Deprecated
+- Added pretty print option to Object Mapper instance
+
 # 1.8.0
 - Added toSeed() method in Account.java
 - Regenerate  HTTP Client (Asset b64 fields + App extra pages)

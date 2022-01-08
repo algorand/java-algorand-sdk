@@ -244,4 +244,16 @@ public class IndexerPaths {
     public void lookupApplication(Long appId) {
         ps.q = this.indexerClient.lookupApplicationByID(appId);
     }
+
+    @When("we make a LookupApplicationLogsByID call with applicationID {long} limit {long} minRound {long} maxRound {long} nextToken {string} sender {string} and txID {string}")
+    public void lookupApplicationLogs(Long appID, Long limit, Long minRound, Long maxRound, String nextToken, String sender, String txID) throws NoSuchAlgorithmException {
+        LookupApplicationLogsByID q = this.indexerClient.lookupApplicationLogsByID(appID);
+        if (TestingUtils.notEmpty(limit)) q.limit(limit);
+        if (TestingUtils.notEmpty(maxRound)) q.maxRound(maxRound);
+        if (TestingUtils.notEmpty(minRound)) q.minRound(minRound);
+        if (TestingUtils.notEmpty(nextToken)) q.next(nextToken);
+        if (TestingUtils.notEmpty(sender)) q.senderAddress(new Address(sender));
+        if (TestingUtils.notEmpty(txID)) q.txid(txID);
+        ps.q = q;
+    }
 }

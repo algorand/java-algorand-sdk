@@ -8,11 +8,12 @@ import java.util.Objects;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Contains all fields common to all transactions and serves as an envelope to all
- * transactions type.
+ * transactions type. Represents both regular and inner transactions.
  * Definition:
  * data/transactions/signedtxn.go : SignedTxn
  * data/transactions/transaction.go : Transaction
@@ -164,6 +165,12 @@ public class Transaction extends PathResponse {
     public String id;
 
     /**
+     * Inner transactions produced by application execution.
+     */
+    @JsonProperty("inner-txns")
+    public List<Transaction> innerTxns = new ArrayList<Transaction>();
+
+    /**
      * Offset into the round where this transaction was confirmed.
      */
     @JsonProperty("intra-round-offset")
@@ -206,6 +213,27 @@ public class Transaction extends PathResponse {
      */
     @JsonProperty("local-state-delta")
     public List<AccountStateDelta> localStateDelta = new ArrayList<AccountStateDelta>();
+
+    /**
+     * (lg) Logs for the application being executed by this transaction.
+     */
+    @JsonProperty("logs")
+    public List<byte[]> logs = new ArrayList<byte[]>();
+    @JsonIgnore
+    public void logs(List<String> base64Encoded) {
+        this.logs = new ArrayList<byte[]>();
+        for (String val : base64Encoded) {
+            this.logs.add(Encoder.decodeFromBase64(val));
+        }
+    }
+    @JsonIgnore
+    public List<String> logs() {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (byte[] val : this.logs) {
+            ret.add(Encoder.encodeToBase64(val));
+        }
+        return ret; 
+    }
 
     /**
      * (note) Free form data.
@@ -316,11 +344,13 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.globalStateDelta, other.globalStateDelta)) return false;
         if (!Objects.deepEquals(this.group, other.group)) return false;
         if (!Objects.deepEquals(this.id, other.id)) return false;
+        if (!Objects.deepEquals(this.innerTxns, other.innerTxns)) return false;
         if (!Objects.deepEquals(this.intraRoundOffset, other.intraRoundOffset)) return false;
         if (!Objects.deepEquals(this.keyregTransaction, other.keyregTransaction)) return false;
         if (!Objects.deepEquals(this.lastValid, other.lastValid)) return false;
         if (!Objects.deepEquals(this.lease, other.lease)) return false;
         if (!Objects.deepEquals(this.localStateDelta, other.localStateDelta)) return false;
+        if (!Objects.deepEquals(this.logs, other.logs)) return false;
         if (!Objects.deepEquals(this.note, other.note)) return false;
         if (!Objects.deepEquals(this.paymentTransaction, other.paymentTransaction)) return false;
         if (!Objects.deepEquals(this.receiverRewards, other.receiverRewards)) return false;

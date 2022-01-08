@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Base {
-    private Map<String, Account> signingAccounts = new HashMap<>();
+    public Map<String, Account> signingAccounts = new HashMap<>();
 
     /**
      * Helper to sign a transaction with the correct account, or fail the test if the correct account isn't available.
