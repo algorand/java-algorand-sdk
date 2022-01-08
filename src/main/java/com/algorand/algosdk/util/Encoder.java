@@ -7,13 +7,12 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base32;
-import org.apache.commons.codec.binary.Base64;
+
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang3.StringUtils;
 import org.msgpack.jackson.dataformat.MessagePackFactory;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 public class Encoder {
     private static final char BASE32_PAD_CHAR = '=';
