@@ -503,7 +503,8 @@ public class AtomicTransactionComposer {
         public Exception parseError;
         public PendingTransactionResponse txInfo;
 
-        public ReturnValue(String txID, byte[] rawValue, Object value, Exception parseError, PendingTransactionResponse txInfo) {
+        public ReturnValue(String txID, byte[] rawValue, Object value,
+                           Exception parseError, PendingTransactionResponse txInfo) {
             this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;

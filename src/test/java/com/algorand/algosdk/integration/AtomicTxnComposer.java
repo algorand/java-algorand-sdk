@@ -1,5 +1,6 @@
 package com.algorand.algosdk.integration;
 
+import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
@@ -13,6 +14,7 @@ import io.cucumber.java.en.When;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,7 @@ public class AtomicTxnComposer {
     SplitAndProcessABIArgs abiArgProcessor;
     Long appID;
     List<Method> composerMethods;
+    String nonce;
 
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
         base = stepdefs;
@@ -40,6 +43,11 @@ public class AtomicTxnComposer {
         applications.transientAccount.base = base;
         transSteps = steps;
         transSteps.transAcc = apps.transientAccount;
+    }
+
+    @Given("I add the nonce {string}")
+    public void addNonce(String nonce) {
+        this.nonce = nonce;
     }
 
     @Given("suggested transaction parameters from the algod v2 client")
@@ -139,7 +147,30 @@ public class AtomicTxnComposer {
             Object idealRes = currMethod.returns.parsedType.decode(Encoder.decodeFromBase64(splitEncoding[i]));
             assertThat(parsed).isEqualTo(idealRes);
         }
+    }
 
+    @Then("The app should have returned ABI types {string}.")
+    public void the_app_should_have_returned_abi_types(String abiTypeStr) {
+        String[] abiTypes = abiTypeStr.split(":");
+        assertThat(abiTypes.length).isEqualTo(execRes.methodResults.size());
+
+        for (int i = 0; i < abiTypes.length; i++) {
+            assertThat(execRes.methodResults.get(i).parseError).isNull();
+            if (abiTypes[i].equals("void")) {
+                assertThat(execRes.methodResults.get(i).rawValue).isNull();
+                continue;
+            }
+            ABIType tokenT = ABIType.valueOf(abiTypes[i]);
+            Object decoded = tokenT.decode(execRes.methodResults.get(i).rawValue);
+            byte[] encoded = tokenT.encode(decoded);
+            assertThat(encoded).isEqualTo(execRes.methodResults.get(i).rawValue);
+        }
+    }
+
+    @Then("The {int}th atomic result for randomInt\\({int}) proves correct")
+    public void the_i_th_atomic_result_for_random_int_proves_correct(Integer resultIndex, Integer fundAmount) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
     }
 
     @Then("The composer should have a status of {string}.")
@@ -148,16 +179,36 @@ public class AtomicTxnComposer {
     }
 
     @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
-    public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String string) {
+    public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
         String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
         composerMethods.add(method);
 
         optionBuilder
-                .setOnComplete(Transaction.OnCompletion.String(string))
+                .setOnComplete(Transaction.OnCompletion.String(onComplete))
                 .setSender(senderAddress)
                 .setSigner(transSigner)
                 .setAppID(applications.appId)
                 .setMethod(method)
+                .setSuggestedParams(transSteps.suggestedParams)
+                .setFirstValid(transSteps.fv)
+                .setLastValid(transSteps.lv)
+                .setFee(transSteps.fee);
+        MethodCallParams optionBuild = optionBuilder.build();
+        atc.addMethodCall(optionBuild);
+    }
+
+    @When("I add a nonced method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
+    public void i_add_a_nonced_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
+        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        composerMethods.add(method);
+
+        optionBuilder
+                .setOnComplete(Transaction.OnCompletion.String(onComplete))
+                .setSender(senderAddress)
+                .setSigner(transSigner)
+                .setAppID(applications.appId)
+                .setMethod(method)
+                .setNote(("I should be unique thanks to this nonce: " + nonce).getBytes(StandardCharsets.UTF_8))
                 .setSuggestedParams(transSteps.suggestedParams)
                 .setFirstValid(transSteps.fv)
                 .setLastValid(transSteps.lv)
@@ -232,15 +283,15 @@ public class AtomicTxnComposer {
     }
 
     @When("I build the transaction group with the composer. If there is an error it is {string}.")
-    public void i_build_the_transaction_group_with_the_composer_if_there_is_an_error_it_is(String string) {
-        String errStr = "";
+    public void i_build_the_transaction_group_with_the_composer_if_there_is_an_error_it_is(String errStr) {
+        String inferredError = "";
         try {
             atc.buildGroup();
         } catch (IllegalArgumentException e) {
-            errStr = "zero group size error";
+            inferredError = "zero group size error";
         } catch (IOException e) {
-            errStr = e.getMessage();
+            inferredError = e.getMessage();
         }
-        assertThat(errStr).isEqualTo(string);
+        assertThat(inferredError).isEqualTo(errStr);
     }
 }

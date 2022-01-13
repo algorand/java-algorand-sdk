@@ -2,7 +2,6 @@ package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -11,7 +10,6 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.*;
-import io.cucumber.java.bs.A;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.algorand.algosdk.cucumber.shared.TransactionSteps.loadTEALProgramFromFile;
+import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
 import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -50,24 +48,24 @@ public class Applications {
         switch (operation) {
             case "create":
                 builder = Transaction.ApplicationCreateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile))
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.clients.v2Client))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.clients.v2Client))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
                         .localStateSchema(new StateSchema(localInts, localBytes))
                         .extraPages(extraPages);
                 break;
             case "create_optin":
                 builder = Transaction.ApplicationCreateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile))
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.clients.v2Client))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.clients.v2Client))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
                         .localStateSchema(new StateSchema(localInts, localBytes))
                         .optIn(true);
                 break;
             case "update":
                 builder = Transaction.ApplicationUpdateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile));
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.clients.v2Client))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.clients.v2Client));
                 break;
             case "call":
                 builder = Transaction.ApplicationCallTransactionBuilder();

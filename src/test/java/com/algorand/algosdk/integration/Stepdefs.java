@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.algorand.algosdk.cucumber.shared.TransactionSteps.loadResource;
+import static com.algorand.algosdk.util.ResourceUtils.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
