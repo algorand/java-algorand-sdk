@@ -168,7 +168,13 @@ public class AtomicTxnComposer {
     }
 
     @Then("The {int}th atomic result for randomInt\\({int}) proves correct")
-    public void the_i_th_atomic_result_for_random_int_proves_correct(Integer resultIndex, Integer fundAmount) {
+    public void the_i_th_atomic_result_for_random_int_proves_correct(Integer resultIndex, Integer randomInt) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @Then("The {int}th atomic result for randElement\\({string}) proves correct")
+    public void the_i_th_atomic_result_for_random_string_proves_correct(Integer resultIndex, String randElement) {
         // Write code here that turns the phrase above into concrete actions
         throw new io.cucumber.java.PendingException();
     }
