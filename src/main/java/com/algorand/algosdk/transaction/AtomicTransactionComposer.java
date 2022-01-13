@@ -11,6 +11,7 @@ import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
+import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
@@ -388,9 +389,9 @@ public class AtomicTransactionComposer {
      * Note: a group can only be submitted again if it fails.
      *
      * @return If the execution is successful, resolves to an object containing the confirmed round for
-     * this transaction, the txIDs of the submitted transactions, and an array of results containing
-     * one element for each method call transaction in this group. If a method has no return value
-     * (void), then the method results array will contain null for that method's return value.
+     * this transaction, the txIDs of the submitted transactions, an array of results containing
+     * one element for each method call transaction in this group, and the raw transaction response from algod.
+     * If a method has no return value (void), then the method results array will contain null for that return value.
      */
     public ExecuteResult execute(AlgodClient client, int waitRounds) throws Exception {
         if (this.status == Status.COMMITTED)
@@ -422,7 +423,8 @@ public class AtomicTransactionComposer {
                         this.transactionList.get(i).txn.txID(),
                         new byte[]{},
                         null,
-                        null
+                        null,
+                        txInfo
                 ));
                 continue;
             }
@@ -437,7 +439,8 @@ public class AtomicTransactionComposer {
                             null,
                             null,
                             null,
-                            new Exception(resp.message())
+                            new Exception(resp.message()),
+                            txInfo
                     ));
                     continue;
                 }
@@ -463,7 +466,8 @@ public class AtomicTransactionComposer {
                     this.transactionList.get(i).txn.txID(),
                     abiEncoded,
                     decoded,
-                    parseError
+                    parseError,
+                    txInfo
             ));
         }
 
@@ -497,12 +501,14 @@ public class AtomicTransactionComposer {
         public byte[] rawValue;
         public Object value;
         public Exception parseError;
+        public PendingTransactionResponse txInfo;
 
-        public ReturnValue(String txID, byte[] rawValue, Object value, Exception parseError) {
+        public ReturnValue(String txID, byte[] rawValue, Object value, Exception parseError, PendingTransactionResponse txInfo) {
             this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;
             this.parseError = parseError;
+            this.txInfo = txInfo;
         }
     }
 }

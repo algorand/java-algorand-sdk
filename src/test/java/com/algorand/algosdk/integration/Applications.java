@@ -1,18 +1,25 @@
 package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.*;
+import io.cucumber.java.bs.A;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,6 +144,16 @@ public class Applications {
     public void rememberTheNewApplicatoinId() throws Exception {
         PendingTransactionResponse r = clients.v2Client.PendingTransactionInformation(txId).execute().body();
         this.appId = r.applicationIndex;
+    }
+
+    @Then("I get the account address for the current application and see that it matches the app id's hash")
+    public void compareApplicationIDHashWithAccountAddress() throws NoSuchAlgorithmException, IOException {
+        Address accountAddress = Address.forApplication(this.appId);
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        buffer.write(Address.APP_ID_PREFIX);
+        buffer.write(Encoder.encodeUint64(this.appId));
+        Address computedHash = new Address(Digester.digest(buffer.toByteArray()));
+        assertThat(computedHash).isEqualTo(accountAddress);
     }
 
     @Then("The transient account should have the created app {string} and total schema byte-slices {long} and uints {long}, the application {string} state contains key {string} with value {string}")
