@@ -1249,6 +1249,13 @@ public class Stepdefs {
         compileResponse = aclv2.TealCompile().source(source).execute();
     }
 
+    @Then("base64 decoding the response is the same as the binary {string}")
+    public void base64_decoding_the_response_is_the_same_as_the_binary(String path) {
+        byte[] source = loadResource(path);
+        String b64EncodedSrc = Encoder.encodeToBase64(source);
+        assertThat(b64EncodedSrc).isEqualTo(compileResponse.body().result);
+    }
+
     @Then("it is compiled with {int} and {string} and {string}")
     public void it_is_compiled_with(Integer status, String result, String hash) {
         assertThat(compileResponse.code()).isEqualTo(status);
