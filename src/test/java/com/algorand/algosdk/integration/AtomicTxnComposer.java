@@ -15,12 +15,12 @@ import io.cucumber.java.en.When;
 
 import java.io.IOException;
 import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -171,6 +171,20 @@ public class AtomicTxnComposer {
         }
     }
 
+    // WE ASSUME WITNESS IS byte[17] IN THIS TEST
+    static byte[] convertToByteArray(Object witnessObj) {
+        Object[] witnessObjArr = (Object[]) witnessObj;
+        byte[] witness = new byte[witnessObjArr.length];
+        for (int i = 0; i < witnessObjArr.length; i++)
+            witness[i] = (byte) witnessObjArr[i];
+        return witness;
+    }
+
+    static BigInteger computeFromWitness(byte[] witness) throws NoSuchAlgorithmException {
+        byte[] witnessChecksum = Arrays.copyOfRange(Digester.digest(witness), 0, 8);
+        return new BigInteger(1, witnessChecksum);
+    }
+
     @Then("The {int}th atomic result for randomInt\\({int}) proves correct")
     public void the_i_th_atomic_result_for_random_int_proves_correct(Integer resultIndex, Integer input)
             throws NoSuchAlgorithmException {
@@ -178,26 +192,31 @@ public class AtomicTxnComposer {
         assertThat(iThRet.parseError).isNull();
         Object[] randIntAndWitness = (Object[]) iThRet.value;
         BigInteger randInt = (BigInteger) randIntAndWitness[0];
-        Object[] witnessObjArr = (Object[]) randIntAndWitness[1];
-        byte[] witness = new byte[witnessObjArr.length];
-        for (int i = 0; i < witnessObjArr.length; i++)
-            witness[i] = (byte) witnessObjArr[i];
-        byte[] witnessChecksum = Arrays.copyOfRange(Digester.digest(witness), 0, 8);
-        BigInteger x = new BigInteger(witnessChecksum);
+        byte[] witness = convertToByteArray(randIntAndWitness[1]);
+        BigInteger x = computeFromWitness(witness);
         assertThat(x.mod(BigInteger.valueOf(input))).isEqualTo(randInt);
     }
 
-    // TODO
     @Then("The {int}th atomic result for randElement\\({string}) proves correct")
-    public void the_i_th_atomic_result_for_random_string_proves_correct(Integer resultIndex, String randElement) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    public void the_i_th_atomic_result_for_random_string_proves_correct(Integer resultIndex, String input)
+            throws NoSuchAlgorithmException {
+        AtomicTransactionComposer.ReturnValue iThRet = execRes.methodResults.get(resultIndex);
+        assertThat(iThRet.parseError).isNull();
+        Object[] randByteAndWitness = (Object[]) iThRet.value;
+        byte randByte = (byte) randByteAndWitness[0];
+        byte[] witness = convertToByteArray(randByteAndWitness[1]);
+        int quotient = computeFromWitness(witness).mod(BigInteger.valueOf(input.length())).intValue();
+        assertThat(input.getBytes(StandardCharsets.UTF_8)[quotient]).isEqualTo(randByte);
     }
 
-    // TODO
     @Then("The {int}th atomic result for {string} satisfies the regex {string}")
     public void the_i_th_atomic_result_for_method_satisfies_regex(Integer resultIndex, String methodName, String regexExpr) {
-        throw new io.cucumber.java.PendingException();
+        assertThat(methodName).isEqualTo("spin()");
+        AtomicTransactionComposer.ReturnValue iThRet = execRes.methodResults.get(resultIndex);
+        Object[] spinResultAndWitness = (Object[]) iThRet.value;
+        byte[] spinResult = convertToByteArray(spinResultAndWitness[0]);
+        String spinResultStr = new String(spinResult, StandardCharsets.UTF_8);
+        assertThat(Pattern.compile(regexExpr).matcher(spinResultStr).matches()).isTrue();
     }
 
     // TODO
