@@ -5,8 +5,8 @@
 - Bug fix for `logs` on `PendingTransactionResponse` (#275)
 - Add WaitForConfirmation function (#274)
 - Better error message on encoding exception. (#258)
-- Revert "Revert "Fix ABI source code position for ABI feature (#260)""
-- Revert "Revert "Add ABI encoding support (#255)""
+- Fix ABI source code position for ABI feature (#260)
+- Add ABI encoding support (#255)
 
 # 1.11.0-beta-2
 - Support Foreign objects as ABI arguments (#283)
