@@ -1,3 +1,13 @@
+# 1.11.0
+- Support Foreign objects as ABI arguments (#283)
+- Upgrade `jackson` packages to resolve PRs on vulnerability (#281)
+- ABI Interaction Support for JAVA SDK (#268)
+- Bug fix for `logs` on `PendingTransactionResponse` (#275)
+- Add WaitForConfirmation function (#274)
+- Better error message on encoding exception. (#258)
+- Revert "Revert "Fix ABI source code position for ABI feature (#260)""
+- Revert "Revert "Add ABI encoding support (#255)""
+
 # 1.11.0-beta-2
 - Support Foreign objects as ABI arguments (#283)
 - Upgrade `jackson` packages to resolve PRs on vulnerability (#281)
