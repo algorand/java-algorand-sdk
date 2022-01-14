@@ -5,6 +5,7 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.*;
+import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
 import com.algorand.algosdk.util.SplitAndProcessABIArgs;
@@ -14,8 +15,11 @@ import io.cucumber.java.en.When;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -168,13 +172,37 @@ public class AtomicTxnComposer {
     }
 
     @Then("The {int}th atomic result for randomInt\\({int}) proves correct")
-    public void the_i_th_atomic_result_for_random_int_proves_correct(Integer resultIndex, Integer randomInt) {
+    public void the_i_th_atomic_result_for_random_int_proves_correct(Integer resultIndex, Integer input)
+            throws NoSuchAlgorithmException {
+        AtomicTransactionComposer.ReturnValue iThRet = execRes.methodResults.get(resultIndex);
+        assertThat(iThRet.parseError).isNull();
+        Object[] randIntAndWitness = (Object[]) iThRet.value;
+        BigInteger randInt = (BigInteger) randIntAndWitness[0];
+        Object[] witnessObjArr = (Object[]) randIntAndWitness[1];
+        byte[] witness = new byte[witnessObjArr.length];
+        for (int i = 0; i < witnessObjArr.length; i++)
+            witness[i] = (byte) witnessObjArr[i];
+        byte[] witnessChecksum = Arrays.copyOfRange(Digester.digest(witness), 0, 8);
+        BigInteger x = new BigInteger(witnessChecksum);
+        assertThat(x.mod(BigInteger.valueOf(input))).isEqualTo(randInt);
+    }
+
+    // TODO
+    @Then("The {int}th atomic result for randElement\\({string}) proves correct")
+    public void the_i_th_atomic_result_for_random_string_proves_correct(Integer resultIndex, String randElement) {
         // Write code here that turns the phrase above into concrete actions
         throw new io.cucumber.java.PendingException();
     }
 
-    @Then("The {int}th atomic result for randElement\\({string}) proves correct")
-    public void the_i_th_atomic_result_for_random_string_proves_correct(Integer resultIndex, String randElement) {
+    // TODO
+    @Then("The {int}th atomic result for {string} satisfies the regex {string}")
+    public void the_i_th_atomic_result_for_method_satisfies_regex(Integer resultIndex, String methodName, String regexExpr) {
+        throw new io.cucumber.java.PendingException();
+    }
+
+    // TODO
+    @Then("I can retrieve all inner transactions that were called from the atomic transaction with call graph {string}.")
+    public void atcInnerTxnMatchCallGraph(String callGraph) {
         // Write code here that turns the phrase above into concrete actions
         throw new io.cucumber.java.PendingException();
     }

@@ -144,6 +144,22 @@ public class Applications {
         this.appId = r.applicationIndex;
     }
 
+    @Given("I fund the current application's address with {int} microalgos.")
+    public void fundAppAccount(Integer amount) throws Exception {
+        Address appAddress = Address.forApplication(this.appId);
+        Address sender = base.getAddress(1);
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(sender)
+                .receiver(appAddress)
+                .amount(amount)
+                .lookupParams(clients.v2Client)
+                .build();
+        SignedTransaction stx = base.signWithAddress(tx, sender);
+
+        Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
+        Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 5);
+    }
+
     @Then("I get the account address for the current application and see that it matches the app id's hash")
     public void compareApplicationIDHashWithAccountAddress() throws NoSuchAlgorithmException, IOException {
         Address accountAddress = Address.forApplication(this.appId);
