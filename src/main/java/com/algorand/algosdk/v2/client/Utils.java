@@ -143,6 +143,7 @@ public class Utils {
             Response<Application> ar = client.GetApplicationByID(app).execute();
             if(ar.isSuccessful()){
                 app_infos.add(ar.body());
+                accts.add(ar.body().params.creator.toString());
             }
         }
 
