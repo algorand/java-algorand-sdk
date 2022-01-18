@@ -18,6 +18,7 @@ import org.assertj.core.api.Assertions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,7 @@ public class Applications {
     public Transaction transaction;
     public String txId = null;
     public Long appId = 0L;
+    public List<Long> rememberedAppIds = new ArrayList<>();
 
     public Applications(TransientAccount transientAccount, Clients clients, Stepdefs base) {
         this.transientAccount = transientAccount;
@@ -142,6 +144,7 @@ public class Applications {
     public void rememberTheNewApplicatoinId() throws Exception {
         PendingTransactionResponse r = clients.v2Client.PendingTransactionInformation(txId).execute().body();
         this.appId = r.applicationIndex;
+        this.rememberedAppIds.add(this.appId);
     }
 
     @Given("I fund the current application's address with {int} microalgos.")

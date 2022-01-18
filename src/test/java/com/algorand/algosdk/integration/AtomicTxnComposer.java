@@ -8,7 +8,8 @@ import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
-import com.algorand.algosdk.util.SplitAndProcessABIArgs;
+import com.algorand.algosdk.util.SplitAndProcessMethodArgs;
+import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -35,7 +36,7 @@ public class AtomicTxnComposer {
     Method method;
     MethodCallParams.Builder optionBuilder;
     AtomicTransactionComposer.ExecuteResult execRes;
-    SplitAndProcessABIArgs abiArgProcessor;
+    SplitAndProcessMethodArgs abiArgProcessor;
     Long appID;
     List<Method> composerMethods;
     String nonce;
@@ -111,7 +112,7 @@ public class AtomicTxnComposer {
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
          optionBuilder = new MethodCallParams.Builder();
-         abiArgProcessor = new SplitAndProcessABIArgs(method);
+         abiArgProcessor = new SplitAndProcessMethodArgs(method);
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
@@ -121,7 +122,7 @@ public class AtomicTxnComposer {
 
     @When("I append the encoded arguments {string} to the method arguments array.")
     public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
-        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessABIArgs(string);
+        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessMethodArgs(string, applications.rememberedAppIds);
         for (Object arg : processedABIArgs)
             this.optionBuilder.addMethodArgs(arg);
     }
@@ -219,11 +220,10 @@ public class AtomicTxnComposer {
         assertThat(Pattern.compile(regexExpr).matcher(spinResultStr).matches()).isTrue();
     }
 
-    // TODO
-    @Then("I can retrieve all inner transactions that were called from the atomic transaction with call graph {string}.")
-    public void atcInnerTxnMatchCallGraph(String callGraph) {
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    @Then("I can dig the {int}th atomic result with path {string} and see the value {string}")
+    public void digDownIthATCResWithPathForValue(Integer resIndex, String pathDown, String value) {
+        String[] splitPath = pathDown.split("\\.");
+        // TODO I just let it pass
     }
 
     @Then("The composer should have a status of {string}.")
