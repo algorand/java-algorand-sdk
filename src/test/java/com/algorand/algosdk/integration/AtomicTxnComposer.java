@@ -5,10 +5,7 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.*;
-import com.algorand.algosdk.util.Digester;
-import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.ResourceUtils;
-import com.algorand.algosdk.util.SplitAndProcessMethodArgs;
+import com.algorand.algosdk.util.*;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -21,6 +18,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -162,7 +160,7 @@ public class AtomicTxnComposer {
         for (int i = 0; i < abiTypes.length; i++) {
             assertThat(execRes.methodResults.get(i).parseError).isNull();
             if (abiTypes[i].equals("void")) {
-                assertThat(execRes.methodResults.get(i).rawValue).isNull();
+                assertThat(execRes.methodResults.get(i).rawValue).isEmpty();
                 continue;
             }
             ABIType tokenT = ABIType.valueOf(abiTypes[i]);
@@ -220,10 +218,75 @@ public class AtomicTxnComposer {
         assertThat(Pattern.compile(regexExpr).matcher(spinResultStr).matches()).isTrue();
     }
 
+    @SuppressWarnings("unchecked")
     @Then("I can dig the {int}th atomic result with path {string} and see the value {string}")
     public void digDownIthATCResWithPathForValue(Integer resIndex, String pathDown, String value) {
-        String[] splitPath = pathDown.split("\\.");
-        // TODO I just let it pass
+        String[] pathKeys = pathDown.split("[.]");
+        PendingTransactionResponse transactionInfo = execRes.methodResults.get(resIndex).txInfo;
+        Object jsonGeneric;
+        try {
+            jsonGeneric = Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(transactionInfo), Object.class);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("cannot encode txInfo to msgpack, then convert back to generic Object");
+        }
+        for (String currentKey : pathKeys) {
+            boolean itIsIntKey = true;
+            int intKey = 0;
+            try {
+                intKey = Integer.parseInt(currentKey);
+            } catch (NumberFormatException e) {
+                itIsIntKey = false;
+            }
+
+            Object genericValue;
+
+            if (itIsIntKey) {
+                Object[] genericArr;
+                try {
+                    genericArr = GenericObjToArray.unifyToArrayOfObjects(jsonGeneric);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(
+                            "path component " + currentKey + " is an array index, but the parent is not an array: parent type " + jsonGeneric.getClass()
+                    );
+                }
+                if (intKey < 0 || intKey >= genericArr.length)
+                    throw new IllegalArgumentException(
+                            "path component " + currentKey + " is an array index that is outside scope: parent length " + genericArr.length
+                    );
+                genericValue = genericArr[intKey];
+            } else {
+                Map<String, Object> castedToMap;
+                try {
+                    castedToMap = (Map<String, Object>) jsonGeneric;
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(
+                            "path component " + currentKey + " is expected to be an object field, but it is not there"
+                    );
+                }
+                try {
+                    genericValue = castedToMap.get(currentKey);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(
+                            "path component " + currentKey + " is expected to get an object field, but we cannot retrieve: " + e.getMessage()
+                    );
+                }
+            }
+            jsonGeneric = genericValue;
+        }
+
+        if (jsonGeneric instanceof String) {
+            assertThat((String) jsonGeneric).isEqualTo(value);
+        } else if (jsonGeneric instanceof Integer) {
+            assertThat((Integer) jsonGeneric).isEqualTo(Integer.valueOf(value));
+        } else
+            throw new IllegalArgumentException("cannot infer type for target json value");
+    }
+
+    @Then("I dig into the paths {string} of the resulting atomic transaction tree I see group ids and they are all the same")
+    public void checkInnerTxnGroupIDs(String colonPathString) {
+        // Write code here that turns the phrase above into concrete actions
+        // TODO
+        throw new io.cucumber.java.PendingException();
     }
 
     @Then("The composer should have a status of {string}.")
