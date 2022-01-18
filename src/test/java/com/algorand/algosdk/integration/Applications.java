@@ -147,6 +147,11 @@ public class Applications {
         this.rememberedAppIds.add(this.appId);
     }
 
+    @Given("I reset the array of application IDs to remember.")
+    public void i_reset_the_array_of_application_i_ds_to_remember() {
+        this.appId = 0L;
+    }
+
     @Given("I fund the current application's address with {int} microalgos.")
     public void fundAppAccount(Integer amount) throws Exception {
         Address appAddress = Address.forApplication(this.appId);
