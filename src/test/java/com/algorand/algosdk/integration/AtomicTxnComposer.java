@@ -2,6 +2,7 @@ package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.*;
@@ -284,9 +285,38 @@ public class AtomicTxnComposer {
 
     @Then("I dig into the paths {string} of the resulting atomic transaction tree I see group ids and they are all the same")
     public void checkInnerTxnGroupIDs(String colonPathString) {
-        // Write code here that turns the phrase above into concrete actions
-        // TODO
-        throw new io.cucumber.java.PendingException();
+        String[] pathKeys = colonPathString.split(":");
+
+        List<List<Integer>> paths = new ArrayList<>();
+        for (String path : pathKeys) {
+            String[] splitPath = path.split(",");
+            List<Integer> integerPath = new ArrayList<>();
+            for (String key : splitPath)
+                integerPath.add(Integer.parseInt(key));
+            paths.add(integerPath);
+        }
+
+        List<PendingTransactionResponse> txInfoToCheck = new ArrayList<>();
+        for (List<Integer> path : paths) {
+            PendingTransactionResponse current = new PendingTransactionResponse();
+            for (int i = 0; i < path.size(); i++) {
+                if (i == 0) {
+                    current = execRes.methodResults.get(path.get(i)).txInfo;
+                } else {
+                    current = current.innerTxns.get(path.get(i));
+                }
+            }
+            txInfoToCheck.add(current);
+        }
+
+        Digest groupID = new Digest();
+        for (int i = 0; i < txInfoToCheck.size(); i++) {
+            Digest currentGroupID = txInfoToCheck.get(i).txn.tx.group;
+            if (i == 0) {
+                groupID = currentGroupID;
+            } else if (!groupID.equals(currentGroupID))
+                throw new IllegalArgumentException("Group hashes differ: " + groupID + " != " + currentGroupID);
+        }
     }
 
     @Then("The composer should have a status of {string}.")
