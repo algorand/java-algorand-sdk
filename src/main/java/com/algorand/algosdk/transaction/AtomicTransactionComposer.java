@@ -417,38 +417,37 @@ public class AtomicTransactionComposer {
             if (!this.methodMap.containsKey(i))
                 continue;
 
+            PendingTransactionResponse currentTxInfo = txInfo;
+            if (i != indexToWait) {
+                Response<PendingTransactionResponse> resp =
+                        client.PendingTransactionInformation(signedTxns.get(i).transactionID).execute();
+                if (!resp.isSuccessful()) {
+                    retList.add(new ReturnValue(
+                            signedTxns.get(i).transactionID,
+                            null,
+                            null,
+                            new Exception(resp.message()),
+                            resp.body()
+                    ));
+                    continue;
+                }
+                currentTxInfo = resp.body();
+            }
+
             if (this.methodMap.get(i).returns.type.equals(Method.Returns.VoidRetType)) {
                 retList.add(new ReturnValue(
-                        this.transactionList.get(i).txn.txID(),
-                        new byte[]{},
+                        currentTxInfo.txn.transactionID,
                         null,
                         null,
-                        txInfo
+                        null,
+                        currentTxInfo
                 ));
                 continue;
             }
 
-            PendingTransactionResponse respBody = txInfo;
-
-            if (i != indexToWait) {
-                Response<PendingTransactionResponse> resp =
-                        client.PendingTransactionInformation(this.transactionList.get(i).txn.txID()).execute();
-                if (!resp.isSuccessful()) {
-                    retList.add(new ReturnValue(
-                            null,
-                            null,
-                            null,
-                            new Exception(resp.message()),
-                            txInfo
-                    ));
-                    continue;
-                }
-                respBody = resp.body();
-            }
-
-            if (respBody.logs.size() == 0)
+            if (currentTxInfo.logs.size() == 0)
                 throw new IllegalArgumentException("App call transaction did not log a return value");
-            byte[] retLine = respBody.logs.get(respBody.logs.size() - 1);
+            byte[] retLine = currentTxInfo.logs.get(currentTxInfo.logs.size() - 1);
             if (!checkLogRet(retLine))
                 throw new IllegalArgumentException("App call transaction did not log a return value");
 
@@ -462,11 +461,11 @@ public class AtomicTransactionComposer {
                 parseError = e;
             }
             retList.add(new ReturnValue(
-                    this.transactionList.get(i).txn.txID(),
+                    currentTxInfo.txn.transactionID,
                     abiEncoded,
                     decoded,
                     parseError,
-                    txInfo
+                    currentTxInfo
             ));
         }
 

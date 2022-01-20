@@ -161,7 +161,7 @@ public class AtomicTxnComposer {
         for (int i = 0; i < abiTypes.length; i++) {
             assertThat(execRes.methodResults.get(i).parseError).isNull();
             if (abiTypes[i].equals("void")) {
-                assertThat(execRes.methodResults.get(i).rawValue).isEmpty();
+                assertThat(execRes.methodResults.get(i).rawValue).isNull();
                 continue;
             }
             ABIType tokenT = ABIType.valueOf(abiTypes[i]);

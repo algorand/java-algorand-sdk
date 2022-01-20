@@ -743,7 +743,7 @@ public class Stepdefs {
         String path = System.getProperty("user.dir");
         Path p = Paths.get(path);
         this.num = num;
-        path = p.getParent() + "/temp/raw" + this.num + ".tx";
+        path = p.getParent() + "/temp.json/raw" + this.num + ".tx";
         FileInputStream inputStream = new FileInputStream(path);
         File file = new File(path);
         byte[] data = new byte[(int) file.length()];
@@ -756,7 +756,7 @@ public class Stepdefs {
     public void writeTxn() throws JsonProcessingException, IOException{
         String path = System.getProperty("user.dir");
         Path p = Paths.get(path);
-        path = p.getParent() + "/temp/raw" + this.num + ".tx";
+        path = p.getParent() + "/temp.json/raw" + this.num + ".tx";
         byte[] data = Encoder.encodeToMsgPack(stx);
         FileOutputStream out = new FileOutputStream(path);
         out.write(data);
@@ -767,7 +767,7 @@ public class Stepdefs {
     public void checkEnc() throws IOException{
         String path = System.getProperty("user.dir");
         Path p = Paths.get(path);
-        path = p.getParent() + "/temp/raw" + this.num + ".tx";
+        path = p.getParent() + "/temp.json/raw" + this.num + ".tx";
         FileInputStream inputStream = new FileInputStream(path);
         File file = new File(path);
         byte[] data = new byte[(int) file.length()];
@@ -775,7 +775,7 @@ public class Stepdefs {
         SignedTransaction stxnew = Encoder.decodeFromMsgPack(data, SignedTransaction.class);
         inputStream.close();
 
-        path = p.getParent() + "/temp/old" + this.num + ".tx";
+        path = p.getParent() + "/temp.json/old" + this.num + ".tx";
         inputStream = new FileInputStream(path);
         file = new File(path);
         data = new byte[(int) file.length()];
@@ -789,7 +789,7 @@ public class Stepdefs {
     public void signSaveTxn() throws IOException, JsonProcessingException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException, Exception{
         String path = System.getProperty("user.dir");
         Path p = Paths.get(path);
-        path = p.getParent() + "/temp/txn.tx";
+        path = p.getParent() + "/temp.json/txn.tx";
         FileInputStream inputStream = new FileInputStream(path);
         File file = new File(path);
         byte[] data = new byte[(int) file.length()];
