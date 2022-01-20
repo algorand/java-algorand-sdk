@@ -1,6 +1,5 @@
 package com.algorand.algosdk.abi;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
