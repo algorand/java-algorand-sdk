@@ -8,6 +8,7 @@ import java.util.Objects;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -43,21 +44,22 @@ public class TransactionApplication extends PathResponse {
      * approval-program and clear-state-program.
      */
     @JsonProperty("application-args")
-    public void applicationArgs(List<String> base64Encoded) {
-         this.applicationArgs = new ArrayList<byte[]>();
-         for (String val : base64Encoded) {
-             this.applicationArgs.add(Encoder.decodeFromBase64(val));
-         }
-     }
-     @JsonProperty("application-args")
-     public List<String> applicationArgs() {
-         ArrayList<String> ret = new ArrayList<String>();
-         for (byte[] val : this.applicationArgs) {
-             ret.add(Encoder.encodeToBase64(val));
-         }
-         return ret; 
-     }
     public List<byte[]> applicationArgs = new ArrayList<byte[]>();
+    @JsonIgnore
+    public void applicationArgs(List<String> base64Encoded) {
+        this.applicationArgs = new ArrayList<byte[]>();
+        for (String val : base64Encoded) {
+            this.applicationArgs.add(Encoder.decodeFromBase64(val));
+        }
+    }
+    @JsonIgnore
+    public List<String> applicationArgs() {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (byte[] val : this.applicationArgs) {
+            ret.add(Encoder.encodeToBase64(val));
+        }
+        return ret; 
+    }
 
     /**
      * (apid) ID of the application being configured or empty if creating.

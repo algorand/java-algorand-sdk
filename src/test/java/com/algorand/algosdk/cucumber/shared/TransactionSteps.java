@@ -1,8 +1,22 @@
 package com.algorand.algosdk.cucumber.shared;
 
+import static com.algorand.algosdk.util.ConversionUtils.convertAccounts;
+import static com.algorand.algosdk.util.ConversionUtils.convertArgs;
+import static com.algorand.algosdk.util.ConversionUtils.convertForeignApps;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Map;
+
+import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.KeyRegistrationTransactionBuilder;
-import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
+import com.algorand.algosdk.crypto.TEALProgram;
+import com.algorand.algosdk.integration.TransientAccount;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -10,34 +24,25 @@ import com.algorand.algosdk.unit.Base;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Map;
-
-import static com.algorand.algosdk.util.ConversionUtils.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 
 public class TransactionSteps {
-    private final Base base;
-    
-    // The Java SDK does not have a comprehensive suggested params object, so all fields are defined here individually
-    public Integer suggestedFee;
-    public Boolean suggestedFlatFee;
-    public Integer suggestedFirstValid;
-    public Integer suggestedLastValid;
-    public String suggestedGenesisHashB64;
-    public String suggestedGenesisId;
-
-    public Transaction transaction = null;
+    public Base base;
+    public Transaction builtTransaction = null;
     public SignedTransaction signedTransaction = null;
+    public TransientAccount transAcc;
+
+    public TransactionParams suggestedParams;
+    public BigInteger fee, flatFee, fv, lv;
+    public boolean isFlatFee;
+    public byte[] genesisHash;
+    public String genesisID;
 
     public TransactionSteps(Base b) {
         this.base = b;
@@ -57,28 +62,16 @@ public class TransactionSteps {
         throw new RuntimeException("Unknown error.");
     }
 
-    @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
-    public void suggested_transaction_parameters(Integer fee, String flatFee, Integer firstValid, Integer lastValid, String genesisHash, String genesisId) {
-        assertThat(flatFee).isIn(Arrays.asList("true", "false"));
-        
-        suggestedFee = fee;
-        suggestedFlatFee = flatFee.equals("true");
-        suggestedFirstValid = firstValid;
-        suggestedLastValid = lastValid;
-        suggestedGenesisHashB64 = genesisHash;
-        suggestedGenesisId = genesisId;
-    }
-
     @When("I build a keyreg transaction with sender {string}, nonparticipation {string}, vote first {int}, vote last {int}, key dilution {int}, vote public key {string}, selection public key {string}, and state proof public key {string}")
     public void buildKeyregTransaction(String sender, String nonpart, Integer voteFirst, Integer voteLast, Integer keyDilution, String votePk, String selectionPk, String stateProofPk) {
         assertThat(nonpart).isIn(Arrays.asList("true", "false"));
 
         KeyRegistrationTransactionBuilder<?> builder = Transaction.KeyRegistrationTransactionBuilder();
 
-        if (suggestedFlatFee) {
-            builder = builder.flatFee(suggestedFee);
+        if (isFlatFee) {
+            builder = builder.flatFee(flatFee);
         } else {
-            builder = builder.fee(suggestedFee);
+            builder = builder.fee(fee);
         }
 
         if (!votePk.isEmpty())
@@ -90,11 +83,11 @@ public class TransactionSteps {
         if (!stateProofPk.isEmpty())
             builder = builder.stateProofKeyBase64(stateProofPk);
         
-        transaction = builder
-            .firstValid(suggestedFirstValid)
-            .lastValid(suggestedLastValid)
-            .genesisHashB64(suggestedGenesisHashB64)
-            .genesisID(suggestedGenesisId)
+        builtTransaction = builder
+            .firstValid(fv)
+            .lastValid(lv)
+            .genesisHash(genesisHash)
+            .genesisID(genesisID)
             .sender(sender)
             .nonparticipation(nonpart.equals("true"))
             .voteFirst(voteFirst)
@@ -173,12 +166,46 @@ public class TransactionSteps {
             builder.genesisHashB64(genesisHash);
         }
 
-        transaction = builder.build();
+        builtTransaction = builder.build();
+    }
+
+    @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
+    public void suggested_transaction_parameters_fee_flat_fee_first_valid_last_valid_genesis_hash_genesis_id(Integer int1, String string, Integer int2, Integer int3, String string2, String string3) {
+        isFlatFee = Boolean.parseBoolean(string);
+        fee = isFlatFee ? null : BigInteger.valueOf(int1);
+        flatFee = isFlatFee ? BigInteger.valueOf(int1) : null;
+
+        genesisHash = Encoder.decodeFromBase64(string2);
+        genesisID = string3;
+        fv = BigInteger.valueOf(int2);
+        lv = BigInteger.valueOf(int3);
+
+        suggestedParams = new TransactionParams().genesishashb64(genesisHash).genesisID(genesisID).lastRound(fv);
+    }
+
+    @When("I build a payment transaction with sender {string}, receiver {string}, amount {int}, close remainder to {string}")
+    public void i_build_a_payment_transaction_with_sender_receiver_amount_close_remainder_to(String string, String string2, Integer int1, String string3) {
+        PaymentTransactionBuilder<?> builder = PaymentTransactionBuilder.Builder();
+        if (string.equals("transient"))
+            builder.sender(transAcc.transientAccount.getAddress());
+        else
+            builder.sender(string);
+        if (string2.equals("transient"))
+            builder.receiver(transAcc.transientAccount.getAddress());
+        else
+            builder.receiver(string2);
+        builder.amount(int1)
+                .fee(fee).flatFee(flatFee)
+                .firstValid(fv).lastValid(lv)
+                .genesisHash(genesisHash).genesisID(genesisID);
+        if (!string3.isEmpty())
+            builder.closeRemainderTo(string3);
+        builtTransaction = builder.build();
     }
 
     @When("sign the transaction")
     public void sign_the_transaction() throws NoSuchAlgorithmException {
-        signedTransaction = base.signTransaction(transaction);
+        signedTransaction = base.signTransaction(builtTransaction);
     }
 
     @Then("fee field is in txn")
@@ -213,7 +240,7 @@ public class TransactionSteps {
     public void the_decoded_transaction_should_equal_the_original() throws JsonProcessingException, IOException {
         String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
         SignedTransaction decoded = Encoder.decodeFromMsgPack(encoded, SignedTransaction.class);
-        assertThat(decoded.tx).isEqualTo(transaction);
+        assertThat(decoded.tx).isEqualTo(builtTransaction);
     }
 
 }

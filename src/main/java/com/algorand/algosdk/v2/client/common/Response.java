@@ -72,7 +72,12 @@ public class Response<T> {
         } catch (Exception e) {
             // Check if the data was base64 encoded.
             byte[] bytes = Encoder.decodeFromBase64(new String(body));
-            return Utils.msgpReader.forType(valueType).readValue(bytes);
+            try {
+                return Utils.msgpReader.forType(valueType).readValue(bytes);
+            } catch (Exception e2) {
+                // Significantly more likely to have a useful error in the original exception.
+                throw e;
+            }
         }
     }
 

@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
@@ -48,21 +49,22 @@ public class DryrunTxnResult extends PathResponse {
     public List<DryrunState> logicSigTrace = new ArrayList<DryrunState>();
 
     @JsonProperty("logs")
-    public void logs(List<String> base64Encoded) {
-         this.logs = new ArrayList<byte[]>();
-         for (String val : base64Encoded) {
-             this.logs.add(Encoder.decodeFromBase64(val));
-         }
-     }
-     @JsonProperty("logs")
-     public List<String> logs() {
-         ArrayList<String> ret = new ArrayList<String>();
-         for (byte[] val : this.logs) {
-             ret.add(Encoder.encodeToBase64(val));
-         }
-         return ret; 
-     }
     public List<byte[]> logs = new ArrayList<byte[]>();
+    @JsonIgnore
+    public void logs(List<String> base64Encoded) {
+        this.logs = new ArrayList<byte[]>();
+        for (String val : base64Encoded) {
+            this.logs.add(Encoder.decodeFromBase64(val));
+        }
+    }
+    @JsonIgnore
+    public List<String> logs() {
+        ArrayList<String> ret = new ArrayList<String>();
+        for (byte[] val : this.logs) {
+            ret.add(Encoder.encodeToBase64(val));
+        }
+        return ret; 
+    }
 
     @Override
     public boolean equals(Object o) {
