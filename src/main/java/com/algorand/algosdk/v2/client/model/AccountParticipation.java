@@ -26,7 +26,7 @@ public class AccountParticipation extends PathResponse {
     public byte[] selectionParticipationKey;
 
     /**
-     * (state) root of the state proof key (if any)
+     * (stprf) Root of the state proof key (if any)
      */
     @JsonProperty("state-proof-key")
     public void stateProofKey(String base64Encoded) {

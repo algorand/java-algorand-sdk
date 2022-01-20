@@ -49,6 +49,13 @@ public class ProofResponse extends PathResponse {
     }
     public byte[] stibhash;
 
+    /**
+     * represents the depth of the tree that is being proven. the root level is not
+     * included.
+     */
+    @JsonProperty("treedepth")
+    public Long treedepth;
+
     @Override
     public boolean equals(Object o) {
 
@@ -60,6 +67,7 @@ public class ProofResponse extends PathResponse {
         if (!Objects.deepEquals(this.idx, other.idx)) return false;
         if (!Objects.deepEquals(this.proof, other.proof)) return false;
         if (!Objects.deepEquals(this.stibhash, other.stibhash)) return false;
+        if (!Objects.deepEquals(this.treedepth, other.treedepth)) return false;
 
         return true;
     }
