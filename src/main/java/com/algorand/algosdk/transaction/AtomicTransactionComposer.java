@@ -427,7 +427,7 @@ public class AtomicTransactionComposer {
                             null,
                             null,
                             new Exception(resp.message()),
-                            resp.body()
+                            null
                     ));
                     continue;
                 }
