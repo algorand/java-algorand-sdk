@@ -18,11 +18,10 @@ public class ResourceUtils {
     public static byte[] loadResource(String file) {
         try {
             return ResourceUtils.readResource(file);
-        } catch (Exception e) {
-            Assertions.fail("Unable to read file ('"+file+"') required by test: " + e.getMessage(), e);
+        } catch (IOException e) {
+            Assertions.fail("Unable to read file ('" + file + "') required by test: " + e.getMessage(), e);
+            throw new RuntimeException("Unknown error.");
         }
-
-        throw new RuntimeException("Unknown error.");
     }
 
     public static TEALProgram loadTEALProgramFromFile(String file, AlgodClient aclv2) throws Exception {

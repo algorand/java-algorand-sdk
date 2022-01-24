@@ -155,7 +155,7 @@ public class Applications {
     @Given("I fund the current application's address with {int} microalgos.")
     public void fundAppAccount(Integer amount) throws Exception {
         Address appAddress = Address.forApplication(this.appId);
-        Address sender = base.getAddress(1);
+        Address sender = base.getAddress(0);
         Transaction tx = Transaction.PaymentTransactionBuilder()
                 .sender(sender)
                 .receiver(appAddress)

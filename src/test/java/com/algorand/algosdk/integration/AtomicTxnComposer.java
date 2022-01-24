@@ -298,23 +298,16 @@ public class AtomicTxnComposer {
 
         List<PendingTransactionResponse> txInfoToCheck = new ArrayList<>();
         for (List<Integer> path : paths) {
-            PendingTransactionResponse current = new PendingTransactionResponse();
-            for (int i = 0; i < path.size(); i++) {
-                if (i == 0) {
-                    current = execRes.methodResults.get(path.get(i)).txInfo;
-                } else {
-                    current = current.innerTxns.get(path.get(i));
-                }
-            }
+            PendingTransactionResponse current = execRes.methodResults.get(path.get(0)).txInfo;
+            for (int i = 1; i < path.size(); i++)
+                current = current.innerTxns.get(path.get(i));
             txInfoToCheck.add(current);
         }
 
-        Digest groupID = new Digest();
-        for (int i = 0; i < txInfoToCheck.size(); i++) {
+        Digest groupID = txInfoToCheck.get(0).txn.tx.group;
+        for (int i = 1; i < txInfoToCheck.size(); i++) {
             Digest currentGroupID = txInfoToCheck.get(i).txn.tx.group;
-            if (i == 0) {
-                groupID = currentGroupID;
-            } else if (!groupID.equals(currentGroupID))
+            if (!groupID.equals(currentGroupID))
                 throw new IllegalArgumentException("Group hashes differ: " + groupID + " != " + currentGroupID);
         }
     }
