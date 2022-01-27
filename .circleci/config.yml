@@ -17,7 +17,7 @@ jobs:
   integration-test:
     machine:
       image: "ubuntu-2004:202104-01"
-    resource_class: large
+    resource_class: medium
     steps:
       - checkout
       - run: make docker-test
