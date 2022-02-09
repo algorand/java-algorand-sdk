@@ -47,7 +47,7 @@ public class Address implements Serializable {
     // prefix for signing bytes
     private static final byte[] BYTES_SIGN_PREFIX = ("MX").getBytes(StandardCharsets.UTF_8);
     // prefix for hashing application ID
-    private static final byte[] APP_ID_PREFIX = ("appID").getBytes(StandardCharsets.UTF_8);
+    public static final byte[] APP_ID_PREFIX = ("appID").getBytes(StandardCharsets.UTF_8);
 
 
     /**

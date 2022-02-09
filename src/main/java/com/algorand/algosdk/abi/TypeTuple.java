@@ -2,6 +2,7 @@ package com.algorand.algosdk.abi;
 
 import com.algorand.algosdk.algod.client.StringUtil;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.GenericObjToArray;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -42,7 +43,7 @@ public class TypeTuple extends ABIType {
 
     @Override
     public byte[] encode(Object o) {
-        Object[] tupleValues = ABIType.unifyToArrayOfObjects(o);
+        Object[] tupleValues = GenericObjToArray.unifyToArrayOfObjects(o);
 
         if (tupleValues.length != this.childTypes.size())
             throw new IllegalArgumentException("abi tuple child type size != abi tuple element value size");

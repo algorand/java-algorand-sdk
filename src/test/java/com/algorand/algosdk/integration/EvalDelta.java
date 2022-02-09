@@ -54,7 +54,7 @@ public class EvalDelta {
         // Try fetching the transaction from indexer a few times to give indexer a chance to process the new block.
         Transaction tx = null;
         for (int i = 0; i < 5 && tx == null; i++) {
-            TransactionsResponse indexerResponse = clients.indexerClients.get(3)
+            TransactionsResponse indexerResponse = clients.indexerClients.get(indexer)
                     .searchForTransactions()
                     .txid(applications.txId)
                     .execute()

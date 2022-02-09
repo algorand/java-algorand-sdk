@@ -43,7 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.algorand.algosdk.cucumber.shared.TransactionSteps.loadResource;
+import static com.algorand.algosdk.util.ResourceUtils.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
@@ -1247,6 +1247,13 @@ public class Stepdefs {
     public void i_compile_teal_program(String path) throws Exception {
         byte[] source = loadResource(path);
         compileResponse = aclv2.TealCompile().source(source).execute();
+    }
+
+    @Then("base64 decoding the response is the same as the binary {string}")
+    public void base64_decoding_the_response_is_the_same_as_the_binary(String path) {
+        byte[] source = loadResource(path);
+        String b64EncodedSrc = Encoder.encodeToBase64(source);
+        assertThat(b64EncodedSrc).isEqualTo(compileResponse.body().result);
     }
 
     @Then("it is compiled with {int} and {string} and {string}")

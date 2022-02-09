@@ -1,6 +1,7 @@
 package com.algorand.algosdk.abi;
 
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.GenericObjToArray;
 import org.assertj.core.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -107,7 +108,7 @@ public class TestEncode {
         byte[] expected = new byte[]{(byte) 0b10011000};
         assertThat(new TypeArrayStatic(new TypeBool(), 5).encode(inputs)).isEqualTo(expected);
 
-        Object[] objInputs = ABIType.unifyToArrayOfObjects(inputs);
+        Object[] objInputs = GenericObjToArray.unifyToArrayOfObjects(inputs);
         assertThat(new TypeArrayStatic(new TypeBool(), 5).encode(objInputs)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(objInputs);
@@ -120,7 +121,7 @@ public class TestEncode {
         byte[] expected = new byte[]{0b00011010, (byte) 0b10100000};
         assertThat(new TypeArrayStatic(new TypeBool(), 11).encode(inputs)).isEqualTo(expected);
 
-        Object[] objInputs = ABIType.unifyToArrayOfObjects(inputs);
+        Object[] objInputs = GenericObjToArray.unifyToArrayOfObjects(inputs);
         assertThat(new TypeArrayStatic(new TypeBool(), 11).encode(objInputs)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(objInputs);
@@ -133,7 +134,7 @@ public class TestEncode {
         byte[] expected = new byte[]{0x00, 0x0B, 0b00011010, (byte) 0b10100000};
         assertThat(new TypeArrayDynamic(new TypeBool()).encode(inputs)).isEqualTo(expected);
 
-        Object[] objInputs = ABIType.unifyToArrayOfObjects(inputs);
+        Object[] objInputs = GenericObjToArray.unifyToArrayOfObjects(inputs);
         assertThat(new TypeArrayDynamic(new TypeBool()).encode(objInputs)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(objInputs);
@@ -168,7 +169,7 @@ public class TestEncode {
         Integer[] inputIntegers = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8};
         assertThat(ABIType.valueOf("uint64[]").encode(inputIntegers)).isEqualTo(expected);
 
-        Object[] objInputs = ABIType.unifyToArrayOfObjects(inputs);
+        Object[] objInputs = GenericObjToArray.unifyToArrayOfObjects(inputs);
         assertThat(ABIType.valueOf("uint64[]").encode(objInputs)).isEqualTo(expected);
 
         List<Object> listInputs = Arrays.asList(objInputs);
