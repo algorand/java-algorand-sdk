@@ -8,13 +8,14 @@ import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
-import com.algorand.algosdk.util.SplitAndProcessABIArgs;
+import com.algorand.algosdk.util.SplitAndProcessMethodArgs;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AtomicTxnComposer {
@@ -35,7 +36,7 @@ public class AtomicTxnComposer {
 
     TransactionWithSigner txnWithSigner;
     MethodCallParams.Builder optionBuilder;
-    SplitAndProcessABIArgs abiArgProcessor = null;
+    SplitAndProcessMethodArgs abiArgProcessor = null;
 
     public AtomicTxnComposer(Base b, ABIJson methodABI_, TransactionSteps steps) {
         base = b;
@@ -74,7 +75,7 @@ public class AtomicTxnComposer {
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
         this.optionBuilder = new MethodCallParams.Builder();
-        abiArgProcessor = new SplitAndProcessABIArgs(methodABI.method);
+        abiArgProcessor = new SplitAndProcessMethodArgs(methodABI.method);
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
@@ -89,7 +90,7 @@ public class AtomicTxnComposer {
 
     @When("I append the encoded arguments {string} to the method arguments array.")
     public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
-        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessABIArgs(string);
+        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessMethodArgs(string, new ArrayList<>());
         for (Object arg : processedABIArgs)
             this.optionBuilder.addMethodArgs(arg);
     }

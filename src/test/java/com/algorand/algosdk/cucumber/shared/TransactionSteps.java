@@ -15,14 +15,12 @@ import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.KeyRegistrationTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
-import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.integration.TransientAccount;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.unit.Base;
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.ResourceUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +29,15 @@ import org.assertj.core.api.Assertions;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+import static com.algorand.algosdk.util.ConversionUtils.*;
+import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionSteps {
     public Base base;
@@ -48,72 +55,24 @@ public class TransactionSteps {
         this.base = b;
     }
 
-    public static TEALProgram loadTEALProgramFromFile(String file) {
-        return new TEALProgram(loadResource(file));
-    }
-
-    public static byte[] loadResource(String file) {
-        try {
-            return ResourceUtils.readResource(file);
-        } catch (Exception e) {
-            Assertions.fail("Unable to read file ('"+file+"') required by test: " + e.getMessage(), e);
-        }
-
-        throw new RuntimeException("Unknown error.");
-    }
-
-    @When("I build a keyreg transaction with sender {string}, nonparticipation {string}, vote first {int}, vote last {int}, key dilution {int}, vote public key {string}, selection public key {string}, and state proof public key {string}")
-    public void buildKeyregTransaction(String sender, String nonpart, Integer voteFirst, Integer voteLast, Integer keyDilution, String votePk, String selectionPk, String stateProofPk) {
-        assertThat(nonpart).isIn(Arrays.asList("true", "false"));
-
-        KeyRegistrationTransactionBuilder<?> builder = Transaction.KeyRegistrationTransactionBuilder();
-
-        if (isFlatFee) {
-            builder = builder.flatFee(flatFee);
-        } else {
-            builder = builder.fee(fee);
-        }
-
-        if (!votePk.isEmpty())
-            builder = builder.participationPublicKeyBase64(votePk);
-
-        if (!selectionPk.isEmpty())
-            builder = builder.selectionPublicKeyBase64(selectionPk);
-
-        if (!stateProofPk.isEmpty())
-            builder = builder.stateProofKeyBase64(stateProofPk);
-        
-        builtTransaction = builder
-            .firstValid(fv)
-            .lastValid(lv)
-            .genesisHash(genesisHash)
-            .genesisID(genesisID)
-            .sender(sender)
-            .nonparticipation(nonpart.equals("true"))
-            .voteFirst(voteFirst)
-            .voteLast(voteLast)
-            .voteKeyDilution(keyDilution)
-            .build();
-    }
-
     @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}, extra-pages {long}")
-    public void buildApplicationTransactions(String operation, Long applicationId, String sender, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long fee, Long firstValid, Long lastValid, String genesisHash, Long extraPages) {
-        ApplicationBaseTransactionBuilder<?> builder = null;
+    public void buildApplicationTransactions(String operation, Long applicationId, String sender, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long fee, Long firstValid, Long lastValid, String genesisHash, Long extraPages) throws Exception {
+        ApplicationBaseTransactionBuilder builder = null;
 
         // Create builder and apply builder-specific parameters
         switch (operation) {
             case "create":
                 builder = Transaction.ApplicationCreateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile))
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, null))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, null))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
                         .localStateSchema(new StateSchema(localInts, localBytes))
                         .extraPages(extraPages);
                 break;
             case "update":
                 builder = Transaction.ApplicationUpdateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile));
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, null))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, null));
                 break;
             case "call":
                 builder = Transaction.ApplicationCallTransactionBuilder();
@@ -167,6 +126,40 @@ public class TransactionSteps {
         }
 
         builtTransaction = builder.build();
+    }
+
+    @When("I build a keyreg transaction with sender {string}, nonparticipation {string}, vote first {int}, vote last {int}, key dilution {int}, vote public key {string}, selection public key {string}, and state proof public key {string}")
+    public void buildKeyregTransaction(String sender, String nonpart, Integer voteFirst, Integer voteLast, Integer keyDilution, String votePk, String selectionPk, String stateProofPk) {
+        assertThat(nonpart).isIn(Arrays.asList("true", "false"));
+
+        KeyRegistrationTransactionBuilder<?> builder = Transaction.KeyRegistrationTransactionBuilder();
+
+        if (isFlatFee) {
+            builder = builder.flatFee(flatFee);
+        } else {
+            builder = builder.fee(fee);
+        }
+
+        if (!votePk.isEmpty())
+            builder = builder.participationPublicKeyBase64(votePk);
+
+        if (!selectionPk.isEmpty())
+            builder = builder.selectionPublicKeyBase64(selectionPk);
+
+        if (!stateProofPk.isEmpty())
+            builder = builder.stateProofKeyBase64(stateProofPk);
+        
+        builtTransaction = builder
+            .firstValid(fv)
+            .lastValid(lv)
+            .genesisHash(genesisHash)
+            .genesisID(genesisID)
+            .sender(sender)
+            .nonparticipation(nonpart.equals("true"))
+            .voteFirst(voteFirst)
+            .voteLast(voteLast)
+            .voteKeyDilution(keyDilution)
+            .build();
     }
 
     @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
