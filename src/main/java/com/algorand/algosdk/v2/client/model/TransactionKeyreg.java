@@ -34,6 +34,19 @@ public class TransactionKeyreg extends PathResponse {
     public byte[] selectionParticipationKey;
 
     /**
+     * (sprfkey) State proof key used in key registration transactions.
+     */
+    @JsonProperty("state-proof-key")
+    public void stateProofKey(String base64Encoded) {
+        this.stateProofKey = Encoder.decodeFromBase64(base64Encoded);
+    }
+    @JsonProperty("state-proof-key")
+    public String stateProofKey() {
+        return Encoder.encodeToBase64(this.stateProofKey);
+    }
+    public byte[] stateProofKey;
+
+    /**
      * (votefst) First round this participation key is valid.
      */
     @JsonProperty("vote-first-valid")
@@ -73,6 +86,7 @@ public class TransactionKeyreg extends PathResponse {
         TransactionKeyreg other = (TransactionKeyreg) o;
         if (!Objects.deepEquals(this.nonParticipation, other.nonParticipation)) return false;
         if (!Objects.deepEquals(this.selectionParticipationKey, other.selectionParticipationKey)) return false;
+        if (!Objects.deepEquals(this.stateProofKey, other.stateProofKey)) return false;
         if (!Objects.deepEquals(this.voteFirstValid, other.voteFirstValid)) return false;
         if (!Objects.deepEquals(this.voteKeyDilution, other.voteKeyDilution)) return false;
         if (!Objects.deepEquals(this.voteLastValid, other.voteLastValid)) return false;

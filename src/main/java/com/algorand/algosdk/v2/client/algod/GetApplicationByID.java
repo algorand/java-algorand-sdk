@@ -9,7 +9,7 @@ import com.algorand.algosdk.v2.client.model.Application;
 
 
 /**
- * Given a application id, it returns application information including creator,
+ * Given a application ID, it returns application information including creator,
  * approval and clear programs, global and local schemas, and global state.
  * /v2/applications/{application-id}
  */

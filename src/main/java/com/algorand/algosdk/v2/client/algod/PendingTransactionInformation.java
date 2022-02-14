@@ -9,7 +9,7 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 
 
 /**
- * Given a transaction id of a recently submitted transaction, it returns
+ * Given a transaction ID of a recently submitted transaction, it returns
  * information about it. There are several cases when this might succeed:
  * - transaction committed (committed round > 0)
  * - transaction still in the pool (committed round = 0, pool error = "")
@@ -24,7 +24,7 @@ public class PendingTransactionInformation extends Query {
     private String txid;
 
     /**
-     * @param txid A transaction id
+     * @param txid A transaction ID
      */
     public PendingTransactionInformation(Client client, String txid) {
         super(client, new HttpMethod("get"));

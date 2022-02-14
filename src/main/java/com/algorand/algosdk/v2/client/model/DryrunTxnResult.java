@@ -42,6 +42,12 @@ public class DryrunTxnResult extends PathResponse {
     @JsonProperty("local-deltas")
     public List<AccountStateDelta> localDeltas = new ArrayList<AccountStateDelta>();
 
+    /**
+     * Disassembled lsig program line by line.
+     */
+    @JsonProperty("logic-sig-disassembly")
+    public List<String> logicSigDisassembly = new ArrayList<String>();
+
     @JsonProperty("logic-sig-messages")
     public List<String> logicSigMessages = new ArrayList<String>();
 
@@ -79,6 +85,7 @@ public class DryrunTxnResult extends PathResponse {
         if (!Objects.deepEquals(this.disassembly, other.disassembly)) return false;
         if (!Objects.deepEquals(this.globalDelta, other.globalDelta)) return false;
         if (!Objects.deepEquals(this.localDeltas, other.localDeltas)) return false;
+        if (!Objects.deepEquals(this.logicSigDisassembly, other.logicSigDisassembly)) return false;
         if (!Objects.deepEquals(this.logicSigMessages, other.logicSigMessages)) return false;
         if (!Objects.deepEquals(this.logicSigTrace, other.logicSigTrace)) return false;
         if (!Objects.deepEquals(this.logs, other.logs)) return false;

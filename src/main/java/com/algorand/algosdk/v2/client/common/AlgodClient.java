@@ -173,7 +173,7 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given a transaction id of a recently submitted transaction, it returns
+     * Given a transaction ID of a recently submitted transaction, it returns
      * information about it. There are several cases when this might succeed:
      * - transaction committed (committed round > 0)
      * - transaction still in the pool (committed round = 0, pool error = "")
@@ -188,7 +188,7 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given a application id, it returns application information including creator,
+     * Given a application ID, it returns application information including creator,
      * approval and clear programs, global and local schemas, and global state.
      * /v2/applications/{application-id}
      */
@@ -197,7 +197,7 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given a asset id, it returns asset information including creator, name, total
+     * Given a asset ID, it returns asset information including creator, name, total
      * supply and special addresses.
      * /v2/assets/{asset-id}
      */

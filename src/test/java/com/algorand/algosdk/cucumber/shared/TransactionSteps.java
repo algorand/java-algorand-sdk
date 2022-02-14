@@ -1,7 +1,19 @@
 package com.algorand.algosdk.cucumber.shared;
 
+import static com.algorand.algosdk.util.ConversionUtils.convertAccounts;
+import static com.algorand.algosdk.util.ConversionUtils.convertArgs;
+import static com.algorand.algosdk.util.ConversionUtils.convertForeignApps;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Map;
+
 import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
+import com.algorand.algosdk.builder.transaction.KeyRegistrationTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.integration.TransientAccount;
 import com.algorand.algosdk.logic.StateSchema;
@@ -10,11 +22,13 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.unit.Base;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Assertions;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.api.Assertions;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -114,6 +128,40 @@ public class TransactionSteps {
         builtTransaction = builder.build();
     }
 
+    @When("I build a keyreg transaction with sender {string}, nonparticipation {string}, vote first {int}, vote last {int}, key dilution {int}, vote public key {string}, selection public key {string}, and state proof public key {string}")
+    public void buildKeyregTransaction(String sender, String nonpart, Integer voteFirst, Integer voteLast, Integer keyDilution, String votePk, String selectionPk, String stateProofPk) {
+        assertThat(nonpart).isIn(Arrays.asList("true", "false"));
+
+        KeyRegistrationTransactionBuilder<?> builder = Transaction.KeyRegistrationTransactionBuilder();
+
+        if (isFlatFee) {
+            builder = builder.flatFee(flatFee);
+        } else {
+            builder = builder.fee(fee);
+        }
+
+        if (!votePk.isEmpty())
+            builder = builder.participationPublicKeyBase64(votePk);
+
+        if (!selectionPk.isEmpty())
+            builder = builder.selectionPublicKeyBase64(selectionPk);
+
+        if (!stateProofPk.isEmpty())
+            builder = builder.stateProofKeyBase64(stateProofPk);
+        
+        builtTransaction = builder
+            .firstValid(fv)
+            .lastValid(lv)
+            .genesisHash(genesisHash)
+            .genesisID(genesisID)
+            .sender(sender)
+            .nonparticipation(nonpart.equals("true"))
+            .voteFirst(voteFirst)
+            .voteLast(voteLast)
+            .voteKeyDilution(keyDilution)
+            .build();
+    }
+
     @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
     public void suggested_transaction_parameters_fee_flat_fee_first_valid_last_valid_genesis_hash_genesis_id(Integer int1, String string, Integer int2, Integer int3, String string2, String string3) {
         isFlatFee = Boolean.parseBoolean(string);
@@ -174,6 +222,7 @@ public class TransactionSteps {
         Map<String,Object> txn = (Map<String,Object>) sigtxn.get("txn");
         assertThat(txn).doesNotContainKey("fee");
     }
+
     @Then("the base64 encoded signed transaction should equal {string}")
     public void the_base64_encoded_signed_transaction_should_equal(String golden) throws JsonProcessingException {
         String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
@@ -181,7 +230,7 @@ public class TransactionSteps {
     }
 
     @Then("the decoded transaction should equal the original")
-    public void the_decoded_transaction_should_equal_the_original() throws IOException {
+    public void the_decoded_transaction_should_equal_the_original() throws JsonProcessingException, IOException {
         String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(signedTransaction));
         SignedTransaction decoded = Encoder.decodeFromMsgPack(encoded, SignedTransaction.class);
         assertThat(decoded.tx).isEqualTo(builtTransaction);
