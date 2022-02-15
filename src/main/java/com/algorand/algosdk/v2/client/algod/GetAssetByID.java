@@ -9,7 +9,7 @@ import com.algorand.algosdk.v2.client.model.Asset;
 
 
 /**
- * Given a asset id, it returns asset information including creator, name, total
+ * Given a asset ID, it returns asset information including creator, name, total
  * supply and special addresses.
  * /v2/assets/{asset-id}
  */

@@ -72,7 +72,7 @@ public class ApplicationParams extends PathResponse {
     public List<TealKeyValue> globalState = new ArrayList<TealKeyValue>();
 
     /**
-     * [\lsch) global schema
+     * [\gsch) global schema
      */
     @JsonProperty("global-state-schema")
     public ApplicationStateSchema globalStateSchema;

@@ -66,6 +66,15 @@ public class Transaction implements Serializable {
     // selectionPK is the VRF public key used in key registration transactions
     @JsonProperty("selkey")
     public VRFPublicKey selectionPK = new VRFPublicKey();
+
+    // stateProofKey
+    @JsonProperty("sprfkey")
+    public MerkleVerifier stateProofKey = new MerkleVerifier();
+
+    // nonparticiation mark
+    @JsonProperty("nonpart")
+    public boolean nonpart = false;
+
     // voteFirst is the first round this keyreg tx is valid for
     @JsonProperty("votefst")
     public BigInteger voteFirst = BigInteger.valueOf(0);
@@ -76,7 +85,7 @@ public class Transaction implements Serializable {
     // voteKeyDilution
     @JsonProperty("votekd")
     public BigInteger voteKeyDilution = BigInteger.valueOf(0);
-    
+
     /* asset creation and configuration fields *********************************/
     @JsonProperty("apar")
     public AssetParams assetParams = new AssetParams();
@@ -254,6 +263,8 @@ public class Transaction implements Serializable {
                 null,
                 // voteKeyDilution
                 null,
+                null,
+                false,
                 // asset creation and configuration
                 null,
                 null,
@@ -357,8 +368,8 @@ public class Transaction implements Serializable {
                 voteLast,
                 // voteKeyDilution
                 voteKeyDilution,
-                // asset creation and configuration
                 null,
+                // asset creation and configuration
                 null,
                 // asset transfer fields
                 null,
@@ -480,6 +491,8 @@ public class Transaction implements Serializable {
                 null,
                 // voteKeyDilution
                 null,
+                null,
+                false,
                 // asset creation and configuration
                 params,
                 null,
@@ -625,9 +638,11 @@ public class Transaction implements Serializable {
                         // keyreg fields
                         @JsonProperty("votekey") byte[] votePK,
                         @JsonProperty("selkey") byte[] vrfPK,
+                        @JsonProperty("sprfkey") byte[] stateProofKey,
                         @JsonProperty("votefst") BigInteger voteFirst,
                         @JsonProperty("votelst") BigInteger voteLast,
                         @JsonProperty("votekd") BigInteger voteKeyDilution,
+                        @JsonProperty("nonpart") boolean nonpart,
                         // asset creation and configuration
                         @JsonProperty("apar") AssetParams assetParams,
                         @JsonProperty("caid") BigInteger assetIndex,
@@ -674,9 +689,11 @@ public class Transaction implements Serializable {
              // keyreg fields
              new ParticipationPublicKey(votePK),
              new VRFPublicKey(vrfPK),
+             new MerkleVerifier(stateProofKey),
              voteFirst,
              voteLast,
              voteKeyDilution,
+             nonpart,
              // asset creation and configuration
              assetParams,
              assetIndex,
@@ -705,7 +722,114 @@ public class Transaction implements Serializable {
     }
 
     /**
-     * Constructor which takes all the fields of Transaction.
+     * Constructor which takes all the fields of Transaction except for nonpart and state proof.
+     * For details about which fields to use with different transaction types, refer to the developer documentation:
+     * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
+     */
+    @Deprecated
+    public Transaction(
+            Type type,
+            //header fields
+            Address sender,
+            BigInteger fee,
+            BigInteger firstValid,
+            BigInteger lastValid,
+            byte[] note,
+            String genesisID,
+            Digest genesisHash,
+            byte[] lease,
+            Address rekeyTo,
+            Digest group,
+            // payment fields
+            BigInteger amount,
+            Address receiver,
+            Address closeRemainderTo,
+            // keyreg fields
+            ParticipationPublicKey votePK,
+            VRFPublicKey vrfPK,
+            BigInteger voteFirst,
+            BigInteger voteLast,
+            // voteKeyDilution
+            BigInteger voteKeyDilution,
+            // asset creation and configuration
+            AssetParams assetParams,
+            BigInteger assetIndex,
+            // asset transfer fields
+            BigInteger xferAsset,
+            BigInteger assetAmount,
+            Address assetSender,
+            Address assetReceiver,
+            Address assetCloseTo,
+            Address freezeTarget,
+            BigInteger assetFreezeID,
+            boolean freezeState,
+            // application fields
+            List<byte[]> applicationArgs,
+            OnCompletion onCompletion,
+            TEALProgram approvalProgram,
+            List<Address> accounts,
+            List<Long> foreignApps,
+            List<Long> foreignAssets,
+            StateSchema globalStateSchema,
+            Long applicationId,
+            StateSchema localStateSchema,
+            TEALProgram clearStateProgram,
+            Long extraPages
+    ) {
+        this(
+                type,
+                //header fields
+                sender,
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                genesisHash,
+                lease,
+                rekeyTo,
+                group,
+                // payment fields
+                amount,
+                receiver,
+                closeRemainderTo,
+                // keyreg fields
+                votePK,
+                vrfPK,
+                new MerkleVerifier(),
+                voteFirst,
+                voteLast,
+                voteKeyDilution,
+                false,
+                // asset creation and configuration
+                assetParams,
+                assetIndex,
+                // asset transfer fields
+                xferAsset,
+                assetAmount,
+                assetSender,
+                assetReceiver,
+                assetCloseTo,
+                freezeTarget,
+                assetFreezeID,
+                freezeState,
+                // application fields
+                applicationArgs,
+                onCompletion,
+                approvalProgram == null ? null : approvalProgram,
+                accounts,
+                foreignApps,
+                foreignAssets,
+                globalStateSchema,
+                applicationId,
+                localStateSchema,
+                clearStateProgram == null ? null : clearStateProgram,
+                extraPages
+        );
+    }
+
+    /**
+     * Constructor which takes all the fields of Transaction including nonpart and state proof.
      * For details about which fields to use with different transaction types, refer to the developer documentation:
      * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
      */
@@ -729,10 +853,12 @@ public class Transaction implements Serializable {
                         // keyreg fields
                         ParticipationPublicKey votePK,
                         VRFPublicKey vrfPK,
+                        MerkleVerifier stateProofKey,
                         BigInteger voteFirst,
                         BigInteger voteLast,
                         // voteKeyDilution
                         BigInteger voteKeyDilution,
+                        boolean nonpart,
                         // asset creation and configuration
                         AssetParams assetParams,
                         BigInteger assetIndex,
@@ -774,9 +900,11 @@ public class Transaction implements Serializable {
         if (closeRemainderTo != null) this.closeRemainderTo = closeRemainderTo;
         if (votePK != null) this.votePK = votePK;
         if (vrfPK != null) this.selectionPK = vrfPK;
+        if (stateProofKey != null) this.stateProofKey = stateProofKey;
         if (voteFirst != null) this.voteFirst = voteFirst;
         if (voteLast != null) this.voteLast = voteLast;
         if (voteKeyDilution != null) this.voteKeyDilution = voteKeyDilution;
+        this.nonpart = nonpart;
         if (assetParams != null) this.assetParams = assetParams;
         if (assetIndex != null) this.assetIndex = assetIndex;
         if (xferAsset != null) this.xferAsset = xferAsset;
@@ -1273,9 +1401,11 @@ public class Transaction implements Serializable {
                 closeRemainderTo.equals(that.closeRemainderTo) &&
                 votePK.equals(that.votePK) &&
                 selectionPK.equals(that.selectionPK) &&
+                stateProofKey.equals(that.stateProofKey) &&
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
+                nonpart==that.nonpart &&
                 assetParams.equals(that.assetParams) &&
                 assetIndex.equals(that.assetIndex) &&
                 xferAsset.equals(that.xferAsset) &&

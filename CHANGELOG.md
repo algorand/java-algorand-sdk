@@ -1,3 +1,10 @@
+# 1.12.0-beta-1
+- Add new key reg txn field (#266)
+- C2C Feature and Testing (#290)
+- Implement circle ci (#293)
+- Update README.md (#297)
+- Update langspec for teal6 (#298)
+
 # 1.11.0
 - Support Foreign objects as ABI arguments (#283)
 - Upgrade `jackson` packages to resolve PRs on vulnerability (#281)
