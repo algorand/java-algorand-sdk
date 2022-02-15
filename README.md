@@ -1,7 +1,3 @@
-
-| IMPORTANT <br /> Version 1.1.6 modifies one of the mnemonic words. Please let your users know that if they have the word "setupIfNeeded" in their passphrase, they should change it to "setup". Everything else remains the same.|
-|---| 
-
 # java-algorand-sdk
 
 [![Build Status](https://travis-ci.com/algorand/java-algorand-sdk.svg?branch=master)](https://travis-ci.com/algorand/java-algorand-sdk?branch=master)
