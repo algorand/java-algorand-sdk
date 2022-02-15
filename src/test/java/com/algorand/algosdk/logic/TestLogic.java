@@ -412,4 +412,39 @@ public class TestLogic {
             assertThat(valid).isTrue();
         }
     }
+
+    @Test
+    public void testCheckProgramTealV6() throws Exception {
+        assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(6);
+
+        {
+            // bsqrt
+            byte[] program = {
+                    0x06, (byte) 0x80, 0x01, (byte) 0x90, (byte) 0x96, (byte) 0x80, 0x01, 0x0c, (byte) 0xa8
+            };
+            // byte 0x90; bsqrt; byte 0x0c; b==
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // divw
+            byte[] program = {
+                    0x06, (byte) 0x81, 0x09, (byte) 0x81, (byte) 0xec, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x01, (byte) 0x81, 0x0a, (byte) 0x97, (byte) 0x81, (byte) 0xfe, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff, 0x01, 0x12
+            };
+            // int 9; int 18446744073709551596; int 10; divw; int 18446744073709551614; ==
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+
+        {
+            // txn fields
+            byte[] program = {
+                    0x06, 0x31, 0x3f, 0x15, (byte) 0x81, 0x40, 0x12, 0x33, 0x00, 0x3e, 0x15, (byte) 0x81, 0x0a, 0x12, 0x10
+            };
+            // txn StateProofPK; len; int 64; ==; gtxn 0 LastLog; len; int 10; ==; &&
+            boolean valid = checkProgram(program, null);
+            assertThat(valid).isTrue();
+        }
+    }
 }
