@@ -31,7 +31,6 @@ public class IndexerPaths {
     public void lookupAssetBalances(Long assetId, Long limit, String afterAddress, Long round, Long currenGT, Long currencyLT) {
         LookupAssetBalances q = indexerClient.lookupAssetBalances(assetId);
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
-        if (TestingUtils.notEmpty(round)) q.round(round);
         if (TestingUtils.notEmpty(currenGT)) q.currencyGreaterThan(currenGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         ps.q = q;

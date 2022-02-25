@@ -1,41 +1,36 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.AccountResponse;
-import com.algorand.algosdk.v2.client.model.Enums;
+import com.algorand.algosdk.v2.client.model.ApplicationsResponse;
 
 
 /**
- * Lookup account information.
- * /v2/accounts/{account-id}
+ * Lookup an account's created application parameters, optionally for a specific
+ * ID.
+ * /v2/accounts/{account-id}/created-applications
  */
-public class LookupAccountByID extends Query {
+public class LookupAccountCreatedApplications extends Query {
 
     private Address accountId;
 
     /**
      * @param accountId account string
      */
-    public LookupAccountByID(Client client, Address accountId) {
+    public LookupAccountCreatedApplications(Client client, Address accountId) {
         super(client, new HttpMethod("get"));
         this.accountId = accountId;
     }
 
     /**
-     * Exclude additional items such as asset holdings, application local data stored
-     * for this account, asset parameters created by this account, and application
-     * parameters created by this account.
+     * Application ID
      */
-    public LookupAccountByID exclude(List<Enums.Exclude> exclude) {
-        addQuery("exclude", String.valueOf(exclude));
+    public LookupAccountCreatedApplications applicationId(Long applicationId) {
+        addQuery("application-id", String.valueOf(applicationId));
         return this;
     }
 
@@ -43,16 +38,25 @@ public class LookupAccountByID extends Query {
      * Include all items including closed accounts, deleted applications, destroyed
      * assets, opted-out asset holdings, and closed-out application localstates.
      */
-    public LookupAccountByID includeAll(Boolean includeAll) {
+    public LookupAccountCreatedApplications includeAll(Boolean includeAll) {
         addQuery("include-all", String.valueOf(includeAll));
         return this;
     }
 
     /**
-     * Include results for the specified round.
+     * Maximum number of results to return. There could be additional pages even if the
+     * limit is not reached.
      */
-    public LookupAccountByID round(Long round) {
-        addQuery("round", String.valueOf(round));
+    public LookupAccountCreatedApplications limit(Long limit) {
+        addQuery("limit", String.valueOf(limit));
+        return this;
+    }
+
+    /**
+     * The next page of results. Use the next token provided by the previous results.
+     */
+    public LookupAccountCreatedApplications next(String next) {
+        addQuery("next", String.valueOf(next));
         return this;
     }
 
@@ -62,9 +66,9 @@ public class LookupAccountByID extends Query {
     * @throws Exception
     */
     @Override
-    public Response<AccountResponse> execute() throws Exception {
-        Response<AccountResponse> resp = baseExecute();
-        resp.setValueType(AccountResponse.class);
+    public Response<ApplicationsResponse> execute() throws Exception {
+        Response<ApplicationsResponse> resp = baseExecute();
+        resp.setValueType(ApplicationsResponse.class);
         return resp;
     }
 
@@ -77,9 +81,9 @@ public class LookupAccountByID extends Query {
     * @throws Exception
     */
     @Override
-    public Response<AccountResponse> execute(String[] headers, String[] values) throws Exception {
-        Response<AccountResponse> resp = baseExecute(headers, values);
-        resp.setValueType(AccountResponse.class);
+    public Response<ApplicationsResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<ApplicationsResponse> resp = baseExecute(headers, values);
+        resp.setValueType(ApplicationsResponse.class);
         return resp;
     }
 
@@ -90,6 +94,7 @@ public class LookupAccountByID extends Query {
         addPathSegment(String.valueOf("v2"));
         addPathSegment(String.valueOf("accounts"));
         addPathSegment(String.valueOf(accountId));
+        addPathSegment(String.valueOf("created-applications"));
 
         return qd;
     }

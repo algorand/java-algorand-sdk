@@ -27,6 +27,14 @@ public class SearchForApplications extends Query {
     }
 
     /**
+     * Filter just applications with the given creator address.
+     */
+    public SearchForApplications creator(String creator) {
+        addQuery("creator", String.valueOf(creator));
+        return this;
+    }
+
+    /**
      * Include all items including closed accounts, deleted applications, destroyed
      * assets, opted-out asset holdings, and closed-out application localstates.
      */

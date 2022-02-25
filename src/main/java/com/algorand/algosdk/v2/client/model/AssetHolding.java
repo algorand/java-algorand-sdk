@@ -25,14 +25,6 @@ public class AssetHolding extends PathResponse {
     public Long assetId;
 
     /**
-     * Address that created this asset. This is the address where the parameters for
-     * this asset can be found, and also the address where unwanted asset units can be
-     * sent in the worst case.
-     */
-    @JsonProperty("creator")
-    public String creator;
-
-    /**
      * Whether or not the asset holding is currently deleted from its account.
      */
     @JsonProperty("deleted")
@@ -65,7 +57,6 @@ public class AssetHolding extends PathResponse {
         AssetHolding other = (AssetHolding) o;
         if (!Objects.deepEquals(this.amount, other.amount)) return false;
         if (!Objects.deepEquals(this.assetId, other.assetId)) return false;
-        if (!Objects.deepEquals(this.creator, other.creator)) return false;
         if (!Objects.deepEquals(this.deleted, other.deleted)) return false;
         if (!Objects.deepEquals(this.isFrozen, other.isFrozen)) return false;
         if (!Objects.deepEquals(this.optedInAtRound, other.optedInAtRound)) return false;
