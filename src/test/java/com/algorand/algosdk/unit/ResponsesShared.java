@@ -90,6 +90,24 @@ public class ResponsesShared {
                     case "lookupAssetTransactions":
                         response = indexer.lookupAssetTransactions(10L).execute();
                         break;
+                    case "lookupAccountAppLocalStates":
+                        response = indexer.lookupAccountAppLocalStates(new Address()).execute();
+                        break;
+                    case "lookupApplicationLogsByID":
+                        response = indexer.lookupApplicationLogsByID(10L).execute();
+                        break;
+                    case "lookupAccountCreatedApplications":
+                        response = indexer.lookupAccountCreatedApplications(new Address()).execute();
+                        break;
+                    case "lookupAccountAssets":
+                        response = indexer.lookupAccountAssets(new Address()).execute();
+                        break;
+                    case "lookupAccountCreatedAssets":
+                        response = indexer.lookupAccountCreatedAssets(new Address()).execute();
+                        break;
+                    case "lookupTransaction":
+                        response = indexer.lookupTransaction("TXID").execute();
+                        break;
                     case "searchForTransactions":
                     case "any": // error case, everything uses the same error message
                         response = indexer.searchForTransactions().execute();

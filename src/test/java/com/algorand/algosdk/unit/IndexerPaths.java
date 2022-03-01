@@ -25,10 +25,9 @@ public class IndexerPaths {
     @When("we make a Lookup Asset Balances call against asset index {long} "
             + "with limit {long} "
             + "afterAddress {string} "
-            + "round {long} "
             + "currencyGreaterThan {long} "
             + "currencyLessThan {long}")
-    public void lookupAssetBalances(Long assetId, Long limit, String afterAddress, Long round, Long currenGT, Long currencyLT) {
+    public void lookupAssetBalances(Long assetId, Long limit, String afterAddress, Long currenGT, Long currencyLT) {
         LookupAssetBalances q = indexerClient.lookupAssetBalances(assetId);
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
         if (TestingUtils.notEmpty(currenGT)) q.currencyGreaterThan(currenGT);
