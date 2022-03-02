@@ -1,4 +1,4 @@
-# 1.12.0-beta-1
+# 1.12.0
 - Add new key reg txn field (#266)
 - C2C Feature and Testing (#290)
 - Implement circle ci (#293)
