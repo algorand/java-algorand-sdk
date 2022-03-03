@@ -72,7 +72,7 @@ public class SearchForAccounts extends Query {
      * parameters created by this account.
      */
     public SearchForAccounts exclude(List<Enums.Exclude> exclude) {
-        addQuery("exclude", String.valueOf(exclude));
+        addQuery("exclude", String.valueOf(exclude).replaceAll("[ \\[\\]]", ""));
         return this;
     }
 

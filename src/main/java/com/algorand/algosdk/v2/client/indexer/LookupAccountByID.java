@@ -35,7 +35,7 @@ public class LookupAccountByID extends Query {
      * parameters created by this account.
      */
     public LookupAccountByID exclude(List<Enums.Exclude> exclude) {
-        addQuery("exclude", String.valueOf(exclude));
+        addQuery("exclude", String.valueOf(exclude).replaceAll("[ \\[\\]]", ""));
         return this;
     }
 

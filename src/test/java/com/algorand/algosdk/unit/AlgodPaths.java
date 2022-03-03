@@ -1,6 +1,7 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.v2.client.algod.*;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
@@ -62,5 +63,34 @@ public class AlgodPaths {
     @When("we make a GetApplicationByID call for applicationID {long}")
     public void getApplicationByID(Long id) {
         ps.q = algodClient.GetApplicationByID(id);
+    }
+
+    @When("we make an Account Application Information call against account {string} applicationID {int}")
+    public void we_make_an_account_application_information_call_against_account_application_id(String string, Integer int1) {
+        try {
+            ps.q = algodClient.AccountApplicationInformation(new Address(string), (long)int1.intValue());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @When("we make an Account Asset Information call against account {string} assetID {int}")
+    public void we_make_an_account_asset_information_call_against_account_asset_id(String string, Integer int1) {
+        try {
+            ps.q = algodClient.AccountAssetInformation(new Address(string), (long)int1.intValue());
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    @When("we make an Account Information call against account {string} with exclude {string}")
+    public void we_make_an_account_information_call_against_account_with_exclude(String string, String string2) {
+        try {
+            AccountInformation aiq = algodClient.AccountInformation(new Address(string));
+            if (TestingUtils.notEmpty(string2)) aiq.exclude(QueryMapper.getExclude(string2));
+            ps.q = aiq;
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
     }
 }

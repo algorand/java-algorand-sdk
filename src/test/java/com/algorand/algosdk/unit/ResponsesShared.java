@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ResponsesShared {
     public File bodyFile;
+    @SuppressWarnings("rawtypes")
     public Response response;
 
     public AlgodClient algod = new AlgodClient("localhost", 123, "");
@@ -158,6 +159,15 @@ public class ResponsesShared {
                         break;
                     case "Proof":
                         response = algod.GetProof(0L, "").execute();
+                        break;
+                    case "AccountInformation":
+                        response = algod.AccountInformation(new Address()).execute();
+                        break;
+                    case "AccountApplicationInformation":
+                        response = algod.AccountApplicationInformation(new Address(), 0L).execute();
+                        break;
+                    case "AccountAssetInformation":
+                        response = algod.AccountAssetInformation(new Address(), 0L).execute();
                         break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);

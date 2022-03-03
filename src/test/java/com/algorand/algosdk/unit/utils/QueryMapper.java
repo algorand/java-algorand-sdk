@@ -669,7 +669,7 @@ public class QueryMapper {
         }
     }
     public static Enums.Exclude getExclude(String val) {
-        switch(val.toUpperCase()) {
+        switch(val.toUpperCase().replaceAll("-", "")) {
         case "ALL":
             return Enums.Exclude.ALL;
         case "ASSETS":
