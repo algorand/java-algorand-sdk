@@ -289,15 +289,7 @@ public class TestingUtils {
         Arrays.sort(segments1, Comparator.naturalOrder());
         Arrays.sort(segments2, Comparator.naturalOrder());
 
-        boolean compensateForFormat = false;
-        for (String segment : segments1) {
-            if (segment.contentEquals("format=msgpack")) {
-                compensateForFormat = true;
-                break;
-            }
-        }
-        
-        if (segments1.length != segments2.length + (compensateForFormat ? 1 : 0)) {
+        if (segments1.length != segments2.length) {
             Assertions.fail("Different number of parameters, "
                     + url1NoProtocol
                     + " != "
@@ -306,9 +298,6 @@ public class TestingUtils {
 
         int s2 = 0;
         for (String seg1 : segments1) {
-            if (seg1.contentEquals("format=msgpack")) {
-                continue;
-            }
             assertThat(seg1).isEqualTo(segments2[s2]).describedAs("Parameter mismatch, "
                     + url1NoProtocol
                     + " != "
