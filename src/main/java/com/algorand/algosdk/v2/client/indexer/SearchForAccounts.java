@@ -1,7 +1,8 @@
 package com.algorand.algosdk.v2.client.indexer;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
@@ -72,7 +73,7 @@ public class SearchForAccounts extends Query {
      * parameters created by this account.
      */
     public SearchForAccounts exclude(List<Enums.Exclude> exclude) {
-        addQuery("exclude", String.valueOf(exclude).replaceAll("[ \\[\\]]", ""));
+        addQuery("exclude", StringUtils.join(exclude, ","));
         return this;
     }
 

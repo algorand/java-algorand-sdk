@@ -9,14 +9,10 @@ import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.model.Enums;
 
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.assertj.core.api.Assertions;
-
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class IndexerPaths {
     IndexerClient indexerClient = new IndexerClient("localhost", 1234, "");;
