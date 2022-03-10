@@ -181,14 +181,15 @@ public class Account extends PathResponse {
     public String status;
 
     /**
-     * The count of all application local data (AppLocalState objects) stored in this
-     * account.
+     * The count of all applications that have been opted in, equivalent to the count
+     * of application local data (AppLocalState objects) stored in this account.
      */
     @JsonProperty("total-apps-opted-in")
     public Long totalAppsOptedIn;
 
     /**
-     * The count of all assets (AssetHolding objects) held by this account.
+     * The count of all assets that have been opted in, equivalent to the count of
+     * AssetHolding objects held by this account.
      */
     @JsonProperty("total-assets-opted-in")
     public Long totalAssetsOptedIn;
