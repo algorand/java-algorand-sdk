@@ -26,7 +26,6 @@ public class AccountAssetInformation extends Query {
      */
     public AccountAssetInformation(Client client, Address address, Long assetId) {
         super(client, new HttpMethod("get"));
-        addQuery("format", "msgpack");
         this.address = address;
         this.assetId = assetId;
     }

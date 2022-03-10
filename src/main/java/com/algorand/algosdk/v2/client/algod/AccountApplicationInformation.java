@@ -27,7 +27,6 @@ public class AccountApplicationInformation extends Query {
      */
     public AccountApplicationInformation(Client client, Address address, Long applicationId) {
         super(client, new HttpMethod("get"));
-        addQuery("format", "msgpack");
         this.address = address;
         this.applicationId = applicationId;
     }
