@@ -1,5 +1,9 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
@@ -7,6 +11,7 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.AccountResponse;
+import com.algorand.algosdk.v2.client.model.Enums;
 
 
 /**
@@ -23,6 +28,16 @@ public class LookupAccountByID extends Query {
     public LookupAccountByID(Client client, Address accountId) {
         super(client, new HttpMethod("get"));
         this.accountId = accountId;
+    }
+
+    /**
+     * Exclude additional items such as asset holdings, application local data stored
+     * for this account, asset parameters created by this account, and application
+     * parameters created by this account.
+     */
+    public LookupAccountByID exclude(List<Enums.Exclude> exclude) {
+        addQuery("exclude", StringUtils.join(exclude, ","));
+        return this;
     }
 
     /**

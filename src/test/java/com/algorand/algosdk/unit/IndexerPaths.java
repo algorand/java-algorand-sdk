@@ -7,12 +7,12 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.indexer.*;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
-import org.assertj.core.api.Assertions;
+import com.algorand.algosdk.v2.client.model.Enums;
 
+import io.cucumber.java.en.When;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.ArrayList;
 
 public class IndexerPaths {
     IndexerClient indexerClient = new IndexerClient("localhost", 1234, "");;
@@ -25,13 +25,11 @@ public class IndexerPaths {
     @When("we make a Lookup Asset Balances call against asset index {long} "
             + "with limit {long} "
             + "afterAddress {string} "
-            + "round {long} "
             + "currencyGreaterThan {long} "
             + "currencyLessThan {long}")
-    public void lookupAssetBalances(Long assetId, Long limit, String afterAddress, Long round, Long currenGT, Long currencyLT) {
+    public void lookupAssetBalances(Long assetId, Long limit, String afterAddress, Long currenGT, Long currencyLT) {
         LookupAssetBalances q = indexerClient.lookupAssetBalances(assetId);
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
-        if (TestingUtils.notEmpty(round)) q.round(round);
         if (TestingUtils.notEmpty(currenGT)) q.currencyGreaterThan(currenGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         ps.q = q;
@@ -208,9 +206,9 @@ public class IndexerPaths {
 
     @When("we make a Search For Transactions call with account {string} NotePrefix {string} TxType {string} SigType {string} txid {string} round {long} minRound {long} maxRound {long} limit {long} beforeTime {string} afterTime {string} currencyGreaterThan {long} currencyLessThan {long} assetIndex {long} addressRole {string} ExcluseCloseTo {string} rekeyTo {string}")
     public void searchForTransactions(String address, String notePrefix, String txType, String sigType,
-                String txid, Long round, Long minRound, Long maxRound, Long limit,
-                String beforeTime, String afterTime, Long currencyGT, Long currencyLT, Long assetID,
-                String addressRole, String excludeCloseTo, String rekeyTo) throws ParseException, NoSuchAlgorithmException {
+            String txid, Long round, Long minRound, Long maxRound, Long limit,
+            String beforeTime, String afterTime, Long currencyGT, Long currencyLT, Long assetID,
+            String addressRole, String excludeCloseTo, String rekeyTo) throws ParseException, NoSuchAlgorithmException {
 
         SearchForTransactions q = this.indexerClient.searchForTransactions();
         if (TestingUtils.notEmpty(address)) q.address(new Address(address));
@@ -256,4 +254,84 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(txID)) q.txid(txID);
         ps.q = q;
     }
+
+    @When("we make a LookupAccountAppLocalStates call with accountID {string} applicationID {int} includeAll {string} limit {int} next {string}")
+    public void lookupAccountAppLocalStates(String string, Integer int1, String string2, Integer int2, String string3) throws NoSuchAlgorithmException {
+        LookupAccountAppLocalStates q = this.indexerClient.lookupAccountAppLocalStates(new Address(string));
+        if (string2.contentEquals("true")) q.includeAll(true);
+        if (TestingUtils.notEmpty((long)int1)) q.applicationId((long)int1);
+        if (TestingUtils.notEmpty((long)int2)) q.limit((long)int2);
+        if (TestingUtils.notEmpty(string3)) q.next(string3);
+        ps.q = q;
+    }
+
+    @When("we make a LookupAccountAssets call with accountID {string} assetID {int} includeAll {string} limit {int} next {string}")
+    public void lookupAccountAssets(String string, Integer int1, String string2, Integer int2, String string3) throws NoSuchAlgorithmException {
+        LookupAccountAssets q = null;
+        q = this.indexerClient.lookupAccountAssets(new Address(string));
+        if (TestingUtils.notEmpty((long)int1)) q.assetId((long)int1);
+        if (string2.contentEquals("true")) q.includeAll(true);
+        if (TestingUtils.notEmpty((long)int2)) q.limit((long)int2);
+        if (string3.compareTo("") != 0) 
+            q.next(string3);
+        ps.q = q;
+    }
+
+    @When("we make a Lookup Account by ID call against account {string} with exclude {string}")
+    public void lookupAccountByID(String string, String string2) throws NoSuchAlgorithmException {
+        LookupAccountByID q = null;
+        q = this.indexerClient.lookupAccountByID(new Address(string));
+
+        if (TestingUtils.notEmpty(string2)) {
+            ArrayList<Enums.Exclude> excludes = new ArrayList<Enums.Exclude>();
+            for (String excld : string2.split(",")) {
+                excludes.add(QueryMapper.getExclude(excld));
+            }
+            q.exclude(excludes);
+        }
+        ps.q = q;
+    }
+
+    @When("we make a LookupAccountCreatedApplications call with accountID {string} applicationID {int} includeAll {string} limit {int} next {string}")
+    public void lookupAccountCreatedApplications(String string, Integer int1, String string2, Integer int2, String string3) throws NoSuchAlgorithmException {
+        LookupAccountCreatedApplications q = null;
+        q = this.indexerClient.lookupAccountCreatedApplications(new Address(string));
+        if (TestingUtils.notEmpty((long)int1)) q.applicationId((long)int1);
+        if (string2.contentEquals("true")) q.includeAll(true);
+        if (TestingUtils.notEmpty((long)int2)) q.limit((long)int2);
+        if (TestingUtils.notEmpty(string3)) q.next(string3);
+        ps.q = q;
+    }
+
+    @When("we make a LookupAccountCreatedAssets call with accountID {string} assetID {int} includeAll {string} limit {int} next {string}")
+    public void lookupAccountCreatedAssets(String string, Integer int1, String string2, Integer int2, String string3) throws NoSuchAlgorithmException {
+        LookupAccountCreatedAssets q = null;
+        q = this.indexerClient.lookupAccountCreatedAssets(new Address(string));
+        if (TestingUtils.notEmpty((long)int1)) q.assetId((long)int1);
+        if (string2.contentEquals("true")) q.includeAll(true);
+        if (TestingUtils.notEmpty((long)int2)) q.limit((long)int2);
+        if (TestingUtils.notEmpty(string3)) q.next(string3);
+        ps.q = q;
+    }
+
+    @When("we make a Search Accounts call with exclude {string}")
+    public void searchForAccounts(String string) {
+        SearchForAccounts q = this.indexerClient.searchForAccounts();
+        if (TestingUtils.notEmpty(string)) {
+            ArrayList<Enums.Exclude> excludes = new ArrayList<Enums.Exclude>();
+            for (String excld : string.split(",")) {
+                excludes.add(QueryMapper.getExclude(excld));
+            }
+            q.exclude(excludes);
+        }
+        ps.q = q;
+    }
+
+    @When("we make a SearchForApplications call with creator {string}")
+    public void searchForApplications(String string) {
+        SearchForApplications q = this.indexerClient.searchForApplications();
+        if (TestingUtils.notEmpty(string)) q.creator(string);
+        ps.q = q;
+    }
+
 }

@@ -3,6 +3,10 @@ package com.algorand.algosdk.v2.client.common;
 import com.algorand.algosdk.v2.client.indexer.MakeHealthCheck;
 import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
+import com.algorand.algosdk.v2.client.indexer.LookupAccountAssets;
+import com.algorand.algosdk.v2.client.indexer.LookupAccountCreatedAssets;
+import com.algorand.algosdk.v2.client.indexer.LookupAccountAppLocalStates;
+import com.algorand.algosdk.v2.client.indexer.LookupAccountCreatedApplications;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
 import com.algorand.algosdk.v2.client.indexer.SearchForApplications;
 import com.algorand.algosdk.v2.client.indexer.LookupApplicationByID;
@@ -70,6 +74,39 @@ public class IndexerClient extends Client {
      */
     public LookupAccountByID lookupAccountByID(Address accountId) {
         return new LookupAccountByID((Client) this, accountId);
+    }
+
+    /**
+     * Lookup an account's asset holdings, optionally for a specific ID.
+     * /v2/accounts/{account-id}/assets
+     */
+    public LookupAccountAssets lookupAccountAssets(Address accountId) {
+        return new LookupAccountAssets((Client) this, accountId);
+    }
+
+    /**
+     * Lookup an account's created asset parameters, optionally for a specific ID.
+     * /v2/accounts/{account-id}/created-assets
+     */
+    public LookupAccountCreatedAssets lookupAccountCreatedAssets(Address accountId) {
+        return new LookupAccountCreatedAssets((Client) this, accountId);
+    }
+
+    /**
+     * Lookup an account's asset holdings, optionally for a specific ID.
+     * /v2/accounts/{account-id}/apps-local-state
+     */
+    public LookupAccountAppLocalStates lookupAccountAppLocalStates(Address accountId) {
+        return new LookupAccountAppLocalStates((Client) this, accountId);
+    }
+
+    /**
+     * Lookup an account's created application parameters, optionally for a specific
+     * ID.
+     * /v2/accounts/{account-id}/created-applications
+     */
+    public LookupAccountCreatedApplications lookupAccountCreatedApplications(Address accountId) {
+        return new LookupAccountCreatedApplications((Client) this, accountId);
     }
 
     /**

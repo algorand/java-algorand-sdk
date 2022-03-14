@@ -6,6 +6,8 @@ import com.algorand.algosdk.v2.client.algod.GetGenesis;
 import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
 import com.algorand.algosdk.v2.client.algod.GetVersion;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
+import com.algorand.algosdk.v2.client.algod.AccountAssetInformation;
+import com.algorand.algosdk.v2.client.algod.AccountApplicationInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
 import com.algorand.algosdk.v2.client.algod.GetProof;
@@ -93,6 +95,29 @@ public class AlgodClient extends Client {
      */
     public AccountInformation AccountInformation(Address address) {
         return new AccountInformation((Client) this, address);
+    }
+
+    /**
+     * Given a specific account public key and asset ID, this call returns the
+     * account's asset holding and asset parameters (if either exist). Asset parameters
+     * will only be returned if the provided address is the asset's creator.
+     * /v2/accounts/{address}/assets/{asset-id}
+     */
+    public AccountAssetInformation AccountAssetInformation(Address address,
+            Long assetId) {
+        return new AccountAssetInformation((Client) this, address, assetId);
+    }
+
+    /**
+     * Given a specific account public key and application ID, this call returns the
+     * account's application local state and global state (AppLocalState and AppParams,
+     * if either exists). Global state will only be returned if the provided address is
+     * the application's creator.
+     * /v2/accounts/{address}/applications/{application-id}
+     */
+    public AccountApplicationInformation AccountApplicationInformation(Address address,
+            Long applicationId) {
+        return new AccountApplicationInformation((Client) this, address, applicationId);
     }
 
     /**
