@@ -17,7 +17,7 @@ public class TealValue extends PathResponse {
     public String bytes;
 
     /**
-     * (tt) value type.
+     * (tt) value type. Value `1` refers to   bytes  , value `2` refers to   uint  
      */
     @JsonProperty("type")
     public Long type;

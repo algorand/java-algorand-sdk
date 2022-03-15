@@ -1,5 +1,6 @@
 package com.algorand.algosdk.builder.transaction;
 
+import com.algorand.algosdk.crypto.MerkleVerifier;
 import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.transaction.Transaction;
@@ -15,11 +16,13 @@ import java.util.Objects;
  *     genesisHash
  *
  * Optional parameters:
+ *     nonparticipation
  *     votePK
  *     selectionPK
  *     voteFirst
  *     voteLast
  *     voteKeyDilution
+ *     stateProofKey
  *
  * Optional global parameters:
  *     fee/flatFee
@@ -30,6 +33,8 @@ import java.util.Objects;
  */
 @SuppressWarnings("unchecked")
 public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransactionBuilder<T>> extends TransactionBuilder<T> {
+    // nonparticipation is an indicator for marking a key registration txn nonparticipating/participating
+    protected boolean nonparticipation = false;
     // votePK is the participation public key used in key registration transactions
     protected ParticipationPublicKey votePK = new ParticipationPublicKey();
     // selectionPK is the VRF private key used in key registration transactions
@@ -40,6 +45,8 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     protected BigInteger voteLast = BigInteger.valueOf(0);
     // voteKeyDilution
     protected BigInteger voteKeyDilution = BigInteger.valueOf(0);
+    // stateProofKey
+    protected MerkleVerifier stateProofPk = new MerkleVerifier();
 
     /**
      * Initialize a {@link KeyRegistrationTransactionBuilder}.
@@ -64,6 +71,8 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
         if (voteFirst != null) txn.voteFirst = voteFirst;
         if (voteLast != null) txn.voteLast = voteLast;
         if (voteKeyDilution != null) txn.voteKeyDilution = voteKeyDilution;
+        if (stateProofPk != null) txn.stateProofKey = stateProofPk;
+        txn.nonpart = nonparticipation;
     }
 
     /**
@@ -94,6 +103,7 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
     public T participationPublicKeyBase64(String pk) {
         this.votePK = new ParticipationPublicKey(Encoder.decodeFromBase64(pk));
         return (T) this;
+
     }
 
     /**
@@ -221,4 +231,45 @@ public class KeyRegistrationTransactionBuilder<T extends KeyRegistrationTransact
         this.voteKeyDilution = BigInteger.valueOf(voteKeyDilution);
         return (T) this;
     }
+
+    /**
+     * Set the stateProofKey value. This is used to identify a state proof
+     * @param stprf The stateProofKey value.
+     * @return This builder.
+     */
+    public T stateProofKey(MerkleVerifier stprf) {
+        stateProofPk = stprf;
+        return (T) this;
+    }
+
+    /**
+     * Set the stateProofKey value. This is used to identify a state proof
+     * @param stprf The stateProofKey value.
+     * @return This builder.
+     */
+    public T stateProofKey(byte[] stprf) {
+        stateProofPk = new MerkleVerifier(stprf);
+        return (T) this;
+    }
+
+    /**
+     * Set the stateProofKey value. This is used to identify a state proof
+     * @param stprf The stateProofKey value.
+     * @return This builder.
+     */
+    public T stateProofKeyBase64(String stprf) {
+        stateProofPk = new MerkleVerifier(Encoder.decodeFromBase64(stprf));
+        return (T) this;
+    }
+
+    /**
+     * Set the nonparticipation value. This is used to mark a key registration transaction participating/nonparticipating
+     * @param nonpart The nonparticipation mark.
+     * @return This builder.
+     */
+    public T nonparticipation(boolean nonpart) {
+        this.nonparticipation = nonpart;
+        return (T) this;
+    }
+
 }

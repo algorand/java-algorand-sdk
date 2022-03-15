@@ -6,6 +6,8 @@ import com.algorand.algosdk.v2.client.algod.GetGenesis;
 import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
 import com.algorand.algosdk.v2.client.algod.GetVersion;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
+import com.algorand.algosdk.v2.client.algod.AccountAssetInformation;
+import com.algorand.algosdk.v2.client.algod.AccountApplicationInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
 import com.algorand.algosdk.v2.client.algod.GetProof;
@@ -96,6 +98,29 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Given a specific account public key and asset ID, this call returns the
+     * account's asset holding and asset parameters (if either exist). Asset parameters
+     * will only be returned if the provided address is the asset's creator.
+     * /v2/accounts/{address}/assets/{asset-id}
+     */
+    public AccountAssetInformation AccountAssetInformation(Address address,
+            Long assetId) {
+        return new AccountAssetInformation((Client) this, address, assetId);
+    }
+
+    /**
+     * Given a specific account public key and application ID, this call returns the
+     * account's application local state and global state (AppLocalState and AppParams,
+     * if either exists). Global state will only be returned if the provided address is
+     * the application's creator.
+     * /v2/accounts/{address}/applications/{application-id}
+     */
+    public AccountApplicationInformation AccountApplicationInformation(Address address,
+            Long applicationId) {
+        return new AccountApplicationInformation((Client) this, address, applicationId);
+    }
+
+    /**
      * Get the list of pending transactions by address, sorted by priority, in
      * decreasing order, truncated at the end at MAX. If MAX = 0, returns all pending
      * transactions.
@@ -173,7 +198,7 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given a transaction id of a recently submitted transaction, it returns
+     * Given a transaction ID of a recently submitted transaction, it returns
      * information about it. There are several cases when this might succeed:
      * - transaction committed (committed round > 0)
      * - transaction still in the pool (committed round = 0, pool error = "")
@@ -188,7 +213,7 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given a application id, it returns application information including creator,
+     * Given a application ID, it returns application information including creator,
      * approval and clear programs, global and local schemas, and global state.
      * /v2/applications/{application-id}
      */
@@ -197,7 +222,7 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given a asset id, it returns asset information including creator, name, total
+     * Given a asset ID, it returns asset information including creator, name, total
      * supply and special addresses.
      * /v2/assets/{asset-id}
      */

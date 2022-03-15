@@ -7,6 +7,7 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.Account;
+import com.algorand.algosdk.v2.client.model.Enums;
 
 
 /**
@@ -24,6 +25,15 @@ public class AccountInformation extends Query {
     public AccountInformation(Client client, Address address) {
         super(client, new HttpMethod("get"));
         this.address = address;
+    }
+
+    /**
+     * When set to `all` will exclude asset holdings, application local state, created
+     * asset parameters, any created application parameters. Defaults to `none`.
+     */
+    public AccountInformation exclude(Enums.Exclude exclude) {
+        addQuery("exclude", String.valueOf(exclude));
+        return this;
     }
 
    /**

@@ -1,6 +1,7 @@
 package com.algorand.algosdk.abi;
 
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.GenericObjToArray;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -30,7 +31,7 @@ public class TypeArrayDynamic extends ABIType {
 
     @Override
     public byte[] encode(Object o) {
-        Object[] objArray = ABIType.unifyToArrayOfObjects(o);
+        Object[] objArray = GenericObjToArray.unifyToArrayOfObjects(o);
 
         byte[] castedEncode = ABIType.castToTupleType(objArray.length, this.elemType).encode(objArray);
         byte[] lengthEncode = Encoder.encodeUintToBytes(BigInteger.valueOf(objArray.length), ABI_DYNAMIC_HEAD_BYTE_LEN);

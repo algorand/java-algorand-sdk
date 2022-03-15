@@ -24,6 +24,30 @@ public class Enums {
     }
 
     /**
+     * Exclude additional items such as asset holdings, application local data stored
+     * for this account, asset parameters created by this account, and application
+     * parameters created by this account.
+     */
+    public enum Exclude {
+        @JsonProperty("all") ALL("all"),
+        @JsonProperty("assets") ASSETS("assets"),
+        @JsonProperty("created-assets") CREATEDASSETS("created-assets"),
+        @JsonProperty("apps-local-state") APPSLOCALSTATE("apps-local-state"),
+        @JsonProperty("created-apps") CREATEDAPPS("created-apps"),
+        @JsonProperty("none") NONE("none");
+
+        final String serializedName;
+        Exclude(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
+
+    /**
      * (apan) defines the what additional actions occur with the transaction.
      * Valid types:
      *   noop
@@ -97,6 +121,24 @@ public class Enums {
 
         final String serializedName;
         TxType(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
+
+    /**
+     * Combine with the address parameter to define what type of address to search for.
+     */
+    public enum Hashtype {
+        @JsonProperty("sumhash") SUMHASH("sumhash"),
+        @JsonProperty("sha512_256") SHA512_256("sha512_256");
+
+        final String serializedName;
+        Hashtype(String name) {
             this.serializedName = name;
         }
 

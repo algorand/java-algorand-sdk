@@ -1,3 +1,24 @@
+# 1.12.0
+- Add new key reg txn field (#266)
+- C2C Feature and Testing (#290)
+- Implement circle ci (#293)
+- Update README.md (#297)
+- Update langspec for teal6 (#298)
+
+# 1.11.0
+- Support Foreign objects as ABI arguments (#283)
+- Upgrade `jackson` packages to resolve PRs on vulnerability (#281)
+- ABI Interaction Support for JAVA SDK (#268)
+- Bug fix for `logs` on `PendingTransactionResponse` (#275)
+- Add WaitForConfirmation function (#274)
+- Better error message on encoding exception. (#258)
+- Fix ABI source code position for ABI feature (#260)
+- Add ABI encoding support (#255)
+
+# 1.11.0-beta-2
+- Support Foreign objects as ABI arguments (#283)
+- Upgrade `jackson` packages to resolve PRs on vulnerability (#281)
+
 # 1.11.0-beta-1
 - ABI Interaction Support for JAVA SDK (#268)
 - Bug fix for `logs` on `PendingTransactionResponse` (#275)

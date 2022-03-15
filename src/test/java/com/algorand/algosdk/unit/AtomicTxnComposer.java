@@ -2,12 +2,13 @@ package com.algorand.algosdk.unit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.algorand.algosdk.abi.ABIType;
-import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.ResourceUtils;
+import com.algorand.algosdk.util.SplitAndProcessMethodArgs;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -35,6 +36,7 @@ public class AtomicTxnComposer {
 
     TransactionWithSigner txnWithSigner;
     MethodCallParams.Builder optionBuilder;
+    SplitAndProcessMethodArgs abiArgProcessor = null;
 
     public AtomicTxnComposer(Base b, ABIJson methodABI_, TransactionSteps steps) {
         base = b;
@@ -73,6 +75,7 @@ public class AtomicTxnComposer {
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
         this.optionBuilder = new MethodCallParams.Builder();
+        abiArgProcessor = new SplitAndProcessMethodArgs(methodABI.method);
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
@@ -85,26 +88,9 @@ public class AtomicTxnComposer {
         this.atc.addTransaction(this.txnWithSigner);
     }
 
-    private List<Object> splitAndProcessABIArgs(String str) {
-        String[] argTokens = str.split(",");
-        List<Object> res = new ArrayList<>();
-
-        int argTokenIndex = 0;
-        for (Method.Arg argType : methodABI.method.args) {
-            if (Method.TxArgTypes.contains(argType.type))
-                continue;
-            ABIType abiT = ABIType.valueOf(argType.type);
-            byte[] abiEncoded = Encoder.decodeFromBase64(argTokens[argTokenIndex]);
-            res.add(abiT.decode(abiEncoded));
-            argTokenIndex++;
-        }
-
-        return res;
-    }
-
     @When("I append the encoded arguments {string} to the method arguments array.")
     public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
-        List<Object> processedABIArgs = splitAndProcessABIArgs(string);
+        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessMethodArgs(string, new ArrayList<>());
         for (Object arg : processedABIArgs)
             this.optionBuilder.addMethodArgs(arg);
     }
@@ -126,12 +112,46 @@ public class AtomicTxnComposer {
         atc.addMethodCall(optionBuild);
     }
 
+    @When("I add a method call with the signing account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments, approval-program {string}, clear-program {string}, global-bytes {int}, global-ints {int}, local-bytes {int}, local-ints {int}, extra-pages {int}.")
+    public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments_approval_program_clear_program_global_bytes_global_ints_local_bytes_local_ints_extra_pages(String string, String string2, String string3, Integer int1, Integer int2, Integer int3, Integer int4, Integer int5) {
+        byte[] tealApproval, tealClear;
+        try {
+            tealApproval = ResourceUtils.readResource(string2);
+            tealClear = ResourceUtils.readResource(string3);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("cannot read resource from specified TEAL files");
+        }
+
+        optionBuilder
+                .setOnComplete(Transaction.OnCompletion.String(string))
+                .setSender(signingAccount.getAddress().toString())
+                .setSigner(txnSigner)
+                .setAppID(appID.longValue())
+                .setMethod(methodABI.method)
+                .setSuggestedParams(this.transSteps.suggestedParams)
+                .setFirstValid(this.transSteps.fv)
+                .setLastValid(this.transSteps.lv)
+                .setFee(this.transSteps.fee)
+                .setFlatFee(this.transSteps.flatFee)
+                .setApprovalProgram(new TEALProgram(tealApproval))
+                .setClearProgram(new TEALProgram(tealClear))
+                .setGlobalBytes(int1.longValue())
+                .setGlobalInts(int2.longValue())
+                .setLocalBytes(int3.longValue())
+                .setLocalInts(int4.longValue())
+                .setExtraPages(int5.longValue());
+        MethodCallParams optionBuild = optionBuilder.build();
+        atc.addMethodCall(optionBuild);
+    }
+
     @When("I build the transaction group with the composer. If there is an error it is {string}.")
     public void i_build_the_transaction_group_with_the_composer_if_there_is_an_error_it_is(String string) {
         String errStr = "";
         try {
             atc.buildGroup();
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            errStr = "zero group size error";
+        } catch (IOException e) {
             errStr = e.getMessage();
         }
         assertThat(errStr).isEqualTo(string);

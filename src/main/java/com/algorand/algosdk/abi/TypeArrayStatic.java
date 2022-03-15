@@ -1,5 +1,7 @@
 package com.algorand.algosdk.abi;
 
+import com.algorand.algosdk.util.GenericObjToArray;
+
 public class TypeArrayStatic extends ABIType {
     public final ABIType elemType;
     public final int length;
@@ -29,7 +31,7 @@ public class TypeArrayStatic extends ABIType {
 
     @Override
     public byte[] encode(Object o) {
-        Object[] objArray = ABIType.unifyToArrayOfObjects(o);
+        Object[] objArray = GenericObjToArray.unifyToArrayOfObjects(o);
         if (objArray.length != this.length)
             throw new IllegalArgumentException("cannot encode abi static array: length of value != length in array type");
         return ABIType.castToTupleType(this.length, this.elemType).encode(objArray);

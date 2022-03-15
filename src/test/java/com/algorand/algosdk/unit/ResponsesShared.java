@@ -19,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ResponsesShared {
     public File bodyFile;
+    @SuppressWarnings("rawtypes")
     public Response response;
 
     public AlgodClient algod = new AlgodClient("localhost", 123, "");
@@ -90,6 +91,24 @@ public class ResponsesShared {
                     case "lookupAssetTransactions":
                         response = indexer.lookupAssetTransactions(10L).execute();
                         break;
+                    case "lookupAccountAppLocalStates":
+                        response = indexer.lookupAccountAppLocalStates(new Address()).execute();
+                        break;
+                    case "lookupApplicationLogsByID":
+                        response = indexer.lookupApplicationLogsByID(10L).execute();
+                        break;
+                    case "lookupAccountCreatedApplications":
+                        response = indexer.lookupAccountCreatedApplications(new Address()).execute();
+                        break;
+                    case "lookupAccountAssets":
+                        response = indexer.lookupAccountAssets(new Address()).execute();
+                        break;
+                    case "lookupAccountCreatedAssets":
+                        response = indexer.lookupAccountCreatedAssets(new Address()).execute();
+                        break;
+                    case "lookupTransaction":
+                        response = indexer.lookupTransaction("TXID").execute();
+                        break;
                     case "searchForTransactions":
                     case "any": // error case, everything uses the same error message
                         response = indexer.searchForTransactions().execute();
@@ -140,6 +159,15 @@ public class ResponsesShared {
                         break;
                     case "Proof":
                         response = algod.GetProof(0L, "").execute();
+                        break;
+                    case "AccountInformation":
+                        response = algod.AccountInformation(new Address()).execute();
+                        break;
+                    case "AccountApplicationInformation":
+                        response = algod.AccountApplicationInformation(new Address(), 0L).execute();
+                        break;
+                    case "AccountAssetInformation":
+                        response = algod.AccountAssetInformation(new Address(), 0L).execute();
                         break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
