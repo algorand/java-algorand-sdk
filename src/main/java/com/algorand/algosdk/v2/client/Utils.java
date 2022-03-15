@@ -88,7 +88,7 @@ public class Utils {
             }
 
             // If this is a create transaction
-            if (tx.applicationId == 0) {
+            if (tx.applicationId == 0 || tx.applicationId == null) {
                 // Prepare and set param fields for Application being created
                 // from the transaction passed
                 ApplicationParams params = new ApplicationParams();
