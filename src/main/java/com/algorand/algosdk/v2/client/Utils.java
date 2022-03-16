@@ -183,18 +183,18 @@ public class Utils {
      * StackPrinterConfig contains configuration parameters for
      * printing the trace from a DryrunTxnResult.
      */
-    public class StackPrinterConfig {
+    public static class StackPrinterConfig {
         public int maxWidth = 0;
         public boolean topOfStackFirst = false;
     }
 
-    private String truncate(String s, int maxWidth) {
+    private static String truncate(String s, int maxWidth) {
         if(s.length()>maxWidth && maxWidth>0){
             return s.substring(0, maxWidth) + "...";
         }
         return s;
     }
-    private String stackToString(List<TealValue> stack, boolean reverse) {
+    private static String stackToString(List<TealValue> stack, boolean reverse) {
         if(reverse){ Collections.reverse(stack); }
 
         List<String> elems = new ArrayList<String>();
@@ -217,7 +217,7 @@ public class Utils {
         return String.format("[%s]", StringUtils.join(elems, ","));
     }
 
-    private String scratchToString(List<TealValue> prevScratch, List<TealValue> currScratch){
+    private static String scratchToString(List<TealValue> prevScratch, List<TealValue> currScratch){
         TealValue tv = new TealValue();
         String newValue = "";
         int newIdx = 0;
@@ -227,6 +227,10 @@ public class Utils {
                 tv = currScratch.get(i);
                 newIdx = i;
             }
+        }
+
+        if(tv.type == null){
+            return "";
         }
 
         switch(tv.type.intValue()){
@@ -244,10 +248,11 @@ public class Utils {
         return String.format("%d = %d", newIdx, newValue);
     }
 
-    private String trace(List<DryrunState> state, List<String> disassembly, StackPrinterConfig spc) {
+    private static String trace(List<DryrunState> state, List<String> disassembly, StackPrinterConfig spc) {
         List<String[]> lines = new ArrayList<String[]>();
         lines.add(new String[]{"pc#", "ln#", "source", "scratch", "stack"});
 
+        // Create lines for trace
         for(int i = 0; i<state.size(); i++){
             DryrunState s = state.get(i);
 
@@ -258,34 +263,41 @@ public class Utils {
             List<TealValue> prevScratch = i>0?state.get(i-1).scratch:new ArrayList<TealValue>();
 
             lines.add(new String[]{
-                String.format("%4d", s.pc),
-                String.format("%4d", s.line),
+                String.format("%-4d", s.pc),
+                String.format("%-4d", s.line),
                 truncate(src, spc.maxWidth),
                 truncate(scratchToString(prevScratch, currScratch), spc.maxWidth),
                 truncate(stackToString(s.stack, spc.topOfStackFirst), spc.maxWidth)
             });
         }
 
+        // Get max length of each column
         int columns = lines.get(0).length;
         int[] maxLengths = new int[columns];
         for(int i=0; i<lines.size();i++){
             String[] line = lines.get(i);
-            for(int j=0;j<columns; i++){
+            for(int j=0;j<columns; j++){
                 if(line[j].length()>maxLengths[j]){
                     maxLengths[j] = line[j].length();
                 }
             }
         }
 
+        // Create formatter
         List<String> fmts = new ArrayList<String>();
         for(int i=0; i<columns; i++){
             fmts.add(String.format("%%-%ds", maxLengths[i] + 1));
         }
 
-        return String.format(StringUtils.join(fmts, "|"), lines);
+        String fmt = StringUtils.join(fmts, "|").trim() + "\n";
+        StringBuilder sb = new StringBuilder();
+        for(String[] line : lines){
+            sb.append(String.format(fmt, line));
+        }
+        return sb.toString();
     }
 
-    public String appTrace(DryrunTxnResult dtr) {
+    public static String appTrace(DryrunTxnResult dtr) {
         StackPrinterConfig spc = new StackPrinterConfig();
         spc.maxWidth = defaultMaxWidth;
         spc.topOfStackFirst = true;
@@ -295,10 +307,10 @@ public class Utils {
             spc
         );
     }
-    public String appTrace(DryrunTxnResult dtr, StackPrinterConfig spc) {
+    public static String appTrace(DryrunTxnResult dtr, StackPrinterConfig spc) {
         return trace(dtr.appCallTrace, dtr.disassembly, spc);
     }
-    public String lsigTrace(DryrunTxnResult dtr) {
+    public static String lsigTrace(DryrunTxnResult dtr) {
         StackPrinterConfig spc = new StackPrinterConfig();
         spc.maxWidth = defaultMaxWidth;
         spc.topOfStackFirst = true;
@@ -308,7 +320,7 @@ public class Utils {
             spc
         );
     }
-    public String lsigTrace(DryrunTxnResult dtr, StackPrinterConfig spc) {
+    public static String lsigTrace(DryrunTxnResult dtr, StackPrinterConfig spc) {
         return trace(dtr.logicSigTrace, dtr.logicSigDisassembly, spc);
     }
 
