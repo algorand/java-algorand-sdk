@@ -22,11 +22,9 @@ public class ApplicationParams extends PathResponse {
     public void approvalProgram(String base64Encoded) {
         this.approvalProgram = Encoder.decodeFromBase64(base64Encoded);
     }
-
     public String approvalProgram() {
         return Encoder.encodeToBase64(this.approvalProgram);
     }
-
     public byte[] approvalProgram;
 
     /**
@@ -36,7 +34,6 @@ public class ApplicationParams extends PathResponse {
     public void clearStateProgram(String base64Encoded) {
         this.clearStateProgram = Encoder.decodeFromBase64(base64Encoded);
     }
-
     public String clearStateProgram() {
         return Encoder.encodeToBase64(this.clearStateProgram);
     }
