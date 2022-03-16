@@ -203,7 +203,7 @@ public class Utils {
             switch(tv.type.intValue()){
                 case 1:
                     byte[] decoded = Encoder.decodeFromBase64(tv.bytes);
-                    elems.add(Encoder.encodeToHexStr(decoded));
+                    elems.add("0x"+Encoder.encodeToHexStr(decoded));
                     break;
                 case 2:
                     elems.add(tv.uint.toString());
@@ -214,7 +214,7 @@ public class Utils {
         }
 
 
-        return String.format("[%s]", StringUtils.join(elems, ","));
+        return String.format("[%s]", StringUtils.join(elems, ", "));
     }
 
     private static String scratchToString(List<TealValue> prevScratch, List<TealValue> currScratch){
@@ -236,7 +236,7 @@ public class Utils {
         switch(tv.type.intValue()){
             case 1:
                 byte[] decoded = Encoder.decodeFromBase64(tv.bytes);
-                newValue = Encoder.encodeToHexStr(decoded);
+                newValue = "0x"+Encoder.encodeToHexStr(decoded);
                 break;
             case 2:
                 newValue = tv.uint.toString();
@@ -263,8 +263,8 @@ public class Utils {
             List<TealValue> prevScratch = i>0?state.get(i-1).scratch:new ArrayList<TealValue>();
 
             lines.add(new String[]{
-                String.format("%-4d", s.pc),
-                String.format("%-4d", s.line),
+                String.format("%-3d", s.pc),
+                String.format("%-3d", s.line),
                 truncate(src, spc.maxWidth),
                 truncate(scratchToString(prevScratch, currScratch), spc.maxWidth),
                 truncate(stackToString(s.stack, spc.topOfStackFirst), spc.maxWidth)
@@ -289,10 +289,10 @@ public class Utils {
             fmts.add(String.format("%%-%ds", maxLengths[i] + 1));
         }
 
-        String fmt = StringUtils.join(fmts, "|").trim() + "\n";
+        String fmt = StringUtils.join(fmts, "|");
         StringBuilder sb = new StringBuilder();
         for(String[] line : lines){
-            sb.append(String.format(fmt, line));
+            sb.append(String.format(fmt, line).trim() + "\n");
         }
         return sb.toString();
     }
