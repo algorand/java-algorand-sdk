@@ -22,10 +22,17 @@ public class ApplicationParams extends PathResponse {
     public void approvalProgram(String base64Encoded) {
         this.approvalProgram = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("approval-program")
+
     public String approvalProgram() {
         return Encoder.encodeToBase64(this.approvalProgram);
     }
+
+    @JsonProperty("approval-program")
+    public byte[] getApprovalProgram() {
+        return this.approvalProgram;
+    }
+
+
     public byte[] approvalProgram;
 
     /**

@@ -161,7 +161,6 @@ public class Utils {
         drr.protocolVersion = protocol_version;
         drr.latestTimestamp = latest_timestamp;
         drr.round = BigInteger.valueOf(round);
-
         return drr;
     }
 
