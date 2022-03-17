@@ -180,6 +180,32 @@ public class Account extends PathResponse {
     @JsonProperty("status")
     public String status;
 
+    /**
+     * The count of all applications that have been opted in, equivalent to the count
+     * of application local data (AppLocalState objects) stored in this account.
+     */
+    @JsonProperty("total-apps-opted-in")
+    public Long totalAppsOptedIn;
+
+    /**
+     * The count of all assets that have been opted in, equivalent to the count of
+     * AssetHolding objects held by this account.
+     */
+    @JsonProperty("total-assets-opted-in")
+    public Long totalAssetsOptedIn;
+
+    /**
+     * The count of all apps (AppParams objects) created by this account.
+     */
+    @JsonProperty("total-created-apps")
+    public Long totalCreatedApps;
+
+    /**
+     * The count of all assets (AssetParams objects) created by this account.
+     */
+    @JsonProperty("total-created-assets")
+    public Long totalCreatedAssets;
+
     @Override
     public boolean equals(Object o) {
 
@@ -207,6 +233,10 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.round, other.round)) return false;
         if (!Objects.deepEquals(this.sigType, other.sigType)) return false;
         if (!Objects.deepEquals(this.status, other.status)) return false;
+        if (!Objects.deepEquals(this.totalAppsOptedIn, other.totalAppsOptedIn)) return false;
+        if (!Objects.deepEquals(this.totalAssetsOptedIn, other.totalAssetsOptedIn)) return false;
+        if (!Objects.deepEquals(this.totalCreatedApps, other.totalCreatedApps)) return false;
+        if (!Objects.deepEquals(this.totalCreatedAssets, other.totalCreatedAssets)) return false;
 
         return true;
     }

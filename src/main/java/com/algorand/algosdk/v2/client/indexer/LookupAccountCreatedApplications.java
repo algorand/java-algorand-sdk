@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
@@ -9,28 +10,27 @@ import com.algorand.algosdk.v2.client.model.ApplicationsResponse;
 
 
 /**
- * Search for applications
- * /v2/applications
+ * Lookup an account's created application parameters, optionally for a specific
+ * ID.
+ * /v2/accounts/{account-id}/created-applications
  */
-public class SearchForApplications extends Query {
+public class LookupAccountCreatedApplications extends Query {
 
-    public SearchForApplications(Client client) {
+    private Address accountId;
+
+    /**
+     * @param accountId account string
+     */
+    public LookupAccountCreatedApplications(Client client, Address accountId) {
         super(client, new HttpMethod("get"));
+        this.accountId = accountId;
     }
 
     /**
      * Application ID
      */
-    public SearchForApplications applicationId(Long applicationId) {
+    public LookupAccountCreatedApplications applicationId(Long applicationId) {
         addQuery("application-id", String.valueOf(applicationId));
-        return this;
-    }
-
-    /**
-     * Filter just applications with the given creator address.
-     */
-    public SearchForApplications creator(String creator) {
-        addQuery("creator", String.valueOf(creator));
         return this;
     }
 
@@ -38,7 +38,7 @@ public class SearchForApplications extends Query {
      * Include all items including closed accounts, deleted applications, destroyed
      * assets, opted-out asset holdings, and closed-out application localstates.
      */
-    public SearchForApplications includeAll(Boolean includeAll) {
+    public LookupAccountCreatedApplications includeAll(Boolean includeAll) {
         addQuery("include-all", String.valueOf(includeAll));
         return this;
     }
@@ -47,7 +47,7 @@ public class SearchForApplications extends Query {
      * Maximum number of results to return. There could be additional pages even if the
      * limit is not reached.
      */
-    public SearchForApplications limit(Long limit) {
+    public LookupAccountCreatedApplications limit(Long limit) {
         addQuery("limit", String.valueOf(limit));
         return this;
     }
@@ -55,7 +55,7 @@ public class SearchForApplications extends Query {
     /**
      * The next page of results. Use the next token provided by the previous results.
      */
-    public SearchForApplications next(String next) {
+    public LookupAccountCreatedApplications next(String next) {
         addQuery("next", String.valueOf(next));
         return this;
     }
@@ -88,8 +88,13 @@ public class SearchForApplications extends Query {
     }
 
     protected QueryData getRequestString() {
+        if (this.accountId == null) {
+            throw new RuntimeException("account-id is not set. It is a required parameter.");
+        }
         addPathSegment(String.valueOf("v2"));
-        addPathSegment(String.valueOf("applications"));
+        addPathSegment(String.valueOf("accounts"));
+        addPathSegment(String.valueOf(accountId));
+        addPathSegment(String.valueOf("created-applications"));
 
         return qd;
     }

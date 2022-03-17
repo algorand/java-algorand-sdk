@@ -69,14 +69,6 @@ public class LookupAssetBalances extends Query {
         return this;
     }
 
-    /**
-     * Include results for the specified round.
-     */
-    public LookupAssetBalances round(Long round) {
-        addQuery("round", String.valueOf(round));
-        return this;
-    }
-
    /**
     * Execute the query.
     * @return the query response object.
