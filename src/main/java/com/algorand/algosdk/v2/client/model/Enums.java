@@ -130,4 +130,22 @@ public class Enums {
         }
     }
 
+    /**
+     * Combine with the address parameter to define what type of address to search for.
+     */
+    public enum Hashtype {
+        @JsonProperty("sumhash") SUMHASH("sumhash"),
+        @JsonProperty("sha512_256") SHA512_256("sha512_256");
+
+        final String serializedName;
+        Hashtype(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
+
 }
