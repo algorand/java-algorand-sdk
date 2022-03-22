@@ -32,7 +32,6 @@ public class ProofResponse extends PathResponse {
     public void proof(String base64Encoded) {
         this.proof = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("proof")
     public String proof() {
         return Encoder.encodeToBase64(this.proof);
     }
@@ -45,7 +44,6 @@ public class ProofResponse extends PathResponse {
     public void stibhash(String base64Encoded) {
         this.stibhash = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("stibhash")
     public String stibhash() {
         return Encoder.encodeToBase64(this.stibhash);
     }

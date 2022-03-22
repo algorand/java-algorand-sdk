@@ -35,7 +35,6 @@ public class TransactionSignature extends PathResponse {
     public void sig(String base64Encoded) {
         this.sig = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("sig")
     public String sig() {
         return Encoder.encodeToBase64(this.sig);
     }

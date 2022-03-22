@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Executes TEAL program(s) in context and returns debugging information about the
- * execution. This endpoint is only enabled when a node's configureation file sets
+ * execution. This endpoint is only enabled when a node's configuration file sets
  * EnableDeveloperAPI to true.
  * /v2/teal/dryrun
  */
