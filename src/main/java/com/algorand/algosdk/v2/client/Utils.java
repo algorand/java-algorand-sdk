@@ -189,21 +189,24 @@ public class Utils {
     }
 
     private static String truncate(String s, int maxWidth) {
-        if(s.length()>maxWidth && maxWidth>0){
+        if (s.length() > maxWidth && maxWidth > 0) {
             return s.substring(0, maxWidth) + "...";
         }
         return s;
     }
+
     private static String stackToString(List<TealValue> stack, boolean reverse) {
-        if(reverse){ Collections.reverse(stack); }
+        if (reverse) {
+            Collections.reverse(stack);
+        }
 
         List<String> elems = new ArrayList<String>();
-        for(int i=0; i<stack.size(); i++){
+        for (int i = 0; i < stack.size(); i++) {
             TealValue tv = stack.get(i);
-            switch(tv.type.intValue()){
+            switch (tv.type.intValue()) {
                 case 1:
                     byte[] decoded = Encoder.decodeFromBase64(tv.bytes);
-                    elems.add("0x"+Encoder.encodeToHexStr(decoded));
+                    elems.add("0x" + Encoder.encodeToHexStr(decoded));
                     break;
                 case 2:
                     elems.add(tv.uint.toString());
@@ -213,71 +216,67 @@ public class Utils {
             }
         }
 
-
         return String.format("[%s]", StringUtils.join(elems, ", "));
     }
 
-    private static String scratchToString(List<TealValue> prevScratch, List<TealValue> currScratch){
-        TealValue tv = new TealValue();
-        String newValue = "";
-        int newIdx = 0;
+    private static String scratchToString(List<TealValue> prevScratch, List<TealValue> currScratch) {
+        if (currScratch.size() == 0)
+            return "";
 
-        for(int i=0; i<currScratch.size(); i++){
-            if(i>prevScratch.size() || !Objects.deepEquals(prevScratch.get(i), currScratch.get(i))){
-                tv = currScratch.get(i);
+        int newIdx = -1;
+        for (int i = 0; i < currScratch.size(); i++) {
+            if (i >= prevScratch.size()) {
+                newIdx = i;
+                continue;
+            }
+
+            if (!Objects.deepEquals(prevScratch.get(i), currScratch.get(i))) {
                 newIdx = i;
             }
         }
 
-        if(tv.type == null){
+        if (newIdx < 0)
             return "";
-        }
 
-        switch(tv.type.intValue()){
-            case 1:
-                byte[] decoded = Encoder.decodeFromBase64(tv.bytes);
-                newValue = "0x"+Encoder.encodeToHexStr(decoded);
-                break;
-            case 2:
-                newValue = tv.uint.toString();
-                break;
-            default:
-                return "";
+        TealValue tv = currScratch.get(newIdx);
+        if (tv.bytes.length() > 0) {
+            byte[] decoded = Encoder.decodeFromBase64(tv.bytes);
+            String newValue = "0x" + Encoder.encodeToHexStr(decoded);
+            return String.format("%d = %s", newIdx, newValue);
         }
-
-        return String.format("%d = %d", newIdx, newValue);
+        return String.format("%d = %d", newIdx, tv.uint);
     }
 
     private static String trace(List<DryrunState> state, List<String> disassembly, StackPrinterConfig spc) {
         List<String[]> lines = new ArrayList<String[]>();
-        lines.add(new String[]{"pc#", "ln#", "source", "scratch", "stack"});
+        lines.add(new String[] { "pc#", "ln#", "source", "scratch", "stack" });
 
         // Create lines for trace
-        for(int i = 0; i<state.size(); i++){
+        for (int i = 0; i < state.size(); i++) {
             DryrunState s = state.get(i);
 
             boolean hasError = s.error != null && s.error != "";
-            String src = hasError?String.format("!! %s !!", s.error):disassembly.get(s.line.intValue());
+            String src = hasError ? String.format("!! %s !!", s.error) : disassembly.get(s.line.intValue());
 
             List<TealValue> currScratch = s.scratch;
-            List<TealValue> prevScratch = i>0?state.get(i-1).scratch:new ArrayList<TealValue>();
+            List<TealValue> prevScratch = i > 0 ? state.get(i - 1).scratch : new ArrayList<TealValue>();
 
-            lines.add(new String[]{
-                String.format("%-3d", s.pc),
-                String.format("%-3d", s.line),
-                truncate(src, spc.maxWidth),
-                truncate(scratchToString(prevScratch, currScratch), spc.maxWidth),
-                truncate(stackToString(s.stack, spc.topOfStackFirst), spc.maxWidth)
+            lines.add(new String[] {
+                    String.format("%-3d", s.pc),
+                    String.format("%-3d", s.line),
+                    truncate(src, spc.maxWidth),
+                    truncate(scratchToString(prevScratch, currScratch), spc.maxWidth),
+                    truncate(stackToString(s.stack, spc.topOfStackFirst), spc.maxWidth)
             });
         }
 
         // Get max length of each column
         int columns = lines.get(0).length;
         int[] maxLengths = new int[columns];
-        for(int i=0; i<lines.size();i++){
+        for (int i = 0; i < lines.size(); i++) {
             String[] line = lines.get(i);
-            for(int j=0;j<columns; j++){
-                if(line[j].length()>maxLengths[j]){
+            for (int j = 0; j < columns; j++) {
+                if (line[j].length() > maxLengths[j]) {
                     maxLengths[j] = line[j].length();
                 }
             }
@@ -285,13 +284,13 @@ public class Utils {
 
         // Create formatter
         List<String> fmts = new ArrayList<String>();
-        for(int i=0; i<columns; i++){
+        for (int i = 0; i < columns; i++) {
             fmts.add(String.format("%%-%ds", maxLengths[i] + 1));
         }
 
         String fmt = StringUtils.join(fmts, "|");
         StringBuilder sb = new StringBuilder();
-        for(String[] line : lines){
+        for (String[] line : lines) {
             sb.append(String.format(fmt, line).trim() + "\n");
         }
         return sb.toString();
@@ -302,24 +301,25 @@ public class Utils {
         spc.maxWidth = defaultMaxWidth;
         spc.topOfStackFirst = true;
         return trace(
-            dtr.appCallTrace, 
-            dtr.disassembly, 
-            spc
-        );
+                dtr.appCallTrace,
+                dtr.disassembly,
+                spc);
     }
+
     public static String appTrace(DryrunTxnResult dtr, StackPrinterConfig spc) {
         return trace(dtr.appCallTrace, dtr.disassembly, spc);
     }
+
     public static String lsigTrace(DryrunTxnResult dtr) {
         StackPrinterConfig spc = new StackPrinterConfig();
         spc.maxWidth = defaultMaxWidth;
         spc.topOfStackFirst = true;
         return trace(
-            dtr.logicSigTrace, 
-            dtr.logicSigDisassembly, 
-            spc
-        );
+                dtr.logicSigTrace,
+                dtr.logicSigDisassembly,
+                spc);
     }
+
     public static String lsigTrace(DryrunTxnResult dtr, StackPrinterConfig spc) {
         return trace(dtr.logicSigTrace, dtr.logicSigDisassembly, spc);
     }
