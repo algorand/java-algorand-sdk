@@ -1,3 +1,6 @@
+# 1.13.0
+- Unlimited assets regenerated code. (#302)
+
 # 1.13.0-beta-1
 - Unlimited assets regenerated code. (#302)
 
