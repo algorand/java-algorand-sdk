@@ -371,7 +371,7 @@ public class AtomicTransactionComposer {
         Response<PostTransactionsResponse> rPost = client.RawTransaction().rawtxn(encoded).execute();
 
         if (!rPost.isSuccessful())
-            throw new Exception("transaction should be submitted successfully");
+            throw new Exception("transaction should be submitted successfully cause : " + rPost.message());
 
         this.status = Status.SUBMITTED;
         return this.getTxIDs();
