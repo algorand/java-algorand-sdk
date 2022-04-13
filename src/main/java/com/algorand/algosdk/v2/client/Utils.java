@@ -3,7 +3,6 @@ package com.algorand.algosdk.v2.client;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,7 +24,7 @@ import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 public class Utils {
 
     // https://github.com/algorand/go-algorand/blob/e466aa18d4d963868d6d15279b1c881977fa603f/libgoal/libgoal.go#L1089-L1090
-    private static Long defaultAppId = 1380011588L;
+    private static final Long defaultAppId = 1380011588L;
 
     /**
      * Construct a DryruynRequest object from a set of transactions. 
