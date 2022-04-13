@@ -45,7 +45,6 @@ public class TransactionSignatureLogicsig extends PathResponse {
     public void logic(String base64Encoded) {
         this.logic = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("logic")
     public String logic() {
         return Encoder.encodeToBase64(this.logic);
     }
@@ -66,7 +65,6 @@ public class TransactionSignatureLogicsig extends PathResponse {
     public void signature(String base64Encoded) {
         this.signature = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("signature")
     public String signature() {
         return Encoder.encodeToBase64(this.signature);
     }

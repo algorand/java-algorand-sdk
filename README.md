@@ -19,7 +19,7 @@ Maven:
 <dependency>
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>1.12.0</version>
+    <version>1.13.0</version>
 </dependency>
 ```
 
@@ -170,7 +170,7 @@ public class Main {
 
 # Documentation
 
-Javadoc can be found at [https://algorand.github.io/java-algorand-sdk](https://algorand.github.io/java-algorand-sdk). <br /> 
+Javadoc can be found at [https://algorand.github.io/java-algorand-sdk](https://algorand.github.io/java-algorand-sdk). <br />
 Additional resources and code samples are located at [https://developer.algorand.org](https://developer.algorand.org).
 
 # Cryptography

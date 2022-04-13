@@ -65,7 +65,6 @@ public class AssetParams extends PathResponse {
     public void metadataHash(String base64Encoded) {
         this.metadataHash = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("metadata-hash")
     public String metadataHash() {
         return Encoder.encodeToBase64(this.metadataHash);
     }
@@ -85,7 +84,6 @@ public class AssetParams extends PathResponse {
     public void nameB64(String base64Encoded) {
         this.nameB64 = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("name-b64")
     public String nameB64() {
         return Encoder.encodeToBase64(this.nameB64);
     }
@@ -117,7 +115,6 @@ public class AssetParams extends PathResponse {
     public void unitNameB64(String base64Encoded) {
         this.unitNameB64 = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("unit-name-b64")
     public String unitNameB64() {
         return Encoder.encodeToBase64(this.unitNameB64);
     }
@@ -137,7 +134,6 @@ public class AssetParams extends PathResponse {
     public void urlB64(String base64Encoded) {
         this.urlB64 = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("url-b64")
     public String urlB64() {
         return Encoder.encodeToBase64(this.urlB64);
     }

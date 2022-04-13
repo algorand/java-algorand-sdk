@@ -124,7 +124,6 @@ public class Transaction extends PathResponse {
     public void genesisHash(String base64Encoded) {
         this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("genesis-hash")
     public String genesisHash() {
         return Encoder.encodeToBase64(this.genesisHash);
     }
@@ -152,7 +151,6 @@ public class Transaction extends PathResponse {
     public void group(String base64Encoded) {
         this.group = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("group")
     public String group() {
         return Encoder.encodeToBase64(this.group);
     }
@@ -201,7 +199,6 @@ public class Transaction extends PathResponse {
     public void lease(String base64Encoded) {
         this.lease = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("lease")
     public String lease() {
         return Encoder.encodeToBase64(this.lease);
     }
@@ -242,7 +239,6 @@ public class Transaction extends PathResponse {
     public void note(String base64Encoded) {
         this.note = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("note")
     public String note() {
         return Encoder.encodeToBase64(this.note);
     }
