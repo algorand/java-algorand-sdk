@@ -15,7 +15,6 @@ public class TransactionSignatureMultisigSubsignature extends PathResponse {
     public void publicKey(String base64Encoded) {
         this.publicKey = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("public-key")
     public String publicKey() {
         return Encoder.encodeToBase64(this.publicKey);
     }
@@ -28,7 +27,6 @@ public class TransactionSignatureMultisigSubsignature extends PathResponse {
     public void signature(String base64Encoded) {
         this.signature = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("signature")
     public String signature() {
         return Encoder.encodeToBase64(this.signature);
     }
