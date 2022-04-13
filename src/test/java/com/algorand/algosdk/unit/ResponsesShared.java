@@ -209,6 +209,7 @@ public class ResponsesShared {
         Utils.StackPrinterConfig spc = new Utils.StackPrinterConfig();
         spc.maxValueWidth = 30;
         spc.topOfStackFirst = false;
+
         String trace = Utils.appTrace(this.dryrunTxnResult, spc);
         assertThat(str_resource).isEqualTo(trace);
     }
