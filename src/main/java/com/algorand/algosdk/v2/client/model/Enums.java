@@ -131,11 +131,12 @@ public class Enums {
     }
 
     /**
-     * Combine with the address parameter to define what type of address to search for.
+     * Indicates the type of hash function used.
+     * A query parameter for GetProof, as two types of merkle TxnRoot block headers exists now.
      */
     public enum Hashtype {
-        @JsonProperty("sumhash") SUMHASH("sumhash"),
-        @JsonProperty("sha512_256") SHA512_256("sha512_256");
+        @JsonProperty("sha512_256") SHA512_256("sha512_256"),
+        @JsonProperty("sha256") SHA256("sha256");
 
         final String serializedName;
         Hashtype(String name) {

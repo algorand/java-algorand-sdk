@@ -12,14 +12,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ProofResponse extends PathResponse {
 
     /**
-     * The type of hash function used to create the proof, must be one of:
-     *   sumhash
-     *   sha512_256
-     */
-    @JsonProperty("hashtype")
-    public Enums.Hashtype hashtype;
-
-    /**
      * Index of the transaction in the block's payset.
      */
     @JsonProperty("idx")
@@ -63,7 +55,6 @@ public class ProofResponse extends PathResponse {
         if (o == null) return false;
 
         ProofResponse other = (ProofResponse) o;
-        if (!Objects.deepEquals(this.hashtype, other.hashtype)) return false;
         if (!Objects.deepEquals(this.idx, other.idx)) return false;
         if (!Objects.deepEquals(this.proof, other.proof)) return false;
         if (!Objects.deepEquals(this.stibhash, other.stibhash)) return false;
