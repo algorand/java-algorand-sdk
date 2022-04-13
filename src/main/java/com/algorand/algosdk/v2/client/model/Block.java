@@ -22,7 +22,6 @@ public class Block extends PathResponse {
     public void genesisHash(String base64Encoded) {
         this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("genesis-hash")
     public String genesisHash() {
         return Encoder.encodeToBase64(this.genesisHash);
     }
@@ -41,7 +40,6 @@ public class Block extends PathResponse {
     public void previousBlockHash(String base64Encoded) {
         this.previousBlockHash = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("previous-block-hash")
     public String previousBlockHash() {
         return Encoder.encodeToBase64(this.previousBlockHash);
     }
@@ -66,7 +64,6 @@ public class Block extends PathResponse {
     public void seed(String base64Encoded) {
         this.seed = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("seed")
     public String seed() {
         return Encoder.encodeToBase64(this.seed);
     }
@@ -96,7 +93,6 @@ public class Block extends PathResponse {
     public void transactionsRoot(String base64Encoded) {
         this.transactionsRoot = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("transactions-root")
     public String transactionsRoot() {
         return Encoder.encodeToBase64(this.transactionsRoot);
     }

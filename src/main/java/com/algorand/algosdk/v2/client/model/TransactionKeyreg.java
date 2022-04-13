@@ -27,7 +27,6 @@ public class TransactionKeyreg extends PathResponse {
     public void selectionParticipationKey(String base64Encoded) {
         this.selectionParticipationKey = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("selection-participation-key")
     public String selectionParticipationKey() {
         return Encoder.encodeToBase64(this.selectionParticipationKey);
     }
@@ -40,7 +39,6 @@ public class TransactionKeyreg extends PathResponse {
     public void stateProofKey(String base64Encoded) {
         this.stateProofKey = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("state-proof-key")
     public String stateProofKey() {
         return Encoder.encodeToBase64(this.stateProofKey);
     }
@@ -71,7 +69,6 @@ public class TransactionKeyreg extends PathResponse {
     public void voteParticipationKey(String base64Encoded) {
         this.voteParticipationKey = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("vote-participation-key")
     public String voteParticipationKey() {
         return Encoder.encodeToBase64(this.voteParticipationKey);
     }
