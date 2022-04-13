@@ -207,7 +207,7 @@ public class ResponsesShared {
         byte[] b = ResourceUtils.loadResource(path);
         String str_resource = new String(b, StandardCharsets.UTF_8);
         Utils.StackPrinterConfig spc = new Utils.StackPrinterConfig();
-        spc.maxWidth = 30;
+        spc.maxValueWidth = 30;
         spc.topOfStackFirst = false;
         String trace = Utils.appTrace(this.dryrunTxnResult, spc);
         assertThat(str_resource).isEqualTo(trace);

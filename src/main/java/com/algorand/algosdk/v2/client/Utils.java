@@ -184,7 +184,7 @@ public class Utils {
      * printing the trace from a DryrunTxnResult.
      */
     public static class StackPrinterConfig {
-        public int maxWidth = 0;
+        public int maxValueWidth = 0;
         public boolean topOfStackFirst = false;
     }
 
@@ -264,9 +264,9 @@ public class Utils {
             lines.add(new String[] {
                     String.format("%-3d", s.pc),
                     String.format("%-3d", s.line),
-                    truncate(src, spc.maxWidth),
-                    truncate(scratchToString(prevScratch, currScratch), spc.maxWidth),
-                    truncate(stackToString(s.stack, spc.topOfStackFirst), spc.maxWidth)
+                    truncate(src, spc.maxValueWidth),
+                    truncate(scratchToString(prevScratch, currScratch), spc.maxValueWidth),
+                    truncate(stackToString(s.stack, spc.topOfStackFirst), spc.maxValueWidth)
             });
         }
 
@@ -298,7 +298,7 @@ public class Utils {
 
     public static String appTrace(DryrunTxnResult dtr) {
         StackPrinterConfig spc = new StackPrinterConfig();
-        spc.maxWidth = defaultMaxWidth;
+        spc.maxValueWidth = defaultMaxWidth;
         spc.topOfStackFirst = true;
         return trace(
                 dtr.appCallTrace,
@@ -312,7 +312,7 @@ public class Utils {
 
     public static String lsigTrace(DryrunTxnResult dtr) {
         StackPrinterConfig spc = new StackPrinterConfig();
-        spc.maxWidth = defaultMaxWidth;
+        spc.maxValueWidth = defaultMaxWidth;
         spc.topOfStackFirst = true;
         return trace(
                 dtr.logicSigTrace,
