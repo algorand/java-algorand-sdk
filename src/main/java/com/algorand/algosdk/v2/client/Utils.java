@@ -32,12 +32,11 @@ import org.apache.commons.lang3.StringUtils;
 public class Utils {
 
     // https://github.com/algorand/go-algorand/blob/e466aa18d4d963868d6d15279b1c881977fa603f/libgoal/libgoal.go#L1089-L1090
-    private static Long defaultAppId = 1380011588L;
-
-    private static int defaultMaxWidth = 30;
+    private static final Long defaultAppId = 1380011588L;
+    private static final int defaultMaxWidth = 30;
 
     /**
-     * Construct a DryruynRequest object from a set of transactions.
+     * Construct a DryrunRequest object from a set of transactions.
      * A DryrunRequest is composed of static balance information. This function uses
      * the ApplicationCall transaction
      * parameters to infer what Application State and Account balance information to
@@ -58,7 +57,7 @@ public class Utils {
     }
 
     /**
-     * Construct a DryruynRequest object from a set of transactions.
+     * Construct a DryrunRequest object from a set of transactions.
      * A DryrunRequest is composed of static balance information. This function uses
      * the ApplicationCall transaction
      * parameters to infer what Application State and Account balance information to
