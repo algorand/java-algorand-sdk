@@ -132,6 +132,9 @@ public class Utils {
 
             if (tx.foreignApps.size() > 0) {
                 apps.addAll(tx.foreignApps);
+                for(Long aidx: tx.foreignApps){
+                    accts.add(Address.forApplication(aidx).toString());
+                }
             }
 
             if (tx.foreignAssets.size() > 0) {
