@@ -1,3 +1,12 @@
+# 1.14.0
+## Added
+- Add foreign app address to dryrun creator (#315)
+- Add appTrace and lsigTrace DryrunTxnResult printer utility functions. (#305)
+- Add createDryrun helper function. (#284)
+- Add error message with atomic transaction composer (#311)
+## Changed
+- Update generated client code. (#307)
+
 # 1.13.0
 - Unlimited assets regenerated code. (#302)
 
