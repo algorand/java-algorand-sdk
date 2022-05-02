@@ -20,7 +20,6 @@ public class Version extends PathResponse {
     public void genesis_hash_b64(String base64Encoded) {
         this.genesis_hash_b64 = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("genesis_hash_b64")
     public String genesis_hash_b64() {
         return Encoder.encodeToBase64(this.genesis_hash_b64);
     }

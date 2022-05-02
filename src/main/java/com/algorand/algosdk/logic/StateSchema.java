@@ -12,10 +12,10 @@ import java.math.BigInteger;
 @JsonPropertyOrder(alphabetic = true)
 public class StateSchema implements Serializable {
     @JsonProperty("nui")
-    BigInteger numUint = BigInteger.ZERO;
+    public BigInteger numUint = BigInteger.ZERO;
 
     @JsonProperty("nbs")
-    BigInteger numByteSlice = BigInteger.ZERO;
+    public BigInteger numByteSlice = BigInteger.ZERO;
 
     // Used by Jackson to figure out the default value.
     public StateSchema() { }

@@ -35,7 +35,6 @@ public class TransactionParametersResponse extends PathResponse {
     public void genesisHash(String base64Encoded) {
         this.genesisHash = Encoder.decodeFromBase64(base64Encoded);
     }
-    @JsonProperty("genesis-hash")
     public String genesisHash() {
         return Encoder.encodeToBase64(this.genesisHash);
     }
