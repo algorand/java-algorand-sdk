@@ -15,7 +15,8 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Search for transactions.
+ * Search for transactions. Transactions are returned oldest to newest unless the
+ * address parameter is used, in which case results are returned newest to oldest.
  * /v2/transactions
  */
 public class SearchForTransactions extends Query {

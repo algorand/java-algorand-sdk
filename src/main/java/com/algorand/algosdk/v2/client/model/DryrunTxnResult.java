@@ -22,10 +22,16 @@ public class DryrunTxnResult extends PathResponse {
     public List<DryrunState> appCallTrace = new ArrayList<DryrunState>();
 
     /**
-     * Execution cost of app call transaction
+     * Budget consumed during execution of app call transaction.
      */
-    @JsonProperty("cost")
-    public Long cost;
+    @JsonProperty("budget-credit")
+    public Long budgetCredit;
+
+    /**
+     * Budget added during execution of app call transaction.
+     */
+    @JsonProperty("budget-debit")
+    public Long budgetDebit;
 
     /**
      * Disassembled program line by line.
@@ -81,7 +87,8 @@ public class DryrunTxnResult extends PathResponse {
         DryrunTxnResult other = (DryrunTxnResult) o;
         if (!Objects.deepEquals(this.appCallMessages, other.appCallMessages)) return false;
         if (!Objects.deepEquals(this.appCallTrace, other.appCallTrace)) return false;
-        if (!Objects.deepEquals(this.cost, other.cost)) return false;
+        if (!Objects.deepEquals(this.budgetCredit, other.budgetCredit)) return false;
+        if (!Objects.deepEquals(this.budgetDebit, other.budgetDebit)) return false;
         if (!Objects.deepEquals(this.disassembly, other.disassembly)) return false;
         if (!Objects.deepEquals(this.globalDelta, other.globalDelta)) return false;
         if (!Objects.deepEquals(this.localDeltas, other.localDeltas)) return false;

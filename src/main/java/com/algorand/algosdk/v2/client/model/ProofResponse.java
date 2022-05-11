@@ -13,8 +13,8 @@ public class ProofResponse extends PathResponse {
 
     /**
      * The type of hash function used to create the proof, must be one of:
-     *   sumhash
      *   sha512_256
+     *   sha256
      */
     @JsonProperty("hashtype")
     public Enums.Hashtype hashtype;
