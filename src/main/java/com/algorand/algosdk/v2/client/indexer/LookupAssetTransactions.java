@@ -15,7 +15,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Lookup transactions for an asset.
+ * Lookup transactions for an asset. Transactions are returned oldest to newest.
  * /v2/assets/{asset-id}/transactions
  */
 public class LookupAssetTransactions extends Query {

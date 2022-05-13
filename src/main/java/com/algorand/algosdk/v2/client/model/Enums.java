@@ -48,6 +48,26 @@ public class Enums {
     }
 
     /**
+     * The type of hash function used to create the proof, must be one of:
+     *   sha512_256
+     *   sha256
+     */
+    public enum Hashtype {
+        @JsonProperty("sha512_256") SHA512_256("sha512_256"),
+        @JsonProperty("sha256") SHA256("sha256");
+
+        final String serializedName;
+        Hashtype(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+    }
+
+    /**
      * (apan) defines the what additional actions occur with the transaction.
      * Valid types:
      *   noop
@@ -121,24 +141,6 @@ public class Enums {
 
         final String serializedName;
         TxType(String name) {
-            this.serializedName = name;
-        }
-
-        @Override
-        public String toString() {
-            return this.serializedName;
-        }
-    }
-
-    /**
-     * Combine with the address parameter to define what type of address to search for.
-     */
-    public enum Hashtype {
-        @JsonProperty("sumhash") SUMHASH("sumhash"),
-        @JsonProperty("sha512_256") SHA512_256("sha512_256");
-
-        final String serializedName;
-        Hashtype(String name) {
             this.serializedName = name;
         }
 

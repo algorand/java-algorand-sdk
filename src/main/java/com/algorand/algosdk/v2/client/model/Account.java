@@ -127,6 +127,14 @@ public class Account extends PathResponse {
     public Boolean deleted;
 
     /**
+     * The type of hash function used to create the proof, must be one of:
+     *   sha512_256
+     *   sha256
+     */
+    @JsonProperty("hashtype")
+    public Enums.Hashtype hashtype;
+
+    /**
      * AccountParticipation describes the parameters used by this account in consensus
      * protocol.
      */
@@ -226,6 +234,7 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.createdAssets, other.createdAssets)) return false;
         if (!Objects.deepEquals(this.createdAtRound, other.createdAtRound)) return false;
         if (!Objects.deepEquals(this.deleted, other.deleted)) return false;
+        if (!Objects.deepEquals(this.hashtype, other.hashtype)) return false;
         if (!Objects.deepEquals(this.participation, other.participation)) return false;
         if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;
         if (!Objects.deepEquals(this.rewardBase, other.rewardBase)) return false;

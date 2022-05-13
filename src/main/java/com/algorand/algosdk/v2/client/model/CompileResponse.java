@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 import com.algorand.algosdk.v2.client.common.PathResponse;
@@ -22,6 +23,12 @@ public class CompileResponse extends PathResponse {
     @JsonProperty("result")
     public String result;
 
+    /**
+     * JSON of the source map
+     */
+    @JsonProperty("sourcemap")
+    public HashMap<String,Object> sourcemap;
+
     @Override
     public boolean equals(Object o) {
 
@@ -31,6 +38,7 @@ public class CompileResponse extends PathResponse {
         CompileResponse other = (CompileResponse) o;
         if (!Objects.deepEquals(this.hash, other.hash)) return false;
         if (!Objects.deepEquals(this.result, other.result)) return false;
+        if (!Objects.deepEquals(this.sourcemap, other.sourcemap)) return false;
 
         return true;
     }

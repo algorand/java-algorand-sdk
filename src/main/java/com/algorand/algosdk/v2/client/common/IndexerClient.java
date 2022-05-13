@@ -110,7 +110,7 @@ public class IndexerClient extends Client {
     }
 
     /**
-     * Lookup account transactions.
+     * Lookup account transactions. Transactions are returned newest to oldest.
      * /v2/accounts/{account-id}/transactions
      */
     public LookupAccountTransactions lookupAccountTransactions(Address accountId) {
@@ -166,7 +166,7 @@ public class IndexerClient extends Client {
     }
 
     /**
-     * Lookup transactions for an asset.
+     * Lookup transactions for an asset. Transactions are returned oldest to newest.
      * /v2/assets/{asset-id}/transactions
      */
     public LookupAssetTransactions lookupAssetTransactions(Long assetId) {
@@ -190,7 +190,8 @@ public class IndexerClient extends Client {
     }
 
     /**
-     * Search for transactions.
+     * Search for transactions. Transactions are returned oldest to newest unless the
+     * address parameter is used, in which case results are returned newest to oldest.
      * /v2/transactions
      */
     public SearchForTransactions searchForTransactions() {

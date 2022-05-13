@@ -15,7 +15,7 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 
 /**
- * Lookup account transactions.
+ * Lookup account transactions. Transactions are returned newest to oldest.
  * /v2/accounts/{account-id}/transactions
  */
 public class LookupAccountTransactions extends Query {
