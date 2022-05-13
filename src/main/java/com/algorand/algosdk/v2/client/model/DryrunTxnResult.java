@@ -84,7 +84,7 @@ public class DryrunTxnResult extends PathResponse {
         if (this == o) return true;
         if (o == null) return false;
 
-        DryrunTxnResult other = (DryrunTxnResult) o;
+        DryrunTxnResult other = (DryrunTxnResult) o; 
         if (!Objects.deepEquals(this.appCallMessages, other.appCallMessages)) return false;
         if (!Objects.deepEquals(this.appCallTrace, other.appCallTrace)) return false;
         if (!Objects.deepEquals(this.budgetCredit, other.budgetCredit)) return false;
