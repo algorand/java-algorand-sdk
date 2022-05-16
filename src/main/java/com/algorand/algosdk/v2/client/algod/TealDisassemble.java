@@ -20,14 +20,6 @@ public class TealDisassemble extends Query {
         super(client, new HttpMethod("post"));
     }
 
-    /**
-     * TEAL program binary to be disassembled
-     */
-    public TealDisassemble source(byte[] source) {
-        addToBody(source);
-        return this;
-    }
-
    /**
     * Execute the query.
     * @return the query response object.
