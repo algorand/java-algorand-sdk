@@ -5,6 +5,7 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.Enums;
 import com.algorand.algosdk.v2.client.model.ProofResponse;
 
 
@@ -26,6 +27,16 @@ public class GetProof extends Query {
         addQuery("format", "msgpack");
         this.round = round;
         this.txid = txid;
+    }
+
+    /**
+     * The type of hash function used to create the proof, must be one of:
+     *   sha512_256
+     *   sha256
+     */
+    public GetProof hashtype(Enums.Hashtype hashtype) {
+        addQuery("hashtype", String.valueOf(hashtype));
+        return this;
     }
 
    /**
