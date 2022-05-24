@@ -9,7 +9,6 @@ import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
-import javax.swing.plaf.nimbus.State;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
