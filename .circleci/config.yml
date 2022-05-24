@@ -5,13 +5,15 @@ workflows:
   test:
     jobs:
       - unit-test:
-          branches:
-            ignore:
-              - gh-pages
+          filters:
+            branches:
+              ignore:
+                - gh-pages
       - integration-test:
-          branches:
-            ignore:
-              - gh-pages
+          filters:
+            branches:
+              ignore:
+                - gh-pages
 
 jobs:
   unit-test:
