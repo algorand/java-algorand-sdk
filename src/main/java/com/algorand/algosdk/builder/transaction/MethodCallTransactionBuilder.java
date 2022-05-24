@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
-public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder<T>> extends TransactionParametersBuilder<T> implements StateSchemaSetter<T>, TEALProgramSetter<T>, ApplicationCallReferencesSetter<T> {
+public class MethodCallTransactionBuilder extends TransactionParametersBuilder<MethodCallTransactionBuilder> implements StateSchemaSetter<MethodCallTransactionBuilder>, TEALProgramSetter<MethodCallTransactionBuilder>, ApplicationCallReferencesSetter<MethodCallTransactionBuilder> {
     protected Long appID;
     protected Transaction.OnCompletion onCompletion;
     protected Method method;
@@ -33,31 +33,31 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     /**
      * Initialize a {@link MethodCallTransactionBuilder}.
      */
-    public static MethodCallTransactionBuilder<?> Builder() {
-        return new MethodCallTransactionBuilder<>();
+    public static MethodCallTransactionBuilder Builder() {
+        return new MethodCallTransactionBuilder();
     }
 
     @Override
-    public T applicationId(Long applicationId) {
+    public MethodCallTransactionBuilder applicationId(Long applicationId) {
         this.appID = applicationId;
-        return (T) this;
+        return this;
     }
 
     /**
      * This is the faux application type used to distinguish different application actions. Specifically, OnCompletion
      * specifies what side effects this transaction will have if it successfully makes it into a block.
      */
-    public T onComplete(Transaction.OnCompletion op) {
+    public MethodCallTransactionBuilder onComplete(Transaction.OnCompletion op) {
         this.onCompletion = op;
-        return (T) this;
+        return this;
     }
 
     /**
      * Specify the ABI method that this method call transaction will invoke.
      */
-    public T method(Method method) {
+    public MethodCallTransactionBuilder method(Method method) {
         this.method = method;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -65,9 +65,9 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
      * 
      * This will reset the arguments list to what is passed in by the caller.
      */
-    public T methodArguments(List<Object> arguments) {
+    public MethodCallTransactionBuilder methodArguments(List<Object> arguments) {
         this.methodArgs = new ArrayList<>(arguments);
-        return (T) this;
+        return this;
     }
 
     /**
@@ -75,9 +75,9 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
      * 
      * This will add the arguments passed in by the caller to the existing list of arguments.
      */
-    public T addMethodArguments(List<Object> arguments) {
+    public MethodCallTransactionBuilder addMethodArguments(List<Object> arguments) {
         this.methodArgs.addAll(arguments);
-        return (T) this;
+        return this;
     }
 
     /**
@@ -85,77 +85,77 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
      * 
      * This will add the argument passed in by the caller to the existing list of arguments.
      */
-    public T addMethodArgument(Object argument) {
+    public MethodCallTransactionBuilder addMethodArgument(Object argument) {
         this.methodArgs.add(argument);
-        return (T) this;
+        return this;
     }
 
     /**
      * Specify the signer for this method call transaction.
      */
-    public T signer(TxnSigner signer) {
+    public MethodCallTransactionBuilder signer(TxnSigner signer) {
         this.signer = signer;
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T accounts(List<Address> accounts) {
+    public MethodCallTransactionBuilder accounts(List<Address> accounts) {
         if (accounts != null)
             this.foreignAccounts = new ArrayList<>(new HashSet<>(accounts));
         else
             this.foreignAccounts.clear();
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T foreignApps(List<Long> foreignApps) {
+    public MethodCallTransactionBuilder foreignApps(List<Long> foreignApps) {
         if (foreignApps != null)
             this.foreignApps = new ArrayList<>(new HashSet<>(foreignApps));
         else
             this.foreignApps.clear();
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T foreignAssets(List<Long> foreignAssets) {
+    public MethodCallTransactionBuilder foreignAssets(List<Long> foreignAssets) {
         if (foreignAssets != null)
             this.foreignAssets = new ArrayList<>(new HashSet<>(foreignAssets));
         else
             this.foreignAssets.clear();
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T approvalProgram(TEALProgram approvalProgram) {
+    public MethodCallTransactionBuilder approvalProgram(TEALProgram approvalProgram) {
         this.approvalProgram = approvalProgram;
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T clearStateProgram(TEALProgram clearStateProgram) {
+    public MethodCallTransactionBuilder clearStateProgram(TEALProgram clearStateProgram) {
         this.clearStateProgram = clearStateProgram;
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T localStateSchema(StateSchema localStateSchema) {
+    public MethodCallTransactionBuilder localStateSchema(StateSchema localStateSchema) {
         this.localStateSchema = localStateSchema;
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T globalStateSchema(StateSchema globalStateSchema) {
+    public MethodCallTransactionBuilder globalStateSchema(StateSchema globalStateSchema) {
         this.globalStateSchema = globalStateSchema;
-        return (T) this;
+        return this;
     }
 
     @Override
-    public T extraPages(Long extraPages) {
+    public MethodCallTransactionBuilder extraPages(Long extraPages) {
         if (extraPages == null || extraPages < 0 || extraPages > 3) {
             throw new IllegalArgumentException("extraPages must be an integer between 0 and 3 inclusive");
         }
         this.extraPages = extraPages;
-        return (T) this;
+        return this;
     }
 
     /**

@@ -9,6 +9,7 @@ import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
+import javax.swing.plaf.nimbus.State;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -110,122 +111,144 @@ public class MethodCallParams {
      * Deprecated, use {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder#Builder()} instead.
      */
     @Deprecated
-    public static class Builder extends MethodCallTransactionBuilder<Builder> {
+    public static class Builder {
+
+        private final MethodCallTransactionBuilder delegated = MethodCallTransactionBuilder.Builder();
+        private StateSchema localSchema = new StateSchema();
+        private StateSchema globalSchema = new StateSchema();
+
+        public Builder() {}
 
         public Builder setAppID(Long appID) {
-            return this.applicationId(appID);
+            delegated.applicationId(appID);
+            return this;
         }
 
         public Builder setMethod(Method method) {
-            return this.method(method);
+            delegated.method(method);
+            return this;
         }
 
         public Builder addMethodArgs(Object ma) {
-            return this.addMethodArgument(ma);
+            delegated.addMethodArgument(ma);
+            return this;
         }
 
         public Builder setSender(String sender) {
-            return this.sender(sender);
+            delegated.sender(sender);
+            return this;
         }
 
         public Builder setSuggestedParams(TransactionParams sp) {
-            return this.suggestedParams(sp);
+            delegated.suggestedParams(sp);
+            return this;
         }
 
         public Builder setSuggestedParams(TransactionParametersResponse sp) {
-            return this.suggestedParams(sp);
+            delegated.suggestedParams(sp);
+            return this;
         }
 
         public Builder setOnComplete(Transaction.OnCompletion op) {
-            return this.onComplete(op);
+            delegated.onComplete(op);
+            return this;
         }
 
         public Builder setNote(byte[] note) {
-            return this.note(note);
+            delegated.note(note);
+            return this;
         }
 
         public Builder setLease(byte[] lease) {
-            return this.lease(lease);
+            delegated.lease(lease);
+            return this;
         }
 
         public Builder setRekeyTo(String rekeyTo) {
-            return this.rekey(rekeyTo);
+            delegated.rekey(rekeyTo);
+            return this;
         }
 
         public Builder setSigner(TxnSigner signer) {
-            return this.signer(signer);
+            delegated.signer(signer);
+            return this;
         }
 
         public Builder setFirstValid(BigInteger fv) {
-            return this.firstValid(fv);
+            delegated.firstValid(fv);
+            return this;
         }
 
         public Builder setLastValid(BigInteger lv) {
-            return this.lastValid(lv);
+            delegated.lastValid(lv);
+            return this;
         }
 
         public Builder setFee(BigInteger fee) {
-            return this.fee(fee);
+            delegated.fee(fee);
+            return this;
         }
 
         public Builder setFlatFee(BigInteger flatFee) {
-            return this.flatFee(flatFee);
+            delegated.flatFee(flatFee);
+            return this;
         }
 
         public Builder setForeignAccounts(List<Address> fAccounts) {
-            return this.accounts(fAccounts);
+            delegated.accounts(fAccounts);
+            return this;
         }
 
         public Builder setForeignAssets(List<Long> fAssets) {
-            return this.foreignAssets(fAssets);
+            delegated.foreignAssets(fAssets);
+            return this;
         }
 
         public Builder setForeignApps(List<Long> fApps) {
-            return this.foreignApps(fApps);
+            delegated.foreignApps(fApps);
+            return this;
         }
 
         public Builder setApprovalProgram(TEALProgram approvalProgram) {
-            return this.approvalProgram(approvalProgram);
+            delegated.approvalProgram(approvalProgram);
+            return this;
         }
 
         public Builder setClearProgram(TEALProgram clearProgram) {
-            return this.clearStateProgram(clearProgram);
+            delegated.clearStateProgram(clearProgram);
+            return this;
         }
 
         public Builder setGlobalInts(Long globalInts) {
-            if (this.globalStateSchema == null) {
-                return this.globalStateSchema(new StateSchema(globalInts, 0L));
-            }
-            this.globalStateSchema.numUint = BigInteger.valueOf(globalInts);
+            this.globalSchema.numUint = BigInteger.valueOf(globalInts);
             return this;
         }
 
         public Builder setGlobalBytes(Long globalBytes) {
-            if (this.globalStateSchema == null) {
-                return this.globalStateSchema(new StateSchema(0L, globalBytes));
-            }
-            this.globalStateSchema.numByteSlice = BigInteger.valueOf(globalBytes);
+            this.globalSchema.numByteSlice = BigInteger.valueOf(globalBytes);
             return this;
         }
 
         public Builder setLocalInts(Long localInts) {
-            if (this.localStateSchema == null) {
-                return this.localStateSchema(new StateSchema(localInts, 0L));
-            }
-            this.localStateSchema.numUint = BigInteger.valueOf(localInts);
+            this.localSchema.numUint = BigInteger.valueOf(localInts);
             return this;
         }
 
         public Builder setLocalBytes(Long localBytes) {
-            if (this.localStateSchema == null) {
-                return this.localStateSchema(new StateSchema(0L, localBytes));
-            }
-            this.localStateSchema.numByteSlice = BigInteger.valueOf(localBytes);
+            this.localSchema.numByteSlice = BigInteger.valueOf(localBytes);
             return this;
         }
 
         public Builder setExtraPages(Long extraPages) {
-            return this.extraPages(extraPages);
+            delegated.extraPages(extraPages);
+            return this;
+        }
+
+        public MethodCallParams build() {
+            delegated.localStateSchema(this.localSchema);
+            delegated.globalStateSchema(this.globalSchema);
+
+            return delegated.build();
         }
     }
 }

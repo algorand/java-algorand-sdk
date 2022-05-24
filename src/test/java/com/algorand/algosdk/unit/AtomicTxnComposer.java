@@ -37,7 +37,7 @@ public class AtomicTxnComposer {
     List<SignedTransaction> signedTxnsGathered;
 
     TransactionWithSigner txnWithSigner;
-    MethodCallTransactionBuilder<?> optionBuilder;
+    MethodCallTransactionBuilder optionBuilder;
     SplitAndProcessMethodArgs abiArgProcessor = null;
 
     public AtomicTxnComposer(Base b, ABIJson methodABI_, TransactionSteps steps) {

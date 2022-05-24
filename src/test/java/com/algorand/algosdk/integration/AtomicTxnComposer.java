@@ -38,7 +38,7 @@ public class AtomicTxnComposer {
     TxnSigner transSigner;
     TransactionWithSigner transWithSigner;
     Method method;
-    MethodCallTransactionBuilder<?> optionBuilder;
+    MethodCallTransactionBuilder optionBuilder;
     AtomicTransactionComposer.ExecuteResult execRes;
     SplitAndProcessMethodArgs abiArgProcessor;
     Long appID;
