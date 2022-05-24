@@ -3,8 +3,10 @@ package com.algorand.algosdk.unit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
+import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
@@ -35,7 +37,7 @@ public class AtomicTxnComposer {
     List<SignedTransaction> signedTxnsGathered;
 
     TransactionWithSigner txnWithSigner;
-    MethodCallParams.Builder optionBuilder;
+    MethodCallTransactionBuilder<?> optionBuilder;
     SplitAndProcessMethodArgs abiArgProcessor = null;
 
     public AtomicTxnComposer(Base b, ABIJson methodABI_, TransactionSteps steps) {
@@ -74,13 +76,13 @@ public class AtomicTxnComposer {
 
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
-        this.optionBuilder = new MethodCallParams.Builder();
+        this.optionBuilder = MethodCallTransactionBuilder.Builder();
         abiArgProcessor = new SplitAndProcessMethodArgs(methodABI.method);
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
     public void i_append_the_current_transaction_with_signer_to_the_method_arguments_array() {
-        this.optionBuilder.addMethodArgs(this.txnWithSigner);
+        this.optionBuilder.addMethodArgument(this.txnWithSigner);
     }
 
     @When("I add the current transaction with signer to the composer.")
@@ -90,56 +92,59 @@ public class AtomicTxnComposer {
 
     @When("I append the encoded arguments {string} to the method arguments array.")
     public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
-        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessMethodArgs(string, new ArrayList<>());
+        List<Object> processedABIArgs = abiArgProcessor.splitAndProcessMethodArgs(string, new ArrayList<Long>());
         for (Object arg : processedABIArgs)
-            this.optionBuilder.addMethodArgs(arg);
+            this.optionBuilder.addMethodArgument(arg);
     }
 
     @When("I add a method call with the signing account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
     public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String string) {
         optionBuilder
-                .setOnComplete(Transaction.OnCompletion.String(string))
-                .setSender(signingAccount.getAddress().toString())
-                .setSigner(txnSigner)
-                .setAppID(appID.longValue())
-                .setMethod(methodABI.method)
-                .setSuggestedParams(this.transSteps.suggestedParams)
-                .setFirstValid(this.transSteps.fv)
-                .setLastValid(this.transSteps.lv)
-                .setFee(this.transSteps.fee)
-                .setFlatFee(this.transSteps.flatFee);
+                .onComplete(Transaction.OnCompletion.String(string))
+                .sender(signingAccount.getAddress())
+                .signer(txnSigner)
+                .applicationId(appID.longValue())
+                .method(methodABI.method)
+                .firstValid(this.transSteps.fv)
+                .lastValid(this.transSteps.lv)
+                .fee(this.transSteps.fee)
+                .flatFee(this.transSteps.flatFee)
+                .genesisHash(this.transSteps.genesisHash)
+                .genesisID(this.transSteps.genesisID);
         MethodCallParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
 
     @When("I add a method call with the signing account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments, approval-program {string}, clear-program {string}, global-bytes {int}, global-ints {int}, local-bytes {int}, local-ints {int}, extra-pages {int}.")
-    public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments_approval_program_clear_program_global_bytes_global_ints_local_bytes_local_ints_extra_pages(String string, String string2, String string3, Integer int1, Integer int2, Integer int3, Integer int4, Integer int5) {
+    public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments_approval_program_clear_program_global_bytes_global_ints_local_bytes_local_ints_extra_pages(String onCompleteString, String approvalProgramPath, String clearProgramPath, Integer globalBytes, Integer globalInts, Integer localBytes, Integer localInts, Integer extraPages) {
         byte[] tealApproval, tealClear;
         try {
-            tealApproval = ResourceUtils.readResource(string2);
-            tealClear = ResourceUtils.readResource(string3);
+            tealApproval = ResourceUtils.readResource(approvalProgramPath);
+            tealClear = ResourceUtils.readResource(clearProgramPath);
         } catch (Exception e) {
             throw new IllegalArgumentException("cannot read resource from specified TEAL files");
         }
 
+        StateSchema globalSchema = new StateSchema(globalInts, globalBytes);
+        StateSchema localSchema = new StateSchema(localInts, localBytes);
+
         optionBuilder
-                .setOnComplete(Transaction.OnCompletion.String(string))
-                .setSender(signingAccount.getAddress().toString())
-                .setSigner(txnSigner)
-                .setAppID(appID.longValue())
-                .setMethod(methodABI.method)
-                .setSuggestedParams(this.transSteps.suggestedParams)
-                .setFirstValid(this.transSteps.fv)
-                .setLastValid(this.transSteps.lv)
-                .setFee(this.transSteps.fee)
-                .setFlatFee(this.transSteps.flatFee)
-                .setApprovalProgram(new TEALProgram(tealApproval))
-                .setClearProgram(new TEALProgram(tealClear))
-                .setGlobalBytes(int1.longValue())
-                .setGlobalInts(int2.longValue())
-                .setLocalBytes(int3.longValue())
-                .setLocalInts(int4.longValue())
-                .setExtraPages(int5.longValue());
+                .onComplete(Transaction.OnCompletion.String(onCompleteString))
+                .sender(signingAccount.getAddress())
+                .signer(txnSigner)
+                .applicationId(appID.longValue())
+                .method(methodABI.method)
+                .firstValid(this.transSteps.fv)
+                .lastValid(this.transSteps.lv)
+                .genesisHash(this.transSteps.genesisHash)
+                .genesisID(this.transSteps.genesisID)
+                .fee(this.transSteps.fee)
+                .flatFee(this.transSteps.flatFee)
+                .approvalProgram(new TEALProgram(tealApproval))
+                .clearStateProgram(new TEALProgram(tealClear))
+                .globalStateSchema(globalSchema)
+                .localStateSchema(localSchema)
+                .extraPages(extraPages.longValue());
         MethodCallParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }

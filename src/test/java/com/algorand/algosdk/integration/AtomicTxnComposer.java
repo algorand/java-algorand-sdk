@@ -3,6 +3,7 @@ package com.algorand.algosdk.integration;
 import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
@@ -322,7 +323,7 @@ public class AtomicTxnComposer {
 
     @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
     public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
         composerMethods.add(method);
 
         optionBuilder
@@ -343,7 +344,7 @@ public class AtomicTxnComposer {
 
     @When("I add a nonced method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
     public void i_add_a_nonced_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
         composerMethods.add(method);
 
         optionBuilder
@@ -374,7 +375,7 @@ public class AtomicTxnComposer {
         }
         composerMethods.add(method);
 
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
 
         StateSchema globalSchema = new StateSchema(globalInts, globalBytes);
         StateSchema localSchema = new StateSchema(localInts, localBytes);
@@ -411,7 +412,7 @@ public class AtomicTxnComposer {
         }
         composerMethods.add(method);
 
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
 
         optionBuilder
                 .onComplete(Transaction.OnCompletion.String(string))
