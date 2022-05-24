@@ -21,7 +21,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -140,6 +139,8 @@ public class AtomicTransactionComposer {
      * An error will be thrown if the composer's status is not BUILDING, if adding this transaction
      * causes the current group to exceed MAX_GROUP_SIZE, or if the provided arguments are invalid
      * for the given method.
+     * <p>
+     * For help creating a MethodCallParams object, see {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder}
      */
     public void addMethodCall(MethodCallParams methodCall) {
         if (!this.status.equals(Status.BUILDING))
@@ -156,16 +157,9 @@ public class AtomicTransactionComposer {
         List<ABIType> methodABIts = new ArrayList<>();
 
         List<TransactionWithSigner> tempTransWithSigner = new ArrayList<>();
-        List<Address> foreignAccounts = methodCall.foreignAccounts;
-        List<Long> foreignAssets = methodCall.foreignAssets;
-        List<Long> foreignApps = methodCall.foreignApps;
-
-        Address senderAddress;
-        try {
-            senderAddress = new Address(methodCall.sender);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalArgumentException(e);
-        }
+        List<Address> foreignAccounts = new ArrayList<>(methodCall.foreignAccounts);
+        List<Long> foreignAssets = new ArrayList<>(methodCall.foreignAssets);
+        List<Long> foreignApps = new ArrayList<>(methodCall.foreignApps);
 
         for (int i = 0; i < methodCall.method.args.size(); i++) {
             Method.Arg argT = methodCall.method.args.get(i);
@@ -183,7 +177,7 @@ public class AtomicTransactionComposer {
                 if (argT.type.equals(Method.RefTypeAccount)) {
                     TypeAddress abiAddressT = new TypeAddress();
                     Address accountAddress = (Address) abiAddressT.decode(abiAddressT.encode(methodArg));
-                    index = populateForeignArrayIndex(accountAddress, foreignAccounts, senderAddress);
+                    index = populateForeignArrayIndex(accountAddress, foreignAccounts, methodCall.sender);
                 } else if (argT.type.equals(Method.RefTypeAsset) && methodArg instanceof BigInteger) {
                     TypeUint abiUintT = new TypeUint(64);
                     BigInteger assetID = (BigInteger) abiUintT.decode(abiUintT.encode(methodArg));
@@ -229,34 +223,34 @@ public class AtomicTransactionComposer {
         ApplicationCallTransactionBuilder<?> txBuilder = ApplicationCallTransactionBuilder.Builder();
 
         txBuilder
-                .suggestedParams(methodCall.suggestedParams)
-                .firstValid(methodCall.fv)
-                .lastValid(methodCall.lv)
-                .fee(methodCall.fee)
-                .sender(methodCall.sender)
-                .flatFee(methodCall.flatFee)
-                .applicationId(methodCall.appID)
-                .args(encodedABIArgs)
-                .note(methodCall.note)
-                .lease(methodCall.lease)
-                .accounts(foreignAccounts)
-                .foreignApps(foreignApps)
-                .foreignAssets(foreignAssets);
-
-        if (methodCall.rekeyTo != null)
-            txBuilder.rekey(methodCall.rekeyTo);
+            .firstValid(methodCall.firstValid)
+            .lastValid(methodCall.lastValid)
+            .genesisHash(methodCall.genesisHash)
+            .genesisID(methodCall.genesisID)
+            .fee(methodCall.fee)
+            .flatFee(methodCall.flatFee)
+            .note(methodCall.note)
+            .lease(methodCall.lease)
+            .rekey(methodCall.rekeyTo)
+            .sender(methodCall.sender)
+            .applicationId(methodCall.appID)
+            .args(encodedABIArgs)
+            .accounts(foreignAccounts)
+            .foreignApps(foreignApps)
+            .foreignAssets(foreignAssets);
 
         Transaction tx = txBuilder.build();
 
+        // must apply these fields manually, as they are not exposed in the base ApplicationCallTransactionBuilder
         tx.onCompletion = methodCall.onCompletion;
         tx.approvalProgram = methodCall.approvalProgram;
         tx.clearStateProgram = methodCall.clearProgram;
 
-        if (methodCall.globalInts != null && methodCall.globalBytes != null)
-            tx.globalStateSchema = new StateSchema(methodCall.globalInts, methodCall.globalBytes);
+        if (methodCall.globalStateSchema != null)
+            tx.globalStateSchema = methodCall.globalStateSchema;
 
-        if (methodCall.localInts != null && methodCall.globalBytes != null)
-            tx.localStateSchema = new StateSchema(methodCall.localInts, methodCall.localBytes);
+        if (methodCall.localStateSchema != null)
+            tx.localStateSchema = methodCall.localStateSchema;
 
         if (methodCall.extraPages != null)
             tx.extraPages = methodCall.extraPages;
