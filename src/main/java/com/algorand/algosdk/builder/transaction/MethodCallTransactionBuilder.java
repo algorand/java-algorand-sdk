@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-@SuppressWarnings("unchecked")
 public class MethodCallTransactionBuilder extends TransactionParametersBuilder<MethodCallTransactionBuilder> implements StateSchemaSetter<MethodCallTransactionBuilder>, TEALProgramSetter<MethodCallTransactionBuilder>, ApplicationCallReferencesSetter<MethodCallTransactionBuilder> {
     protected Long appID;
     protected Transaction.OnCompletion onCompletion;
