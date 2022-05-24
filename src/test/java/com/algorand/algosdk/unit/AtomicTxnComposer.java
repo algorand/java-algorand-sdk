@@ -174,12 +174,12 @@ public class AtomicTxnComposer {
 
     @Then("the base64 encoded signed transactions should equal {string}")
     public void the_base64_encoded_signed_transactions_should_equal(String string) throws IOException {
-        String[] splitStr = string.split(",");
-        for (int i = 0; i < splitStr.length; i++) {
-            String subStr = splitStr[i];
+        List<SignedTransaction> expectedSignTxns = new ArrayList<>();
+        for (String subStr : string.split(",")) {
             SignedTransaction decodedMsgPack = Encoder.decodeFromMsgPack(subStr, SignedTransaction.class);
-            SignedTransaction actual = signedTxnsGathered.get(i);
-            assertThat(actual).isEqualTo(decodedMsgPack);
+            expectedSignTxns.add(decodedMsgPack);
         }
+
+        assertThat(signedTxnsGathered).isEqualTo(expectedSignTxns);
     }
 }

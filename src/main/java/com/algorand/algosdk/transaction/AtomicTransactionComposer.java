@@ -245,9 +245,13 @@ public class AtomicTransactionComposer {
         tx.onCompletion = methodCall.onCompletion;
         tx.approvalProgram = methodCall.approvalProgram;
         tx.clearStateProgram = methodCall.clearProgram;
-        tx.globalStateSchema = methodCall.globalStateSchema;
-        tx.localStateSchema = methodCall.localStateSchema;
-        tx.extraPages = methodCall.extraPages;
+
+        if (methodCall.globalStateSchema != null)
+            tx.globalStateSchema = methodCall.globalStateSchema;
+        if (methodCall.localStateSchema != null)
+            tx.localStateSchema = methodCall.localStateSchema;
+        if (methodCall.extraPages != null)
+            tx.extraPages = methodCall.extraPages;
 
         this.transactionList.addAll(tempTransWithSigner);
         this.transactionList.add(new TransactionWithSigner(tx, methodCall.signer));
