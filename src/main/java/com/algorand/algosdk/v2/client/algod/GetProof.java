@@ -29,6 +29,16 @@ public class GetProof extends Query {
         this.txid = txid;
     }
 
+    /**
+     * The type of hash function used to create the proof, must be one of:
+     *   sha512_256
+     *   sha256
+     */
+    public GetProof hashtype(Enums.Hashtype hashtype) {
+        addQuery("hashtype", String.valueOf(hashtype));
+        return this;
+    }
+
    /**
     * Execute the query.
     * @return the query response object.
