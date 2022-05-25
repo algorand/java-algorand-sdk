@@ -1,0 +1,31 @@
+version: 2.1
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - unit-test:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - integration-test:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+
+jobs:
+  unit-test:
+    docker:
+      - image: adoptopenjdk/maven-openjdk11
+    steps:
+      - checkout
+      - run: mvn test
+  integration-test:
+    machine:
+      image: "ubuntu-2004:202104-01"
+    resource_class: medium
+    steps:
+      - checkout
+      - run: make docker-test
