@@ -28,6 +28,15 @@ public class TealCompile extends Query {
         return this;
     }
 
+    /**
+     * When set to `true`, returns the source map of the program as a JSON. Defaults to
+     * `false`.
+     */
+    public TealCompile sourcemap(Boolean sourcemap) {
+        addQuery("sourcemap", String.valueOf(sourcemap));
+        return this;
+    }
+
    /**
     * Execute the query.
     * @return the query response object.

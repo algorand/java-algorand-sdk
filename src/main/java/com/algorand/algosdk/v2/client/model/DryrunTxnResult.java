@@ -22,16 +22,23 @@ public class DryrunTxnResult extends PathResponse {
     public List<DryrunState> appCallTrace = new ArrayList<DryrunState>();
 
     /**
-     * Budget consumed during execution of app call transaction.
-     */
-    @JsonProperty("budget-credit")
-    public Long budgetCredit;
-
-    /**
      * Budget added during execution of app call transaction.
      */
-    @JsonProperty("budget-debit")
-    public Long budgetDebit;
+    @JsonProperty("budget-added")
+    public Long budgetAdded;
+
+    /**
+     * Budget consumed during execution of app call transaction.
+     */
+    @JsonProperty("budget-consumed")
+    public Long budgetConsumed;
+
+    /**
+     * Net cost of app execution. Field is DEPRECATED and is subject for removal.
+     * Instead, use `budget-added` and `budget-consumed.
+     */
+    @JsonProperty("cost")
+    public Long cost;
 
     /**
      * Disassembled program line by line.
@@ -84,11 +91,12 @@ public class DryrunTxnResult extends PathResponse {
         if (this == o) return true;
         if (o == null) return false;
 
-        DryrunTxnResult other = (DryrunTxnResult) o; 
+        DryrunTxnResult other = (DryrunTxnResult) o;
         if (!Objects.deepEquals(this.appCallMessages, other.appCallMessages)) return false;
         if (!Objects.deepEquals(this.appCallTrace, other.appCallTrace)) return false;
-        if (!Objects.deepEquals(this.budgetCredit, other.budgetCredit)) return false;
-        if (!Objects.deepEquals(this.budgetDebit, other.budgetDebit)) return false;
+        if (!Objects.deepEquals(this.budgetAdded, other.budgetAdded)) return false;
+        if (!Objects.deepEquals(this.budgetConsumed, other.budgetConsumed)) return false;
+        if (!Objects.deepEquals(this.cost, other.cost)) return false;
         if (!Objects.deepEquals(this.disassembly, other.disassembly)) return false;
         if (!Objects.deepEquals(this.globalDelta, other.globalDelta)) return false;
         if (!Objects.deepEquals(this.localDeltas, other.localDeltas)) return false;

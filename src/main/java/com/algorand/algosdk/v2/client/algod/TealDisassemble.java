@@ -9,8 +9,8 @@ import com.algorand.algosdk.v2.client.model.DisassembleResponse;
 
 
 /**
- * Given the base64 encoded program bytes, return the TEAL source code in plain
- * text. This endpoint is only enabled when a node's configuration file sets
+ * Given the program bytes, return the TEAL source code in plain text. This
+ * endpoint is only enabled when a node's configuration file sets
  * EnableDeveloperAPI to true.
  * /v2/teal/disassemble
  */
@@ -18,6 +18,14 @@ public class TealDisassemble extends Query {
 
     public TealDisassemble(Client client) {
         super(client, new HttpMethod("post"));
+    }
+
+    /**
+     * TEAL program binary to be disassembled
+     */
+    public TealDisassemble source(byte[] source) {
+        addToBody(source);
+        return this;
     }
 
    /**

@@ -242,8 +242,8 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given the base64 encoded program bytes, return the TEAL source code in plain
-     * text. This endpoint is only enabled when a node's configuration file sets
+     * Given the program bytes, return the TEAL source code in plain text. This
+     * endpoint is only enabled when a node's configuration file sets
      * EnableDeveloperAPI to true.
      * /v2/teal/disassemble
      */
