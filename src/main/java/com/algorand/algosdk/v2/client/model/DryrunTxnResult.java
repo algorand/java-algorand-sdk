@@ -22,7 +22,20 @@ public class DryrunTxnResult extends PathResponse {
     public List<DryrunState> appCallTrace = new ArrayList<DryrunState>();
 
     /**
-     * Execution cost of app call transaction
+     * Budget added during execution of app call transaction.
+     */
+    @JsonProperty("budget-added")
+    public Long budgetAdded;
+
+    /**
+     * Budget consumed during execution of app call transaction.
+     */
+    @JsonProperty("budget-consumed")
+    public Long budgetConsumed;
+
+    /**
+     * Net cost of app execution. Field is DEPRECATED and is subject for removal.
+     * Instead, use `budget-added` and `budget-consumed.
      */
     @JsonProperty("cost")
     public Long cost;
@@ -81,6 +94,8 @@ public class DryrunTxnResult extends PathResponse {
         DryrunTxnResult other = (DryrunTxnResult) o;
         if (!Objects.deepEquals(this.appCallMessages, other.appCallMessages)) return false;
         if (!Objects.deepEquals(this.appCallTrace, other.appCallTrace)) return false;
+        if (!Objects.deepEquals(this.budgetAdded, other.budgetAdded)) return false;
+        if (!Objects.deepEquals(this.budgetConsumed, other.budgetConsumed)) return false;
         if (!Objects.deepEquals(this.cost, other.cost)) return false;
         if (!Objects.deepEquals(this.disassembly, other.disassembly)) return false;
         if (!Objects.deepEquals(this.globalDelta, other.globalDelta)) return false;
