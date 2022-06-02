@@ -1,250 +1,389 @@
 package com.algorand.algosdk.transaction;
 
+import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
+import com.algorand.algosdk.abi.TypeAddress;
+import com.algorand.algosdk.abi.TypeTuple;
+import com.algorand.algosdk.abi.TypeUint;
 import com.algorand.algosdk.algod.client.model.TransactionParams;
+import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
+import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
+import com.algorand.algosdk.logic.StateSchema;
+import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
+/**
+ * MethodCallParams is an object that holds all parameters necessary to invoke {@link AtomicTransactionComposer#addMethodCall(MethodCallParams)}
+ */
 public class MethodCallParams {
-    public Long appID;
-    public Method method;
-    public List<Object> methodArgs;
-    public String sender, rekeyTo;
-    public Transaction.OnCompletion onCompletion;
-    public byte[] note, lease;
-    public BigInteger fv, lv, fee, flatFee;
-    TxnSigner signer;
-    public TransactionParams suggestedParams;
-    public List<Address> foreignAccounts;
-    public List<Long> foreignAssets;
-    public List<Long> foreignApps;
+    // if the abi type argument number > 15, then the abi types after 14th should be wrapped in a tuple
+    private static final int MAX_ABI_ARG_TYPE_LEN = 15;
 
-    public TEALProgram approvalProgram, clearProgram;
-    public Long globalInts, globalBytes;
-    public Long localInts, localBytes;
-    public Long extraPages;
+    private static final int FOREIGN_OBJ_ABI_UINT_SIZE = 8;
 
-    public MethodCallParams(Long appID, Method method, List<Object> methodArgs, String sender,
-                            TransactionParams sp, Transaction.OnCompletion onCompletion, byte[] note, byte[] lease,
-                            BigInteger fv, BigInteger lv, BigInteger fee, BigInteger flatFee,
-                            String rekeyTo, TxnSigner signer,
+    public final Long appID;
+    public final Transaction.OnCompletion onCompletion;
+    public final Method method;
+    public final List<Object> methodArgs;
+
+    public final List<Address> foreignAccounts;
+    public final List<Long> foreignAssets;
+    public final List<Long> foreignApps;
+    
+    public final TEALProgram approvalProgram, clearProgram;
+    public final StateSchema globalStateSchema, localStateSchema;
+    public final Long extraPages;
+
+    public final TxnSigner signer;
+
+    // from com.algorand.algosdk.builder.transaction.TransactionParametersBuilder
+    public final Address sender;
+    public final BigInteger fee;
+    public final BigInteger flatFee;
+    public final BigInteger firstValid;
+    public final BigInteger lastValid;
+    public final byte[] note;
+    public final byte[] lease;
+    public final Address rekeyTo;
+    public final String genesisID;
+    public final Digest genesisHash;
+
+    /**
+     * NOTE: it's strongly suggested to use {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder}
+     * instead of this constructor to create a new MethodCallParams object.
+     */
+    public MethodCallParams(Long appID, Method method, List<Object> methodArgs, Address sender,
+                            Transaction.OnCompletion onCompletion, byte[] note, byte[] lease, String genesisID, Digest genesisHash,
+                            BigInteger firstValid, BigInteger lastValid, BigInteger fee, BigInteger flatFee,
+                            Address rekeyTo, TxnSigner signer,
                             List<Address> fAccounts, List<Long> fAssets, List<Long> fApps,
-                            TEALProgram approvalProgram, TEALProgram clearProgram, Long globalInts, Long globalBytes,
-                            Long localInts, Long localBytes, Long extraPages) {
-        if (appID == null || method == null || sender == null || onCompletion == null || signer == null || sp == null)
+                            TEALProgram approvalProgram, TEALProgram clearProgram,
+                            StateSchema globalStateSchema, StateSchema localStateSchema, Long extraPages) {
+        if (appID == null || method == null || sender == null || onCompletion == null || signer == null || genesisID == null || genesisHash == null || firstValid == null || lastValid == null || (fee == null && flatFee == null))
             throw new IllegalArgumentException("Method call builder error: some required field not added");
+        if (fee != null && flatFee != null)
+            throw new IllegalArgumentException("Cannot set both fee and flatFee");
         if (method.args.size() != methodArgs.size())
             throw new IllegalArgumentException("Method call error: incorrect method arg number provided");
         if (appID == 0) {
-            if (approvalProgram == null || clearProgram == null || globalInts == null || localInts == null || globalBytes == null || localBytes == null)
+            if (approvalProgram == null || clearProgram == null || globalStateSchema == null || localStateSchema == null)
                 throw new IllegalArgumentException(
                         "One of the following required parameters for application creation is missing: " +
-                                "approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlice"
+                                "approvalProgram, clearProgram, globalStateSchema, localStateSchema"
                 );
         } else if (onCompletion == Transaction.OnCompletion.UpdateApplicationOC) {
             if (approvalProgram == null || clearProgram == null)
                 throw new IllegalArgumentException(
                         "One of the following required parameters for OnApplicationComplete.UpdateApplicationOC is missing: approvalProgram, clearProgram"
                 );
-            if (globalBytes != null || globalInts != null || localBytes != null || localInts != null || extraPages != null)
+            if (globalStateSchema != null || localStateSchema != null || extraPages != null)
                 throw new IllegalArgumentException(
                         "One of the following application creation parameters were set on a non-creation call: " +
-                                "numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages"
+                                "globalStateSchema, localStateSchema, extraPages"
                 );
         } else {
-            if (approvalProgram != null || clearProgram != null || globalInts != null || localInts != null || globalBytes != null || localBytes != null || extraPages != null) {
+            if (approvalProgram != null || clearProgram != null || globalStateSchema != null || localStateSchema != null || extraPages != null) {
                 throw new IllegalArgumentException(
                         "One of the following application creation parameters were set on a non-creation call: " +
-                                "approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages"
+                                "approvalProgram, clearProgram, globalStateSchema, localStateSchema, extraPages"
                 );
             }
         }
         this.appID = appID;
         this.method = method;
-        this.methodArgs = methodArgs;
+        this.methodArgs = new ArrayList<>(methodArgs);
         this.sender = sender;
-        this.suggestedParams = sp;
         this.onCompletion = onCompletion;
         this.note = note;
         this.lease = lease;
-        this.fv = fv;
-        this.lv = lv;
+        this.genesisID = genesisID;
+        this.genesisHash = genesisHash;
+        this.firstValid = firstValid;
+        this.lastValid = lastValid;
         this.fee = fee;
         this.flatFee = flatFee;
         this.rekeyTo = rekeyTo;
         this.signer = signer;
-        this.foreignAccounts = fAccounts;
-        this.foreignAssets = fAssets;
-        this.foreignApps = fApps;
+        this.foreignAccounts = new ArrayList<>(fAccounts);
+        this.foreignAssets = new ArrayList<>(fAssets);
+        this.foreignApps = new ArrayList<>(fApps);
         this.approvalProgram = approvalProgram;
         this.clearProgram = clearProgram;
-        this.globalBytes = globalBytes;
-        this.globalInts = globalInts;
-        this.localBytes = localBytes;
-        this.localInts = localInts;
+        this.globalStateSchema = globalStateSchema;
+        this.localStateSchema = localStateSchema;
         this.extraPages = extraPages;
     }
 
-    public static class Builder {
-        public Long appID;
-        public Method method;
-        public List<Object> methodArgs;
-        public String sender, rekeyTo;
-        public Transaction.OnCompletion onCompletion;
-        public byte[] note, lease;
-        public BigInteger fv, lv, fee, flatFee;
-        TxnSigner signer;
-        public TransactionParams sp;
-        public List<Address> foreignAccounts = new ArrayList<>();
-        public List<Long> foreignAssets = new ArrayList<>();
-        public List<Long> foreignApps = new ArrayList<>();
+    /**
+     * Create the transactions which will carry out the specified method call.
+     * 
+     * The list of transactions returned by this function will have the same length as method.getTxnCallCount().
+     */
+    public List<TransactionWithSigner> createTransactions() {
+        List<byte[]> encodedABIArgs = new ArrayList<>();
+        encodedABIArgs.add(this.method.getSelector());
 
-        public TEALProgram approvalProgram, clearProgram;
-        public Long globalInts, globalBytes;
-        public Long localInts, localBytes;
-        public Long extraPages;
+        List<Object> methodArgs = new ArrayList<>();
+        List<ABIType> methodABIts = new ArrayList<>();
 
-        public Builder() {
-            this.onCompletion = Transaction.OnCompletion.NoOpOC;
-            this.methodArgs = new ArrayList<>();
+        List<TransactionWithSigner> transactionArgs = new ArrayList<>();
+        List<Address> foreignAccounts = new ArrayList<>(this.foreignAccounts);
+        List<Long> foreignAssets = new ArrayList<>(this.foreignAssets);
+        List<Long> foreignApps = new ArrayList<>(this.foreignApps);
+
+        for (int i = 0; i < this.method.args.size(); i++) {
+            Method.Arg argT = this.method.args.get(i);
+            Object methodArg = this.methodArgs.get(i);
+            if (argT.parsedType == null && methodArg instanceof TransactionWithSigner) {
+                TransactionWithSigner twsConverted = (TransactionWithSigner) methodArg;
+                if (!checkTransactionType(twsConverted, argT.type))
+                    throw new IllegalArgumentException(
+                            "expected transaction type " + argT.type
+                                    + " not match with given " + twsConverted.txn.type.toValue()
+                    );
+                transactionArgs.add((TransactionWithSigner) methodArg);
+            } else if (Method.RefArgTypes.contains(argT.type)) {
+                int index;
+                if (argT.type.equals(Method.RefTypeAccount)) {
+                    TypeAddress abiAddressT = new TypeAddress();
+                    Address accountAddress = (Address) abiAddressT.decode(abiAddressT.encode(methodArg));
+                    index = populateForeignArrayIndex(accountAddress, foreignAccounts, this.sender);
+                } else if (argT.type.equals(Method.RefTypeAsset) && methodArg instanceof BigInteger) {
+                    TypeUint abiUintT = new TypeUint(64);
+                    BigInteger assetID = (BigInteger) abiUintT.decode(abiUintT.encode(methodArg));
+                    index = populateForeignArrayIndex(assetID.longValue(), foreignAssets, null);
+                } else if (argT.type.equals(Method.RefTypeApplication) && methodArg instanceof BigInteger) {
+                    TypeUint abiUintT = new TypeUint(64);
+                    BigInteger appID = (BigInteger) abiUintT.decode(abiUintT.encode(methodArg));
+                    index = populateForeignArrayIndex(appID.longValue(), foreignApps, this.appID);
+                } else
+                    throw new IllegalArgumentException(
+                            "cannot add method call in AtomicTransactionComposer: ForeignArray arg type not matching"
+                    );
+                methodArgs.add(index);
+                methodABIts.add(new TypeUint(FOREIGN_OBJ_ABI_UINT_SIZE));
+            } else if (argT.parsedType != null) {
+                methodArgs.add(methodArg);
+                methodABIts.add(argT.parsedType);
+            } else
+                throw new IllegalArgumentException(
+                        "error: the type of method argument is a transaction-type, but no transaction-with-signer provided"
+                );
         }
 
+        if (methodArgs.size() > MAX_ABI_ARG_TYPE_LEN) {
+            List<ABIType> wrappedABITypeList = new ArrayList<>();
+            List<Object> wrappedValueList = new ArrayList<>();
+
+            for (int i = MAX_ABI_ARG_TYPE_LEN - 1; i < methodArgs.size(); i++) {
+                wrappedABITypeList.add(methodABIts.get(i));
+                wrappedValueList.add(methodArgs.get(i));
+            }
+
+            TypeTuple tupleT = new TypeTuple(wrappedABITypeList);
+            methodABIts = methodABIts.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
+            methodABIts.add(tupleT);
+            methodArgs = methodArgs.subList(0, MAX_ABI_ARG_TYPE_LEN - 1);
+            methodArgs.add(wrappedValueList);
+        }
+
+        for (int i = 0; i < methodArgs.size(); i++)
+            encodedABIArgs.add(methodABIts.get(i).encode(methodArgs.get(i)));
+
+        ApplicationCallTransactionBuilder<?> txBuilder = ApplicationCallTransactionBuilder.Builder();
+
+        txBuilder
+            .firstValid(this.firstValid)
+            .lastValid(this.lastValid)
+            .genesisHash(this.genesisHash)
+            .genesisID(this.genesisID)
+            .fee(this.fee)
+            .flatFee(this.flatFee)
+            .note(this.note)
+            .lease(this.lease)
+            .rekey(this.rekeyTo)
+            .sender(this.sender)
+            .applicationId(this.appID)
+            .args(encodedABIArgs)
+            .accounts(foreignAccounts)
+            .foreignApps(foreignApps)
+            .foreignAssets(foreignAssets);
+
+        Transaction tx = txBuilder.build();
+
+        // must apply these fields manually, as they are not exposed in the base ApplicationCallTransactionBuilder
+        tx.onCompletion = this.onCompletion;
+        tx.approvalProgram = this.approvalProgram;
+        tx.clearStateProgram = this.clearProgram;
+
+        if (this.globalStateSchema != null)
+            tx.globalStateSchema = this.globalStateSchema;
+        if (this.localStateSchema != null)
+            tx.localStateSchema = this.localStateSchema;
+        if (this.extraPages != null)
+            tx.extraPages = this.extraPages;
+        
+        TransactionWithSigner methodCall = new TransactionWithSigner(tx, this.signer);
+        transactionArgs.add(methodCall);
+
+        return transactionArgs;
+    }
+
+    private static boolean checkTransactionType(TransactionWithSigner tws, String txnType) {
+        if (txnType.equals(Method.TxAnyType)) return true;
+        return tws.txn.type.toValue().equals(txnType);
+    }
+
+    /**
+     * Add a value to an application call's foreign array. The addition will be as compact as possible,
+     * and this function will return an index that can be used to reference `objectToBeAdded` in `objectArray`.
+     *
+     * @param objectToBeAdded - The value to add to the array. If this value is already present in the array,
+     *   it will not be added again. Instead, the existing index will be returned.
+     * @param objectArray - The existing foreign array. This input may be modified to append `valueToAdd`.
+     * @param zerothObject - If provided, this value indicated two things: the 0 value is special for this
+     *   array, so all indexes into `objectArray` must start at 1; additionally, if `objectToBeAdded` equals
+     *   `zerothValue`, then `objectToBeAdded` will not be added to the array, and instead the 0 indexes will
+     *   be returned.
+     * @return An index that can be used to reference `valueToAdd` in `array`.
+     */
+    private static <T> int populateForeignArrayIndex(T objectToBeAdded, List<T> objectArray, T zerothObject) {
+        if (objectToBeAdded.equals(zerothObject))
+            return 0;
+        int startFrom = zerothObject == null ? 0 : 1;
+        int searchInListIndex = objectArray.indexOf(objectToBeAdded);
+        if (searchInListIndex != -1)
+            return startFrom + searchInListIndex;
+        objectArray.add(objectToBeAdded);
+        return objectArray.size() - 1 + startFrom;
+    }
+
+    /**
+     * Deprecated, use {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder#Builder()} instead.
+     */
+    @Deprecated
+    public static class Builder extends MethodCallTransactionBuilder<Builder> {
+
         public Builder setAppID(Long appID) {
-            this.appID = appID;
-            return this;
+            return this.applicationId(appID);
         }
 
         public Builder setMethod(Method method) {
-            this.method = method;
-            return this;
+            return this.method(method);
         }
 
         public Builder addMethodArgs(Object ma) {
-            this.methodArgs.add(ma);
-            return this;
+            return this.addMethodArgument(ma);
         }
 
         public Builder setSender(String sender) {
-            this.sender = sender;
-            return this;
+            return this.sender(sender);
         }
 
         public Builder setSuggestedParams(TransactionParams sp) {
-            this.sp = sp;
-            return this;
+            return this.suggestedParams(sp);
+        }
+
+        public Builder setSuggestedParams(TransactionParametersResponse sp) {
+            return this.suggestedParams(sp);
         }
 
         public Builder setOnComplete(Transaction.OnCompletion op) {
-            this.onCompletion = op;
-            return this;
+            return this.onComplete(op);
         }
 
         public Builder setNote(byte[] note) {
-            this.note = note;
-            return this;
+            return this.note(note);
         }
 
         public Builder setLease(byte[] lease) {
-            this.lease = lease;
-            return this;
+            return this.lease(lease);
         }
 
         public Builder setRekeyTo(String rekeyTo) {
-            this.rekeyTo = rekeyTo;
-            return this;
+            return this.rekey(rekeyTo);
         }
 
         public Builder setSigner(TxnSigner signer) {
-            this.signer = signer;
-            return this;
+            return this.signer(signer);
         }
 
         public Builder setFirstValid(BigInteger fv) {
-            this.fv = fv;
-            return this;
+            return this.firstValid(fv);
         }
 
         public Builder setLastValid(BigInteger lv) {
-            this.lv = lv;
-            return this;
+            return this.lastValid(lv);
         }
 
         public Builder setFee(BigInteger fee) {
-            this.fee = fee;
-            return this;
+            return this.fee(fee);
         }
 
         public Builder setFlatFee(BigInteger flatFee) {
-            this.flatFee = flatFee;
-            return this;
+            return this.flatFee(flatFee);
         }
 
         public Builder setForeignAccounts(List<Address> fAccounts) {
-            if (fAccounts == null) return this;
-            this.foreignAccounts = new ArrayList<>(new HashSet<>(fAccounts));
-            return this;
+            return this.accounts(fAccounts);
         }
 
         public Builder setForeignAssets(List<Long> fAssets) {
-            if (fAssets == null) return this;
-            this.foreignAssets = new ArrayList<>(new HashSet<>(fAssets));
-            return this;
+            return this.foreignAssets(fAssets);
         }
 
         public Builder setForeignApps(List<Long> fApps) {
-            if (fApps == null) return this;
-            this.foreignApps = new ArrayList<>(new HashSet<>(fApps));
-            return this;
+            return this.foreignApps(fApps);
         }
 
         public Builder setApprovalProgram(TEALProgram approvalProgram) {
-            if (approvalProgram == null) return this;
-            this.approvalProgram = approvalProgram;
-            return this;
+            return this.approvalProgram(approvalProgram);
         }
 
         public Builder setClearProgram(TEALProgram clearProgram) {
-            if (clearProgram == null) return this;
-            this.clearProgram = clearProgram;
-            return this;
+            return this.clearStateProgram(clearProgram);
         }
 
         public Builder setGlobalInts(Long globalInts) {
-            this.globalInts = globalInts;
+            if (this.globalStateSchema == null) {
+                return this.globalStateSchema(new StateSchema(globalInts, 0L));
+            }
+            this.globalStateSchema.numUint = BigInteger.valueOf(globalInts);
             return this;
         }
 
         public Builder setGlobalBytes(Long globalBytes) {
-            this.globalBytes = globalBytes;
+            if (this.globalStateSchema == null) {
+                return this.globalStateSchema(new StateSchema(0L, globalBytes));
+            }
+            this.globalStateSchema.numByteSlice = BigInteger.valueOf(globalBytes);
             return this;
         }
 
         public Builder setLocalInts(Long localInts) {
-            this.localInts = localInts;
+            if (this.localStateSchema == null) {
+                return this.localStateSchema(new StateSchema(localInts, 0L));
+            }
+            this.localStateSchema.numUint = BigInteger.valueOf(localInts);
             return this;
         }
 
         public Builder setLocalBytes(Long localBytes) {
-            this.localBytes = localBytes;
+            if (this.localStateSchema == null) {
+                return this.localStateSchema(new StateSchema(0L, localBytes));
+            }
+            this.localStateSchema.numByteSlice = BigInteger.valueOf(localBytes);
             return this;
         }
 
         public Builder setExtraPages(Long extraPages) {
-            this.extraPages = extraPages;
-            return this;
-        }
-
-        public MethodCallParams build() {
-            return new MethodCallParams(
-                    appID, method, methodArgs, sender, sp, onCompletion, note, lease,
-                    fv, lv, fee, flatFee, rekeyTo, signer, foreignAccounts, foreignAssets, foreignApps,
-                    approvalProgram, clearProgram, globalInts, globalBytes, localInts, localBytes, extraPages
-            );
+            return this.extraPages(extraPages);
         }
     }
 }

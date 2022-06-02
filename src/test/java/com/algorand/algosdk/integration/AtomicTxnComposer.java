@@ -2,12 +2,17 @@ package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.abi.Method;
+import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
+import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.*;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
+import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -33,7 +38,7 @@ public class AtomicTxnComposer {
     TxnSigner transSigner;
     TransactionWithSigner transWithSigner;
     Method method;
-    MethodCallParams.Builder optionBuilder;
+    MethodCallTransactionBuilder<?> optionBuilder;
     AtomicTransactionComposer.ExecuteResult execRes;
     SplitAndProcessMethodArgs abiArgProcessor;
     Long appID;
@@ -55,15 +60,14 @@ public class AtomicTxnComposer {
     }
 
     @Given("suggested transaction parameters from the algod v2 client")
-    public void suggested_transaction_parameters_from_the_algod_v2_client() throws IOException {
-        base.aClient();
-        base.getParams();
+    public void suggested_transaction_parameters_from_the_algod_v2_client() throws Exception {
+        TransactionParametersResponse response = applications.base.aclv2.TransactionParams().execute().body();
 
-        transSteps.suggestedParams = base.params;
-        transSteps.genesisHash = transSteps.suggestedParams.getGenesishashb64();
-        transSteps.genesisID = transSteps.suggestedParams.getGenesisID();
-        transSteps.fee = transSteps.suggestedParams.getFee();
-        transSteps.fv = transSteps.suggestedParams.getLastRound();
+        transSteps.genesisHash = response.genesisHash;
+        transSteps.genesisID = response.genesisId;
+        transSteps.fee = BigInteger.valueOf(response.fee);
+        transSteps.flatFee = null;
+        transSteps.fv = BigInteger.valueOf(response.lastRound);
         transSteps.lv = transSteps.fv.add(BigInteger.valueOf(1000));
     }
 
@@ -110,20 +114,20 @@ public class AtomicTxnComposer {
 
     @When("I create a new method arguments array.")
     public void i_create_a_new_method_arguments_array() {
-         optionBuilder = new MethodCallParams.Builder();
+         optionBuilder = MethodCallTransactionBuilder.Builder();
          abiArgProcessor = new SplitAndProcessMethodArgs(method);
     }
 
     @When("I append the current transaction with signer to the method arguments array.")
     public void i_append_the_current_transaction_with_signer_to_the_method_arguments_array() {
-        this.optionBuilder.addMethodArgs(this.transWithSigner);
+        this.optionBuilder.addMethodArgument(this.transWithSigner);
     }
 
     @When("I append the encoded arguments {string} to the method arguments array.")
     public void i_append_the_encoded_arguments_to_the_method_arguments_array(String string) {
         List<Object> processedABIArgs = abiArgProcessor.splitAndProcessMethodArgs(string, applications.rememberedAppIds);
         for (Object arg : processedABIArgs)
-            this.optionBuilder.addMethodArgs(arg);
+            this.optionBuilder.addMethodArgument(arg);
     }
 
     @Then("I execute the current transaction group with the composer.")
@@ -319,74 +323,80 @@ public class AtomicTxnComposer {
 
     @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
     public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
         composerMethods.add(method);
 
         optionBuilder
-                .setOnComplete(Transaction.OnCompletion.String(onComplete))
-                .setSender(senderAddress)
-                .setSigner(transSigner)
-                .setAppID(applications.appId)
-                .setMethod(method)
-                .setSuggestedParams(transSteps.suggestedParams)
-                .setFirstValid(transSteps.fv)
-                .setLastValid(transSteps.lv)
-                .setFee(transSteps.fee);
+                .onComplete(Transaction.OnCompletion.String(onComplete))
+                .sender(senderAddress)
+                .signer(transSigner)
+                .applicationId(applications.appId)
+                .method(method)
+                .firstValid(transSteps.fv)
+                .lastValid(transSteps.lv)
+                .genesisHash(transSteps.genesisHash)
+                .genesisID(transSteps.genesisID)
+                .fee(transSteps.fee)
+                .flatFee(transSteps.flatFee);
         MethodCallParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
 
     @When("I add a nonced method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
     public void i_add_a_nonced_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
         composerMethods.add(method);
 
         optionBuilder
-                .setOnComplete(Transaction.OnCompletion.String(onComplete))
-                .setSender(senderAddress)
-                .setSigner(transSigner)
-                .setAppID(applications.appId)
-                .setMethod(method)
-                .setNote(("I should be unique thanks to this nonce: " + nonce).getBytes(StandardCharsets.UTF_8))
-                .setSuggestedParams(transSteps.suggestedParams)
-                .setFirstValid(transSteps.fv)
-                .setLastValid(transSteps.lv)
-                .setFee(transSteps.fee);
+                .onComplete(Transaction.OnCompletion.String(onComplete))
+                .sender(senderAddress)
+                .signer(transSigner)
+                .applicationId(applications.appId)
+                .method(method)
+                .note(("I should be unique thanks to this nonce: " + nonce).getBytes(StandardCharsets.UTF_8))
+                .firstValid(transSteps.fv)
+                .lastValid(transSteps.lv)
+                .genesisHash(transSteps.genesisHash)
+                .genesisID(transSteps.genesisID)
+                .fee(transSteps.fee)
+                .flatFee(transSteps.flatFee);
         MethodCallParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
 
     @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments, approval-program {string}, clear-program {string}, global-bytes {int}, global-ints {int}, local-bytes {int}, local-ints {int}, extra-pages {int}.")
-    public void i_add_a_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments_approval_program_clear_program_global_bytes_global_ints_local_bytes_local_ints_extra_pages(String string, String string2, String string3, Integer int1, Integer int2, Integer int3, Integer int4, Integer int5) {
+    public void i_add_a_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments_approval_program_clear_program_global_bytes_global_ints_local_bytes_local_ints_extra_pages(String onCompleteString, String approvalProgramPath, String clearProgramPath, Integer globalBytes, Integer globalInts, Integer localBytes, Integer localInts, Integer extraPages) {
         byte[] tealApproval, tealClear;
         try {
-            tealApproval = ResourceUtils.readResource(string2);
-            tealClear = ResourceUtils.readResource(string3);
+            tealApproval = ResourceUtils.readResource(approvalProgramPath);
+            tealClear = ResourceUtils.readResource(clearProgramPath);
         } catch (Exception e) {
             throw new IllegalArgumentException("cannot read resource from specified TEAL files");
         }
         composerMethods.add(method);
 
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
+
+        StateSchema globalSchema = new StateSchema(globalInts, globalBytes);
+        StateSchema localSchema = new StateSchema(localInts, localBytes);
 
         optionBuilder
-                .setOnComplete(Transaction.OnCompletion.String(string))
-                .setSender(senderAddress)
-                .setSigner(transSigner)
-                .setAppID(appID)
-                .setMethod(method)
-                .setSuggestedParams(this.transSteps.suggestedParams)
-                .setFirstValid(this.transSteps.fv)
-                .setLastValid(this.transSteps.lv)
-                .setFee(this.transSteps.fee)
-                .setFlatFee(this.transSteps.flatFee)
-                .setApprovalProgram(new TEALProgram(tealApproval))
-                .setClearProgram(new TEALProgram(tealClear))
-                .setGlobalBytes(int1.longValue())
-                .setGlobalInts(int2.longValue())
-                .setLocalBytes(int3.longValue())
-                .setLocalInts(int4.longValue())
-                .setExtraPages(int5.longValue());
+                .onComplete(Transaction.OnCompletion.String(onCompleteString))
+                .sender(senderAddress)
+                .signer(transSigner)
+                .applicationId(appID)
+                .method(method)
+                .firstValid(transSteps.fv)
+                .lastValid(transSteps.lv)
+                .genesisHash(transSteps.genesisHash)
+                .genesisID(transSteps.genesisID)
+                .fee(transSteps.fee)
+                .flatFee(transSteps.flatFee)
+                .approvalProgram(new TEALProgram(tealApproval))
+                .clearStateProgram(new TEALProgram(tealClear))
+                .globalStateSchema(globalSchema)
+                .localStateSchema(localSchema)
+                .extraPages(extraPages.longValue());
         MethodCallParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }
@@ -402,21 +412,22 @@ public class AtomicTxnComposer {
         }
         composerMethods.add(method);
 
-        String senderAddress = applications.transientAccount.transientAccount.getAddress().toString();
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
 
         optionBuilder
-                .setOnComplete(Transaction.OnCompletion.String(string))
-                .setSender(senderAddress)
-                .setSigner(transSigner)
-                .setAppID(applications.appId)
-                .setMethod(method)
-                .setSuggestedParams(this.transSteps.suggestedParams)
-                .setFirstValid(this.transSteps.fv)
-                .setLastValid(this.transSteps.lv)
-                .setFee(this.transSteps.fee)
-                .setFlatFee(this.transSteps.flatFee)
-                .setApprovalProgram(new TEALProgram(tealApproval))
-                .setClearProgram(new TEALProgram(tealClear));
+                .onComplete(Transaction.OnCompletion.String(string))
+                .sender(senderAddress)
+                .signer(transSigner)
+                .applicationId(applications.appId)
+                .method(method)
+                .firstValid(transSteps.fv)
+                .lastValid(transSteps.lv)
+                .genesisHash(transSteps.genesisHash)
+                .genesisID(transSteps.genesisID)
+                .fee(transSteps.fee)
+                .flatFee(transSteps.flatFee)
+                .approvalProgram(new TEALProgram(tealApproval))
+                .clearStateProgram(new TEALProgram(tealClear));
         MethodCallParams optionBuild = optionBuilder.build();
         atc.addMethodCall(optionBuild);
     }

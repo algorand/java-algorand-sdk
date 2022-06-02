@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("unchecked")
-public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransactionBuilder<T>> extends TransactionBuilder<T> {
+public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransactionBuilder<T>> extends TransactionBuilder<T> implements ApplicationCallReferencesSetter<T> {
     private Transaction.OnCompletion onCompletion;
     private List<byte[]> applicationArgs;
     private List<Address> accounts;
@@ -38,9 +38,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         if (foreignAssets != null) txn.foreignAssets = foreignAssets;
     }
 
-    /**
-     * ApplicationID is the application being interacted with, or 0 if creating a new application.
-     */
+    @Override
     public T applicationId(Long applicationId) {
         this.applicationId = applicationId;
         return (T) this;
@@ -75,27 +73,19 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         return this.args(decodedArgs);
     }
 
-    /**
-     * Accounts lists the accounts (in addition to the sender) that may be accessed from the application logic.
-     */
+    @Override
     public T accounts(List<Address> accounts) {
         this.accounts = accounts;
         return (T) this;
     }
 
-    /**
-     * ForeignApps lists the applications (in addition to txn.ApplicationID) whose global states may be accessed by this
-     * application. The access is read-only.
-     */
+    @Override
     public T foreignApps(List<Long> foreignApps) {
         this.foreignApps = foreignApps;
         return (T) this;
     }
 
-    /**
-     * ForeignAssets lists the assets whose global states may be accessed by this
-     * application. The access is read-only.
-     */
+    @Override
     public T foreignAssets(List<Long> foreignAssets) {
         this.foreignAssets = foreignAssets;
         return (T) this;

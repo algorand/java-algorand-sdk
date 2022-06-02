@@ -24,7 +24,7 @@ import io.cucumber.java.en.When;
 public class Rekeying {
 
     @SuppressWarnings("rawtypes")
-    private TransactionBuilder transactionBuilder;
+    private TransactionBuilder<?> transactionBuilder;
     private SignedTransaction signedTransaction;
     public Account account;
     SignedTransaction stx;
