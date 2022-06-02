@@ -4,8 +4,16 @@ workflows:
   version: 2
   test:
     jobs:
-      - unit-test
-      - integration-test
+      - unit-test:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
+      - integration-test:
+          filters:
+            branches:
+              ignore:
+                - gh-pages
 
 jobs:
   unit-test:

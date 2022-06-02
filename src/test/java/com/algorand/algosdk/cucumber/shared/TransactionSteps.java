@@ -11,7 +11,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Map;
 
-import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.KeyRegistrationTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
@@ -30,14 +29,9 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 import static com.algorand.algosdk.util.ConversionUtils.*;
 import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionSteps {
     public Base base;
@@ -45,9 +39,7 @@ public class TransactionSteps {
     public SignedTransaction signedTransaction = null;
     public TransientAccount transAcc;
 
-    public TransactionParams suggestedParams;
     public BigInteger fee, flatFee, fv, lv;
-    public boolean isFlatFee;
     public byte[] genesisHash;
     public String genesisID;
 
@@ -57,7 +49,7 @@ public class TransactionSteps {
 
     @When("I build an application transaction with operation {string}, application-id {long}, sender {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, fee {long}, first-valid {long}, last-valid {long}, genesis-hash {string}, extra-pages {long}")
     public void buildApplicationTransactions(String operation, Long applicationId, String sender, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long fee, Long firstValid, Long lastValid, String genesisHash, Long extraPages) throws Exception {
-        ApplicationBaseTransactionBuilder builder = null;
+        ApplicationBaseTransactionBuilder<?> builder = null;
 
         // Create builder and apply builder-specific parameters
         switch (operation) {
@@ -134,12 +126,6 @@ public class TransactionSteps {
 
         KeyRegistrationTransactionBuilder<?> builder = Transaction.KeyRegistrationTransactionBuilder();
 
-        if (isFlatFee) {
-            builder = builder.flatFee(flatFee);
-        } else {
-            builder = builder.fee(fee);
-        }
-
         if (!votePk.isEmpty())
             builder = builder.participationPublicKeyBase64(votePk);
 
@@ -154,6 +140,8 @@ public class TransactionSteps {
             .lastValid(lv)
             .genesisHash(genesisHash)
             .genesisID(genesisID)
+            .fee(fee)
+            .flatFee(flatFee)
             .sender(sender)
             .nonparticipation(nonpart.equals("true"))
             .voteFirst(voteFirst)
@@ -164,7 +152,7 @@ public class TransactionSteps {
 
     @Given("suggested transaction parameters fee {int}, flat-fee {string}, first-valid {int}, last-valid {int}, genesis-hash {string}, genesis-id {string}")
     public void suggested_transaction_parameters_fee_flat_fee_first_valid_last_valid_genesis_hash_genesis_id(Integer int1, String string, Integer int2, Integer int3, String string2, String string3) {
-        isFlatFee = Boolean.parseBoolean(string);
+        boolean isFlatFee = Boolean.parseBoolean(string);
         fee = isFlatFee ? null : BigInteger.valueOf(int1);
         flatFee = isFlatFee ? BigInteger.valueOf(int1) : null;
 
@@ -172,8 +160,6 @@ public class TransactionSteps {
         genesisID = string3;
         fv = BigInteger.valueOf(int2);
         lv = BigInteger.valueOf(int3);
-
-        suggestedParams = new TransactionParams().genesishashb64(genesisHash).genesisID(genesisID).lastRound(fv);
     }
 
     @When("I build a payment transaction with sender {string}, receiver {string}, amount {int}, close remainder to {string}")

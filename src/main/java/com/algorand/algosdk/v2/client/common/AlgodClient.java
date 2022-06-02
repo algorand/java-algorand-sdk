@@ -21,6 +21,7 @@ import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
+import com.algorand.algosdk.v2.client.algod.TealDisassemble;
 import com.algorand.algosdk.v2.client.algod.TealDryrun;
 import com.algorand.algosdk.crypto.Address;
 
@@ -238,6 +239,16 @@ public class AlgodClient extends Client {
      */
     public TealCompile TealCompile() {
         return new TealCompile((Client) this);
+    }
+
+    /**
+     * Given the program bytes, return the TEAL source code in plain text. This
+     * endpoint is only enabled when a node's configuration file sets
+     * EnableDeveloperAPI to true.
+     * /v2/teal/disassemble
+     */
+    public TealDisassemble TealDisassemble() {
+        return new TealDisassemble((Client) this);
     }
 
     /**

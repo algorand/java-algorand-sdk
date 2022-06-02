@@ -1,3 +1,17 @@
+# 1.15.0
+
+## What's Changed
+* Rerun code generation based on new models by @Eric-Warehime in https://github.com/algorand/java-algorand-sdk/pull/321
+* Excluding gh-pages branch from cicd by @algojack in https://github.com/algorand/java-algorand-sdk/pull/325
+* Build: Add SDK code generation workflow by @Eric-Warehime in https://github.com/algorand/java-algorand-sdk/pull/327
+* Add branch info to sdk gen action by @Eric-Warehime in https://github.com/algorand/java-algorand-sdk/pull/330
+* Generate updated client API code by @algoidurovic in https://github.com/algorand/java-algorand-sdk/pull/318
+* Introduce unified `MethodCallTransactionBuilder` & deprecate `MethodCallParams.Builder` by @jasonpaulos in https://github.com/algorand/java-algorand-sdk/pull/324
+
+## New Contributors
+* @Eric-Warehime made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/321
+* @algoidurovic made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/318
+
 # 1.14.0
 ## Added
 - Add foreign app address to dryrun creator (#315)
