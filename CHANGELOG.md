@@ -1,23 +1,6 @@
 # 1.15.0
 
 ## What's Changed
-* Better error message on encoding exception. by @winder in https://github.com/algorand/java-algorand-sdk/pull/258
-* Add WaitForConfirmation function by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/274
-* Bug fix for `logs` on `PendingTransactionResponse` by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/275
-* ABI Interaction Support for JAVA SDK by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/268
-* Resolve #229 and #279 on upgrading jackson packages by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/281
-* Support Foreign objects as ABI arguments by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/277
-* Implement circle ci by @bricerisingalgorand in https://github.com/algorand/java-algorand-sdk/pull/293
-* C2C Feature and Testing by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/290
-* add new key reg txn field by @shiqizng in https://github.com/algorand/java-algorand-sdk/pull/266
-* Update README.md by @rotemh in https://github.com/algorand/java-algorand-sdk/pull/297
-* Update langspec for teal6 by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/298
-* Unlimited assets regenerated code by @algonautshant in https://github.com/algorand/java-algorand-sdk/pull/302
-* add error message with atomic transaction composer by @Reguzzoni in https://github.com/algorand/java-algorand-sdk/pull/311
-* ran updated generator against latest json specs by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/307
-* adding createDryrun method by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/284
-* Dryrun printer by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/305
-* adding foreign app address to dryrun creator by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/315
 * Rerun code generation based on new models by @Eric-Warehime in https://github.com/algorand/java-algorand-sdk/pull/321
 * Excluding gh-pages branch from cicd by @algojack in https://github.com/algorand/java-algorand-sdk/pull/325
 * Build: Add SDK code generation workflow by @Eric-Warehime in https://github.com/algorand/java-algorand-sdk/pull/327
@@ -26,8 +9,6 @@
 * Introduce unified `MethodCallTransactionBuilder` & deprecate `MethodCallParams.Builder` by @jasonpaulos in https://github.com/algorand/java-algorand-sdk/pull/324
 
 ## New Contributors
-* @Reguzzoni made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/311
-* @barnjamin made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/307
 * @Eric-Warehime made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/321
 * @algoidurovic made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/318
 
