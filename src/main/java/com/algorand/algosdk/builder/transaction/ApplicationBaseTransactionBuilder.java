@@ -1,7 +1,9 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.BoxReference;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.BoxReference.BoxReferenceSerialize;
 import com.algorand.algosdk.util.Encoder;
 
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<Address> accounts;
     private List<Long> foreignApps;
     private List<Long> foreignAssets;
+    private List<BoxReference> boxReferences;
     private Long applicationId;
 
     /**
@@ -36,6 +39,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         if (accounts != null) txn.accounts = accounts;
         if (foreignApps != null) txn.foreignApps = foreignApps;
         if (foreignAssets != null) txn.foreignAssets = foreignAssets;
+        if (boxReferences != null) txn.boxReferences = convertBoxes(boxReferences, foreignApps, applicationId);
     }
 
     @Override
@@ -88,6 +92,27 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     @Override
     public T foreignAssets(List<Long> foreignAssets) {
         this.foreignAssets = foreignAssets;
+        return (T) this;
+    }
+
+    /**
+     * The boxReferences must be converted to a serializable form before inserting
+     * them into the transaction.
+     */
+    private List<BoxReferenceSerialize> convertBoxes(List<BoxReference> boxes, List<Long> foreignApps, Long curApp) {
+        ArrayList<BoxReferenceSerialize> boxesToSerialize = new ArrayList<>();
+        for (BoxReference box : boxes) {
+            boxesToSerialize.add(box.getBoxReferenceSerialize(foreignApps, curApp));
+        }
+        return boxesToSerialize;
+    }
+
+    /**
+     * BoxReferences lists the boxes whose state may be accessed during the execution
+     * of this application call. The access is read-only.
+     */
+    public T boxReferences(List<BoxReference> boxReferences) {
+        this.boxReferences = boxReferences;
         return (T) this;
     }
 }

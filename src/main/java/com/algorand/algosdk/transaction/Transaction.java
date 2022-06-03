@@ -4,6 +4,7 @@ import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.*;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.logic.StateSchema;
+import com.algorand.algosdk.transaction.BoxReference.BoxReferenceSerialize;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.*;
@@ -147,6 +148,9 @@ public class Transaction implements Serializable {
     @JsonProperty("apas")
     public List<Long> foreignAssets = new ArrayList<>();
 
+    @JsonProperty("apbx")
+    public List<BoxReferenceSerialize> boxReferences = new ArrayList<>();
+
     @JsonProperty("apgs")
     public StateSchema globalStateSchema = new StateSchema();
 
@@ -287,6 +291,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
+                null,
                 null);
     }
 
@@ -380,6 +385,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
+                null,
                 null,
                 null,
                 null,
@@ -505,6 +511,7 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
+                null,
                 null,
                 null,
                 null,
@@ -663,6 +670,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("apat") List<byte[]> accounts,
                         @JsonProperty("apfa") List<Long> foreignApps,
                         @JsonProperty("apas") List<Long> foreignAssets,
+                        @JsonProperty("apbx") List<BoxReferenceSerialize> boxReferences,
                         @JsonProperty("apgs") StateSchema globalStateSchema,
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
@@ -713,6 +721,7 @@ public class Transaction implements Serializable {
              convertToAddressList(accounts),
              foreignApps,
              foreignAssets,
+             boxReferences,
              globalStateSchema,
              applicationId,
              localStateSchema,
@@ -770,6 +779,7 @@ public class Transaction implements Serializable {
             List<Address> accounts,
             List<Long> foreignApps,
             List<Long> foreignAssets,
+            List<BoxReferenceSerialize> boxReferences,
             StateSchema globalStateSchema,
             Long applicationId,
             StateSchema localStateSchema,
@@ -820,6 +830,7 @@ public class Transaction implements Serializable {
                 accounts,
                 foreignApps,
                 foreignAssets,
+                boxReferences,
                 globalStateSchema,
                 applicationId,
                 localStateSchema,
@@ -878,6 +889,7 @@ public class Transaction implements Serializable {
                         List<Address> accounts,
                         List<Long> foreignApps,
                         List<Long> foreignAssets,
+                        List<BoxReferenceSerialize> boxReferences,
                         StateSchema globalStateSchema,
                         Long applicationId,
                         StateSchema localStateSchema,
@@ -921,6 +933,7 @@ public class Transaction implements Serializable {
         if (accounts != null) this.accounts = accounts;
         if (foreignApps != null) this.foreignApps = foreignApps;
         if (foreignAssets != null) this.foreignAssets = foreignAssets;
+        if (boxReferences != null) this.boxReferences = boxReferences;
         if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
         if (applicationId != null) this.applicationId = applicationId;
         if (localStateSchema != null) this.localStateSchema = globalStateSchema;

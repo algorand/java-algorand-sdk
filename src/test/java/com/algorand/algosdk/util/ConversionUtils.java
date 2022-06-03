@@ -1,11 +1,16 @@
 package com.algorand.algosdk.util;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.BoxReference;
+
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.util.Strings;
 
+import okio.ByteString;
+
 import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,6 +68,32 @@ public class ConversionUtils {
         return Arrays.stream(Strings.split(accounts, ','))
                 .map(ConversionUtils::convertOrFailTest)
                 .collect(Collectors.toList());
+    }
+
+    public static List<BoxReference> convertBoxes(String boxesStr) {
+        if (boxesStr.equals("")) {
+            return null;
+        }
+
+        ArrayList<BoxReference> boxReferences = new ArrayList<>();
+        String[] boxesArray = Strings.split(boxesStr, ',');
+        for (int i = 0; i < boxesArray.length; i += 2) {
+            Long appID = Long.parseLong(boxesArray[i]);
+
+            byte[] name = null;
+            String enc = Strings.split(boxesArray[i+1], ':')[0];
+            String strName = Strings.split(boxesArray[i+1], ':')[1];
+            if (enc.equals("str")) {
+                name = strName.getBytes();
+            } else {
+                // b64 encoding
+                name = ByteString.decodeBase64(strName).toByteArray();
+            }
+
+            boxReferences.add(new BoxReference(appID, name));
+        }
+
+        return boxReferences;
     }
 
 }
