@@ -79,7 +79,6 @@ public class ConversionUtils {
         String[] boxesArray = Strings.split(boxesStr, ',');
         for (int i = 0; i < boxesArray.length; i += 2) {
             Long appID = Long.parseLong(boxesArray[i]);
-
             byte[] name = null;
             String enc = Strings.split(boxesArray[i+1], ':')[0];
             String strName = Strings.split(boxesArray[i+1], ':')[1];

@@ -4,6 +4,7 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
+import com.algorand.algosdk.transaction.BoxReference;
 import com.algorand.algosdk.transaction.MethodCallParams;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxnSigner;
@@ -22,6 +23,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     protected List<Address> foreignAccounts = new ArrayList<>();
     protected List<Long> foreignAssets = new ArrayList<>();
     protected List<Long> foreignApps = new ArrayList<>();
+    protected List<BoxReference> boxReferences = new ArrayList<>();
 
     protected TEALProgram approvalProgram, clearStateProgram;
     protected StateSchema localStateSchema;
@@ -126,6 +128,15 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     }
 
     @Override
+    public T boxReferences(List<BoxReference> boxReferences) {
+        if (boxReferences != null) 
+            this.boxReferences = new ArrayList<>(new HashSet<>(boxReferences));
+        else
+            this.boxReferences.clear();
+        return (T) this;
+    }
+
+    @Override
     public T approvalProgram(TEALProgram approvalProgram) {
         this.approvalProgram = approvalProgram;
         return (T) this;
@@ -165,7 +176,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
         return new MethodCallParams(
                 appID, method, methodArgs, sender, onCompletion, note, lease, genesisID, genesisHash,
                 firstValid, lastValid, fee, flatFee, rekeyTo, signer, foreignAccounts, foreignAssets, foreignApps,
-                approvalProgram, clearStateProgram, globalStateSchema, localStateSchema, extraPages
+                boxReferences, approvalProgram, clearStateProgram, globalStateSchema, localStateSchema, extraPages
         );
     }
 }
