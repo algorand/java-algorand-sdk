@@ -357,7 +357,7 @@ public class AtomicTransactionComposer {
         public PendingTransactionResponse txInfo;
 
         public ReturnValue(String txID, byte[] rawValue, Object value, Method method, 
-                           Exception parseError,PendingTransactionResponse txInfo) {
+                           Exception parseError, PendingTransactionResponse txInfo) {
             this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;
