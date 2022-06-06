@@ -42,7 +42,6 @@ public class AtomicTxnComposer {
     AtomicTransactionComposer.ExecuteResult execRes;
     SplitAndProcessMethodArgs abiArgProcessor;
     Long appID;
-    List<Method> composerMethods;
     String nonce;
 
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
@@ -79,7 +78,6 @@ public class AtomicTxnComposer {
     @Given("a new AtomicTransactionComposer")
     public void a_new_atomic_transaction_composer() {
         this.atc = new AtomicTransactionComposer();
-        composerMethods = new ArrayList<>();
     }
 
     @When("I make a transaction signer for the transient account.")
@@ -139,11 +137,10 @@ public class AtomicTxnComposer {
     public void the_app_should_have_returned(String string) {
         String[] splitEncoding = string.split(",");
         assertThat(execRes.methodResults.size()).isEqualTo(splitEncoding.length);
-        assertThat(execRes.methodResults.size()).isEqualTo(composerMethods.size());
 
         for (int i = 0; i < splitEncoding.length; i++) {
             AtomicTransactionComposer.ReturnValue execRetVal = execRes.methodResults.get(i);
-            Method currMethod = composerMethods.get(i);
+            Method currMethod = execRetVal.method;
             assertThat(execRetVal.parseError).isNull();
 
             if (splitEncoding[i].isEmpty()) {
@@ -324,7 +321,6 @@ public class AtomicTxnComposer {
     @When("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
     public void i_add_a_method_call_with_the_signing_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
         Address senderAddress = applications.transientAccount.transientAccount.getAddress();
-        composerMethods.add(method);
 
         optionBuilder
                 .onComplete(Transaction.OnCompletion.String(onComplete))
@@ -345,7 +341,6 @@ public class AtomicTxnComposer {
     @When("I add a nonced method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments.")
     public void i_add_a_nonced_method_call_with_the_transient_account_the_current_application_suggested_params_on_complete_current_transaction_signer_current_method_arguments(String onComplete) {
         Address senderAddress = applications.transientAccount.transientAccount.getAddress();
-        composerMethods.add(method);
 
         optionBuilder
                 .onComplete(Transaction.OnCompletion.String(onComplete))
@@ -373,7 +368,6 @@ public class AtomicTxnComposer {
         } catch (Exception e) {
             throw new IllegalArgumentException("cannot read resource from specified TEAL files");
         }
-        composerMethods.add(method);
 
         Address senderAddress = applications.transientAccount.transientAccount.getAddress();
 
@@ -410,7 +404,6 @@ public class AtomicTxnComposer {
         } catch (Exception e) {
             throw new IllegalArgumentException("cannot read resource from specified TEAL files");
         }
-        composerMethods.add(method);
 
         Address senderAddress = applications.transientAccount.transientAccount.getAddress();
 
