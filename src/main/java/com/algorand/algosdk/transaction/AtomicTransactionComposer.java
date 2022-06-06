@@ -277,6 +277,7 @@ public class AtomicTransactionComposer {
                             signedTxns.get(i).transactionID,
                             null,
                             null,
+                            this.methodMap.get(i),
                             new Exception(resp.message()),
                             null
                     ));
@@ -290,6 +291,7 @@ public class AtomicTransactionComposer {
                         currentTxInfo.txn.transactionID,
                         null,
                         null,
+                        this.methodMap.get(i),
                         null,
                         currentTxInfo
                 ));
@@ -315,6 +317,7 @@ public class AtomicTransactionComposer {
                     currentTxInfo.txn.transactionID,
                     abiEncoded,
                     decoded,
+                    this.methodMap.get(i),
                     parseError,
                     currentTxInfo
             ));
@@ -349,14 +352,16 @@ public class AtomicTransactionComposer {
         public String txID;
         public byte[] rawValue;
         public Object value;
+        public Method method;
         public Exception parseError;
         public PendingTransactionResponse txInfo;
 
-        public ReturnValue(String txID, byte[] rawValue, Object value,
+        public ReturnValue(String txID, byte[] rawValue, Object value, Method method, 
                            Exception parseError, PendingTransactionResponse txInfo) {
             this.txID = txID;
             this.rawValue = rawValue;
             this.value = value;
+            this.method = method;
             this.parseError = parseError;
             this.txInfo = txInfo;
         }
