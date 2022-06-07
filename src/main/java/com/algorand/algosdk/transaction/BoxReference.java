@@ -41,10 +41,12 @@ public class BoxReference {
             appIdx = 0;
         }
 
-        for (int i = 0; i < foreignApps.size(); i++) {
-            if (foreignApps.get(i).equals(appID)) {
-                appIdx = i + 1;
-                break;
+        if (foreignApps != null) {
+            for (int i = 0; i < foreignApps.size(); i++) {
+                if (foreignApps.get(i).equals(appID)) {
+                    appIdx = i + 1;
+                    break;
+                }
             }
         }
 
@@ -56,7 +58,7 @@ public class BoxReference {
 
     @JsonPropertyOrder(alphabetic=true)
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    public class BoxReferenceSerialize implements Serializable {
+    public static class BoxReferenceSerialize implements Serializable {
         // the index in the foreign apps array of the app this box belongs to
         @JsonProperty("i")
         public int appIdx;
