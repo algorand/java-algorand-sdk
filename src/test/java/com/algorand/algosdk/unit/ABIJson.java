@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 public class ABIJson {
     private enum CHECK_FIELD {
@@ -34,6 +35,9 @@ public class ABIJson {
     Contract contract = null;
     String jsonContract = null;
     CHECK_FIELD state = null;
+
+    List<Method> methods = null;
+    String errString = null;
 
     @When("I create the Method object from method signature {string}")
     public void i_create_the_method_object_from_method_signature(String string) {
@@ -149,4 +153,48 @@ public class ABIJson {
         Contract deserialized = new ObjectMapper().readValue(this.jsonContract, Contract.class);
         assertThat(this.contract).isEqualTo(deserialized);
     }
+
+    @When("I append to my Method objects list in the case of a non-empty signature {string}")
+    public void i_append_to_my_method_objects_list_in_the_case_of_a_non_empty_signature(String methodsig) {
+        if(this.methods == null){
+            this.methods = new ArrayList<>();
+        }
+
+        if(!methodsig.equals("")){
+            this.methods.add(new Method(methodsig));
+        }
+    }
+
+    @When("I create an Interface object from my Method objects list")
+    public void i_create_an_interface_object_from_my_method_objects_list() {
+        this.interfaceObj = new Interface("", "", this.methods);
+    }
+    @When("I get the method from the Interface by name {string}")
+    public void i_get_the_method_from_the_interface_by_name(String name) {
+        try {
+            this.method = this.interfaceObj.getMethodByName(name);
+        }catch(Exception e){
+            this.errString = e.toString();
+        }
+    }
+
+    @When("I create a Contract object from my Method objects list")
+    public void i_create_a_contract_object_from_my_method_objects_list() {
+        this.contract = new Contract("", "", null, this.methods);
+    }
+
+    @When("I get the method from the Contract by name {string}")
+    public void i_get_the_method_from_the_contract_by_name(String name) {
+        try {
+            this.method = this.contract.getMethodByName(name);
+        }catch(Exception e){
+            this.errString = e.toString();
+        }
+    }
+
+    @Then("the produced method signature should equal {string}. If there is an error it begins with {string}")
+    public void the_produced_method_signature_should_equal_if_there_is_an_error_it_begins_with(String sig, String errstr) {
+        
+    }
+
 }

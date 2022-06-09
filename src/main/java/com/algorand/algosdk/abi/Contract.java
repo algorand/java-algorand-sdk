@@ -1,5 +1,6 @@
 package com.algorand.algosdk.abi;
 
+import com.algorand.algosdk.algod.client.StringUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -53,6 +54,31 @@ public class Contract {
     @JsonIgnore
     public Method getMethodByIndex(int index) {
         return this.methods.get(index);
+    }
+
+    @JsonIgnore
+    public Method getMethodByName(String name) {
+        List<Method> methods = new ArrayList<>();
+        for(Method m: this.methods){
+            if(m.name == name){
+                methods.add(m);
+            }
+        }
+
+        if(methods.size()>1){
+            String[] sigs = new String[methods.size()];
+            for(int idx=0;idx<methods.size();idx++){
+               sigs[idx] = methods.get(idx).getSignature();
+            }
+            String found = StringUtil.join(sigs, ",");
+            throw new IllegalArgumentException(String.format("found %d methods with the same name: %s", methods.size(), found));
+        }
+
+        if(methods.size()==1){
+            throw new IllegalArgumentException(String.format("found 0 methods with the name %s", name));
+        }
+
+        return methods.get(0);
     }
 
     @Override
