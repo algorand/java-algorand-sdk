@@ -160,7 +160,7 @@ public class ABIJson {
             this.methods = new ArrayList<>();
         }
 
-        if(!methodsig.equals("")){
+        if(!methodsig.isEmpty()){
             this.methods.add(new Method(methodsig));
         }
     }
@@ -174,7 +174,7 @@ public class ABIJson {
         try {
             this.method = this.interfaceObj.getMethodByName(name);
         }catch(Exception e){
-            this.errString = e.toString();
+            this.errString = e.getMessage();
         }
     }
 
@@ -188,13 +188,17 @@ public class ABIJson {
         try {
             this.method = this.contract.getMethodByName(name);
         }catch(Exception e){
-            this.errString = e.toString();
+            this.errString = e.getMessage();
         }
     }
 
     @Then("the produced method signature should equal {string}. If there is an error it begins with {string}")
     public void the_produced_method_signature_should_equal_if_there_is_an_error_it_begins_with(String sig, String errstr) {
-        
+        if(!errstr.isEmpty()){
+            assertThat(this.errString).startsWith(errstr);
+        }else{
+            assertThat(this.method.getSignature()).isEqualTo(sig);
+        }
     }
 
 }

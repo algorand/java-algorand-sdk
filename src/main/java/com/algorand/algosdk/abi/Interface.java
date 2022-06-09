@@ -49,7 +49,7 @@ public class Interface {
     public Method getMethodByName(String name) {
         List<Method> methods = new ArrayList<>();
         for(Method m: this.methods){
-            if(m.name == name){
+            if(m.name.equals(name)){
                 methods.add(m);
             }
         }
@@ -63,7 +63,7 @@ public class Interface {
             throw new IllegalArgumentException(String.format("found %d methods with the same name: %s", methods.size(), found));
         }
 
-        if(methods.size()==1){
+        if(methods.size()==0){
             throw new IllegalArgumentException(String.format("found 0 methods with the name %s", name));
         }
 
