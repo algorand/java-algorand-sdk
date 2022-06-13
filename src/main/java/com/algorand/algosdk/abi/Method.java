@@ -180,6 +180,32 @@ public class Method {
                 Objects.equals(args, method.args) && Objects.equals(returns, method.returns);
     }
 
+
+    @JsonIgnore
+    public static Method getMethodByName(List<Method> methods,  String name) {
+        List<Method> filteredMethods = new ArrayList<>();
+        for(Method m: methods){
+            if(m.name.equals(name)){
+                filteredMethods.add(m);
+            }
+        }
+
+        if(filteredMethods.size()>1){
+            String[] sigs = new String[filteredMethods.size()];
+            for(int idx=0;idx<filteredMethods.size();idx++){
+               sigs[idx] = filteredMethods.get(idx).getSignature();
+            }
+            String found = StringUtil.join(sigs, ",");
+            throw new IllegalArgumentException(String.format("found %d methods with the same name: %s", filteredMethods.size(), found));
+        }
+
+        if(filteredMethods.size()==0){
+            throw new IllegalArgumentException(String.format("found 0 methods with the name %s", name));
+        }
+
+        return filteredMethods.get(0);
+    }
+
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class Returns {
         @JsonIgnore
