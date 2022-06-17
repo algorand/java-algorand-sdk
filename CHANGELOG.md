@@ -1,3 +1,9 @@
+# 1.16.0
+
+## What's Changed
+* adding method to abi result object by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/334
+* adding tests and methods for getMethodByName by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/337
+
 # 1.15.0
 
 ## What's Changed
