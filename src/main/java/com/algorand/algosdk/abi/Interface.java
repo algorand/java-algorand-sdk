@@ -1,5 +1,6 @@
 package com.algorand.algosdk.abi;
 
+import com.algorand.algosdk.algod.client.StringUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -42,6 +43,11 @@ public class Interface {
     @JsonIgnore
     public Method getMethodByIndex(int index) {
         return this.methods.get(index);
+    }
+
+    @JsonIgnore
+    public Method getMethodByName(String name) {
+        return Method.getMethodByName(this.methods, name);
     }
 
     @Override
