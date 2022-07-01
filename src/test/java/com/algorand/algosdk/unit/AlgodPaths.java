@@ -1,16 +1,15 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.BoxReference;
 import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestingUtils;
-import com.algorand.algosdk.util.ConversionUtils;
-import com.algorand.algosdk.v2.client.algod.*;
+import com.algorand.algosdk.v2.client.algod.AccountInformation;
+import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
+import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.When;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 public class AlgodPaths {
     AlgodClient algodClient = new AlgodClient("localhost", 1234, "");
@@ -70,14 +69,14 @@ public class AlgodPaths {
 
     @When("we make an Account Application Information call against account {string} applicationID {int}")
     public void accountApplicationInformation(String string, Integer int1) throws NoSuchAlgorithmException {
-        ps.q = algodClient.AccountApplicationInformation(new Address(string), (long)int1.intValue());
+        ps.q = algodClient.AccountApplicationInformation(new Address(string), (long) int1.intValue());
     }
-    
+
     @When("we make an Account Asset Information call against account {string} assetID {int}")
     public void accountAssetInformation(String string, Integer int1) throws NoSuchAlgorithmException {
-        ps.q = algodClient.AccountAssetInformation(new Address(string), (long)int1.intValue());
+        ps.q = algodClient.AccountAssetInformation(new Address(string), (long) int1.intValue());
     }
-    
+
     @When("we make an Account Information call against account {string} with exclude {string}")
     public void accountInformation(String string, String string2) throws NoSuchAlgorithmException {
         AccountInformation aiq = algodClient.AccountInformation(new Address(string));
