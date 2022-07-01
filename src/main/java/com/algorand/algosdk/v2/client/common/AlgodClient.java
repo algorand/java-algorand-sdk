@@ -224,16 +224,6 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given an application ID and box name, it returns the box name and value (each
-     * base64 encoded).
-     * /v2/applications/{application-id}/boxes/{box-name}
-     */
-    public GetApplicationBoxByName GetApplicationBoxByName(Long applicationId,
-            byte[] boxName) {
-        return new GetApplicationBoxByName((Client) this, applicationId, boxName);
-    }
-
-    /**
      * Given a asset ID, it returns asset information including creator, name, total
      * supply and special addresses.
      * /v2/assets/{asset-id}

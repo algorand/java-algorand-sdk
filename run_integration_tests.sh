@@ -6,7 +6,7 @@ pushd $rootdir
 
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
-TEST_BRANCH=box-reference
+TEST_BRANCH=use_latest
 
 function help {
   echo "Options:"
@@ -75,8 +75,8 @@ fi
 docker build -t java-sdk-testing -f Dockerfile "$(pwd)"
 
 # Launch SDK testing
-docker run -it \
-     --network host \
-     java-sdk-testing:latest 
+#docker run -it \
+#     --network host \
+#     java-sdk-testing:latest
 
 my_exit 0
