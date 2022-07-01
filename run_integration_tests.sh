@@ -75,8 +75,8 @@ fi
 docker build -t java-sdk-testing -f Dockerfile "$(pwd)"
 
 # Launch SDK testing
-#docker run -it \
-#     --network host \
-#     java-sdk-testing:latest
+docker run -it \
+     --network host \
+     java-sdk-testing:latest
 
 my_exit 0
