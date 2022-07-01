@@ -232,11 +232,4 @@ public class Encoder {
     public static BigInteger decodeBytesToUint(byte[] encoded) {
         return new BigInteger(1, encoded);
     }
-
-    public static String encodeToURL(Object value) throws Exception {
-        if (value instanceof byte[]) {
-            return URLEncoder.encode(new String((byte[])value, StandardCharsets.ISO_8859_1.name()), StandardCharsets.ISO_8859_1.name());
-        }
-        return value.toString();
-    }
 }
