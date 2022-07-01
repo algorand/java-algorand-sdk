@@ -19,7 +19,6 @@ import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
-import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.algod.TealDisassemble;

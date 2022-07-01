@@ -84,11 +84,4 @@ public class AlgodPaths {
         if (TestingUtils.notEmpty(string2)) aiq.exclude(QueryMapper.getExclude(string2));
         ps.q = aiq;
     }
-
-    @When("we make a GetApplicationBoxByName call for applicationID {int} with box name {string}")
-    public void we_make_a_get_application_box_by_name_call_for_application_id_with_box_name(Integer appID, String boxName) {
-        // Write code here that turns the phrase above into concrete actions
-        List<BoxReference> boxes = ConversionUtils.convertBoxes(appID + "," + boxName);
-        ps.q = algodClient.GetApplicationBoxByName(boxes.get(0).appID, boxes.get(0).name);
-    }
 }
