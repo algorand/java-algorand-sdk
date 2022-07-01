@@ -1,4 +1,5 @@
 unit:
+	mvn test
 	mvn test -Dcucumber.filter.tags="@unit.offline or @unit.algod or @unit.indexer or @unit.rekey or @unit.indexer.rekey or @unit.transactions or @unit.transactions.keyreg or @unit.responses or @unit.applications or @unit.dryrun or @unit.tealsign or @unit.responses.messagepack or @unit.responses.231 or @unit.responses.messagepack.231 or @unit.feetest or @unit.indexer.logs or @unit.abijson or @unit.abijson.byname or @unit.atomic_transaction_composer or @unit.transactions.payment or @unit.responses.unlimited_assets or @unit.algod.ledger_refactoring or @unit.indexer.ledger_refactoring or @unit.dryrun.trace.application"
 
 integration:
