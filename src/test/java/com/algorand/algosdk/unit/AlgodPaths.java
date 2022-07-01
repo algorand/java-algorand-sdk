@@ -1,19 +1,15 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.BoxReference;
 import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestingUtils;
-import com.algorand.algosdk.util.ConversionUtils;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
-import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.When;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 public class AlgodPaths {
     AlgodClient algodClient = new AlgodClient("localhost", 1234, "");
