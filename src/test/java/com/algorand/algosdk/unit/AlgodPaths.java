@@ -90,8 +90,6 @@ public class AlgodPaths {
 
     @When("we make a GetApplicationBoxByName call for applicationID {int} with encoded box name {string}")
     public void getBoxByName(Integer appID, String encodedBoxName) {
-        List<BoxReference> boxes = ConversionUtils.convertBoxes(appID + "," + encodedBoxName);
-
-        ps.q = algodClient.GetApplicationBoxByName(boxes.get(0).appID).name(encodedBoxName);
+        ps.q = algodClient.GetApplicationBoxByName(Long.valueOf(appID)).name(encodedBoxName);
     }
 }
