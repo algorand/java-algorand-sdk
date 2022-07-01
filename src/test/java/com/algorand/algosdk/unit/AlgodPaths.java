@@ -1,15 +1,19 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.BoxReference;
 import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestingUtils;
+import com.algorand.algosdk.util.ConversionUtils;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
+import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import io.cucumber.java.en.When;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 public class AlgodPaths {
     AlgodClient algodClient = new AlgodClient("localhost", 1234, "");
@@ -82,5 +86,12 @@ public class AlgodPaths {
         AccountInformation aiq = algodClient.AccountInformation(new Address(string));
         if (TestingUtils.notEmpty(string2)) aiq.exclude(QueryMapper.getExclude(string2));
         ps.q = aiq;
+    }
+
+    @When("we make a GetApplicationBoxByName call for applicationID {int} with encoded box name {string}")
+    public void getBoxByName(Integer appID, String encodedBoxName) {
+        List<BoxReference> boxes = ConversionUtils.convertBoxes(appID + "," + encodedBoxName);
+
+        ps.q = algodClient.GetApplicationBoxByName(boxes.get(0).appID).name(encodedBoxName);
     }
 }
