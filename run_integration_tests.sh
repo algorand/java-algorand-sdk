@@ -6,7 +6,7 @@ pushd $rootdir
 
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
-TEST_BRANCH=use_latest
+TEST_BRANCH=feature/box-storage
 
 function help {
   echo "Options:"
