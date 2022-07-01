@@ -42,8 +42,8 @@ public class Applications {
         this.base = base;
     }
 
-    @Given("I build an application transaction with the transient account, the current application, suggested params, operation {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, extra-pages {long}")
-    public void buildAnApplicationTransactions(String operation, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long extraPages) throws Exception {
+    @Given("I build an application transaction with the transient account, the current application, suggested params, operation {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, extra-pages {long}, boxes {string}")
+    public void buildAnApplicationTransactions(String operation, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long extraPages, String boxesStr) throws Exception {
         ApplicationBaseTransactionBuilder builder = null;
 
         // Create builder and apply builder-specific parameters
@@ -100,6 +100,9 @@ public class Applications {
         }
         if (StringUtils.isNotEmpty(appAccounts)) {
             builder.accounts(convertAccounts(appAccounts));
+        }
+        if (StringUtils.isNotEmpty(boxesStr)) {
+            builder.boxReferences(convertBoxes(boxesStr));
         }
 
         // Send with transient account, suggested params and current application
@@ -246,5 +249,26 @@ public class Applications {
         }
 
         assertThat(found).as("Couldn't find key '%s'", hasKey).isTrue();
+    }
+
+    @Then("the contents of the box with name {string} should be {string}. If there is an error it is {string}.")
+    public void contentsOfBoxShouldBe(String boxName, String boxContents, String errStr) throws Exception {
+        boxName = boxName.split(":")[1];
+        try {
+            Response<Box> boxResp = clients.v2Client.GetApplicationBoxByName(this.appId, boxName.getBytes()).execute();
+            
+            // If an error was expected, make sure it is set correctly.
+            if (StringUtils.isNotEmpty(errStr)) {
+                assertThat(boxResp.isSuccessful()).isFalse();
+                assertThat(boxResp.message()).containsIgnoringCase(errStr);
+                return;
+            }
+
+            assertThat(boxResp.body().value().equals(boxContents));
+        } catch (Exception e) {
+            if (errStr.equals("") || !e.getMessage().contains(errStr)) {
+                throw e;
+            }
+        }
     }
 }

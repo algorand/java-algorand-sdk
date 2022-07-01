@@ -16,8 +16,10 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
@@ -103,6 +105,8 @@ public class TestTransaction {
                 .firstValid(301)
                 .lastValid(1300)
                 .genesisHash(new Digest())
+                .foreignApps(Arrays.asList(10L))
+                .boxReferences(Arrays.asList(new BoxReference(10L, "name".getBytes())))
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -111,6 +115,28 @@ public class TestTransaction {
         assertEqual(tx, transaction);
         String transactionJson1 = objectMapper.writeValueAsString(transaction);
         assertThat(transactionJson).isEqualTo(transactionJson1);
+    }
+
+    @Test
+    public void testApplicationTransactionWithBoxes() throws Exception {
+        Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
+        Transaction tx = Transaction.ApplicationUpdateTransactionBuilder()
+                .sender(from)
+                .applicationId(100000L)
+                .firstValid(301)
+                .lastValid(1300)
+                .genesisHash(new Digest())
+                .foreignApps(Arrays.asList(10L, 100000L))
+                .boxReferences(Arrays.asList(
+                    new BoxReference(10L, "name".getBytes()),
+                    new BoxReference(100000L, "name2".getBytes()),
+                    new BoxReference(0L, "name3".getBytes())))
+                .build();
+
+        assert(tx.boxReferences.size() == 3);
+        assert(tx.boxReferences.get(0).appIdx == 1);
+        assert(tx.boxReferences.get(1).appIdx == 2);
+        assert(tx.boxReferences.get(2).appIdx == 0);
     }
 
     @Test
