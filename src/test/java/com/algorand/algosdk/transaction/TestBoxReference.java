@@ -57,4 +57,21 @@ public class TestBoxReference {
                 new BoxReference.BoxReferenceSerialize(0, br.name),
                 br.getBoxReferenceSerialize(Lists.newArrayList(), 1L));
     }
+
+    @Test
+    public void testBoxReferenceSerializeFallbackToCurrentApp() {
+        // Mirrors priority search in goal from `cmd/goal/application.go::translateBoxRefs`.
+        long appId = 7;
+        BoxReference br = genWithAppId(appId);
+
+        // Prefer foreign apps index when present.
+        Assert.assertEquals(
+                new BoxReference.BoxReferenceSerialize(4, br.name),
+                br.getBoxReferenceSerialize(Lists.newArrayList(1L, 3L, 4L, appId), appId));
+
+        // Fallback to current app when absent from foreign apps.
+        Assert.assertEquals(
+                new BoxReference.BoxReferenceSerialize(0, br.name),
+                br.getBoxReferenceSerialize(Lists.newArrayList(1L, 3L, 4L), appId));
+    }
 }
