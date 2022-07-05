@@ -1,6 +1,5 @@
 package com.algorand.algosdk.transaction;
 
-import com.algorand.algosdk.v2.client.model.Box;
 import com.google.common.collect.Lists;
 import org.junit.Test;
 
@@ -38,8 +37,8 @@ public class TestBoxReference {
         BoxReference br = genWithAppId(appId);
 
         Assert.assertEquals(
-                new BoxReference.BoxReferenceSerialize(4, br.name),
-                br.getBoxReferenceSerialize(Lists.newArrayList(1L, 3L, 4L, appId), appId - 1));
+                new BoxReference.ByAppIndex(4, br.name),
+                br.asBoxReferenceByAppIndex(Lists.newArrayList(1L, 3L, 4L, appId), appId - 1));
     }
 
     @Test(expected = RuntimeException.class)
@@ -47,15 +46,15 @@ public class TestBoxReference {
         long appId = 7;
         final BoxReference br = genWithAppId(appId);
 
-        br.getBoxReferenceSerialize(Lists.newArrayList(1L, 3L, 4L), appId - 1);
+        br.asBoxReferenceByAppIndex(Lists.newArrayList(1L, 3L, 4L), appId - 1);
     }
 
     @Test
     public void testBoxReferenceSerializeNewAppId() {
         BoxReference br = genWithNewAppId();
         Assert.assertEquals(
-                new BoxReference.BoxReferenceSerialize(0, br.name),
-                br.getBoxReferenceSerialize(Lists.newArrayList(), 1L));
+                new BoxReference.ByAppIndex(0, br.name),
+                br.asBoxReferenceByAppIndex(Lists.newArrayList(), 1L));
     }
 
     @Test
@@ -66,12 +65,12 @@ public class TestBoxReference {
 
         // Prefer foreign apps index when present.
         Assert.assertEquals(
-                new BoxReference.BoxReferenceSerialize(4, br.name),
-                br.getBoxReferenceSerialize(Lists.newArrayList(1L, 3L, 4L, appId), appId));
+                new BoxReference.ByAppIndex(4, br.name),
+                br.asBoxReferenceByAppIndex(Lists.newArrayList(1L, 3L, 4L, appId), appId));
 
         // Fallback to current app when absent from foreign apps.
         Assert.assertEquals(
-                new BoxReference.BoxReferenceSerialize(0, br.name),
-                br.getBoxReferenceSerialize(Lists.newArrayList(1L, 3L, 4L), appId));
+                new BoxReference.ByAppIndex(0, br.name),
+                br.asBoxReferenceByAppIndex(Lists.newArrayList(1L, 3L, 4L), appId));
     }
 }

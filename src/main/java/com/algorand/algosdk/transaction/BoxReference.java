@@ -44,17 +44,17 @@ public class BoxReference {
     private static final int FOREIGN_APPS_INDEX_OFFSET = 1;
     private static final long NEW_APP_ID = 0L;
 
-    public BoxReferenceSerialize getBoxReferenceSerialize(List<Long> foreignApps, Long curApp) {
+    public ByAppIndex asBoxReferenceByAppIndex(List<Long> foreignApps, Long curApp) {
         if (appID.equals(NEW_APP_ID))
-            return new BoxReferenceSerialize(0, name);
+            return new ByAppIndex(0, name);
 
         if (foreignApps == null || !foreignApps.contains(appID))
             if (appID.equals(curApp))
-                return new BoxReferenceSerialize(0, name);
+                return new ByAppIndex(0, name);
             else
                 throw new RuntimeException(String.format("this box's appID is not present in the foreign apps array: %d %d %s", appID, curApp, foreignApps));
         else
-            return new BoxReferenceSerialize(foreignApps.indexOf(appID) + FOREIGN_APPS_INDEX_OFFSET, name);
+            return new ByAppIndex(foreignApps.indexOf(appID) + FOREIGN_APPS_INDEX_OFFSET, name);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BoxReference {
 
     @JsonPropertyOrder(alphabetic = true)
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
-    public static class BoxReferenceSerialize implements Serializable {
+    public static class ByAppIndex implements Serializable {
         // the index in the foreign apps array of the app this box belongs to
         @JsonProperty("i")
         public int appIdx;
@@ -77,15 +77,15 @@ public class BoxReference {
         public byte[] name;
 
         @JsonCreator
-        public BoxReferenceSerialize(@JsonProperty("i") int appIdx,
-                                     @JsonProperty("n") byte[] name) {
+        public ByAppIndex(@JsonProperty("i") int appIdx,
+                          @JsonProperty("n") byte[] name) {
             this.appIdx = appIdx;
             this.name = name;
         }
 
         @Override
         public String toString() {
-            return "BoxReferenceSerialize{" +
+            return "ByAppIndex{" +
                     "appIdx=" + appIdx +
                     ", name=" + Arrays.toString(name) +
                     '}';
@@ -95,7 +95,7 @@ public class BoxReference {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            BoxReferenceSerialize that = (BoxReferenceSerialize) o;
+            ByAppIndex that = (ByAppIndex) o;
             return appIdx == that.appIdx && Arrays.equals(name, that.name);
         }
 

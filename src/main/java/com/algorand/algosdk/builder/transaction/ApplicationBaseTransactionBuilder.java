@@ -3,7 +3,6 @@ package com.algorand.algosdk.builder.transaction;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.BoxReference;
 import com.algorand.algosdk.transaction.Transaction;
-import com.algorand.algosdk.transaction.BoxReference.BoxReferenceSerialize;
 import com.algorand.algosdk.util.Encoder;
 
 import java.util.ArrayList;
@@ -67,6 +66,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
 
     /**
      * ApplicationArgs lists some transaction-specific arguments accessible from application logic.
+     *
      * @param args List of Base64 encoded strings.
      */
     public T argsBase64Encoded(List<String> args) {
@@ -99,12 +99,12 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      * The boxReferences must be converted to a serializable form before inserting
      * them into the transaction.
      */
-    private List<BoxReferenceSerialize> convertBoxes(List<BoxReference> boxes, List<Long> foreignApps, Long curApp) {
-        ArrayList<BoxReferenceSerialize> boxesToSerialize = new ArrayList<>();
+    private List<BoxReference.ByAppIndex> convertBoxes(List<BoxReference> boxes, List<Long> foreignApps, Long curApp) {
+        ArrayList<BoxReference.ByAppIndex> xs = new ArrayList<>();
         for (BoxReference box : boxes) {
-            boxesToSerialize.add(box.getBoxReferenceSerialize(foreignApps, curApp));
+            xs.add(box.asBoxReferenceByAppIndex(foreignApps, curApp));
         }
-        return boxesToSerialize;
+        return xs;
     }
 
     /**

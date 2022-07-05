@@ -4,7 +4,6 @@ import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.*;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.logic.StateSchema;
-import com.algorand.algosdk.transaction.BoxReference.BoxReferenceSerialize;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.*;
@@ -20,7 +19,7 @@ import java.util.*;
  * A raw serializable transaction class, used to generate transactions to broadcast to the network.
  * This is distinct from algod.model.Transaction, which is only returned for GET requests to algod.
  */
-@JsonPropertyOrder(alphabetic=true)
+@JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class Transaction implements Serializable {
     private static final byte[] TX_SIGN_PREFIX = ("TX").getBytes(StandardCharsets.UTF_8);
@@ -118,7 +117,7 @@ public class Transaction implements Serializable {
     // account.
     @JsonProperty("aclose")
     public Address assetCloseTo = new Address();
-    
+
     /* asset freeze fields */
     @JsonProperty("fadd")
     public Address freezeTarget = new Address();
@@ -149,7 +148,7 @@ public class Transaction implements Serializable {
     public List<Long> foreignAssets = new ArrayList<>();
 
     @JsonProperty("apbx")
-    public List<BoxReferenceSerialize> boxReferences = new ArrayList<>();
+    public List<BoxReference.ByAppIndex> boxReferences = new ArrayList<>();
 
     @JsonProperty("apgs")
     public StateSchema globalStateSchema = new StateSchema();
@@ -168,12 +167,13 @@ public class Transaction implements Serializable {
 
     /**
      * Create a payment transaction
-     * @param fromAddr source address
-     * @param toAddr destination address
-     * @param fee transaction fee
-     * @param amount payment amount
+     *
+     * @param fromAddr   source address
+     * @param toAddr     destination address
+     * @param fee        transaction fee
+     * @param amount     payment amount
      * @param firstRound first valid round
-     * @param lastRound last valid round
+     * @param lastRound  last valid round
      */
     @Deprecated
     public Transaction(Address fromAddr, Address toAddr, BigInteger fee, BigInteger amount, BigInteger firstRound,
@@ -190,12 +190,13 @@ public class Transaction implements Serializable {
 
     /**
      * Create a payment transaction. Make sure to sign with a suggested fee.
-     * @param fromAddr source address
-     * @param toAddr destination address
-     * @param amount amount to send
-     * @param firstRound first valid round
-     * @param lastRound last valid round
-     * @param genesisID genesis id
+     *
+     * @param fromAddr    source address
+     * @param toAddr      destination address
+     * @param amount      amount to send
+     * @param firstRound  first valid round
+     * @param lastRound   last valid round
+     * @param genesisID   genesis id
      * @param genesisHash genesis hash
      */
     @Deprecated
@@ -231,9 +232,9 @@ public class Transaction implements Serializable {
      */
     @Deprecated
     public static Transaction createPaymentTransaction(Address sender, BigInteger fee, BigInteger firstValid,
-                                                        BigInteger lastValid, byte[] note, String genesisID,
-                                                        Digest genesisHash, BigInteger amount, Address receiver,
-                                                        Address closeRemainderTo) {
+                                                       BigInteger lastValid, byte[] note, String genesisID,
+                                                       Digest genesisHash, BigInteger amount, Address receiver,
+                                                       Address closeRemainderTo) {
         Objects.requireNonNull(sender, "sender is required.");
         Objects.requireNonNull(firstValid, "firstValid is required.");
         Objects.requireNonNull(lastValid, "lastValid is required.");
@@ -297,15 +298,16 @@ public class Transaction implements Serializable {
 
     /**
      * Create a key registration transaction. No field can be null except the note field.
-     * @param sender source address
-     * @param fee transaction fee
-     * @param firstValid first valid round
-     * @param lastValid last valid round
-     * @param note optional notes field (can be null)
-     * @param votePK the new participation key to register
-     * @param vrfPK the sortition key to register
-     * @param voteFirst key reg valid first round
-     * @param voteLast key reg valid last round
+     *
+     * @param sender          source address
+     * @param fee             transaction fee
+     * @param firstValid      first valid round
+     * @param lastValid       last valid round
+     * @param note            optional notes field (can be null)
+     * @param votePK          the new participation key to register
+     * @param vrfPK           the sortition key to register
+     * @param voteFirst       key reg valid first round
+     * @param voteLast        key reg valid last round
      * @param voteKeyDilution key reg dilution
      */
     @Deprecated
@@ -320,7 +322,7 @@ public class Transaction implements Serializable {
         if (lastValid != null) this.lastValid = lastValid;
         setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
-        if (genesisHash != null) this.genesisHash = genesisHash;        
+        if (genesisHash != null) this.genesisHash = genesisHash;
         if (votePK != null) this.votePK = votePK;
         if (vrfPK != null) this.selectionPK = vrfPK;
         if (voteFirst != null) this.voteFirst = voteFirst;
@@ -401,30 +403,31 @@ public class Transaction implements Serializable {
 
     /**
      * Create an asset creation transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
-     * @param sender source address
-     * @param fee transaction fee
-     * @param firstValid first valid round
-     * @param lastValid last valid round
-     * @param note optional note field (can be null)
+     *
+     * @param sender        source address
+     * @param fee           transaction fee
+     * @param firstValid    first valid round
+     * @param lastValid     last valid round
+     * @param note          optional note field (can be null)
      * @param genesisID
      * @param genesisHash
-     * @param assetTotal total asset issuance
+     * @param assetTotal    total asset issuance
      * @param assetDecimals asset decimal precision
      * @param defaultFrozen whether accounts have this asset frozen by default
      * @param assetUnitName name of unit of the asset
-     * @param assetName name of the asset
-     * @param url where more information about the asset can be retrieved
-     * @param metadataHash specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application
-     * @param manager account which can reconfigure the asset
-     * @param reserve account whose asset holdings count as non-minted
-     * @param freeze account which can freeze or unfreeze holder accounts
-     * @param clawback account which can issue clawbacks against holder accounts
+     * @param assetName     name of the asset
+     * @param url           where more information about the asset can be retrieved
+     * @param metadataHash  specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application
+     * @param manager       account which can reconfigure the asset
+     * @param reserve       account whose asset holdings count as non-minted
+     * @param freeze        account which can freeze or unfreeze holder accounts
+     * @param clawback      account which can issue clawbacks against holder accounts
      */
     @Deprecated
     private Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
-                       String assetUnitName, String assetName, String url, byte[] metadataHash, 
-                       Address manager, Address reserve, Address freeze, Address clawback) {
+                        String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
+                        String assetUnitName, String assetName, String url, byte[] metadataHash,
+                        Address manager, Address reserve, Address freeze, Address clawback) {
         this.type = Type.AssetConfig;
         if (sender != null) this.sender = sender;
         setFee(fee);
@@ -433,36 +436,37 @@ public class Transaction implements Serializable {
         setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
- 
-        this.assetParams = new AssetParams(assetTotal, assetDecimals, defaultFrozen, assetUnitName, assetName, url, metadataHash, manager, reserve, freeze, clawback);        
+
+        this.assetParams = new AssetParams(assetTotal, assetDecimals, defaultFrozen, assetUnitName, assetName, url, metadataHash, manager, reserve, freeze, clawback);
     }
 
     /**
      * Create an asset creation transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
-     * @param sender source address
-     * @param fee transaction fee
-     * @param firstValid first valid round
-     * @param lastValid last valid round
-     * @param note optional note field (can be null)
+     *
+     * @param sender        source address
+     * @param fee           transaction fee
+     * @param firstValid    first valid round
+     * @param lastValid     last valid round
+     * @param note          optional note field (can be null)
      * @param genesisID
      * @param genesisHash
-     * @param assetTotal total asset issuance
+     * @param assetTotal    total asset issuance
      * @param assetDecimals asset decimal precision
      * @param defaultFrozen whether accounts have this asset frozen by default
      * @param assetUnitName name of unit of the asset
-     * @param assetName name of the asset
-     * @param url where more information about the asset can be retrieved
-     * @param metadataHash specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application
-     * @param manager account which can reconfigure the asset
-     * @param reserve account whose asset holdings count as non-minted
-     * @param freeze account which can freeze or unfreeze holder accounts
-     * @param clawback account which can issue clawbacks against holder accounts
+     * @param assetName     name of the asset
+     * @param url           where more information about the asset can be retrieved
+     * @param metadataHash  specifies a commitment to some unspecified asset metadata. The format of this metadata is up to the application
+     * @param manager       account which can reconfigure the asset
+     * @param reserve       account whose asset holdings count as non-minted
+     * @param freeze        account which can freeze or unfreeze holder accounts
+     * @param clawback      account which can issue clawbacks against holder accounts
      */
     @Deprecated
     public static Transaction createAssetCreateTransaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
-                       String assetUnitName, String assetName, String url, byte[] metadataHash,
-                       Address manager, Address reserve, Address freeze, Address clawback) {
+                                                           String genesisID, Digest genesisHash, BigInteger assetTotal, Integer assetDecimals, boolean defaultFrozen,
+                                                           String assetUnitName, String assetName, String url, byte[] metadataHash,
+                                                           Address manager, Address reserve, Address freeze, Address clawback) {
 
         Objects.requireNonNull(sender, "sender is required.");
         Objects.requireNonNull(firstValid, "firstValid is required.");
@@ -524,26 +528,27 @@ public class Transaction implements Serializable {
                 null,
                 null);
     }
-    
+
     /**
      * Create an asset configuration transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
-     * @param sender source address
-     * @param fee transaction fee
-     * @param firstValid first valid round
-     * @param lastValid last valid round
-     * @param note optional note field (can be null)
+     *
+     * @param sender      source address
+     * @param fee         transaction fee
+     * @param firstValid  first valid round
+     * @param lastValid   last valid round
+     * @param note        optional note field (can be null)
      * @param genesisID
      * @param genesisHash
-     * @param index asset index
-     * @param manager account which can reconfigure the asset
-     * @param reserve account whose asset holdings count as non-minted
-     * @param freeze account which can freeze or unfreeze holder accounts
-     * @param clawback account which can issue clawbacks against holder accounts
+     * @param index       asset index
+     * @param manager     account which can reconfigure the asset
+     * @param reserve     account whose asset holdings count as non-minted
+     * @param freeze      account which can freeze or unfreeze holder accounts
+     * @param clawback    account which can issue clawbacks against holder accounts
      */
     private Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                       String genesisID, Digest genesisHash, BigInteger index,
-                    Address manager, Address reserve, Address freeze, Address clawback) {
- 
+                        String genesisID, Digest genesisHash, BigInteger index,
+                        Address manager, Address reserve, Address freeze, Address clawback) {
+
         this.type = Type.AssetConfig;
         if (sender != null) this.sender = sender;
         setFee(fee);
@@ -554,62 +559,63 @@ public class Transaction implements Serializable {
         if (genesisHash != null) this.genesisHash = genesisHash;
         this.assetParams = new AssetParams(BigInteger.valueOf(0), 0, false, "", "", "", null, manager, reserve, freeze, clawback);
         assetIndex = index;
-    }        
+    }
 
     /**
      * Create an asset configuration transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
-     * @param sender source address
-     * @param fee transaction fee
-     * @param firstValid first valid round
-     * @param lastValid last valid round
-     * @param note optional note field (can be null)
+     *
+     * @param sender                     source address
+     * @param fee                        transaction fee
+     * @param firstValid                 first valid round
+     * @param lastValid                  last valid round
+     * @param note                       optional note field (can be null)
      * @param genesisID
      * @param genesisHash
-     * @param index asset index
-     * @param manager account which can reconfigure the asset
-     * @param reserve account whose asset holdings count as non-minted
-     * @param freeze account which can freeze or unfreeze holder accounts
-     * @param clawback account which can issue clawbacks against holder accounts
+     * @param index                      asset index
+     * @param manager                    account which can reconfigure the asset
+     * @param reserve                    account whose asset holdings count as non-minted
+     * @param freeze                     account which can freeze or unfreeze holder accounts
+     * @param clawback                   account which can issue clawbacks against holder accounts
      * @param strictEmptyAddressChecking if true, disallow empty admin accounts from being set (preventing accidental disable of admin features)
      */
     @Deprecated
     public static Transaction createAssetConfigureTransaction(
-    		Address sender, 
-    		BigInteger fee, 
-    		BigInteger firstValid, 
-    		BigInteger lastValid, 
-    		byte[] note,
-    		String genesisID, 
-    		Digest genesisHash,
-    		BigInteger index,
-    		Address manager, 
-    		Address reserve, 
-    		Address freeze, 
-    		Address clawback,
-    		boolean strictEmptyAddressChecking) {
+            Address sender,
+            BigInteger fee,
+            BigInteger firstValid,
+            BigInteger lastValid,
+            byte[] note,
+            String genesisID,
+            Digest genesisHash,
+            BigInteger index,
+            Address manager,
+            Address reserve,
+            Address freeze,
+            Address clawback,
+            boolean strictEmptyAddressChecking) {
         Address defaultAddr = new Address();
-    	if (strictEmptyAddressChecking && ( 
-    			(manager == null || manager.equals(defaultAddr)) ||
-    			(reserve == null || reserve.equals(defaultAddr)) ||	
-    			(freeze == null || freeze.equals(defaultAddr)) ||
-    			(clawback == null || clawback.equals(defaultAddr))
-    			)) {
-    		throw new RuntimeException("strict empty address checking requested but "
-    				+ "empty or default address supplied to one or more manager addresses");
-    	}
-    	return new Transaction(
-    			sender, 
-    			fee, 
-    			firstValid, 
-    			lastValid, 
-    			note,
-    			genesisID, 
-    			genesisHash, 
-    			index,
-    			manager, 
-    			reserve, 
-    			freeze, 
-    			clawback);
+        if (strictEmptyAddressChecking && (
+                (manager == null || manager.equals(defaultAddr)) ||
+                        (reserve == null || reserve.equals(defaultAddr)) ||
+                        (freeze == null || freeze.equals(defaultAddr)) ||
+                        (clawback == null || clawback.equals(defaultAddr))
+        )) {
+            throw new RuntimeException("strict empty address checking requested but "
+                    + "empty or default address supplied to one or more manager addresses");
+        }
+        return new Transaction(
+                sender,
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                genesisHash,
+                index,
+                manager,
+                reserve,
+                freeze,
+                clawback);
     }
 
     /**
@@ -637,7 +643,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("gh") byte[] genesisHash,
                         @JsonProperty("lx") byte[] lease,
                         @JsonProperty("rekey") byte[] rekeyTo,
-                        @JsonProperty("grp") byte[] group,			
+                        @JsonProperty("grp") byte[] group,
                         // payment fields
                         @JsonProperty("amt") BigInteger amount,
                         @JsonProperty("rcv") byte[] receiver,
@@ -670,63 +676,63 @@ public class Transaction implements Serializable {
                         @JsonProperty("apat") List<byte[]> accounts,
                         @JsonProperty("apfa") List<Long> foreignApps,
                         @JsonProperty("apas") List<Long> foreignAssets,
-                        @JsonProperty("apbx") List<BoxReferenceSerialize> boxReferences,
+                        @JsonProperty("apbx") List<BoxReference.ByAppIndex> boxReferences,
                         @JsonProperty("apgs") StateSchema globalStateSchema,
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
                         @JsonProperty("apsu") byte[] clearStateProgram,
                         @JsonProperty("apep") Long extraPages
-                        ) throws IOException {
+    ) throws IOException {
         this(
-             type,
-             //header fields
-             new Address(sender),
-             fee,
-             firstValid,
-             lastValid,
-             note,
-             genesisID,
-             new Digest(genesisHash),
-             lease,
-             new Address(rekeyTo),
-             new Digest(group),
-             // payment fields
-             amount,
-             new Address(receiver),
-             new Address(closeRemainderTo),
-             // keyreg fields
-             new ParticipationPublicKey(votePK),
-             new VRFPublicKey(vrfPK),
-             new MerkleVerifier(stateProofKey),
-             voteFirst,
-             voteLast,
-             voteKeyDilution,
-             nonpart,
-             // asset creation and configuration
-             assetParams,
-             assetIndex,
-             // asset transfer fields
-             xferAsset,
-             assetAmount,
-             new Address(assetSender),
-             new Address(assetReceiver),
-             new Address(assetCloseTo),
-             new Address(freezeTarget),
-             assetFreezeID,
-             freezeState,
-             // application fields
-             applicationArgs,
-             onCompletion,
-             approvalProgram == null ? null : new TEALProgram(approvalProgram),
-             convertToAddressList(accounts),
-             foreignApps,
-             foreignAssets,
-             boxReferences,
-             globalStateSchema,
-             applicationId,
-             localStateSchema,
-             clearStateProgram == null ? null : new TEALProgram(clearStateProgram),
-             extraPages
+                type,
+                //header fields
+                new Address(sender),
+                fee,
+                firstValid,
+                lastValid,
+                note,
+                genesisID,
+                new Digest(genesisHash),
+                lease,
+                new Address(rekeyTo),
+                new Digest(group),
+                // payment fields
+                amount,
+                new Address(receiver),
+                new Address(closeRemainderTo),
+                // keyreg fields
+                new ParticipationPublicKey(votePK),
+                new VRFPublicKey(vrfPK),
+                new MerkleVerifier(stateProofKey),
+                voteFirst,
+                voteLast,
+                voteKeyDilution,
+                nonpart,
+                // asset creation and configuration
+                assetParams,
+                assetIndex,
+                // asset transfer fields
+                xferAsset,
+                assetAmount,
+                new Address(assetSender),
+                new Address(assetReceiver),
+                new Address(assetCloseTo),
+                new Address(freezeTarget),
+                assetFreezeID,
+                freezeState,
+                // application fields
+                applicationArgs,
+                onCompletion,
+                approvalProgram == null ? null : new TEALProgram(approvalProgram),
+                convertToAddressList(accounts),
+                foreignApps,
+                foreignAssets,
+                boxReferences,
+                globalStateSchema,
+                applicationId,
+                localStateSchema,
+                clearStateProgram == null ? null : new TEALProgram(clearStateProgram),
+                extraPages
         );
     }
 
@@ -779,7 +785,7 @@ public class Transaction implements Serializable {
             List<Address> accounts,
             List<Long> foreignApps,
             List<Long> foreignAssets,
-            List<BoxReferenceSerialize> boxReferences,
+            List<BoxReference.ByAppIndex> boxReferences,
             StateSchema globalStateSchema,
             Long applicationId,
             StateSchema localStateSchema,
@@ -845,57 +851,57 @@ public class Transaction implements Serializable {
      * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
      */
     public Transaction(
-                        Type type,
-                        //header fields
-                        Address sender,
-                        BigInteger fee,
-                        BigInteger firstValid,
-                        BigInteger lastValid,
-                        byte[] note,
-                        String genesisID,
-                        Digest genesisHash,
-                        byte[] lease,
-                        Address rekeyTo,
-                        Digest group,
-                        // payment fields
-                        BigInteger amount,
-                        Address receiver,
-                        Address closeRemainderTo,
-                        // keyreg fields
-                        ParticipationPublicKey votePK,
-                        VRFPublicKey vrfPK,
-                        MerkleVerifier stateProofKey,
-                        BigInteger voteFirst,
-                        BigInteger voteLast,
-                        // voteKeyDilution
-                        BigInteger voteKeyDilution,
-                        boolean nonpart,
-                        // asset creation and configuration
-                        AssetParams assetParams,
-                        BigInteger assetIndex,
-                        // asset transfer fields
-                        BigInteger xferAsset,
-                        BigInteger assetAmount,
-                        Address assetSender,
-                        Address assetReceiver,
-                        Address assetCloseTo,
-                        Address freezeTarget,
-                        BigInteger assetFreezeID,
-                        boolean freezeState,
-                        // application fields
-                        List<byte[]> applicationArgs,
-                        OnCompletion onCompletion,
-                        TEALProgram approvalProgram,
-                        List<Address> accounts,
-                        List<Long> foreignApps,
-                        List<Long> foreignAssets,
-                        List<BoxReferenceSerialize> boxReferences,
-                        StateSchema globalStateSchema,
-                        Long applicationId,
-                        StateSchema localStateSchema,
-                        TEALProgram clearStateProgram,
-                        Long extraPages
-                        ) {
+            Type type,
+            //header fields
+            Address sender,
+            BigInteger fee,
+            BigInteger firstValid,
+            BigInteger lastValid,
+            byte[] note,
+            String genesisID,
+            Digest genesisHash,
+            byte[] lease,
+            Address rekeyTo,
+            Digest group,
+            // payment fields
+            BigInteger amount,
+            Address receiver,
+            Address closeRemainderTo,
+            // keyreg fields
+            ParticipationPublicKey votePK,
+            VRFPublicKey vrfPK,
+            MerkleVerifier stateProofKey,
+            BigInteger voteFirst,
+            BigInteger voteLast,
+            // voteKeyDilution
+            BigInteger voteKeyDilution,
+            boolean nonpart,
+            // asset creation and configuration
+            AssetParams assetParams,
+            BigInteger assetIndex,
+            // asset transfer fields
+            BigInteger xferAsset,
+            BigInteger assetAmount,
+            Address assetSender,
+            Address assetReceiver,
+            Address assetCloseTo,
+            Address freezeTarget,
+            BigInteger assetFreezeID,
+            boolean freezeState,
+            // application fields
+            List<byte[]> applicationArgs,
+            OnCompletion onCompletion,
+            TEALProgram approvalProgram,
+            List<Address> accounts,
+            List<Long> foreignApps,
+            List<Long> foreignAssets,
+            List<BoxReference.ByAppIndex> boxReferences,
+            StateSchema globalStateSchema,
+            Long applicationId,
+            StateSchema localStateSchema,
+            TEALProgram clearStateProgram,
+            Long extraPages
+    ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
         setFee(fee);
@@ -942,24 +948,26 @@ public class Transaction implements Serializable {
     }
 
     // Used by Jackson to determine "default" values.
-    public Transaction() {}
+    public Transaction() {
+    }
 
     /**
      * Base constructor with flat fee for asset xfer/freeze/destroy transactions.
-     * @param flatFee is the transaction flat fee
-     * @param firstRound is the first round this txn is valid (txn semantics
-     * unrelated to asset management)
-     * @param lastRound is the last round this txn is valid
+     *
+     * @param flatFee     is the transaction flat fee
+     * @param firstRound  is the first round this txn is valid (txn semantics
+     *                    unrelated to asset management)
+     * @param lastRound   is the last round this txn is valid
      * @param note
      * @param genesisHash corresponds to the base64-encoded hash of the genesis
-     * of the network
+     *                    of the network
      **/
     private Transaction(
             Type type,
             BigInteger flatFee,
             BigInteger firstRound,
             BigInteger lastRound,
-            byte [] note,
+            byte[] note,
             Digest genesisHash) {
 
         this.type = type;
@@ -972,28 +980,29 @@ public class Transaction implements Serializable {
 
     /**
      * Creates a tx to mark the account as willing to accept the asset.
+     *
      * @param acceptingAccount is a checksummed, human-readable address that
-     * will accept receiving the asset.
-     * @param flatFee is the transaction flat fee
-     * @param firstRound is the first round this txn is valid (txn semantics
-     * unrelated to asset management)
-     * @param lastRound is the last round this txn is valid
+     *                         will accept receiving the asset.
+     * @param flatFee          is the transaction flat fee
+     * @param firstRound       is the first round this txn is valid (txn semantics
+     *                         unrelated to asset management)
+     * @param lastRound        is the last round this txn is valid
      * @param note
-     * @param genesisID corresponds to the id of the network
-     * @param genesisHash corresponds to the base64-encoded hash of the genesis
-     * of the network
-     * @param assetIndex is the asset index
+     * @param genesisID        corresponds to the id of the network
+     * @param genesisHash      corresponds to the base64-encoded hash of the genesis
+     *                         of the network
+     * @param assetIndex       is the asset index
      **/
     @Deprecated
     public static Transaction createAssetAcceptTransaction( //AssetTransaction
-            Address acceptingAccount, 
-            BigInteger flatFee,
-            BigInteger firstRound,
-            BigInteger lastRound,
-            byte [] note,
-            String genesisID,
-            Digest genesisHash,
-            BigInteger assetIndex) {
+                                                            Address acceptingAccount,
+                                                            BigInteger flatFee,
+                                                            BigInteger firstRound,
+                                                            BigInteger lastRound,
+                                                            byte[] note,
+                                                            String genesisID,
+                                                            Digest genesisHash,
+                                                            BigInteger assetIndex) {
 
         Transaction tx = createAssetTransferTransaction(
                 acceptingAccount,
@@ -1013,23 +1022,24 @@ public class Transaction implements Serializable {
 
     /**
      * Creates a tx to destroy the asset
-     * @param senderAccount is a checksummed, human-readable address of the sender 
-     * @param flatFee is the transaction flat fee
-     * @param firstValid is the first round this txn is valid (txn semantics
-     * unrelated to asset management)
-     * @param lastValid is the last round this txn is valid
+     *
+     * @param senderAccount is a checksummed, human-readable address of the sender
+     * @param flatFee       is the transaction flat fee
+     * @param firstValid    is the first round this txn is valid (txn semantics
+     *                      unrelated to asset management)
+     * @param lastValid     is the last round this txn is valid
      * @param note
-     * @param genesisHash corresponds to the base64-encoded hash of the genesis
-     * of the network
-     * @param assetIndex is the asset ID to destroy
+     * @param genesisHash   corresponds to the base64-encoded hash of the genesis
+     *                      of the network
+     * @param assetIndex    is the asset ID to destroy
      **/
     @Deprecated
     public static Transaction createAssetDestroyTransaction(
-            Address senderAccount, 
+            Address senderAccount,
             BigInteger flatFee,
             BigInteger firstValid,
             BigInteger lastValid,
-            byte [] note,
+            byte[] note,
             Digest genesisHash,
             BigInteger assetIndex) {
         Transaction tx = new Transaction(
@@ -1039,7 +1049,7 @@ public class Transaction implements Serializable {
                 lastValid,
                 note,
                 genesisHash);
-        
+
         if (assetIndex != null) tx.assetIndex = assetIndex;
         if (senderAccount != null) tx.sender = senderAccount;
         return tx;
@@ -1047,25 +1057,26 @@ public class Transaction implements Serializable {
 
     /**
      * Creates a tx to freeze/unfreeze assets
-     * @param senderAccount is a checksummed, human-readable address of the sender 
-     * @param flatFee is the transaction flat fee
-     * @param firstValid is the first round this txn is valid (txn semantics
-     * unrelated to asset management)
-     * @param lastValid is the last round this txn is valid
+     *
+     * @param senderAccount is a checksummed, human-readable address of the sender
+     * @param flatFee       is the transaction flat fee
+     * @param firstValid    is the first round this txn is valid (txn semantics
+     *                      unrelated to asset management)
+     * @param lastValid     is the last round this txn is valid
      * @param note
-     * @param genesisHash corresponds to the base64-encoded hash of the genesis
-     * of the network
-     * @param assetIndex is the asset ID to destroy
+     * @param genesisHash   corresponds to the base64-encoded hash of the genesis
+     *                      of the network
+     * @param assetIndex    is the asset ID to destroy
      **/
     @Deprecated
     public static Transaction createAssetFreezeTransaction(
-            Address senderAccount, 
+            Address senderAccount,
             Address accountToFreeze,
             boolean freezeState,
             BigInteger flatFee,
             BigInteger firstValid,
             BigInteger lastValid,
-            byte [] note,
+            byte[] note,
             Digest genesisHash,
             BigInteger assetIndex) {
         Transaction tx = new Transaction(
@@ -1075,46 +1086,47 @@ public class Transaction implements Serializable {
                 lastValid,
                 note,
                 genesisHash);
-        
+
         if (senderAccount != null) tx.sender = senderAccount;
         if (accountToFreeze != null) tx.freezeTarget = accountToFreeze;
         if (assetIndex != null) tx.assetFreezeID = assetIndex;
         tx.freezeState = freezeState;
         return tx;
-    }    
-    
+    }
+
     /**
      * Creates a tx for revoking an asset from an account and sending it to another
+     *
      * @param transactionSender is a checksummed, human-readable address that will
-     * send the transaction
-     * @param assetRevokedFrom is a checksummed, human-readable address that will
-     * have assets taken from
-     * @param assetReceiver is a checksummed, human-readable address what will
-     * receive the assets
-     * @param assetAmount is the number of assets to send
-     * @param flatFee is the transaction flat fee
-     * @param firstRound is the first round this txn is valid (txn semantics
-     * unrelated to asset management)
-     * @param lastRound is the last round this txn is valid
+     *                          send the transaction
+     * @param assetRevokedFrom  is a checksummed, human-readable address that will
+     *                          have assets taken from
+     * @param assetReceiver     is a checksummed, human-readable address what will
+     *                          receive the assets
+     * @param assetAmount       is the number of assets to send
+     * @param flatFee           is the transaction flat fee
+     * @param firstRound        is the first round this txn is valid (txn semantics
+     *                          unrelated to asset management)
+     * @param lastRound         is the last round this txn is valid
      * @param note
-     * @param genesisID corresponds to the id of the network
-     * @param genesisHash corresponds to the base64-encoded hash of the genesis
-     * of the network
-     * @param assetIndex is the asset index
+     * @param genesisID         corresponds to the id of the network
+     * @param genesisHash       corresponds to the base64-encoded hash of the genesis
+     *                          of the network
+     * @param assetIndex        is the asset index
      **/
     @Deprecated
     public static Transaction createAssetRevokeTransaction(// AssetTransaction
-            Address transactionSender,
-            Address assetRevokedFrom,
-            Address assetReceiver,
-            BigInteger assetAmount,
-            BigInteger flatFee,
-            BigInteger firstRound,
-            BigInteger lastRound,
-            byte [] note,
-            String genesisID,
-            Digest genesisHash,
-            BigInteger assetIndex) {
+                                                           Address transactionSender,
+                                                           Address assetRevokedFrom,
+                                                           Address assetReceiver,
+                                                           BigInteger assetAmount,
+                                                           BigInteger flatFee,
+                                                           BigInteger firstRound,
+                                                           BigInteger lastRound,
+                                                           byte[] note,
+                                                           String genesisID,
+                                                           Digest genesisHash,
+                                                           BigInteger assetIndex) {
 
         Transaction tx = new Transaction(
                 Type.AssetTransfer,
@@ -1132,43 +1144,44 @@ public class Transaction implements Serializable {
         return tx;
     }
 
-    
+
     /**
      * Creates a tx for sending some asset from an asset holder to another user.
-     *  The asset receiver must have marked itself as willing to accept the
-     *  asset.
-     * @param assetSender is a checksummed, human-readable address that will
-     * send the transaction and assets
+     * The asset receiver must have marked itself as willing to accept the
+     * asset.
+     *
+     * @param assetSender   is a checksummed, human-readable address that will
+     *                      send the transaction and assets
      * @param assetReceiver is a checksummed, human-readable address what will
-     * receive the assets
-     * @param assetCloseTo is a checksummed, human-readable address that
-     * behaves as a close-to address for the asset transaction; the remaining
-     * assets not sent to assetReceiver will be sent to assetCloseTo. Leave
-     * blank for no close-to behavior.
-     * @param assetAmount is the number of assets to send
-     * @param flatFee is the transaction flat fee
-     * @param firstRound is the first round this txn is valid (txn semantics
-     * unrelated to asset management)
-     * @param lastRound is the last round this txn is valid
+     *                      receive the assets
+     * @param assetCloseTo  is a checksummed, human-readable address that
+     *                      behaves as a close-to address for the asset transaction; the remaining
+     *                      assets not sent to assetReceiver will be sent to assetCloseTo. Leave
+     *                      blank for no close-to behavior.
+     * @param assetAmount   is the number of assets to send
+     * @param flatFee       is the transaction flat fee
+     * @param firstRound    is the first round this txn is valid (txn semantics
+     *                      unrelated to asset management)
+     * @param lastRound     is the last round this txn is valid
      * @param note
-     * @param genesisID corresponds to the id of the network
-     * @param genesisHash corresponds to the base64-encoded hash of the genesis
-     * of the network
-     * @param assetIndex is the asset index
+     * @param genesisID     corresponds to the id of the network
+     * @param genesisHash   corresponds to the base64-encoded hash of the genesis
+     *                      of the network
+     * @param assetIndex    is the asset index
      **/
     @Deprecated
     public static Transaction createAssetTransferTransaction(// AssetTransaction
-            Address assetSender,
-            Address assetReceiver,
-            Address assetCloseTo,
-            BigInteger assetAmount,
-            BigInteger flatFee,
-            BigInteger firstRound,
-            BigInteger lastRound,
-            byte [] note,
-            String genesisID,
-            Digest genesisHash,
-            BigInteger assetIndex) {
+                                                             Address assetSender,
+                                                             Address assetReceiver,
+                                                             Address assetCloseTo,
+                                                             BigInteger assetAmount,
+                                                             BigInteger flatFee,
+                                                             BigInteger firstRound,
+                                                             BigInteger lastRound,
+                                                             byte[] note,
+                                                             String genesisID,
+                                                             Digest genesisHash,
+                                                             BigInteger assetIndex) {
 
         Transaction tx = new Transaction(
                 Type.AssetTransfer,
@@ -1194,15 +1207,15 @@ public class Transaction implements Serializable {
 
     /**
      * Set a transaction fee taking the minimum transaction fee into consideration.
-     * @param fee
      *
+     * @param fee
      * @Deprecated a transaction builder is coming.
      */
     @Deprecated
     public void setFee(BigInteger fee) {
         if (fee != null) {
             this.fee = fee;
-        } else  {
+        } else {
             this.fee = Account.MIN_TX_FEE_UALGOS;
         }
 
@@ -1223,10 +1236,10 @@ public class Transaction implements Serializable {
      * the lease identified by the (Sender, Lease) pair of the
      * transaction until the LastValid round passes.  While this
      * transaction possesses the lease, no other transaction
-     * specifying this lease can be confirmed. 
-     * The Size is fixed at 32 bytes. 
-     * @param lease 32 byte lease
+     * specifying this lease can be confirmed.
+     * The Size is fixed at 32 bytes.
      *
+     * @param lease 32 byte lease
      * @Deprecated use setLease(Lease)
      **/
     @Deprecated
@@ -1245,6 +1258,7 @@ public class Transaction implements Serializable {
      * transaction possesses the lease, no other transaction
      * specifying this lease can be confirmed.
      * The Size is fixed at 32 bytes.
+     *
      * @param lease Lease object
      **/
     public void setLease(Lease lease) {
@@ -1268,19 +1282,21 @@ public class Transaction implements Serializable {
         private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
 
         private final String value;
+
         Type(String value) {
             this.value = value;
         }
 
         /**
          * Return the enumeration for the given string value. Required for JSON serialization.
+         *
          * @param value string representation
          * @return enumeration type
          */
         @JsonCreator
         public static Type forValue(String value) {
-            for (Type t :  values()) {
-                if(t.value.equalsIgnoreCase(value)) {
+            for (Type t : values()) {
+                if (t.value.equalsIgnoreCase(value)) {
                     return t;
                 }
             }
@@ -1289,6 +1305,7 @@ public class Transaction implements Serializable {
 
         /**
          * Return the string value for this enumeration. Required for JSON serialization.
+         *
          * @return string value
          */
         @JsonValue
@@ -1314,7 +1331,7 @@ public class Transaction implements Serializable {
         }
 
         public static OnCompletion String(String name) {
-            for(OnCompletion oc : values()) {
+            for (OnCompletion oc : values()) {
                 if (oc.serializedName.equalsIgnoreCase(name)) {
                     return oc;
                 }
@@ -1324,7 +1341,7 @@ public class Transaction implements Serializable {
 
         @JsonCreator
         public static OnCompletion forValue(int value) {
-            for(OnCompletion oc : values()) {
+            for (OnCompletion oc : values()) {
                 if (oc.serializedValue == value) {
                     return oc;
                 }
@@ -1375,7 +1392,7 @@ public class Transaction implements Serializable {
      */
     public Digest rawTxID() throws IOException {
         try {
-         return new Digest(Digester.digest(this.bytesToSign()));
+            return new Digest(Digester.digest(this.bytesToSign()));
         } catch (IOException e) {
             throw new RuntimeException("tx computation failed", e);
         } catch (NoSuchAlgorithmException e) {
@@ -1418,7 +1435,7 @@ public class Transaction implements Serializable {
                 voteFirst.equals(that.voteFirst) &&
                 voteLast.equals(that.voteLast) &&
                 voteKeyDilution.equals(that.voteKeyDilution) &&
-                nonpart==that.nonpart &&
+                nonpart == that.nonpart &&
                 assetParams.equals(that.assetParams) &&
                 assetIndex.equals(that.assetIndex) &&
                 xferAsset.equals(that.xferAsset) &&
