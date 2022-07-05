@@ -1,7 +1,7 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.BoxReference;
+import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
@@ -16,7 +16,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<Address> accounts;
     private List<Long> foreignApps;
     private List<Long> foreignAssets;
-    private List<BoxReference> boxReferences;
+    private List<AppBoxReference> appBoxReferences;
     private Long applicationId;
 
     /**
@@ -38,7 +38,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         if (accounts != null) txn.accounts = accounts;
         if (foreignApps != null) txn.foreignApps = foreignApps;
         if (foreignAssets != null) txn.foreignAssets = foreignAssets;
-        if (boxReferences != null) txn.boxReferences = convertBoxes(boxReferences, foreignApps, applicationId);
+        if (appBoxReferences != null) txn.boxReferences = convertBoxes(appBoxReferences, foreignApps, applicationId);
     }
 
     @Override
@@ -95,14 +95,10 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         return (T) this;
     }
 
-    /**
-     * The boxReferences must be converted to a serializable form before inserting
-     * them into the transaction.
-     */
-    private List<BoxReference.ByAppIndex> convertBoxes(List<BoxReference> boxes, List<Long> foreignApps, Long curApp) {
-        ArrayList<BoxReference.ByAppIndex> xs = new ArrayList<>();
-        for (BoxReference box : boxes) {
-            xs.add(box.asBoxReferenceByAppIndex(foreignApps, curApp));
+    private List<Transaction.BoxReference> convertBoxes(List<AppBoxReference> abrs, List<Long> foreignApps, Long curApp) {
+        ArrayList<Transaction.BoxReference> xs = new ArrayList<>();
+        for (AppBoxReference abr : abrs) {
+            xs.add(Transaction.BoxReference.fromAppBoxReference(abr, foreignApps, curApp));
         }
         return xs;
     }
@@ -111,8 +107,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      * BoxReferences lists the boxes whose state may be accessed during the execution
      * of this application call. The access is read-only.
      */
-    public T boxReferences(List<BoxReference> boxReferences) {
-        this.boxReferences = boxReferences;
+    public T boxReferences(List<AppBoxReference> boxReferences) {
+        this.appBoxReferences = boxReferences;
         return (T) this;
     }
 }

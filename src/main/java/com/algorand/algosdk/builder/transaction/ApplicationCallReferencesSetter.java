@@ -3,10 +3,10 @@ package com.algorand.algosdk.builder.transaction;
 import java.util.List;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.BoxReference;
+import com.algorand.algosdk.transaction.AppBoxReference;
 
 public interface ApplicationCallReferencesSetter<T extends ApplicationCallReferencesSetter<T>> {
-    
+
     /**
      * ApplicationID is the application being interacted with, or 0 if creating a new application.
      */
@@ -33,5 +33,5 @@ public interface ApplicationCallReferencesSetter<T extends ApplicationCallRefere
      * BoxReferences lists the boxes whose state may be accessed during evaluation of this application call. The apps
      * the boxes belong to must be present in ForeignApps. The access is read-only.
      */
-    public T boxReferences(List<BoxReference> boxReferences);
+    public T boxReferences(List<AppBoxReference> boxReferences);
 }

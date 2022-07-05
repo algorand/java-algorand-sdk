@@ -148,7 +148,7 @@ public class Transaction implements Serializable {
     public List<Long> foreignAssets = new ArrayList<>();
 
     @JsonProperty("apbx")
-    public List<BoxReference.ByAppIndex> boxReferences = new ArrayList<>();
+    public List<BoxReference> boxReferences = new ArrayList<>();
 
     @JsonProperty("apgs")
     public StateSchema globalStateSchema = new StateSchema();
@@ -676,7 +676,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("apat") List<byte[]> accounts,
                         @JsonProperty("apfa") List<Long> foreignApps,
                         @JsonProperty("apas") List<Long> foreignAssets,
-                        @JsonProperty("apbx") List<BoxReference.ByAppIndex> boxReferences,
+                        @JsonProperty("apbx") List<BoxReference> boxReferences,
                         @JsonProperty("apgs") StateSchema globalStateSchema,
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
@@ -785,7 +785,7 @@ public class Transaction implements Serializable {
             List<Address> accounts,
             List<Long> foreignApps,
             List<Long> foreignAssets,
-            List<BoxReference.ByAppIndex> boxReferences,
+            List<BoxReference> boxReferences,
             StateSchema globalStateSchema,
             Long applicationId,
             StateSchema localStateSchema,
@@ -895,7 +895,7 @@ public class Transaction implements Serializable {
             List<Address> accounts,
             List<Long> foreignApps,
             List<Long> foreignAssets,
-            List<BoxReference.ByAppIndex> boxReferences,
+            List<BoxReference> boxReferences,
             StateSchema globalStateSchema,
             Long applicationId,
             StateSchema localStateSchema,
@@ -1561,5 +1561,73 @@ public class Transaction implements Serializable {
      */
     public static ApplicationClearTransactionBuilder<?> ApplicationClearTransactionBuilder() {
         return ApplicationClearTransactionBuilder.Builder();
+    }
+
+    @JsonPropertyOrder(alphabetic = true)
+    public static class BoxReference {
+        // the index in the foreign apps array of the app this box belongs to
+        @JsonProperty("i")
+        private final int appIndex;
+
+        // the name of the box unique to the app it belongs to
+        @JsonProperty("n")
+        private final byte[] name;
+
+        public BoxReference(
+                @JsonProperty("i") int appIndex,
+                @JsonProperty("n") byte[] name) {
+            this.appIndex = appIndex;
+            this.name = name;
+        }
+
+        // Foreign apps start from index 1.  Index 0 is the called App ID.
+        // Must apply offset to yield the foreign app index expected by algod.
+        private static final int FOREIGN_APPS_INDEX_OFFSET = 1;
+        private static final long NEW_APP_ID = 0L;
+
+        public static BoxReference fromAppBoxReference(AppBoxReference abr, List<Long> foreignApps, Long currentApp) {
+            if (abr.getAppId() == NEW_APP_ID)
+                return new BoxReference(0, abr.getName());
+
+            if (foreignApps == null || !foreignApps.contains(abr.getAppId()))
+                if (Long.valueOf(abr.getAppId()).equals(currentApp))
+                    return new BoxReference(0, abr.getName());
+                else
+                    throw new RuntimeException(
+                            String.format("Box app ID (%d) is not present in the foreign apps array: %d %s", abr.getAppId(), currentApp, foreignApps));
+            else
+                return new BoxReference(foreignApps.indexOf(abr.getAppId()) + FOREIGN_APPS_INDEX_OFFSET, abr.getName());
+        }
+
+        public byte[] getName() {
+            return Arrays.copyOf(name, name.length);
+        }
+
+        public int getAppIndex() {
+            return appIndex;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            BoxReference that = (BoxReference) o;
+            return appIndex == that.appIndex && Arrays.equals(name, that.name);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = Objects.hash(appIndex);
+            result = 31 * result + Arrays.hashCode(name);
+            return result;
+        }
+
+        @Override
+        public String toString() {
+            return "BoxReference{" +
+                    "appIndex=" + appIndex +
+                    ", name=" + Arrays.toString(name) +
+                    '}';
+        }
     }
 }

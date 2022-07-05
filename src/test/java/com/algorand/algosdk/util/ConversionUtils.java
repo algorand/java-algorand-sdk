@@ -1,7 +1,7 @@
 package com.algorand.algosdk.util;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.BoxReference;
+import com.algorand.algosdk.transaction.AppBoxReference;
 
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.util.Strings;
@@ -25,7 +25,7 @@ public class ConversionUtils {
                 .map(s -> {
                     String[] parts = Strings.split(s, ':');
                     byte[] converted = null;
-                    switch(parts[0]) {
+                    switch (parts[0]) {
                         case "str":
                             converted = parts[1].getBytes();
                             break;
@@ -70,18 +70,18 @@ public class ConversionUtils {
                 .collect(Collectors.toList());
     }
 
-    public static List<BoxReference> convertBoxes(String boxesStr) {
+    public static List<AppBoxReference> convertBoxes(String boxesStr) {
         if (boxesStr.equals("")) {
             return null;
         }
 
-        ArrayList<BoxReference> boxReferences = new ArrayList<>();
+        ArrayList<AppBoxReference> boxReferences = new ArrayList<>();
         String[] boxesArray = Strings.split(boxesStr, ',');
         for (int i = 0; i < boxesArray.length; i += 2) {
             Long appID = Long.parseLong(boxesArray[i]);
             byte[] name = null;
-            String enc = Strings.split(boxesArray[i+1], ':')[0];
-            String strName = Strings.split(boxesArray[i+1], ':')[1];
+            String enc = Strings.split(boxesArray[i + 1], ':')[0];
+            String strName = Strings.split(boxesArray[i + 1], ':')[1];
             if (enc.equals("str")) {
                 name = strName.getBytes();
             } else {
@@ -89,7 +89,7 @@ public class ConversionUtils {
                 name = ByteString.decodeBase64(strName).toByteArray();
             }
 
-            boxReferences.add(new BoxReference(appID, name));
+            boxReferences.add(new AppBoxReference(appID, name));
         }
 
         return boxReferences;
