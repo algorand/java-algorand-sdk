@@ -48,7 +48,7 @@ public class Client {
         httpUrlBuilder.port(port);
 
         for (String ps : qData.pathSegments) {
-            httpUrlBuilder.addPathSegment(ps);
+            httpUrlBuilder.addEncodedPathSegment(ps);
         }
         for (Entry<String, String> kvp : qData.queries.entrySet()) {
             try {

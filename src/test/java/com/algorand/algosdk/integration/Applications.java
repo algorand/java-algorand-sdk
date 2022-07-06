@@ -42,8 +42,8 @@ public class Applications {
         this.base = base;
     }
 
-    @Given("I build an application transaction with the transient account, the current application, suggested params, operation {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, extra-pages {long}")
-    public void buildAnApplicationTransactions(String operation, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long extraPages) throws Exception {
+    @Given("I build an application transaction with the transient account, the current application, suggested params, operation {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, extra-pages {long}, boxes {string}")
+    public void buildAnApplicationTransactions(String operation, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long extraPages, String boxesStr) throws Exception {
         ApplicationBaseTransactionBuilder builder = null;
 
         // Create builder and apply builder-specific parameters
@@ -100,6 +100,9 @@ public class Applications {
         }
         if (StringUtils.isNotEmpty(appAccounts)) {
             builder.accounts(convertAccounts(appAccounts));
+        }
+        if (StringUtils.isNotEmpty(boxesStr)) {
+            builder.boxReferences(convertBoxes(boxesStr));
         }
 
         // Send with transient account, suggested params and current application

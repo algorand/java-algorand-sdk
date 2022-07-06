@@ -35,7 +35,8 @@ public class MethodCallParams {
     public final List<Address> foreignAccounts;
     public final List<Long> foreignAssets;
     public final List<Long> foreignApps;
-    
+    public final List<AppBoxReference> boxReferences;
+
     public final TEALProgram approvalProgram, clearProgram;
     public final StateSchema globalStateSchema, localStateSchema;
     public final Long extraPages;
@@ -62,7 +63,7 @@ public class MethodCallParams {
                             Transaction.OnCompletion onCompletion, byte[] note, byte[] lease, String genesisID, Digest genesisHash,
                             BigInteger firstValid, BigInteger lastValid, BigInteger fee, BigInteger flatFee,
                             Address rekeyTo, TxnSigner signer,
-                            List<Address> fAccounts, List<Long> fAssets, List<Long> fApps,
+                            List<Address> fAccounts, List<Long> fAssets, List<Long> fApps, List<AppBoxReference> boxes,
                             TEALProgram approvalProgram, TEALProgram clearProgram,
                             StateSchema globalStateSchema, StateSchema localStateSchema, Long extraPages) {
         if (appID == null || method == null || sender == null || onCompletion == null || signer == null || genesisID == null || genesisHash == null || firstValid == null || lastValid == null || (fee == null && flatFee == null))
@@ -113,6 +114,7 @@ public class MethodCallParams {
         this.foreignAccounts = new ArrayList<>(fAccounts);
         this.foreignAssets = new ArrayList<>(fAssets);
         this.foreignApps = new ArrayList<>(fApps);
+        this.boxReferences = new ArrayList<>(boxes);
         this.approvalProgram = approvalProgram;
         this.clearProgram = clearProgram;
         this.globalStateSchema = globalStateSchema;
@@ -122,7 +124,7 @@ public class MethodCallParams {
 
     /**
      * Create the transactions which will carry out the specified method call.
-     * 
+     * <p>
      * The list of transactions returned by this function will have the same length as method.getTxnCallCount().
      */
     public List<TransactionWithSigner> createTransactions() {
@@ -136,6 +138,7 @@ public class MethodCallParams {
         List<Address> foreignAccounts = new ArrayList<>(this.foreignAccounts);
         List<Long> foreignAssets = new ArrayList<>(this.foreignAssets);
         List<Long> foreignApps = new ArrayList<>(this.foreignApps);
+        List<AppBoxReference> boxReferences = new ArrayList<>(this.boxReferences);
 
         for (int i = 0; i < this.method.args.size(); i++) {
             Method.Arg argT = this.method.args.get(i);
@@ -199,21 +202,22 @@ public class MethodCallParams {
         ApplicationCallTransactionBuilder<?> txBuilder = ApplicationCallTransactionBuilder.Builder();
 
         txBuilder
-            .firstValid(this.firstValid)
-            .lastValid(this.lastValid)
-            .genesisHash(this.genesisHash)
-            .genesisID(this.genesisID)
-            .fee(this.fee)
-            .flatFee(this.flatFee)
-            .note(this.note)
-            .lease(this.lease)
-            .rekey(this.rekeyTo)
-            .sender(this.sender)
-            .applicationId(this.appID)
-            .args(encodedABIArgs)
-            .accounts(foreignAccounts)
-            .foreignApps(foreignApps)
-            .foreignAssets(foreignAssets);
+                .firstValid(this.firstValid)
+                .lastValid(this.lastValid)
+                .genesisHash(this.genesisHash)
+                .genesisID(this.genesisID)
+                .fee(this.fee)
+                .flatFee(this.flatFee)
+                .note(this.note)
+                .lease(this.lease)
+                .rekey(this.rekeyTo)
+                .sender(this.sender)
+                .applicationId(this.appID)
+                .args(encodedABIArgs)
+                .accounts(foreignAccounts)
+                .foreignApps(foreignApps)
+                .foreignAssets(foreignAssets)
+                .boxReferences(boxReferences);
 
         Transaction tx = txBuilder.build();
 
@@ -228,7 +232,7 @@ public class MethodCallParams {
             tx.localStateSchema = this.localStateSchema;
         if (this.extraPages != null)
             tx.extraPages = this.extraPages;
-        
+
         TransactionWithSigner methodCall = new TransactionWithSigner(tx, this.signer);
         transactionArgs.add(methodCall);
 
@@ -245,12 +249,12 @@ public class MethodCallParams {
      * and this function will return an index that can be used to reference `objectToBeAdded` in `objectArray`.
      *
      * @param objectToBeAdded - The value to add to the array. If this value is already present in the array,
-     *   it will not be added again. Instead, the existing index will be returned.
-     * @param objectArray - The existing foreign array. This input may be modified to append `valueToAdd`.
-     * @param zerothObject - If provided, this value indicated two things: the 0 value is special for this
-     *   array, so all indexes into `objectArray` must start at 1; additionally, if `objectToBeAdded` equals
-     *   `zerothValue`, then `objectToBeAdded` will not be added to the array, and instead the 0 indexes will
-     *   be returned.
+     *                        it will not be added again. Instead, the existing index will be returned.
+     * @param objectArray     - The existing foreign array. This input may be modified to append `valueToAdd`.
+     * @param zerothObject    - If provided, this value indicated two things: the 0 value is special for this
+     *                        array, so all indexes into `objectArray` must start at 1; additionally, if `objectToBeAdded` equals
+     *                        `zerothValue`, then `objectToBeAdded` will not be added to the array, and instead the 0 indexes will
+     *                        be returned.
      * @return An index that can be used to reference `valueToAdd` in `array`.
      */
     private static <T> int populateForeignArrayIndex(T objectToBeAdded, List<T> objectArray, T zerothObject) {

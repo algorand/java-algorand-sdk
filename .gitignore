@@ -6,6 +6,7 @@ src/test/resources/**/*.json
 src/test/resources/**/*.base64
 src/test/resources/**/*.teal
 src/test/resources/**/*.tok
+src/test/resources/**/*.txt
 
 # OS X
 .DS_Store

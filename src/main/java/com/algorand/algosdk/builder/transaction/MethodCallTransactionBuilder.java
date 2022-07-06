@@ -4,6 +4,7 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
+import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.MethodCallParams;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxnSigner;
@@ -22,6 +23,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     protected List<Address> foreignAccounts = new ArrayList<>();
     protected List<Long> foreignAssets = new ArrayList<>();
     protected List<Long> foreignApps = new ArrayList<>();
+    protected List<AppBoxReference> boxReferences = new ArrayList<>();
 
     protected TEALProgram approvalProgram, clearStateProgram;
     protected StateSchema localStateSchema;
@@ -62,7 +64,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
 
     /**
      * Specify arguments for the ABI method invocation.
-     * 
+     * <p>
      * This will reset the arguments list to what is passed in by the caller.
      */
     public T methodArguments(List<Object> arguments) {
@@ -72,7 +74,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
 
     /**
      * Specify arguments for the ABI method invocation.
-     * 
+     * <p>
      * This will add the arguments passed in by the caller to the existing list of arguments.
      */
     public T addMethodArguments(List<Object> arguments) {
@@ -82,7 +84,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
 
     /**
      * Specify arguments for the ABI method invocation.
-     * 
+     * <p>
      * This will add the argument passed in by the caller to the existing list of arguments.
      */
     public T addMethodArgument(Object argument) {
@@ -126,6 +128,15 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     }
 
     @Override
+    public T boxReferences(List<AppBoxReference> boxReferences) {
+        if (boxReferences != null)
+            this.boxReferences = new ArrayList<>(new HashSet<>(boxReferences));
+        else
+            this.boxReferences.clear();
+        return (T) this;
+    }
+
+    @Override
     public T approvalProgram(TEALProgram approvalProgram) {
         this.approvalProgram = approvalProgram;
         return (T) this;
@@ -165,7 +176,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
         return new MethodCallParams(
                 appID, method, methodArgs, sender, onCompletion, note, lease, genesisID, genesisHash,
                 firstValid, lastValid, fee, flatFee, rekeyTo, signer, foreignAccounts, foreignAssets, foreignApps,
-                approvalProgram, clearStateProgram, globalStateSchema, localStateSchema, extraPages
+                boxReferences, approvalProgram, clearStateProgram, globalStateSchema, localStateSchema, extraPages
         );
     }
 }
