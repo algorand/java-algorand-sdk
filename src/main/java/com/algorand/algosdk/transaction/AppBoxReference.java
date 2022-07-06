@@ -41,7 +41,7 @@ public class AppBoxReference {
 
     @Override
     public String toString() {
-        return "BoxReference{" +
+        return "AppBoxReference{" +
                 "appID=" + appId +
                 ", name=" + Arrays.toString(name) +
                 '}';
