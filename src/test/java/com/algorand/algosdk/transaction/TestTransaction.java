@@ -5,10 +5,8 @@ import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.junit.Assert;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -16,11 +14,8 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
-import java.util.List;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -106,7 +101,7 @@ public class TestTransaction {
                 .lastValid(1300)
                 .genesisHash(new Digest())
                 .foreignApps(Arrays.asList(10L))
-                .boxReferences(Arrays.asList(new BoxReference(10L, "name".getBytes())))
+                .boxReferences(Arrays.asList(new AppBoxReference(10L, "name".getBytes())))
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -128,15 +123,19 @@ public class TestTransaction {
                 .genesisHash(new Digest())
                 .foreignApps(Arrays.asList(10L, 100000L))
                 .boxReferences(Arrays.asList(
-                    new BoxReference(10L, "name".getBytes()),
-                    new BoxReference(100000L, "name2".getBytes()),
-                    new BoxReference(0L, "name3".getBytes())))
+                        new AppBoxReference(10L, "name".getBytes(StandardCharsets.US_ASCII)),
+                        new AppBoxReference(100000L, "name2".getBytes(StandardCharsets.US_ASCII)),
+                        new AppBoxReference(0L, "name3".getBytes(StandardCharsets.US_ASCII))))
                 .build();
 
-        assert(tx.boxReferences.size() == 3);
-        assert(tx.boxReferences.get(0).appIdx == 1);
-        assert(tx.boxReferences.get(1).appIdx == 2);
-        assert(tx.boxReferences.get(2).appIdx == 0);
+        Assert.assertEquals(3, tx.boxReferences.size());
+        Assert.assertArrayEquals(
+                new int[]{1, 2, 0},
+                new int[]{
+                        tx.boxReferences.get(0).getAppIndex(),
+                        tx.boxReferences.get(1).getAppIndex(),
+                        tx.boxReferences.get(2).getAppIndex(),
+                });
     }
 
     @Test
@@ -165,7 +164,7 @@ public class TestTransaction {
         // when given as input the same metadata hash
         // and that it is different when the input is different
 
-        String metadataHashUTF8          = "Hello! This is the metadata hash";
+        String metadataHashUTF8 = "Hello! This is the metadata hash";
         String metadataHashUTF8Different = "Hi! I am another metadata hash..";
         byte[] metadataHashBytes = metadataHashUTF8.getBytes(StandardCharsets.UTF_8);
         // The value below is the base64 of metadataHashUTF8
