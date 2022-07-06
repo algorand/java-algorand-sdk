@@ -13,7 +13,7 @@ public class AppBoxReference {
 
     public AppBoxReference(long appId, byte[] name) {
         this.appId = appId;
-        this.name = name;
+        this.name = Arrays.copyOf(name, name.length);
     }
 
     @Override
