@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class AppBoxReference {
     // the app ID of the app this box belongs to. Instead of serializing this value,
-    // it's used to calculate the appIdx for BoxReferenceSerialize.
+    // it's used to calculate the appIdx for AppBoxReference.
     private final long appId;
 
     // the name of the box unique to the app it belongs to
