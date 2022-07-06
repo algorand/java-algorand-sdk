@@ -1,11 +1,9 @@
 package com.algorand.algosdk.transaction;
 
-import com.google.common.collect.Lists;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
-
-import org.junit.Assert;
 
 public class TestAppBoxReference {
 
