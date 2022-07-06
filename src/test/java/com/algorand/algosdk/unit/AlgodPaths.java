@@ -83,4 +83,9 @@ public class AlgodPaths {
         if (TestingUtils.notEmpty(string2)) aiq.exclude(QueryMapper.getExclude(string2));
         ps.q = aiq;
     }
+
+    @When("we make a GetApplicationBoxByName call for applicationID {int} with encoded box name {string}")
+    public void getBoxByName(Integer appID, String encodedBoxName) {
+        ps.q = algodClient.GetApplicationBoxByName(Long.valueOf(appID)).name(encodedBoxName);
+    }
 }

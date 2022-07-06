@@ -250,4 +250,18 @@ public class Applications {
 
         assertThat(found).as("Couldn't find key '%s'", hasKey).isTrue();
     }
+
+    @Then("the contents of the box with name {string} should be {string}. If there is an error it is {string}.")
+    public void contentsOfBoxShouldBe(String encodedBoxName, String boxContents, String errStr) throws Exception {
+        Response<Box> boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
+
+        // If an error was expected, make sure it is set correctly.
+        if (StringUtils.isNotEmpty(errStr)) {
+            assertThat(boxResp.isSuccessful()).isFalse();
+            assertThat(boxResp.message()).containsIgnoringCase(errStr);
+            return;
+        }
+
+        assertThat(boxResp.body().value().equals(boxContents));
+    }
 }

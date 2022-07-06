@@ -19,6 +19,7 @@ import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
+import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.algod.TealDisassemble;
@@ -29,8 +30,9 @@ public class AlgodClient extends Client {
 
     /**
      * Construct an AlgodClient for communicating with the REST API.
-     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
-     * @param port REST server port.
+     *
+     * @param host  using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port  REST server port.
      * @param token authentication token.
      */
     public AlgodClient(String host, int port, String token) {
@@ -39,9 +41,10 @@ public class AlgodClient extends Client {
 
     /**
      * Construct an AlgodClient with custom token key for communicating with the REST API.
-     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
-     * @param port REST server port.
-     * @param token authentication token.
+     *
+     * @param host     using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port     REST server port.
+     * @param token    authentication token.
      * @param tokenKey authentication token key.
      */
     public AlgodClient(String host, int port, String token, String tokenKey) {
@@ -105,7 +108,7 @@ public class AlgodClient extends Client {
      * /v2/accounts/{address}/assets/{asset-id}
      */
     public AccountAssetInformation AccountAssetInformation(Address address,
-            Long assetId) {
+                                                           Long assetId) {
         return new AccountAssetInformation((Client) this, address, assetId);
     }
 
@@ -117,7 +120,7 @@ public class AlgodClient extends Client {
      * /v2/accounts/{address}/applications/{application-id}
      */
     public AccountApplicationInformation AccountApplicationInformation(Address address,
-            Long applicationId) {
+                                                                       Long applicationId) {
         return new AccountApplicationInformation((Client) this, address, applicationId);
     }
 
@@ -144,7 +147,7 @@ public class AlgodClient extends Client {
      * /v2/blocks/{round}/transactions/{txid}/proof
      */
     public GetProof GetProof(Long round,
-            String txid) {
+                             String txid) {
         return new GetProof((Client) this, round, txid);
     }
 
@@ -220,6 +223,18 @@ public class AlgodClient extends Client {
      */
     public GetApplicationByID GetApplicationByID(Long applicationId) {
         return new GetApplicationByID((Client) this, applicationId);
+    }
+
+    /**
+     * Given an application ID and box name, it returns the box name and value (each
+     * base64 encoded). Box names must be in the goal app call arg encoding form
+     * 'encoding:value'. For ints, use the form 'int:1234'. For raw bytes, use the form
+     * 'b64:A=='. For printable strings, use the form 'str:hello'. For addresses, use
+     * the form 'addr:XYZ...'.
+     * /v2/applications/{application-id}/box
+     */
+    public GetApplicationBoxByName GetApplicationBoxByName(Long applicationId) {
+        return new GetApplicationBoxByName((Client) this, applicationId);
     }
 
     /**
