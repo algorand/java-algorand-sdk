@@ -1564,6 +1564,7 @@ public class Transaction implements Serializable {
     }
 
     @JsonPropertyOrder(alphabetic = true)
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class BoxReference {
         // the index in the foreign apps array of the app this box belongs to
         @JsonProperty("i")
