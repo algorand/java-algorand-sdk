@@ -1590,6 +1590,8 @@ public class Transaction implements Serializable {
                 return new BoxReference(0, abr.getName());
 
             if (foreignApps == null || !foreignApps.contains(abr.getAppId()))
+                // If the app references itself in foreign apps, then prefer foreign app index.
+                // Otherwise, fallback to comparing against the invoked app (`currentApp`).
                 if (Long.valueOf(abr.getAppId()).equals(currentApp))
                     return new BoxReference(0, abr.getName());
                 else
