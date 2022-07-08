@@ -50,14 +50,4 @@ public class TestBoxQueryEncoding {
                 BoxQueryEncoding.encodeBoxReference(br)
         );
     }
-
-    @Test
-    public void testEncodeAppBoxReference() {
-        AppBoxReference abr = new AppBoxReference(0, e.source.getBytes(StandardCharsets.UTF_8));
-
-        Assert.assertEquals(
-                e.expectedEncoding,
-                BoxQueryEncoding.encodeAppBoxReference(abr)
-        );
-    }
 }

@@ -22,8 +22,4 @@ public final class BoxQueryEncoding {
     public static String encodeBoxReference(Transaction.BoxReference br) {
         return encodeBytes(br.getName());
     }
-
-    public static String encodeAppBoxReference(AppBoxReference abr) {
-        return encodeBytes(abr.getName());
-    }
 }

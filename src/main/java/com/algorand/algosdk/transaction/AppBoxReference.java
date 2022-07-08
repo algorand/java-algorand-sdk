@@ -1,5 +1,7 @@
 package com.algorand.algosdk.transaction;
 
+import com.algorand.algosdk.util.BoxQueryEncoding;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -45,5 +47,9 @@ public class AppBoxReference {
                 "appID=" + appId +
                 ", name=" + Arrays.toString(name) +
                 '}';
+    }
+
+    public String nameQueryEncoded() {
+        return BoxQueryEncoding.encodeBytes(this.getName());
     }
 }
