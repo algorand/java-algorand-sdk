@@ -6,9 +6,8 @@ import com.algorand.algosdk.transaction.AppBoxReference;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.util.Strings;
 
-import okio.ByteString;
-
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +31,11 @@ public class ConversionUtils {
                         case "int":
                             converted = BigInteger.valueOf(Integer.parseInt(parts[1])).toByteArray();
                             break;
+                        case "b64":
+                            converted = Encoder.decodeFromBase64(parts[1]);
+                            break;
                         default:
-                            Assertions.fail("Doesn't currently support '" + parts[0] + "' convertion.");
+                            Assertions.fail("Doesn't currently support '" + parts[0] + "' conversion.");
                     }
                     return converted;
                 })
@@ -75,21 +77,27 @@ public class ConversionUtils {
             return null;
         }
 
-        ArrayList<AppBoxReference> boxReferences = new ArrayList<>();
+        List<AppBoxReference> boxReferences = new ArrayList<>();
         String[] boxesArray = Strings.split(boxesStr, ',');
         for (int i = 0; i < boxesArray.length; i += 2) {
-            Long appID = Long.parseLong(boxesArray[i]);
-            byte[] name = null;
+            long appId = Long.parseLong(boxesArray[i]);
+
             String enc = Strings.split(boxesArray[i + 1], ':')[0];
             String strName = Strings.split(boxesArray[i + 1], ':')[1];
-            if (enc.equals("str")) {
-                name = strName.getBytes();
-            } else {
-                // b64 encoding
-                name = ByteString.decodeBase64(strName).toByteArray();
+
+            byte[] name;
+            switch (enc) {
+                case "str":
+                    name = strName.getBytes(StandardCharsets.US_ASCII);
+                    break;
+                case "b64":
+                    name = Encoder.decodeFromBase64(strName);
+                    break;
+                default:
+                    throw new RuntimeException("Unsupported encoding = " + enc);
             }
 
-            boxReferences.add(new AppBoxReference(appID, name));
+            boxReferences.add(new AppBoxReference(appId, name));
         }
 
         return boxReferences;

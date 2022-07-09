@@ -14,11 +14,16 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Lists;
+import org.bouncycastle.util.Strings;
+import org.junit.Assert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -251,7 +256,7 @@ public class Applications {
         assertThat(found).as("Couldn't find key '%s'", hasKey).isTrue();
     }
 
-    @Then("the contents of the box with name {string} should be {string}. If there is an error it is {string}.")
+    @Then("the contents of the box with name {string} in the current application should be {string}. If there is an error it is {string}.")
     public void contentsOfBoxShouldBe(String encodedBoxName, String boxContents, String errStr) throws Exception {
         Response<Box> boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
 
@@ -263,5 +268,54 @@ public class Applications {
         }
 
         assertThat(boxResp.body().value().equals(boxContents));
+    }
+
+    private static byte[] decodeBoxName(String encodedBoxName) {
+        String[] split = Strings.split(encodedBoxName, ':');
+        if (split.length != 2)
+            throw new RuntimeException("encodedBoxName (" + encodedBoxName + ") does not match expected format");
+
+        String encoding = split[0];
+        String encoded = split[1];
+        switch (encoding) {
+            case "str":
+                return encoded.getBytes(StandardCharsets.US_ASCII);
+            case "b64":
+                return Encoder.decodeFromBase64(encoded);
+            default:
+                throw new RuntimeException("Unsupported encoding = " + encoding);
+        }
+    }
+
+    private static boolean contains(byte[] elem, List<byte[]> xs) {
+        for (byte[] e : xs) {
+            if (Arrays.equals(e, elem))
+                return true;
+        }
+        return false;
+    }
+
+    @Then("the current application should have the following boxes {string}.")
+    public void checkAppBoxes(String encodedBoxesRaw) throws Exception {
+        final List<byte[]> expectedNames = Lists.newArrayList();
+        if (!encodedBoxesRaw.isEmpty()) {
+            for (String s : Strings.split(encodedBoxesRaw, ',')) {
+                expectedNames.add(decodeBoxName(s));
+            }
+        }
+
+        final Response<BoxesResponse> r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
+        Assert.assertTrue(r.isSuccessful());
+
+        final List<byte[]> actualNames = Lists.newArrayList();
+        for (BoxDescriptor b : r.body().boxes) {
+            actualNames.add(b.name);
+        }
+
+        Assert.assertEquals("expected and actual box names length do not match", expectedNames.size(), actualNames.size());
+        for (byte[] e : expectedNames) {
+            if (!contains(e, actualNames))
+                throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
+        }
     }
 }

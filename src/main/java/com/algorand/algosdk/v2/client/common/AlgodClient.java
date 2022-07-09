@@ -19,6 +19,7 @@ import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
+import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
@@ -223,6 +224,15 @@ public class AlgodClient extends Client {
      */
     public GetApplicationByID GetApplicationByID(Long applicationId) {
         return new GetApplicationByID((Client) this, applicationId);
+    }
+
+    /**
+     * Given an application ID, it returns the box names of that application. No
+     * particular ordering is guaranteed.
+     * /v2/applications/{application-id}/boxes
+     */
+    public GetApplicationBoxes GetApplicationBoxes(Long applicationId) {
+        return new GetApplicationBoxes((Client) this, applicationId);
     }
 
     /**

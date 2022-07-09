@@ -1,8 +1,8 @@
 package com.algorand.algosdk.util;
 
-import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.v2.client.model.Box;
+import com.algorand.algosdk.v2.client.model.BoxDescriptor;
 
 /**
  * BoxQueryEncoding provides convenience methods to String encode box names for use with Box search APIs (e.g. GetApplicationBoxByName).
@@ -16,6 +16,10 @@ public final class BoxQueryEncoding {
     }
 
     public static String encodeBox(Box b) {
+        return encodeBytes(b.name);
+    }
+
+    public static String encodeBoxDescriptor(BoxDescriptor b) {
         return encodeBytes(b.name);
     }
 

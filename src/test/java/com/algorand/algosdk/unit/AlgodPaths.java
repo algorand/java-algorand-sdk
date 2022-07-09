@@ -88,4 +88,9 @@ public class AlgodPaths {
     public void getBoxByName(Integer appID, String encodedBoxName) {
         ps.q = algodClient.GetApplicationBoxByName(Long.valueOf(appID)).name(encodedBoxName);
     }
+
+    @When("we make a GetApplicationBoxes call for applicationID {int}")
+    public void getBoxes(Integer appId) {
+        ps.q = algodClient.GetApplicationBoxes(Long.valueOf(appId));
+    }
 }
