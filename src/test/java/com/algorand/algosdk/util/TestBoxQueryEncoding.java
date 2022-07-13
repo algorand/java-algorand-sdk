@@ -1,6 +1,5 @@
 package com.algorand.algosdk.util;
 
-import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.v2.client.model.Box;
 import com.algorand.algosdk.v2.client.model.BoxDescriptor;
