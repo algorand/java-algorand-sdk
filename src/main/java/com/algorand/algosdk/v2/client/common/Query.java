@@ -17,11 +17,11 @@ public abstract class Query {
 
     protected abstract QueryData getRequestString();
 
-    protected <T>Response<T> baseExecute() throws Exception {
+    protected <T> Response<T> baseExecute() throws Exception {
         return baseExecute(null, null);
     }
 
-    protected <T>Response<T> baseExecute(String[] headers, String[] values) throws Exception {
+    protected <T> Response<T> baseExecute(String[] headers, String[] values) throws Exception {
 
         QueryData qData = this.getRequestString();
         com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod, headers, values);
@@ -45,6 +45,15 @@ public abstract class Query {
     }
 
     protected void addQuery(String key, String value) {
+        // Omit max default value (0) to maintain parity with other SDKs.
+        // Side effect happens here to avoid modifying generated code.
+        try {
+            if (key.equals("max") && Long.parseLong(value) == 0)
+                return;
+        } catch (NumberFormatException e) {
+            // Continue processing
+        }
+
         qd.addQuery(key, value);
     }
 
@@ -69,5 +78,6 @@ public abstract class Query {
     }
 
     public abstract Response<?> execute() throws Exception;
+
     public abstract Response<?> execute(String[] headers, String[] values) throws Exception;
 }

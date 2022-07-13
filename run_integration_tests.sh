@@ -6,7 +6,7 @@ pushd $rootdir
 
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
-TEST_BRANCH=boxes_response_rework
+TEST_BRANCH=list-boxes
 
 function help {
   echo "Options:"
