@@ -84,13 +84,13 @@ public class AlgodPaths {
         ps.q = aiq;
     }
 
-    @When("we make a GetApplicationBoxByName call for applicationID {int} with encoded box name {string}")
-    public void getBoxByName(Integer appID, String encodedBoxName) {
-        ps.q = algodClient.GetApplicationBoxByName(Long.valueOf(appID)).name(encodedBoxName);
+    @When("we make a GetApplicationBoxByName call for applicationID {long} with encoded box name {string}")
+    public void getBoxByName(Long appID, String encodedBoxName) {
+        ps.q = algodClient.GetApplicationBoxByName(appID).name(encodedBoxName);
     }
 
-    @When("we make a GetApplicationBoxes call for applicationID {int} with max {int}")
-    public void getBoxes(Integer appId, Integer max) {
-        ps.q = algodClient.GetApplicationBoxes(Long.valueOf(appId)).max(Long.valueOf(max));
+    @When("we make a GetApplicationBoxes call for applicationID {long} with max {long}")
+    public void getBoxes(Long appId, Long max) {
+        ps.q = algodClient.GetApplicationBoxes(appId).max(max);
     }
 }
