@@ -45,15 +45,6 @@ public abstract class Query {
     }
 
     protected void addQuery(String key, String value) {
-        // Omit max default value (0) to maintain parity with other SDKs.
-        // Side effect happens here to avoid modifying generated code.
-        try {
-            if (key.equals("max") && Long.parseLong(value) == 0)
-                return;
-        } catch (NumberFormatException e) {
-            // Continue processing
-        }
-
         qd.addQuery(key, value);
     }
 
