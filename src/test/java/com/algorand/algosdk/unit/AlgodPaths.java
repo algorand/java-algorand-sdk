@@ -4,6 +4,7 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
+import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
@@ -84,8 +85,17 @@ public class AlgodPaths {
         ps.q = aiq;
     }
 
-    @When("we make a GetApplicationBoxByName call for applicationID {int} with encoded box name {string}")
-    public void getBoxByName(Integer appID, String encodedBoxName) {
-        ps.q = algodClient.GetApplicationBoxByName(Long.valueOf(appID)).name(encodedBoxName);
+    @When("we make a GetApplicationBoxByName call for applicationID {long} with encoded box name {string}")
+    public void getBoxByName(Long appID, String encodedBoxName) {
+        ps.q = algodClient.GetApplicationBoxByName(appID).name(encodedBoxName);
+    }
+
+    @When("we make a GetApplicationBoxes call for applicationID {long} with max {long}")
+    public void getBoxes(Long appId, Long max) {
+        GetApplicationBoxes q = algodClient.GetApplicationBoxes(appId);
+
+        if (TestingUtils.notEmpty(max)) q.max(max);
+
+        ps.q = q;
     }
 }

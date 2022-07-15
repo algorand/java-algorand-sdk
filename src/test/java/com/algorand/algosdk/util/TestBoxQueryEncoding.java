@@ -1,8 +1,8 @@
 package com.algorand.algosdk.util;
 
-import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.v2.client.model.Box;
+import com.algorand.algosdk.v2.client.model.BoxDescriptor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,6 +38,17 @@ public class TestBoxQueryEncoding {
         Assert.assertEquals(
                 e.expectedEncoding,
                 BoxQueryEncoding.encodeBox(b)
+        );
+    }
+
+    @Test
+    public void testEncodeBoxDescriptor() {
+        BoxDescriptor b = new BoxDescriptor();
+        b.name(Encoder.encodeToBase64(e.source.getBytes(StandardCharsets.UTF_8)));
+
+        Assert.assertEquals(
+                e.expectedEncoding,
+                BoxQueryEncoding.encodeBoxDescriptor(b)
         );
     }
 
