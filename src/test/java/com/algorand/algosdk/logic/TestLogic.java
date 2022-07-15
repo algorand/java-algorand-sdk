@@ -213,7 +213,7 @@ public class TestLogic {
         program2[0] = v;
         assertThatThrownBy(() -> readProgram(program2, args))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("program too costly for Teal version < 4. consider using v4.");
+            .hasMessage("program too costly for version < 4. consider using v4.");
     }
 
     for (byte v : versions) {
