@@ -257,7 +257,7 @@ public class Logic {
     }
 
     /**
-     * Retrieves TEAL supported version
+     * Retrieves supported program version
      * @return int
      * @throws IOException
      */
@@ -269,7 +269,7 @@ public class Logic {
     }
 
     /**
-     * Retrieves max supported version of TEAL evaluator
+     * Retrieves max supported program version of evaluator
      * @return int
      * @throws IOException
      */
