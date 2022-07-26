@@ -579,12 +579,39 @@ public class Stepdefs {
     }
 
     @When("I generate a key using kmd")
-    public void genKeyKmd() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
+    public void genKeyKmd() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
         GenerateKeyRequest req = new GenerateKeyRequest();
         req.setDisplayMnemonic(false);
         req.setWalletHandleToken(handle);
         pk = new Address(kcl.generateKey(req).getAddress());
     }
+
+    @When("I generate a key using kmd for rekeying")
+    public void genKeyKmdRekey() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+        GenerateKeyRequest req = new GenerateKeyRequest();
+        req.setDisplayMnemonic(false);
+        req.setWalletHandleToken(handle);
+        rekey = new Address(kcl.generateKey(req).getAddress());
+
+        // Fund rekey address
+        try {
+            getParams();
+            Address sender = getAddress(0);
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(sender)
+                            .suggestedParams(acl.transactionParams())
+                            .amount(BigInteger.valueOf(100_000_000))
+                            .receiver(rekey)
+                            .build();
+            SignedTransaction st = signWithAddress(tx, sender);
+            acl.rawTransaction(Encoder.encodeToMsgPack(st));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    Address rekey;
 
     @Then("the key should be in the wallet")
     public void keyInWallet() throws com.algorand.algosdk.kmd.client.ApiException {
@@ -592,8 +619,8 @@ public class Stepdefs {
         req.setWalletHandleToken(handle);
         List<String> keys = kcl.listKeysInWallet(req).getAddresses();
         boolean exists = false;
-        for (String k : keys){
-            if (k.equals(pk.toString())){
+        for (String k : keys) {
+            if (k.equals(pk.toString())) {
                 exists = true;
             }
         }
@@ -714,33 +741,45 @@ public class Stepdefs {
     }
 
     @Given("default transaction with parameters {int} {string}")
-    public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException{
+    public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
+        defaultTxnWithKey(amt, note, getAddress(0));
+
+        pk = getAddress(0);
+    }
+
+    @Given("default transaction with parameters {int} {string} and rekeying key")
+    public void defaultTxnWithExistingKey(int amt, String note) {
+        defaultTxnWithKey(amt, note, rekey);
+
+        pk = rekey;
+    }
+
+    private void defaultTxnWithKey(int amt, String note, Address sender) {
         getParams();
-        if (note.equals("none")){
+        if (note.equals("none")) {
             this.note = null;
-        } else{
+        } else {
             this.note = Encoder.decodeFromBase64(note);
         }
         txnBuilder = Transaction.PaymentTransactionBuilder()
-                .sender(getAddress(0))
+                .sender(sender)
                 .suggestedParams(params)
                 .note(this.note)
                 .amount(amt)
                 .receiver(getAddress(1));
         txn = txnBuilder.build();
-        pk = getAddress(0);
     }
 
     @Given("default multisig transaction with parameters {int} {string}")
-    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException{
+    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
         getParams();
-        if (note.equals("none")){
+        if (note.equals("none")) {
             this.note = null;
-        } else{
+        } else {
             this.note = Encoder.decodeFromBase64(note);
         }
         Ed25519PublicKey[] addrlist = new Ed25519PublicKey[addresses.size()];
-        for(int x = 0; x < addresses.size(); x++){
+        for (int x = 0; x < addresses.size(); x++) {
             addrlist[x] = new Ed25519PublicKey((getAddress(x)).getBytes());
         }
         msig = new MultisigAddress(1, 1, Arrays.asList(addrlist));
