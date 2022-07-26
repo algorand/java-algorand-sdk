@@ -809,7 +809,7 @@ public class Stepdefs {
 
     @Then("the transaction should go through")
     public void checkTxn() throws ApiException, InterruptedException{
-        advanceRoundsV1(3);
+        advanceRoundsV1(1);
         String ans = acl.pendingTransactionInformation(txid).getFrom();
         assertThat(this.txn.sender.toString()).isEqualTo(ans);
         String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
