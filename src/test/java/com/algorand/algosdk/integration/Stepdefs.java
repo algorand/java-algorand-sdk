@@ -159,6 +159,59 @@ public class Stepdefs {
     }
 
     /**
+     * advanceRound is a convenience method intended for testing with DevMode networks.
+     * <p>
+     * Since DevMode block generation requires a transaction rather than time passing, test assertions may require advancing rounds.  advanceRound issues advanceCount payments to advance rounds.
+     */
+    private void advanceRoundsV1(int advanceCount) {
+        initializeDevModeAccount();
+        for (int i = 0; i < advanceCount; i++) {
+            try {
+                Transaction tx =
+                        Transaction.PaymentTransactionBuilder()
+                                .sender(devMode.getAddress())
+                                .suggestedParams(acl.transactionParams())
+                                .amount(BigInteger.valueOf(1))
+                                .receiver(devMode.getAddress())
+                                .build();
+                SignedTransaction st = devMode.signTransaction(tx);
+                acl.rawTransaction(Encoder.encodeToMsgPack(st));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    private Account devMode;
+
+    /**
+     * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
+     */
+    public void initializeDevModeAccount() {
+        if (devMode != null) {
+            return;
+        }
+
+        try {
+            getParams();
+            devMode = new Account();
+            Address sender = getAddress(0);
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(sender)
+                            .suggestedParams(acl.transactionParams())
+                            .amount(BigInteger.valueOf(100_000_000))
+                            .receiver(devMode.getAddress())
+                            .build();
+            SignedTransaction st = signWithAddress(tx, sender);
+            acl.rawTransaction(Encoder.encodeToMsgPack(st));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    /**
      * Convenience method to export a key and initialize an account to use for signing.
      */
     public void exportKeyAndSetAccount(Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
@@ -447,8 +500,8 @@ public class Stepdefs {
     }
 
     @When("I get status after this block")
-    public void statusBlock() throws ApiException, InterruptedException {
-        Thread.sleep(4000);
+    public void statusBlock() throws Exception {
+        advanceRoundsV1(1);
         statusAfter = acl.waitForBlock(status.getLastRound());
     }
 
@@ -632,6 +685,7 @@ public class Stepdefs {
         algodClient.setBasePath("http://localhost:" + algodPort);
         acl = new AlgodApi(algodClient);
     }
+
     @Given("an algod v2 client")
     public void aClientv2() throws FileNotFoundException, IOException{
         aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
@@ -716,16 +770,17 @@ public class Stepdefs {
 
     @Then("the transaction should go through")
     public void checkTxn() throws ApiException, InterruptedException{
+        advanceRoundsV1(1);
         String ans = acl.pendingTransactionInformation(txid).getFrom();
         assertThat(this.txn.sender.toString()).isEqualTo(ans);
-        acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
         String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
         assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
         assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
     }
 
     @Then("I can get the transaction by ID")
-    public void txnbyID() throws ApiException, InterruptedException{
+    public void txnbyID() throws Exception {
+        advanceRoundsV1(3);
         acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
         assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
     }
