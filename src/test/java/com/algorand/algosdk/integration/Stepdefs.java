@@ -819,8 +819,7 @@ public class Stepdefs {
 
     @Then("I can get the transaction by ID")
     public void txnbyID() throws Exception {
-        advanceRoundsV1(3);
-        acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
+        advanceRoundsV1(1);
         assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
     }
 
