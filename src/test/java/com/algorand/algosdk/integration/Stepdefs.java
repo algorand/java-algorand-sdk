@@ -758,15 +758,11 @@ public class Stepdefs {
     @Given("default transaction with parameters {int} {string}")
     public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
         defaultTxnWithAddress(amt, note, getAddress(0));
-
-        pk = getAddress(0);
     }
 
     @Given("default transaction with parameters {int} {string} and rekeying key")
-    public void defaultTxnWithExistingKey(int amt, String note) {
+    public void defaultTxnForRekeying(int amt, String note) {
         defaultTxnWithAddress(amt, note, rekey);
-
-        pk = rekey;
     }
 
     private void defaultTxnWithAddress(int amt, String note, Address sender) {
@@ -783,6 +779,7 @@ public class Stepdefs {
                 .amount(amt)
                 .receiver(getAddress(1));
         txn = txnBuilder.build();
+        pk = sender;
     }
 
     @Given("default multisig transaction with parameters {int} {string}")
