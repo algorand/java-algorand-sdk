@@ -119,9 +119,30 @@ public class Stepdefs {
     Response<CompileResponse> compileResponse;
     Response<DryrunResponse> dryrunResponse;
 
-    // Start of state specific to running tests in DevMode.
-    private Account devMode;
-    // End DevMode state.
+    private static class DevModeState {
+        static final long ACCOUNT_FUNDING_MICROALGOS = 100_000_000;
+        private Account advanceRounds;
+
+        /**
+         * randomAmount minimizes the chance `advanceRounds` issues duplicate transactions by randomizing the payment amount.
+         */
+        private long randomAmount() {
+            return ThreadLocalRandom.current().nextLong(1, (long) (ACCOUNT_FUNDING_MICROALGOS * .01));
+        }
+
+        public SignedTransaction selfPay(TransactionParams tp) throws Exception {
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(advanceRounds.getAddress())
+                            .suggestedParams(tp)
+                            .amount(randomAmount())
+                            .receiver(advanceRounds.getAddress())
+                            .build();
+            return advanceRounds.signTransaction(tx);
+        }
+    }
+
+    private final DevModeState dms = new DevModeState();
 
     protected Address getAddress(int i) {
         if (addresses == null) {
@@ -172,16 +193,7 @@ public class Stepdefs {
         initializeDevModeAccount();
         for (int i = 0; i < advanceCount; i++) {
             try {
-                long minimizeDuplicateTxnChance = ThreadLocalRandom.current().nextLong(1, 1000);
-                Transaction tx =
-                        Transaction.PaymentTransactionBuilder()
-                                .sender(devMode.getAddress())
-                                .suggestedParams(acl.transactionParams())
-                                .amount(minimizeDuplicateTxnChance)
-                                .receiver(devMode.getAddress())
-                                .build();
-                SignedTransaction st = devMode.signTransaction(tx);
-                acl.rawTransaction(Encoder.encodeToMsgPack(st));
+                acl.rawTransaction(Encoder.encodeToMsgPack(dms.selfPay(acl.transactionParams())));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -192,20 +204,20 @@ public class Stepdefs {
      * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
      */
     public void initializeDevModeAccount() {
-        if (devMode != null) {
+        if (dms.advanceRounds != null) {
             return;
         }
 
         try {
             getParams();
-            devMode = new Account();
+            dms.advanceRounds = new Account();
             Address sender = getAddress(0);
             Transaction tx =
                     Transaction.PaymentTransactionBuilder()
                             .sender(sender)
                             .suggestedParams(acl.transactionParams())
-                            .amount(BigInteger.valueOf(100_000_000))
-                            .receiver(devMode.getAddress())
+                            .amount(DevModeState.ACCOUNT_FUNDING_MICROALGOS)
+                            .receiver(dms.advanceRounds.getAddress())
                             .build();
             SignedTransaction st = signWithAddress(tx, sender);
             acl.rawTransaction(Encoder.encodeToMsgPack(st));
@@ -213,7 +225,6 @@ public class Stepdefs {
             throw new RuntimeException(e);
         }
     }
-
 
     /**
      * Convenience method to export a key and initialize an account to use for signing.
@@ -605,7 +616,7 @@ public class Stepdefs {
                     Transaction.PaymentTransactionBuilder()
                             .sender(sender)
                             .suggestedParams(acl.transactionParams())
-                            .amount(BigInteger.valueOf(100_000_000))
+                            .amount(100_000_000)
                             .receiver(rekey)
                             .build();
             SignedTransaction st = signWithAddress(tx, sender);
