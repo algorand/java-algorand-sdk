@@ -771,15 +771,15 @@ public class Stepdefs {
     }
 
     @Given("default multisig transaction with parameters {int} {string}")
-    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
+    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException{
         getParams();
-        if (note.equals("none")) {
+        if (note.equals("none")){
             this.note = null;
-        } else {
+        } else{
             this.note = Encoder.decodeFromBase64(note);
         }
         Ed25519PublicKey[] addrlist = new Ed25519PublicKey[addresses.size()];
-        for (int x = 0; x < addresses.size(); x++) {
+        for(int x = 0; x < addresses.size(); x++){
             addrlist[x] = new Ed25519PublicKey((getAddress(x)).getBytes());
         }
         msig = new MultisigAddress(1, 1, Arrays.asList(addrlist));
