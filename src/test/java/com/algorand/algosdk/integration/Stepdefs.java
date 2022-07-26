@@ -814,7 +814,7 @@ public class Stepdefs {
         assertThat(this.txn.sender.toString()).isEqualTo(ans);
         String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
         assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
-        assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
+        // assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse); // Stop supporting the commented out v1 API assertion in dev mode.
     }
 
     @Then("I can get the transaction by ID")
