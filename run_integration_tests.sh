@@ -7,6 +7,7 @@ pushd $rootdir
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
 TEST_BRANCH=devmodenet-rekeying
+NETWORK_TEMPLATE=DevModeNetwork.json
 
 function help {
   echo "Options:"
