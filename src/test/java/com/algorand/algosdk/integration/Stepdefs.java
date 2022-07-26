@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,6 +119,10 @@ public class Stepdefs {
     Response<CompileResponse> compileResponse;
     Response<DryrunResponse> dryrunResponse;
 
+    // Start of state specific to running tests in DevMode.
+    private Account devMode;
+    // End DevMode state.
+
     protected Address getAddress(int i) {
         if (addresses == null) {
             throw new RuntimeException("Addresses not initialized, must use given 'wallet information'");
@@ -167,11 +172,12 @@ public class Stepdefs {
         initializeDevModeAccount();
         for (int i = 0; i < advanceCount; i++) {
             try {
+                long minimizeDuplicateTxnChance = ThreadLocalRandom.current().nextLong(1, 1000);
                 Transaction tx =
                         Transaction.PaymentTransactionBuilder()
                                 .sender(devMode.getAddress())
                                 .suggestedParams(acl.transactionParams())
-                                .amount(BigInteger.valueOf(1))
+                                .amount(minimizeDuplicateTxnChance)
                                 .receiver(devMode.getAddress())
                                 .build();
                 SignedTransaction st = devMode.signTransaction(tx);
@@ -181,8 +187,6 @@ public class Stepdefs {
             }
         }
     }
-
-    private Account devMode;
 
     /**
      * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
