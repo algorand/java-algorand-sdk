@@ -742,19 +742,19 @@ public class Stepdefs {
 
     @Given("default transaction with parameters {int} {string}")
     public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
-        defaultTxnWithKey(amt, note, getAddress(0));
+        defaultTxnWithAddress(amt, note, getAddress(0));
 
         pk = getAddress(0);
     }
 
     @Given("default transaction with parameters {int} {string} and rekeying key")
     public void defaultTxnWithExistingKey(int amt, String note) {
-        defaultTxnWithKey(amt, note, rekey);
+        defaultTxnWithAddress(amt, note, rekey);
 
         pk = rekey;
     }
 
-    private void defaultTxnWithKey(int amt, String note, Address sender) {
+    private void defaultTxnWithAddress(int amt, String note, Address sender) {
         getParams();
         if (note.equals("none")) {
             this.note = null;
