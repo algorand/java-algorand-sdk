@@ -601,7 +601,7 @@ public class Stepdefs {
         pk = new Address(kcl.generateKey(req).getAddress());
     }
 
-    @When("I generate a key using kmd for rekeying")
+    @When("I generate a key using kmd for rekeying and fund it")
     public void genKeyKmdRekey() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
         GenerateKeyRequest req = new GenerateKeyRequest();
         req.setDisplayMnemonic(false);
