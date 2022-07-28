@@ -820,24 +820,32 @@ public class Stepdefs {
     }
 
     @Then("the transaction should go through")
-    public void checkTxn() throws ApiException, InterruptedException{
-        advanceRoundsV1(1);
+    public void checkTxn() throws Exception {
         String ans = acl.pendingTransactionInformation(txid).getFrom();
         assertThat(this.txn.sender.toString()).isEqualTo(ans);
+        waitForAlgodTransactionProcessingToComplete();
         String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
         assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
-        // Stop supporting the commented out v1 API assertion in dev mode.  Fails periodically due to "couldn't find the required transaction in the required range"
-        // assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
+        assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
+    }
+
+    /**
+     * waitForAlgodTransactionProcessingToComplete is a Dev mode helper method that's a rough analog to `acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));`.
+     * <p>
+     * Since Dev mode produces blocks on a per transaction basis, it's possible algod generates a block _before_ the corresponding SDK call to wait for a block.  Without _any_ wait, it's possible the SDK looks for the transaction before algod completes processing.  So, the method performs a local sleep to simulate waiting for a block.
+     */
+    private static void waitForAlgodTransactionProcessingToComplete() throws Exception {
+        Thread.sleep(500);
     }
 
     @Then("I can get the transaction by ID")
-    public void txnbyID() throws Exception {
-        advanceRoundsV1(1);
+    public void txnByID() throws Exception {
+        waitForAlgodTransactionProcessingToComplete();
         assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
     }
 
     @Then("the transaction should not go through")
-    public void txnFail(){
+    public void txnFail() {
         assertThat(err).isTrue();
     }
 
