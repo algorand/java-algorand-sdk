@@ -153,6 +153,8 @@ public class TestEncoder {
         } else {
             assertThat(Transaction.Type.Default).isEqualTo(txn.type);
         }
+
+        TestUtil.serializeDeserializeCheck(txn);
     }
 
     @ParameterizedTest
@@ -170,5 +172,7 @@ public class TestEncoder {
         } else {
             assertThat(Enums.SigType.UNKNOWN).isEqualTo(acct.sigType);
         }
+
+        TestUtil.serializeDeserializeCheck(acct);
     }
 }
