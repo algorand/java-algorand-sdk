@@ -1,11 +1,17 @@
 package com.algorand.algosdk.util;
 
+import com.algorand.algosdk.algod.client.model.PaymentTransactionType;
+import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.v2.client.model.Account;
+import com.algorand.algosdk.v2.client.model.Enums;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.io.IOException;
 import java.math.BigInteger;
 
 import static org.assertj.core.api.Assertions.*;
@@ -130,5 +136,39 @@ public class TestEncoder {
             assertThatCode(() -> Encoder.decodeUint64(input))
                     .isInstanceOf(IllegalArgumentException.class)
                     .hasMessage("Length of byte array is invalid");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "pay, pay",
+            "blah, ",
+            "blah, ''"
+    })
+    public void testTransactionEnum(String type, String expected) throws IOException {
+        String txnString = "{\"type\": \"" + type + "\"}";
+        Transaction txn = Encoder.decodeFromJson(txnString, Transaction.class);
+        if (expected != null) {
+            Transaction.Type enumValue = Transaction.Type.forValue(expected);
+            assertThat(enumValue).isEqualTo(txn.type);
+        } else {
+            assertThat(Transaction.Type.Default).isEqualTo(txn.type);
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "sig, sig",
+            "blah, ",
+            "blah, ''"
+    })
+    public void testHttpModelEnum(String type, String expected) throws IOException {
+        String acctString = "{\"sig-type\": \"" + type + "\"}";
+        Account acct = Encoder.decodeFromJson(acctString, Account.class);
+        if (expected != null) {
+            Enums.SigType enumValue = Enums.SigType.forValue(expected);
+            assertThat(enumValue).isEqualTo(acct.sigType);
+        } else {
+            assertThat(Enums.SigType.UNKNOWN).isEqualTo(acct.sigType);
+        }
     }
 }
