@@ -213,7 +213,7 @@ public class TestLogic {
         program2[0] = v;
         assertThatThrownBy(() -> readProgram(program2, args))
             .isInstanceOf(IllegalArgumentException.class)
-            .hasMessage("program too costly for Teal version < 4. consider using v4.");
+            .hasMessage("program too costly for version < 4. consider using v4.");
     }
 
     for (byte v : versions) {
@@ -236,7 +236,7 @@ public class TestLogic {
     }
 
     @Test
-    public void testCheckProgramTealV2() throws Exception {
+    public void testCheckProgramV2() throws Exception {
         assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(2);
         assertThat(getLogicSigVersion()).isGreaterThanOrEqualTo(2);
 
@@ -269,7 +269,7 @@ public class TestLogic {
     }
 
     @Test
-    public void testCheckProgramTealV3() throws Exception {
+    public void testCheckProgramV3() throws Exception {
         assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(3);
         assertThat(getLogicSigVersion()).isGreaterThanOrEqualTo(3);
 
@@ -311,7 +311,7 @@ public class TestLogic {
     }
 
     @Test
-    public void testCheckProgramTealV4() throws Exception {
+    public void testCheckProgramV4() throws Exception {
         assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(4);
 
         {
@@ -379,7 +379,7 @@ public class TestLogic {
     }
 
     @Test
-    public void testCheckProgramTealV5() throws Exception {
+    public void testCheckProgramV5() throws Exception {
         assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(5);
 
         {
@@ -414,7 +414,7 @@ public class TestLogic {
     }
 
     @Test
-    public void testCheckProgramTealV6() throws Exception {
+    public void testCheckProgramV6() throws Exception {
         assertThat(getEvalMaxVersion()).isGreaterThanOrEqualTo(6);
 
         {
