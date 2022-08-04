@@ -20,11 +20,11 @@ public class SourceMap {
     public HashMap<Integer, ArrayList<Integer>> lineToPc;
 
     public SourceMap(HashMap<String,Object> sourceMap) {
-        Double version = (Double) sourceMap.get("version");
+        int version = (int) sourceMap.get("version");
         if(version != 3){
             //TODO: error, only v3 is supported
         }
-        this.version = version.intValue();
+        this.version = version;
 
         this.file = (String) sourceMap.get("file");
         //this.sources = (String[]) sourceMap.get("sources");

@@ -25,6 +25,11 @@ import com.algorand.algosdk.v2.client.model.DryrunRequest;
 import com.algorand.algosdk.v2.client.model.DryrunSource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.gson.Gson;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -33,6 +38,7 @@ import org.threeten.bp.LocalDate;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
@@ -41,7 +47,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -1486,10 +1494,16 @@ public class Stepdefs {
 
 
     @Then("the resulting source map is the same as the json {string}")
-    public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws JsonProcessingException {
-        byte[] expectedSrcMap = ResourceUtils.loadResource(jsonPath);
-        String actualSrcMapStr = Encoder.encodeToJson(this.compileResponse.body().sourcemap) + "\n";
-        assertThat(actualSrcMapStr.getBytes()).isEqualTo(expectedSrcMap);
+    public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws Exception {
+        String[] fields = {"version", "sources", "names", "mapping", "mappings"};
+        String srcMapStr = new String(ResourceUtils.readResource(jsonPath), StandardCharsets.UTF_8);
+
+        HashMap<String, Object> expectedMap = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
+        HashMap<String, Object> actualMap = this.compileResponse.body().sourcemap;
+
+        for(String field: fields){
+            assertThat(actualMap.get(field)).isEqualTo(expectedMap.get(field));
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.logic.SourceMap;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
 import com.google.gson.Gson;
 
@@ -23,7 +24,7 @@ public class TestSourceMap {
     @Given("a source map json file {string}")
     public void a_source_map_json_file(String srcMapPath) throws IOException {
         String srcMapStr = new String(ResourceUtils.readResource(srcMapPath), StandardCharsets.UTF_8);
-        HashMap<String, Object> map = new HashMap<>(new Gson().fromJson(srcMapStr, Map.class));
+        HashMap<String, Object> map = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
         this.srcMap = new SourceMap(map);
     }
 
