@@ -22,13 +22,11 @@ public class SourceMap {
     public SourceMap(HashMap<String,Object> sourceMap) {
         int version = (int) sourceMap.get("version");
         if(version != 3){
-            //TODO: error, only v3 is supported
+            throw new IllegalArgumentException("Only source map version 3 is supported");
         }
         this.version = version;
 
         this.file = (String) sourceMap.get("file");
-        //this.sources = (String[]) sourceMap.get("sources");
-        //this.names = (String[]) sourceMap.get("names");
         this.mappings = (String) sourceMap.get("mappings");
 
         this.lineToPc = new HashMap<>();
