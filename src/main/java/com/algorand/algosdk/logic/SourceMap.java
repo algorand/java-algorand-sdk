@@ -1,5 +1,6 @@
 package com.algorand.algosdk.logic;
 
+import java.lang.Integer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -19,17 +20,19 @@ public class SourceMap {
     public HashMap<Integer, ArrayList<Integer>> lineToPc;
 
     public SourceMap(HashMap<String,Object> sourceMap) {
-        int version = (int) sourceMap.get("version");
+        Double version = (Double) sourceMap.get("version");
         if(version != 3){
-            //TODO: error
-	        //	return sm, fmt.Errorf("only version 3 is supported")
+            //TODO: error, only v3 is supported
         }
-        this.version = version;
+        this.version = version.intValue();
 
         this.file = (String) sourceMap.get("file");
-        this.sources = (String[]) sourceMap.get("sources");
-        this.names = (String[]) sourceMap.get("names");
+        //this.sources = (String[]) sourceMap.get("sources");
+        //this.names = (String[]) sourceMap.get("names");
         this.mappings = (String) sourceMap.get("mappings");
+
+        this.lineToPc = new HashMap<>();
+        this.pcToLine = new HashMap<>();
 
         Integer lastLine = 0;
         String[] vlqs = this.mappings.split(";");
@@ -41,7 +44,11 @@ public class SourceMap {
                 lastLine = lastLine + vals.get(2);
             }
 
-            ArrayList<Integer> currList = this.lineToPc.getOrDefault(lastLine, new ArrayList<Integer>());
+            if(!this.lineToPc.containsKey(lastLine)){
+                this.lineToPc.put(lastLine, new ArrayList<Integer>());
+            }
+
+            ArrayList<Integer> currList = this.lineToPc.get(lastLine);
             currList.add(i);
             this.lineToPc.put(lastLine, currList);
 
@@ -51,11 +58,17 @@ public class SourceMap {
     }
 
     public Integer getLineForPc(Integer pc) {
-        return this.pcToLine.getOrDefault(pc, 0);
+        if(!this.pcToLine.containsKey(pc)){
+            return 0;
+        }
+        return this.pcToLine.get(pc);
     }
 
     public ArrayList<Integer> getPcsForLine(Integer line) {
-        return this.lineToPc.getOrDefault(line, new ArrayList<Integer>());
+        if(!this.pcToLine.containsKey(line)){
+            return new ArrayList<Integer>();
+        }
+        return this.lineToPc.get(line);
     }
 
     private static class VLQDecoder {
@@ -73,16 +86,18 @@ public class SourceMap {
 
             for(int i=0; i<vlq.length(); i++){
                 int digit = b64table.indexOf(vlq.charAt(i));
-                value |= (digit * vlqMask) << shift;
+
+                value |= (digit & vlqMask) << shift;
 
                 if((digit & vlqFlag) > 0)  {
                     shift += vlqShiftSize;
                     continue;
                 }
 
-                value >>= 1;
                 if((value&1)>0){
-                    value *= -1;
+                    value = (value >> 1) * -1;
+                }else{
+                    value = value >> 1;
                 }
 
                 results.add(value);
