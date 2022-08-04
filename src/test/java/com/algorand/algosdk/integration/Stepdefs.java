@@ -1488,7 +1488,7 @@ public class Stepdefs {
     @Then("the resulting source map is the same as the json {string}")
     public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws JsonProcessingException {
         byte[] expectedSrcMap = ResourceUtils.loadResource(jsonPath);
-        String actualSrcMapStr = Encoder.encodeToJson(this.compileResponse.body().sourcemap);
+        String actualSrcMapStr = Encoder.encodeToJson(this.compileResponse.body().sourcemap) + "\n";
         assertThat(actualSrcMapStr.getBytes()).isEqualTo(expectedSrcMap);
     }
 
