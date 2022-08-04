@@ -3,7 +3,6 @@ package com.algorand.algosdk.unit;
 import com.algorand.algosdk.logic.SourceMap;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
-import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
