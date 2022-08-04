@@ -17,6 +17,7 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.AlgoConverter;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.ResourceUtils;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.CompileResponse;
 import com.algorand.algosdk.v2.client.model.DryrunResponse;
@@ -1475,4 +1476,20 @@ public class Stepdefs {
         assertThat(msgs.size()).isGreaterThan(0);
         assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
+
+
+    @When("I compile a teal program {string} with mapping enabled")
+    public void i_compile_a_teal_program_with_mapping_enabled(String tealPath) throws Exception {
+        byte[] tealProgram = ResourceUtils.loadResource(tealPath);
+        this.compileResponse = aclv2.TealCompile().source(tealProgram).sourcemap(true).execute();
+    }
+
+
+    @Then("the resulting source map is the same as the json {string}")
+    public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws JsonProcessingException {
+        byte[] expectedSrcMap = ResourceUtils.loadResource(jsonPath);
+        String actualSrcMapStr = Encoder.encodeToJson(this.compileResponse.body().sourcemap);
+        assertThat(actualSrcMapStr.getBytes()).isEqualTo(expectedSrcMap);
+    }
+
 }

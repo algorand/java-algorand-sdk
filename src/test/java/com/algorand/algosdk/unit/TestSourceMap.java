@@ -1,21 +1,16 @@
 package com.algorand.algosdk.unit;
 
+import com.algorand.algosdk.logic.SourceMap;
+import com.algorand.algosdk.util.ResourceUtils;
+import com.google.gson.Gson;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
-
-import com.algorand.algosdk.logic.SourceMap;
-import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.ResourceUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
