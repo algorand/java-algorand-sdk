@@ -17,6 +17,7 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.AlgoConverter;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.ResourceUtils;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.CompileResponse;
 import com.algorand.algosdk.v2.client.model.DryrunResponse;
@@ -24,6 +25,7 @@ import com.algorand.algosdk.v2.client.model.DryrunRequest;
 import com.algorand.algosdk.v2.client.model.DryrunSource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -32,6 +34,7 @@ import org.threeten.bp.LocalDate;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
@@ -40,7 +43,9 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -1475,4 +1480,26 @@ public class Stepdefs {
         assertThat(msgs.size()).isGreaterThan(0);
         assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
+
+
+    @When("I compile a teal program {string} with mapping enabled")
+    public void i_compile_a_teal_program_with_mapping_enabled(String tealPath) throws Exception {
+        byte[] tealProgram = ResourceUtils.loadResource(tealPath);
+        this.compileResponse = aclv2.TealCompile().source(tealProgram).sourcemap(true).execute();
+    }
+
+
+    @Then("the resulting source map is the same as the json {string}")
+    public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws Exception {
+        String[] fields = {"version", "sources", "names", "mapping", "mappings"};
+        String srcMapStr = new String(ResourceUtils.readResource(jsonPath), StandardCharsets.UTF_8);
+
+        HashMap<String, Object> expectedMap = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
+        HashMap<String, Object> actualMap = this.compileResponse.body().sourcemap;
+
+        for(String field: fields){
+            assertThat(actualMap.get(field)).isEqualTo(expectedMap.get(field));
+        }
+    }
+
 }
