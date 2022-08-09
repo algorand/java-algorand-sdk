@@ -55,10 +55,20 @@ public class SourceMap {
 
     }
 
+    /**
+    * Returns the Integer line number for the passed PC or null if not found
+    * @param  pc   the pc (program counter) of the assembled file
+    * @return      the line number or null if not found 
+    */
     public Integer getLineForPc(Integer pc) {
         return this.pcToLine.get(pc);
     }
 
+    /**
+    * Returns the List of PCs for the passed line number 
+    * @param  pc   the line number of the source file
+    * @return      the list of PCs that line generated or empty array if not found 
+    */
     public ArrayList<Integer> getPcsForLine(Integer line) {
         if(!this.pcToLine.containsKey(line)){
             return new ArrayList<Integer>();
@@ -67,6 +77,8 @@ public class SourceMap {
     }
 
     private static class VLQDecoder {
+        // VLQDecoder for decoding the VLQ values returned for source map
+        // based on the decoder implementation here: https://github.com/algorand/go-algorand-sdk/blob/develop/logic/source_map.go
 
         private static final String b64table    = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
         private static final int vlqShiftSize   = 5;
