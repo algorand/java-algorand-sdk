@@ -56,9 +56,6 @@ public class SourceMap {
     }
 
     public Integer getLineForPc(Integer pc) {
-        if(!this.pcToLine.containsKey(pc)){
-            return 0;
-        }
         return this.pcToLine.get(pc);
     }
 
