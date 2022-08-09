@@ -66,7 +66,7 @@ public class SourceMap {
 
     /**
     * Returns the List of PCs for the passed line number 
-    * @param  pc   the line number of the source file
+    * @param  line the line number of the source file
     * @return      the list of PCs that line generated or empty array if not found 
     */
     public ArrayList<Integer> getPcsForLine(Integer line) {
