@@ -17,6 +17,7 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.AlgoConverter;
 import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.ResourceUtils;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.CompileResponse;
 import com.algorand.algosdk.v2.client.model.DryrunResponse;
@@ -24,6 +25,7 @@ import com.algorand.algosdk.v2.client.model.DryrunRequest;
 import com.algorand.algosdk.v2.client.model.DryrunSource;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -32,6 +34,7 @@ import org.threeten.bp.LocalDate;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
@@ -40,8 +43,11 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -118,6 +124,31 @@ public class Stepdefs {
     Response<CompileResponse> compileResponse;
     Response<DryrunResponse> dryrunResponse;
 
+    private static class DevModeState {
+        static final long ACCOUNT_FUNDING_MICROALGOS = 100_000_000;
+        private Account advanceRounds;
+
+        /**
+         * randomAmount minimizes the chance `advanceRounds` issues duplicate transactions by randomizing the payment amount.
+         */
+        private long randomAmount() {
+            return ThreadLocalRandom.current().nextLong(1, (long) (ACCOUNT_FUNDING_MICROALGOS * .01));
+        }
+
+        public SignedTransaction selfPay(TransactionParams tp) throws Exception {
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(advanceRounds.getAddress())
+                            .suggestedParams(tp)
+                            .amount(randomAmount())
+                            .receiver(advanceRounds.getAddress())
+                            .build();
+            return advanceRounds.signTransaction(tx);
+        }
+    }
+
+    private final DevModeState dms = new DevModeState();
+
     protected Address getAddress(int i) {
         if (addresses == null) {
             throw new RuntimeException("Addresses not initialized, must use given 'wallet information'");
@@ -156,6 +187,48 @@ public class Stepdefs {
         byte[] secretKey = kcl.exportKey(req).getPrivateKey();
         Account acct = new Account(Arrays.copyOfRange(secretKey, 0, 32));
         return acct.signTransaction(tx);
+    }
+
+    /**
+     * advanceRound is a convenience method intended for testing with DevMode networks.
+     * <p>
+     * Since DevMode block generation requires a transaction rather than time passing, test assertions may require advancing rounds.  advanceRound issues advanceCount payments to advance rounds.
+     */
+    private void advanceRoundsV1(int advanceCount) {
+        initializeDevModeAccount();
+        for (int i = 0; i < advanceCount; i++) {
+            try {
+                acl.rawTransaction(Encoder.encodeToMsgPack(dms.selfPay(acl.transactionParams())));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    /**
+     * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
+     */
+    public void initializeDevModeAccount() {
+        if (dms.advanceRounds != null) {
+            return;
+        }
+
+        try {
+            getParams();
+            dms.advanceRounds = new Account();
+            Address sender = getAddress(0);
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(sender)
+                            .suggestedParams(acl.transactionParams())
+                            .amount(DevModeState.ACCOUNT_FUNDING_MICROALGOS)
+                            .receiver(dms.advanceRounds.getAddress())
+                            .build();
+            SignedTransaction st = signWithAddress(tx, sender);
+            acl.rawTransaction(Encoder.encodeToMsgPack(st));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -447,8 +520,8 @@ public class Stepdefs {
     }
 
     @When("I get status after this block")
-    public void statusBlock() throws ApiException, InterruptedException {
-        Thread.sleep(4000);
+    public void statusBlock() throws Exception {
+        advanceRoundsV1(1);
         statusAfter = acl.waitForBlock(status.getLastRound());
     }
 
@@ -526,12 +599,39 @@ public class Stepdefs {
     }
 
     @When("I generate a key using kmd")
-    public void genKeyKmd() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
+    public void genKeyKmd() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
         GenerateKeyRequest req = new GenerateKeyRequest();
         req.setDisplayMnemonic(false);
         req.setWalletHandleToken(handle);
         pk = new Address(kcl.generateKey(req).getAddress());
     }
+
+    @When("I generate a key using kmd for rekeying and fund it")
+    public void genKeyKmdRekey() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+        GenerateKeyRequest req = new GenerateKeyRequest();
+        req.setDisplayMnemonic(false);
+        req.setWalletHandleToken(handle);
+        rekey = new Address(kcl.generateKey(req).getAddress());
+
+        // Fund rekey address
+        try {
+            getParams();
+            Address sender = getAddress(0);
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(sender)
+                            .suggestedParams(acl.transactionParams())
+                            .amount(100_000_000)
+                            .receiver(rekey)
+                            .build();
+            SignedTransaction st = signWithAddress(tx, sender);
+            acl.rawTransaction(Encoder.encodeToMsgPack(st));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    Address rekey;
 
     @Then("the key should be in the wallet")
     public void keyInWallet() throws com.algorand.algosdk.kmd.client.ApiException {
@@ -539,8 +639,8 @@ public class Stepdefs {
         req.setWalletHandleToken(handle);
         List<String> keys = kcl.listKeysInWallet(req).getAddresses();
         boolean exists = false;
-        for (String k : keys){
-            if (k.equals(pk.toString())){
+        for (String k : keys) {
+            if (k.equals(pk.toString())) {
                 exists = true;
             }
         }
@@ -632,6 +732,7 @@ public class Stepdefs {
         algodClient.setBasePath("http://localhost:" + algodPort);
         acl = new AlgodApi(algodClient);
     }
+
     @Given("an algod v2 client")
     public void aClientv2() throws FileNotFoundException, IOException{
         aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
@@ -660,21 +761,30 @@ public class Stepdefs {
     }
 
     @Given("default transaction with parameters {int} {string}")
-    public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException{
+    public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
+        defaultTxnWithAddress(amt, note, getAddress(0));
+    }
+
+    @Given("default transaction with parameters {int} {string} and rekeying key")
+    public void defaultTxnForRekeying(int amt, String note) {
+        defaultTxnWithAddress(amt, note, rekey);
+    }
+
+    private void defaultTxnWithAddress(int amt, String note, Address sender) {
         getParams();
-        if (note.equals("none")){
+        if (note.equals("none")) {
             this.note = null;
-        } else{
+        } else {
             this.note = Encoder.decodeFromBase64(note);
         }
         txnBuilder = Transaction.PaymentTransactionBuilder()
-                .sender(getAddress(0))
+                .sender(sender)
                 .suggestedParams(params)
                 .note(this.note)
                 .amount(amt)
                 .receiver(getAddress(1));
         txn = txnBuilder.build();
-        pk = getAddress(0);
+        pk = sender;
     }
 
     @Given("default multisig transaction with parameters {int} {string}")
@@ -715,23 +825,32 @@ public class Stepdefs {
     }
 
     @Then("the transaction should go through")
-    public void checkTxn() throws ApiException, InterruptedException{
+    public void checkTxn() throws Exception {
         String ans = acl.pendingTransactionInformation(txid).getFrom();
         assertThat(this.txn.sender.toString()).isEqualTo(ans);
-        acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
+        waitForAlgodTransactionProcessingToComplete();
         String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
         assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
         assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
     }
 
+    /**
+     * waitForAlgodTransactionProcessingToComplete is a Dev mode helper method that's a rough analog to `acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));`.
+     * <p>
+     * Since Dev mode produces blocks on a per transaction basis, it's possible algod generates a block _before_ the corresponding SDK call to wait for a block.  Without _any_ wait, it's possible the SDK looks for the transaction before algod completes processing.  So, the method performs a local sleep to simulate waiting for a block.
+     */
+    private static void waitForAlgodTransactionProcessingToComplete() throws Exception {
+        Thread.sleep(500);
+    }
+
     @Then("I can get the transaction by ID")
-    public void txnbyID() throws ApiException, InterruptedException{
-        acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));
+    public void txnByID() throws Exception {
+        waitForAlgodTransactionProcessingToComplete();
         assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
     }
 
     @Then("the transaction should not go through")
-    public void txnFail(){
+    public void txnFail() {
         assertThat(err).isTrue();
     }
 
@@ -1361,4 +1480,26 @@ public class Stepdefs {
         assertThat(msgs.size()).isGreaterThan(0);
         assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
+
+
+    @When("I compile a teal program {string} with mapping enabled")
+    public void i_compile_a_teal_program_with_mapping_enabled(String tealPath) throws Exception {
+        byte[] tealProgram = ResourceUtils.loadResource(tealPath);
+        this.compileResponse = aclv2.TealCompile().source(tealProgram).sourcemap(true).execute();
+    }
+
+
+    @Then("the resulting source map is the same as the json {string}")
+    public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws Exception {
+        String[] fields = {"version", "sources", "names", "mapping", "mappings"};
+        String srcMapStr = new String(ResourceUtils.readResource(jsonPath), StandardCharsets.UTF_8);
+
+        HashMap<String, Object> expectedMap = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
+        HashMap<String, Object> actualMap = this.compileResponse.body().sourcemap;
+
+        for(String field: fields){
+            assertThat(actualMap.get(field)).isEqualTo(expectedMap.get(field));
+        }
+    }
+
 }
