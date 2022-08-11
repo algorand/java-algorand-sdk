@@ -334,4 +334,15 @@ public class IndexerPaths {
         ps.q = q;
     }
 
+    @When("we make a LookupApplicationBoxByIDandName call with applicationID {long} with encoded box name {string}")
+    public void lookUpApplicationBox(Long appID, String boxName) {
+        ps.q = indexerClient.lookupApplicationBoxByIDandName(appID).name(boxName);
+    }
+
+    @When("we make a SearchForApplicationBoxes call with applicationID {long} with max {long}")
+    public void searchApplicationBoxes(Long appID, Long maxRes) {
+        SearchForApplicationBoxes q = indexerClient.searchForApplicationBoxes(appID);
+        if (maxRes > 0) q.limit(maxRes);
+        ps.q = q;
+    }
 }
