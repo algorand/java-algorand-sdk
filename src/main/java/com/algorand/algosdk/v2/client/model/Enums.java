@@ -1,5 +1,6 @@
 package com.algorand.algosdk.v2.client.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Enums {
@@ -10,7 +11,8 @@ public class Enums {
     public enum AddressRole {
         @JsonProperty("sender") SENDER("sender"),
         @JsonProperty("receiver") RECEIVER("receiver"),
-        @JsonProperty("freeze-target") FREEZETARGET("freeze-target");
+        @JsonProperty("freeze-target") FREEZETARGET("freeze-target"),
+        @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
         AddressRole(String name) {
@@ -21,6 +23,17 @@ public class Enums {
         public String toString() {
             return this.serializedName;
         }
+
+        @JsonCreator
+        public static AddressRole forValue(String value) {
+            for (AddressRole t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
     }
 
     /**
@@ -34,7 +47,8 @@ public class Enums {
         @JsonProperty("created-assets") CREATEDASSETS("created-assets"),
         @JsonProperty("apps-local-state") APPSLOCALSTATE("apps-local-state"),
         @JsonProperty("created-apps") CREATEDAPPS("created-apps"),
-        @JsonProperty("none") NONE("none");
+        @JsonProperty("none") NONE("none"),
+        @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
         Exclude(String name) {
@@ -45,6 +59,17 @@ public class Enums {
         public String toString() {
             return this.serializedName;
         }
+
+        @JsonCreator
+        public static Exclude forValue(String value) {
+            for (Exclude t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
     }
 
     /**
@@ -54,7 +79,8 @@ public class Enums {
      */
     public enum Hashtype {
         @JsonProperty("sha512_256") SHA512_256("sha512_256"),
-        @JsonProperty("sha256") SHA256("sha256");
+        @JsonProperty("sha256") SHA256("sha256"),
+        @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
         Hashtype(String name) {
@@ -65,6 +91,17 @@ public class Enums {
         public String toString() {
             return this.serializedName;
         }
+
+        @JsonCreator
+        public static Hashtype forValue(String value) {
+            for (Hashtype t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
     }
 
     /**
@@ -84,7 +121,8 @@ public class Enums {
         @JsonProperty("closeout") CLOSEOUT("closeout"),
         @JsonProperty("clear") CLEAR("clear"),
         @JsonProperty("update") UPDATE("update"),
-        @JsonProperty("delete") DELETE("delete");
+        @JsonProperty("delete") DELETE("delete"),
+        @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
         OnCompletion(String name) {
@@ -95,6 +133,17 @@ public class Enums {
         public String toString() {
             return this.serializedName;
         }
+
+        @JsonCreator
+        public static OnCompletion forValue(String value) {
+            for (OnCompletion t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
     }
 
     /**
@@ -107,7 +156,8 @@ public class Enums {
     public enum SigType {
         @JsonProperty("sig") SIG("sig"),
         @JsonProperty("msig") MSIG("msig"),
-        @JsonProperty("lsig") LSIG("lsig");
+        @JsonProperty("lsig") LSIG("lsig"),
+        @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
         SigType(String name) {
@@ -118,6 +168,17 @@ public class Enums {
         public String toString() {
             return this.serializedName;
         }
+
+        @JsonCreator
+        public static SigType forValue(String value) {
+            for (SigType t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
     }
 
     /**
@@ -137,7 +198,8 @@ public class Enums {
         @JsonProperty("acfg") ACFG("acfg"),
         @JsonProperty("axfer") AXFER("axfer"),
         @JsonProperty("afrz") AFRZ("afrz"),
-        @JsonProperty("appl") APPL("appl");
+        @JsonProperty("appl") APPL("appl"),
+        @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
         TxType(String name) {
@@ -148,6 +210,17 @@ public class Enums {
         public String toString() {
             return this.serializedName;
         }
+
+        @JsonCreator
+        public static TxType forValue(String value) {
+            for (TxType t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
     }
 
 }

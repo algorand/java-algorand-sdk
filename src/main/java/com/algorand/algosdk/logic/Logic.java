@@ -250,14 +250,14 @@ public class Logic {
         }
         // costs calculated dynamically starting in v4
         if (version < 4 && cost > MAX_COST) {
-            throw new IllegalArgumentException("program too costly for Teal version < 4. consider using v4.");
+            throw new IllegalArgumentException("program too costly for version < 4. consider using v4.");
         }
         
         return new ProgramData(true, ints, bytes);
     }
 
     /**
-     * Retrieves TEAL supported version
+     * Retrieves supported program version
      * @return int
      * @throws IOException
      */
@@ -269,7 +269,7 @@ public class Logic {
     }
 
     /**
-     * Retrieves max supported version of TEAL evaluator
+     * Retrieves max supported program version of evaluator
      * @return int
      * @throws IOException
      */
