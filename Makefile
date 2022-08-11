@@ -4,7 +4,7 @@ unit:
 integration:
 	mvn test \
 	  -Dtest=com.algorand.algosdk.integration.RunCucumberIntegrationTest \
-	  mvn test -Dcucumber.filter.tags="@algod or @assets or @auction or @kmd or @send or @send.keyregtxn or @indexer or @rekey_v1 or @applications.verified or @applications or @applications.boxes or @compile or @dryrun or @indexer.applications or @indexer.231 or @abi or @c2c or @compile.sourcemap"
+	  -Dcucumber.filter.tags="@algod or @assets or @auction or @kmd or @send or @send.keyregtxn or @indexer or @rekey_v1 or @applications.verified or @applications or @applications.boxes or @compile or @dryrun or @indexer.applications or @indexer.231 or @abi or @c2c or @compile.sourcemap"
 
 docker-test:
 	./run_integration_tests.sh
