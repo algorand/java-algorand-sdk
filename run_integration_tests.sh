@@ -6,7 +6,9 @@ pushd $rootdir
 
 SKIP_TEST_CONTAINER=0
 UPDATE_FEATURE_FILES_ONLY=0
-TEST_BRANCH=feature/box-storage
+TEST_BRANCH=indexer-boxes
+
+# TODO: TEST_BRANCH used to be feature/box-storage, revert later
 
 function help {
   echo "Options:"

@@ -12,6 +12,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class BoxesResponse extends PathResponse {
 
+    /**
+     * (appidx) application index.
+     */
+    @JsonProperty("application-id")
+    public Long applicationId;
+
     @JsonProperty("boxes")
     public List<BoxDescriptor> boxes = new ArrayList<BoxDescriptor>();
 
@@ -22,6 +28,7 @@ public class BoxesResponse extends PathResponse {
         if (o == null) return false;
 
         BoxesResponse other = (BoxesResponse) o;
+        if (!Objects.deepEquals(this.applicationId, other.applicationId)) return false;
         if (!Objects.deepEquals(this.boxes, other.boxes)) return false;
 
         return true;

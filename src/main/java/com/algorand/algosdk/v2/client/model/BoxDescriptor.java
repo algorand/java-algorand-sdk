@@ -7,7 +7,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Box descriptor describes a Box.
+ * Box descriptor describes an app box without a value.
  */
 public class BoxDescriptor extends PathResponse {
 
