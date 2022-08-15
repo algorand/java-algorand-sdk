@@ -10,6 +10,7 @@ import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.DryrunResponse;
 import com.algorand.algosdk.v2.client.model.DryrunTxnResult;
+import com.algorand.algosdk.v2.client.model.StateProof;
 import com.google.common.io.Files;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -71,6 +72,9 @@ public class ResponsesShared {
         switch(client) {
             case "indexer": {
                 switch(endpoint) {
+                    case "lookupBlock":
+                        response = indexer.lookupBlock(1234L).execute();
+                        break;
                     case "lookupAccountByID":
                         response = indexer.lookupAccountByID(new Address()).execute();
                         break;
@@ -165,7 +169,8 @@ public class ResponsesShared {
                         response = algod.TealDryrun().execute();
                         break;
                     case "Proof":
-                        response = algod.GetProof(0L, "").execute();
+                    case "GetTransactionProof":
+                        response = algod.GetTransactionProof(0L, "").execute();
                         break;
                     case "AccountInformation":
                         response = algod.AccountInformation(new Address()).execute();
@@ -175,6 +180,16 @@ public class ResponsesShared {
                         break;
                     case "AccountAssetInformation":
                         response = algod.AccountAssetInformation(new Address(), 0L).execute();
+                        break;
+                    case "GetBlock":
+                        response = algod.GetBlock(1234L).execute();
+                        break;
+                    case "GetLightBlockHeaderProof":
+                        response = algod.GetLightBlockHeaderProof(1234L).execute();
+                        break;
+                    case "GetStateProof":
+                        Response<StateProof> r = algod.GetStateProof(1234L).execute();
+                        response = r;
                         break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);

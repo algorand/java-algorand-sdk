@@ -1,10 +1,10 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.v2.client.algod.*;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.model.Enums;
 import io.cucumber.java.en.When;
 
 import java.security.NoSuchAlgorithmException;
@@ -78,7 +78,7 @@ public class AlgodPaths {
     @When("we make an Account Information call against account {string} with exclude {string}")
     public void accountInformation(String string, String string2) throws NoSuchAlgorithmException {
         AccountInformation aiq = algodClient.AccountInformation(new Address(string));
-        if (TestingUtils.notEmpty(string2)) aiq.exclude(QueryMapper.getExclude(string2));
+        if (TestingUtils.notEmpty(string2)) aiq.exclude(Enums.Exclude.forValue(string2));
         ps.q = aiq;
     }
 }
