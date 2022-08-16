@@ -164,7 +164,7 @@ public class Transaction implements Serializable {
 
     /* state proof fields */
     @JsonProperty("sptype")
-    public BigInteger stateProofType = null;
+    public Integer stateProofType = null;
 
     @JsonProperty("sp")
     public Map<String,Object> stateProof = null;
