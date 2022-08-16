@@ -238,7 +238,7 @@ mvn clean deploy -P release,default
 
 # Testing
 
-Many cross-SDK tests are defined in [algorand-sdk-testing](https://github.com/algorand/algorand-sdk-testing/). Some are integration tests wit additional dependencies. These dependencies are containerized in a docker file, which can be executed with `make docker-test`.
+Many cross-SDK tests are defined in [algorand-sdk-testing](https://github.com/algorand/algorand-sdk-testing/). Some are integration tests with additional dependencies. These dependencies are containerized in a docker file, which can be executed with `make docker-test`.
 
 It is occasionally useful to run locally, or against alternate integration branches. To do this:
 1. Install feature files for your test branch "./run_integration_tests.sh -feature-only -test-branch <branch here>"
