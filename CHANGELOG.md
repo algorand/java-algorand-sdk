@@ -1,3 +1,14 @@
+# 1.17.0
+### New Features
+* DevTools: adding source map decoder by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/352
+### Enhancements
+* Github-Actions: Adding pr title and label checks by @algojack in https://github.com/algorand/java-algorand-sdk/pull/339
+* Enhancement: Add UNKNOWN enum type to HTTP client enums. by @winder in https://github.com/algorand/java-algorand-sdk/pull/351
+* AVM:  Consolidate TEAL and AVM versions by @michaeldiamant in https://github.com/algorand/java-algorand-sdk/pull/348
+* Testing: Modify cucumber steps to use dev mode network  by @michaeldiamant in https://github.com/algorand/java-algorand-sdk/pull/350
+### Other
+* Ignore copied over txt test resource files by @michaeldiamant in https://github.com/algorand/java-algorand-sdk/pull/342
+
 # 1.16.0
 
 ## What's Changed
