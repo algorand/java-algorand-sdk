@@ -135,7 +135,7 @@ public class Applications {
 
     @Given("I wait for the transaction to be confirmed.")
     public void waitForTransactionToBeConfirmed() throws Exception {
-        Utils.waitForConfirmation(clients.v2Client, txId, 5);
+        Utils.waitForConfirmation(clients.v2Client, txId, 1);
     }
 
     // TODO: Use V2 Pending Transaction endpoint when it is available.
@@ -165,7 +165,7 @@ public class Applications {
         SignedTransaction stx = base.signWithAddress(tx, sender);
 
         Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
-        Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 5);
+        Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 1);
     }
 
     @Then("I get the account address for the current application and see that it matches the app id's hash")
