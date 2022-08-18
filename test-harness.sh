@@ -49,7 +49,7 @@ mkdir -p $TEST_RESOURCES_DIR
 
 # The Java implementation of these is too tightly coupled with the
 # integration tests, so add them to the integration tests instead.
-mv "$SDK_TESTING_HARNESS"/features/unit/offline.feature "$SDK_TESTING_HARNESS/features/integration/
+mv "$SDK_TESTING_HARNESS"/features/unit/offline.feature "$SDK_TESTING_HARNESS"/features/integration/
 
 cp -r "$SDK_TESTING_HARNESS"/features/integration/*  $TEST_DIR/integration
 cp -r "$SDK_TESTING_HARNESS"/features/unit/* $TEST_DIR/unit
