@@ -1,10 +1,14 @@
-UNITS = "@unit.offline or @unit.algod or @unit.indexer or @unit.rekey or @unit.indexer.rekey or @unit.transactions or @unit.transactions.keyreg or @unit.responses or @unit.applications or @unit.dryrun or @unit.tealsign or @unit.responses.messagepack or @unit.responses.231 or @unit.responses.messagepack.231 or @unit.feetest or @unit.indexer.logs or @unit.abijson or @unit.abijson.byname or @unit.atomic_transaction_composer or @unit.transactions.payment or @unit.responses.unlimited_assets or @unit.algod.ledger_refactoring or @unit.indexer.ledger_refactoring or @unit.dryrun.trace.application or @unit.sourcemap"
-unit:
-	mvn test -Dcucumber.filter.tags=$(UNITS)
+UNIT_TAGS :=  "$(subst :, or ,$(shell awk '{print $2}' src/test/unit.tags | paste -s -d: -))"
+INTEGRATIONS_TAGS := "$(subst :, or ,$(shell awk '{print $2}' src/test/integration.tags | paste -s -d: -))"
 
-INTEGRATIONS = "@algod or @assets or @auction or @kmd or @send or @send.keyregtxn or @indexer or @rekey_v1 or @applications.verified or @applications or @compile or @dryrun or @indexer.applications or @indexer.231 or @abi or @c2c or @compile.sourcemap"
+unit:
+	mvn test -Dcucumber.filter.tags=$(UNIT_TAGS)
+
 integration:
-	mvn test -Dtest=com.algorand.algosdk.integration.RunCucumberIntegrationTest -Dcucumber.filter.tags=$(INTEGRATIONS)
+	mvn test -Dtest=com.algorand.algosdk.integration.RunCucumberIntegrationTest -Dcucumber.filter.tags=$(INTEGRATION_TAGS)
+
+display-all-java-steps:
+	find src/test/java/com/algorand/algosdk -name *.java | xargs grep "io.cucumber.java.en" 2>/dev/null | grep -v Binary | cut -d: -f1 | sort | uniq | xargs grep -E "@(Given|Then|When)"
 
 harness:
 	./test-harness.sh
