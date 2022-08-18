@@ -191,6 +191,7 @@ public class Enums {
      *   (axfer) asset-transfer-transaction
      *   (afrz) asset-freeze-transaction
      *   (appl) application-transaction
+     *   (stpf) state-proof-transaction
      */
     public enum TxType {
         @JsonProperty("pay") PAY("pay"),
@@ -199,6 +200,7 @@ public class Enums {
         @JsonProperty("axfer") AXFER("axfer"),
         @JsonProperty("afrz") AFRZ("afrz"),
         @JsonProperty("appl") APPL("appl"),
+        @JsonProperty("stpf") STPF("stpf"),
         @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
