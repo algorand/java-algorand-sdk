@@ -129,20 +129,20 @@ public class Stepdefs {
         private Account advanceRounds;
 
         /**
-         * randomAmount minimizes the chance `advanceRounds` issues duplicate
-         * transactions by randomizing the payment amount.
+         * randomAmount minimizes the chance `advanceRounds` issues duplicate transactions by randomizing the payment amount.
          */
         private long randomAmount() {
             return ThreadLocalRandom.current().nextLong(1, (long) (ACCOUNT_FUNDING_MICROALGOS * .01));
         }
 
         public SignedTransaction selfPay(TransactionParams tp) throws Exception {
-            Transaction tx = Transaction.PaymentTransactionBuilder()
-                    .sender(advanceRounds.getAddress())
-                    .suggestedParams(tp)
-                    .amount(randomAmount())
-                    .receiver(advanceRounds.getAddress())
-                    .build();
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(advanceRounds.getAddress())
+                            .suggestedParams(tp)
+                            .amount(randomAmount())
+                            .receiver(advanceRounds.getAddress())
+                            .build();
             return advanceRounds.signTransaction(tx);
         }
     }
@@ -177,11 +177,9 @@ public class Stepdefs {
     }
 
     /**
-     * Convenience method to lookup a secret key and sign a transaction with the
-     * key.
+     * Convenience method to lookup a secret key and sign a transaction with the key.
      */
-    public SignedTransaction signWithAddress(Transaction tx, Address addr)
-            throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+    public SignedTransaction signWithAddress(Transaction tx, Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
         ExportKeyRequest req = new ExportKeyRequest();
         req.setAddress(addr.toString());
         req.setWalletHandleToken(handle);
@@ -192,12 +190,9 @@ public class Stepdefs {
     }
 
     /**
-     * advanceRound is a convenience method intended for testing with DevMode
-     * networks.
+     * advanceRound is a convenience method intended for testing with DevMode networks.
      * <p>
-     * Since DevMode block generation requires a transaction rather than time
-     * passing, test assertions may require advancing rounds. advanceRound issues
-     * advanceCount payments to advance rounds.
+     * Since DevMode block generation requires a transaction rather than time passing, test assertions may require advancing rounds.  advanceRound issues advanceCount payments to advance rounds.
      */
     private void advanceRoundsV1(int advanceCount) {
         initializeDevModeAccount();
@@ -211,8 +206,7 @@ public class Stepdefs {
     }
 
     /**
-     * initializeDevModeAccount performs a one-time account initialization per
-     * inclusion in a scenario outline. No attempt is made to delete the account.
+     * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
      */
     public void initializeDevModeAccount() {
         if (dms.advanceRounds != null) {
@@ -223,12 +217,13 @@ public class Stepdefs {
             getParams();
             dms.advanceRounds = new Account();
             Address sender = getAddress(0);
-            Transaction tx = Transaction.PaymentTransactionBuilder()
-                    .sender(sender)
-                    .suggestedParams(acl.transactionParams())
-                    .amount(DevModeState.ACCOUNT_FUNDING_MICROALGOS)
-                    .receiver(dms.advanceRounds.getAddress())
-                    .build();
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(sender)
+                            .suggestedParams(acl.transactionParams())
+                            .amount(DevModeState.ACCOUNT_FUNDING_MICROALGOS)
+                            .receiver(dms.advanceRounds.getAddress())
+                            .build();
             SignedTransaction st = signWithAddress(tx, sender);
             acl.rawTransaction(Encoder.encodeToMsgPack(st));
         } catch (Exception e) {
@@ -237,11 +232,9 @@ public class Stepdefs {
     }
 
     /**
-     * Convenience method to export a key and initialize an account to use for
-     * signing.
+     * Convenience method to export a key and initialize an account to use for signing.
      */
-    public void exportKeyAndSetAccount(Address addr)
-            throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+    public void exportKeyAndSetAccount(Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
         ExportKeyRequest req = new ExportKeyRequest();
         req.setAddress(addr.toString());
         req.setWalletHandleToken(handle);
@@ -262,11 +255,11 @@ public class Stepdefs {
     }
 
     @Then("the wallet should exist")
-    public void walletExist() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void walletExist() throws com.algorand.algosdk.kmd.client.ApiException{
         boolean exists = false;
         APIV1GETWalletsResponse resp = kcl.listWallets();
-        for (APIV1Wallet w : resp.getWallets()) {
-            if (w.getName().equals(walletName)) {
+        for (APIV1Wallet w : resp.getWallets()){
+            if (w.getName().equals(walletName)){
                 exists = true;
             }
         }
@@ -274,7 +267,7 @@ public class Stepdefs {
     }
 
     @When("I get the wallet handle")
-    public void getHandle() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void getHandle() throws com.algorand.algosdk.kmd.client.ApiException{
         InitWalletHandleTokenRequest req = new InitWalletHandleTokenRequest();
         req.setWalletId(walletID);
         req.setWalletPassword(walletPswd);
@@ -283,7 +276,7 @@ public class Stepdefs {
     }
 
     @Then("I can get the master derivation key")
-    public void getMdk() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void getMdk() throws com.algorand.algosdk.kmd.client.ApiException{
         ExportMasterKeyRequest req = new ExportMasterKeyRequest();
         req.setWalletHandleToken(handle);
         req.setWalletPassword(walletPswd);
@@ -292,7 +285,7 @@ public class Stepdefs {
     }
 
     @When("I rename the wallet")
-    public void renameWallet() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void renameWallet() throws com.algorand.algosdk.kmd.client.ApiException{
         RenameWalletRequest req = new RenameWalletRequest();
         walletName = "Walletjava_new";
         req.setWalletId(walletID);
@@ -302,7 +295,7 @@ public class Stepdefs {
     }
 
     @Then("I can still get the wallet information with the same handle")
-    public void getWalletInfo() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void getWalletInfo() throws com.algorand.algosdk.kmd.client.ApiException{
         WalletInfoRequest req = new WalletInfoRequest();
         req.setWalletHandleToken(handle);
         String name = kcl.getWalletInfo(req).getWalletHandle().getWallet().getName();
@@ -310,41 +303,40 @@ public class Stepdefs {
     }
 
     @When("I renew the wallet handle")
-    public void renewHandle() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void renewHandle() throws com.algorand.algosdk.kmd.client.ApiException{
         RenewWalletHandleTokenRequest req = new RenewWalletHandleTokenRequest();
         req.setWalletHandleToken(handle);
         kcl.renewWalletHandleToken(req);
     }
 
     @When("I release the wallet handle")
-    public void releaseHandle() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void releaseHandle() throws com.algorand.algosdk.kmd.client.ApiException{
         ReleaseWalletHandleTokenRequest req = new ReleaseWalletHandleTokenRequest();
         req.setWalletHandleToken(handle);
         kcl.releaseWalletHandleToken(req);
     }
 
     @Then("the wallet handle should not work")
-    public void tryHandle() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void tryHandle() throws com.algorand.algosdk.kmd.client.ApiException{
         RenewWalletHandleTokenRequest req = new RenewWalletHandleTokenRequest();
         req.setWalletHandleToken(handle);
         err = false;
-        try {
+        try{
             kcl.renewWalletHandleToken(req);
-        } catch (Exception e) {
+        } catch(Exception e){
             err = true;
         }
         assertThat(err).isTrue();
     }
 
     @Given("payment transaction parameters {int} {int} {int} {string} {string} {string} {int} {string} {string}")
-    public void transactionParameters(int fee, int fv, int lv, String gh, String to, String close, int amt, String gen,
-            String note) throws GeneralSecurityException, NoSuchAlgorithmException {
+    public void transactionParameters(int fee, int fv, int lv, String gh, String to, String close, int amt, String gen, String note)  throws GeneralSecurityException, NoSuchAlgorithmException{
         this.fee = BigInteger.valueOf(fee);
         this.fv = BigInteger.valueOf(fv);
         this.lv = BigInteger.valueOf(lv);
         this.gh = new Digest(Encoder.decodeFromBase64(gh));
         this.to = new Address(to);
-        if (!close.equals("none")) {
+        if (!close.equals("none")){
             this.close = new Address(close);
         }
         this.amt = BigInteger.valueOf(amt);
@@ -357,9 +349,7 @@ public class Stepdefs {
     }
 
     @Given("key registration transaction parameters {int} {int} {int} {string} {string} {string} {int} {int} {int} {string} {string}")
-    public void keyregTxnParameters(int fee, int fv, int lv, String gh, String votepk, String vrfpk, int votefst,
-            int votelst, int votekd, String gen, String note)
-            throws GeneralSecurityException, NoSuchAlgorithmException {
+    public void keyregTxnParameters(int fee, int fv, int lv, String gh, String votepk, String vrfpk, int votefst, int votelst, int votekd, String gen, String note)  throws GeneralSecurityException, NoSuchAlgorithmException{
         this.fee = BigInteger.valueOf(fee);
         this.fv = BigInteger.valueOf(fv);
         this.lv = BigInteger.valueOf(lv);
@@ -378,13 +368,13 @@ public class Stepdefs {
     }
 
     @Given("mnemonic for private key {string}")
-    public void mn_for_sk(String mn) throws GeneralSecurityException {
+    public void mn_for_sk(String mn) throws GeneralSecurityException{
         account = new Account(mn);
         pk = account.getAddress();
     }
 
     @When("I create the payment transaction")
-    public void createPaytxn() throws NoSuchAlgorithmException, JsonProcessingException, IOException {
+    public void createPaytxn() throws NoSuchAlgorithmException, JsonProcessingException, IOException{
         txn = Transaction.PaymentTransactionBuilder()
                 .sender(pk)
                 .fee(fee)
@@ -400,7 +390,7 @@ public class Stepdefs {
     }
 
     @When("I create the key registration transaction")
-    public void createKeyregTxn() throws NoSuchAlgorithmException, JsonProcessingException, IOException {
+    public void createKeyregTxn() throws NoSuchAlgorithmException, JsonProcessingException, IOException{
         txn = Transaction.KeyRegistrationTransactionBuilder()
                 .sender(pk)
                 .fee(fee)
@@ -418,17 +408,16 @@ public class Stepdefs {
     }
 
     @Given("default V2 key registration transaction {string}")
-    public void default_v2_key_registration_transaction(String type)
-            throws NoSuchAlgorithmException, JsonProcessingException, IOException {
+    public void  default_v2_key_registration_transaction(String type) throws NoSuchAlgorithmException, JsonProcessingException, IOException{
         getParams();
-        votepk = new ParticipationPublicKey(Encoder.decodeFromBase64("9mr13Ri8rFepxN3ghIUrZNui6LqqM5hEzB45Rri5lkU="));
+        votepk=new ParticipationPublicKey(Encoder.decodeFromBase64("9mr13Ri8rFepxN3ghIUrZNui6LqqM5hEzB45Rri5lkU="));
         vrfpk = new VRFPublicKey(Encoder.decodeFromBase64("dx717L3uOIIb/jr9OIyls1l5Ei00NFgRa380w7TnPr4="));
         votefst = BigInteger.valueOf(0);
         votelst = BigInteger.valueOf(2000);
         votekd = BigInteger.valueOf(10);
         pk = getAddress(0);
 
-        if (type.equals("online")) {
+        if(type.equals("online")){
             sprfpk = "mYR0GVEObMTSNdsKM6RwYywHYPqVDqg3E4JFzxZOreH9NU8B+tKzUanyY8AQ144hETgSMX7fXWwjBdHz6AWk9w==";
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
@@ -440,12 +429,12 @@ public class Stepdefs {
                     .stateProofKeyBase64(sprfpk)
                     .suggestedParams(this.params)
                     .build();
-        } else if (type.equals("offline")) {
+        }else if(type.equals("offline")){
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
                     .suggestedParams(this.params)
                     .build();
-        } else if (type.equals("nonparticipation")) {
+        }else if(type.equals("nonparticipation")){
             txn = Transaction.KeyRegistrationTransactionBuilder()
                     .sender(pk)
                     .suggestedParams(this.params)
@@ -458,7 +447,7 @@ public class Stepdefs {
     public void msig_addresses(String addresses) throws NoSuchAlgorithmException {
         String[] addrs = addresses.split(" ");
         Ed25519PublicKey[] addrlist = new Ed25519PublicKey[addrs.length];
-        for (int x = 0; x < addrs.length; x++) {
+        for(int x = 0; x < addrs.length; x++){
             addrlist[x] = new Ed25519PublicKey((new Address(addrs[x])).getBytes());
         }
         msig = new MultisigAddress(1, 2, Arrays.asList(addrlist));
@@ -466,7 +455,7 @@ public class Stepdefs {
     }
 
     @When("I create the multisig payment transaction")
-    public void createMsigTxn() throws NoSuchAlgorithmException {
+    public void createMsigTxn() throws NoSuchAlgorithmException{
         txn = Transaction.PaymentTransactionBuilder()
                 .sender(msig.toString())
                 .fee(fee)
@@ -482,50 +471,51 @@ public class Stepdefs {
     }
 
     @When("I sign the multisig transaction with the private key")
-    public void signMsigTxn() throws NoSuchAlgorithmException {
+    public void signMsigTxn() throws NoSuchAlgorithmException{
         stx = account.signMultisigTransaction(msig, txn);
     }
 
     @When("I sign the transaction with the private key")
-    public void signTxn() throws NoSuchAlgorithmException {
+    public void signTxn() throws NoSuchAlgorithmException{
         stx = account.signTransaction(txn);
     }
 
     @Then("the signed transaction should equal the golden {string}")
-    public void equalGolden(String golden) throws JsonProcessingException {
+    public void equalGolden(String golden) throws JsonProcessingException{
         byte[] signedTxBytes = Encoder.encodeToMsgPack(stx);
         assertThat(Encoder.encodeToBase64(signedTxBytes)).isEqualTo(golden);
 
     }
 
     @Then("the multisig transaction should equal the golden {string}")
-    public void equalMsigGolden(String golden) throws JsonProcessingException {
+    public void equalMsigGolden(String golden) throws JsonProcessingException{
         byte[] signedTxBytes = Encoder.encodeToMsgPack(stx);
         assertThat(Encoder.encodeToBase64(signedTxBytes)).isEqualTo(golden);
     }
 
+
     @Then("the multisig address should equal the golden {string}")
-    public void equalMsigAddrGolden(String golden) {
+    public void equalMsigAddrGolden(String golden){
         assertThat(msig.toString()).isEqualTo(golden);
     }
 
     @When("I get versions with algod")
-    public void aclV() throws ApiException {
+    public void aclV() throws ApiException{
         versions = acl.getVersion().getVersions();
     }
 
     @Then("v1 should be in the versions")
-    public void v1InVersions() {
+    public void v1InVersions(){
         assertThat(versions).contains("v1");
     }
 
     @When("I get versions with kmd")
-    public void kclV() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void kclV() throws com.algorand.algosdk.kmd.client.ApiException{
         versions = kcl.getVersion().getVersions();
     }
 
     @When("I get the status")
-    public void status() throws ApiException {
+    public void status() throws ApiException{
         status = acl.getStatus();
     }
 
@@ -536,12 +526,12 @@ public class Stepdefs {
     }
 
     @Then("I can get the block info")
-    public void block() throws ApiException {
+    public void block() throws ApiException{
         acl.getBlock(status.getLastRound().add(BigInteger.valueOf(1)));
     }
 
     @When("I import the multisig")
-    public void importMsig() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void importMsig() throws com.algorand.algosdk.kmd.client.ApiException{
         ImportMultisigRequest req = new ImportMultisigRequest();
         req.setMultisigVersion(msig.version);
         req.setThreshold(msig.threshold);
@@ -551,13 +541,13 @@ public class Stepdefs {
     }
 
     @Then("the multisig should be in the wallet")
-    public void msigInWallet() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void msigInWallet() throws com.algorand.algosdk.kmd.client.ApiException{
         ListMultisigRequest req = new ListMultisigRequest();
         req.setWalletHandleToken(handle);
         List<String> msigs = kcl.listMultisig(req).getAddresses();
         boolean exists = false;
-        for (String m : msigs) {
-            if (m.equals(msig.toString())) {
+        for (String m : msigs){
+            if (m.equals(msig.toString())){
                 exists = true;
             }
         }
@@ -565,7 +555,7 @@ public class Stepdefs {
     }
 
     @When("I export the multisig")
-    public void expMsig() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void expMsig() throws com.algorand.algosdk.kmd.client.ApiException{
         ExportMultisigRequest req = new ExportMultisigRequest();
         req.setAddress(msig.toString());
         req.setWalletHandleToken(handle);
@@ -574,18 +564,17 @@ public class Stepdefs {
     }
 
     @Then("the multisig should equal the exported multisig")
-    public void msigEq() {
+    public void msigEq(){
         boolean eq = true;
-        for (int x = 0; x < msig.publicKeys.size(); x++) {
-            if (!Encoder.encodeToBase64(msig.publicKeys.get(x).getBytes()).equals(Encoder.encodeToBase64(pks.get(x)))) {
+        for (int x = 0; x < msig.publicKeys.size(); x++){
+            if (!Encoder.encodeToBase64(msig.publicKeys.get(x).getBytes()).equals(Encoder.encodeToBase64(pks.get(x)))){
                 eq = false;
             }
         }
         assertThat(eq).isTrue();
     }
-
     @When("I delete the multisig")
-    public void deleteMsig() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void deleteMsig() throws com.algorand.algosdk.kmd.client.ApiException{
         DeleteMultisigRequest req = new DeleteMultisigRequest();
         req.setAddress(msig.toString());
         req.setWalletHandleToken(handle);
@@ -594,14 +583,14 @@ public class Stepdefs {
     }
 
     @Then("the multisig should not be in the wallet")
-    public void msigNotInWallet() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void msigNotInWallet()throws com.algorand.algosdk.kmd.client.ApiException{
         ListMultisigRequest req = new ListMultisigRequest();
         req.setWalletHandleToken(handle);
         List<String> msigs = kcl.listMultisig(req).getAddresses();
         boolean exists = false;
         if (msigs != null) {
-            for (String m : msigs) {
-                if (m.equals(msig.toString())) {
+            for (String m : msigs){
+                if (m.equals(msig.toString())){
                     exists = true;
                 }
             }
@@ -628,12 +617,13 @@ public class Stepdefs {
         try {
             getParams();
             Address sender = getAddress(0);
-            Transaction tx = Transaction.PaymentTransactionBuilder()
-                    .sender(sender)
-                    .suggestedParams(acl.transactionParams())
-                    .amount(100_000_000)
-                    .receiver(rekey)
-                    .build();
+            Transaction tx =
+                    Transaction.PaymentTransactionBuilder()
+                            .sender(sender)
+                            .suggestedParams(acl.transactionParams())
+                            .amount(100_000_000)
+                            .receiver(rekey)
+                            .build();
             SignedTransaction st = signWithAddress(tx, sender);
             acl.rawTransaction(Encoder.encodeToMsgPack(st));
         } catch (Exception e) {
@@ -658,7 +648,7 @@ public class Stepdefs {
     }
 
     @When("I delete the key")
-    public void deleteKey() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void deleteKey() throws com.algorand.algosdk.kmd.client.ApiException{
         DeleteKeyRequest req = new DeleteKeyRequest();
         req.setAddress(pk.toString());
         req.setWalletHandleToken(handle);
@@ -667,13 +657,13 @@ public class Stepdefs {
     }
 
     @Then("the key should not be in the wallet")
-    public void keyNotInWallet() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void keyNotInWallet() throws com.algorand.algosdk.kmd.client.ApiException{
         ListKeysRequest req = new ListKeysRequest();
         req.setWalletHandleToken(handle);
         List<String> keys = kcl.listKeysInWallet(req).getAddresses();
         boolean exists = false;
-        for (String k : keys) {
-            if (k.equals(pk.toString())) {
+        for (String k : keys){
+            if (k.equals(pk.toString())){
                 exists = true;
             }
         }
@@ -681,7 +671,7 @@ public class Stepdefs {
     }
 
     @When("I generate a key")
-    public void genKey() throws NoSuchAlgorithmException, GeneralSecurityException {
+    public void genKey()throws NoSuchAlgorithmException, GeneralSecurityException{
         account = new Account();
         pk = account.getAddress();
         address = pk.toString();
@@ -689,7 +679,7 @@ public class Stepdefs {
     }
 
     @When("I import the key")
-    public void importKey() throws com.algorand.algosdk.kmd.client.ApiException {
+    public void importKey() throws com.algorand.algosdk.kmd.client.ApiException{
         ImportKeyRequest req = new ImportKeyRequest();
         req.setWalletHandleToken(handle);
         req.setPrivateKey(sk);
@@ -697,7 +687,7 @@ public class Stepdefs {
     }
 
     @When("I get the private key")
-    public void getSk() throws com.algorand.algosdk.kmd.client.ApiException, GeneralSecurityException {
+    public void getSk() throws com.algorand.algosdk.kmd.client.ApiException, GeneralSecurityException{
         ExportKeyRequest req = new ExportKeyRequest();
         req.setAddress(pk.toString());
         req.setWalletHandleToken(handle);
@@ -722,7 +712,7 @@ public class Stepdefs {
     }
 
     @Given("a kmd client")
-    public void kClient() throws FileNotFoundException, IOException, NoSuchAlgorithmException {
+    public void kClient() throws FileNotFoundException, IOException, NoSuchAlgorithmException{
         kmdClient = new KmdClient();
         kmdClient.setConnectTimeout(30000);
         kmdClient.setReadTimeout(30000);
@@ -733,7 +723,7 @@ public class Stepdefs {
     }
 
     @Given("an algod client")
-    public void aClient() throws FileNotFoundException, IOException {
+    public void aClient() throws FileNotFoundException, IOException{
         algodClient = new AlgodClient();
         algodClient.setConnectTimeout(30000);
         algodClient.setReadTimeout(30000);
@@ -744,18 +734,19 @@ public class Stepdefs {
     }
 
     @Given("an algod v2 client")
-    public void aClientv2() throws FileNotFoundException, IOException {
+    public void aClientv2() throws FileNotFoundException, IOException{
         aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
-                "http://localhost", algodPort, token);
+            "http://localhost", algodPort, token
+        );
     }
 
     @Given("wallet information")
-    public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+    public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
         walletName = "unencrypted-default-wallet";
         walletPswd = "";
         List<APIV1Wallet> wallets = kcl.listWallets().getWallets();
-        for (APIV1Wallet w : wallets) {
-            if (w.getName().equals(walletName)) {
+        for (APIV1Wallet w: wallets){
+            if (w.getName().equals(walletName)){
                 walletID = w.getId();
             }
         }
@@ -797,15 +788,15 @@ public class Stepdefs {
     }
 
     @Given("default multisig transaction with parameters {int} {string}")
-    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
+    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException{
         getParams();
-        if (note.equals("none")) {
+        if (note.equals("none")){
             this.note = null;
-        } else {
+        } else{
             this.note = Encoder.decodeFromBase64(note);
         }
         Ed25519PublicKey[] addrlist = new Ed25519PublicKey[addresses.size()];
-        for (int x = 0; x < addresses.size(); x++) {
+        for(int x = 0; x < addresses.size(); x++){
             addrlist[x] = new Ed25519PublicKey((getAddress(x)).getBytes());
         }
         msig = new MultisigAddress(1, 1, Arrays.asList(addrlist));
@@ -820,15 +811,15 @@ public class Stepdefs {
     }
 
     @When("I send the transaction")
-    public void sendTxn() throws JsonProcessingException, ApiException {
+    public void sendTxn() throws JsonProcessingException, ApiException{
         txid = acl.rawTransaction(Encoder.encodeToMsgPack(stx)).getTxId();
     }
 
     @When("I send the multisig transaction")
-    public void sendMsigTxn() throws JsonProcessingException, ApiException {
-        try {
+    public void sendMsigTxn() throws JsonProcessingException, ApiException{
+        try{
             acl.rawTransaction(Encoder.encodeToMsgPack(stx));
-        } catch (Exception e) {
+        } catch(Exception e) {
             err = true;
         }
     }
@@ -845,15 +836,9 @@ public class Stepdefs {
     }
 
     /**
-     * waitForAlgodTransactionProcessingToComplete is a Dev mode helper method
-     * that's a rough analog to
-     * `acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));`.
+     * waitForAlgodTransactionProcessingToComplete is a Dev mode helper method that's a rough analog to `acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));`.
      * <p>
-     * Since Dev mode produces blocks on a per transaction basis, it's possible
-     * algod generates a block _before_ the corresponding SDK call to wait for a
-     * block. Without _any_ wait, it's possible the SDK looks for the transaction
-     * before algod completes processing. So, the method performs a local sleep to
-     * simulate waiting for a block.
+     * Since Dev mode produces blocks on a per transaction basis, it's possible algod generates a block _before_ the corresponding SDK call to wait for a block.  Without _any_ wait, it's possible the SDK looks for the transaction before algod completes processing.  So, the method performs a local sleep to simulate waiting for a block.
      */
     private static void waitForAlgodTransactionProcessingToComplete() throws Exception {
         Thread.sleep(500);
@@ -871,23 +856,20 @@ public class Stepdefs {
     }
 
     @When("I sign the transaction with kmd")
-    public void signKmd()
-            throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
+    public void signKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
         SignTransactionRequest req = new SignTransactionRequest();
         req.setTransaction(Encoder.encodeToMsgPack(txn));
         req.setWalletHandleToken(handle);
         req.setWalletPassword(walletPswd);
         stxBytes = kcl.signTransaction(req).getSignedTransaction();
     }
-
     @Then("the signed transaction should equal the kmd signed transaction")
     public void signBothEqual() throws JsonProcessingException {
         assertThat(Encoder.encodeToBase64(stxBytes)).isEqualTo(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx)));
     }
 
     @When("I sign the multisig transaction with kmd")
-    public void signMsigKmd()
-            throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, IOException {
+    public void signMsigKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, IOException{
         ImportMultisigRequest importReq = new ImportMultisigRequest();
         importReq.setMultisigVersion(msig.version);
         importReq.setThreshold(msig.threshold);
@@ -905,8 +887,7 @@ public class Stepdefs {
 
     @Then("the multisig transaction should equal the kmd signed multisig transaction")
     public void signMsigBothEqual() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException {
-        assertThat(Encoder.encodeToBase64(stxBytes))
-                .isEqualTo(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx.mSig)));
+        assertThat(Encoder.encodeToBase64(stxBytes)).isEqualTo(Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx.mSig)));
         DeleteMultisigRequest req = new DeleteMultisigRequest();
         req.setAddress(msig.toString());
         req.setWalletHandleToken(handle);
@@ -929,7 +910,7 @@ public class Stepdefs {
     }
 
     @When("I write the transaction to file")
-    public void writeTxn() throws JsonProcessingException, IOException {
+    public void writeTxn() throws JsonProcessingException, IOException{
         String path = System.getProperty("user.dir");
         Path p = Paths.get(path);
         path = p.getParent() + "/temp/raw" + this.num + ".tx";
@@ -940,7 +921,7 @@ public class Stepdefs {
     }
 
     @Then("the transaction should still be the same")
-    public void checkEnc() throws IOException {
+    public void checkEnc() throws IOException{
         String path = System.getProperty("user.dir");
         Path p = Paths.get(path);
         path = p.getParent() + "/temp/raw" + this.num + ".tx";
@@ -962,8 +943,7 @@ public class Stepdefs {
     }
 
     @Then("I do my part")
-    public void signSaveTxn() throws IOException, JsonProcessingException, NoSuchAlgorithmException,
-            com.algorand.algosdk.kmd.client.ApiException, Exception {
+    public void signSaveTxn() throws IOException, JsonProcessingException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException, Exception{
         String path = System.getProperty("user.dir");
         Path p = Paths.get(path);
         path = p.getParent() + "/temp/txn.tx";
@@ -984,54 +964,45 @@ public class Stepdefs {
     }
 
     @Then("the node should be healthy")
-    public void nodeHealth() throws ApiException {
+    public void nodeHealth() throws ApiException{
         acl.healthCheck();
     }
 
     @Then("I get the ledger supply")
-    public void getLedger() throws ApiException {
+    public void getLedger() throws ApiException{
         acl.getSupply();
     }
 
     @Then("I get transactions by address and round")
-    public void txnsByAddrRound() throws ApiException {
-        assertThat(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null,
-                BigInteger.valueOf(10)).getTransactions())
+    public void txnsByAddrRound() throws ApiException{
+        assertThat(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions())
                 .isInstanceOf(List.class);
-        // Assert.assertTrue(acl.transactions(addresses.get(0), BigInteger.valueOf(1),
-        // acl.getStatus().getLastRound(), null, null,
-        // BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
+        //Assert.assertTrue(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
     }
 
     @Then("I get transactions by address only")
-    public void txnsByAddrOnly() throws ApiException {
+    public void txnsByAddrOnly() throws ApiException{
         assertThat(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(10)).getTransactions())
                 .isInstanceOf(List.class);
-        // Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null,
-        // BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
+        //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
     }
 
     @Then("I get transactions by address and date")
-    public void txnsByAddrDate() throws ApiException {
-        assertThat(
-                acl.transactions(addresses.get(0), null, null, LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10))
-                        .getTransactions())
+    public void txnsByAddrDate() throws ApiException{
+        assertThat(acl.transactions(addresses.get(0), null, null, LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10)).getTransactions())
                 .isInstanceOf(List.class);
-        // Assert.assertTrue(acl.transactions(addresses.get(0), null, null,
-        // LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10)).getTransactions()
-        // instanceof List<?>);
+        //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
     }
 
     @Then("I get pending transactions")
-    public void pendingTxns() throws ApiException {
+    public void pendingTxns() throws ApiException{
         assertThat(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns())
-                .isInstanceOf(TransactionList.class);
-        // Assert.assertTrue(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns()
-        // instanceof TransactionList);
+            .isInstanceOf(TransactionList.class);
+        //Assert.assertTrue(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns() instanceof TransactionList);
     }
 
     @When("I get the suggested params")
-    public void suggestedParams() throws ApiException {
+    public void suggestedParams() throws ApiException{
         paramsFee = acl.transactionParams().getFee();
     }
 
@@ -1050,17 +1021,16 @@ public class Stepdefs {
         account = new Account();
         pk = account.getAddress();
         address = pk.toString();
-        bid = new Bid(pk, pk, BigInteger.valueOf(1L), BigInteger.valueOf(2L), BigInteger.valueOf(3L),
-                BigInteger.valueOf(4L));
+        bid = new Bid(pk, pk, BigInteger.valueOf(1L), BigInteger.valueOf(2L), BigInteger.valueOf(3L), BigInteger.valueOf(4L));
     }
 
     @When("I encode and decode the bid")
-    public void encDecBid() throws JsonProcessingException, IOException {
+    public void encDecBid() throws JsonProcessingException, IOException{
         sbid = Encoder.decodeFromMsgPack(Encoder.encodeToMsgPack(sbid), SignedBid.class);
     }
 
     @When("I sign the bid")
-    public void signBid() throws NoSuchAlgorithmException {
+    public void signBid() throws NoSuchAlgorithmException{
         sbid = account.signBid(bid);
         oldBid = account.signBid(bid);
     }
@@ -1071,7 +1041,7 @@ public class Stepdefs {
     }
 
     @When("I decode the address")
-    public void decAddr() throws NoSuchAlgorithmException {
+    public void decAddr() throws NoSuchAlgorithmException{
         pk = new Address(address);
         oldAddr = address;
     }
@@ -1107,7 +1077,7 @@ public class Stepdefs {
     }
 
     @When("I create the flat fee payment transaction")
-    public void createPaytxnFlat() throws NoSuchAlgorithmException {
+    public void createPaytxnFlat() throws NoSuchAlgorithmException{
         txn = Transaction.PaymentTransactionBuilder()
                 .sender(pk)
                 .flatFee(fee)
@@ -1126,7 +1096,7 @@ public class Stepdefs {
     public void encMsigTxn(String encTxn) throws IOException {
         stx = Encoder.decodeFromMsgPack(Encoder.decodeFromBase64(encTxn), SignedTransaction.class);
         Ed25519PublicKey[] addrlist = new Ed25519PublicKey[stx.mSig.subsigs.size()];
-        for (int x = 0; x < addrlist.length; x++) {
+        for(int x = 0; x < addrlist.length; x++){
             addrlist[x] = stx.mSig.subsigs.get(x).key;
         }
         msig = new MultisigAddress(stx.mSig.version, stx.mSig.threshold, Arrays.asList(addrlist));
@@ -1141,7 +1111,7 @@ public class Stepdefs {
     public void encMsigTxns(String encTxns) throws IOException {
         String[] txnArray = encTxns.split(" ");
         stxs = new SignedTransaction[txnArray.length];
-        for (int t = 0; t < txnArray.length; t++) {
+        for (int t = 0; t < txnArray.length; t++){
             stxs[t] = Encoder.decodeFromMsgPack(Encoder.decodeFromBase64(txnArray[t]), SignedTransaction.class);
         }
     }
@@ -1169,8 +1139,7 @@ public class Stepdefs {
     }
 
     @Then("I can get account information")
-    public void newAccInfo()
-            throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException {
+    public void newAccInfo() throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException {
         acl.accountInformation(pk.encodeAsString());
         DeleteKeyRequest req = new DeleteKeyRequest();
         req.setAddress(pk.encodeAsString());
@@ -1181,11 +1150,9 @@ public class Stepdefs {
 
     @When("I get recent transactions, limited by {int} transactions")
     public void i_get_recent_transactions_limited_by_count(int cnt) throws ApiException {
-        assertThat(
-                acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(cnt)).getTransactions())
+        assertThat(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(cnt)).getTransactions())
                 .isInstanceOf(List.class);
-        // Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null,
-        // BigInteger.valueOf(cnt)).getTransactions() instanceof List<?>);
+        //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(cnt)).getTransactions() instanceof List<?>);
     }
 
     @Given("asset test fixture")
@@ -1194,8 +1161,7 @@ public class Stepdefs {
     }
 
     @Given("default asset creation transaction with total issuance {int}")
-    public void default_asset_creation_transaction_with_total_issuance(Integer assetTotal)
-            throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void default_asset_creation_transaction_with_total_issuance(Integer assetTotal) throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
         getParams();
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
@@ -1223,10 +1189,8 @@ public class Stepdefs {
     }
 
     @Then("the asset info should match the expected asset info")
-    public void the_asset_info_should_match_the_expected_asset_info()
-            throws JsonProcessingException, NoSuchAlgorithmException {
-        // Can't use a regular assertj call because 'compareTo' isn't a regular
-        // comparator.
+    public void the_asset_info_should_match_the_expected_asset_info() throws JsonProcessingException, NoSuchAlgorithmException {
+        // Can't use a regular assertj call because 'compareTo' isn't a regular comparator.
         assertThat(this.expectedParams.assetManager.compareTo(this.queriedParams.getManagerkey())).isTrue();
         assertThat(this.expectedParams.assetReserve.compareTo(this.queriedParams.getReserveaddr())).isTrue();
         assertThat(this.expectedParams.assetFreeze.compareTo(this.queriedParams.getFreezeaddr())).isTrue();
@@ -1234,8 +1198,7 @@ public class Stepdefs {
     }
 
     @When("I create a no-managers asset reconfigure transaction")
-    public void i_create_a_no_managers_asset_reconfigure_transaction()
-            throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_a_no_managers_asset_reconfigure_transaction() throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
         getParams();
 
         Transaction tx = Transaction.AssetConfigureTransactionBuilder()
@@ -1251,8 +1214,7 @@ public class Stepdefs {
     }
 
     @When("I create an asset destroy transaction")
-    public void i_create_an_asset_destroy_transaction()
-            throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_an_asset_destroy_transaction() throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
         getParams();
 
         Transaction tx = Transaction.AssetDestroyTransactionBuilder()
@@ -1277,8 +1239,7 @@ public class Stepdefs {
     }
 
     @When("I create a transaction transferring {int} assets from creator to a second account")
-    public void i_create_a_transaction_transferring_assets_from_creator_to_a_second_account(Integer int1)
-            throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_a_transaction_transferring_assets_from_creator_to_a_second_account(Integer int1) throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
         getParams();
 
         Transaction tx = Transaction.AssetTransferTransactionBuilder()
@@ -1295,7 +1256,8 @@ public class Stepdefs {
 
     @Then("the creator should have {int} assets remaining")
     public void the_creator_should_have_assets_remaining(Integer expectedBal) throws ApiException {
-        com.algorand.algosdk.algod.client.model.Account accountResp = this.acl.accountInformation(this.creator);
+        com.algorand.algosdk.algod.client.model.Account accountResp =
+                this.acl.accountInformation(this.creator);
         AssetHolding holding = accountResp.getHolding(this.assetID);
         assertThat(holding.getAmount()).isEqualTo(BigInteger.valueOf(expectedBal));
     }
@@ -1317,8 +1279,7 @@ public class Stepdefs {
     }
 
     @Then("I create a transaction for a second account, signalling asset acceptance")
-    public void i_create_a_transaction_for_a_second_account_signalling_asset_acceptance()
-            throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_for_a_second_account_signalling_asset_acceptance() throws ApiException, NoSuchAlgorithmException {
         getParams();
 
         Transaction tx = Transaction.AssetAcceptTransactionBuilder()
@@ -1337,8 +1298,7 @@ public class Stepdefs {
     }
 
     @When("I create a freeze transaction targeting the second account")
-    public void i_create_a_freeze_transaction_targeting_the_second_account()
-            throws NoSuchAlgorithmException, ApiException, com.algorand.algosdk.kmd.client.ApiException {
+    public void i_create_a_freeze_transaction_targeting_the_second_account() throws NoSuchAlgorithmException, ApiException, com.algorand.algosdk.kmd.client.ApiException {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
@@ -1355,8 +1315,7 @@ public class Stepdefs {
     }
 
     @When("I create a transaction transferring {int} assets from a second account to creator")
-    public void i_create_a_transaction_transferring_assets_from_a_second_account_to_creator(Integer int1)
-            throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_transferring_assets_from_a_second_account_to_creator(Integer int1) throws ApiException, NoSuchAlgorithmException {
         getParams();
 
         Transaction tx = Transaction.AssetTransferTransactionBuilder()
@@ -1372,8 +1331,7 @@ public class Stepdefs {
     }
 
     @When("I create an un-freeze transaction targeting the second account")
-    public void i_create_an_un_freeze_transaction_targeting_the_second_account()
-            throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException {
+    public void i_create_an_un_freeze_transaction_targeting_the_second_account() throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException  {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
@@ -1390,8 +1348,7 @@ public class Stepdefs {
     }
 
     @Given("default-frozen asset creation transaction with total issuance {int}")
-    public void default_frozen_asset_creation_transaction_with_total_issuance(Integer int1)
-            throws ApiException, NoSuchAlgorithmException {
+    public void default_frozen_asset_creation_transaction_with_total_issuance(Integer int1) throws ApiException, NoSuchAlgorithmException {
         getParams();
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
@@ -1415,8 +1372,7 @@ public class Stepdefs {
     }
 
     @When("I create a transaction revoking {int} assets from a second account to creator")
-    public void i_create_a_transaction_revoking_assets_from_a_second_account_to_creator(Integer int1)
-            throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_revoking_assets_from_a_second_account_to_creator(Integer int1) throws ApiException, NoSuchAlgorithmException {
         getParams();
 
         Transaction tx = Transaction.AssetClawbackTransactionBuilder()
@@ -1479,14 +1435,14 @@ public class Stepdefs {
         Address pk = account.getAddress();
         Digest gh = new Digest(Encoder.decodeFromBase64("ZIkPs8pTDxbRJsFB1yJ7gvnpDu0Q85FRkl2NCkEAQLU="));
         Transaction txn = Transaction.PaymentTransactionBuilder()
-                .sender(pk)
-                .fee(1000)
-                .firstValid(1)
-                .lastValid(100)
-                .amount(1000)
-                .genesisHash(gh)
-                .receiver(pk)
-                .build();
+            .sender(pk)
+            .fee(1000)
+            .firstValid(1)
+            .lastValid(100)
+            .amount(1000)
+            .genesisHash(gh)
+            .receiver(pk)
+            .build();
 
         if (kind.equals("compiled")) {
             LogicsigSignature lsig = new LogicsigSignature(data);
@@ -1526,21 +1482,23 @@ public class Stepdefs {
         assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
 
+
     @When("I compile a teal program {string} with mapping enabled")
     public void i_compile_a_teal_program_with_mapping_enabled(String tealPath) throws Exception {
         byte[] tealProgram = ResourceUtils.loadResource(tealPath);
         this.compileResponse = aclv2.TealCompile().source(tealProgram).sourcemap(true).execute();
     }
 
+
     @Then("the resulting source map is the same as the json {string}")
     public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws Exception {
-        String[] fields = { "version", "sources", "names", "mapping", "mappings" };
+        String[] fields = {"version", "sources", "names", "mapping", "mappings"};
         String srcMapStr = new String(ResourceUtils.readResource(jsonPath), StandardCharsets.UTF_8);
 
         HashMap<String, Object> expectedMap = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
         HashMap<String, Object> actualMap = this.compileResponse.body().sourcemap;
 
-        for (String field : fields) {
+        for(String field: fields){
             assertThat(actualMap.get(field)).isEqualTo(expectedMap.get(field));
         }
     }
