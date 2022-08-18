@@ -2,11 +2,14 @@ package com.algorand.algosdk.logic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.algorand.algosdk.crypto.Address;
+import org.apache.commons.codec.binary.Base64;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,20 +20,32 @@ import java.util.List;
  */
 public class Logic {
 
+    @Deprecated
     private static final int MAX_COST = 20000;
+    @Deprecated
     private static final int MAX_LENGTH = 1000;
 
+    @Deprecated
     private static final int INTCBLOCK_OPCODE = 32;
+    @Deprecated
     private static final int BYTECBLOCK_OPCODE = 38;
+    @Deprecated
     private static final int PUSHBYTES_OPCODE = 128;
+    @Deprecated
     private static final int PUSHINT_OPCODE = 129;
 
+    @Deprecated
     private class LangSpec {
         public int EvalMaxVersion;
         public int LogicSigVersion;
         public Operation[] Ops;
     }
 
+    public static int EvalMaxVersion = 7;
+
+    public static int MaxLogicSigVersion = 7;
+
+    @Deprecated
     private class Operation {
         int Opcode;
         String Name;
@@ -47,6 +62,7 @@ public class Logic {
     /**
      * Metadata related to a teal program.
      */
+    @Deprecated
     public static class ProgramData {
         public final boolean good;
         public final List<Integer> intBlock;
@@ -77,6 +93,7 @@ public class Logic {
         }
     }
 
+    @Deprecated
     protected static class IntConstBlock {
         public final int size;
         public final List<Integer> results;
@@ -87,6 +104,7 @@ public class Logic {
         }
     }
 
+    @Deprecated
     protected static class ByteConstBlock {
         public final int size;
         public final List<byte[]> results;
@@ -103,12 +121,13 @@ public class Logic {
      * Each byte in a varint, except the last byte, has the most significant
      * bit (msb) set – this indicates that there are further bytes to come.
      * The lower 7 bits of each byte are used to store the two's complement
-     * representation of the number in groups of 7 bits, least significant
+     * representation of the number in groups of 7 bits, the least significant
      * group first.
      * https://developers.google.com/protocol-buffers/docs/encoding
      * @param value being serialized
      * @return byte array holding the serialized bits
      */
+    @Deprecated
     public static byte[] putUVarint(int value) {
         assert value >= 0 : "putUVarint expects non-negative values.";
         List<Byte> buffer = new ArrayList<>();
@@ -128,7 +147,7 @@ public class Logic {
      * Given a varint, get the integer value
      * @param buffer serialized varint
      * @param bufferOffset position in the buffer to start reading from
-     * @return pair of values in in array: value, read size
+     * @return pair of values in an array: value, read size
      */
     public static VarintResult getUVarint(byte [] buffer, int bufferOffset) {
         int x = 0;
@@ -147,7 +166,53 @@ public class Logic {
         return new VarintResult();
     }
 
+    private static boolean isAsciiPrintable(final byte symbol) {
+        char symbolChar = (char) (symbol & 0xFF);
+        boolean isBreakLine = symbolChar == 10;
+        boolean isStdPrintable = symbolChar >= 32 && symbolChar < 127;
+        return isBreakLine || isStdPrintable;
+    }
+
+    private static boolean isAsciiPrintable(final byte[] program) {
+        for (byte b : program) {
+            if (!isAsciiPrintable(b))
+                return false;
+        }
+        return true;
+    }
+
+    public static void sanityCheckProgram(final byte[] program) {
+        VarintResult versionRes = getUVarint(program, 0);
+        if (versionRes.length <= 0)
+            throw new IllegalArgumentException("version parsing error");
+        int version = versionRes.value;
+        if (version > EvalMaxVersion)
+            throw new IllegalArgumentException("unsupported version");
+
+        // though previous first byte check versioning eliminates most of the following heuristic checks
+        // things might change as version goes up, e.g., version goes to 10, then it is `\n` in ASCII.
+        if (Base64.isBase64(program))
+            throw new IllegalArgumentException("program should not be b64 encoded");
+
+        boolean isAddress = false;
+        try {
+            new Address(new String(program));
+            isAddress = true;
+        } catch (NoSuchAlgorithmException | IllegalArgumentException e) {
+            // if exception is IllegalArgException, it means bytes are not Algorand address
+            if (e instanceof NoSuchAlgorithmException)
+                throw new IllegalArgumentException("cannot check if program bytes are Algorand address" + e);
+        }
+        if (isAddress)
+            throw new IllegalArgumentException("requesting program bytes, but get Algorand address");
+
+        if (isAsciiPrintable(program))
+            throw new IllegalArgumentException("program bytes are all ASCII printable characters");
+    }
+
+    @Deprecated
     private static LangSpec langSpec;
+    @Deprecated
     private static Operation[] opcodes;
 
     /**
@@ -158,6 +223,7 @@ public class Logic {
      * @return
      * @throws IOException
      */
+    @Deprecated
     public static boolean checkProgram(byte[] program, List<byte[]> args) throws IOException {
         return readProgram(program, args).good;
     }
@@ -169,6 +235,7 @@ public class Logic {
      * @return boolean
      * @throws IOException
      */
+    @Deprecated
     public static ProgramData readProgram(byte[] program, List<byte[]> args) throws IOException {
         List<Integer> ints = new ArrayList<>();
         List<byte[]> bytes = new ArrayList<>();
@@ -261,6 +328,7 @@ public class Logic {
      * @return int
      * @throws IOException
      */
+    @Deprecated
     public static int getLogicSigVersion() throws IOException {
         if (langSpec == null) {
             loadLangSpec();
@@ -273,6 +341,7 @@ public class Logic {
      * @return int
      * @throws IOException
      */
+    @Deprecated
     public static int getEvalMaxVersion() throws IOException {
         if (langSpec == null) {
             loadLangSpec();
@@ -280,6 +349,7 @@ public class Logic {
         return langSpec.EvalMaxVersion;
     }
 
+    @Deprecated
     private static void loadLangSpec() throws IOException {
         if (langSpec != null) {
             return;
