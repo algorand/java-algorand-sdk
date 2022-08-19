@@ -1,5 +1,5 @@
 UNIT_TAGS :=  "$(subst :, or ,$(shell awk '{print $2}' src/test/unit.tags | paste -s -d: -))"
-INTEGRATIONS_TAGS := "$(subst :, or ,$(shell awk '{print $2}' src/test/integration.tags | paste -s -d: -))"
+INTEGRATION_TAGS := "$(subst :, or ,$(shell awk '{print $2}' src/test/integration.tags | paste -s -d: -))"
 
 unit:
 	mvn test -Dcucumber.filter.tags=$(UNIT_TAGS)
