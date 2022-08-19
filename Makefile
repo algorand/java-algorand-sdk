@@ -8,7 +8,7 @@ integration:
 	mvn test -Dtest=com.algorand.algosdk.integration.RunCucumberIntegrationTest -Dcucumber.filter.tags=$(INTEGRATION_TAGS)
 
 display-all-java-steps:
-	find src/test/java/com/algorand/algosdk -name *.java | xargs grep "io.cucumber.java.en" 2>/dev/null | grep -v Binary | cut -d: -f1 | sort | uniq | xargs grep -E "@(Given|Then|When)"
+	find src/test/java/com/algorand/algosdk -name "*.java" | xargs grep "io.cucumber.java.en" 2>/dev/null | grep -v Binary | cut -d: -f1 | sort | uniq | xargs grep -E "@(Given|Then|When)"
 
 harness:
 	./test-harness.sh
