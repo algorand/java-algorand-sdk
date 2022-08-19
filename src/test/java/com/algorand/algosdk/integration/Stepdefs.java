@@ -920,28 +920,6 @@ public class Stepdefs {
         out.close();
     }
 
-    @Then("the transaction should still be the same")
-    public void checkEnc() throws IOException{
-        String path = System.getProperty("user.dir");
-        Path p = Paths.get(path);
-        path = p.getParent() + "/temp/raw" + this.num + ".tx";
-        FileInputStream inputStream = new FileInputStream(path);
-        File file = new File(path);
-        byte[] data = new byte[(int) file.length()];
-        inputStream.read(data);
-        SignedTransaction stxnew = Encoder.decodeFromMsgPack(data, SignedTransaction.class);
-        inputStream.close();
-
-        path = p.getParent() + "/temp/old" + this.num + ".tx";
-        inputStream = new FileInputStream(path);
-        file = new File(path);
-        data = new byte[(int) file.length()];
-        inputStream.read(data);
-        SignedTransaction stxold = Encoder.decodeFromMsgPack(data, SignedTransaction.class);
-        inputStream.close();
-        assertThat(stxnew).isEqualTo(stxold);
-    }
-
     @Then("I do my part")
     public void signSaveTxn() throws IOException, JsonProcessingException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException, Exception{
         String path = System.getProperty("user.dir");
@@ -978,20 +956,6 @@ public class Stepdefs {
         assertThat(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions())
                 .isInstanceOf(List.class);
         //Assert.assertTrue(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
-    }
-
-    @Then("I get transactions by address only")
-    public void txnsByAddrOnly() throws ApiException{
-        assertThat(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(10)).getTransactions())
-                .isInstanceOf(List.class);
-        //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
-    }
-
-    @Then("I get transactions by address and date")
-    public void txnsByAddrDate() throws ApiException{
-        assertThat(acl.transactions(addresses.get(0), null, null, LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10)).getTransactions())
-                .isInstanceOf(List.class);
-        //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, LocalDate.now(), LocalDate.now(), BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
     }
 
     @Then("I get pending transactions")
