@@ -41,10 +41,6 @@ public class Logic {
         public Operation[] Ops;
     }
 
-    public static int EvalMaxVersion = 7;
-
-    public static int MaxLogicSigVersion = 7;
-
     @Deprecated
     private class Operation {
         int Opcode;
@@ -149,6 +145,7 @@ public class Logic {
      * @param bufferOffset position in the buffer to start reading from
      * @return pair of values in an array: value, read size
      */
+    @Deprecated
     public static VarintResult getUVarint(byte [] buffer, int bufferOffset) {
         int x = 0;
         int s = 0;
@@ -182,12 +179,12 @@ public class Logic {
     }
 
     public static void sanityCheckProgram(final byte[] program) {
-        VarintResult versionRes = getUVarint(program, 0);
-        if (versionRes.length <= 0)
-            throw new IllegalArgumentException("version parsing error");
-        int version = versionRes.value;
-        if (version > EvalMaxVersion)
-            throw new IllegalArgumentException("unsupported version");
+//        VarintResult versionRes = getUVarint(program, 0);
+//        if (versionRes.length <= 0)
+//            throw new IllegalArgumentException("version parsing error");
+//        int version = versionRes.value;
+//        if (version > EvalMaxVersion)
+//            throw new IllegalArgumentException("unsupported version");
 
         // though previous first byte check versioning eliminates most of the following heuristic checks
         // things might change as version goes up, e.g., version goes to 10, then it is `\n` in ASCII.
