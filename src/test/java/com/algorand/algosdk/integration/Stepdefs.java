@@ -348,63 +348,10 @@ public class Stepdefs {
         }
     }
 
-    @Given("key registration transaction parameters {int} {int} {int} {string} {string} {string} {int} {int} {int} {string} {string}")
-    public void keyregTxnParameters(int fee, int fv, int lv, String gh, String votepk, String vrfpk, int votefst, int votelst, int votekd, String gen, String note)  throws GeneralSecurityException, NoSuchAlgorithmException{
-        this.fee = BigInteger.valueOf(fee);
-        this.fv = BigInteger.valueOf(fv);
-        this.lv = BigInteger.valueOf(lv);
-        this.gh = new Digest(Encoder.decodeFromBase64(gh));
-        this.votepk = new ParticipationPublicKey(Encoder.decodeFromBase64(votepk));
-        this.vrfpk = new VRFPublicKey(Encoder.decodeFromBase64(vrfpk));
-        this.votefst = BigInteger.valueOf(votefst);
-        this.votelst = BigInteger.valueOf(votelst);
-        this.votekd = BigInteger.valueOf(votekd);
-        if (!gen.equals("none")) {
-            this.gen = gen;
-        }
-        if (!note.equals("none")) {
-            this.note = Encoder.decodeFromBase64(note);
-        }
-    }
-
     @Given("mnemonic for private key {string}")
     public void mn_for_sk(String mn) throws GeneralSecurityException{
         account = new Account(mn);
         pk = account.getAddress();
-    }
-
-    @When("I create the payment transaction")
-    public void createPaytxn() throws NoSuchAlgorithmException, JsonProcessingException, IOException{
-        txn = Transaction.PaymentTransactionBuilder()
-                .sender(pk)
-                .fee(fee)
-                .firstValid(fv)
-                .lastValid(lv)
-                .note(note)
-                .genesisID(gen)
-                .genesisHash(gh)
-                .amount(amt)
-                .receiver(to)
-                .closeRemainderTo(close)
-                .build();
-    }
-
-    @When("I create the key registration transaction")
-    public void createKeyregTxn() throws NoSuchAlgorithmException, JsonProcessingException, IOException{
-        txn = Transaction.KeyRegistrationTransactionBuilder()
-                .sender(pk)
-                .fee(fee)
-                .firstValid(fv)
-                .lastValid(lv)
-                .note(note)
-                .genesisID(gen)
-                .genesisHash(gh)
-                .participationPublicKey(votepk)
-                .selectionPublicKey(vrfpk)
-                .voteFirst(votefst)
-                .voteLast(votelst)
-                .voteKeyDilution(votekd)
-                .build();
     }
 
     @Given("default V2 key registration transaction {string}")
@@ -844,12 +791,6 @@ public class Stepdefs {
         Thread.sleep(500);
     }
 
-    @Then("I can get the transaction by ID")
-    public void txnByID() throws Exception {
-        waitForAlgodTransactionProcessingToComplete();
-        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
-    }
-
     @Then("the transaction should not go through")
     public void txnFail() {
         assertThat(err).isTrue();
@@ -893,52 +834,6 @@ public class Stepdefs {
         req.setWalletHandleToken(handle);
         req.setWalletPassword(walletPswd);
         kcl.deleteMultisig(req);
-    }
-
-    @When("I read a transaction {string} from file {string}")
-    public void readTxn(String encodedTxn, String num) throws IOException {
-        String path = System.getProperty("user.dir");
-        Path p = Paths.get(path);
-        this.num = num;
-        path = p.getParent() + "/temp/raw" + this.num + ".tx";
-        FileInputStream inputStream = new FileInputStream(path);
-        File file = new File(path);
-        byte[] data = new byte[(int) file.length()];
-        inputStream.read(data);
-        stx = Encoder.decodeFromMsgPack(data, SignedTransaction.class);
-        inputStream.close();
-    }
-
-    @When("I write the transaction to file")
-    public void writeTxn() throws JsonProcessingException, IOException{
-        String path = System.getProperty("user.dir");
-        Path p = Paths.get(path);
-        path = p.getParent() + "/temp/raw" + this.num + ".tx";
-        byte[] data = Encoder.encodeToMsgPack(stx);
-        FileOutputStream out = new FileOutputStream(path);
-        out.write(data);
-        out.close();
-    }
-
-    @Then("I do my part")
-    public void signSaveTxn() throws IOException, JsonProcessingException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException, Exception{
-        String path = System.getProperty("user.dir");
-        Path p = Paths.get(path);
-        path = p.getParent() + "/temp/txn.tx";
-        FileInputStream inputStream = new FileInputStream(path);
-        File file = new File(path);
-        byte[] data = new byte[(int) file.length()];
-        inputStream.read(data);
-        inputStream.close();
-
-        txn = Encoder.decodeFromMsgPack(data, Transaction.class);
-        exportKeyAndSetAccount(txn.sender);
-
-        stx = account.signTransaction(txn);
-        data = Encoder.encodeToMsgPack(stx);
-        FileOutputStream out = new FileOutputStream(path);
-        out.write(data);
-        out.close();
     }
 
     @Then("the node should be healthy")
@@ -1110,13 +1005,6 @@ public class Stepdefs {
         req.setWalletHandleToken(handle);
         req.setWalletPassword(walletPswd);
         kcl.deleteKey(req);
-    }
-
-    @When("I get recent transactions, limited by {int} transactions")
-    public void i_get_recent_transactions_limited_by_count(int cnt) throws ApiException {
-        assertThat(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(cnt)).getTransactions())
-                .isInstanceOf(List.class);
-        //Assert.assertTrue(acl.transactions(addresses.get(0), null, null, null, null, BigInteger.valueOf(cnt)).getTransactions() instanceof List<?>);
     }
 
     @Given("asset test fixture")
