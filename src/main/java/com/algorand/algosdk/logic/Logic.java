@@ -74,6 +74,7 @@ public class Logic {
     /**
      * Metadata related to a varint parsed from teal program data.
      */
+    @Deprecated
     public static class VarintResult {
         final public int value;
         final public int length;
@@ -187,6 +188,9 @@ public class Logic {
 
     /**
      * Performs basic program validation: instruction count and program cost
+     * @deprecated For we are deprecating use of `langspec.json` across all SDKs.
+     * The behavior of method `checkProgram` relies on `langspec.json`.
+     * Thus, this method is being deprecated.
      *
      * @param program
      * @param args
@@ -200,6 +204,10 @@ public class Logic {
 
     /**
      * Performs basic program validation: instruction count and program cost
+     * @deprecated For we are deprecating use of `langspec.json` across all SDKs,
+     * The behavior of method `readProgram` relies on `langspec.json`.
+     * Thus, this method is being deprecated.
+     *
      * @param program Program to validate
      * @param args Program arguments to validate
      * @return boolean
@@ -341,6 +349,7 @@ public class Logic {
         reader.close();
     }
 
+    @Deprecated
     protected static IntConstBlock readIntConstBlock(byte[] program, int pc) {
         ArrayList<Integer> results = new ArrayList<>();
 
@@ -369,6 +378,7 @@ public class Logic {
         return new IntConstBlock(size, results);
     }
 
+    @Deprecated
     protected static ByteConstBlock readByteConstBlock(byte[] program, int pc) {
         ArrayList<byte[]> results = new ArrayList<>();
         int size = 1;
@@ -402,6 +412,7 @@ public class Logic {
         return new ByteConstBlock(size, results);
     }
 
+    @Deprecated
     protected static IntConstBlock readPushIntOp(byte[] program, int pc) {
         int size = 1;
         VarintResult result = getUVarint(program, pc + size);
@@ -415,6 +426,7 @@ public class Logic {
         return new IntConstBlock(size, Collections.singletonList(result.value));
     }
 
+    @Deprecated
     protected static ByteConstBlock readPushByteOp(byte[] program, int pc) {
         int size = 1;
         VarintResult result = getUVarint(program, pc + size);
