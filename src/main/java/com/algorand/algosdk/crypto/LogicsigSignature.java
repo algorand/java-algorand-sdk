@@ -49,8 +49,6 @@ public class LogicsigSignature {
         this.logic = Objects.requireNonNull(logic, "program must not be null");
         this.args = args;
 
-        // NOTE: Logic.checkProgram has been deprecated, use Logic.sanityCheckProgram instead
-        //       we no longer read from langspec.json, we do not need to catch IOException error
         Logic.sanityCheckProgram(this.logic);
 
         if (sig != null) this.sig = new Signature(sig);
