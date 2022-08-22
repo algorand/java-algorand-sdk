@@ -163,31 +163,7 @@ public class Logic {
         return new VarintResult();
     }
 
-    private static boolean isAsciiPrintable(final byte symbol) {
-        char symbolChar = (char) (symbol & 0xFF);
-        boolean isBreakLine = symbolChar == 10;
-        boolean isStdPrintable = symbolChar >= 32 && symbolChar < 127;
-        return isBreakLine || isStdPrintable;
-    }
-
-    private static boolean isAsciiPrintable(final byte[] program) {
-        for (byte b : program) {
-            if (!isAsciiPrintable(b))
-                return false;
-        }
-        return true;
-    }
-
     public static void sanityCheckProgram(final byte[] program) {
-//        VarintResult versionRes = getUVarint(program, 0);
-//        if (versionRes.length <= 0)
-//            throw new IllegalArgumentException("version parsing error");
-//        int version = versionRes.value;
-//        if (version > EvalMaxVersion)
-//            throw new IllegalArgumentException("unsupported version");
-
-        // though previous first byte check versioning eliminates most of the following heuristic checks
-        // things might change as version goes up, e.g., version goes to 10, then it is `\n` in ASCII.
         if (Base64.isBase64(program))
             throw new IllegalArgumentException("program should not be b64 encoded");
 
@@ -202,9 +178,6 @@ public class Logic {
         }
         if (isAddress)
             throw new IllegalArgumentException("requesting program bytes, but get Algorand address");
-
-        if (isAsciiPrintable(program))
-            throw new IllegalArgumentException("program bytes are all ASCII printable characters");
     }
 
     @Deprecated
