@@ -3,10 +3,12 @@ package com.algorand.algosdk.logic;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static com.algorand.algosdk.logic.Logic.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLogic {
     @Test
@@ -445,6 +447,32 @@ public class TestLogic {
             // txn StateProofPK; len; int 64; ==; gtxn 0 LastLog; len; int 10; ==; &&
             boolean valid = checkProgram(program, null);
             assertThat(valid).isTrue();
+        }
+    }
+
+    @Test
+    public void testSanityCheckProgram() {
+        {
+            // pass in address
+            String addressNotProg = "DN7MBMCL5JQ3PFUQS7TMX5AH4EEKOBJVDUF4TCV6WERATKFLQF4MQUPZTA";
+            assertThatThrownBy(() -> sanityCheckProgram(addressNotProg.getBytes(StandardCharsets.UTF_8)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("requesting program bytes, but get Algorand address");
+        }
+
+        {
+            // pass in b64 encoded msg
+            String exampleB64 = "gqRtc2lng6ZzdWJzaWeTgqJwa8QgG37AsEvqYbeWkJfmy/QH4QinBTUdC8mKvrEiCairgXihc8RAdvZ3y9GsInBPutdwKc7Jy+an13CcjSV1lcvRAYQKYOxXwfgT5B/mK14R57ueYJTYyoDO8zBY6kQmBalWkm95AIGicGvEIAljMglTc4nwdWcRdzmRx9A+G3PIxPUr9q/wGqJc+cJxgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaN0eG6Jo2FtdM0TiKNmZWXOAANPqKJmds4ADtbco2dlbq10ZXN0bmV0LXYzMS4womx2zgAO2sSkbm90ZcQItFF5Ofz60nGjcmN2xCAbfsCwS+pht5aQl+bL9AfhCKcFNR0LyYq+sSIJqKuBeKNzbmTEII2StImQAXOgTfpDWaNmamr86ixCoF3Zwfc+66VHgDfppHR5cGWjcGF5";
+            assertThatThrownBy(() -> sanityCheckProgram(exampleB64.getBytes(StandardCharsets.UTF_8)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("program should not be b64 encoded");
+        }
+
+        {
+            byte[] program = {
+                    0x06, 0x31, 0x3f, 0x15, (byte) 0x81, 0x40, 0x12, 0x33, 0x00, 0x3e, 0x15, (byte) 0x81, 0x0a, 0x12, 0x10
+            };
+            assertDoesNotThrow(() -> sanityCheckProgram(program));
         }
     }
 }

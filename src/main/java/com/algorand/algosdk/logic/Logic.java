@@ -170,9 +170,6 @@ public class Logic {
      * @param program
      */
     public static void sanityCheckProgram(final byte[] program) {
-        if (Base64.isBase64(program))
-            throw new IllegalArgumentException("program should not be b64 encoded");
-
         boolean isAddress = false;
         try {
             new Address(new String(program));
@@ -184,6 +181,9 @@ public class Logic {
         }
         if (isAddress)
             throw new IllegalArgumentException("requesting program bytes, but get Algorand address");
+
+        if (Base64.isBase64(program))
+            throw new IllegalArgumentException("program should not be b64 encoded");
     }
 
     @Deprecated
