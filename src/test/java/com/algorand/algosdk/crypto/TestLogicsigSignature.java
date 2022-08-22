@@ -7,8 +7,6 @@ import java.util.Arrays;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.util.Encoder;
-import org.junit.Ignore;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.*;
@@ -62,18 +60,6 @@ public class TestLogicsigSignature {
         outBytes = Encoder.encodeToMsgPack(lsig);
         lsig1 = Encoder.decodeFromMsgPack(outBytes, LogicsigSignature.class);
         assertThat(lsig).isEqualTo(lsig1);
-    }
-
-    @Deprecated
-    @Disabled("LogicsigSignature now deprecate checkProgram, use sanityCheckProgram instead, won't check invalid version")
-    @Test
-    public void testLogicsigInvalidProgramCreation() {
-        byte[] program = {
-            0x7F, 0x20, 0x01, 0x01, 0x22
-        };
-        assertThatThrownBy(() -> new LogicsigSignature(program))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("unsupported version");
     }
 
     @Test
