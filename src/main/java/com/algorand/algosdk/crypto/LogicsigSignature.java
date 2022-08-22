@@ -120,8 +120,6 @@ public class LogicsigSignature {
             return false;
         }
 
-        // NOTE: Logic.checkProgram has been deprecated, use Logic.sanityCheckProgram instead
-        //       we no longer read from langspec.json, we do not need to catch IOException error
         Logic.sanityCheckProgram(this.logic);
 
         PublicKey pk;
