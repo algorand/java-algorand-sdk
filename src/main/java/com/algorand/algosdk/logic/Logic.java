@@ -193,7 +193,9 @@ public class Logic {
 
     /**
      * Performs basic program validation: instruction count and program cost
-     * @deprecated For we are deprecating use of `langspec.json` across all SDKs.
+     * @deprecated `langspec.json` can no longer correctly to depicting the cost model (as of 2022.08.22),
+     * also to minimize the work in updating SDKs per AVM release,
+     * we are deprecating`langspec.json` across all SDKs.
      * The behavior of method `checkProgram` relies on `langspec.json`.
      * Thus, this method is being deprecated.
      *
@@ -209,7 +211,9 @@ public class Logic {
 
     /**
      * Performs basic program validation: instruction count and program cost
-     * @deprecated For we are deprecating use of `langspec.json` across all SDKs,
+     * @deprecated `langspec.json` can no longer correctly to depicting the cost model (as of 2022.08.22),
+     * also to minimize the work in updating SDKs per AVM release,
+     * we are deprecating`langspec.json` across all SDKs.
      * The behavior of method `readProgram` relies on `langspec.json`.
      * Thus, this method is being deprecated.
      *
