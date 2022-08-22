@@ -48,17 +48,10 @@ public class LogicsigSignature {
     ) {
         this.logic = Objects.requireNonNull(logic, "program must not be null");
         this.args = args;
+
+        // NOTE: Logic.checkProgram has been deprecated, use Logic.sanityCheckProgram instead
+        //       we no longer read from langspec.json, we do not need to catch IOException error
         Logic.sanityCheckProgram(this.logic);
-
-        // Deprecated:
-        // try {
-        //     Logic.checkProgram(this.logic, this.args);
-        // } catch (Exception ex) {
-        //     return false;
-        // }
-
-        // verified = Logic.checkProgram(this.logic, this.args); Logic.checkProgram has been deprecated
-        // since we no longer read from langspec.json, we do not need to catch IOException error
 
         if (sig != null) this.sig = new Signature(sig);
         this.msig = msig;
@@ -127,17 +120,9 @@ public class LogicsigSignature {
             return false;
         }
 
+        // NOTE: Logic.checkProgram has been deprecated, use Logic.sanityCheckProgram instead
+        //       we no longer read from langspec.json, we do not need to catch IOException error
         Logic.sanityCheckProgram(this.logic);
-
-        // Deprecated:
-        // try {
-        //     Logic.checkProgram(this.logic, this.args);
-        // } catch (Exception ex) {
-        //     return false;
-        // }
-
-        // Logic.checkProgram has been deprecated
-        // since we no longer read from langspec.json, we do not need to catch IOException error
 
         PublicKey pk;
         try {
