@@ -164,6 +164,11 @@ public class Logic {
         return new VarintResult();
     }
 
+    /**
+     * Performs heuristic program validation:
+     * check if passed in bytes are Algorand address or is B64 encoded, rather than Teal bytes
+     * @param program
+     */
     public static void sanityCheckProgram(final byte[] program) {
         if (Base64.isBase64(program))
             throw new IllegalArgumentException("program should not be b64 encoded");
