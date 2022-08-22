@@ -19,7 +19,7 @@ Maven:
 <dependency>
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>1.16.0</version>
+    <version>1.17.0</version>
 </dependency>
 ```
 
@@ -218,6 +218,13 @@ There is also a special integration test environment, and shared tests. To run t
 ```
 ~$ make docker-test
 ```
+
+To stand up the test harness, without running the entire test suite use the Makefile:
+```
+~$ make harness
+```
+You can then run specific cucumber-based unit and integration tests directly.
+
 
 ## deploying artifacts
 
