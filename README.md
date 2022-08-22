@@ -219,6 +219,13 @@ There is also a special integration test environment, and shared tests. To run t
 ~$ make docker-test
 ```
 
+To stand up the test harness, without running the entire test suite use the Makefile:
+```
+~$ make harness
+```
+You can then run specific cucumber-based unit and integration tests directly.
+
+
 ## deploying artifacts
 
 The generated pom file provides maven compatibility and deploy capabilities.
