@@ -202,7 +202,7 @@ public class Logic {
                     throw new IllegalArgumentException("cannot check if program bytes are Algorand address" + e);
             }
             if (isAddress)
-                throw new IllegalArgumentException("requesting program bytes, but get Algorand address");
+                throw new IllegalArgumentException("requesting program bytes, get Algorand address");
 
             // or maybe these bytes are some B64 encoded bytes representation
             if (Base64.isBase64(program))
