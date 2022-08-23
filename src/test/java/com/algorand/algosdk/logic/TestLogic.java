@@ -469,6 +469,13 @@ public class TestLogic {
         }
 
         {
+            String readableStuff = "Cast a cold eye\non life, on death.\nHorseman, pass by";
+            assertThatThrownBy(() -> sanityCheckProgram(readableStuff.getBytes(StandardCharsets.UTF_8)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessage("program bytes are all ASCII printable characters, not looking like Teal byte code");
+        }
+
+        {
             byte[] program = {
                     0x06, 0x31, 0x3f, 0x15, (byte) 0x81, 0x40, 0x12, 0x33, 0x00, 0x3e, 0x15, (byte) 0x81, 0x0a, 0x12, 0x10
             };
