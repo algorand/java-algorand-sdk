@@ -187,6 +187,8 @@ public class Logic {
      * @param program
      */
     public static void sanityCheckProgram(final byte[] program) {
+        if (program == null || program.length == 0)
+            throw new IllegalArgumentException("empty program");
         // in any case, if a slice of "program-bytes" is full of ASCII printable,
         // then the slice of bytes can't be Teal program bytes.
         // need to check what possible kind of bytes are passed in.
