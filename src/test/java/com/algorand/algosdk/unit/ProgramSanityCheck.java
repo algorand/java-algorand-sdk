@@ -1,6 +1,6 @@
 package com.algorand.algosdk.unit;
 
-import com.algorand.algosdk.logic.Logic;
+import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.util.Encoder;
 
 import io.cucumber.java.en.Given;
@@ -21,7 +21,7 @@ public class ProgramSanityCheck {
     @When("I start heuristic sanity check over the bytes")
     public void heuristicCheckOverBytes() {
         try {
-            Logic.sanityCheckProgram(seeminglyProgram);
+            new LogicsigSignature(seeminglyProgram);
         } catch (Exception e) {
             actualErrMsg = e.getMessage();
         }
