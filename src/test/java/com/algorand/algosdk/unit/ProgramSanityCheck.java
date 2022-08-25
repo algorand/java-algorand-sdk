@@ -27,7 +27,7 @@ public class ProgramSanityCheck {
         }
     }
 
-    @Then("if there exists an error, the error contains {string}")
+    @Then("if the heuristic sanity check throws an error, the error contains {string}")
     public void checkErrorIfMatching(String errMsg) {
         if (errMsg != null && !errMsg.isEmpty())
             assertThat(actualErrMsg).contains(errMsg);
