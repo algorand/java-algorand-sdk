@@ -42,7 +42,7 @@ public class LogicsigSignature {
 
 
     private static boolean isAsciiPrintable(final byte symbol) {
-        char symbolChar = (char) (symbol & 0xFF);
+        char symbolChar = (char) symbol;
         // linebreak existence check in program byte
         boolean isBreakLine = symbolChar == '\n';
         // printable ascii between range 32 (space) and 126 (tilde ~)
