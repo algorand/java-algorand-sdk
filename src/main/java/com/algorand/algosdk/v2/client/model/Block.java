@@ -70,6 +70,12 @@ public class Block extends PathResponse {
     public byte[] seed;
 
     /**
+     * Tracks the status of state proofs.
+     */
+    @JsonProperty("state-proof-tracking")
+    public List<StateProofTracking> stateProofTracking = new ArrayList<StateProofTracking>();
+
+    /**
      * (ts) Block creation timestamp in seconds since eposh
      */
     @JsonProperty("timestamp")
@@ -133,6 +139,7 @@ public class Block extends PathResponse {
         if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
         if (!Objects.deepEquals(this.round, other.round)) return false;
         if (!Objects.deepEquals(this.seed, other.seed)) return false;
+        if (!Objects.deepEquals(this.stateProofTracking, other.stateProofTracking)) return false;
         if (!Objects.deepEquals(this.timestamp, other.timestamp)) return false;
         if (!Objects.deepEquals(this.transactions, other.transactions)) return false;
         if (!Objects.deepEquals(this.transactionsRoot, other.transactionsRoot)) return false;
