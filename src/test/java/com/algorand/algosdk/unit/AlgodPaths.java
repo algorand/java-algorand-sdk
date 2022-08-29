@@ -81,4 +81,21 @@ public class AlgodPaths {
         if (TestingUtils.notEmpty(string2)) aiq.exclude(Enums.Exclude.forValue(string2));
         ps.q = aiq;
     }
+
+    @When("we make a GetTransactionProof call for round {long} txid {string} and hashtype {string}")
+    public void getTransactionProof(Long round, String txid, String hashType) {
+        GetTransactionProof gtp = algodClient.GetTransactionProof(round, txid);
+        if (TestingUtils.notEmpty(hashType)) gtp.hashtype(Enums.Hashtype.forValue(hashType));
+        ps.q = gtp;
+    }
+
+    @When("we make a GetLightBlockHeaderProof call for round {long}")
+    public void getLightBlockHeaderProof(Long round) {
+        ps.q = algodClient.GetLightBlockHeaderProof(round);
+    }
+
+    @When("we make a GetStateProof call for round {long}")
+    public void getStateProof(Long round) {
+        ps.q = algodClient.GetStateProof(round);
+    }
 }
