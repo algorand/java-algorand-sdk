@@ -1,3 +1,18 @@
+# 1.18.0-beta-1
+## What's Changed
+### Bugfixes
+* Bug-Fix: Pass verbosity to the harness and sandbox by @tzaffi in https://github.com/algorand/java-algorand-sdk/pull/371
+### New Features
+* StateProofs: Add State Proof support. by @winder in https://github.com/algorand/java-algorand-sdk/pull/360
+### Enhancements
+* Enhancement: Use Sandbox for Testing by @tzaffi in https://github.com/algorand/java-algorand-sdk/pull/363
+* Enhancement: Deprecating use of langspec by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/367
+
+## New Contributors
+* @tzaffi made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/363
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/1.17.0...1.18.0-beta-1
+
 # 1.17.0
 ### New Features
 * DevTools: adding source map decoder by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/352
