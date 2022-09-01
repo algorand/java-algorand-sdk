@@ -165,6 +165,16 @@ public class Transaction implements Serializable {
     @JsonProperty("apep")
     public Long extraPages = 0L;
 
+    /* state proof fields */
+    @JsonProperty("sptype")
+    public Integer stateProofType = null;
+
+    @JsonProperty("sp")
+    public Map<String,Object> stateProof = null;
+
+    @JsonProperty("spmsg")
+    public Map<String,Object> stateProofMessage = null;
+
     /**
      * Create a payment transaction
      *
@@ -737,7 +747,7 @@ public class Transaction implements Serializable {
     }
 
     /**
-     * Constructor which takes all the fields of Transaction except for nonpart and state proof.
+     * Constructor which takes all the fields of Transaction except for nonpart.
      * For details about which fields to use with different transaction types, refer to the developer documentation:
      * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
      */
@@ -1277,7 +1287,8 @@ public class Transaction implements Serializable {
         AssetConfig("acfg"),
         AssetTransfer("axfer"),
         AssetFreeze("afrz"),
-        ApplicationCall("appl");
+        ApplicationCall("appl"),
+        StateProof("stpf");
 
         private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
 
