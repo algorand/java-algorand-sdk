@@ -16,7 +16,7 @@ public class TransactionStateProof extends PathResponse {
      * (spmsg)
      */
     @JsonProperty("message")
-    public IndexerStateProofMessage message;
+    public StateProofMessage message;
 
     /**
      * (sp) represents a state proof.
@@ -24,7 +24,7 @@ public class TransactionStateProof extends PathResponse {
      * crypto/stateproof/structs.go : StateProof
      */
     @JsonProperty("state-proof")
-    public StateProofFields stateProof;
+    public StateProof stateProof;
 
     /**
      * (sptype) Type of the state proof. Integer representing an entry defined in
