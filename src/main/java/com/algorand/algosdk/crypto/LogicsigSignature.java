@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.codec.binary.Base64;
 
 /**
  * Serializable logicsig class.
@@ -39,6 +40,59 @@ public class LogicsigSignature {
     @JsonProperty("msig")
     public MultisigSignature msig;
 
+
+    private static boolean isAsciiPrintable(final byte symbol) {
+        // linebreak existence check in program byte
+        boolean isBreakLine = symbol == '\n';
+        // printable ascii between range 32 (space) and 126 (tilde ~)
+        boolean isStdPrintable = symbol >= ' ' && symbol <= '~';
+        return isBreakLine || isStdPrintable;
+    }
+
+    private static boolean isAsciiPrintable(final byte[] program) {
+        for (byte b : program) {
+            if (!isAsciiPrintable(b))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Performs heuristic program validation:
+     * check if passed in bytes are Algorand address or is B64 encoded, rather than Teal bytes
+     * @param program
+     */
+    private static void sanityCheckProgram(final byte[] program) {
+        if (program == null || program.length == 0)
+            throw new IllegalArgumentException("empty program");
+        // in any case, if a slice of "program-bytes" is full of ASCII printable,
+        // then the slice of bytes can't be Teal program bytes.
+        // need to check what possible kind of bytes are passed in.
+        if (isAsciiPrintable(program)) {
+            // maybe the bytes passed in are representing an Algorand address
+            boolean isAddress = false;
+            try {
+                new Address(new String(program));
+                isAddress = true;
+            } catch (NoSuchAlgorithmException | IllegalArgumentException e) {
+                // if exception is IllegalArgException, it means bytes are not Algorand address
+                if (e instanceof NoSuchAlgorithmException)
+                    throw new IllegalArgumentException("cannot check if program bytes are Algorand address" + e);
+            }
+            if (isAddress)
+                throw new IllegalArgumentException("requesting program bytes, get Algorand address");
+
+            // or maybe these bytes are some B64 encoded bytes representation
+            if (Base64.isBase64(program))
+                throw new IllegalArgumentException("program should not be b64 encoded");
+
+            // can't further analyze, but it is more than just B64 encoding at this point
+            throw new IllegalArgumentException(
+                    "program bytes are all ASCII printable characters, not looking like Teal byte code"
+            );
+        }
+    }
+
     @JsonCreator
     public LogicsigSignature(
         @JsonProperty("l") byte[] logic,
@@ -48,14 +102,8 @@ public class LogicsigSignature {
     ) {
         this.logic = Objects.requireNonNull(logic, "program must not be null");
         this.args = args;
-        boolean verified = false;
-        try {
-            verified = Logic.checkProgram(this.logic, this.args);
-        } catch (IOException ex) {
-            throw new IllegalArgumentException("invalid program", ex);
-        }
 
-        assert verified;
+        sanityCheckProgram(this.logic);
 
         if (sig != null) this.sig = new Signature(sig);
         this.msig = msig;
@@ -124,11 +172,7 @@ public class LogicsigSignature {
             return false;
         }
 
-        try {
-            Logic.checkProgram(this.logic, this.args);
-        } catch (Exception ex) {
-            return false;
-        }
+        sanityCheckProgram(this.logic);
 
         PublicKey pk;
         try {

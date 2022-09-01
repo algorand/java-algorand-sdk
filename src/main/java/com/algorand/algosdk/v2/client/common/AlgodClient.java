@@ -10,7 +10,7 @@ import com.algorand.algosdk.v2.client.algod.AccountAssetInformation;
 import com.algorand.algosdk.v2.client.algod.AccountApplicationInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
-import com.algorand.algosdk.v2.client.algod.GetProof;
+import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
@@ -18,6 +18,8 @@ import com.algorand.algosdk.v2.client.algod.RawTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
+import com.algorand.algosdk.v2.client.algod.GetStateProof;
+import com.algorand.algosdk.v2.client.algod.GetLightBlockHeaderProof;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
@@ -144,12 +146,12 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Get a Merkle proof for a transaction in a block.
+     * Get a proof for a transaction in a block.
      * /v2/blocks/{round}/transactions/{txid}/proof
      */
-    public GetProof GetProof(Long round,
-                             String txid) {
-        return new GetProof((Client) this, round, txid);
+    public GetTransactionProof GetTransactionProof(Long round,
+                                                   String txid) {
+        return new GetTransactionProof((Client) this, round, txid);
     }
 
     /**
@@ -215,6 +217,22 @@ public class AlgodClient extends Client {
      */
     public PendingTransactionInformation PendingTransactionInformation(String txid) {
         return new PendingTransactionInformation((Client) this, txid);
+    }
+
+    /**
+     * Get a state proof that covers a given round
+     * /v2/stateproofs/{round}
+     */
+    public GetStateProof GetStateProof(Long round) {
+        return new GetStateProof((Client) this, round);
+    }
+
+    /**
+     * Gets a proof for a given light block header inside a state proof commitment
+     * /v2/blocks/{round}/lightheader/proof
+     */
+    public GetLightBlockHeaderProof GetLightBlockHeaderProof(Long round) {
+        return new GetLightBlockHeaderProof((Client) this, round);
     }
 
     /**

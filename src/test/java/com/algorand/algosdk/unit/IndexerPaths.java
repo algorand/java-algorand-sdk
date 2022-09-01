@@ -1,7 +1,6 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.unit.utils.QueryMapper;
 import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
@@ -155,8 +154,8 @@ public class IndexerPaths {
         LookupAssetTransactions q = this.indexerClient.lookupAssetTransactions(assetId);
         if (TestingUtils.notEmpty(address)) q.address(new Address(address));
         if (TestingUtils.notEmpty(notePrefix)) q.notePrefix(Encoder.decodeFromBase64(notePrefix));
-        if (TestingUtils.notEmpty(txType)) q.txType(QueryMapper.getTxType(txType));
-        if (TestingUtils.notEmpty(sigType)) q.sigType(QueryMapper.getSigType(sigType));
+        if (TestingUtils.notEmpty(txType)) q.txType(Enums.TxType.forValue(txType));
+        if (TestingUtils.notEmpty(sigType)) q.sigType(Enums.SigType.forValue(sigType));
         if (TestingUtils.notEmpty(txid)) q.txid(txid);
         if (TestingUtils.notEmpty(round)) q.round(round);
         if (TestingUtils.notEmpty(minRound)) q.minRound(minRound);
@@ -166,7 +165,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(afterTime)) q.afterTime(Utils.parseDate(afterTime));
         if (TestingUtils.notEmpty(currencyGT)) q.currencyGreaterThan(currencyGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
-        if (TestingUtils.notEmpty(addressRole)) q.addressRole(QueryMapper.getAddressRole(addressRole));
+        if (TestingUtils.notEmpty(addressRole)) q.addressRole(Enums.AddressRole.forValue(addressRole));
         if (TestingUtils.notEmpty(excludeCloseTo)) q.excludeCloseTo(excludeCloseTo.equals("true"));
         if (TestingUtils.notEmpty(rekeyTo)) q.rekeyTo(rekeyTo.equals("true"));
         ps.q = q;
@@ -176,8 +175,8 @@ public class IndexerPaths {
     public void lookupAccountTransactions(String account, String notePrefix, String txType, String sigType, String txid, Long round, Long minRound, Long maxRound, Long limit, String beforeTime, String afterTime, Long currencyGT, Long currencyLT, Long assetId, String rekeyTo) throws NoSuchAlgorithmException, ParseException {
         LookupAccountTransactions q = this.indexerClient.lookupAccountTransactions(new Address(account));
         if (TestingUtils.notEmpty(notePrefix)) q.notePrefix(Encoder.decodeFromBase64(notePrefix));
-        if (TestingUtils.notEmpty(txType)) q.txType(QueryMapper.getTxType(txType));
-        if (TestingUtils.notEmpty(sigType)) q.sigType(QueryMapper.getSigType(sigType));
+        if (TestingUtils.notEmpty(txType)) q.txType(Enums.TxType.forValue(txType));
+        if (TestingUtils.notEmpty(sigType)) q.sigType(Enums.SigType.forValue(sigType));
         if (TestingUtils.notEmpty(txid)) q.txid(txid);
         if (TestingUtils.notEmpty(round)) q.round(round);
         if (TestingUtils.notEmpty(minRound)) q.minRound(minRound);
@@ -213,8 +212,8 @@ public class IndexerPaths {
         SearchForTransactions q = this.indexerClient.searchForTransactions();
         if (TestingUtils.notEmpty(address)) q.address(new Address(address));
         if (TestingUtils.notEmpty(notePrefix)) q.notePrefix(Encoder.decodeFromBase64(notePrefix));
-        if (TestingUtils.notEmpty(txType)) q.txType(QueryMapper.getTxType(txType));
-        if (TestingUtils.notEmpty(sigType)) q.sigType(QueryMapper.getSigType(sigType));
+        if (TestingUtils.notEmpty(txType)) q.txType(Enums.TxType.forValue(txType));
+        if (TestingUtils.notEmpty(sigType)) q.sigType(Enums.SigType.forValue(sigType));
         if (TestingUtils.notEmpty(txid)) q.txid(txid);
         if (TestingUtils.notEmpty(round)) q.round(round);
         if (TestingUtils.notEmpty(minRound)) q.minRound(minRound);
@@ -225,7 +224,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(currencyGT)) q.currencyGreaterThan(currencyGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         if (TestingUtils.notEmpty(assetID)) q.assetId(assetID);
-        if (TestingUtils.notEmpty(addressRole)) q.addressRole(QueryMapper.getAddressRole(addressRole));
+        if (TestingUtils.notEmpty(addressRole)) q.addressRole(Enums.AddressRole.forValue(addressRole));
         if (TestingUtils.notEmpty(excludeCloseTo)) q.excludeCloseTo(excludeCloseTo.equals("true"));
         if (TestingUtils.notEmpty(rekeyTo)) q.rekeyTo(rekeyTo.equals("true"));
         ps.q = q;
@@ -285,7 +284,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(string2)) {
             ArrayList<Enums.Exclude> excludes = new ArrayList<Enums.Exclude>();
             for (String excld : string2.split(",")) {
-                excludes.add(QueryMapper.getExclude(excld));
+                excludes.add(Enums.Exclude.forValue(excld));
             }
             q.exclude(excludes);
         }
@@ -320,7 +319,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(string)) {
             ArrayList<Enums.Exclude> excludes = new ArrayList<Enums.Exclude>();
             for (String excld : string.split(",")) {
-                excludes.add(QueryMapper.getExclude(excld));
+                excludes.add(Enums.Exclude.forValue(excld));
             }
             q.exclude(excludes);
         }
