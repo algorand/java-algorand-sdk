@@ -22,4 +22,3 @@ docker-javasdk-run:
 	docker run -it --network host java-sdk-testing:latest
 
 docker-test: harness docker-javasdk-build docker-javasdk-run
-
