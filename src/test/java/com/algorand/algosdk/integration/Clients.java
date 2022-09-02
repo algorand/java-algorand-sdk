@@ -15,9 +15,4 @@ public class Clients {
     public void an_algod_v2_client_connected_to_port_with_token(String host, Integer port, String token) {
         v2Client = new AlgodClient(host, port, token);
     }
-
-    @Given("indexer client {int} at {string} port {int} with token {string}")
-    public void indexer_client_at_port_with_token(Integer index, String uri, Integer port, String token) {
-        indexerClients.put(index, new IndexerClient(uri, port, ""));
-    }
 }

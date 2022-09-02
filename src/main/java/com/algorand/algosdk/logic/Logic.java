@@ -14,7 +14,11 @@ import java.util.List;
 /**
  * Logic class provides static checkProgram function
  * that can be used for client-side program validation for size and execution cost.
+ *
+ * @deprecated this class is deprecated for relying on metadata (`langspec.json`) that
+ * does not accurately represent opcode behavior across program versions.
  */
+@Deprecated
 public class Logic {
 
     private static final int MAX_COST = 20000;
@@ -103,7 +107,7 @@ public class Logic {
      * Each byte in a varint, except the last byte, has the most significant
      * bit (msb) set – this indicates that there are further bytes to come.
      * The lower 7 bits of each byte are used to store the two's complement
-     * representation of the number in groups of 7 bits, least significant
+     * representation of the number in groups of 7 bits, the least significant
      * group first.
      * https://developers.google.com/protocol-buffers/docs/encoding
      * @param value being serialized
@@ -128,7 +132,7 @@ public class Logic {
      * Given a varint, get the integer value
      * @param buffer serialized varint
      * @param bufferOffset position in the buffer to start reading from
-     * @return pair of values in in array: value, read size
+     * @return pair of values in an array: value, read size
      */
     public static VarintResult getUVarint(byte [] buffer, int bufferOffset) {
         int x = 0;
@@ -164,6 +168,7 @@ public class Logic {
 
     /**
      * Performs basic program validation: instruction count and program cost
+     *
      * @param program Program to validate
      * @param args Program arguments to validate
      * @return boolean
