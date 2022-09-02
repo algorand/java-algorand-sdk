@@ -63,16 +63,6 @@ public class TestLogicsigSignature {
     }
 
     @Test
-    public void testLogicsigInvalidProgramCreation() throws Exception {
-        byte[] program = {
-            0x7F, 0x20, 0x01, 0x01, 0x22
-        };
-        assertThatThrownBy(() -> new LogicsigSignature(program))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("unsupported version");
-    }
-
-    @Test
     public void testLogicsigSignature() throws Exception {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1

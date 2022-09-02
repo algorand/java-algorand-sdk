@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Proof of transaction in a block.
  */
-public class ProofResponse extends PathResponse {
+public class TransactionProofResponse extends PathResponse {
 
     /**
      * The type of hash function used to create the proof, must be one of:
@@ -26,7 +26,7 @@ public class ProofResponse extends PathResponse {
     public Long idx;
 
     /**
-     * Merkle proof of transaction membership.
+     * Proof of transaction membership.
      */
     @JsonProperty("proof")
     public void proof(String base64Encoded) {
@@ -62,7 +62,7 @@ public class ProofResponse extends PathResponse {
         if (this == o) return true;
         if (o == null) return false;
 
-        ProofResponse other = (ProofResponse) o;
+        TransactionProofResponse other = (TransactionProofResponse) o;
         if (!Objects.deepEquals(this.hashtype, other.hashtype)) return false;
         if (!Objects.deepEquals(this.idx, other.idx)) return false;
         if (!Objects.deepEquals(this.proof, other.proof)) return false;

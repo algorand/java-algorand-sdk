@@ -1,10 +1,24 @@
+UNIT_TAGS :=  "$(subst :, or ,$(shell awk '{print $2}' src/test/unit.tags | paste -s -d: -))"
+INTEGRATION_TAGS := "$(subst :, or ,$(shell awk '{print $2}' src/test/integration.tags | paste -s -d: -))"
+
 unit:
-	mvn test -Dcucumber.filter.tags="@unit.offline or @unit.algod or @unit.indexer or @unit.rekey or @unit.indexer.rekey or @unit.transactions or @unit.transactions.keyreg or @unit.responses or @unit.applications or @unit.applications.boxes or @unit.dryrun or @unit.tealsign or @unit.responses.messagepack or @unit.responses.231 or @unit.responses.messagepack.231 or @unit.feetest or @unit.indexer.logs or @unit.abijson or @unit.abijson.byname or @unit.atomic_transaction_composer or @unit.transactions.payment or @unit.responses.unlimited_assets or @unit.algod.ledger_refactoring or @unit.indexer.ledger_refactoring or @unit.dryrun.trace.application or @unit.sourcemap"
+	mvn test -Dcucumber.filter.tags=$(UNIT_TAGS)
 
 integration:
-	mvn test \
-	  -Dtest=com.algorand.algosdk.integration.RunCucumberIntegrationTest \
-	  -Dcucumber.filter.tags="@algod or @assets or @auction or @kmd or @send or @send.keyregtxn or @indexer or @rekey_v1 or @applications.verified or @applications or @applications.boxes or @compile or @dryrun or @indexer.applications or @indexer.231 or @abi or @c2c or @compile.sourcemap"
+	mvn test -Dtest=com.algorand.algosdk.integration.RunCucumberIntegrationTest -Dcucumber.filter.tags=$(INTEGRATION_TAGS)
 
-docker-test:
-	./run_integration_tests.sh
+display-all-java-steps:
+	find src/test/java/com/algorand/algosdk -name "*.java" | xargs grep "io.cucumber.java.en" 2>/dev/null | grep -v Binary | cut -d: -f1 | sort | uniq | xargs grep -E "@(Given|Then|When)"
+
+harness:
+	./test-harness.sh
+
+docker-javasdk-build:
+	# Build SDK testing environment
+	docker build -t java-sdk-testing .
+
+docker-javasdk-run:
+	# Launch SDK testing
+	docker run -it --network host java-sdk-testing:latest
+
+docker-test: harness docker-javasdk-build docker-javasdk-run
