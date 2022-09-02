@@ -788,12 +788,6 @@ public class Stepdefs {
         Thread.sleep(500);
     }
 
-    @Then("I can get the transaction by ID")
-    public void txnByID() throws Exception {
-        waitForAlgodTransactionProcessingToComplete();
-        assertThat(acl.transaction(txid).getFrom()).isEqualTo(pk.toString());
-    }
-
     @Then("the transaction should not go through")
     public void txnFail() {
         assertThat(err).isTrue();
