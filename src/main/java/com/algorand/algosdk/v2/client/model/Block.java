@@ -70,6 +70,12 @@ public class Block extends PathResponse {
     public byte[] seed;
 
     /**
+     * Tracks the status of state proofs.
+     */
+    @JsonProperty("state-proof-tracking")
+    public List<StateProofTracking> stateProofTracking = new ArrayList<StateProofTracking>();
+
+    /**
      * (ts) Block creation timestamp in seconds since eposh
      */
     @JsonProperty("timestamp")
@@ -97,6 +103,21 @@ public class Block extends PathResponse {
         return Encoder.encodeToBase64(this.transactionsRoot);
     }
     public byte[] transactionsRoot;
+
+    /**
+     * (txn256) TransactionsRootSHA256 is an auxiliary TransactionRoot, built using a
+     * vector commitment instead of a merkle tree, and SHA256 hash function instead of
+     * the default SHA512_256. This commitment can be used on environments where only
+     * the SHA256 function exists.
+     */
+    @JsonProperty("transactions-root-sha256")
+    public void transactionsRootSha256(String base64Encoded) {
+        this.transactionsRootSha256 = Encoder.decodeFromBase64(base64Encoded);
+    }
+    public String transactionsRootSha256() {
+        return Encoder.encodeToBase64(this.transactionsRootSha256);
+    }
+    public byte[] transactionsRootSha256;
 
     /**
      * (tc) TxnCounter counts the number of transactions committed in the ledger, from
@@ -133,9 +154,11 @@ public class Block extends PathResponse {
         if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
         if (!Objects.deepEquals(this.round, other.round)) return false;
         if (!Objects.deepEquals(this.seed, other.seed)) return false;
+        if (!Objects.deepEquals(this.stateProofTracking, other.stateProofTracking)) return false;
         if (!Objects.deepEquals(this.timestamp, other.timestamp)) return false;
         if (!Objects.deepEquals(this.transactions, other.transactions)) return false;
         if (!Objects.deepEquals(this.transactionsRoot, other.transactionsRoot)) return false;
+        if (!Objects.deepEquals(this.transactionsRootSha256, other.transactionsRootSha256)) return false;
         if (!Objects.deepEquals(this.txnCounter, other.txnCounter)) return false;
         if (!Objects.deepEquals(this.upgradeState, other.upgradeState)) return false;
         if (!Objects.deepEquals(this.upgradeVote, other.upgradeVote)) return false;

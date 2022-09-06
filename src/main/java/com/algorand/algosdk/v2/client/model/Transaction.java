@@ -303,6 +303,14 @@ public class Transaction extends PathResponse {
     public TransactionSignature signature;
 
     /**
+     * Fields for a state proof transaction.
+     * Definition:
+     * data/transactions/stateproof.go : StateProofTxnFields
+     */
+    @JsonProperty("state-proof-transaction")
+    public TransactionStateProof stateProofTransaction;
+
+    /**
      * (type) Indicates what type of transaction this is. Different types have
      * different fields.
      * Valid types, and where their fields are stored:
@@ -312,6 +320,7 @@ public class Transaction extends PathResponse {
      *   (axfer) asset-transfer-transaction
      *   (afrz) asset-freeze-transaction
      *   (appl) application-transaction
+     *   (stpf) state-proof-transaction
      */
     @JsonProperty("tx-type")
     public Enums.TxType txType;
@@ -355,6 +364,7 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.sender, other.sender)) return false;
         if (!Objects.deepEquals(this.senderRewards, other.senderRewards)) return false;
         if (!Objects.deepEquals(this.signature, other.signature)) return false;
+        if (!Objects.deepEquals(this.stateProofTransaction, other.stateProofTransaction)) return false;
         if (!Objects.deepEquals(this.txType, other.txType)) return false;
 
         return true;

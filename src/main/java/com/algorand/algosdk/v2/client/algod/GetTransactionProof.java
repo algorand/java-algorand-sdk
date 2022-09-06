@@ -6,14 +6,14 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.Enums;
-import com.algorand.algosdk.v2.client.model.ProofResponse;
+import com.algorand.algosdk.v2.client.model.TransactionProofResponse;
 
 
 /**
- * Get a Merkle proof for a transaction in a block.
+ * Get a proof for a transaction in a block.
  * /v2/blocks/{round}/transactions/{txid}/proof
  */
-public class GetProof extends Query {
+public class GetTransactionProof extends Query {
 
     private Long round;
     private String txid;
@@ -22,7 +22,7 @@ public class GetProof extends Query {
      * @param round The round in which the transaction appears.
      * @param txid The transaction ID for which to generate a proof.
      */
-    public GetProof(Client client, Long round, String txid) {
+    public GetTransactionProof(Client client, Long round, String txid) {
         super(client, new HttpMethod("get"));
         addQuery("format", "msgpack");
         this.round = round;
@@ -34,7 +34,7 @@ public class GetProof extends Query {
      *   sha512_256
      *   sha256
      */
-    public GetProof hashtype(Enums.Hashtype hashtype) {
+    public GetTransactionProof hashtype(Enums.Hashtype hashtype) {
         addQuery("hashtype", String.valueOf(hashtype));
         return this;
     }
@@ -45,9 +45,9 @@ public class GetProof extends Query {
     * @throws Exception
     */
     @Override
-    public Response<ProofResponse> execute() throws Exception {
-        Response<ProofResponse> resp = baseExecute();
-        resp.setValueType(ProofResponse.class);
+    public Response<TransactionProofResponse> execute() throws Exception {
+        Response<TransactionProofResponse> resp = baseExecute();
+        resp.setValueType(TransactionProofResponse.class);
         return resp;
     }
 
@@ -60,9 +60,9 @@ public class GetProof extends Query {
     * @throws Exception
     */
     @Override
-    public Response<ProofResponse> execute(String[] headers, String[] values) throws Exception {
-        Response<ProofResponse> resp = baseExecute(headers, values);
-        resp.setValueType(ProofResponse.class);
+    public Response<TransactionProofResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<TransactionProofResponse> resp = baseExecute(headers, values);
+        resp.setValueType(TransactionProofResponse.class);
         return resp;
     }
 
