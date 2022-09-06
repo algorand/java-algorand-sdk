@@ -105,7 +105,10 @@ public class SearchForAccounts extends Query {
 
     /**
      * Include results for the specified round. For performance reasons, this parameter
-     * may be disabled on some configurations.
+     * may be disabled on some configurations. Using application-id or asset-id filters
+     * will return both creator and opt-in accounts. Filtering by include-all will
+     * return creator and opt-in accounts for deleted assets and accounts. Non-opt-in
+     * managers are not included in the results when asset-id is used.
      */
     public SearchForAccounts round(Long round) {
         addQuery("round", String.valueOf(round));

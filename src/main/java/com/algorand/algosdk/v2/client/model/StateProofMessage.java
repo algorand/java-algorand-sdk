@@ -6,16 +6,12 @@ import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Represents the message that the state proofs are attesting to.
- */
 public class StateProofMessage extends PathResponse {
 
     /**
-     * The vector commitment root on all light block headers within a state proof
-     * interval.
+     * (b)
      */
-    @JsonProperty("BlockHeadersCommitment")
+    @JsonProperty("block-headers-commitment")
     public void blockHeadersCommitment(String base64Encoded) {
         this.blockHeadersCommitment = Encoder.decodeFromBase64(base64Encoded);
     }
@@ -25,28 +21,27 @@ public class StateProofMessage extends PathResponse {
     public byte[] blockHeadersCommitment;
 
     /**
-     * The first round the message attests to.
+     * (f)
      */
-    @JsonProperty("FirstAttestedRound")
+    @JsonProperty("first-attested-round")
     public java.math.BigInteger firstAttestedRound;
 
     /**
-     * The last round the message attests to.
+     * (l)
      */
-    @JsonProperty("LastAttestedRound")
-    public java.math.BigInteger lastAttestedRound;
+    @JsonProperty("latest-attested-round")
+    public java.math.BigInteger latestAttestedRound;
 
     /**
-     * An integer value representing the natural log of the proven weight with 16 bits
-     * of precision. This value would be used to verify the next state proof.
+     * (P)
      */
-    @JsonProperty("LnProvenWeight")
+    @JsonProperty("ln-proven-weight")
     public java.math.BigInteger lnProvenWeight;
 
     /**
-     * The vector commitment root of the top N accounts to sign the next StateProof.
+     * (v)
      */
-    @JsonProperty("VotersCommitment")
+    @JsonProperty("voters-commitment")
     public void votersCommitment(String base64Encoded) {
         this.votersCommitment = Encoder.decodeFromBase64(base64Encoded);
     }
@@ -64,7 +59,7 @@ public class StateProofMessage extends PathResponse {
         StateProofMessage other = (StateProofMessage) o;
         if (!Objects.deepEquals(this.blockHeadersCommitment, other.blockHeadersCommitment)) return false;
         if (!Objects.deepEquals(this.firstAttestedRound, other.firstAttestedRound)) return false;
-        if (!Objects.deepEquals(this.lastAttestedRound, other.lastAttestedRound)) return false;
+        if (!Objects.deepEquals(this.latestAttestedRound, other.latestAttestedRound)) return false;
         if (!Objects.deepEquals(this.lnProvenWeight, other.lnProvenWeight)) return false;
         if (!Objects.deepEquals(this.votersCommitment, other.votersCommitment)) return false;
 
