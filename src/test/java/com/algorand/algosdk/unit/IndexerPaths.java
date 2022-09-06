@@ -338,15 +338,8 @@ public class IndexerPaths {
         ps.q = indexerClient.lookupApplicationBoxByIDandName(appID).name(boxName);
     }
 
-    @When("we make a SearchForApplicationBoxes call with applicationID {long} with max {long}")
-    public void searchApplicationBoxes(Long appID, Long maxRes) {
-        SearchForApplicationBoxes q = indexerClient.searchForApplicationBoxes(appID);
-        if (TestingUtils.notEmpty(maxRes)) q.limit(maxRes);
-        ps.q = q;
-    }
-
     @When("we make a SearchForApplicationBoxes call with applicationID {long} with max {long} nextToken {string}")
-    public void searchApplicationBoxesWithNext(Long appID, Long maxRes, String nextToken) {
+    public void searchApplicationBoxes(Long appID, Long maxRes, String nextToken) {
         SearchForApplicationBoxes q = indexerClient.searchForApplicationBoxes(appID);
         if (TestingUtils.notEmpty(maxRes)) q.limit(maxRes);
         if (TestingUtils.notEmpty(nextToken)) q.next(nextToken);
