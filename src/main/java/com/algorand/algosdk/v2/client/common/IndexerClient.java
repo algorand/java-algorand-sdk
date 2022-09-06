@@ -10,6 +10,8 @@ import com.algorand.algosdk.v2.client.indexer.LookupAccountCreatedApplications;
 import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
 import com.algorand.algosdk.v2.client.indexer.SearchForApplications;
 import com.algorand.algosdk.v2.client.indexer.LookupApplicationByID;
+import com.algorand.algosdk.v2.client.indexer.SearchForApplicationBoxes;
+import com.algorand.algosdk.v2.client.indexer.LookupApplicationBoxByIDandName;
 import com.algorand.algosdk.v2.client.indexer.LookupApplicationLogsByID;
 import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
@@ -131,6 +133,27 @@ public class IndexerClient extends Client {
      */
     public LookupApplicationByID lookupApplicationByID(Long applicationId) {
         return new LookupApplicationByID((Client) this, applicationId);
+    }
+
+    /**
+     * Given an application ID, returns the box names of that application sorted
+     * lexicographically.
+     * /v2/applications/{application-id}/boxes
+     */
+    public SearchForApplicationBoxes searchForApplicationBoxes(Long applicationId) {
+        return new SearchForApplicationBoxes((Client) this, applicationId);
+    }
+
+    /**
+     * Given an application ID and box name, returns base64 encoded box name and value.
+     * Box names must be in the goal-arg form 'encoding:value'. For ints, use the form
+     * 'int:1234'. For raw bytes, encode base 64 and use 'b64' prefix as in 'b64:A=='.
+     * For printable strings, use the form 'str:hello'. For addresses, use the form
+     * 'addr:XYZ...'.
+     * /v2/applications/{application-id}/box
+     */
+    public LookupApplicationBoxByIDandName lookupApplicationBoxByIDandName(Long applicationId) {
+        return new LookupApplicationBoxByIDandName((Client) this, applicationId);
     }
 
     /**

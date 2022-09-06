@@ -195,6 +195,20 @@ public class Account extends PathResponse {
     public Long totalAssetsOptedIn;
 
     /**
+     * For app-accounts only. The total number of bytes allocated for the keys and
+     * values of boxes which belong to the associated application.
+     */
+    @JsonProperty("total-box-bytes")
+    public Long totalBoxBytes;
+
+    /**
+     * For app-accounts only. The total number of boxes which belong to the associated
+     * application.
+     */
+    @JsonProperty("total-boxes")
+    public Long totalBoxes;
+
+    /**
      * The count of all apps (AppParams objects) created by this account.
      */
     @JsonProperty("total-created-apps")
@@ -235,6 +249,8 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.status, other.status)) return false;
         if (!Objects.deepEquals(this.totalAppsOptedIn, other.totalAppsOptedIn)) return false;
         if (!Objects.deepEquals(this.totalAssetsOptedIn, other.totalAssetsOptedIn)) return false;
+        if (!Objects.deepEquals(this.totalBoxBytes, other.totalBoxBytes)) return false;
+        if (!Objects.deepEquals(this.totalBoxes, other.totalBoxes)) return false;
         if (!Objects.deepEquals(this.totalCreatedApps, other.totalCreatedApps)) return false;
         if (!Objects.deepEquals(this.totalCreatedAssets, other.totalCreatedAssets)) return false;
 
