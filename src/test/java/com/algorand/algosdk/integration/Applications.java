@@ -256,9 +256,15 @@ public class Applications {
         assertThat(found).as("Couldn't find key '%s'", hasKey).isTrue();
     }
 
-    @Then("the contents of the box with name {string} in the current application should be {string}. If there is an error it is {string}.")
-    public void contentsOfBoxShouldBe(String encodedBoxName, String boxContents, String errStr) throws Exception {
-        Response<Box> boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
+    @Then("according to {string}, the contents of the box with name {string} in the current application should be {string}. If there is an error it is {string}.")
+    public void contentsOfBoxShouldBe(String from_client, String encodedBoxName, String boxContents, String errStr) throws Exception {
+        Response<Box> boxResp;
+        if (from_client.equals("algod"))
+            boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
+        else if (from_client.equals("indexer"))
+            boxResp = clients.v2IndexerClient.lookupApplicationBoxByIDandName(this.appId).name(encodedBoxName).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + from_client);
 
         // If an error was expected, make sure it is set correctly.
         if (StringUtils.isNotEmpty(errStr)) {
@@ -295,17 +301,24 @@ public class Applications {
         return false;
     }
 
-    @Then("the current application should have the following boxes {string}.")
-    public void checkAppBoxes(String encodedBoxesRaw) throws Exception {
+    @Then("according to {string}, the current application should have the following boxes {string}.")
+    public void checkAppBoxes(String from_client, String encodedBoxesRaw) throws Exception {
+        Response<BoxesResponse> r;
+        if (from_client.equals("algod"))
+            r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
+        else if (from_client.equals("indexer"))
+            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + from_client);
+
+        Assert.assertTrue(r.isSuccessful());
+
         final List<byte[]> expectedNames = Lists.newArrayList();
         if (!encodedBoxesRaw.isEmpty()) {
             for (String s : Strings.split(encodedBoxesRaw, ',')) {
                 expectedNames.add(decodeBoxName(s));
             }
         }
-
-        final Response<BoxesResponse> r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
-        Assert.assertTrue(r.isSuccessful());
 
         final List<byte[]> actualNames = Lists.newArrayList();
         for (BoxDescriptor b : r.body().boxes) {
