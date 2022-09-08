@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
 import static com.algorand.algosdk.util.ConversionUtils.*;
@@ -40,6 +41,8 @@ public class Applications {
     public String txId = null;
     public Long appId = 0L;
     public List<Long> rememberedAppIds = new ArrayList<>();
+    public TransactionParametersResponse sp = null;
+    static final String zeroAddress = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ";
 
     public Applications(TransientAccount transientAccount, Clients clients, Stepdefs base) {
         this.transientAccount = transientAccount;
@@ -329,6 +332,30 @@ public class Applications {
         for (byte[] e : expectedNames) {
             if (!contains(e, actualNames))
                 throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
+        }
+    }
+
+    @Then("I forward {int} empty rounds with transient account.")
+    public void forwardNEmptyRounds(int roundNum) throws Exception {
+        if (sp == null)
+            sp = clients.v2Client.TransactionParams().execute().body();
+        byte[] randomNote = new byte[8];
+        for (int i = 0; i < roundNum; i++) {
+            ThreadLocalRandom.current().nextBytes(randomNote);
+            Transaction ptx = Transaction.PaymentTransactionBuilder()
+                            .sender(transientAccount.transientAccount.getAddress())
+                            .suggestedParams(sp)
+                            .amount(0)
+                            .note(randomNote)
+                            .closeRemainderTo(base.close)
+                            .receiver(zeroAddress)
+                            .build();
+
+            SignedTransaction stx = transientAccount.transientAccount.signTransaction(ptx);
+
+            Response<PostTransactionsResponse> rPost =
+                    clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
+            Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 1);
         }
     }
 }
