@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
+@Deprecated
 public class ApiClient {
 
     private String basePath = "http://localhost";

@@ -24,6 +24,7 @@ import okio.ForwardingSource;
 import okio.Okio;
 import okio.Source;
 
+@Deprecated
 public class ProgressResponseBody extends ResponseBody {
 
     public interface ProgressListener {

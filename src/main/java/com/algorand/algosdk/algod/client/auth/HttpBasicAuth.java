@@ -19,6 +19,7 @@ import com.squareup.okhttp.Credentials;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public class HttpBasicAuth implements Authentication {
     private String username;
     private String password;
