@@ -335,6 +335,43 @@ public class Applications {
         }
     }
 
+    @Then("according to {string}, by parameter max {long}, the current application should have {int} boxes.")
+    public void checkAppBoxesNum(String from_client, Long limit, int expected_num) throws Exception {
+        Response<BoxesResponse> r;
+        if (from_client.equals("algod"))
+            r = clients.v2Client.GetApplicationBoxes(this.appId).max(limit).execute();
+        else if (from_client.equals("indexer"))
+            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + from_client);
+
+        Assert.assertTrue(r.isSuccessful());
+        Assert.assertEquals("expected " + expected_num + " boxes, actual " + r.body().boxes.size(),
+                r.body().boxes.size(), expected_num);
+    }
+
+    @Then("according to indexer, by parameter max {long} and next {string}, the current application should have the following boxes {string}.")
+    public void indexerCheckAppBoxesWithParams(Long limit, String next, String encodedBoxesRaw) throws Exception {
+        Response<BoxesResponse> r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
+        final List<byte[]> expectedNames = Lists.newArrayList();
+        if (!encodedBoxesRaw.isEmpty()) {
+            for (String s : Strings.split(encodedBoxesRaw, ',')) {
+                expectedNames.add(decodeBoxName(s));
+            }
+        }
+
+        final List<byte[]> actualNames = Lists.newArrayList();
+        for (BoxDescriptor b : r.body().boxes) {
+            actualNames.add(b.name);
+        }
+
+        Assert.assertEquals("expected and actual box names length do not match", expectedNames.size(), actualNames.size());
+        for (byte[] e : expectedNames) {
+            if (!contains(e, actualNames))
+                throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
+        }
+    }
+
     @Then("I forward {int} empty rounds with transient account.")
     public void forwardNEmptyRounds(int roundNum) throws Exception {
         if (sp == null)
