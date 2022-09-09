@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * TransactionFee contains the suggested fee
  */
 @ApiModel(description = "TransactionFee contains the suggested fee")
-
+@Deprecated
 public class TransactionFee {
   @SerializedName("fee")
   private java.math.BigInteger fee = null;

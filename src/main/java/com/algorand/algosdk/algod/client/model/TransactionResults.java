@@ -27,7 +27,7 @@ import java.io.IOException;
  * TransactionResults contains information about the side effects of a transaction
  */
 @ApiModel(description = "TransactionResults contains information about the side effects of a transaction")
-
+@Deprecated
 public class TransactionResults {
   @SerializedName("createdasset")
   private java.math.BigInteger createdasset = null;

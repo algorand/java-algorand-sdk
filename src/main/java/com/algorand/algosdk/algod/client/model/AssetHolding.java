@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 @ApiModel(description = "AssetParams specifies the holdings of a particular asset.")
+@Deprecated
 public class AssetHolding {
   @SerializedName("creator")
   private String creator = null;

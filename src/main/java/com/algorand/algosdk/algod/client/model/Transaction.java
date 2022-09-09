@@ -24,7 +24,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * Transaction contains all fields common to all transactions and serves as an envelope to all transactions type
  */
 @ApiModel(description = "Transaction contains all fields common to all transactions and serves as an envelope to all transactions type")
-
+@Deprecated
 public class Transaction {
   @SerializedName("fee")
   private java.math.BigInteger fee = null;

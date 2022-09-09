@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * PaymentTransactionType contains the additional fields for a payment Transaction
  */
 @ApiModel(description = "PaymentTransactionType contains the additional fields for a payment Transaction")
-
+@Deprecated
 public class PaymentTransactionType {
   @SerializedName("amount")
   private java.math.BigInteger amount = null;

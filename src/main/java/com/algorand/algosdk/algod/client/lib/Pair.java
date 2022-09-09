@@ -13,7 +13,7 @@
 
 package com.algorand.algosdk.algod.client.lib;
 
-
+@Deprecated
 public class Pair {
     private String name = "";
     private String value = "";

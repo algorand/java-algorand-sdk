@@ -27,7 +27,7 @@ import java.io.IOException;
  * Participation Description
  */
 @ApiModel(description = "Participation Description")
-
+@Deprecated
 public class Participation {
   @SerializedName("partpkb64")
   private byte[] partpkb64 = null;
