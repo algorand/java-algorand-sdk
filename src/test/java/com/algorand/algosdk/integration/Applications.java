@@ -276,7 +276,7 @@ public class Applications {
             return;
         }
 
-        assertThat(boxResp.body().value().equals(boxContents));
+        assertThat(boxResp.body().value()).isEqualTo(boxContents);
     }
 
     private static byte[] decodeBoxName(String encodedBoxName) {
