@@ -338,27 +338,8 @@ public class Applications {
         }
     }
 
-    @Then("I forward {int} empty rounds with transient account.")
-    public void forwardNEmptyRounds(int roundNum) throws Exception {
-        if (sp == null)
-            sp = clients.v2Client.TransactionParams().execute().body();
-        byte[] randomNote = new byte[8];
-        for (int i = 0; i < roundNum; i++) {
-            ThreadLocalRandom.current().nextBytes(randomNote);
-            Transaction ptx = Transaction.PaymentTransactionBuilder()
-                            .sender(transientAccount.transientAccount.getAddress())
-                            .suggestedParams(sp)
-                            .amount(0)
-                            .note(randomNote)
-                            .closeRemainderTo(base.close)
-                            .receiver(zeroAddress)
-                            .build();
-
-            SignedTransaction stx = transientAccount.transientAccount.signTransaction(ptx);
-
-            Response<PostTransactionsResponse> rPost =
-                    clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
-            Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 1);
-        }
+    @Then("I sleep for {int} seconds for indexer to digest things down.")
+    public void sleepForNSecondsForIndexer(int seconds) throws Exception {
+        Thread.sleep(seconds * 1000L);
     }
 }
