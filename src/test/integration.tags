@@ -3,7 +3,6 @@
 @applications
 @applications.boxes
 @applications.verified
-@applications.boxes_indexer_confirmed
 @assets
 @auction
 @c2c
