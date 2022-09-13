@@ -10,7 +10,6 @@
 @unit.indexer
 @unit.indexer.ledger_refactoring
 @unit.indexer.logs
-@unit.indexer.participationupdates
 @unit.indexer.rekey
 @unit.offline
 @unit.program_sanity_check
@@ -19,6 +18,7 @@
 @unit.responses.231
 @unit.responses.messagepack
 @unit.responses.messagepack.231
+@unit.responses.participationupdates
 @unit.responses.unlimited_assets
 @unit.sourcemap
 @unit.stateproof.paths
