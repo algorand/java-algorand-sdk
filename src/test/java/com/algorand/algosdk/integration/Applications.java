@@ -317,8 +317,8 @@ public class Applications {
 
         final List<byte[]> expectedNames = Lists.newArrayList();
         if (!encodedBoxesRaw.isEmpty()) {
-            for (String s : Strings.split(encodedBoxesRaw, ',')) {
-                expectedNames.add(decodeBoxName(s));
+            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+                expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
 
@@ -354,8 +354,8 @@ public class Applications {
         Response<BoxesResponse> r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
         final List<byte[]> expectedNames = Lists.newArrayList();
         if (!encodedBoxesRaw.isEmpty()) {
-            for (String s : Strings.split(encodedBoxesRaw, ',')) {
-                expectedNames.add(decodeBoxName(s));
+            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+                expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
 
@@ -371,8 +371,8 @@ public class Applications {
         }
     }
 
-    @Then("I sleep for {int} seconds for indexer to digest things down.")
-    public void sleepForNSecondsForIndexer(int seconds) throws Exception {
-        Thread.sleep(seconds * 1000L);
+    @Then("I sleep for {int} milliseconds for indexer to digest things down.")
+    public void sleepForNSecondsForIndexer(int milliseconds) throws Exception {
+        Thread.sleep(milliseconds);
     }
 }
