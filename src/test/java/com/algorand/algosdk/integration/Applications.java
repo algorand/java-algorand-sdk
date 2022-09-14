@@ -334,22 +334,22 @@ public class Applications {
         }
     }
 
-    @Then("according to {string}, by parameter max {long}, the current application should have {int} boxes.")
-    public void checkAppBoxesNum(String from_client, Long limit, int expected_num) throws Exception {
+    @Then("according to {string}, with {long} being the parameter that limits results, the current application should have {int} boxes.")
+    public void checkAppBoxesNum(String fromClient, Long limit, int expected_num) throws Exception {
         Response<BoxesResponse> r;
-        if (from_client.equals("algod"))
+        if (fromClient.equals("algod"))
             r = clients.v2Client.GetApplicationBoxes(this.appId).max(limit).execute();
-        else if (from_client.equals("indexer"))
+        else if (fromClient.equals("indexer"))
             r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
         else
-            throw new IllegalArgumentException("expecting algod or indexer, got " + from_client);
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
         Assert.assertTrue(r.isSuccessful());
         Assert.assertEquals("expected " + expected_num + " boxes, actual " + r.body().boxes.size(),
                 r.body().boxes.size(), expected_num);
     }
 
-    @Then("according to indexer, by parameter max {long} and next {string}, the current application should have the following boxes {string}.")
+    @Then("according to indexer, with {long} being the parameter that limits results, and {string} being the parameter that sets the next result, the current application should have the following boxes {string}.")
     public void indexerCheckAppBoxesWithParams(Long limit, String next, String encodedBoxesRaw) throws Exception {
         Response<BoxesResponse> r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
         final List<byte[]> expectedNames = Lists.newArrayList();

@@ -10,9 +10,6 @@ import java.util.Map;
 public class Clients {
     AlgodClient v2Client = null;
 
-    @Deprecated
-    Map<Integer, IndexerClient> indexerClients = new HashMap<>();
-
     IndexerClient v2IndexerClient = null;
 
     @Given("an algod v2 client connected to {string} port {int} with token {string}")
