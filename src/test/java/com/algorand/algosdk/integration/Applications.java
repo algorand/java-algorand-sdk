@@ -278,23 +278,6 @@ public class Applications {
         assertThat(boxResp.body().value()).isEqualTo(boxContents);
     }
 
-    private static byte[] decodeBoxName(String encodedBoxName) {
-        String[] split = Strings.split(encodedBoxName, ':');
-        if (split.length != 2)
-            throw new RuntimeException("encodedBoxName (" + encodedBoxName + ") does not match expected format");
-
-        String encoding = split[0];
-        String encoded = split[1];
-        switch (encoding) {
-            case "str":
-                return encoded.getBytes(StandardCharsets.US_ASCII);
-            case "b64":
-                return Encoder.decodeFromBase64(encoded);
-            default:
-                throw new RuntimeException("Unsupported encoding = " + encoding);
-        }
-    }
-
     private static boolean contains(byte[] elem, List<byte[]> xs) {
         for (byte[] e : xs) {
             if (Arrays.equals(e, elem))
@@ -304,14 +287,14 @@ public class Applications {
     }
 
     @Then("according to {string}, the current application should have the following boxes {string}.")
-    public void checkAppBoxes(String from_client, String encodedBoxesRaw) throws Exception {
+    public void checkAppBoxes(String fromClient, String encodedBoxesRaw) throws Exception {
         Response<BoxesResponse> r;
-        if (from_client.equals("algod"))
+        if (fromClient.equals("algod"))
             r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
-        else if (from_client.equals("indexer"))
+        else if (fromClient.equals("indexer"))
             r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
         else
-            throw new IllegalArgumentException("expecting algod or indexer, got " + from_client);
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
         Assert.assertTrue(r.isSuccessful());
 
