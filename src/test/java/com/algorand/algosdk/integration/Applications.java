@@ -20,7 +20,6 @@ import org.junit.Assert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,8 +39,6 @@ public class Applications {
     public String txId = null;
     public Long appId = 0L;
     public List<Long> rememberedAppIds = new ArrayList<>();
-    public TransactionParametersResponse sp = null;
-    static final String zeroAddress = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAY5HFKQ";
 
     public Applications(TransientAccount transientAccount, Clients clients, Stepdefs base) {
         this.transientAccount = transientAccount;
@@ -259,14 +256,14 @@ public class Applications {
     }
 
     @Then("according to {string}, the contents of the box with name {string} in the current application should be {string}. If there is an error it is {string}.")
-    public void contentsOfBoxShouldBe(String from_client, String encodedBoxName, String boxContents, String errStr) throws Exception {
+    public void contentsOfBoxShouldBe(String fromClient, String encodedBoxName, String boxContents, String errStr) throws Exception {
         Response<Box> boxResp;
-        if (from_client.equals("algod"))
+        if (fromClient.equals("algod"))
             boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
-        else if (from_client.equals("indexer"))
+        else if (fromClient.equals("indexer"))
             boxResp = clients.v2IndexerClient.lookupApplicationBoxByIDandName(this.appId).name(encodedBoxName).execute();
         else
-            throw new IllegalArgumentException("expecting algod or indexer, got " + from_client);
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
         // If an error was expected, make sure it is set correctly.
         if (StringUtils.isNotEmpty(errStr)) {
