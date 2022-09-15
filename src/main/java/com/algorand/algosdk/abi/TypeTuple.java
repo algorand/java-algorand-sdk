@@ -1,6 +1,5 @@
 package com.algorand.algosdk.abi;
 
-import com.algorand.algosdk.algod.client.StringUtil;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.GenericObjToArray;
 
@@ -10,6 +9,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class TypeTuple extends ABIType {
     public final List<ABIType> childTypes;
@@ -23,7 +24,7 @@ public class TypeTuple extends ABIType {
         List<String> childStrs = new ArrayList<>();
         for (ABIType t : this.childTypes)
             childStrs.add(t.toString());
-        return "(" + StringUtil.join(childStrs.toArray(new String[0]), ",") + ")";
+        return "(" + StringUtils.join(childStrs.toArray(new String[0]), ",") + ")";
     }
 
     @Override

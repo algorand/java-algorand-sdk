@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * TransactionID Description
  */
 @ApiModel(description = "TransactionID Description")
-
+@Deprecated
 public class TransactionID {
   @SerializedName("txId")
   private String txId = null;

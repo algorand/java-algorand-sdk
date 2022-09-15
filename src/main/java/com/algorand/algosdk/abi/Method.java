@@ -1,6 +1,5 @@
 package com.algorand.algosdk.abi;
 
-import com.algorand.algosdk.algod.client.StringUtil;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.CryptoProvider;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -19,6 +18,8 @@ import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.List;
 import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Method {
@@ -150,7 +151,7 @@ public class Method {
     public String getSignature() {
         List<String> argStringList = new ArrayList<>();
         for (Arg value : this.args) argStringList.add(value.type);
-        return this.name + "(" + StringUtil.join(argStringList.toArray(new String[0]), ",") + ")" + this.returns.type;
+        return this.name + "(" + StringUtils.join(argStringList.toArray(new String[0]), ",") + ")" + this.returns.type;
     }
 
     @JsonIgnore
@@ -195,7 +196,7 @@ public class Method {
             for(int idx=0;idx<filteredMethods.size();idx++){
                sigs[idx] = filteredMethods.get(idx).getSignature();
             }
-            String found = StringUtil.join(sigs, ",");
+            String found = StringUtils.join(sigs, ",");
             throw new IllegalArgumentException(String.format("found %d methods with the same name: %s", filteredMethods.size(), found));
         }
 

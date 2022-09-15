@@ -25,7 +25,7 @@ import java.util.List;
  * Note that we annotate this as a model so that legacy clients can directly import a swagger generated Version model.
  */
 @ApiModel(description = "Note that we annotate this as a model so that legacy clients can directly import a swagger generated Version model.")
-
+@Deprecated
 public class Version {
   @SerializedName("genesis_hash_b64")
   private byte[] genesisHashB64 = null;

@@ -32,6 +32,7 @@ import java.text.ParsePosition;
 import java.util.Date;
 import java.util.Map;
 
+@Deprecated
 public class JSON {
     private Gson gson;
     private boolean isLenientOnJson = false;

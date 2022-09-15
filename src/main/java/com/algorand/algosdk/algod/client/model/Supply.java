@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * Supply represents the current supply of MicroAlgos in the system
  */
 @ApiModel(description = "Supply represents the current supply of MicroAlgos in the system")
-
+@Deprecated
 public class Supply {
   @SerializedName("onlineMoney")
   private java.math.BigInteger onlineMoney = null;
