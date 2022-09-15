@@ -20,7 +20,6 @@ import org.junit.Assert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -256,9 +255,15 @@ public class Applications {
         assertThat(found).as("Couldn't find key '%s'", hasKey).isTrue();
     }
 
-    @Then("the contents of the box with name {string} in the current application should be {string}. If there is an error it is {string}.")
-    public void contentsOfBoxShouldBe(String encodedBoxName, String boxContents, String errStr) throws Exception {
-        Response<Box> boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
+    @Then("according to {string}, the contents of the box with name {string} in the current application should be {string}. If there is an error it is {string}.")
+    public void contentsOfBoxShouldBe(String fromClient, String encodedBoxName, String boxContents, String errStr) throws Exception {
+        Response<Box> boxResp;
+        if (fromClient.equals("algod"))
+            boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
+        else if (fromClient.equals("indexer"))
+            boxResp = clients.v2IndexerClient.lookupApplicationBoxByIDandName(this.appId).name(encodedBoxName).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
         // If an error was expected, make sure it is set correctly.
         if (StringUtils.isNotEmpty(errStr)) {
@@ -267,24 +272,7 @@ public class Applications {
             return;
         }
 
-        assertThat(boxResp.body().value().equals(boxContents));
-    }
-
-    private static byte[] decodeBoxName(String encodedBoxName) {
-        String[] split = Strings.split(encodedBoxName, ':');
-        if (split.length != 2)
-            throw new RuntimeException("encodedBoxName (" + encodedBoxName + ") does not match expected format");
-
-        String encoding = split[0];
-        String encoded = split[1];
-        switch (encoding) {
-            case "str":
-                return encoded.getBytes(StandardCharsets.US_ASCII);
-            case "b64":
-                return Encoder.decodeFromBase64(encoded);
-            default:
-                throw new RuntimeException("Unsupported encoding = " + encoding);
-        }
+        assertThat(boxResp.body().value()).isEqualTo(boxContents);
     }
 
     private static boolean contains(byte[] elem, List<byte[]> xs) {
@@ -295,17 +283,24 @@ public class Applications {
         return false;
     }
 
-    @Then("the current application should have the following boxes {string}.")
-    public void checkAppBoxes(String encodedBoxesRaw) throws Exception {
+    @Then("according to {string}, the current application should have the following boxes {string}.")
+    public void checkAppBoxes(String fromClient, String encodedBoxesRaw) throws Exception {
+        Response<BoxesResponse> r;
+        if (fromClient.equals("algod"))
+            r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
+        else if (fromClient.equals("indexer"))
+            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
+
+        Assert.assertTrue(r.isSuccessful());
+
         final List<byte[]> expectedNames = Lists.newArrayList();
         if (!encodedBoxesRaw.isEmpty()) {
-            for (String s : Strings.split(encodedBoxesRaw, ',')) {
-                expectedNames.add(decodeBoxName(s));
+            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+                expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
-
-        final Response<BoxesResponse> r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
-        Assert.assertTrue(r.isSuccessful());
 
         final List<byte[]> actualNames = Lists.newArrayList();
         for (BoxDescriptor b : r.body().boxes) {
@@ -317,5 +312,47 @@ public class Applications {
             if (!contains(e, actualNames))
                 throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
         }
+    }
+
+    @Then("according to {string}, with {long} being the parameter that limits results, the current application should have {int} boxes.")
+    public void checkAppBoxesNum(String fromClient, Long limit, int expected_num) throws Exception {
+        Response<BoxesResponse> r;
+        if (fromClient.equals("algod"))
+            r = clients.v2Client.GetApplicationBoxes(this.appId).max(limit).execute();
+        else if (fromClient.equals("indexer"))
+            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
+
+        Assert.assertTrue(r.isSuccessful());
+        Assert.assertEquals("expected " + expected_num + " boxes, actual " + r.body().boxes.size(),
+                r.body().boxes.size(), expected_num);
+    }
+
+    @Then("according to indexer, with {long} being the parameter that limits results, and {string} being the parameter that sets the next result, the current application should have the following boxes {string}.")
+    public void indexerCheckAppBoxesWithParams(Long limit, String next, String encodedBoxesRaw) throws Exception {
+        Response<BoxesResponse> r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
+        final List<byte[]> expectedNames = Lists.newArrayList();
+        if (!encodedBoxesRaw.isEmpty()) {
+            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+                expectedNames.add(Encoder.decodeFromBase64(s));
+            }
+        }
+
+        final List<byte[]> actualNames = Lists.newArrayList();
+        for (BoxDescriptor b : r.body().boxes) {
+            actualNames.add(b.name);
+        }
+
+        Assert.assertEquals("expected and actual box names length do not match", expectedNames.size(), actualNames.size());
+        for (byte[] e : expectedNames) {
+            if (!contains(e, actualNames))
+                throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
+        }
+    }
+
+    @Then("I sleep for {int} milliseconds for indexer to digest things down.")
+    public void sleepForNSecondsForIndexer(int milliseconds) throws Exception {
+        Thread.sleep(milliseconds);
     }
 }
