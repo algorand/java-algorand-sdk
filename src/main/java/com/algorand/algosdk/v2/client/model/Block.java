@@ -34,6 +34,12 @@ public class Block extends PathResponse {
     public String genesisId;
 
     /**
+     * Participation account data that needs to be checked/acted on by the network.
+     */
+    @JsonProperty("participation-updates")
+    public ParticipationUpdates participationUpdates;
+
+    /**
      * (prev) Previous block hash.
      */
     @JsonProperty("previous-block-hash")
@@ -150,6 +156,7 @@ public class Block extends PathResponse {
         Block other = (Block) o;
         if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
         if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
+        if (!Objects.deepEquals(this.participationUpdates, other.participationUpdates)) return false;
         if (!Objects.deepEquals(this.previousBlockHash, other.previousBlockHash)) return false;
         if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
         if (!Objects.deepEquals(this.round, other.round)) return false;
