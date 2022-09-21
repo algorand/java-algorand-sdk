@@ -250,7 +250,7 @@ public class Transaction implements Serializable {
         Objects.requireNonNull(lastValid, "lastValid is required.");
         Objects.requireNonNull(genesisHash, "genesisHash is required.");
 
-        if (sender == null && closeRemainderTo == null) {
+        if (receiver == null && closeRemainderTo == null) {
             throw new IllegalArgumentException("Must set at least one of 'receiver' or 'closeRemainderTo'");
         }
 
@@ -1458,7 +1458,6 @@ public class Transaction implements Serializable {
                 assetFreezeID.equals(that.assetFreezeID) &&
                 freezeState == that.freezeState &&
                 rekeyTo.equals(that.rekeyTo) &&
-                Arrays.equals(lease, ((Transaction) o).lease) &&
                 extraPages.equals(that.extraPages);
     }
 

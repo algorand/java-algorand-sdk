@@ -103,10 +103,6 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         return xs;
     }
 
-    /**
-     * BoxReferences lists the boxes whose state may be accessed during the execution
-     * of this application call. The access is read-only.
-     */
     public T boxReferences(List<AppBoxReference> boxReferences) {
         this.appBoxReferences = boxReferences;
         return (T) this;

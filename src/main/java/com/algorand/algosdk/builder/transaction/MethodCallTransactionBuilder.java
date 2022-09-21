@@ -130,7 +130,8 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     @Override
     public T boxReferences(List<AppBoxReference> boxReferences) {
         if (boxReferences != null)
-            this.boxReferences = new ArrayList<>(new HashSet<>(boxReferences));
+            // duplicate box references can be meaningful, don't get rid of them
+            this.boxReferences = new ArrayList<>(boxReferences);
         else
             this.boxReferences.clear();
         return (T) this;

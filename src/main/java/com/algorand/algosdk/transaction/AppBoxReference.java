@@ -50,6 +50,6 @@ public class AppBoxReference {
     }
 
     public String nameQueryEncoded() {
-        return BoxQueryEncoding.encodeBytes(this.getName());
+        return BoxQueryEncoding.encodeBytes(name);
     }
 }

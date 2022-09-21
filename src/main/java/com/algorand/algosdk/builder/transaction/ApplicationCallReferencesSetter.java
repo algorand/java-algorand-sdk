@@ -31,7 +31,7 @@ public interface ApplicationCallReferencesSetter<T extends ApplicationCallRefere
 
     /**
      * BoxReferences lists the boxes whose state may be accessed during evaluation of this application call. The apps
-     * the boxes belong to must be present in ForeignApps. The access is read-only.
+     * the boxes belong to must be present in ForeignApps.
      */
     public T boxReferences(List<AppBoxReference> boxReferences);
 }

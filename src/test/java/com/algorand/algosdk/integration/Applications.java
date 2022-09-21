@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -275,12 +276,26 @@ public class Applications {
         assertThat(boxResp.body().value()).isEqualTo(boxContents);
     }
 
-    private static boolean contains(byte[] elem, List<byte[]> xs) {
-        for (byte[] e : xs) {
-            if (Arrays.equals(e, elem))
-                return true;
+    private static class ByteArrayComparator implements Comparator<byte[]> {
+        public ByteArrayComparator(){}
+
+        @Override
+        public int compare(byte[] a, byte[] b) {
+            return Arrays.compare(a, b);
         }
-        return false;
+    }
+
+    private static void assertListOfByteArraysEqual(List<byte[]> expected, List<byte[]> actual) {
+        Comparator<byte[]> c = new ByteArrayComparator();
+        List<byte[]> expectedOrdered = new ArrayList<>(expected);
+        expectedOrdered.sort(c);
+        List<byte[]> actualOrdered = new ArrayList<>(actual);
+        actualOrdered.sort(c);
+
+        Assert.assertEquals("List sizes unequal", expectedOrdered.size(), actualOrdered.size());
+        for (int i = 0; i < expectedOrdered.size(); i++) {
+            Assert.assertArrayEquals(expectedOrdered.get(i), actualOrdered.get(i));
+        }
     }
 
     @Then("according to {string}, the current application should have the following boxes {string}.")
@@ -307,11 +322,7 @@ public class Applications {
             actualNames.add(b.name);
         }
 
-        Assert.assertEquals("expected and actual box names length do not match", expectedNames.size(), actualNames.size());
-        for (byte[] e : expectedNames) {
-            if (!contains(e, actualNames))
-                throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
-        }
+        assertListOfByteArraysEqual(expectedNames, actualNames);
     }
 
     @Then("according to {string}, with {long} being the parameter that limits results, the current application should have {int} boxes.")
@@ -344,11 +355,7 @@ public class Applications {
             actualNames.add(b.name);
         }
 
-        Assert.assertEquals("expected and actual box names length do not match", expectedNames.size(), actualNames.size());
-        for (byte[] e : expectedNames) {
-            if (!contains(e, actualNames))
-                throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
-        }
+        assertListOfByteArraysEqual(expectedNames, actualNames);
     }
 
     @Then("I sleep for {int} milliseconds for indexer to digest things down.")
