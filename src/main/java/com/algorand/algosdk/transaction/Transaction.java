@@ -1459,7 +1459,8 @@ public class Transaction implements Serializable {
                 freezeState == that.freezeState &&
                 rekeyTo.equals(that.rekeyTo) &&
                 Arrays.equals(lease, ((Transaction) o).lease) &&
-                extraPages.equals(that.extraPages);
+                extraPages.equals(that.extraPages) &&
+                boxReferences.equals(that.boxReferences);
     }
 
     /**
