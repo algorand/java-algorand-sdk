@@ -302,7 +302,6 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 null,
-                null,
                 null);
     }
 
@@ -397,7 +396,6 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
-                null,
                 null,
                 null,
                 null,
@@ -525,7 +523,6 @@ public class Transaction implements Serializable {
                 null,
                 null,
                 false, // default value which wont be included in the serialized object.
-                null,
                 null,
                 null,
                 null,
@@ -686,7 +683,6 @@ public class Transaction implements Serializable {
                         @JsonProperty("apat") List<byte[]> accounts,
                         @JsonProperty("apfa") List<Long> foreignApps,
                         @JsonProperty("apas") List<Long> foreignAssets,
-                        @JsonProperty("apbx") List<BoxReference> boxReferences,
                         @JsonProperty("apgs") StateSchema globalStateSchema,
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
@@ -737,7 +733,6 @@ public class Transaction implements Serializable {
                 convertToAddressList(accounts),
                 foreignApps,
                 foreignAssets,
-                boxReferences,
                 globalStateSchema,
                 applicationId,
                 localStateSchema,
@@ -795,7 +790,6 @@ public class Transaction implements Serializable {
             List<Address> accounts,
             List<Long> foreignApps,
             List<Long> foreignAssets,
-            List<BoxReference> boxReferences,
             StateSchema globalStateSchema,
             Long applicationId,
             StateSchema localStateSchema,
@@ -846,7 +840,6 @@ public class Transaction implements Serializable {
                 accounts,
                 foreignApps,
                 foreignAssets,
-                boxReferences,
                 globalStateSchema,
                 applicationId,
                 localStateSchema,
@@ -905,7 +898,6 @@ public class Transaction implements Serializable {
             List<Address> accounts,
             List<Long> foreignApps,
             List<Long> foreignAssets,
-            List<BoxReference> boxReferences,
             StateSchema globalStateSchema,
             Long applicationId,
             StateSchema localStateSchema,
@@ -949,7 +941,6 @@ public class Transaction implements Serializable {
         if (accounts != null) this.accounts = accounts;
         if (foreignApps != null) this.foreignApps = foreignApps;
         if (foreignAssets != null) this.foreignAssets = foreignAssets;
-        if (boxReferences != null) this.boxReferences = boxReferences;
         if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
         if (applicationId != null) this.applicationId = applicationId;
         if (localStateSchema != null) this.localStateSchema = globalStateSchema;
