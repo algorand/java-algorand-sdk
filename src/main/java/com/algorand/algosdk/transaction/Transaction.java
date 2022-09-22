@@ -683,6 +683,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("apat") List<byte[]> accounts,
                         @JsonProperty("apfa") List<Long> foreignApps,
                         @JsonProperty("apas") List<Long> foreignAssets,
+                        @JsonProperty("apbx") List<BoxReference> boxReferences,
                         @JsonProperty("apgs") StateSchema globalStateSchema,
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
@@ -739,6 +740,10 @@ public class Transaction implements Serializable {
                 clearStateProgram == null ? null : new TEALProgram(clearStateProgram),
                 extraPages
         );
+        // Set fields _not_ exposed by public constructor.  Needed because:
+        // * Adding parameters to a public constructor is a breaking API change.
+        // * To ensure JSON serialization (via Jackson's ObjectMapper) works, must add `@JsonProperty` to _a_ constructor.  Using a private constructor here to maintain API backwards compatibility.
+        if (boxReferences != null) this.boxReferences = boxReferences;
     }
 
     /**
