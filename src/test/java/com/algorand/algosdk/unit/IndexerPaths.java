@@ -335,7 +335,7 @@ public class IndexerPaths {
 
     @When("we make a LookupApplicationBoxByIDandName call with applicationID {long} with encoded box name {string}")
     public void lookUpApplicationBox(Long appID, String boxName) {
-        ps.q = indexerClient.lookupApplicationBoxByIDandName(appID).name(boxName);
+        ps.q = indexerClient.lookupApplicationBoxByIDAndName(appID).name(boxName);
     }
 
     @When("we make a SearchForApplicationBoxes call with applicationID {long} with max {long} nextToken {string}")

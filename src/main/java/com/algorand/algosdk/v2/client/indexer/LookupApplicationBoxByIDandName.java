@@ -10,20 +10,20 @@ import com.algorand.algosdk.v2.client.model.Box;
 
 /**
  * Given an application ID and box name, returns base64 encoded box name and value.
- * Box names must be in the goal-arg form 'encoding:value'. For ints, use the form
- * 'int:1234'. For raw bytes, encode base 64 and use 'b64' prefix as in 'b64:A=='.
- * For printable strings, use the form 'str:hello'. For addresses, use the form
- * 'addr:XYZ...'.
+ * Box names must be in the goal app call arg form 'encoding:value'. For ints, use
+ * the form 'int:1234'. For raw bytes, encode base 64 and use 'b64' prefix as in
+ * 'b64:A=='. For printable strings, use the form 'str:hello'. For addresses, use
+ * the form 'addr:XYZ...'.
  * /v2/applications/{application-id}/box
  */
-public class LookupApplicationBoxByIDandName extends Query {
+public class LookupApplicationBoxByIDAndName extends Query {
 
     private Long applicationId;
 
     /**
      * @param applicationId
      */
-    public LookupApplicationBoxByIDandName(Client client, Long applicationId) {
+    public LookupApplicationBoxByIDAndName(Client client, Long applicationId) {
         super(client, new HttpMethod("get"));
         this.applicationId = applicationId;
     }
@@ -33,7 +33,7 @@ public class LookupApplicationBoxByIDandName extends Query {
      * For raw bytes, use the form 'b64:A=='. For printable strings, use the form
      * 'str:hello'. For addresses, use the form 'addr:XYZ...'.
      */
-    public LookupApplicationBoxByIDandName name(String name) {
+    public LookupApplicationBoxByIDAndName name(String name) {
         addQuery("name", String.valueOf(name));
         return this;
     }

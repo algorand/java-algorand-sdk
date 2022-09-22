@@ -21,6 +21,14 @@ public class BoxesResponse extends PathResponse {
     @JsonProperty("boxes")
     public List<BoxDescriptor> boxes = new ArrayList<BoxDescriptor>();
 
+    /**
+     * Base64 encoded final box name result. Used for pagination, when making another
+     * request provide this token with the next parameter and prepend with "b64:" if
+     * keeping the provided encoding.
+     */
+    @JsonProperty("next-token")
+    public String nextToken;
+
     @Override
     public boolean equals(Object o) {
 
@@ -30,6 +38,7 @@ public class BoxesResponse extends PathResponse {
         BoxesResponse other = (BoxesResponse) o;
         if (!Objects.deepEquals(this.applicationId, other.applicationId)) return false;
         if (!Objects.deepEquals(this.boxes, other.boxes)) return false;
+        if (!Objects.deepEquals(this.nextToken, other.nextToken)) return false;
 
         return true;
     }

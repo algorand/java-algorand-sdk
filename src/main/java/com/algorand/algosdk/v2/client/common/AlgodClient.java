@@ -33,9 +33,8 @@ public class AlgodClient extends Client {
 
     /**
      * Construct an AlgodClient for communicating with the REST API.
-     *
-     * @param host  using a URI format. If the scheme is not supplied the client will use HTTP.
-     * @param port  REST server port.
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port REST server port.
      * @param token authentication token.
      */
     public AlgodClient(String host, int port, String token) {
@@ -44,10 +43,9 @@ public class AlgodClient extends Client {
 
     /**
      * Construct an AlgodClient with custom token key for communicating with the REST API.
-     *
-     * @param host     using a URI format. If the scheme is not supplied the client will use HTTP.
-     * @param port     REST server port.
-     * @param token    authentication token.
+     * @param host using a URI format. If the scheme is not supplied the client will use HTTP.
+     * @param port REST server port.
+     * @param token authentication token.
      * @param tokenKey authentication token key.
      */
     public AlgodClient(String host, int port, String token, String tokenKey) {
@@ -111,7 +109,7 @@ public class AlgodClient extends Client {
      * /v2/accounts/{address}/assets/{asset-id}
      */
     public AccountAssetInformation AccountAssetInformation(Address address,
-                                                           Long assetId) {
+            Long assetId) {
         return new AccountAssetInformation((Client) this, address, assetId);
     }
 
@@ -123,7 +121,7 @@ public class AlgodClient extends Client {
      * /v2/accounts/{address}/applications/{application-id}
      */
     public AccountApplicationInformation AccountApplicationInformation(Address address,
-                                                                       Long applicationId) {
+            Long applicationId) {
         return new AccountApplicationInformation((Client) this, address, applicationId);
     }
 
@@ -150,7 +148,7 @@ public class AlgodClient extends Client {
      * /v2/blocks/{round}/transactions/{txid}/proof
      */
     public GetTransactionProof GetTransactionProof(Long round,
-                                                   String txid) {
+            String txid) {
         return new GetTransactionProof((Client) this, round, txid);
     }
 
