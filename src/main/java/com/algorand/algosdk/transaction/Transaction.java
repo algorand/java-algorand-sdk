@@ -742,7 +742,7 @@ public class Transaction implements Serializable {
         );
         // Set fields _not_ exposed by public constructor.  Needed because:
         // * Adding parameters to a public constructor is a breaking API change.
-        // * To ensure JSON serialization (via Jackson's ObjectMapper) works, must add `@JsonProperty` to _a_ constructor.  Using a private constructor here to maintain API backwards compatibility.
+        // * To ensure JSON/msgpack serialization (via Jackson's ObjectMapper) works, must add `@JsonProperty` to _a_ constructor.  Using a private constructor here to maintain API backwards compatibility.
         if (boxReferences != null) this.boxReferences = boxReferences;
     }
 
