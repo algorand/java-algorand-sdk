@@ -26,6 +26,7 @@ import org.apache.commons.lang3.ObjectUtils;
  */
 @ApiModel(description = "Account Description")
 
+@Deprecated
 public class Account {
   @SerializedName("address")
   private String address = null;

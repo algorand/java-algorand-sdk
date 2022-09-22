@@ -25,7 +25,7 @@ import java.util.List;
  * TransactionList contains a list of transactions
  */
 @ApiModel(description = "TransactionList contains a list of transactions")
-
+@Deprecated
 public class TransactionList {
   @SerializedName("transactions")
   private List<Transaction> transactions = new ArrayList<Transaction>();

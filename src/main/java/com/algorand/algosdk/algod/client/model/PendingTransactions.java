@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * PendingTransactions represents a potentially truncated list of transactions currently in the node&#39;s transaction pool.
  */
 @ApiModel(description = "PendingTransactions represents a potentially truncated list of transactions currently in the node's transaction pool.")
-
+@Deprecated
 public class PendingTransactions {
   @SerializedName("totalTxns")
   private java.math.BigInteger totalTxns = null;

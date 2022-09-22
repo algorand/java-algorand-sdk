@@ -18,7 +18,7 @@ import com.algorand.algosdk.algod.client.lib.Pair;
 import java.util.List;
 import java.util.Map;
 
-
+@Deprecated
 public class ApiKeyAuth implements Authentication {
   private final String location;
   private final String paramName;

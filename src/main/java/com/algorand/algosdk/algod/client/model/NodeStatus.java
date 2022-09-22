@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * NodeStatus contains the information about a node status
  */
 @ApiModel(description = "NodeStatus contains the information about a node status")
-
+@Deprecated
 public class NodeStatus {
   @SerializedName("catchupTime")
   private java.math.BigInteger catchupTime = null;

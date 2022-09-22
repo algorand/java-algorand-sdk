@@ -24,6 +24,7 @@ import okio.ForwardingSink;
 import okio.Okio;
 import okio.Sink;
 
+@Deprecated
 public class ProgressRequestBody extends RequestBody {
 
     public interface ProgressRequestListener {

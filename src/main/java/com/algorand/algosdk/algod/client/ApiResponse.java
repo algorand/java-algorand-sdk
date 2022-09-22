@@ -20,7 +20,9 @@ import java.util.Map;
  * API response returned by API call.
  *
  * @param <T> The type of data that is deserialized from response body
+ * @deprecated Use the equivalent in v2 algod client
  */
+@Deprecated
 public class ApiResponse<T> {
     final private int statusCode;
     final private Map<String, List<String>> headers;

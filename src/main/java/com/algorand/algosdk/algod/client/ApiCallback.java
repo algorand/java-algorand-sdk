@@ -22,7 +22,9 @@ import java.util.List;
  * Callback for asynchronous API call.
  *
  * @param <T> The return type
+ * @deprecated Use the equivalent in v2 algod client
  */
+@Deprecated
 public interface ApiCallback<T> {
     /**
      * This is called when the API call fails.
