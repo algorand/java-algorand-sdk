@@ -10,10 +10,15 @@ public class ComparableBytes {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof ComparableBytes)) {
-            return false;
-        }
-        return Arrays.equals(data, ((ComparableBytes)other).data);
+    public int hashCode() {
+        return Arrays.hashCode(data);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ComparableBytes that = (ComparableBytes) o;
+        return Arrays.equals(data, that.data);
     }
 }
