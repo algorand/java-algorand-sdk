@@ -261,7 +261,7 @@ public class Applications {
         if (fromClient.equals("algod"))
             boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
         else if (fromClient.equals("indexer"))
-            boxResp = clients.v2IndexerClient.lookupApplicationBoxByIDandName(this.appId).name(encodedBoxName).execute();
+            boxResp = clients.v2IndexerClient.lookupApplicationBoxByIDAndName(this.appId).name(encodedBoxName).execute();
         else
             throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
