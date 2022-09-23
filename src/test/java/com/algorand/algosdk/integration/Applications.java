@@ -5,6 +5,7 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.ComparableBytes;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
@@ -23,7 +24,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
@@ -275,12 +279,18 @@ public class Applications {
         assertThat(boxResp.body().value()).isEqualTo(boxContents);
     }
 
-    private static boolean contains(byte[] elem, List<byte[]> xs) {
-        for (byte[] e : xs) {
-            if (Arrays.equals(e, elem))
-                return true;
+    private static void assertSetOfByteArraysEqual(Set<byte[]> expected, Set<byte[]> actual) {
+        Set<ComparableBytes> expectedComparable = new HashSet<>();
+        for (byte[] element : expected) {
+            expectedComparable.add(new ComparableBytes(element));
         }
-        return false;
+
+        Set<ComparableBytes> actualComparable = new HashSet<>();
+        for (byte[] element : actual) {
+            actualComparable.add(new ComparableBytes(element));
+        }
+
+        Assert.assertEquals(expectedComparable, actualComparable);
     }
 
     @Then("according to {string}, the current application should have the following boxes {string}.")
@@ -295,23 +305,19 @@ public class Applications {
 
         Assert.assertTrue(r.isSuccessful());
 
-        final List<byte[]> expectedNames = Lists.newArrayList();
+        final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
             for (String s : Strings.split(encodedBoxesRaw, ':')) {
                 expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
 
-        final List<byte[]> actualNames = Lists.newArrayList();
+        final Set<byte[]> actualNames = new HashSet<>();
         for (BoxDescriptor b : r.body().boxes) {
             actualNames.add(b.name);
         }
 
-        Assert.assertEquals("expected and actual box names length do not match", expectedNames.size(), actualNames.size());
-        for (byte[] e : expectedNames) {
-            if (!contains(e, actualNames))
-                throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
-        }
+        assertSetOfByteArraysEqual(expectedNames, actualNames);
     }
 
     @Then("according to {string}, with {long} being the parameter that limits results, the current application should have {int} boxes.")
@@ -332,23 +338,19 @@ public class Applications {
     @Then("according to indexer, with {long} being the parameter that limits results, and {string} being the parameter that sets the next result, the current application should have the following boxes {string}.")
     public void indexerCheckAppBoxesWithParams(Long limit, String next, String encodedBoxesRaw) throws Exception {
         Response<BoxesResponse> r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
-        final List<byte[]> expectedNames = Lists.newArrayList();
+        final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
             for (String s : Strings.split(encodedBoxesRaw, ':')) {
                 expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
 
-        final List<byte[]> actualNames = Lists.newArrayList();
+        final Set<byte[]> actualNames = new HashSet<>();
         for (BoxDescriptor b : r.body().boxes) {
             actualNames.add(b.name);
         }
 
-        Assert.assertEquals("expected and actual box names length do not match", expectedNames.size(), actualNames.size());
-        for (byte[] e : expectedNames) {
-            if (!contains(e, actualNames))
-                throw new RuntimeException("expected and actual box names do not match: " + expectedNames + " != " + actualNames);
-        }
+        assertSetOfByteArraysEqual(expectedNames, actualNames);
     }
 
     @Then("I sleep for {int} milliseconds for indexer to digest things down.")
