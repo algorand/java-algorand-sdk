@@ -22,9 +22,8 @@ public class BoxesResponse extends PathResponse {
     public List<BoxDescriptor> boxes = new ArrayList<BoxDescriptor>();
 
     /**
-     * Base64 encoded final box name result. Used for pagination, when making another
-     * request provide this token with the next parameter and prepend with "b64:" if
-     * keeping the provided encoding.
+     * Used for pagination, when making another request provide this token with the
+     * next parameter.
      */
     @JsonProperty("next-token")
     public String nextToken;
