@@ -36,7 +36,7 @@ public class MethodCallParams {
     public final List<Address> foreignAccounts;
     public final List<Long> foreignAssets;
     public final List<Long> foreignApps;
-    public List<AppBoxReference> boxReferences;
+    public final List<AppBoxReference> boxReferences;
 
     public final TEALProgram approvalProgram, clearProgram;
     public final StateSchema globalStateSchema, localStateSchema;
