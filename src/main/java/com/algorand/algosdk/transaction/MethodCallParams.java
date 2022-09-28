@@ -22,6 +22,7 @@ import java.util.List;
  * MethodCallParams is an object that holds all parameters necessary to invoke {@link AtomicTransactionComposer#addMethodCall(MethodCallParams)}
  */
 public class MethodCallParams {
+
     // if the abi type argument number > 15, then the abi types after 14th should be wrapped in a tuple
     private static final int MAX_ABI_ARG_TYPE_LEN = 15;
 
@@ -55,17 +56,13 @@ public class MethodCallParams {
     public final String genesisID;
     public final Digest genesisHash;
 
-    /**
-     * NOTE: it's strongly suggested to use {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder}
-     * instead of this constructor to create a new MethodCallParams object.
-     */
-    public MethodCallParams(Long appID, Method method, List<Object> methodArgs, Address sender,
-                            Transaction.OnCompletion onCompletion, byte[] note, byte[] lease, String genesisID, Digest genesisHash,
-                            BigInteger firstValid, BigInteger lastValid, BigInteger fee, BigInteger flatFee,
-                            Address rekeyTo, TxnSigner signer,
-                            List<Address> fAccounts, List<Long> fAssets, List<Long> fApps, List<AppBoxReference> boxes,
-                            TEALProgram approvalProgram, TEALProgram clearProgram,
-                            StateSchema globalStateSchema, StateSchema localStateSchema, Long extraPages) {
+    protected MethodCallParams(Long appID, Method method, List<Object> methodArgs, Address sender,
+                               Transaction.OnCompletion onCompletion, byte[] note, byte[] lease, String genesisID, Digest genesisHash,
+                               BigInteger firstValid, BigInteger lastValid, BigInteger fee, BigInteger flatFee,
+                               Address rekeyTo, TxnSigner signer,
+                               List<Address> fAccounts, List<Long> fAssets, List<Long> fApps, List<AppBoxReference> boxes,
+                               TEALProgram approvalProgram, TEALProgram clearProgram,
+                               StateSchema globalStateSchema, StateSchema localStateSchema, Long extraPages) {
         if (appID == null || method == null || sender == null || onCompletion == null || signer == null || genesisID == null || genesisHash == null || firstValid == null || lastValid == null || (fee == null && flatFee == null))
             throw new IllegalArgumentException("Method call builder error: some required field not added");
         if (fee != null && flatFee != null)
@@ -120,6 +117,27 @@ public class MethodCallParams {
         this.globalStateSchema = globalStateSchema;
         this.localStateSchema = localStateSchema;
         this.extraPages = extraPages;
+    }
+
+    /**
+     * Deprecated - Use {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder}
+     * to create a new MethodCallParams object instead.
+     */
+    @Deprecated
+    public MethodCallParams(Long appID, Method method, List<Object> methodArgs, Address sender,
+                            Transaction.OnCompletion onCompletion, byte[] note, byte[] lease, String genesisID, Digest genesisHash,
+                            BigInteger firstValid, BigInteger lastValid, BigInteger fee, BigInteger flatFee,
+                            Address rekeyTo, TxnSigner signer,
+                            List<Address> fAccounts, List<Long> fAssets, List<Long> fApps,
+                            TEALProgram approvalProgram, TEALProgram clearProgram,
+                            StateSchema globalStateSchema, StateSchema localStateSchema, Long extraPages) {
+        this(appID, method, methodArgs, sender,
+                onCompletion, note, lease, genesisID, genesisHash,
+                firstValid, lastValid, fee, flatFee,
+                rekeyTo, signer,
+                fAccounts, fAssets, fApps, new ArrayList(),
+                approvalProgram, clearProgram,
+                globalStateSchema, localStateSchema, extraPages);
     }
 
     /**
