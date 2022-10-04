@@ -24,6 +24,15 @@ public class LookupBlock extends Query {
         this.roundNumber = roundNumber;
     }
 
+    /**
+     * Header only flag. When this is set to true, returned block does not contain the
+     * transactions
+     */
+    public LookupBlock headerOnly(Boolean headerOnly) {
+        addQuery("header-only", String.valueOf(headerOnly));
+        return this;
+    }
+
    /**
     * Execute the query.
     * @return the query response object.
