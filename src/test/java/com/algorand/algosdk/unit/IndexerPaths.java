@@ -333,4 +333,13 @@ public class IndexerPaths {
         ps.q = q;
     }
 
+
+    @When("we make a Lookup Block call against round {long} and header {string}")
+    public void anyBlockLookupCall(Long round, String headerOnly) {
+        LookupBlock q = this.indexerClient.lookupBlock(round);
+        headerOnly = headerOnly.toLowerCase();
+        if (headerOnly.contentEquals("true")) q.headerOnly(true);
+        if (headerOnly.contentEquals("false")) q.headerOnly(false);
+        ps.q = q;
+    }
 }

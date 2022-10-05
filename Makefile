@@ -11,7 +11,10 @@ display-all-java-steps:
 	find src/test/java/com/algorand/algosdk -name "*.java" | xargs grep "io.cucumber.java.en" 2>/dev/null | grep -v Binary | cut -d: -f1 | sort | uniq | xargs grep -E "@(Given|Then|When)"
 
 harness:
-	./test-harness.sh
+	./test-harness.sh up
+
+harness-down:
+	./test-harness.sh down
 
 docker-javasdk-build:
 	# Build SDK testing environment

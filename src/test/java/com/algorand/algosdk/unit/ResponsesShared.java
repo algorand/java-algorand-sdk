@@ -191,6 +191,9 @@ public class ResponsesShared {
                         Response<StateProof> r = algod.GetStateProof(1234L).execute();
                         response = r;
                         break;
+                    case "GetBlockHash":
+                        response = algod.GetBlockHash(1234L).execute();
+                        break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
                 }
