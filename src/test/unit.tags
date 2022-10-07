@@ -4,6 +4,7 @@
 @unit.algod.ledger_refactoring
 @unit.applications
 @unit.atomic_transaction_composer
+@unit.blocksummary
 @unit.dryrun
 @unit.dryrun.trace.application
 @unit.feetest
@@ -19,6 +20,7 @@
 @unit.responses.messagepack
 @unit.responses.messagepack.231
 @unit.responses.unlimited_assets
+@unit.responses.blocksummary
 @unit.sourcemap
 @unit.stateproof.paths
 @unit.stateproof.responses
