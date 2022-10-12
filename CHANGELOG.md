@@ -1,3 +1,8 @@
+# 1.20.0
+
+### Enhancements
+* REST API: Add algod block hash endpoint, add indexer block header-only param. by @winder in https://github.com/algorand/java-algorand-sdk/pull/413
+
 # 1.19.0
 
 ### Enhancements
