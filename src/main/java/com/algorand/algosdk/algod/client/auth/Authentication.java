@@ -18,6 +18,7 @@ import com.algorand.algosdk.algod.client.lib.Pair;
 import java.util.List;
 import java.util.Map;
 
+@Deprecated
 public interface Authentication {
     /**
      * Apply authentication settings to header and query params.

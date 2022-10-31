@@ -10,6 +10,7 @@ import com.algorand.algosdk.v2.client.algod.AccountAssetInformation;
 import com.algorand.algosdk.v2.client.algod.AccountApplicationInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
+import com.algorand.algosdk.v2.client.algod.GetBlockHash;
 import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
@@ -141,6 +142,14 @@ public class AlgodClient extends Client {
      */
     public GetBlock GetBlock(Long round) {
         return new GetBlock((Client) this, round);
+    }
+
+    /**
+     * Get the block hash for the block on the given round.
+     * /v2/blocks/{round}/hash
+     */
+    public GetBlockHash GetBlockHash(Long round) {
+        return new GetBlockHash((Client) this, round);
     }
 
     /**

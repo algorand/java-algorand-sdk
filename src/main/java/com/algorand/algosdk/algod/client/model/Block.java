@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * Block contains a block information
  */
 @ApiModel(description = "Block contains a block information")
-
+@Deprecated
 public class Block {
   @SerializedName("currentProtocol")
   private String currentProtocol = null;

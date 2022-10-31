@@ -1,6 +1,5 @@
 package com.algorand.algosdk.abi;
 
-import com.algorand.algosdk.algod.client.StringUtil;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiModelProperty;
  */
 
 @ApiModel(description = "AssetParams specifies the parameters for an asset")
+@Deprecated
 public class AssetParams {
   @SerializedName("assetname")
   private String assetname = null;

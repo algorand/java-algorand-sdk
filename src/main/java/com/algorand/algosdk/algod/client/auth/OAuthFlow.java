@@ -13,6 +13,7 @@
 
 package com.algorand.algosdk.algod.client.auth;
 
+@Deprecated
 public enum OAuthFlow {
     accessCode, implicit, password, application
 }
