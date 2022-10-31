@@ -1,3 +1,20 @@
+# 1.20.0
+
+### Enhancements
+* REST API: Add algod block hash endpoint, add indexer block header-only param. by @winder in https://github.com/algorand/java-algorand-sdk/pull/413
+
+# 1.19.0
+
+### Enhancements
+* Deprecation: Add deprecation tags to v1 `algod` API by @algochoi in https://github.com/algorand/java-algorand-sdk/pull/388
+### Other
+* Regenerate code with the latest specification file (b243e19e) by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/387
+
+## New Contributors
+* @github-actions made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/387
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/1.18.0...1.19.0
+
 # 1.18.0
 
 ## What's Changed

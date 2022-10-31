@@ -10,6 +10,7 @@ import com.algorand.algosdk.v2.client.algod.AccountAssetInformation;
 import com.algorand.algosdk.v2.client.algod.AccountApplicationInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
+import com.algorand.algosdk.v2.client.algod.GetBlockHash;
 import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
@@ -144,6 +145,14 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get the block hash for the block on the given round.
+     * /v2/blocks/{round}/hash
+     */
+    public GetBlockHash GetBlockHash(Long round) {
+        return new GetBlockHash((Client) this, round);
+    }
+
+    /**
      * Get a proof for a transaction in a block.
      * /v2/blocks/{round}/transactions/{txid}/proof
      */
@@ -243,8 +252,9 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given an application ID, it returns the box names of that application. No
-     * particular ordering is guaranteed.
+     * Given an application ID, return all Box names. No particular ordering is
+     * guaranteed. Request fails when client or server-side configured limits prevent
+     * returning all Box names.
      * /v2/applications/{application-id}/boxes
      */
     public GetApplicationBoxes GetApplicationBoxes(Long applicationId) {

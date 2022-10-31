@@ -116,4 +116,9 @@ public class AlgodPaths {
     public void getStateProof(Long round) {
         ps.q = algodClient.GetStateProof(round);
     }
+
+    @When("we make a Lookup Block Hash call against round {long}")
+    public void getBlockHash(Long round) {
+        ps.q = algodClient.GetBlockHash(round);
+    }
 }

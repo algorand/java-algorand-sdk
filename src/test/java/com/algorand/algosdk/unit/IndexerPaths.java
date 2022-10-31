@@ -345,4 +345,11 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(nextToken)) q.next(nextToken);
         ps.q = q;
     }
+    
+    @When("we make a Lookup Block call against round {long} and header {string}")
+    public void anyBlockLookupCall(Long round, String headerOnly) {
+        LookupBlock q = this.indexerClient.lookupBlock(round);
+        if (headerOnly.contentEquals("true")) q.headerOnly(true);
+        ps.q = q;
+    }
 }

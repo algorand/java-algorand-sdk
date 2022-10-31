@@ -13,7 +13,7 @@
 
 package com.algorand.algosdk.algod.client;
 
-
+@Deprecated
 public class Configuration {
     private static ApiClient defaultApiClient = new ApiClient();
 

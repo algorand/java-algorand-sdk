@@ -26,6 +26,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @deprecated Use the equivalent in v2 algod client
+ */
+@Deprecated
 public class DefaultApi {
     private ApiClient apiClient;
 

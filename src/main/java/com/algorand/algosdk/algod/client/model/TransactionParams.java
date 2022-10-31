@@ -22,7 +22,7 @@ import org.apache.commons.lang3.ObjectUtils;
  * TransactionParams contains the parameters that help a client construct a new transaction.
  */
 @ApiModel(description = "TransactionParams contains the parameters that help a client construct a new transaction.")
-
+@Deprecated
 public class TransactionParams {
   @SerializedName("consensusVersion")
   private String consensusVersion = null;
