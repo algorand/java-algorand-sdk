@@ -22,6 +22,8 @@ import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
 import com.algorand.algosdk.v2.client.algod.GetStateProof;
 import com.algorand.algosdk.v2.client.algod.GetLightBlockHeaderProof;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
+import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
+import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.algod.TealDisassemble;
@@ -247,6 +249,28 @@ public class AlgodClient extends Client {
      */
     public GetApplicationByID GetApplicationByID(Long applicationId) {
         return new GetApplicationByID((Client) this, applicationId);
+    }
+
+    /**
+     * Given an application ID, return all Box names. No particular ordering is
+     * guaranteed. Request fails when client or server-side configured limits prevent
+     * returning all Box names.
+     * /v2/applications/{application-id}/boxes
+     */
+    public GetApplicationBoxes GetApplicationBoxes(Long applicationId) {
+        return new GetApplicationBoxes((Client) this, applicationId);
+    }
+
+    /**
+     * Given an application ID and box name, it returns the box name and value (each
+     * base64 encoded). Box names must be in the goal app call arg encoding form
+     * 'encoding:value'. For ints, use the form 'int:1234'. For raw bytes, use the form
+     * 'b64:A=='. For printable strings, use the form 'str:hello'. For addresses, use
+     * the form 'addr:XYZ...'.
+     * /v2/applications/{application-id}/box
+     */
+    public GetApplicationBoxByName GetApplicationBoxByName(Long applicationId) {
+        return new GetApplicationBoxByName((Client) this, applicationId);
     }
 
     /**
