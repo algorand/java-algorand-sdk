@@ -252,8 +252,9 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given an application ID, it returns the box names of that application. No
-     * particular ordering is guaranteed.
+     * Given an application ID, return all Box names. No particular ordering is
+     * guaranteed. Request fails when client or server-side configured limits prevent
+     * returning all Box names.
      * /v2/applications/{application-id}/boxes
      */
     public GetApplicationBoxes GetApplicationBoxes(Long applicationId) {
