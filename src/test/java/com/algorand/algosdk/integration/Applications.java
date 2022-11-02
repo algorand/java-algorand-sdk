@@ -5,6 +5,7 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.util.ComparableBytes;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
@@ -14,12 +15,19 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.util.Lists;
+import org.bouncycastle.util.Strings;
+import org.junit.Assert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
@@ -42,8 +50,8 @@ public class Applications {
         this.base = base;
     }
 
-    @Given("I build an application transaction with the transient account, the current application, suggested params, operation {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, extra-pages {long}")
-    public void buildAnApplicationTransactions(String operation, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long extraPages) throws Exception {
+    @Given("I build an application transaction with the transient account, the current application, suggested params, operation {string}, approval-program {string}, clear-program {string}, global-bytes {long}, global-ints {long}, local-bytes {long}, local-ints {long}, app-args {string}, foreign-apps {string}, foreign-assets {string}, app-accounts {string}, extra-pages {long}, boxes {string}")
+    public void buildAnApplicationTransactions(String operation, String approvalProgramFile, String clearProgramFile, Long globalBytes, Long globalInts, Long localBytes, Long localInts, String appArgs, String foreignApps, String foreignAssets, String appAccounts, Long extraPages, String boxesStr) throws Exception {
         ApplicationBaseTransactionBuilder builder = null;
 
         // Create builder and apply builder-specific parameters
@@ -100,6 +108,9 @@ public class Applications {
         }
         if (StringUtils.isNotEmpty(appAccounts)) {
             builder.accounts(convertAccounts(appAccounts));
+        }
+        if (StringUtils.isNotEmpty(boxesStr)) {
+            builder.boxReferences(convertBoxes(boxesStr));
         }
 
         // Send with transient account, suggested params and current application
@@ -246,5 +257,104 @@ public class Applications {
         }
 
         assertThat(found).as("Couldn't find key '%s'", hasKey).isTrue();
+    }
+
+    @Then("according to {string}, the contents of the box with name {string} in the current application should be {string}. If there is an error it is {string}.")
+    public void contentsOfBoxShouldBe(String fromClient, String encodedBoxName, String boxContents, String errStr) throws Exception {
+        Response<Box> boxResp;
+        if (fromClient.equals("algod"))
+            boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
+        else if (fromClient.equals("indexer"))
+            boxResp = clients.v2IndexerClient.lookupApplicationBoxByIDAndName(this.appId).name(encodedBoxName).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
+
+        // If an error was expected, make sure it is set correctly.
+        if (StringUtils.isNotEmpty(errStr)) {
+            assertThat(boxResp.isSuccessful()).isFalse();
+            assertThat(boxResp.message()).containsIgnoringCase(errStr);
+            return;
+        }
+
+        assertThat(boxResp.body().value()).isEqualTo(boxContents);
+    }
+
+    private static void assertSetOfByteArraysEqual(Set<byte[]> expected, Set<byte[]> actual) {
+        Set<ComparableBytes> expectedComparable = new HashSet<>();
+        for (byte[] element : expected) {
+            expectedComparable.add(new ComparableBytes(element));
+        }
+
+        Set<ComparableBytes> actualComparable = new HashSet<>();
+        for (byte[] element : actual) {
+            actualComparable.add(new ComparableBytes(element));
+        }
+
+        Assert.assertEquals(expectedComparable, actualComparable);
+    }
+
+    @Then("according to {string}, the current application should have the following boxes {string}.")
+    public void checkAppBoxes(String fromClient, String encodedBoxesRaw) throws Exception {
+        Response<BoxesResponse> r;
+        if (fromClient.equals("algod"))
+            r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
+        else if (fromClient.equals("indexer"))
+            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
+
+        Assert.assertTrue(r.isSuccessful());
+
+        final Set<byte[]> expectedNames = new HashSet<>();
+        if (!encodedBoxesRaw.isEmpty()) {
+            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+                expectedNames.add(Encoder.decodeFromBase64(s));
+            }
+        }
+
+        final Set<byte[]> actualNames = new HashSet<>();
+        for (BoxDescriptor b : r.body().boxes) {
+            actualNames.add(b.name);
+        }
+
+        assertSetOfByteArraysEqual(expectedNames, actualNames);
+    }
+
+    @Then("according to {string}, with {long} being the parameter that limits results, the current application should have {int} boxes.")
+    public void checkAppBoxesNum(String fromClient, Long limit, int expected_num) throws Exception {
+        Response<BoxesResponse> r;
+        if (fromClient.equals("algod"))
+            r = clients.v2Client.GetApplicationBoxes(this.appId).max(limit).execute();
+        else if (fromClient.equals("indexer"))
+            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
+
+        Assert.assertTrue(r.isSuccessful());
+        Assert.assertEquals("expected " + expected_num + " boxes, actual " + r.body().boxes.size(),
+                r.body().boxes.size(), expected_num);
+    }
+
+    @Then("according to indexer, with {long} being the parameter that limits results, and {string} being the parameter that sets the next result, the current application should have the following boxes {string}.")
+    public void indexerCheckAppBoxesWithParams(Long limit, String next, String encodedBoxesRaw) throws Exception {
+        Response<BoxesResponse> r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
+        final Set<byte[]> expectedNames = new HashSet<>();
+        if (!encodedBoxesRaw.isEmpty()) {
+            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+                expectedNames.add(Encoder.decodeFromBase64(s));
+            }
+        }
+
+        final Set<byte[]> actualNames = new HashSet<>();
+        for (BoxDescriptor b : r.body().boxes) {
+            actualNames.add(b.name);
+        }
+
+        assertSetOfByteArraysEqual(expectedNames, actualNames);
+    }
+
+    @Then("I sleep for {int} milliseconds for indexer to digest things down.")
+    public void sleepForNSecondsForIndexer(int milliseconds) throws Exception {
+        Thread.sleep(milliseconds);
     }
 }

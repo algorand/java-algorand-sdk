@@ -2,12 +2,15 @@ package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
+import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.MethodCallParams;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxnSigner;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +25,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     protected List<Address> foreignAccounts = new ArrayList<>();
     protected List<Long> foreignAssets = new ArrayList<>();
     protected List<Long> foreignApps = new ArrayList<>();
+    protected List<AppBoxReference> boxReferences = new ArrayList<>();
 
     protected TEALProgram approvalProgram, clearStateProgram;
     protected StateSchema localStateSchema;
@@ -62,7 +66,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
 
     /**
      * Specify arguments for the ABI method invocation.
-     * 
+     * <p>
      * This will reset the arguments list to what is passed in by the caller.
      */
     public T methodArguments(List<Object> arguments) {
@@ -72,7 +76,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
 
     /**
      * Specify arguments for the ABI method invocation.
-     * 
+     * <p>
      * This will add the arguments passed in by the caller to the existing list of arguments.
      */
     public T addMethodArguments(List<Object> arguments) {
@@ -82,7 +86,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
 
     /**
      * Specify arguments for the ABI method invocation.
-     * 
+     * <p>
      * This will add the argument passed in by the caller to the existing list of arguments.
      */
     public T addMethodArgument(Object argument) {
@@ -126,6 +130,16 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     }
 
     @Override
+    public T boxReferences(List<AppBoxReference> boxReferences) {
+        if (boxReferences != null)
+            // duplicate box references can be meaningful, don't get rid of them
+            this.boxReferences = new ArrayList<>(boxReferences);
+        else
+            this.boxReferences.clear();
+        return (T) this;
+    }
+
+    @Override
     public T approvalProgram(TEALProgram approvalProgram) {
         this.approvalProgram = approvalProgram;
         return (T) this;
@@ -162,10 +176,34 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
      * Build a MethodCallParams object.
      */
     public MethodCallParams build() {
-        return new MethodCallParams(
-                appID, method, methodArgs, sender, onCompletion, note, lease, genesisID, genesisHash,
+        return new MethodCallParamsFactory(appID, method, methodArgs, sender, onCompletion, note, lease, genesisID, genesisHash,
                 firstValid, lastValid, fee, flatFee, rekeyTo, signer, foreignAccounts, foreignAssets, foreignApps,
-                approvalProgram, clearStateProgram, globalStateSchema, localStateSchema, extraPages
-        );
+                boxReferences, approvalProgram, clearStateProgram, globalStateSchema, localStateSchema, extraPages);
+    }
+
+    /**
+     * MethodCallParamsFactory exists only as a way to facilitate construction of
+     * `MethodCallParams` instances via a protected constructor.
+     * <p>
+     * No extension or other modification is intended.
+     */
+    private static class MethodCallParamsFactory extends MethodCallParams {
+
+        MethodCallParamsFactory(Long appID, Method method, List<Object> methodArgs, Address sender,
+                                Transaction.OnCompletion onCompletion, byte[] note, byte[] lease, String genesisID, Digest genesisHash,
+                                BigInteger firstValid, BigInteger lastValid, BigInteger fee, BigInteger flatFee,
+                                Address rekeyTo, TxnSigner signer,
+                                List<Address> fAccounts, List<Long> fAssets, List<Long> fApps, List<AppBoxReference> boxes,
+                                TEALProgram approvalProgram, TEALProgram clearProgram,
+                                StateSchema globalStateSchema, StateSchema localStateSchema, Long extraPages) {
+            super(appID, method, methodArgs, sender,
+                    onCompletion, note, lease, genesisID, genesisHash,
+                    firstValid, lastValid, fee, flatFee,
+                    rekeyTo, signer,
+                    fAccounts, fAssets, fApps, boxes,
+                    approvalProgram, clearProgram,
+                    globalStateSchema, localStateSchema, extraPages);
+        }
+
     }
 }

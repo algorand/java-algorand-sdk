@@ -333,7 +333,19 @@ public class IndexerPaths {
         ps.q = q;
     }
 
+    @When("we make a LookupApplicationBoxByIDandName call with applicationID {long} with encoded box name {string}")
+    public void lookUpApplicationBox(Long appID, String boxName) {
+        ps.q = indexerClient.lookupApplicationBoxByIDAndName(appID).name(boxName);
+    }
 
+    @When("we make a SearchForApplicationBoxes call with applicationID {long} with max {long} nextToken {string}")
+    public void searchApplicationBoxes(Long appID, Long maxRes, String nextToken) {
+        SearchForApplicationBoxes q = indexerClient.searchForApplicationBoxes(appID);
+        if (TestingUtils.notEmpty(maxRes)) q.limit(maxRes);
+        if (TestingUtils.notEmpty(nextToken)) q.next(nextToken);
+        ps.q = q;
+    }
+    
     @When("we make a Lookup Block call against round {long} and header {string}")
     public void anyBlockLookupCall(Long round, String headerOnly) {
         LookupBlock q = this.indexerClient.lookupBlock(round);

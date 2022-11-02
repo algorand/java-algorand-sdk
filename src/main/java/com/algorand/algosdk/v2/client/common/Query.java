@@ -17,11 +17,11 @@ public abstract class Query {
 
     protected abstract QueryData getRequestString();
 
-    protected <T>Response<T> baseExecute() throws Exception {
+    protected <T> Response<T> baseExecute() throws Exception {
         return baseExecute(null, null);
     }
 
-    protected <T>Response<T> baseExecute(String[] headers, String[] values) throws Exception {
+    protected <T> Response<T> baseExecute(String[] headers, String[] values) throws Exception {
 
         QueryData qData = this.getRequestString();
         com.squareup.okhttp.Response resp = this.client.executeCall(qData, httpMethod, headers, values);
@@ -69,5 +69,6 @@ public abstract class Query {
     }
 
     public abstract Response<?> execute() throws Exception;
+
     public abstract Response<?> execute(String[] headers, String[] values) throws Exception;
 }
