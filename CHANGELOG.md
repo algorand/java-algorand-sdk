@@ -1,3 +1,11 @@
+# 1.21.0
+
+## What's Changed
+### New Features
+* Boxes: Add support for Boxes by @michaeldiamant in https://github.com/algorand/java-algorand-sdk/pull/345
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/1.20.0...1.21.0
+
 # 1.20.0
 
 ### Enhancements
