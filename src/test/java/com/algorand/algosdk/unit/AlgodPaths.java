@@ -2,7 +2,11 @@ package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.TestingUtils;
-import com.algorand.algosdk.v2.client.algod.*;
+import com.algorand.algosdk.v2.client.algod.AccountInformation;
+import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
+import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
+import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
+import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.model.Enums;
 import io.cucumber.java.en.When;
@@ -67,19 +71,33 @@ public class AlgodPaths {
 
     @When("we make an Account Application Information call against account {string} applicationID {int}")
     public void accountApplicationInformation(String string, Integer int1) throws NoSuchAlgorithmException {
-        ps.q = algodClient.AccountApplicationInformation(new Address(string), (long)int1.intValue());
+        ps.q = algodClient.AccountApplicationInformation(new Address(string), (long) int1.intValue());
     }
-    
+
     @When("we make an Account Asset Information call against account {string} assetID {int}")
     public void accountAssetInformation(String string, Integer int1) throws NoSuchAlgorithmException {
-        ps.q = algodClient.AccountAssetInformation(new Address(string), (long)int1.intValue());
+        ps.q = algodClient.AccountAssetInformation(new Address(string), (long) int1.intValue());
     }
-    
+
     @When("we make an Account Information call against account {string} with exclude {string}")
     public void accountInformation(String string, String string2) throws NoSuchAlgorithmException {
         AccountInformation aiq = algodClient.AccountInformation(new Address(string));
         if (TestingUtils.notEmpty(string2)) aiq.exclude(Enums.Exclude.forValue(string2));
         ps.q = aiq;
+    }
+
+    @When("we make a GetApplicationBoxByName call for applicationID {long} with encoded box name {string}")
+    public void getBoxByName(Long appID, String encodedBoxName) {
+        ps.q = algodClient.GetApplicationBoxByName(appID).name(encodedBoxName);
+    }
+
+    @When("we make a GetApplicationBoxes call for applicationID {long} with max {long}")
+    public void getBoxes(Long appId, Long max) {
+        GetApplicationBoxes q = algodClient.GetApplicationBoxes(appId);
+
+        if (TestingUtils.notEmpty(max)) q.max(max);
+
+        ps.q = q;
     }
 
     @When("we make a GetTransactionProof call for round {long} txid {string} and hashtype {string}")
