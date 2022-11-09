@@ -158,6 +158,31 @@ public class TestTransaction {
     }
 
     @Test
+    public void testEmptyBoxReferenceSerializationMsgpack() throws Exception {
+        Transaction.BoxReference boxReference = new Transaction.BoxReference(0, new byte[]{});
+
+        byte[] encoded = Encoder.encodeToMsgPack(boxReference);
+        byte[] expectedEncoded = {(byte) 128};
+        assertThat(encoded).isEqualTo(expectedEncoded);
+
+        Transaction.BoxReference decoded = Encoder.decodeFromMsgPack(encoded, Transaction.BoxReference.class);
+        assertThat(decoded).isEqualTo(boxReference);
+    }
+
+    @Test
+    public void testEmptyBoxReferenceSerializationJson() throws Exception {
+        Transaction.BoxReference boxReference = new Transaction.BoxReference(0, new byte[]{});
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String encoded = objectMapper.writeValueAsString(boxReference);
+        String expectedEncoded = "{}";
+        assertThat(encoded).isEqualTo(expectedEncoded);
+
+        Transaction.BoxReference decoded = objectMapper.readValue(encoded, Transaction.BoxReference.class);
+        assertThat(decoded).isEqualTo(boxReference);
+    }
+
+    @Test
     public void testMetadaHashBuilderMethods() throws Exception {
         // Test that the following 3 builder methods returns the same transaction
         //    metadataHash, metadataHashUTF8, and metadataHashB64
