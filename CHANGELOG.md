@@ -1,3 +1,11 @@
+# 1.21.1
+
+## What's Changed
+### Bugfixes
+* SDK: Fix transaction decoding with boxes by @jasonpaulos in https://github.com/algorand/java-algorand-sdk/pull/422
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/1.21.0...1.21.1
+
 # 1.21.0
 
 ## What's Changed
