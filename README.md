@@ -19,7 +19,7 @@ Maven:
 <dependency>
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>1.21.0</version>
+    <version>1.21.1</version>
 </dependency>
 ```
 
