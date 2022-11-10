@@ -1585,7 +1585,7 @@ public class Transaction implements Serializable {
                 @JsonProperty("i") int appIndex,
                 @JsonProperty("n") byte[] name) {
             this.appIndex = appIndex;
-            this.name = Arrays.copyOf(name, name.length);
+            this.name = name == null ? new byte[]{} : Arrays.copyOf(name, name.length);
         }
 
         // Foreign apps start from index 1.  Index 0 is the called App ID.
