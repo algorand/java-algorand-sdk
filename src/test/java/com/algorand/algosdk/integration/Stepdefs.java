@@ -1,7 +1,6 @@
 package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.AlgodClient;
 import com.algorand.algosdk.algod.client.ApiException;
 import com.algorand.algosdk.algod.client.api.AlgodApi;
 import com.algorand.algosdk.algod.client.model.*;
@@ -18,12 +17,12 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.AlgoConverter;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
+import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.CompileResponse;
-import com.algorand.algosdk.v2.client.model.DryrunResponse;
-import com.algorand.algosdk.v2.client.model.DryrunRequest;
-import com.algorand.algosdk.v2.client.model.DryrunSource;
+import com.algorand.algosdk.v2.client.model.*;
 
+import com.algorand.algosdk.v2.client.model.AssetParams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.cucumber.java.en.Given;
@@ -55,7 +54,7 @@ public class Stepdefs {
     public static Integer algodPort = 60000;
     public static Integer kmdPort = 60001;
 
-    TransactionParams params;
+    TransactionParametersResponse params;
     SignedTransaction stx;
     SignedTransaction[] stxs;
     byte[] stxBytes;
@@ -80,11 +79,10 @@ public class Stepdefs {
     String walletName;
     String walletPswd;
     String walletID;
-    AlgodApi acl;
-    AlgodClient algodClient;
     KmdApi kcl;
     KmdClient kmdClient;
     com.algorand.algosdk.v2.client.common.AlgodClient aclv2;
+    IndexerClient v2IndexerClient;
     String handle;
     List<String> versions;
     NodeStatus status;
@@ -115,7 +113,7 @@ public class Stepdefs {
     String assetName = "testcoin";
     String assetUnitName = "coins";
     com.algorand.algosdk.transaction.AssetParams expectedParams = null;
-    AssetParams queriedParams = new AssetParams();
+    Asset queriedParams = new Asset();
 
     /* Compile / Dryrun */
     Response<CompileResponse> compileResponse;
@@ -166,8 +164,8 @@ public class Stepdefs {
      */
     protected void getParams() {
         try {
-            params = acl.transactionParams();
-            lastRound = params.getLastRound();
+            params = aclv2.TransactionParams().execute().body();
+            lastRound = BigInteger.valueOf(params.lastRound);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -187,22 +185,6 @@ public class Stepdefs {
     }
 
     /**
-     * advanceRound is a convenience method intended for testing with DevMode networks.
-     * <p>
-     * Since DevMode block generation requires a transaction rather than time passing, test assertions may require advancing rounds.  advanceRound issues advanceCount payments to advance rounds.
-     */
-    private void advanceRoundsV1(int advanceCount) {
-        initializeDevModeAccount();
-        for (int i = 0; i < advanceCount; i++) {
-            try {
-                acl.rawTransaction(Encoder.encodeToMsgPack(dms.selfPay(acl.transactionParams())));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
      * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
      */
     public void initializeDevModeAccount() {
@@ -217,12 +199,12 @@ public class Stepdefs {
             Transaction tx =
                     Transaction.PaymentTransactionBuilder()
                             .sender(sender)
-                            .suggestedParams(acl.transactionParams())
+                            .suggestedParams(params)
                             .amount(DevModeState.ACCOUNT_FUNDING_MICROALGOS)
                             .receiver(dms.advanceRounds.getAddress())
                             .build();
             SignedTransaction st = signWithAddress(tx, sender);
-            acl.rawTransaction(Encoder.encodeToMsgPack(st));
+            aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(st)).execute();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -444,8 +426,8 @@ public class Stepdefs {
     }
 
     @When("I get versions with algod")
-    public void aclV() throws ApiException{
-        versions = acl.getVersion().getVersions();
+    public void aclV() throws Exception {
+        versions = aclv2.GetVersion().execute().body().versions;
     }
 
     @Then("v1 should be in the versions")
@@ -453,25 +435,14 @@ public class Stepdefs {
         assertThat(versions).contains("v1");
     }
 
+    @Then("v2 should be in the versions")
+    public void v2InVersions(){
+        assertThat(versions).contains("v2");
+    }
+
     @When("I get versions with kmd")
     public void kclV() throws com.algorand.algosdk.kmd.client.ApiException{
         versions = kcl.getVersion().getVersions();
-    }
-
-    @When("I get the status")
-    public void status() throws ApiException{
-        status = acl.getStatus();
-    }
-
-    @When("I get status after this block")
-    public void statusBlock() throws Exception {
-        advanceRoundsV1(1);
-        statusAfter = acl.waitForBlock(status.getLastRound());
-    }
-
-    @Then("I can get the block info")
-    public void block() throws ApiException{
-        acl.getBlock(status.getLastRound().add(BigInteger.valueOf(1)));
     }
 
     @When("I import the multisig")
@@ -564,12 +535,12 @@ public class Stepdefs {
             Transaction tx =
                     Transaction.PaymentTransactionBuilder()
                             .sender(sender)
-                            .suggestedParams(acl.transactionParams())
+                            .suggestedParams(params)
                             .amount(100_000_000)
                             .receiver(rekey)
                             .build();
             SignedTransaction st = signWithAddress(tx, sender);
-            acl.rawTransaction(Encoder.encodeToMsgPack(st));
+            aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(st)).execute();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -666,22 +637,21 @@ public class Stepdefs {
         kcl = new KmdApi(kmdClient);
     }
 
-    @Given("an algod client")
-    public void aClient() throws FileNotFoundException, IOException{
-        algodClient = new AlgodClient();
-        algodClient.setConnectTimeout(30000);
-        algodClient.setReadTimeout(30000);
-        algodClient.setWriteTimeout(30000);
-        algodClient.setApiKey(token);
-        algodClient.setBasePath("http://localhost:" + algodPort);
-        acl = new AlgodApi(algodClient);
-    }
-
     @Given("an algod v2 client")
-    public void aClientv2() throws FileNotFoundException, IOException{
+    public void aClientv2() {
         aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
             "http://localhost", algodPort, token
         );
+    }
+
+    @Given("an algod v2 client connected to {string} port {int} with token {string}")
+    public void an_algod_v2_client_connected_to_port_with_token(String host, Integer port, String token) {
+        aclv2 = new AlgodClient(host, port, token);
+    }
+
+    @Given("an indexer v2 client")
+    public void indexer_v2_client() {
+        v2IndexerClient = new IndexerClient("localhost", 59999);
     }
 
     @Given("wallet information")
@@ -755,37 +725,13 @@ public class Stepdefs {
     }
 
     @When("I send the transaction")
-    public void sendTxn() throws JsonProcessingException, ApiException{
-        txid = acl.rawTransaction(Encoder.encodeToMsgPack(stx)).getTxId();
+    public void sendTxn() throws Exception {
+        txid = aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute().body().txId;
     }
 
     @When("I send the multisig transaction")
-    public void sendMsigTxn() throws JsonProcessingException, ApiException{
-        try{
-            acl.rawTransaction(Encoder.encodeToMsgPack(stx));
-        } catch(Exception e) {
-            err = true;
-        }
-    }
-
-    // TODO: this needs to be modified/removed when v1 is no longer supported!!!
-    @Then("the transaction should go through")
-    public void checkTxn() throws Exception {
-        String ans = acl.pendingTransactionInformation(txid).getFrom();
-        assertThat(this.txn.sender.toString()).isEqualTo(ans);
-        waitForAlgodTransactionProcessingToComplete();
-        String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
-        assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
-        // assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
-    }
-
-    /**
-     * waitForAlgodTransactionProcessingToComplete is a Dev mode helper method that's a rough analog to `acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));`.
-     * <p>
-     * Since Dev mode produces blocks on a per transaction basis, it's possible algod generates a block _before_ the corresponding SDK call to wait for a block.  Without _any_ wait, it's possible the SDK looks for the transaction before algod completes processing.  So, the method performs a local sleep to simulate waiting for a block.
-     */
-    private static void waitForAlgodTransactionProcessingToComplete() throws Exception {
-        Thread.sleep(500);
+    public void sendMsigTxn() throws Exception {
+        err = !aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute().isSuccessful();
     }
 
     @Then("the transaction should not go through")
@@ -834,42 +780,18 @@ public class Stepdefs {
     }
 
     @Then("the node should be healthy")
-    public void nodeHealth() throws ApiException{
-        acl.healthCheck();
+    public void nodeHealth() throws Exception {
+        aclv2.HealthCheck().execute();
     }
 
     @Then("I get the ledger supply")
-    public void getLedger() throws ApiException{
-        acl.getSupply();
-    }
-
-    @Then("I get transactions by address and round")
-    public void txnsByAddrRound() throws ApiException{
-        assertThat(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions())
-                .isInstanceOf(List.class);
-        //Assert.assertTrue(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
-    }
-
-    @Then("I get pending transactions")
-    public void pendingTxns() throws ApiException{
-        assertThat(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns())
-            .isInstanceOf(TransactionList.class);
-        //Assert.assertTrue(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns() instanceof TransactionList);
+    public void getLedger() throws Exception {
+        aclv2.GetSupply().execute();
     }
 
     @When("I get the suggested params")
-    public void suggestedParams() throws ApiException{
-        paramsFee = acl.transactionParams().getFee();
-    }
-
-    @When("I get the suggested fee")
-    public void suggestedFee() throws ApiException {
-        fee = acl.suggestedFee().getFee();
-    }
-
-    @Then("the fee in the suggested params should equal the suggested fee")
-    public void checkSuggested() {
-        assertThat(paramsFee).isEqualTo(fee);
+    public void suggestedParams() throws Exception {
+        paramsFee = BigInteger.valueOf(aclv2.TransactionParams().execute().body().fee);
     }
 
     @When("I create a bid")
@@ -990,13 +912,13 @@ public class Stepdefs {
     }
 
     @Then("I get account information")
-    public void accInfo() throws ApiException {
-        acl.accountInformation(addresses.get(0));
+    public void accInfo() throws Exception {
+        aclv2.AccountInformation(new Address(addresses.get(0))).execute();
     }
 
     @Then("I can get account information")
-    public void newAccInfo() throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException {
-        acl.accountInformation(pk.encodeAsString());
+    public void newAccInfo() throws Exception {
+        aclv2.AccountInformation(pk).execute();
         DeleteKeyRequest req = new DeleteKeyRequest();
         req.setAddress(pk.encodeAsString());
         req.setWalletHandleToken(handle);
@@ -1033,17 +955,17 @@ public class Stepdefs {
     }
 
     @When("I get the asset info")
-    public void i_get_the_asset_info() throws ApiException {
-        this.queriedParams = acl.assetInformation(this.assetID);
+    public void i_get_the_asset_info() throws Exception {
+        this.queriedParams = aclv2.GetAssetByID(this.assetID.longValue()).execute().body();
     }
 
     @Then("the asset info should match the expected asset info")
-    public void the_asset_info_should_match_the_expected_asset_info() throws JsonProcessingException, NoSuchAlgorithmException {
+    public void the_asset_info_should_match_the_expected_asset_info() {
         // Can't use a regular assertj call because 'compareTo' isn't a regular comparator.
-        assertThat(this.expectedParams.assetManager.compareTo(this.queriedParams.getManagerkey())).isTrue();
-        assertThat(this.expectedParams.assetReserve.compareTo(this.queriedParams.getReserveaddr())).isTrue();
-        assertThat(this.expectedParams.assetFreeze.compareTo(this.queriedParams.getFreezeaddr())).isTrue();
-        assertThat(this.expectedParams.assetClawback.compareTo(this.queriedParams.getClawbackaddr())).isTrue();
+        assertThat(this.expectedParams.assetManager.compareTo(this.queriedParams.params.manager == null ? "" : this.queriedParams.params.manager)).isTrue();
+        assertThat(this.expectedParams.assetReserve.compareTo(this.queriedParams.params.reserve == null ? "" : this.queriedParams.params.reserve)).isTrue();
+        assertThat(this.expectedParams.assetFreeze.compareTo(this.queriedParams.params.freeze == null ? "" : this.queriedParams.params.freeze)).isTrue();
+        assertThat(this.expectedParams.assetClawback.compareTo(this.queriedParams.params.clawback == null ? "" : this.queriedParams.params.clawback)).isTrue();
     }
 
     @When("I create a no-managers asset reconfigure transaction")
@@ -1077,14 +999,9 @@ public class Stepdefs {
     }
 
     @Then("I should be unable to get the asset info")
-    public void i_should_be_unable_to_get_the_asset_info() {
-        boolean exists = true;
-        try {
-            this.i_get_the_asset_info();
-        } catch (ApiException e) {
-            exists = false;
-        }
-        assertThat(exists).isFalse();
+    public void i_should_be_unable_to_get_the_asset_info() throws Exception {
+        this.i_get_the_asset_info();
+        assertThat(queriedParams).isNull();
     }
 
     @When("I create a transaction transferring {int} assets from creator to a second account")
@@ -1104,25 +1021,26 @@ public class Stepdefs {
     }
 
     @Then("the creator should have {int} assets remaining")
-    public void the_creator_should_have_assets_remaining(Integer expectedBal) throws ApiException {
-        com.algorand.algosdk.algod.client.model.Account accountResp =
-                this.acl.accountInformation(this.creator);
-        AssetHolding holding = accountResp.getHolding(this.assetID);
-        assertThat(holding.getAmount()).isEqualTo(BigInteger.valueOf(expectedBal));
+    public void the_creator_should_have_assets_remaining(Integer expectedBal) throws Exception {
+        AccountAssetResponse holding = aclv2.AccountAssetInformation(new Address(this.creator), this.assetID.longValue()).execute().body();
+        assertThat(holding.assetHolding.amount).isEqualTo(BigInteger.valueOf(expectedBal));
     }
 
     @Then("I update the asset index")
-    public void i_update_the_asset_index() throws ApiException {
-        com.algorand.algosdk.algod.client.model.Account accountResp = acl.accountInformation(this.creator);
-        Set<java.math.BigInteger> keys = accountResp.getThisassettotal().keySet();
-        this.assetID = Collections.max(keys);
+    public void i_update_the_asset_index() throws Exception {
+        List<Asset> assets = aclv2.AccountInformation(new Address(this.creator)).execute().body().createdAssets;
+        List<BigInteger> assetIDs = new ArrayList<>();
+        for (Asset a: assets) {
+            assetIDs.add(BigInteger.valueOf(a.index));
+        }
+        this.assetID = Collections.max(assetIDs);
     }
 
     @When("I send the bogus kmd-signed transaction")
     public void i_send_the_bogus_kmd_signed_transaction() {
         try {
-            txid = acl.rawTransaction(this.stxBytes).getTxId();
-        } catch (ApiException e) {
+            txid = aclv2.RawTransaction().rawtxn(this.stxBytes).execute().body().txId;
+        } catch (Exception e) {
             this.err = true;
         }
     }
@@ -1142,8 +1060,8 @@ public class Stepdefs {
     }
 
     @Then("I send the kmd-signed transaction")
-    public void i_send_the_kmd_signed_transaction() throws ApiException {
-        txid = acl.rawTransaction(this.stxBytes).getTxId();
+    public void i_send_the_kmd_signed_transaction() throws Exception {
+        txid = aclv2.RawTransaction().rawtxn(this.stxBytes).execute().body().txId;
     }
 
     @When("I create a freeze transaction targeting the second account")
