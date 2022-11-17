@@ -230,8 +230,9 @@ public class Stepdefs {
         boolean exists = false;
         APIV1GETWalletsResponse resp = kcl.listWallets();
         for (APIV1Wallet w : resp.getWallets()){
-            if (w.getName().equals(walletName)){
+            if (w.getName().equals(walletName)) {
                 exists = true;
+                break;
             }
         }
         assertThat(exists).isTrue();
@@ -301,7 +302,7 @@ public class Stepdefs {
     }
 
     @Given("payment transaction parameters {int} {int} {int} {string} {string} {string} {int} {string} {string}")
-    public void transactionParameters(int fee, int fv, int lv, String gh, String to, String close, int amt, String gen, String note)  throws GeneralSecurityException, NoSuchAlgorithmException{
+    public void transactionParameters(int fee, int fv, int lv, String gh, String to, String close, int amt, String gen, String note)  throws GeneralSecurityException {
         this.fee = BigInteger.valueOf(fee);
         this.fv = BigInteger.valueOf(fv);
         this.lv = BigInteger.valueOf(lv);
@@ -745,7 +746,7 @@ public class Stepdefs {
     }
 
     @When("I sign the multisig transaction with kmd")
-    public void signMsigKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, IOException{
+    public void signMsigKmd() throws com.algorand.algosdk.kmd.client.ApiException, IOException{
         ImportMultisigRequest importReq = new ImportMultisigRequest();
         importReq.setMultisigVersion(msig.version);
         importReq.setThreshold(msig.threshold);
@@ -1000,7 +1001,7 @@ public class Stepdefs {
     public void i_create_a_transaction_transferring_assets_from_creator_to_a_second_account(Integer int1) {
         getParams();
 
-        Transaction tx = Transaction.AssetTransferTransactionBuilder()
+        this.txn = Transaction.AssetTransferTransactionBuilder()
                 .sender(this.creator)
                 .assetReceiver(getAddress(1))
                 .assetAmount(int1)
@@ -1008,7 +1009,6 @@ public class Stepdefs {
                 .note(this.note)
                 .assetIndex(this.assetID)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
@@ -1041,13 +1041,12 @@ public class Stepdefs {
     public void i_create_a_transaction_for_a_second_account_signalling_asset_acceptance() {
         getParams();
 
-        Transaction tx = Transaction.AssetAcceptTransactionBuilder()
+        this.txn = Transaction.AssetAcceptTransactionBuilder()
                 .acceptingAccount(getAddress(1))
                 .suggestedParams(this.params)
                 .note(this.note)
                 .assetIndex(this.assetID)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(1);
     }
 
@@ -1061,7 +1060,7 @@ public class Stepdefs {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
-        Transaction tx = Transaction.AssetFreezeTransactionBuilder()
+        this.txn = Transaction.AssetFreezeTransactionBuilder()
                 .sender(getAddress(0))
                 .freezeTarget(getAddress(1))
                 .freezeState(true)
@@ -1069,7 +1068,6 @@ public class Stepdefs {
                 .note(this.note)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
@@ -1077,7 +1075,7 @@ public class Stepdefs {
     public void i_create_a_transaction_transferring_assets_from_a_second_account_to_creator(Integer int1) {
         getParams();
 
-        Transaction tx = Transaction.AssetTransferTransactionBuilder()
+        this.txn = Transaction.AssetTransferTransactionBuilder()
                 .sender(getAddress(1))
                 .assetReceiver(this.creator)
                 .assetAmount(int1)
@@ -1085,7 +1083,6 @@ public class Stepdefs {
                 .assetIndex(this.assetID)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(1);
     }
 
@@ -1094,7 +1091,7 @@ public class Stepdefs {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
-        Transaction tx = Transaction.AssetFreezeTransactionBuilder()
+        this.txn = Transaction.AssetFreezeTransactionBuilder()
                 .sender(getAddress(0))
                 .freezeTarget(getAddress(1))
                 .freezeState(false)
@@ -1102,7 +1099,6 @@ public class Stepdefs {
                 .note(this.note)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
@@ -1134,7 +1130,7 @@ public class Stepdefs {
     public void i_create_a_transaction_revoking_assets_from_a_second_account_to_creator(Integer int1) {
         getParams();
 
-        Transaction tx = Transaction.AssetClawbackTransactionBuilder()
+        this.txn = Transaction.AssetClawbackTransactionBuilder()
                 .sender(getAddress(0))
                 .assetClawbackFrom(getAddress(1))
                 .assetReceiver(getAddress(0))
@@ -1143,7 +1139,6 @@ public class Stepdefs {
                 .note(this.note)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
@@ -1211,7 +1206,7 @@ public class Stepdefs {
             DryrunSource drs = new DryrunSource();
             drs.fieldName = "lsig";
             drs.source = new String(data);
-            drs.txnIndex = 0l;
+            drs.txnIndex = 0L;
             sources.add(drs);
             SignedTransaction stxn = new SignedTransaction(txn, new Signature());
             stxns.add(stxn);
