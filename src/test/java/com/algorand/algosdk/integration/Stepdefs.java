@@ -1,9 +1,6 @@
 package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.algod.client.api.AlgodApi;
-import com.algorand.algosdk.algod.client.model.*;
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
 import com.algorand.algosdk.builder.transaction.TransactionBuilder;
@@ -22,7 +19,6 @@ import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.*;
 
-import com.algorand.algosdk.v2.client.model.AssetParams;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 import io.cucumber.java.en.Given;
@@ -35,14 +31,12 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadResource;
@@ -85,8 +79,6 @@ public class Stepdefs {
     IndexerClient v2IndexerClient;
     String handle;
     List<String> versions;
-    NodeStatus status;
-    NodeStatus statusAfter;
     List<byte[]> pks;
     List<String> addresses;
     BigInteger lastRound;
@@ -130,16 +122,16 @@ public class Stepdefs {
             return ThreadLocalRandom.current().nextLong(1, (long) (ACCOUNT_FUNDING_MICROALGOS * .01));
         }
 
-        public SignedTransaction selfPay(TransactionParams tp) throws Exception {
-            Transaction tx =
-                    Transaction.PaymentTransactionBuilder()
-                            .sender(advanceRounds.getAddress())
-                            .suggestedParams(tp)
-                            .amount(randomAmount())
-                            .receiver(advanceRounds.getAddress())
-                            .build();
-            return advanceRounds.signTransaction(tx);
-        }
+//        public SignedTransaction selfPay(TransactionParams tp) throws Exception {
+//            Transaction tx =
+//                    Transaction.PaymentTransactionBuilder()
+//                            .sender(advanceRounds.getAddress())
+//                            .suggestedParams(tp)
+//                            .amount(randomAmount())
+//                            .receiver(advanceRounds.getAddress())
+//                            .build();
+//            return advanceRounds.signTransaction(tx);
+//        }
     }
 
     private final DevModeState dms = new DevModeState();
@@ -296,7 +288,7 @@ public class Stepdefs {
     }
 
     @Then("the wallet handle should not work")
-    public void tryHandle() throws com.algorand.algosdk.kmd.client.ApiException{
+    public void tryHandle() {
         RenewWalletHandleTokenRequest req = new RenewWalletHandleTokenRequest();
         req.setWalletHandleToken(handle);
         err = false;
@@ -586,7 +578,7 @@ public class Stepdefs {
     }
 
     @When("I generate a key")
-    public void genKey()throws NoSuchAlgorithmException, GeneralSecurityException{
+    public void genKey()throws GeneralSecurityException{
         account = new Account();
         pk = account.getAddress();
         address = pk.toString();
@@ -627,7 +619,7 @@ public class Stepdefs {
     }
 
     @Given("a kmd client")
-    public void kClient() throws FileNotFoundException, IOException, NoSuchAlgorithmException{
+    public void kClient() {
         kmdClient = new KmdClient();
         kmdClient.setConnectTimeout(30000);
         kmdClient.setReadTimeout(30000);
@@ -655,7 +647,7 @@ public class Stepdefs {
     }
 
     @Given("wallet information")
-    public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
+    public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException {
         walletName = "unencrypted-default-wallet";
         walletPswd = "";
         List<APIV1Wallet> wallets = kcl.listWallets().getWallets();
@@ -675,7 +667,7 @@ public class Stepdefs {
     }
 
     @Given("default transaction with parameters {int} {string}")
-    public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
+    public void defaultTxn(int amt, String note) {
         defaultTxnWithAddress(amt, note, getAddress(0));
     }
 
@@ -702,7 +694,7 @@ public class Stepdefs {
     }
 
     @Given("default multisig transaction with parameters {int} {string}")
-    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException{
+    public void defaultMsigTxn(int amt, String note) {
         getParams();
         if (note.equals("none")){
             this.note = null;
@@ -740,7 +732,7 @@ public class Stepdefs {
     }
 
     @When("I sign the transaction with kmd")
-    public void signKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
+    public void signKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException {
         SignTransactionRequest req = new SignTransactionRequest();
         req.setTransaction(Encoder.encodeToMsgPack(txn));
         req.setWalletHandleToken(handle);
@@ -932,7 +924,7 @@ public class Stepdefs {
     }
 
     @Given("default asset creation transaction with total issuance {int}")
-    public void default_asset_creation_transaction_with_total_issuance(Integer assetTotal) throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void default_asset_creation_transaction_with_total_issuance(Integer assetTotal) {
         getParams();
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
@@ -969,7 +961,7 @@ public class Stepdefs {
     }
 
     @When("I create a no-managers asset reconfigure transaction")
-    public void i_create_a_no_managers_asset_reconfigure_transaction() throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_a_no_managers_asset_reconfigure_transaction() {
         getParams();
 
         Transaction tx = Transaction.AssetConfigureTransactionBuilder()
@@ -985,7 +977,7 @@ public class Stepdefs {
     }
 
     @When("I create an asset destroy transaction")
-    public void i_create_an_asset_destroy_transaction() throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_an_asset_destroy_transaction() {
         getParams();
 
         Transaction tx = Transaction.AssetDestroyTransactionBuilder()
@@ -1005,7 +997,7 @@ public class Stepdefs {
     }
 
     @When("I create a transaction transferring {int} assets from creator to a second account")
-    public void i_create_a_transaction_transferring_assets_from_creator_to_a_second_account(Integer int1) throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_a_transaction_transferring_assets_from_creator_to_a_second_account(Integer int1) {
         getParams();
 
         Transaction tx = Transaction.AssetTransferTransactionBuilder()
@@ -1046,7 +1038,7 @@ public class Stepdefs {
     }
 
     @Then("I create a transaction for a second account, signalling asset acceptance")
-    public void i_create_a_transaction_for_a_second_account_signalling_asset_acceptance() throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_for_a_second_account_signalling_asset_acceptance() {
         getParams();
 
         Transaction tx = Transaction.AssetAcceptTransactionBuilder()
@@ -1065,7 +1057,7 @@ public class Stepdefs {
     }
 
     @When("I create a freeze transaction targeting the second account")
-    public void i_create_a_freeze_transaction_targeting_the_second_account() throws NoSuchAlgorithmException, ApiException, com.algorand.algosdk.kmd.client.ApiException {
+    public void i_create_a_freeze_transaction_targeting_the_second_account() throws com.algorand.algosdk.kmd.client.ApiException {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
@@ -1082,7 +1074,7 @@ public class Stepdefs {
     }
 
     @When("I create a transaction transferring {int} assets from a second account to creator")
-    public void i_create_a_transaction_transferring_assets_from_a_second_account_to_creator(Integer int1) throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_transferring_assets_from_a_second_account_to_creator(Integer int1) {
         getParams();
 
         Transaction tx = Transaction.AssetTransferTransactionBuilder()
@@ -1098,7 +1090,7 @@ public class Stepdefs {
     }
 
     @When("I create an un-freeze transaction targeting the second account")
-    public void i_create_an_un_freeze_transaction_targeting_the_second_account() throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException  {
+    public void i_create_an_un_freeze_transaction_targeting_the_second_account() throws com.algorand.algosdk.kmd.client.ApiException  {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
@@ -1115,7 +1107,7 @@ public class Stepdefs {
     }
 
     @Given("default-frozen asset creation transaction with total issuance {int}")
-    public void default_frozen_asset_creation_transaction_with_total_issuance(Integer int1) throws ApiException, NoSuchAlgorithmException {
+    public void default_frozen_asset_creation_transaction_with_total_issuance(Integer int1) throws NoSuchAlgorithmException {
         getParams();
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
@@ -1139,7 +1131,7 @@ public class Stepdefs {
     }
 
     @When("I create a transaction revoking {int} assets from a second account to creator")
-    public void i_create_a_transaction_revoking_assets_from_a_second_account_to_creator(Integer int1) throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_revoking_assets_from_a_second_account_to_creator(Integer int1) {
         getParams();
 
         Transaction tx = Transaction.AssetClawbackTransactionBuilder()
