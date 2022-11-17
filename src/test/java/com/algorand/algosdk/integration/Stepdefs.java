@@ -782,11 +782,6 @@ public class Stepdefs {
         aclv2.GetSupply().execute();
     }
 
-    @When("I get the suggested params")
-    public void suggestedParams() throws Exception {
-        paramsFee = BigInteger.valueOf(aclv2.TransactionParams().execute().body().fee);
-    }
-
     @When("I create a bid")
     public void createBid() throws NoSuchAlgorithmException {
         account = new Account();
@@ -902,11 +897,6 @@ public class Stepdefs {
     @Then("it should still be the same amount of microalgos {long}")
     public void checkMicro(long ma) {
         assertThat(microalgos).isEqualTo(BigInteger.valueOf(ma));
-    }
-
-    @Then("I get account information")
-    public void accInfo() throws Exception {
-        aclv2.AccountInformation(new Address(addresses.get(0))).execute();
     }
 
     @Then("I can get account information")
@@ -1236,13 +1226,11 @@ public class Stepdefs {
         assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
 
-
     @When("I compile a teal program {string} with mapping enabled")
     public void i_compile_a_teal_program_with_mapping_enabled(String tealPath) throws Exception {
         byte[] tealProgram = ResourceUtils.loadResource(tealPath);
         this.compileResponse = aclv2.TealCompile().source(tealProgram).sourcemap(true).execute();
     }
-
 
     @Then("the resulting source map is the same as the json {string}")
     public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws Exception {
