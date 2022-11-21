@@ -28,6 +28,13 @@ public class NodeStatusResponse extends PathResponse {
     public Long catchpointProcessedAccounts;
 
     /**
+     * The number of key-values (KVs) from the current catchpoint that have been
+     * processed so far as part of the catchup
+     */
+    @JsonProperty("catchpoint-processed-kvs")
+    public Long catchpointProcessedKvs;
+
+    /**
      * The total number of accounts included in the current catchpoint
      */
     @JsonProperty("catchpoint-total-accounts")
@@ -41,11 +48,24 @@ public class NodeStatusResponse extends PathResponse {
     public Long catchpointTotalBlocks;
 
     /**
+     * The total number of key-values (KVs) included in the current catchpoint
+     */
+    @JsonProperty("catchpoint-total-kvs")
+    public Long catchpointTotalKvs;
+
+    /**
      * The number of accounts from the current catchpoint that have been verified so
      * far as part of the catchup
      */
     @JsonProperty("catchpoint-verified-accounts")
     public Long catchpointVerifiedAccounts;
+
+    /**
+     * The number of key-values (KVs) from the current catchpoint that have been
+     * verified so far as part of the catchup
+     */
+    @JsonProperty("catchpoint-verified-kvs")
+    public Long catchpointVerifiedKvs;
 
     /**
      * CatchupTime in nanoseconds
@@ -113,9 +133,12 @@ public class NodeStatusResponse extends PathResponse {
         if (!Objects.deepEquals(this.catchpoint, other.catchpoint)) return false;
         if (!Objects.deepEquals(this.catchpointAcquiredBlocks, other.catchpointAcquiredBlocks)) return false;
         if (!Objects.deepEquals(this.catchpointProcessedAccounts, other.catchpointProcessedAccounts)) return false;
+        if (!Objects.deepEquals(this.catchpointProcessedKvs, other.catchpointProcessedKvs)) return false;
         if (!Objects.deepEquals(this.catchpointTotalAccounts, other.catchpointTotalAccounts)) return false;
         if (!Objects.deepEquals(this.catchpointTotalBlocks, other.catchpointTotalBlocks)) return false;
+        if (!Objects.deepEquals(this.catchpointTotalKvs, other.catchpointTotalKvs)) return false;
         if (!Objects.deepEquals(this.catchpointVerifiedAccounts, other.catchpointVerifiedAccounts)) return false;
+        if (!Objects.deepEquals(this.catchpointVerifiedKvs, other.catchpointVerifiedKvs)) return false;
         if (!Objects.deepEquals(this.catchupTime, other.catchupTime)) return false;
         if (!Objects.deepEquals(this.lastCatchpoint, other.lastCatchpoint)) return false;
         if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
