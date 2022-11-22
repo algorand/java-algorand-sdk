@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -69,7 +68,6 @@ public class Stepdefs {
     String gen;
     byte[] note;
     MultisigAddress msig;
-    MultisigSignature msigsig;
     String walletName;
     String walletPswd;
     String walletID;
@@ -90,14 +88,12 @@ public class Stepdefs {
     Bid bid;
     SignedBid oldBid;
     SignedBid sbid;
-    BigInteger paramsFee;
     ParticipationPublicKey votepk;
     VRFPublicKey vrfpk;
     String sprfpk;
     BigInteger votefst;
     BigInteger votelst;
     BigInteger votekd;
-    String num;
 
     /* Assets */
     String creator = "";
@@ -110,31 +106,6 @@ public class Stepdefs {
     /* Compile / Dryrun */
     Response<CompileResponse> compileResponse;
     Response<DryrunResponse> dryrunResponse;
-
-    private static class DevModeState {
-        static final long ACCOUNT_FUNDING_MICROALGOS = 100_000_000;
-        private Account advanceRounds;
-
-        /**
-         * randomAmount minimizes the chance `advanceRounds` issues duplicate transactions by randomizing the payment amount.
-         */
-        private long randomAmount() {
-            return ThreadLocalRandom.current().nextLong(1, (long) (ACCOUNT_FUNDING_MICROALGOS * .01));
-        }
-
-//        public SignedTransaction selfPay(TransactionParams tp) throws Exception {
-//            Transaction tx =
-//                    Transaction.PaymentTransactionBuilder()
-//                            .sender(advanceRounds.getAddress())
-//                            .suggestedParams(tp)
-//                            .amount(randomAmount())
-//                            .receiver(advanceRounds.getAddress())
-//                            .build();
-//            return advanceRounds.signTransaction(tx);
-//        }
-    }
-
-    private final DevModeState dms = new DevModeState();
 
     protected Address getAddress(int i) {
         if (addresses == null) {
@@ -174,44 +145,6 @@ public class Stepdefs {
         byte[] secretKey = kcl.exportKey(req).getPrivateKey();
         Account acct = new Account(Arrays.copyOfRange(secretKey, 0, 32));
         return acct.signTransaction(tx);
-    }
-
-    /**
-     * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
-     */
-    public void initializeDevModeAccount() {
-        if (dms.advanceRounds != null) {
-            return;
-        }
-
-        try {
-            getParams();
-            dms.advanceRounds = new Account();
-            Address sender = getAddress(0);
-            Transaction tx =
-                    Transaction.PaymentTransactionBuilder()
-                            .sender(sender)
-                            .suggestedParams(params)
-                            .amount(DevModeState.ACCOUNT_FUNDING_MICROALGOS)
-                            .receiver(dms.advanceRounds.getAddress())
-                            .build();
-            SignedTransaction st = signWithAddress(tx, sender);
-            aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(st)).execute();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Convenience method to export a key and initialize an account to use for signing.
-     */
-    public void exportKeyAndSetAccount(Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
-        ExportKeyRequest req = new ExportKeyRequest();
-        req.setAddress(addr.toString());
-        req.setWalletHandleToken(handle);
-        req.setWalletPassword(walletPswd);
-        sk = kcl.exportKey(req).getPrivateKey();
-        account = new Account(Arrays.copyOfRange(sk, 0, 32));
     }
 
     @When("I create a wallet")
@@ -327,7 +260,7 @@ public class Stepdefs {
     }
 
     @Given("default V2 key registration transaction {string}")
-    public void  default_v2_key_registration_transaction(String type) throws NoSuchAlgorithmException, JsonProcessingException, IOException{
+    public void  default_v2_key_registration_transaction(String type) {
         getParams();
         votepk=new ParticipationPublicKey(Encoder.decodeFromBase64("9mr13Ri8rFepxN3ghIUrZNui6LqqM5hEzB45Rri5lkU="));
         vrfpk = new VRFPublicKey(Encoder.decodeFromBase64("dx717L3uOIIb/jr9OIyls1l5Ei00NFgRa380w7TnPr4="));
