@@ -875,13 +875,17 @@ public class Stepdefs {
         this.queriedParams = aclv2.GetAssetByID(this.assetID.longValue()).execute().body();
     }
 
+    static private String null_to_empty(String str) {
+        return str == null ? "" : str;
+    }
+
     @Then("the asset info should match the expected asset info")
     public void the_asset_info_should_match_the_expected_asset_info() {
         // Can't use a regular assertj call because 'compareTo' isn't a regular comparator.
-        assertThat(this.expectedParams.assetManager.compareTo(this.queriedParams.params.manager == null ? "" : this.queriedParams.params.manager)).isTrue();
-        assertThat(this.expectedParams.assetReserve.compareTo(this.queriedParams.params.reserve == null ? "" : this.queriedParams.params.reserve)).isTrue();
-        assertThat(this.expectedParams.assetFreeze.compareTo(this.queriedParams.params.freeze == null ? "" : this.queriedParams.params.freeze)).isTrue();
-        assertThat(this.expectedParams.assetClawback.compareTo(this.queriedParams.params.clawback == null ? "" : this.queriedParams.params.clawback)).isTrue();
+        assertThat(this.expectedParams.assetManager.compareTo(null_to_empty(this.queriedParams.params.manager))).isTrue();
+        assertThat(this.expectedParams.assetReserve.compareTo(null_to_empty(this.queriedParams.params.reserve))).isTrue();
+        assertThat(this.expectedParams.assetFreeze.compareTo(null_to_empty(this.queriedParams.params.freeze))).isTrue();
+        assertThat(this.expectedParams.assetClawback.compareTo(null_to_empty(this.queriedParams.params.clawback))).isTrue();
     }
 
     @When("I create a no-managers asset reconfigure transaction")
