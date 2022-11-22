@@ -260,7 +260,7 @@ public class Stepdefs {
     }
 
     @Given("default V2 key registration transaction {string}")
-    public void  default_v2_key_registration_transaction(String type) {
+    public void default_v2_key_registration_transaction(String type) {
         getParams();
         votepk=new ParticipationPublicKey(Encoder.decodeFromBase64("9mr13Ri8rFepxN3ghIUrZNui6LqqM5hEzB45Rri5lkU="));
         vrfpk = new VRFPublicKey(Encoder.decodeFromBase64("dx717L3uOIIb/jr9OIyls1l5Ei00NFgRa380w7TnPr4="));
@@ -776,7 +776,7 @@ public class Stepdefs {
     }
 
     @When("I create the flat fee payment transaction")
-    public void createPaytxnFlat() throws NoSuchAlgorithmException{
+    public void createPaytxnFlat() {
         txn = Transaction.PaymentTransactionBuilder()
                 .sender(pk)
                 .flatFee(fee)
@@ -1148,7 +1148,7 @@ public class Stepdefs {
     }
 
     @When("I get execution result {string}")
-    public void i_get_execution_result(String result) throws Exception {
+    public void i_get_execution_result(String result) {
         DryrunResponse ddr = dryrunResponse.body();
         assertThat(ddr).isNotNull();
         assertThat(ddr.txns).isNotNull();

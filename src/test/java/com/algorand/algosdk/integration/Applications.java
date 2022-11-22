@@ -15,7 +15,6 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.bouncycastle.util.Strings;
 import org.junit.Assert;
 
 import java.io.ByteArrayOutputStream;
@@ -303,7 +302,7 @@ public class Applications {
 
         final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
-            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+            for (String s : encodedBoxesRaw.split(":")) {
                 expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
@@ -336,7 +335,7 @@ public class Applications {
         Response<BoxesResponse> r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
         final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
-            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+            for (String s : encodedBoxesRaw.split(":")) {
                 expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
