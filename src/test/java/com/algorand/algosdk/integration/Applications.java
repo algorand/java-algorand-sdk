@@ -144,8 +144,6 @@ public class Applications {
         Utils.waitForConfirmation(base.aclv2, base.txid, 1);
     }
 
-    // TODO: Use V2 Pending Transaction endpoint when it is available.
-    //       The initial implementation hacks into the v1 endpoint to manually extract the new data.
     @Given("I remember the new application ID.")
     public void rememberTheNewApplicatoinId() throws Exception {
         PendingTransactionResponse r = base.aclv2.PendingTransactionInformation(txId).execute().body();
