@@ -11,13 +11,11 @@ import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import io.cucumber.java.en.Given;
 
 public class TransientAccount {
-    public Clients clients;
     public Stepdefs base;
 
     public Account transientAccount = null;
 
-    public TransientAccount(Clients clients, Stepdefs base) {
-        this.clients = clients;
+    public TransientAccount(Stepdefs base) {
         this.base = base;
     }
 
@@ -33,12 +31,12 @@ public class TransientAccount {
                 .sender(sender)
                 .receiver(this.transientAccount.getAddress())
                 .amount(amount)
-                .lookupParams(clients.v2Client)
+                .lookupParams(base.aclv2)
                 .build();
         SignedTransaction stx = base.signWithAddress(tx, sender);
 
-        Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
-        Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 1);
+        Response<PostTransactionsResponse> rPost = base.aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
+        Utils.waitForConfirmation(base.aclv2, rPost.body().txId, 1);
     }
 
 }

@@ -47,7 +47,7 @@ public class AtomicTxnComposer {
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
         base = stepdefs;
         applications = apps;
-        applications.transientAccount.clients.v2Client = base.aclv2;
+        applications.base.aclv2 = base.aclv2;
         applications.transientAccount.base = base;
         transSteps = steps;
         transSteps.transAcc = apps.transientAccount;

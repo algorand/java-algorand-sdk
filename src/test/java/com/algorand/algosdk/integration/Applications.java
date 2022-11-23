@@ -15,16 +15,12 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import org.apache.commons.lang3.StringUtils;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Lists;
-import org.bouncycastle.util.Strings;
 import org.junit.Assert;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +31,6 @@ import static com.algorand.algosdk.util.ConversionUtils.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Applications {
-    public Clients clients;
     public Stepdefs base;
     public TransientAccount transientAccount;
 
@@ -44,9 +39,8 @@ public class Applications {
     public Long appId = 0L;
     public List<Long> rememberedAppIds = new ArrayList<>();
 
-    public Applications(TransientAccount transientAccount, Clients clients, Stepdefs base) {
+    public Applications(TransientAccount transientAccount, Stepdefs base) {
         this.transientAccount = transientAccount;
-        this.clients = clients;
         this.base = base;
     }
 
@@ -58,24 +52,24 @@ public class Applications {
         switch (operation) {
             case "create":
                 builder = Transaction.ApplicationCreateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.clients.v2Client))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.clients.v2Client))
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.base.aclv2))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.base.aclv2))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
                         .localStateSchema(new StateSchema(localInts, localBytes))
                         .extraPages(extraPages);
                 break;
             case "create_optin":
                 builder = Transaction.ApplicationCreateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.clients.v2Client))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.clients.v2Client))
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.base.aclv2))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.base.aclv2))
                         .globalStateSchema(new StateSchema(globalInts, globalBytes))
                         .localStateSchema(new StateSchema(localInts, localBytes))
                         .optIn(true);
                 break;
             case "update":
                 builder = Transaction.ApplicationUpdateTransactionBuilder()
-                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.clients.v2Client))
-                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.clients.v2Client));
+                        .approvalProgram(loadTEALProgramFromFile(approvalProgramFile, this.base.aclv2))
+                        .clearStateProgram(loadTEALProgramFromFile(clearProgramFile, this.base.aclv2));
                 break;
             case "call":
                 builder = Transaction.ApplicationCallTransactionBuilder();
@@ -115,7 +109,7 @@ public class Applications {
 
         // Send with transient account, suggested params and current application
         builder.sender(this.transientAccount.transientAccount.getAddress());
-        builder.lookupParams(this.clients.v2Client);
+        builder.lookupParams(this.base.aclv2);
         if (this.appId != 0 && !operation.equals("create")) {
             builder.applicationId(appId);
         }
@@ -128,7 +122,7 @@ public class Applications {
         SignedTransaction stx = this.transientAccount.transientAccount.signTransaction(this.transaction);
 
         // Submit
-        Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
+        Response<PostTransactionsResponse> rPost = base.aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
 
         // If an error was expected, make sure it is set correctly.
         if (StringUtils.isNotEmpty(error)) {
@@ -142,18 +136,17 @@ public class Applications {
 
         // And save the txId for later
         this.txId = rPost.body().txId;
+        base.txid = this.txId;
     }
 
     @Given("I wait for the transaction to be confirmed.")
     public void waitForTransactionToBeConfirmed() throws Exception {
-        Utils.waitForConfirmation(clients.v2Client, txId, 1);
+        Utils.waitForConfirmation(base.aclv2, base.txid, 1);
     }
 
-    // TODO: Use V2 Pending Transaction endpoint when it is available.
-    //       The initial implementation hacks into the v1 endpoint to manually extract the new data.
     @Given("I remember the new application ID.")
     public void rememberTheNewApplicatoinId() throws Exception {
-        PendingTransactionResponse r = clients.v2Client.PendingTransactionInformation(txId).execute().body();
+        PendingTransactionResponse r = base.aclv2.PendingTransactionInformation(txId).execute().body();
         this.appId = r.applicationIndex;
         this.rememberedAppIds.add(this.appId);
     }
@@ -171,12 +164,12 @@ public class Applications {
                 .sender(sender)
                 .receiver(appAddress)
                 .amount(amount)
-                .lookupParams(clients.v2Client)
+                .lookupParams(base.aclv2)
                 .build();
         SignedTransaction stx = base.signWithAddress(tx, sender);
 
-        Response<PostTransactionsResponse> rPost = clients.v2Client.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
-        Utils.waitForConfirmation(clients.v2Client, rPost.body().txId, 1);
+        Response<PostTransactionsResponse> rPost = base.aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
+        Utils.waitForConfirmation(base.aclv2, rPost.body().txId, 1);
     }
 
     @Then("I get the account address for the current application and see that it matches the app id's hash")
@@ -198,7 +191,7 @@ public class Applications {
             String hasKey,
             String keyValue
     ) throws Exception {
-        Response<com.algorand.algosdk.v2.client.model.Account> acctResponse = clients.v2Client.AccountInformation(transientAccount.transientAccount.getAddress()).execute();
+        Response<com.algorand.algosdk.v2.client.model.Account> acctResponse = base.aclv2.AccountInformation(this.transientAccount.transientAccount.getAddress()).execute();
 
         com.algorand.algosdk.v2.client.model.Account acct = acctResponse.body();
 
@@ -263,9 +256,9 @@ public class Applications {
     public void contentsOfBoxShouldBe(String fromClient, String encodedBoxName, String boxContents, String errStr) throws Exception {
         Response<Box> boxResp;
         if (fromClient.equals("algod"))
-            boxResp = clients.v2Client.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
+            boxResp = base.aclv2.GetApplicationBoxByName(this.appId).name(encodedBoxName).execute();
         else if (fromClient.equals("indexer"))
-            boxResp = clients.v2IndexerClient.lookupApplicationBoxByIDAndName(this.appId).name(encodedBoxName).execute();
+            boxResp = base.v2IndexerClient.lookupApplicationBoxByIDAndName(this.appId).name(encodedBoxName).execute();
         else
             throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
@@ -297,9 +290,9 @@ public class Applications {
     public void checkAppBoxes(String fromClient, String encodedBoxesRaw) throws Exception {
         Response<BoxesResponse> r;
         if (fromClient.equals("algod"))
-            r = clients.v2Client.GetApplicationBoxes(this.appId).execute();
+            r = base.aclv2.GetApplicationBoxes(this.appId).execute();
         else if (fromClient.equals("indexer"))
-            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
+            r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
         else
             throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
@@ -307,7 +300,7 @@ public class Applications {
 
         final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
-            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+            for (String s : encodedBoxesRaw.split(":")) {
                 expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
@@ -324,9 +317,9 @@ public class Applications {
     public void checkAppBoxesNum(String fromClient, Long limit, int expected_num) throws Exception {
         Response<BoxesResponse> r;
         if (fromClient.equals("algod"))
-            r = clients.v2Client.GetApplicationBoxes(this.appId).max(limit).execute();
+            r = base.aclv2.GetApplicationBoxes(this.appId).max(limit).execute();
         else if (fromClient.equals("indexer"))
-            r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
+            r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
         else
             throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
@@ -337,10 +330,10 @@ public class Applications {
 
     @Then("according to indexer, with {long} being the parameter that limits results, and {string} being the parameter that sets the next result, the current application should have the following boxes {string}.")
     public void indexerCheckAppBoxesWithParams(Long limit, String next, String encodedBoxesRaw) throws Exception {
-        Response<BoxesResponse> r = clients.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
+        Response<BoxesResponse> r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
         final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
-            for (String s : Strings.split(encodedBoxesRaw, ':')) {
+            for (String s : encodedBoxesRaw.split(":")) {
                 expectedNames.add(Encoder.decodeFromBase64(s));
             }
         }
