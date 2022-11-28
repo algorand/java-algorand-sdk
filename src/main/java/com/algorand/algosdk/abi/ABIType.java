@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public abstract class ABIType {
     public static final int ABI_DYNAMIC_HEAD_BYTE_LEN = 2;
-    private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>[1-9][\\d]*)]$");
+    private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>0|[1-9][\\d]*)]$");
     private static final Pattern ufixedPattern = Pattern.compile("^ufixed(?<size>[1-9][\\d]*)x(?<precision>[1-9][\\d]*)$");
 
     /**
