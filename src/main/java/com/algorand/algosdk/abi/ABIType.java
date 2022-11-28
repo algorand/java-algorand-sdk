@@ -103,7 +103,7 @@ public abstract class ABIType {
             return new ArrayList<>();
 
         if (str.startsWith(",") || str.endsWith(","))
-            throw new IllegalArgumentException("parsing error: tuple content should not start with comma");
+            throw new IllegalArgumentException("parsing error: tuple content should not start or end with comma");
 
         if (str.contains(",,"))
             throw new IllegalArgumentException("parsing error: tuple content should not have consecutive commas");
