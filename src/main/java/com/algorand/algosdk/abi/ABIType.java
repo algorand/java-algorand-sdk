@@ -118,8 +118,13 @@ public abstract class ABIType {
                 if (parenStack.isEmpty())
                     throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
                 int leftParenIndex = parenStack.pop();
-                if (parenStack.isEmpty())
+                if (parenStack.isEmpty()) {
+                    int forwardIndex = i + 1;
+                    while (forwardIndex < str.length() && str.charAt(forwardIndex) != ',')
+                        forwardIndex++;
+                    i = forwardIndex - 1;
                     parenSegments.add(new Segment(leftParenIndex, i));
+                }
             }
         }
         if (!parenStack.isEmpty())

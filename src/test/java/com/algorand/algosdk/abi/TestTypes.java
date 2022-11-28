@@ -238,6 +238,22 @@ public class TestTypes {
                         )
                 )
         );
+        assertThat(ABIType.valueOf("(uint32,(uint64,bool)[10],byte)")).isEqualTo(
+                new TypeTuple(
+                        Arrays.asList(
+                                new TypeUint(32),
+                                new TypeArrayStatic(
+                                        new TypeTuple(
+                                                Arrays.asList(
+                                                        new TypeUint(64),
+                                                        new TypeBool()
+                                                )
+                                        ),
+                                        10),
+                                new TypeByte()
+                        )
+                )
+        );
     }
 
     @Test
