@@ -119,6 +119,8 @@ public abstract class ABIType {
                     throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
                 int leftParenIndex = parenStack.pop();
                 if (parenStack.isEmpty()) {
+                    // iterate through the byte str, include all the bytes after closing round bracket, for array indicator
+                    // increase the index until it meets comma, or end of string
                     int forwardIndex = i + 1;
                     while (forwardIndex < str.length() && str.charAt(forwardIndex) != ',')
                         forwardIndex++;
