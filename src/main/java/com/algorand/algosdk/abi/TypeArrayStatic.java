@@ -8,7 +8,7 @@ public class TypeArrayStatic extends ABIType {
 
     public TypeArrayStatic(ABIType elemType, int length) {
         if (length < 0)
-            throw new IllegalArgumentException("static-array initialize failure: array length should be positive");
+            throw new IllegalArgumentException("static-array initialize failure: array length should be non-negative");
         this.elemType = elemType;
         this.length = length;
     }
