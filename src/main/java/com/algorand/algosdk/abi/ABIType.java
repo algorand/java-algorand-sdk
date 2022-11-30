@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 public abstract class ABIType {
     public static final int ABI_DYNAMIC_HEAD_BYTE_LEN = 2;
-    private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>[1-9][\\d]*)]$");
+    private static final Pattern staticArrayPattern = Pattern.compile("^(?<elemT>[a-z\\d\\[\\](),]+)\\[(?<len>0|[1-9][\\d]*)]$");
     private static final Pattern ufixedPattern = Pattern.compile("^ufixed(?<size>[1-9][\\d]*)x(?<precision>[1-9][\\d]*)$");
 
     /**
@@ -103,7 +103,7 @@ public abstract class ABIType {
             return new ArrayList<>();
 
         if (str.startsWith(",") || str.endsWith(","))
-            throw new IllegalArgumentException("parsing error: tuple content should not start with comma");
+            throw new IllegalArgumentException("parsing error: tuple content should not start or end with comma");
 
         if (str.contains(",,"))
             throw new IllegalArgumentException("parsing error: tuple content should not have consecutive commas");
@@ -118,8 +118,15 @@ public abstract class ABIType {
                 if (parenStack.isEmpty())
                     throw new IllegalArgumentException("parsing error: tuple parentheses are not balanced: " + str);
                 int leftParenIndex = parenStack.pop();
-                if (parenStack.isEmpty())
+                if (parenStack.isEmpty()) {
+                    // iterate through the byte str, include all the bytes after closing round bracket, for array indicator
+                    // increase the index until it meets comma, or end of string
+                    int forwardIndex = i + 1;
+                    while (forwardIndex < str.length() && str.charAt(forwardIndex) != ',')
+                        forwardIndex++;
+                    i = forwardIndex - 1;
                     parenSegments.add(new Segment(leftParenIndex, i));
+                }
             }
         }
         if (!parenStack.isEmpty())
