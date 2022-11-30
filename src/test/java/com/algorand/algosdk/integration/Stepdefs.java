@@ -1177,9 +1177,16 @@ public class Stepdefs {
         HashMap<String, Object> expectedMap = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
         HashMap<String, Object> actualMap = this.compileResponse.body().sourcemap;
 
-        for(String field: fields){
+        for (String field : fields) {
             assertThat(actualMap.get(field)).isEqualTo(expectedMap.get(field));
         }
     }
 
+    @Then("disassembly of {string} matches {string}")
+    public void disassemblyMatches(String bytecodeFilename, String sourceFilename) throws Exception {
+        String disassembledSource = aclv2.TealDisassemble().source(loadResource(bytecodeFilename)).execute().body().result;
+        String expectedSource = new String(ResourceUtils.readResource(sourceFilename), StandardCharsets.UTF_8);
+
+        assertThat(disassembledSource).isEqualTo(expectedSource);
+    }
 }
