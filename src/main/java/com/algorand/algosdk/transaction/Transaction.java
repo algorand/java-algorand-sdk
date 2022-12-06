@@ -948,7 +948,7 @@ public class Transaction implements Serializable {
         if (foreignAssets != null) this.foreignAssets = foreignAssets;
         if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
         if (applicationId != null) this.applicationId = applicationId;
-        if (localStateSchema != null) this.localStateSchema = globalStateSchema;
+        if (localStateSchema != null) this.localStateSchema = localStateSchema;
         if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
         if (extraPages != null) this.extraPages = extraPages;
     }

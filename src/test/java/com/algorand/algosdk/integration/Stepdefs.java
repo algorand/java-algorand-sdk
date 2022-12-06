@@ -1,10 +1,6 @@
 package com.algorand.algosdk.integration;
 
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.AlgodClient;
-import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.algod.client.api.AlgodApi;
-import com.algorand.algosdk.algod.client.model.*;
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
 import com.algorand.algosdk.builder.transaction.TransactionBuilder;
@@ -18,11 +14,10 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.AlgoConverter;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
+import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.CompileResponse;
-import com.algorand.algosdk.v2.client.model.DryrunResponse;
-import com.algorand.algosdk.v2.client.model.DryrunRequest;
-import com.algorand.algosdk.v2.client.model.DryrunSource;
+import com.algorand.algosdk.v2.client.model.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -36,15 +31,12 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,7 +47,7 @@ public class Stepdefs {
     public static Integer algodPort = 60000;
     public static Integer kmdPort = 60001;
 
-    TransactionParams params;
+    TransactionParametersResponse params;
     SignedTransaction stx;
     SignedTransaction[] stxs;
     byte[] stxBytes;
@@ -76,19 +68,15 @@ public class Stepdefs {
     String gen;
     byte[] note;
     MultisigAddress msig;
-    MultisigSignature msigsig;
     String walletName;
     String walletPswd;
     String walletID;
-    AlgodApi acl;
-    AlgodClient algodClient;
     KmdApi kcl;
     KmdClient kmdClient;
     com.algorand.algosdk.v2.client.common.AlgodClient aclv2;
+    IndexerClient v2IndexerClient;
     String handle;
     List<String> versions;
-    NodeStatus status;
-    NodeStatus statusAfter;
     List<byte[]> pks;
     List<String> addresses;
     BigInteger lastRound;
@@ -100,14 +88,12 @@ public class Stepdefs {
     Bid bid;
     SignedBid oldBid;
     SignedBid sbid;
-    BigInteger paramsFee;
     ParticipationPublicKey votepk;
     VRFPublicKey vrfpk;
     String sprfpk;
     BigInteger votefst;
     BigInteger votelst;
     BigInteger votekd;
-    String num;
 
     /* Assets */
     String creator = "";
@@ -115,36 +101,11 @@ public class Stepdefs {
     String assetName = "testcoin";
     String assetUnitName = "coins";
     com.algorand.algosdk.transaction.AssetParams expectedParams = null;
-    AssetParams queriedParams = new AssetParams();
+    Asset queriedParams = new Asset();
 
     /* Compile / Dryrun */
     Response<CompileResponse> compileResponse;
     Response<DryrunResponse> dryrunResponse;
-
-    private static class DevModeState {
-        static final long ACCOUNT_FUNDING_MICROALGOS = 100_000_000;
-        private Account advanceRounds;
-
-        /**
-         * randomAmount minimizes the chance `advanceRounds` issues duplicate transactions by randomizing the payment amount.
-         */
-        private long randomAmount() {
-            return ThreadLocalRandom.current().nextLong(1, (long) (ACCOUNT_FUNDING_MICROALGOS * .01));
-        }
-
-        public SignedTransaction selfPay(TransactionParams tp) throws Exception {
-            Transaction tx =
-                    Transaction.PaymentTransactionBuilder()
-                            .sender(advanceRounds.getAddress())
-                            .suggestedParams(tp)
-                            .amount(randomAmount())
-                            .receiver(advanceRounds.getAddress())
-                            .build();
-            return advanceRounds.signTransaction(tx);
-        }
-    }
-
-    private final DevModeState dms = new DevModeState();
 
     protected Address getAddress(int i) {
         if (addresses == null) {
@@ -166,8 +127,8 @@ public class Stepdefs {
      */
     protected void getParams() {
         try {
-            params = acl.transactionParams();
-            lastRound = params.getLastRound();
+            params = aclv2.TransactionParams().execute().body();
+            lastRound = BigInteger.valueOf(params.lastRound);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -186,60 +147,6 @@ public class Stepdefs {
         return acct.signTransaction(tx);
     }
 
-    /**
-     * advanceRound is a convenience method intended for testing with DevMode networks.
-     * <p>
-     * Since DevMode block generation requires a transaction rather than time passing, test assertions may require advancing rounds.  advanceRound issues advanceCount payments to advance rounds.
-     */
-    private void advanceRoundsV1(int advanceCount) {
-        initializeDevModeAccount();
-        for (int i = 0; i < advanceCount; i++) {
-            try {
-                acl.rawTransaction(Encoder.encodeToMsgPack(dms.selfPay(acl.transactionParams())));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * initializeDevModeAccount performs a one-time account initialization per inclusion in a scenario outline.  No attempt is made to delete the account.
-     */
-    public void initializeDevModeAccount() {
-        if (dms.advanceRounds != null) {
-            return;
-        }
-
-        try {
-            getParams();
-            dms.advanceRounds = new Account();
-            Address sender = getAddress(0);
-            Transaction tx =
-                    Transaction.PaymentTransactionBuilder()
-                            .sender(sender)
-                            .suggestedParams(acl.transactionParams())
-                            .amount(DevModeState.ACCOUNT_FUNDING_MICROALGOS)
-                            .receiver(dms.advanceRounds.getAddress())
-                            .build();
-            SignedTransaction st = signWithAddress(tx, sender);
-            acl.rawTransaction(Encoder.encodeToMsgPack(st));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Convenience method to export a key and initialize an account to use for signing.
-     */
-    public void exportKeyAndSetAccount(Address addr) throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException {
-        ExportKeyRequest req = new ExportKeyRequest();
-        req.setAddress(addr.toString());
-        req.setWalletHandleToken(handle);
-        req.setWalletPassword(walletPswd);
-        sk = kcl.exportKey(req).getPrivateKey();
-        account = new Account(Arrays.copyOfRange(sk, 0, 32));
-    }
-
     @When("I create a wallet")
     public void createWallet() throws com.algorand.algosdk.kmd.client.ApiException {
         walletName = "Walletjava";
@@ -256,8 +163,9 @@ public class Stepdefs {
         boolean exists = false;
         APIV1GETWalletsResponse resp = kcl.listWallets();
         for (APIV1Wallet w : resp.getWallets()){
-            if (w.getName().equals(walletName)){
+            if (w.getName().equals(walletName)) {
                 exists = true;
+                break;
             }
         }
         assertThat(exists).isTrue();
@@ -314,7 +222,7 @@ public class Stepdefs {
     }
 
     @Then("the wallet handle should not work")
-    public void tryHandle() throws com.algorand.algosdk.kmd.client.ApiException{
+    public void tryHandle() {
         RenewWalletHandleTokenRequest req = new RenewWalletHandleTokenRequest();
         req.setWalletHandleToken(handle);
         err = false;
@@ -327,7 +235,7 @@ public class Stepdefs {
     }
 
     @Given("payment transaction parameters {int} {int} {int} {string} {string} {string} {int} {string} {string}")
-    public void transactionParameters(int fee, int fv, int lv, String gh, String to, String close, int amt, String gen, String note)  throws GeneralSecurityException, NoSuchAlgorithmException{
+    public void transactionParameters(int fee, int fv, int lv, String gh, String to, String close, int amt, String gen, String note)  throws GeneralSecurityException {
         this.fee = BigInteger.valueOf(fee);
         this.fv = BigInteger.valueOf(fv);
         this.lv = BigInteger.valueOf(lv);
@@ -352,7 +260,7 @@ public class Stepdefs {
     }
 
     @Given("default V2 key registration transaction {string}")
-    public void  default_v2_key_registration_transaction(String type) throws NoSuchAlgorithmException, JsonProcessingException, IOException{
+    public void default_v2_key_registration_transaction(String type) {
         getParams();
         votepk=new ParticipationPublicKey(Encoder.decodeFromBase64("9mr13Ri8rFepxN3ghIUrZNui6LqqM5hEzB45Rri5lkU="));
         vrfpk = new VRFPublicKey(Encoder.decodeFromBase64("dx717L3uOIIb/jr9OIyls1l5Ei00NFgRa380w7TnPr4="));
@@ -444,8 +352,8 @@ public class Stepdefs {
     }
 
     @When("I get versions with algod")
-    public void aclV() throws ApiException{
-        versions = acl.getVersion().getVersions();
+    public void aclV() throws Exception {
+        versions = aclv2.GetVersion().execute().body().versions;
     }
 
     @Then("v1 should be in the versions")
@@ -453,25 +361,14 @@ public class Stepdefs {
         assertThat(versions).contains("v1");
     }
 
+    @Then("v2 should be in the versions")
+    public void v2InVersions(){
+        assertThat(versions).contains("v2");
+    }
+
     @When("I get versions with kmd")
     public void kclV() throws com.algorand.algosdk.kmd.client.ApiException{
         versions = kcl.getVersion().getVersions();
-    }
-
-    @When("I get the status")
-    public void status() throws ApiException{
-        status = acl.getStatus();
-    }
-
-    @When("I get status after this block")
-    public void statusBlock() throws Exception {
-        advanceRoundsV1(1);
-        statusAfter = acl.waitForBlock(status.getLastRound());
-    }
-
-    @Then("I can get the block info")
-    public void block() throws ApiException{
-        acl.getBlock(status.getLastRound().add(BigInteger.valueOf(1)));
     }
 
     @When("I import the multisig")
@@ -564,12 +461,12 @@ public class Stepdefs {
             Transaction tx =
                     Transaction.PaymentTransactionBuilder()
                             .sender(sender)
-                            .suggestedParams(acl.transactionParams())
+                            .suggestedParams(params)
                             .amount(100_000_000)
                             .receiver(rekey)
                             .build();
             SignedTransaction st = signWithAddress(tx, sender);
-            acl.rawTransaction(Encoder.encodeToMsgPack(st));
+            aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(st)).execute();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -615,7 +512,7 @@ public class Stepdefs {
     }
 
     @When("I generate a key")
-    public void genKey()throws NoSuchAlgorithmException, GeneralSecurityException{
+    public void genKey()throws GeneralSecurityException{
         account = new Account();
         pk = account.getAddress();
         address = pk.toString();
@@ -656,7 +553,7 @@ public class Stepdefs {
     }
 
     @Given("a kmd client")
-    public void kClient() throws FileNotFoundException, IOException, NoSuchAlgorithmException{
+    public void kClient() {
         kmdClient = new KmdClient();
         kmdClient.setConnectTimeout(30000);
         kmdClient.setReadTimeout(30000);
@@ -666,26 +563,25 @@ public class Stepdefs {
         kcl = new KmdApi(kmdClient);
     }
 
-    @Given("an algod client")
-    public void aClient() throws FileNotFoundException, IOException{
-        algodClient = new AlgodClient();
-        algodClient.setConnectTimeout(30000);
-        algodClient.setReadTimeout(30000);
-        algodClient.setWriteTimeout(30000);
-        algodClient.setApiKey(token);
-        algodClient.setBasePath("http://localhost:" + algodPort);
-        acl = new AlgodApi(algodClient);
-    }
-
     @Given("an algod v2 client")
-    public void aClientv2() throws FileNotFoundException, IOException{
+    public void aClientv2() {
         aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
             "http://localhost", algodPort, token
         );
     }
 
+    @Given("an algod v2 client connected to {string} port {int} with token {string}")
+    public void an_algod_v2_client_connected_to_port_with_token(String host, Integer port, String token) {
+        aclv2 = new AlgodClient(host, port, token);
+    }
+
+    @Given("an indexer v2 client")
+    public void indexer_v2_client() {
+        v2IndexerClient = new IndexerClient("localhost", 59999);
+    }
+
     @Given("wallet information")
-    public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
+    public void walletInfo() throws com.algorand.algosdk.kmd.client.ApiException {
         walletName = "unencrypted-default-wallet";
         walletPswd = "";
         List<APIV1Wallet> wallets = kcl.listWallets().getWallets();
@@ -705,7 +601,7 @@ public class Stepdefs {
     }
 
     @Given("default transaction with parameters {int} {string}")
-    public void defaultTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException {
+    public void defaultTxn(int amt, String note) {
         defaultTxnWithAddress(amt, note, getAddress(0));
     }
 
@@ -732,7 +628,7 @@ public class Stepdefs {
     }
 
     @Given("default multisig transaction with parameters {int} {string}")
-    public void defaultMsigTxn(int amt, String note) throws ApiException, NoSuchAlgorithmException{
+    public void defaultMsigTxn(int amt, String note) {
         getParams();
         if (note.equals("none")){
             this.note = null;
@@ -755,37 +651,13 @@ public class Stepdefs {
     }
 
     @When("I send the transaction")
-    public void sendTxn() throws JsonProcessingException, ApiException{
-        txid = acl.rawTransaction(Encoder.encodeToMsgPack(stx)).getTxId();
+    public void sendTxn() throws Exception {
+        txid = aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute().body().txId;
     }
 
     @When("I send the multisig transaction")
-    public void sendMsigTxn() throws JsonProcessingException, ApiException{
-        try{
-            acl.rawTransaction(Encoder.encodeToMsgPack(stx));
-        } catch(Exception e) {
-            err = true;
-        }
-    }
-
-    // TODO: this needs to be modified/removed when v1 is no longer supported!!!
-    @Then("the transaction should go through")
-    public void checkTxn() throws Exception {
-        String ans = acl.pendingTransactionInformation(txid).getFrom();
-        assertThat(this.txn.sender.toString()).isEqualTo(ans);
-        waitForAlgodTransactionProcessingToComplete();
-        String senderFromResponse = acl.transactionInformation(txn.sender.toString(), txid).getFrom();
-        assertThat(senderFromResponse).isEqualTo(txn.sender.toString());
-        // assertThat(acl.transaction(txid).getFrom()).isEqualTo(senderFromResponse);
-    }
-
-    /**
-     * waitForAlgodTransactionProcessingToComplete is a Dev mode helper method that's a rough analog to `acl.waitForBlock(lastRound.add(BigInteger.valueOf(2)));`.
-     * <p>
-     * Since Dev mode produces blocks on a per transaction basis, it's possible algod generates a block _before_ the corresponding SDK call to wait for a block.  Without _any_ wait, it's possible the SDK looks for the transaction before algod completes processing.  So, the method performs a local sleep to simulate waiting for a block.
-     */
-    private static void waitForAlgodTransactionProcessingToComplete() throws Exception {
-        Thread.sleep(500);
+    public void sendMsigTxn() throws Exception {
+        err = !aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute().isSuccessful();
     }
 
     @Then("the transaction should not go through")
@@ -794,7 +666,7 @@ public class Stepdefs {
     }
 
     @When("I sign the transaction with kmd")
-    public void signKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, NoSuchAlgorithmException{
+    public void signKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException {
         SignTransactionRequest req = new SignTransactionRequest();
         req.setTransaction(Encoder.encodeToMsgPack(txn));
         req.setWalletHandleToken(handle);
@@ -807,7 +679,7 @@ public class Stepdefs {
     }
 
     @When("I sign the multisig transaction with kmd")
-    public void signMsigKmd() throws JsonProcessingException, com.algorand.algosdk.kmd.client.ApiException, IOException{
+    public void signMsigKmd() throws com.algorand.algosdk.kmd.client.ApiException, IOException{
         ImportMultisigRequest importReq = new ImportMultisigRequest();
         importReq.setMultisigVersion(msig.version);
         importReq.setThreshold(msig.threshold);
@@ -834,42 +706,13 @@ public class Stepdefs {
     }
 
     @Then("the node should be healthy")
-    public void nodeHealth() throws ApiException{
-        acl.healthCheck();
+    public void nodeHealth() throws Exception {
+        aclv2.HealthCheck().execute();
     }
 
     @Then("I get the ledger supply")
-    public void getLedger() throws ApiException{
-        acl.getSupply();
-    }
-
-    @Then("I get transactions by address and round")
-    public void txnsByAddrRound() throws ApiException{
-        assertThat(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions())
-                .isInstanceOf(List.class);
-        //Assert.assertTrue(acl.transactions(addresses.get(0), BigInteger.valueOf(1), acl.getStatus().getLastRound(), null, null, BigInteger.valueOf(10)).getTransactions() instanceof List<?>);
-    }
-
-    @Then("I get pending transactions")
-    public void pendingTxns() throws ApiException{
-        assertThat(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns())
-            .isInstanceOf(TransactionList.class);
-        //Assert.assertTrue(acl.getPendingTransactions(BigInteger.valueOf(10)).getTruncatedTxns() instanceof TransactionList);
-    }
-
-    @When("I get the suggested params")
-    public void suggestedParams() throws ApiException{
-        paramsFee = acl.transactionParams().getFee();
-    }
-
-    @When("I get the suggested fee")
-    public void suggestedFee() throws ApiException {
-        fee = acl.suggestedFee().getFee();
-    }
-
-    @Then("the fee in the suggested params should equal the suggested fee")
-    public void checkSuggested() {
-        assertThat(paramsFee).isEqualTo(fee);
+    public void getLedger() throws Exception {
+        aclv2.GetSupply().execute();
     }
 
     @When("I create a bid")
@@ -933,7 +776,7 @@ public class Stepdefs {
     }
 
     @When("I create the flat fee payment transaction")
-    public void createPaytxnFlat() throws NoSuchAlgorithmException{
+    public void createPaytxnFlat() {
         txn = Transaction.PaymentTransactionBuilder()
                 .sender(pk)
                 .flatFee(fee)
@@ -989,14 +832,9 @@ public class Stepdefs {
         assertThat(microalgos).isEqualTo(BigInteger.valueOf(ma));
     }
 
-    @Then("I get account information")
-    public void accInfo() throws ApiException {
-        acl.accountInformation(addresses.get(0));
-    }
-
     @Then("I can get account information")
-    public void newAccInfo() throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException {
-        acl.accountInformation(pk.encodeAsString());
+    public void newAccInfo() throws Exception {
+        aclv2.AccountInformation(pk).execute();
         DeleteKeyRequest req = new DeleteKeyRequest();
         req.setAddress(pk.encodeAsString());
         req.setWalletHandleToken(handle);
@@ -1010,7 +848,7 @@ public class Stepdefs {
     }
 
     @Given("default asset creation transaction with total issuance {int}")
-    public void default_asset_creation_transaction_with_total_issuance(Integer assetTotal) throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void default_asset_creation_transaction_with_total_issuance(Integer assetTotal) {
         getParams();
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
@@ -1033,21 +871,25 @@ public class Stepdefs {
     }
 
     @When("I get the asset info")
-    public void i_get_the_asset_info() throws ApiException {
-        this.queriedParams = acl.assetInformation(this.assetID);
+    public void i_get_the_asset_info() throws Exception {
+        this.queriedParams = aclv2.GetAssetByID(this.assetID.longValue()).execute().body();
+    }
+
+    static private String null_to_empty(String str) {
+        return str == null ? "" : str;
     }
 
     @Then("the asset info should match the expected asset info")
-    public void the_asset_info_should_match_the_expected_asset_info() throws JsonProcessingException, NoSuchAlgorithmException {
+    public void the_asset_info_should_match_the_expected_asset_info() {
         // Can't use a regular assertj call because 'compareTo' isn't a regular comparator.
-        assertThat(this.expectedParams.assetManager.compareTo(this.queriedParams.getManagerkey())).isTrue();
-        assertThat(this.expectedParams.assetReserve.compareTo(this.queriedParams.getReserveaddr())).isTrue();
-        assertThat(this.expectedParams.assetFreeze.compareTo(this.queriedParams.getFreezeaddr())).isTrue();
-        assertThat(this.expectedParams.assetClawback.compareTo(this.queriedParams.getClawbackaddr())).isTrue();
+        assertThat(this.expectedParams.assetManager.compareTo(null_to_empty(this.queriedParams.params.manager))).isTrue();
+        assertThat(this.expectedParams.assetReserve.compareTo(null_to_empty(this.queriedParams.params.reserve))).isTrue();
+        assertThat(this.expectedParams.assetFreeze.compareTo(null_to_empty(this.queriedParams.params.freeze))).isTrue();
+        assertThat(this.expectedParams.assetClawback.compareTo(null_to_empty(this.queriedParams.params.clawback))).isTrue();
     }
 
     @When("I create a no-managers asset reconfigure transaction")
-    public void i_create_a_no_managers_asset_reconfigure_transaction() throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_a_no_managers_asset_reconfigure_transaction() {
         getParams();
 
         Transaction tx = Transaction.AssetConfigureTransactionBuilder()
@@ -1063,7 +905,7 @@ public class Stepdefs {
     }
 
     @When("I create an asset destroy transaction")
-    public void i_create_an_asset_destroy_transaction() throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_an_asset_destroy_transaction() {
         getParams();
 
         Transaction tx = Transaction.AssetDestroyTransactionBuilder()
@@ -1077,21 +919,16 @@ public class Stepdefs {
     }
 
     @Then("I should be unable to get the asset info")
-    public void i_should_be_unable_to_get_the_asset_info() {
-        boolean exists = true;
-        try {
-            this.i_get_the_asset_info();
-        } catch (ApiException e) {
-            exists = false;
-        }
-        assertThat(exists).isFalse();
+    public void i_should_be_unable_to_get_the_asset_info() throws Exception {
+        this.i_get_the_asset_info();
+        assertThat(queriedParams).isNull();
     }
 
     @When("I create a transaction transferring {int} assets from creator to a second account")
-    public void i_create_a_transaction_transferring_assets_from_creator_to_a_second_account(Integer int1) throws NoSuchAlgorithmException, ApiException, InvalidKeySpecException {
+    public void i_create_a_transaction_transferring_assets_from_creator_to_a_second_account(Integer int1) {
         getParams();
 
-        Transaction tx = Transaction.AssetTransferTransactionBuilder()
+        this.txn = Transaction.AssetTransferTransactionBuilder()
                 .sender(this.creator)
                 .assetReceiver(getAddress(1))
                 .assetAmount(int1)
@@ -1099,59 +936,58 @@ public class Stepdefs {
                 .note(this.note)
                 .assetIndex(this.assetID)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
     @Then("the creator should have {int} assets remaining")
-    public void the_creator_should_have_assets_remaining(Integer expectedBal) throws ApiException {
-        com.algorand.algosdk.algod.client.model.Account accountResp =
-                this.acl.accountInformation(this.creator);
-        AssetHolding holding = accountResp.getHolding(this.assetID);
-        assertThat(holding.getAmount()).isEqualTo(BigInteger.valueOf(expectedBal));
+    public void the_creator_should_have_assets_remaining(Integer expectedBal) throws Exception {
+        AccountAssetResponse holding = aclv2.AccountAssetInformation(new Address(this.creator), this.assetID.longValue()).execute().body();
+        assertThat(holding.assetHolding.amount).isEqualTo(BigInteger.valueOf(expectedBal));
     }
 
     @Then("I update the asset index")
-    public void i_update_the_asset_index() throws ApiException {
-        com.algorand.algosdk.algod.client.model.Account accountResp = acl.accountInformation(this.creator);
-        Set<java.math.BigInteger> keys = accountResp.getThisassettotal().keySet();
-        this.assetID = Collections.max(keys);
+    public void i_update_the_asset_index() throws Exception {
+        List<Asset> assets = aclv2.AccountInformation(new Address(this.creator)).execute().body().createdAssets;
+        List<BigInteger> assetIDs = new ArrayList<>();
+        for (Asset a: assets) {
+            assetIDs.add(BigInteger.valueOf(a.index));
+        }
+        this.assetID = Collections.max(assetIDs);
     }
 
     @When("I send the bogus kmd-signed transaction")
     public void i_send_the_bogus_kmd_signed_transaction() {
         try {
-            txid = acl.rawTransaction(this.stxBytes).getTxId();
-        } catch (ApiException e) {
+            txid = aclv2.RawTransaction().rawtxn(this.stxBytes).execute().body().txId;
+        } catch (Exception e) {
             this.err = true;
         }
     }
 
     @Then("I create a transaction for a second account, signalling asset acceptance")
-    public void i_create_a_transaction_for_a_second_account_signalling_asset_acceptance() throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_for_a_second_account_signalling_asset_acceptance() {
         getParams();
 
-        Transaction tx = Transaction.AssetAcceptTransactionBuilder()
+        this.txn = Transaction.AssetAcceptTransactionBuilder()
                 .acceptingAccount(getAddress(1))
                 .suggestedParams(this.params)
                 .note(this.note)
                 .assetIndex(this.assetID)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(1);
     }
 
     @Then("I send the kmd-signed transaction")
-    public void i_send_the_kmd_signed_transaction() throws ApiException {
-        txid = acl.rawTransaction(this.stxBytes).getTxId();
+    public void i_send_the_kmd_signed_transaction() throws Exception {
+        txid = aclv2.RawTransaction().rawtxn(this.stxBytes).execute().body().txId;
     }
 
     @When("I create a freeze transaction targeting the second account")
-    public void i_create_a_freeze_transaction_targeting_the_second_account() throws NoSuchAlgorithmException, ApiException, com.algorand.algosdk.kmd.client.ApiException {
+    public void i_create_a_freeze_transaction_targeting_the_second_account() throws com.algorand.algosdk.kmd.client.ApiException {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
-        Transaction tx = Transaction.AssetFreezeTransactionBuilder()
+        this.txn = Transaction.AssetFreezeTransactionBuilder()
                 .sender(getAddress(0))
                 .freezeTarget(getAddress(1))
                 .freezeState(true)
@@ -1159,15 +995,14 @@ public class Stepdefs {
                 .note(this.note)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
     @When("I create a transaction transferring {int} assets from a second account to creator")
-    public void i_create_a_transaction_transferring_assets_from_a_second_account_to_creator(Integer int1) throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_transferring_assets_from_a_second_account_to_creator(Integer int1) {
         getParams();
 
-        Transaction tx = Transaction.AssetTransferTransactionBuilder()
+        this.txn = Transaction.AssetTransferTransactionBuilder()
                 .sender(getAddress(1))
                 .assetReceiver(this.creator)
                 .assetAmount(int1)
@@ -1175,16 +1010,15 @@ public class Stepdefs {
                 .assetIndex(this.assetID)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(1);
     }
 
     @When("I create an un-freeze transaction targeting the second account")
-    public void i_create_an_un_freeze_transaction_targeting_the_second_account() throws ApiException, NoSuchAlgorithmException, com.algorand.algosdk.kmd.client.ApiException  {
+    public void i_create_an_un_freeze_transaction_targeting_the_second_account() throws com.algorand.algosdk.kmd.client.ApiException  {
         this.renewHandle(); // to avoid handle expired error
         getParams();
 
-        Transaction tx = Transaction.AssetFreezeTransactionBuilder()
+        this.txn = Transaction.AssetFreezeTransactionBuilder()
                 .sender(getAddress(0))
                 .freezeTarget(getAddress(1))
                 .freezeState(false)
@@ -1192,12 +1026,11 @@ public class Stepdefs {
                 .note(this.note)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
     @Given("default-frozen asset creation transaction with total issuance {int}")
-    public void default_frozen_asset_creation_transaction_with_total_issuance(Integer int1) throws ApiException, NoSuchAlgorithmException {
+    public void default_frozen_asset_creation_transaction_with_total_issuance(Integer int1) throws NoSuchAlgorithmException {
         getParams();
 
         Transaction tx = Transaction.AssetCreateTransactionBuilder()
@@ -1221,10 +1054,10 @@ public class Stepdefs {
     }
 
     @When("I create a transaction revoking {int} assets from a second account to creator")
-    public void i_create_a_transaction_revoking_assets_from_a_second_account_to_creator(Integer int1) throws ApiException, NoSuchAlgorithmException {
+    public void i_create_a_transaction_revoking_assets_from_a_second_account_to_creator(Integer int1) {
         getParams();
 
-        Transaction tx = Transaction.AssetClawbackTransactionBuilder()
+        this.txn = Transaction.AssetClawbackTransactionBuilder()
                 .sender(getAddress(0))
                 .assetClawbackFrom(getAddress(1))
                 .assetReceiver(getAddress(0))
@@ -1233,7 +1066,6 @@ public class Stepdefs {
                 .note(this.note)
                 .suggestedParams(this.params)
                 .build();
-        this.txn = tx;
         this.pk = getAddress(0);
     }
 
@@ -1301,7 +1133,7 @@ public class Stepdefs {
             DryrunSource drs = new DryrunSource();
             drs.fieldName = "lsig";
             drs.source = new String(data);
-            drs.txnIndex = 0l;
+            drs.txnIndex = 0L;
             sources.add(drs);
             SignedTransaction stxn = new SignedTransaction(txn, new Signature());
             stxns.add(stxn);
@@ -1316,7 +1148,7 @@ public class Stepdefs {
     }
 
     @When("I get execution result {string}")
-    public void i_get_execution_result(String result) throws Exception {
+    public void i_get_execution_result(String result) {
         DryrunResponse ddr = dryrunResponse.body();
         assertThat(ddr).isNotNull();
         assertThat(ddr.txns).isNotNull();
@@ -1331,13 +1163,11 @@ public class Stepdefs {
         assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
 
-
     @When("I compile a teal program {string} with mapping enabled")
     public void i_compile_a_teal_program_with_mapping_enabled(String tealPath) throws Exception {
         byte[] tealProgram = ResourceUtils.loadResource(tealPath);
         this.compileResponse = aclv2.TealCompile().source(tealProgram).sourcemap(true).execute();
     }
-
 
     @Then("the resulting source map is the same as the json {string}")
     public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws Exception {

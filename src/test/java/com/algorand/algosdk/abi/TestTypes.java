@@ -238,6 +238,54 @@ public class TestTypes {
                         )
                 )
         );
+        assertThat(ABIType.valueOf("(uint32,(uint64,bool)[10],byte)")).isEqualTo(
+                new TypeTuple(
+                        Arrays.asList(
+                                new TypeUint(32),
+                                new TypeArrayStatic(
+                                        new TypeTuple(
+                                                Arrays.asList(
+                                                        new TypeUint(64),
+                                                        new TypeBool()
+                                                )
+                                        ),
+                                        10),
+                                new TypeByte()
+                        )
+                )
+        );
+        assertThat(ABIType.valueOf("(uint32,byte,(uint64,bool)[10])")).isEqualTo(
+                new TypeTuple(
+                        Arrays.asList(
+                                new TypeUint(32),
+                                new TypeByte(),
+                                new TypeArrayStatic(
+                                        new TypeTuple(
+                                                Arrays.asList(
+                                                        new TypeUint(64),
+                                                        new TypeBool()
+                                                )
+                                        ),
+                                        10)
+                        )
+                )
+        );
+        assertThat(ABIType.valueOf("((uint64,bool)[10],uint32,byte)")).isEqualTo(
+                new TypeTuple(
+                        Arrays.asList(
+                                new TypeArrayStatic(
+                                        new TypeTuple(
+                                                Arrays.asList(
+                                                        new TypeUint(64),
+                                                        new TypeBool()
+                                                )
+                                        ),
+                                        10),
+                                new TypeUint(32),
+                                new TypeByte()
+                        )
+                )
+        );
     }
 
     @Test
@@ -266,7 +314,7 @@ public class TestTypes {
                 "[][][]",
                 "stuff[]",
                 // static array
-                "ufixed32x10[0]",
+                "bool[01]",
                 "byte[10 ]",
                 "uint64[0x21]",
                 // tuple
