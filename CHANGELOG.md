@@ -1,3 +1,16 @@
+# 1.22.0
+
+### Bugfixes
+* BugFix: Fix incorrect reference to global schema by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/427
+* Bug-Fix: parsing type strings for tuples containing static arrays of tuples by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/431
+### Enhancements
+* REST API: Add KV counts to NodeStatusResponse by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/428
+* Enhancement: Migrate v1 algod dependencies to v2 in cucumber tests by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/425
+* Enhancement: Allowing zero length in static array by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/432
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/1.21.1...1.22.0
+
 # 1.21.1
 
 ## What's Changed
