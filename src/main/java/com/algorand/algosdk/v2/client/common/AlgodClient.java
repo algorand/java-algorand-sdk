@@ -19,12 +19,14 @@ import com.algorand.algosdk.v2.client.algod.RawTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
+import com.algorand.algosdk.v2.client.algod.GetLedgerStateDelta;
 import com.algorand.algosdk.v2.client.algod.GetStateProof;
 import com.algorand.algosdk.v2.client.algod.GetLightBlockHeaderProof;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
+import com.algorand.algosdk.v2.client.algod.UnsetSyncRound;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.algod.TealDisassemble;
 import com.algorand.algosdk.v2.client.algod.TealDryrun;
@@ -227,6 +229,14 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get ledger deltas for a round.
+     * /v2/deltas/{round}
+     */
+    public GetLedgerStateDelta GetLedgerStateDelta(Long round) {
+        return new GetLedgerStateDelta((Client) this, round);
+    }
+
+    /**
      * Get a state proof that covers a given round
      * /v2/stateproofs/{round}
      */
@@ -280,6 +290,14 @@ public class AlgodClient extends Client {
      */
     public GetAssetByID GetAssetByID(Long assetId) {
         return new GetAssetByID((Client) this, assetId);
+    }
+
+    /**
+     * Unset the ledger sync round.
+     * /v2/ledger/sync
+     */
+    public UnsetSyncRound UnsetSyncRound() {
+        return new UnsetSyncRound((Client) this);
     }
 
     /**
