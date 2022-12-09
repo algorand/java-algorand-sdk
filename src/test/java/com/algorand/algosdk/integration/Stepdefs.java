@@ -1171,7 +1171,7 @@ public class Stepdefs {
 
     @Then("the resulting source map is the same as the json {string}")
     public void the_resulting_source_map_is_the_same_as_the_json(String jsonPath) throws Exception {
-        String[] fields = {"version", "sources", "names", "mapping", "mappings"};
+        String[] fields = {"version", "sources", "names", "mappings"};
         String srcMapStr = new String(ResourceUtils.readResource(jsonPath), StandardCharsets.UTF_8);
 
         HashMap<String, Object> expectedMap = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
