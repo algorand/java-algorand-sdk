@@ -1177,6 +1177,8 @@ public class Stepdefs {
         HashMap<String, Object> expectedMap = new HashMap<>(Encoder.decodeFromJson(srcMapStr, Map.class));
         HashMap<String, Object> actualMap = this.compileResponse.body().sourcemap;
 
+        assertThat(expectedMap.size()).isEqualTo(actualMap.size());
+
         for(String field: fields){
             assertThat(actualMap.get(field)).isEqualTo(expectedMap.get(field));
         }
