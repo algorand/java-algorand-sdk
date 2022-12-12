@@ -5,7 +5,7 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.abi.TypeAddress;
 import com.algorand.algosdk.abi.TypeTuple;
 import com.algorand.algosdk.abi.TypeUint;
-import com.algorand.algosdk.algod.client.model.TransactionParams;
+//import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
@@ -308,9 +308,9 @@ public class MethodCallParams {
             return this.sender(sender);
         }
 
-        public Builder setSuggestedParams(TransactionParams sp) {
-            return this.suggestedParams(sp);
-        }
+//        public Builder setSuggestedParams(TransactionParams sp) {
+//            return this.suggestedParams(sp);
+//        }
 
         public Builder setSuggestedParams(TransactionParametersResponse sp) {
             return this.suggestedParams(sp);
