@@ -5,14 +5,11 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.abi.TypeAddress;
 import com.algorand.algosdk.abi.TypeTuple;
 import com.algorand.algosdk.abi.TypeUint;
-//import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
-import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
-import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
