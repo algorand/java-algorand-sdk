@@ -58,7 +58,7 @@ public class TxGroup implements Serializable{
      * @return array of grouped transactions, optionally filtered with the address parameter.
      */
     public static Transaction[] assignGroupID(Transaction ...txns) throws IOException {
-        return assignGroupID(txns, null);
+        return assignGroupID(null, txns);
     }
 
     /**
@@ -68,23 +68,8 @@ public class TxGroup implements Serializable{
      * @return array of grouped transactions, optionally filtered with the address parameter.
      */
     public static Transaction[] assignGroupID(Address address, Transaction ...txns) throws IOException {
-        return assignGroupID(txns, address);
-    }
-
-    /**
-     * Assigns group id to a given array of unsigned transactions
-     * @param txns array of transactions
-     * @param address optional sender address specifying which transaction return
-     * @return array of grouped transactions, optionally filtered with the address parameter.
-     *
-     * @Deprecated use assignGroupID(address, Transaction ...txns)
-     */
-    @Deprecated // Jan 8, 2020
-    public static Transaction[] assignGroupID(
-        Transaction[] txns, Address address
-    ) throws IOException {
         Digest gid = TxGroup.computeGroupID(txns);
-        ArrayList<Transaction> result = new ArrayList<Transaction>();
+        ArrayList<Transaction> result = new ArrayList<>();
         for (Transaction tx : txns) {
             if (address == null || address.toString() == "" || address == tx.sender) {
                 tx.assignGroupID(gid);
