@@ -1,8 +1,5 @@
 package com.algorand.algosdk.builder.transaction;
 
-import com.algorand.algosdk.algod.client.ApiException;
-import com.algorand.algosdk.algod.client.api.AlgodApi;
-import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.transaction.Lease;
@@ -29,47 +26,11 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
     protected Digest genesisHash = null;
 
     /**
-     * Query the V1 REST API with {@link AlgodApi} for Transaction Parameters:
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid by querying algod if not already set.
-     * @param client The backend client connection.
-     * @return This builder.
-     * @throws ApiException When the client fails to retrieve {@link TransactionParams} from the backend.
-     */
-    public T lookupParams(AlgodApi client) throws ApiException {
-        TransactionParams params = client.transactionParams();
-        return suggestedParams(params);
-    }
-
-    /**
-     * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParams} if not already set.
-     * @param params The suggested transaction parameters.
-     * @return This builder.
-     */
-    public T suggestedParams(TransactionParams params) {
-        if (this.fee == null) {
-            fee(params.getFee());
-        }
-        if (this.genesisID == null) {
-            genesisID(params.getGenesisID());
-        }
-        if (this.genesisHash == null) {
-            genesisHash(params.getGenesishashb64());
-        }
-        if (this.firstValid == null) {
-            firstValid(params.getLastRound());
-        }
-        if (this.lastValid == null) {
-            lastValid(params.getLastRound().add(BigInteger.valueOf(1000L)));
-        }
-        return (T) this;
-    }
-
-    /**
      * Query the V2 REST API with {@link com.algorand.algosdk.v2.client.common.AlgodClient} for Transaction Parameters:
      * Initialize fee, genesisID, genesisHash, firstValid, lastValid using {@link TransactionParametersResponse} if not already set.
      * @param client The backend client connection.
      * @return This builder.
-     * @throws ApiException When the client fails to retrieve {@link TransactionParametersResponse} from the backend.
+     * @throws Exception When the client fails to retrieve {@link TransactionParametersResponse} from the backend.
      */
     public T lookupParams(com.algorand.algosdk.v2.client.common.AlgodClient client) throws Exception {
         Response<TransactionParametersResponse> params = client.TransactionParams().execute();
