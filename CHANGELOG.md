@@ -4,6 +4,7 @@
 
 * Remove `TxGroup.assignGroupID(Transaction[] txns, Address address)` in favor
   of `TxGroup.assignGroupID(Address address, Transaction ...txns)`.
+* Remove `Account.transactionWithSuggestedFeePerByte` in favor of `Account.setFeeByFeePerByte`.
 
 # 1.22.0
 
