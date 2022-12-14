@@ -1,13 +1,27 @@
+# 2.0.0
+
+## Breaking changes
+
+* Remove `TxGroup.assignGroupID(Transaction[] txns, Address address)` in favor
+  of `TxGroup.assignGroupID(Address address, Transaction ...txns)`.
+
 # 1.22.0
 
 ### Bugfixes
-* BugFix: Fix incorrect reference to global schema by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/427
-* Bug-Fix: parsing type strings for tuples containing static arrays of tuples by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/431
-### Enhancements
-* REST API: Add KV counts to NodeStatusResponse by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/428
-* Enhancement: Migrate v1 algod dependencies to v2 in cucumber tests by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/425
-* Enhancement: Allowing zero length in static array by @ahangsu in https://github.com/algorand/java-algorand-sdk/pull/432
 
+* BugFix: Fix incorrect reference to global schema by @barnjamin
+  in https://github.com/algorand/java-algorand-sdk/pull/427
+* Bug-Fix: parsing type strings for tuples containing static arrays of tuples by @ahangsu
+  in https://github.com/algorand/java-algorand-sdk/pull/431
+
+### Enhancements
+
+* REST API: Add KV counts to NodeStatusResponse by @github-actions
+  in https://github.com/algorand/java-algorand-sdk/pull/428
+* Enhancement: Migrate v1 algod dependencies to v2 in cucumber tests by @ahangsu
+  in https://github.com/algorand/java-algorand-sdk/pull/425
+* Enhancement: Allowing zero length in static array by @ahangsu
+  in https://github.com/algorand/java-algorand-sdk/pull/432
 
 **Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/1.21.1...1.22.0
 
@@ -212,10 +226,11 @@
 - Fix javadoc and build pom.xml.
 
 # 1.3.0
+
 - Added additional Algorand Smart Contracts (ASC)
-    - Added support for Dynamic Fee contract
-    - Added support for Limit Order contract
-    - Added support for Periodic Payment contract
+  - Added support for Dynamic Fee contract
+  - Added support for Limit Order contract
+  - Added support for Periodic Payment contract
 - Added new builder patterns for creating Transactions, see com.algorand.algosdk.builder.transaction.*
 - Add missing getters to AssetHolding model object.
 
@@ -225,10 +240,11 @@
 
 # 1.2.0
 # Added
+
 - Added support for Algorand Standardized Assets (ASA)
 - Added support for Algorand Smart Contracts (ASC)
-    - Added support for Hashed Time Lock Contract (HTLC)
-    - Added support for Split contract
+  - Added support for Hashed Time Lock Contract (HTLC)
+  - Added support for Split contract
 - Added support for Group Transactions
 - Added support for leases
 # 1.1.6
