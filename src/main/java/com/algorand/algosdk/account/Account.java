@@ -220,35 +220,6 @@ public class Account {
     }
 
     /**
-     * Creates a version of the given transaction with fee populated according to suggestedFeePerByte * estimateTxSize.
-     * @param copyTx transaction to populate fee field
-     * @param suggestedFeePerByte suggestedFee given by network
-     * @return transaction with proper fee set
-     * @throws NoSuchAlgorithmException could not estimate tx encoded size.
-     * @deprecated  Replaced by {@link #setFeeByFeePerByte}.
-     * This is unsafe to use because the returned transaction is a shallow copy of copyTx.
-     */
-    @Deprecated
-    static public Transaction transactionWithSuggestedFeePerByte(Transaction copyTx, BigInteger suggestedFeePerByte) throws NoSuchAlgorithmException{
-        BigInteger newFee = suggestedFeePerByte.multiply(estimatedEncodedSize(copyTx));
-        if (newFee.compareTo(MIN_TX_FEE_UALGOS) < 0) {
-            newFee = MIN_TX_FEE_UALGOS;
-        }
-        switch (copyTx.type) {
-            case Payment:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.amount, copyTx.receiver, copyTx.closeRemainderTo);
-            case KeyRegistration:
-                return new Transaction(copyTx.sender, newFee, copyTx.firstValid, copyTx.lastValid, copyTx.note, copyTx.genesisID, copyTx.genesisHash,
-                        copyTx.votePK, copyTx.selectionPK, copyTx.voteFirst, copyTx.voteLast, copyTx.voteKeyDilution);
-            case Default:
-                throw new IllegalArgumentException("tx cannot have no type");
-            default:
-                throw new RuntimeException("cannot reach");
-        }
-    }
-
-    /**
      * Sets the transaction fee according to suggestedFeePerByte * estimateTxSize.
      * @param tx transaction to populate fee field
      * @param suggestedFeePerByte suggestedFee given by network
