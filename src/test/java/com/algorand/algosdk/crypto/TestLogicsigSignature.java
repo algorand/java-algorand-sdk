@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.*;
 
 public class TestLogicsigSignature {
     @Test
-    public void testLogicsigEmptyCreation() throws Exception {
+    public void testLogicsigEmptyCreation() {
         assertThatThrownBy(() -> new LogicsigSignature(null, null))
                 .isInstanceOf(NullPointerException.class);
     }
@@ -23,7 +23,7 @@ public class TestLogicsigSignature {
         byte[] program = {
             0x01, 0x20, 0x01, 0x01, 0x22  // int 1
         };
-        ArrayList<byte[]> args = new ArrayList<byte[]>();
+        ArrayList<byte[]> args = new ArrayList<>();
         String programHash = "6Z3C3LDVWGMX23BMSYMANACQOSINPFIRF77H7N3AWJZYV6OH6GWTJKVMXY";
         Address sender = new Address(programHash);
 

@@ -1,9 +1,7 @@
 package com.algorand.algosdk.crypto;
 
-import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.util.Digester;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.NoSuchAlgorithmException;
