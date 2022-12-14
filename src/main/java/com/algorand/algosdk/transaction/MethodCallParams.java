@@ -5,14 +5,11 @@ import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.abi.TypeAddress;
 import com.algorand.algosdk.abi.TypeTuple;
 import com.algorand.algosdk.abi.TypeUint;
-import com.algorand.algosdk.algod.client.model.TransactionParams;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
-import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
-import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -117,27 +114,6 @@ public class MethodCallParams {
         this.globalStateSchema = globalStateSchema;
         this.localStateSchema = localStateSchema;
         this.extraPages = extraPages;
-    }
-
-    /**
-     * Deprecated - Use {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder}
-     * to create a new MethodCallParams object instead.
-     */
-    @Deprecated
-    public MethodCallParams(Long appID, Method method, List<Object> methodArgs, Address sender,
-                            Transaction.OnCompletion onCompletion, byte[] note, byte[] lease, String genesisID, Digest genesisHash,
-                            BigInteger firstValid, BigInteger lastValid, BigInteger fee, BigInteger flatFee,
-                            Address rekeyTo, TxnSigner signer,
-                            List<Address> fAccounts, List<Long> fAssets, List<Long> fApps,
-                            TEALProgram approvalProgram, TEALProgram clearProgram,
-                            StateSchema globalStateSchema, StateSchema localStateSchema, Long extraPages) {
-        this(appID, method, methodArgs, sender,
-                onCompletion, note, lease, genesisID, genesisHash,
-                firstValid, lastValid, fee, flatFee,
-                rekeyTo, signer,
-                fAccounts, fAssets, fApps, new ArrayList(),
-                approvalProgram, clearProgram,
-                globalStateSchema, localStateSchema, extraPages);
     }
 
     /**
@@ -284,128 +260,5 @@ public class MethodCallParams {
             return startFrom + searchInListIndex;
         objectArray.add(objectToBeAdded);
         return objectArray.size() - 1 + startFrom;
-    }
-
-    /**
-     * Deprecated, use {@link com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder#Builder()} instead.
-     */
-    @Deprecated
-    public static class Builder extends MethodCallTransactionBuilder<Builder> {
-
-        public Builder setAppID(Long appID) {
-            return this.applicationId(appID);
-        }
-
-        public Builder setMethod(Method method) {
-            return this.method(method);
-        }
-
-        public Builder addMethodArgs(Object ma) {
-            return this.addMethodArgument(ma);
-        }
-
-        public Builder setSender(String sender) {
-            return this.sender(sender);
-        }
-
-        public Builder setSuggestedParams(TransactionParams sp) {
-            return this.suggestedParams(sp);
-        }
-
-        public Builder setSuggestedParams(TransactionParametersResponse sp) {
-            return this.suggestedParams(sp);
-        }
-
-        public Builder setOnComplete(Transaction.OnCompletion op) {
-            return this.onComplete(op);
-        }
-
-        public Builder setNote(byte[] note) {
-            return this.note(note);
-        }
-
-        public Builder setLease(byte[] lease) {
-            return this.lease(lease);
-        }
-
-        public Builder setRekeyTo(String rekeyTo) {
-            return this.rekey(rekeyTo);
-        }
-
-        public Builder setSigner(TxnSigner signer) {
-            return this.signer(signer);
-        }
-
-        public Builder setFirstValid(BigInteger fv) {
-            return this.firstValid(fv);
-        }
-
-        public Builder setLastValid(BigInteger lv) {
-            return this.lastValid(lv);
-        }
-
-        public Builder setFee(BigInteger fee) {
-            return this.fee(fee);
-        }
-
-        public Builder setFlatFee(BigInteger flatFee) {
-            return this.flatFee(flatFee);
-        }
-
-        public Builder setForeignAccounts(List<Address> fAccounts) {
-            return this.accounts(fAccounts);
-        }
-
-        public Builder setForeignAssets(List<Long> fAssets) {
-            return this.foreignAssets(fAssets);
-        }
-
-        public Builder setForeignApps(List<Long> fApps) {
-            return this.foreignApps(fApps);
-        }
-
-        public Builder setApprovalProgram(TEALProgram approvalProgram) {
-            return this.approvalProgram(approvalProgram);
-        }
-
-        public Builder setClearProgram(TEALProgram clearProgram) {
-            return this.clearStateProgram(clearProgram);
-        }
-
-        public Builder setGlobalInts(Long globalInts) {
-            if (this.globalStateSchema == null) {
-                return this.globalStateSchema(new StateSchema(globalInts, 0L));
-            }
-            this.globalStateSchema.numUint = BigInteger.valueOf(globalInts);
-            return this;
-        }
-
-        public Builder setGlobalBytes(Long globalBytes) {
-            if (this.globalStateSchema == null) {
-                return this.globalStateSchema(new StateSchema(0L, globalBytes));
-            }
-            this.globalStateSchema.numByteSlice = BigInteger.valueOf(globalBytes);
-            return this;
-        }
-
-        public Builder setLocalInts(Long localInts) {
-            if (this.localStateSchema == null) {
-                return this.localStateSchema(new StateSchema(localInts, 0L));
-            }
-            this.localStateSchema.numUint = BigInteger.valueOf(localInts);
-            return this;
-        }
-
-        public Builder setLocalBytes(Long localBytes) {
-            if (this.localStateSchema == null) {
-                return this.localStateSchema(new StateSchema(0L, localBytes));
-            }
-            this.localStateSchema.numByteSlice = BigInteger.valueOf(localBytes);
-            return this;
-        }
-
-        public Builder setExtraPages(Long extraPages) {
-            return this.extraPages(extraPages);
-        }
     }
 }
