@@ -6,6 +6,7 @@
   of `TxGroup.assignGroupID(Address address, Transaction ...txns)`.
 * Remove `Account.transactionWithSuggestedFeePerByte` in favor of `Account.setFeeByFeePerByte`.
 * Remove deprecated methods in `Transaction.java`, mark public `Transaction` constructor as hidden in favor of `builder.transaction`.
+* Remove deprecated `Transaction.setFee` and `Transaction.setLease` methods
 
 # 1.22.0
 

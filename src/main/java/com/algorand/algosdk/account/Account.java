@@ -247,7 +247,7 @@ public class Account {
         if (fee.compareTo(Account.MIN_TX_FEE_UALGOS) < 0) {
             fee = Account.MIN_TX_FEE_UALGOS;
         }
-        tx.setFee(fee);
+        tx.fee = fee;
     }
 
     /**
