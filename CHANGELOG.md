@@ -7,6 +7,10 @@
 * Remove `Account.transactionWithSuggestedFeePerByte` in favor of `Account.setFeeByFeePerByte`.
 * Remove deprecated methods in `Transaction.java`, mark public `Transaction` constructor as hidden in favor of `com.algorand.algosdk.builder.transaction`.
 * Remove deprecated `Transaction.setFee` and `Transaction.setLease` methods.
+* Remove v1 algod API (`com.algorand.algosdk.algod.client`) due to API end-of-life (2022-12-01). Instead, use v2 algod API (`com.algorand.algosdk.v2.client.algod`).
+* Remove `cost` field in `DryrunTxnResult` in favor of 2 fields:  `budget-added` and `budget-consumed`. `cost` can be derived by `budget-consumed - budget-added`.
+* Remove logicsig templates, `com/algorand/algosdk/resource/langspec.json`, `com.algorand.algosdk.logic` and methods in `com.algorand.algosdk.crypto` depending on `langspec.json`.
+* Remove the deprecated `MethodCallParams` public constructor in favor of `com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder`.
 
 # 1.22.0
 
