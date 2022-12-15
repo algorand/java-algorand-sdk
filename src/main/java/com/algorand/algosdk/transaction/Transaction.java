@@ -176,38 +176,6 @@ public class Transaction implements Serializable {
     public Map<String,Object> stateProofMessage = null;
 
     /**
-     * Create an asset configuration transaction. Note can be null. manager, reserve, freeze, and clawback can be zeroed.
-     *
-     * @param sender      source address
-     * @param fee         transaction fee
-     * @param firstValid  first valid round
-     * @param lastValid   last valid round
-     * @param note        optional note field (can be null)
-     * @param genesisID
-     * @param genesisHash
-     * @param index       asset index
-     * @param manager     account which can reconfigure the asset
-     * @param reserve     account whose asset holdings count as non-minted
-     * @param freeze      account which can freeze or unfreeze holder accounts
-     * @param clawback    account which can issue clawbacks against holder accounts
-     */
-    private Transaction(Address sender, BigInteger fee, BigInteger firstValid, BigInteger lastValid, byte[] note,
-                        String genesisID, Digest genesisHash, BigInteger index,
-                        Address manager, Address reserve, Address freeze, Address clawback) {
-
-        this.type = Type.AssetConfig;
-        if (sender != null) this.sender = sender;
-        setFee(fee);
-        if (firstValid != null) this.firstValid = firstValid;
-        if (lastValid != null) this.lastValid = lastValid;
-        setNote(note);
-        if (genesisID != null) this.genesisID = genesisID;
-        if (genesisHash != null) this.genesisHash = genesisHash;
-        this.assetParams = new AssetParams(BigInteger.valueOf(0), 0, false, "", "", "", null, manager, reserve, freeze, clawback);
-        assetIndex = index;
-    }
-
-    /**
      * Helper for Jackson conversion.
      */
     private static List<Address> convertToAddressList(List<byte[]> addressBytes) {
@@ -429,33 +397,6 @@ public class Transaction implements Serializable {
 
     // Used by Jackson to determine "default" values.
     public Transaction() {
-    }
-
-    /**
-     * Base constructor with flat fee for asset xfer/freeze/destroy transactions.
-     *
-     * @param flatFee     is the transaction flat fee
-     * @param firstRound  is the first round this txn is valid (txn semantics
-     *                    unrelated to asset management)
-     * @param lastRound   is the last round this txn is valid
-     * @param note
-     * @param genesisHash corresponds to the base64-encoded hash of the genesis
-     *                    of the network
-     **/
-    private Transaction(
-            Type type,
-            BigInteger flatFee,
-            BigInteger firstRound,
-            BigInteger lastRound,
-            byte[] note,
-            Digest genesisHash) {
-
-        this.type = type;
-        setFee(flatFee);
-        if (firstRound != null) this.firstValid = firstRound;
-        if (lastRound != null) this.lastValid = lastRound;
-        setNote(note);
-        if (genesisHash != null) this.genesisHash = genesisHash;
     }
 
     private void setNote(byte[] note) {
