@@ -316,16 +316,13 @@ public class Transaction implements Serializable {
                 convertToAddressList(accounts),
                 foreignApps,
                 foreignAssets,
+                boxReferences,
                 globalStateSchema,
                 applicationId,
                 localStateSchema,
                 clearStateProgram == null ? null : new TEALProgram(clearStateProgram),
                 extraPages
         );
-        // Set fields _not_ exposed by public constructor.  Needed because:
-        // * Adding parameters to a public constructor is a breaking API change.
-        // * To ensure JSON/msgpack serialization (via Jackson's ObjectMapper) works, must add `@JsonProperty` to _a_ constructor.  Using a private constructor here to maintain API backwards compatibility.
-        if (boxReferences != null) this.boxReferences = boxReferences;
     }
 
     /**
@@ -333,7 +330,7 @@ public class Transaction implements Serializable {
      * For details about which fields to use with different transaction types, refer to the developer documentation:
      * https://developer.algorand.org/docs/reference/transactions/#asset-transfer-transaction
      */
-    public Transaction(
+    private Transaction(
             Type type,
             //header fields
             Address sender,
@@ -378,6 +375,7 @@ public class Transaction implements Serializable {
             List<Address> accounts,
             List<Long> foreignApps,
             List<Long> foreignAssets,
+            List<BoxReference> boxReferences,
             StateSchema globalStateSchema,
             Long applicationId,
             StateSchema localStateSchema,
@@ -421,6 +419,7 @@ public class Transaction implements Serializable {
         if (accounts != null) this.accounts = accounts;
         if (foreignApps != null) this.foreignApps = foreignApps;
         if (foreignAssets != null) this.foreignAssets = foreignAssets;
+        if (boxReferences != null) this.boxReferences = boxReferences;
         if (globalStateSchema != null) this.globalStateSchema = globalStateSchema;
         if (applicationId != null) this.applicationId = applicationId;
         if (localStateSchema != null) this.localStateSchema = localStateSchema;
