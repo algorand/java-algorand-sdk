@@ -352,13 +352,13 @@ public class Transaction implements Serializable {
     ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
-        setFee(fee);
+        this.fee = (fee == null ? Account.MIN_TX_FEE_UALGOS : fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         setNote(note);
         if (genesisID != null) this.genesisID = genesisID;
         if (genesisHash != null) this.genesisHash = genesisHash;
-        setLease(lease);
+        if (lease != null) setLease(new Lease(lease));
         if (rekeyTo != null) this.rekeyTo = rekeyTo;
         if (group != null) this.group = group;
         if (amount != null) this.amount = amount;
@@ -402,51 +402,6 @@ public class Transaction implements Serializable {
     private void setNote(byte[] note) {
         if (note != null && note.length != 0) {
             this.note = note;
-        }
-    }
-
-    /**
-     * Set a transaction fee taking the minimum transaction fee into consideration.
-     *
-     * @param fee
-     * @Deprecated a transaction builder is coming.
-     */
-    @Deprecated
-    public void setFee(BigInteger fee) {
-        if (fee != null) {
-            this.fee = fee;
-        } else {
-            this.fee = Account.MIN_TX_FEE_UALGOS;
-        }
-
-        /*
-        // Cannot set this here without risk to breaking existing programs.
-        // Because of this common pattern:
-        // Transaction tx = new Transaction(fee = 10, ...);
-        // Account.setFeeByFeePerByte(tx, tx.fee);
-        if (this.fee.compareTo(Account.MIN_TX_FEE_UALGOS) < 0) {
-            this.fee = Account.MIN_TX_FEE_UALGOS;
-        }
-         */
-    }
-
-    /**
-     * Lease enforces mutual exclusion of transactions.  If this field
-     * is nonzero, then once the transaction is confirmed, it acquires
-     * the lease identified by the (Sender, Lease) pair of the
-     * transaction until the LastValid round passes.  While this
-     * transaction possesses the lease, no other transaction
-     * specifying this lease can be confirmed.
-     * The Size is fixed at 32 bytes.
-     *
-     * @param lease 32 byte lease
-     * @Deprecated use setLease(Lease)
-     **/
-    @Deprecated
-    @JsonIgnore
-    public void setLease(byte[] lease) {
-        if (lease != null && lease.length != 0) {
-            setLease(new Lease(lease));
         }
     }
 
