@@ -34,13 +34,6 @@ public class DryrunTxnResult extends PathResponse {
     public Long budgetConsumed;
 
     /**
-     * Net cost of app execution. Field is DEPRECATED and is subject for removal.
-     * Instead, use `budget-added` and `budget-consumed.
-     */
-    @JsonProperty("cost")
-    public Long cost;
-
-    /**
      * Disassembled program line by line.
      */
     @JsonProperty("disassembly")
@@ -96,7 +89,6 @@ public class DryrunTxnResult extends PathResponse {
         if (!Objects.deepEquals(this.appCallTrace, other.appCallTrace)) return false;
         if (!Objects.deepEquals(this.budgetAdded, other.budgetAdded)) return false;
         if (!Objects.deepEquals(this.budgetConsumed, other.budgetConsumed)) return false;
-        if (!Objects.deepEquals(this.cost, other.cost)) return false;
         if (!Objects.deepEquals(this.disassembly, other.disassembly)) return false;
         if (!Objects.deepEquals(this.globalDelta, other.globalDelta)) return false;
         if (!Objects.deepEquals(this.localDeltas, other.localDeltas)) return false;
