@@ -47,7 +47,7 @@ public abstract class TransactionBuilder<T extends TransactionBuilder<T>> extend
         if (rekeyTo != null) txn.rekeyTo = rekeyTo;
         if (genesisID != null) txn.genesisID = genesisID;
         if (genesisHash != null) txn.genesisHash = genesisHash;
-        
+
         if (lease != null && lease.length != 0) {
             txn.setLease(new Lease(lease));
         }
