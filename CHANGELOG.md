@@ -11,6 +11,7 @@
 * Remove `cost` field in `DryrunTxnResult` in favor of 2 fields:  `budget-added` and `budget-consumed`. `cost` can be derived by `budget-consumed - budget-added`.
 * Remove logicsig templates, `com/algorand/algosdk/resource/langspec.json`, `com.algorand.algosdk.logic` and methods in `com.algorand.algosdk.crypto` depending on `langspec.json`.
 * Remove the deprecated `MethodCallParams` public constructor in favor of `com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder`.
+* Remove unused generated types:  `CatchpointAbortResponse`, `CatchpointStartResponse`.
 
 # 1.22.0
 
