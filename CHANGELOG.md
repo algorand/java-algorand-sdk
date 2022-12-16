@@ -1,6 +1,7 @@
 # 2.0.0
 
-## Breaking changes
+## What's Changed
+### Breaking changes
 
 * Remove `TxGroup.assignGroupID(Transaction[] txns, Address address)` in favor
   of `TxGroup.assignGroupID(Address address, Transaction ...txns)`.
