@@ -1,6 +1,5 @@
 package com.algorand.algosdk.crypto;
 
-import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
