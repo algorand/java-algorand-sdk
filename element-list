@@ -1,10 +1,5 @@
 com.algorand.algosdk.abi
 com.algorand.algosdk.account
-com.algorand.algosdk.algod.client
-com.algorand.algosdk.algod.client.api
-com.algorand.algosdk.algod.client.auth
-com.algorand.algosdk.algod.client.lib
-com.algorand.algosdk.algod.client.model
 com.algorand.algosdk.auction
 com.algorand.algosdk.builder.transaction
 com.algorand.algosdk.crypto
@@ -15,7 +10,6 @@ com.algorand.algosdk.kmd.client.lib
 com.algorand.algosdk.kmd.client.model
 com.algorand.algosdk.logic
 com.algorand.algosdk.mnemonic
-com.algorand.algosdk.templates
 com.algorand.algosdk.transaction
 com.algorand.algosdk.util
 com.algorand.algosdk.v2.client
