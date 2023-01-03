@@ -1,6 +1,7 @@
 # 2.0.0
 
 ## What's Changed
+
 ### Breaking changes
 
 * Remove `TxGroup.assignGroupID(Transaction[] txns, Address address)` in favor
@@ -13,6 +14,8 @@
 * Remove logicsig templates, `com/algorand/algosdk/resource/langspec.json`, `com.algorand.algosdk.logic` and methods in `com.algorand.algosdk.crypto` depending on `langspec.json`.
 * Remove the deprecated `MethodCallParams` public constructor in favor of `com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder`.
 * Remove unused generated types:  `CatchpointAbortResponse`, `CatchpointStartResponse`.
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/1.22.0...2.0.0
 
 # 1.22.0
 
