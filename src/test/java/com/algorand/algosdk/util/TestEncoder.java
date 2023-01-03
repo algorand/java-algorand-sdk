@@ -1,6 +1,5 @@
 package com.algorand.algosdk.util;
 
-import com.algorand.algosdk.algod.client.model.PaymentTransactionType;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.v2.client.model.Account;
 import com.algorand.algosdk.v2.client.model.Enums;
