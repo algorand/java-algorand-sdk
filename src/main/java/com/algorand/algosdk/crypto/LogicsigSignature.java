@@ -1,9 +1,7 @@
 package com.algorand.algosdk.crypto;
 
-import com.algorand.algosdk.logic.Logic;
 import com.algorand.algosdk.util.Digester;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.NoSuchAlgorithmException;
@@ -21,7 +19,9 @@ import org.apache.commons.codec.binary.Base64;
 /**
  * Serializable logicsig class.
  * LogicsigSignature is constructed from a program and optional arguments.
- * Signature sig and MultisigSignature msig property are available for modification by it's clients.
+ * Signature sig and MultisigSignature msig property are available for modification by its clients.
+ * <p>
+ * LogicsigSignature cannot sign transactions in all cases.  Instead, use LogicSigAccount as a safe, general purpose signing mechanism.  Since LogicSig does not track the provided signature's public key, LogicSig cannot sign transactions when delegated to a non-multisig account _and_ the sender is not the delegating account.
  */
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
