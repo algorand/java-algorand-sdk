@@ -4,8 +4,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.account.Account;
-import com.algorand.algosdk.algod.client.AlgodClient;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
@@ -15,21 +16,34 @@ import com.algorand.algosdk.kmd.client.model.InitWalletHandleTokenRequest;
 import com.algorand.algosdk.kmd.client.model.ListKeysRequest;
 import com.algorand.algosdk.kmd.client.ApiException;
 
-public class Utils {
+public class ExampleUtils {
 
-    private static String host = "http://localhost:4002";
-    private static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private static String kmd_host = "http://localhost:4002";
+    private static String kmd_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     private static KmdApi kmd = null;
 
-    public static AlgodClient getAlgodClient() {
+    private static String algod_host = "http://localhost";
+    private static int algod_port = 4001;
+    private static String algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
+    private static String indexer_host = "http://localhost";
+    private static int indexer_port = 8980;
+    private static String indexer_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+
+
+    public static AlgodClient getAlgodClient() {
+        return new AlgodClient(algod_host, algod_port, algod_token);
+    }
+
+    public static IndexerClient getIndexerClient() {
+        return new IndexerClient(indexer_host, indexer_port, indexer_token);
     }
 
     public static List<Account> getSandboxAccounts() throws Exception {
         // Initialize KMD v1 client
         KmdClient kmdClient = new KmdClient();
-        kmdClient.setBasePath(host);
-        kmdClient.setApiKey(token);
+        kmdClient.setBasePath(kmd_host);
+        kmdClient.setApiKey(kmd_token);
         kmd = new KmdApi(kmdClient);
 
         // Get accounts from sandbox.
