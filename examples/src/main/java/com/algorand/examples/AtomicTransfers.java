@@ -9,7 +9,6 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxGroup;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
-import com.algorand.algosdk.v2.client.algod.RawTransaction;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
@@ -64,7 +63,9 @@ public class AtomicTransfers {
         Response<PostTransactionsResponse> txResponse = algodClient.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stxns)).execute();
         String txid = txResponse.body().txId;
 
-        // Wait for it to be confirmed
+        // Wait for the transaction id to be confirmed
+        // If the results from other transactions are needed, grab the txid from those directly and
+        // call waitForConfirmation on each
         PendingTransactionResponse txResult = Utils.waitForConfirmation(algodClient, txid, 4);
         System.out.printf("Transaction %s confirmed in round %d\n", txid, txResult.confirmedRound);
         // example: ATOMIC_GROUP_SEND

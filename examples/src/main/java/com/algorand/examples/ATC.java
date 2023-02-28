@@ -18,7 +18,6 @@ import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TransactionWithSigner;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer.ExecuteResult;
-import com.algorand.algosdk.transaction.AtomicTransactionComposer.ReturnValue;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
@@ -67,14 +66,14 @@ public class ATC {
 
         // example: ATC_ADD_METHOD_CALL
         // create methodCallParams by builder (or create by constructor) for add method
-        List<Object> method_args = new ArrayList<Object>();
-        method_args.add(1);
-        method_args.add(1);
+        List<Object> methodArgs = new ArrayList<Object>();
+        methodArgs.add(1);
+        methodArgs.add(1);
 
         MethodCallTransactionBuilder<?> mctb = MethodCallTransactionBuilder.Builder();
 
         MethodCallParams mcp = mctb.applicationId(appId).signer(acct.getTransactionSigner()).sender(acct.getAddress())
-                .method(contract.getMethodByName("add")).methodArguments(method_args)
+                .method(contract.getMethodByName("add")).methodArguments(methodArgs)
                 .onComplete(Transaction.OnCompletion.NoOpOC).suggestedParams(sp).build();
 
         atc.addMethodCall(mcp);
