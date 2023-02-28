@@ -4,10 +4,12 @@ import com.algorand.algosdk.kmd.client.ApiException;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
 import com.algorand.algosdk.kmd.client.model.APIV1POSTKeyResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1POSTMasterKeyExportResponse;
 import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletInitResponse;
 import com.algorand.algosdk.kmd.client.model.APIV1POSTWalletResponse;
 import com.algorand.algosdk.kmd.client.model.APIV1Wallet;
 import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
+import com.algorand.algosdk.kmd.client.model.ExportMasterKeyRequest;
 import com.algorand.algosdk.kmd.client.model.GenerateKeyRequest;
 import com.algorand.algosdk.kmd.client.model.InitWalletHandleTokenRequest;
 
@@ -26,10 +28,13 @@ public class KMDExamples {
         // example: KMD_CREATE_CLIENT 
 
 
+        String walletName =  "MyNewWallet";
+        String password = "supersecretpassword";
         // example: KMD_CREATE_WALLET 
+        //create a new request
         CreateWalletRequest cwr = new CreateWalletRequest();
-        cwr.setWalletName("MyNewWallet");
-        cwr.setWalletPassword("supersecretpassword");
+        cwr.setWalletName(walletName);
+        cwr.setWalletPassword(password);
         cwr.setWalletDriverName("sqlite"); // other option is `ledger`
         APIV1POSTWalletResponse result = kmd.createWallet(cwr);
         APIV1Wallet wallet = result.getWallet();
@@ -40,14 +45,20 @@ public class KMDExamples {
         // First grab a handle that we can re-use
         InitWalletHandleTokenRequest tokenReq = new InitWalletHandleTokenRequest();
         tokenReq.setWalletId(wallet.getId());
-        tokenReq.setWalletPassword("supersecretpassword");
+        tokenReq.setWalletPassword(password);
         APIV1POSTWalletInitResponse handleTokenResp = kmd.initWalletHandleToken(tokenReq);
 
+        String handleToken = handleTokenResp.getWalletHandleToken()
         GenerateKeyRequest gkr = new GenerateKeyRequest();
-        gkr.setWalletHandleToken(handleTokenResp.getWalletHandleToken());
+        gkr.setWalletHandleToken(handleToken);
         APIV1POSTKeyResponse generatedKey = kmd.generateKey(gkr);
         System.out.printf("New account: %s\n", generatedKey.getAddress());
         // example: KMD_CREATE_ACCOUNT
+
+        ExportMasterKeyRequest mker = new ExportMasterKeyRequest();
+        mker.setWalletHandleToken(handleToken);
+        APIV1POSTMasterKeyExportResponse masterKeyResp = kmd.exportMasterKey(mker);
+        byte[] backupKey = masterKeyResp.getMasterDerivationKey();
 
         // /example: KMD_RECOVER_WALLET
         // /...
