@@ -4,8 +4,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
+import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
+import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.kmd.client.KmdClient;
@@ -14,6 +18,8 @@ import com.algorand.algosdk.kmd.client.model.APIV1Wallet;
 import com.algorand.algosdk.kmd.client.model.ExportKeyRequest;
 import com.algorand.algosdk.kmd.client.model.InitWalletHandleTokenRequest;
 import com.algorand.algosdk.kmd.client.model.ListKeysRequest;
+import com.algorand.algosdk.transaction.SignedTransaction;
+import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.kmd.client.ApiException;
 
 public class ExampleUtils {
@@ -80,13 +86,23 @@ public class ExampleUtils {
 
     public static List<Address> getWalletAccounts(String walletHandle) throws ApiException, NoSuchAlgorithmException {
         List<Address> accounts = new ArrayList<>();
-
         ListKeysRequest keysRequest = new ListKeysRequest();
         keysRequest.setWalletHandleToken(walletHandle);
         for (String addr : kmd.listKeysInWallet(keysRequest).getAddresses()) {
             accounts.add(new Address(addr));
         }
-
         return accounts;
+    }
+
+    public static void sendPrint(AlgodClient algodClient, SignedTransaction stxn, String name) throws Exception {
+        Response<PostTransactionsResponse> submitResult = algodClient.RawTransaction()
+                .rawtxn(Encoder.encodeToMsgPack(stxn)).execute();
+        printTxnResults(algodClient, submitResult.body(), name);
+    }
+
+
+    public static void printTxnResults(AlgodClient client, PostTransactionsResponse ptr, String name) throws Exception {
+        PendingTransactionResponse result = Utils.waitForConfirmation(client, ptr.txId, 4);
+        System.out.printf("%s transaction (%s) Confirmed in round %d\n", name, ptr.txId, result.confirmedRound);
     }
 }
