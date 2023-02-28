@@ -82,8 +82,9 @@ public class ATC {
         // example: ATC_RESULTS
         ExecuteResult res = atc.execute(algodClient, 2);
         System.out.printf("App call (%s) confirmed in round %d\n", res.txIDs, res.confirmedRound);
-        ReturnValue returnValue = res.methodResults.get(0);
-        System.out.printf("Result from calling '%s' method: %s\n", returnValue.method.name, returnValue.value);
+        res.methodResults.forEach(methodResult -> {
+            System.out.printf("Result from calling '%s' method: %s\n", methodResult.method.name, methodResult.value);
+        });
         // example: ATC_RESULTS
     }
 
