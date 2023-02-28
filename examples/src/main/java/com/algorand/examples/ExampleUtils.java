@@ -103,6 +103,6 @@ public class ExampleUtils {
 
     public static void printTxnResults(AlgodClient client, PostTransactionsResponse ptr, String name) throws Exception {
         PendingTransactionResponse result = Utils.waitForConfirmation(client, ptr.txId, 4);
-        System.out.printf("%s transaction (%s) Confirmed in round %d\n", name, ptr.txId, result.confirmedRound);
+        System.out.printf("%s\ttransaction (%s) was confirmed in round %d\n", name, ptr.txId, result.confirmedRound);
     }
 }

@@ -2,6 +2,8 @@ package com.algorand.examples;
 
 import java.util.List;
 
+import org.bouncycastle.pqc.crypto.ExchangePair;
+
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
@@ -24,19 +26,22 @@ public class ASAExamples {
 
         Long asaId = createAsset(algodClient, acct1);
 
-        // example: ASSET_INFO
-        // Retrieve the asset info of the newly created asset
-        Response<Asset> assetResp = algodClient.GetAssetByID(asaId).execute();
-        Asset assetInfo = assetResp.body();
-        System.out.printf("Asset Name: %s", assetInfo.params.name);
-        // example: ASSET_INFO
-
+        printAssetInfo(algodClient, asaId);
+        configureAsset(algodClient, acct1, asaId);
         optInToAsset(algodClient, acct2, asaId);
         xferAsset(algodClient, acct1, acct2, asaId);
         freezeAsset(algodClient, acct1, acct2, asaId);
         clawbackAsset(algodClient, acct1, acct2, asaId);
         deleteAsset(algodClient, acct1, asaId);
+    }
 
+    public static void printAssetInfo(AlgodClient algodClient, Long asaId) throws Exception  {
+        // example: ASSET_INFO
+        // Retrieve the asset info of the newly created asset
+        Response<Asset> assetResp = algodClient.GetAssetByID(asaId).execute();
+        Asset assetInfo = assetResp.body();
+        System.out.printf("Asset Name: %s\n", assetInfo.params.name);
+        // example: ASSET_INFO
     }
 
     public static Long createAsset(AlgodClient algodClient, Account acct) throws Exception {
@@ -73,6 +78,26 @@ public class ASAExamples {
 
         // example: ASSET_CREATE
         return asaId;
+    }
+
+    public static void configureAsset(AlgodClient algodClient, Account acct, Long asaId) throws Exception {
+        // example: ASSET_CONFIG
+        Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
+        TransactionParametersResponse sp = rsp.body();
+        // Wipe the `reserve` address through an AssetConfigTransaction 
+        Transaction reconfigureTxn = Transaction.AssetConfigureTransactionBuilder().suggestedParams(sp)
+                .sender(acct.getAddress())
+                .assetIndex(asaId)
+                .manager(acct.getAddress())
+                .freeze(acct.getAddress())
+                .clawback(acct.getAddress())
+                .strictEmptyAddressChecking(false)
+                .reserve(new byte[32])
+                .build();
+
+        // example: ASSET_CONFIG
+        SignedTransaction signedReconfigure = acct.signTransaction(reconfigureTxn);
+        ExampleUtils.sendPrint(algodClient, signedReconfigure, "config asset");
     }
 
     public static void optInToAsset(AlgodClient algodClient, Account acct, Long asaId) throws Exception {
