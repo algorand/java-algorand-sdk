@@ -3,6 +3,9 @@ package com.algorand.examples;
 import java.math.BigInteger;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Hex;
+
+import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -63,6 +66,17 @@ public class CodecExamples {
                 SignedTransaction.class);
         assert decodedSignedTransaction.equals(signedTxn);
         // example: CODEC_TRANSACTION_SIGNED
+
+        // example: CODEC_ABI_TYPES
+        ABIType tupleCodec = ABIType.valueOf("(uint64,bool,string)");
+        Object[] data = new Object[]{123, false, "hi"};
+        byte[] encoded = tupleCodec.encode(data);
+        System.out.printf("Encoded: '%s'\n", Hex.encodeHexString(encoded));
+
+        ABIType boolCodec = ABIType.valueOf("bool");
+        byte[] singleEncoded = boolCodec.encode(true);
+        System.out.printf("Single Encoded: '%s'\n", Hex.encodeHexString(singleEncoded));
+        // example: CODEC_ABI_TYPES
 
     }
 }
