@@ -3,6 +3,7 @@ package com.algorand.examples;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import com.algorand.algosdk.v2.client.Utils;
+import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
@@ -46,6 +47,16 @@ public class Overview {
         PendingTransactionResponse result = Utils.waitForConfirmation(algodClient, txid, 4);
         System.out.printf("Transaction %s confirmed in round %d\n", txid, result.confirmedRound);
         // example: TRANSACTION_PAYMENT_SUBMIT
+
+
+        // example: SP_MIN_FEE
+        Response<TransactionParametersResponse> sp = algodClient.TransactionParams().execute();
+        System.out.printf("Min fee from suggested params: %d\n", sp.body().minFee);
+        // example: SP_MIN_FEE
+
+        // example: CONST_MIN_FEE
+        System.out.printf("Min fee from const: %d\n", Account.MIN_TX_FEE_UALGOS);
+        // example: CONST_MIN_FEE
     }
 
     public static void createAccount() throws NoSuchAlgorithmException{
@@ -54,6 +65,15 @@ public class Overview {
         System.out.println("Address: " + acct.getAddress());
         System.out.println("Passphrase: " + acct.toMnemonic());
         // example: ACCOUNT_GENERATE
+    }
+
+    public static void getAccountInfo(AlgodClient algodClient, Account acct) throws Exception {
+        // example: ALGOD_FETCH_ACCOUNT_INFO
+        Response<com.algorand.algosdk.v2.client.model.Account> acctInfoResp = algodClient.AccountInformation(acct.getAddress()).execute();
+        com.algorand.algosdk.v2.client.model.Account acctInfo = acctInfoResp.body();
+        // print one of the fields in the account info response
+        System.out.printf("Current balance: %d", acctInfo.amount);
+        // example: ALGOD_FETCH_ACCOUNT_INFO
     }
 
     public static AlgodClient createClient() {
