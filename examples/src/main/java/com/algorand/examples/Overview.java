@@ -50,9 +50,21 @@ public class Overview {
 
 
         // example: SP_MIN_FEE
-        Response<TransactionParametersResponse> sp = algodClient.TransactionParams().execute();
-        System.out.printf("Min fee from suggested params: %d\n", sp.body().minFee);
+        Response<TransactionParametersResponse> tpr = algodClient.TransactionParams().execute();
+        TransactionParametersResponse sp = tpr.body();
+        System.out.printf("Min fee from suggested params: %d\n", sp.minFee);
         // example: SP_MIN_FEE
+
+        // example: TRANSACTION_FEE_OVERRIDE
+        Transaction feeOverrideTxn = Transaction.PaymentTransactionBuilder()
+            .sender(acct.getAddress())
+            .receiver(acct2.getAddress())
+            .suggestedParams(suggestedParams.body())
+            // override the fee given by suggested params
+            // to set a flat fee of 2x minfee to cover another transaction
+            // in the same group
+            .flatFee(2*suggestedParams.body().minFee).build();
+        // example: TRANSACTION_FEE_OVERRIDE
 
         // example: CONST_MIN_FEE
         System.out.printf("Min fee from const: %d\n", Account.MIN_TX_FEE_UALGOS);

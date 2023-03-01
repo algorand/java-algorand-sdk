@@ -62,5 +62,6 @@ public class CodecExamples {
         SignedTransaction decodedSignedTransaction = Encoder.decodeFromMsgPack(encodedSignedTxn, SignedTransaction.class);
         assert decodedSignedTransaction.equals(signedTxn);
         // example: CODEC_TRANSACTION_SIGNED
+
     }
 }
