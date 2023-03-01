@@ -36,7 +36,6 @@ public class ExampleUtils {
     private static int indexer_port = 8980;
     private static String indexer_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
-
     public static AlgodClient getAlgodClient() {
         return new AlgodClient(algod_host, algod_port, algod_token);
     }
@@ -54,10 +53,10 @@ public class ExampleUtils {
 
         // Get accounts from sandbox.
         String walletHandle = getDefaultWalletHandle();
-        List<Address> addresses  = getWalletAccounts(walletHandle);
+        List<Address> addresses = getWalletAccounts(walletHandle);
 
         List<Account> accts = new ArrayList<>();
-        for(Address addr: addresses){
+        for (Address addr : addresses) {
             byte[] pk = lookupPrivateKey(addr, walletHandle);
             accts.add(new Account(pk));
         }
@@ -99,7 +98,6 @@ public class ExampleUtils {
                 .rawtxn(Encoder.encodeToMsgPack(stxn)).execute();
         printTxnResults(algodClient, submitResult.body(), name);
     }
-
 
     public static void printTxnResults(AlgodClient client, PostTransactionsResponse ptr, String name) throws Exception {
         PendingTransactionResponse result = Utils.waitForConfirmation(client, ptr.txId, 4);

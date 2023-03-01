@@ -29,91 +29,95 @@ import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 public class ATC {
 
-    public static void main(String[] args) throws Exception {
-        AlgodClient algodClient = ExampleUtils.getAlgodClient();
-        List<Account> accts = ExampleUtils.getSandboxAccounts();
-        Account acct = accts.get(0);
+        public static void main(String[] args) throws Exception {
+                AlgodClient algodClient = ExampleUtils.getAlgodClient();
+                List<Account> accts = ExampleUtils.getSandboxAccounts();
+                Account acct = accts.get(0);
 
-        Long appId = deployApp(algodClient, acct);
+                Long appId = deployApp(algodClient, acct);
 
-        // Get suggested params from client
-        Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
-        TransactionParametersResponse sp = rsp.body();
+                // Get suggested params from client
+                Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
+                TransactionParametersResponse sp = rsp.body();
 
-        // example: ATC_CREATE
-        AtomicTransactionComposer atc = new AtomicTransactionComposer();
-        // example: ATC_CREATE
+                // example: ATC_CREATE
+                AtomicTransactionComposer atc = new AtomicTransactionComposer();
+                // example: ATC_CREATE
 
-        // example: ATC_ADD_TRANSACTION
-        // Create a transaction
-        Transaction ptxn = PaymentTransactionBuilder.Builder().amount(10000).suggestedParams(sp)
-                .sender(acct.getAddress()).receiver(acct.getAddress()).build();
+                // example: ATC_ADD_TRANSACTION
+                // Create a transaction
+                Transaction ptxn = PaymentTransactionBuilder.Builder().amount(10000).suggestedParams(sp)
+                                .sender(acct.getAddress()).receiver(acct.getAddress()).build();
 
-        // Construct TransactionWithSigner
-        TransactionWithSigner tws = new TransactionWithSigner(ptxn,
-                acct.getTransactionSigner());
+                // Construct TransactionWithSigner
+                TransactionWithSigner tws = new TransactionWithSigner(ptxn,
+                                acct.getTransactionSigner());
 
-        // Pass TransactionWithSigner to atc
-        atc.addTransaction(tws);
-        // example: ATC_ADD_TRANSACTION
+                // Pass TransactionWithSigner to atc
+                atc.addTransaction(tws);
+                // example: ATC_ADD_TRANSACTION
 
-        // example: ATC_CONTRACT_INIT
-        // Read the json from disk
-        String jsonContract = Files.readString(Paths.get("calculator/contract.json"));
-        // Create Contract from Json
-        Contract contract = Encoder.decodeFromJson(jsonContract, Contract.class);
-        // example: ATC_CONTRACT_INIT
+                // example: ATC_CONTRACT_INIT
+                // Read the json from disk
+                String jsonContract = Files.readString(Paths.get("calculator/contract.json"));
+                // Create Contract from Json
+                Contract contract = Encoder.decodeFromJson(jsonContract, Contract.class);
+                // example: ATC_CONTRACT_INIT
 
-        // example: ATC_ADD_METHOD_CALL
-        // create methodCallParams by builder (or create by constructor) for add method
-        List<Object> methodArgs = new ArrayList<Object>();
-        methodArgs.add(1);
-        methodArgs.add(1);
+                // example: ATC_ADD_METHOD_CALL
+                // create methodCallParams by builder (or create by constructor) for add method
+                List<Object> methodArgs = new ArrayList<Object>();
+                methodArgs.add(1);
+                methodArgs.add(1);
 
-        MethodCallTransactionBuilder<?> mctb = MethodCallTransactionBuilder.Builder();
+                MethodCallTransactionBuilder<?> mctb = MethodCallTransactionBuilder.Builder();
 
-        MethodCallParams mcp = mctb.applicationId(appId).signer(acct.getTransactionSigner()).sender(acct.getAddress())
-                .method(contract.getMethodByName("add")).methodArguments(methodArgs)
-                .onComplete(Transaction.OnCompletion.NoOpOC).suggestedParams(sp).build();
+                MethodCallParams mcp = mctb.applicationId(appId).signer(acct.getTransactionSigner())
+                                .sender(acct.getAddress())
+                                .method(contract.getMethodByName("add")).methodArguments(methodArgs)
+                                .onComplete(Transaction.OnCompletion.NoOpOC).suggestedParams(sp).build();
 
-        atc.addMethodCall(mcp);
-        // example: ATC_ADD_METHOD_CALL
-        // example: ATC_RESULTS
-        ExecuteResult res = atc.execute(algodClient, 2);
-        System.out.printf("App call (%s) confirmed in round %d\n", res.txIDs, res.confirmedRound);
-        res.methodResults.forEach(methodResult -> {
-            System.out.printf("Result from calling '%s' method: %s\n", methodResult.method.name, methodResult.value);
-        });
-        // example: ATC_RESULTS
-    }
+                atc.addMethodCall(mcp);
+                // example: ATC_ADD_METHOD_CALL
+                // example: ATC_RESULTS
+                ExecuteResult res = atc.execute(algodClient, 2);
+                System.out.printf("App call (%s) confirmed in round %d\n", res.txIDs, res.confirmedRound);
+                res.methodResults.forEach(methodResult -> {
+                        System.out.printf("Result from calling '%s' method: %s\n", methodResult.method.name,
+                                        methodResult.value);
+                });
+                // example: ATC_RESULTS
+        }
 
-    public static Long deployApp(AlgodClient algodClient, Account acct1) throws Exception {
-        String approvalSource = Files.readString(Paths.get("calculator/approval.teal"));
-        String clearSource = Files.readString(Paths.get("calculator/clear.teal"));
+        public static Long deployApp(AlgodClient algodClient, Account acct1) throws Exception {
+                String approvalSource = Files.readString(Paths.get("calculator/approval.teal"));
+                String clearSource = Files.readString(Paths.get("calculator/clear.teal"));
 
-        CompileResponse approvalResponse = algodClient.TealCompile().source(approvalSource.getBytes()).execute().body();
-        CompileResponse clearResponse = algodClient.TealCompile().source(clearSource.getBytes()).execute().body();
+                CompileResponse approvalResponse = algodClient.TealCompile().source(approvalSource.getBytes()).execute()
+                                .body();
+                CompileResponse clearResponse = algodClient.TealCompile().source(clearSource.getBytes()).execute()
+                                .body();
 
-        TEALProgram approvalProg = new TEALProgram(approvalResponse.result);
-        TEALProgram clearProg = new TEALProgram(clearResponse.result);
+                TEALProgram approvalProg = new TEALProgram(approvalResponse.result);
+                TEALProgram clearProg = new TEALProgram(clearResponse.result);
 
-        Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
-        TransactionParametersResponse sp = rsp.body();
+                Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
+                TransactionParametersResponse sp = rsp.body();
 
-        StateSchema schema = new StateSchema(0, 0);
+                StateSchema schema = new StateSchema(0, 0);
 
-        Transaction appCreate = ApplicationCreateTransactionBuilder.Builder().sender(acct1.getAddress())
-                .approvalProgram(approvalProg).clearStateProgram(clearProg).localStateSchema(schema)
-                .globalStateSchema(schema)
-                .suggestedParams(sp).build();
-        SignedTransaction signedAppCreate = acct1.signTransaction(appCreate);
+                Transaction appCreate = ApplicationCreateTransactionBuilder.Builder().sender(acct1.getAddress())
+                                .approvalProgram(approvalProg).clearStateProgram(clearProg).localStateSchema(schema)
+                                .globalStateSchema(schema)
+                                .suggestedParams(sp).build();
+                SignedTransaction signedAppCreate = acct1.signTransaction(appCreate);
 
-        Response<PostTransactionsResponse> createResult = algodClient.RawTransaction()
-                .rawtxn(Encoder.encodeToMsgPack(signedAppCreate)).execute();
+                Response<PostTransactionsResponse> createResult = algodClient.RawTransaction()
+                                .rawtxn(Encoder.encodeToMsgPack(signedAppCreate)).execute();
 
-        PendingTransactionResponse result = Utils.waitForConfirmation(algodClient, createResult.body().txId, 4);
+                PendingTransactionResponse result = Utils.waitForConfirmation(algodClient, createResult.body().txId, 4);
 
-        return result.applicationIndex;
-    }
+                return result.applicationIndex;
+        }
 
 }

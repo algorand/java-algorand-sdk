@@ -59,7 +59,8 @@ public class CodecExamples {
         SignedTransaction signedTxn = acct.signTransaction(ptxn);
         byte[] encodedSignedTxn = Encoder.encodeToMsgPack(signedTxn);
 
-        SignedTransaction decodedSignedTransaction = Encoder.decodeFromMsgPack(encodedSignedTxn, SignedTransaction.class);
+        SignedTransaction decodedSignedTransaction = Encoder.decodeFromMsgPack(encodedSignedTxn,
+                SignedTransaction.class);
         assert decodedSignedTransaction.equals(signedTxn);
         // example: CODEC_TRANSACTION_SIGNED
 

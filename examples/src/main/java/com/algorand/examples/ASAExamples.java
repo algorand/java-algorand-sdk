@@ -35,7 +35,7 @@ public class ASAExamples {
         deleteAsset(algodClient, acct1, asaId);
     }
 
-    public static void printAssetInfo(AlgodClient algodClient, Long asaId) throws Exception  {
+    public static void printAssetInfo(AlgodClient algodClient, Long asaId) throws Exception {
         // example: ASSET_INFO
         // Retrieve the asset info of the newly created asset
         Response<Asset> assetResp = algodClient.GetAssetByID(asaId).execute();
@@ -84,7 +84,7 @@ public class ASAExamples {
         // example: ASSET_CONFIG
         Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
         TransactionParametersResponse sp = rsp.body();
-        // Wipe the `reserve` address through an AssetConfigTransaction 
+        // Wipe the `reserve` address through an AssetConfigTransaction
         Transaction reconfigureTxn = Transaction.AssetConfigureTransactionBuilder().suggestedParams(sp)
                 .sender(acct.getAddress())
                 .assetIndex(asaId)

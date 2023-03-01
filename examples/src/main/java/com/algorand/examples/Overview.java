@@ -26,13 +26,12 @@ public class Overview {
         Response<TransactionParametersResponse> suggestedParams = algodClient.TransactionParams().execute();
         Integer amount = 1000000; // 1 Algo
         Transaction ptxn = Transaction.PaymentTransactionBuilder()
-            .sender(acct.getAddress())
-            .amount(amount)
-            .receiver(acct2.getAddress())
-            .suggestedParams(suggestedParams.body()).build();
+                .sender(acct.getAddress())
+                .amount(amount)
+                .receiver(acct2.getAddress())
+                .suggestedParams(suggestedParams.body()).build();
         // example: TRANSACTION_PAYMENT_CREATE
 
-        
         // example: TRANSACTION_PAYMENT_SIGN
         SignedTransaction sptxn = acct.signTransaction(ptxn);
         // example: TRANSACTION_PAYMENT_SIGN
@@ -48,7 +47,6 @@ public class Overview {
         System.out.printf("Transaction %s confirmed in round %d\n", txid, result.confirmedRound);
         // example: TRANSACTION_PAYMENT_SUBMIT
 
-
         // example: SP_MIN_FEE
         Response<TransactionParametersResponse> tpr = algodClient.TransactionParams().execute();
         TransactionParametersResponse sp = tpr.body();
@@ -57,13 +55,13 @@ public class Overview {
 
         // example: TRANSACTION_FEE_OVERRIDE
         Transaction feeOverrideTxn = Transaction.PaymentTransactionBuilder()
-            .sender(acct.getAddress())
-            .receiver(acct2.getAddress())
-            .suggestedParams(suggestedParams.body())
-            // override the fee given by suggested params
-            // to set a flat fee of 2x minfee to cover another transaction
-            // in the same group
-            .flatFee(2*suggestedParams.body().minFee).build();
+                .sender(acct.getAddress())
+                .receiver(acct2.getAddress())
+                .suggestedParams(suggestedParams.body())
+                // override the fee given by suggested params
+                // to set a flat fee of 2x minfee to cover another transaction
+                // in the same group
+                .flatFee(2 * suggestedParams.body().minFee).build();
         // example: TRANSACTION_FEE_OVERRIDE
 
         // example: CONST_MIN_FEE
@@ -71,7 +69,7 @@ public class Overview {
         // example: CONST_MIN_FEE
     }
 
-    public static void createAccount() throws NoSuchAlgorithmException{
+    public static void createAccount() throws NoSuchAlgorithmException {
         // example: ACCOUNT_GENERATE
         Account acct = new Account();
         System.out.println("Address: " + acct.getAddress());
@@ -81,7 +79,8 @@ public class Overview {
 
     public static void getAccountInfo(AlgodClient algodClient, Account acct) throws Exception {
         // example: ALGOD_FETCH_ACCOUNT_INFO
-        Response<com.algorand.algosdk.v2.client.model.Account> acctInfoResp = algodClient.AccountInformation(acct.getAddress()).execute();
+        Response<com.algorand.algosdk.v2.client.model.Account> acctInfoResp = algodClient
+                .AccountInformation(acct.getAddress()).execute();
         com.algorand.algosdk.v2.client.model.Account acctInfo = acctInfoResp.body();
         // print one of the fields in the account info response
         System.out.printf("Current balance: %d", acctInfo.amount);
@@ -101,6 +100,5 @@ public class Overview {
         // example: ALGOD_CREATE_CLIENT
         return algodClient;
     }
-
 
 }
