@@ -5,7 +5,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.codec.binary.Hex;
+
 import com.algorand.algosdk.abi.Contract;
+import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.ApplicationCreateTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
@@ -87,6 +90,43 @@ public class ATC {
                                         methodResult.value);
                 });
                 // example: ATC_RESULTS
+        }
+
+        public static void atcWithTws(AlgodClient algodClient, Account account) throws Exception {
+                Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
+                TransactionParametersResponse sp = rsp.body();
+
+                Transaction ptxn = PaymentTransactionBuilder.Builder().amount(10000).suggestedParams(sp)
+                                .sender(account.getAddress()).receiver(account.getAddress()).build();
+
+                // Construct TransactionWithSigner
+                TransactionWithSigner tws = new TransactionWithSigner(ptxn,
+                                account.getTransactionSigner());
+
+                MethodCallTransactionBuilder<?> mctb = MethodCallTransactionBuilder.Builder();
+
+                Method m = new Method("doit(pay,bool)void");
+
+                List<Object> methodArgs = new ArrayList<>();
+                Boolean isHeads = true;
+                methodArgs.add(tws);
+                methodArgs.add(isHeads);
+                MethodCallParams mcp = mctb.applicationId(123l).signer(account.getTransactionSigner())
+                                .sender(account.getAddress())
+                                .method(m).methodArguments(methodArgs)
+                                .onComplete(Transaction.OnCompletion.NoOpOC).suggestedParams(sp).build();
+
+                AtomicTransactionComposer atc = new AtomicTransactionComposer();
+                atc.addMethodCall(mcp);
+
+                List<SignedTransaction> stxns = atc.gatherSignatures();
+                System.out.printf("Created %d transactions\n", stxns.size());
+                // should be the app call
+                SignedTransaction stxn = stxns.get(1);
+                List<byte[]> args = stxn.tx.applicationArgs;
+                for (int i = 0; i < args.size(); i++) {
+                        System.out.printf("Arg %d is %s\n", i, Hex.encodeHexString(args.get(i)));
+                }
         }
 
         public static Long deployApp(AlgodClient algodClient, Account acct1) throws Exception {
