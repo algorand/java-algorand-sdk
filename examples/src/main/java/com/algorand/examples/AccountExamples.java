@@ -1,5 +1,6 @@
 package com.algorand.examples;
 
+import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Ed25519PublicKey;
 import com.algorand.algosdk.crypto.MultisigAddress;
+import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
@@ -56,6 +58,17 @@ public class AccountExamples {
 
                 rekeyAcct(algodClient, acct1, acct2);
 
+        }
+        public static Account recoverFromMnemonic() throws GeneralSecurityException {
+                // example: ACCOUNT_RECOVER_MNEMONIC 
+                // Space delimited 25 word mnemonic
+                String mn = "cost piano sample enough south bar diet garden nasty mystery mesh sadness convince bacon best patch surround protect drum actress entire vacuum begin abandon hair";
+                // We can get the private key
+                byte[] key = Mnemonic.toKey(mn);
+                // Or just init the account directly from the mnemonic
+                Account acct = new Account(mn);
+                // example: ACCOUNT_RECOVER_MNEMONIC 
+                return acct;
         }
 
         public static MultisigAddress createMsig(Account addr1, Account addr2, Account addr3)
