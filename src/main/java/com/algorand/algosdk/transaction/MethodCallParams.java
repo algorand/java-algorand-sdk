@@ -170,7 +170,7 @@ public class MethodCallParams {
                 methodABIts.add(argT.parsedType);
             } else
                 throw new IllegalArgumentException(
-                        "error: the type of method argument "+i+" is a "+argT.type+", but "+argT.type+" not provided"
+                        "error: the type of method (" + this.method.name +") argument " + (i+1) + " is a " + methodArg.getClass().getName() + ", but " + argT.type + " not provided"
                 );
         }
 
