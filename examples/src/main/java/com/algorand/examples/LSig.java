@@ -76,7 +76,7 @@ public class LSig {
         // of a signature for a transaction
         LogicsigSignature delegateLsig = seedAcct.signLogicsig(lsigWithArgs.lsig);
         params = algodClient.TransactionParams().execute().body();
-        // create a transaction where the sender is the signer of the lsig 
+        // create a transaction where the sender is the signer of the lsig
         txn = Transaction.PaymentTransactionBuilder()
                 .sender(seedAcct.getAddress())
                 .amount(100000)

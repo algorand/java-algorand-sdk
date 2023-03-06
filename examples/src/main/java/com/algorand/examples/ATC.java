@@ -15,6 +15,7 @@ import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
+import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer;
 import com.algorand.algosdk.transaction.MethodCallParams;
 import com.algorand.algosdk.transaction.SignedTransaction;
@@ -82,6 +83,7 @@ public class ATC {
 
                 atc.addMethodCall(mcp);
                 // example: ATC_ADD_METHOD_CALL
+
                 // example: ATC_RESULTS
                 ExecuteResult res = atc.execute(algodClient, 2);
                 System.out.printf("App call (%s) confirmed in round %d\n", res.txIDs, res.confirmedRound);
@@ -90,6 +92,25 @@ public class ATC {
                                         methodResult.value);
                 });
                 // example: ATC_RESULTS
+
+                // example: ATC_BOX_REF
+                MethodCallTransactionBuilder<?> mct_builder = MethodCallTransactionBuilder.Builder();
+
+                List<AppBoxReference> boxRefs = new ArrayList<>();
+                boxRefs.add(new AppBoxReference(appId.intValue(), "cool-box".getBytes()));
+                MethodCallParams box_ref_mcp = mct_builder
+                                .suggestedParams(sp)
+                                .applicationId(appId)
+                                .sender(acct.getAddress())
+                                .method(contract.getMethodByName("add"))
+                                .methodArguments(methodArgs)
+                                .signer(acct.getTransactionSigner())
+                                .onComplete(Transaction.OnCompletion.NoOpOC)
+                                // Include reference to a box so the app logic may
+                                // use it during evaluation
+                                .boxReferences(boxRefs)
+                                .build();
+                // example: ATC_BOX_REF
         }
 
         public static void atcWithTws(AlgodClient algodClient, Account account) throws Exception {
