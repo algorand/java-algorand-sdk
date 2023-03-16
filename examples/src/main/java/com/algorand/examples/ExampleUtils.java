@@ -25,16 +25,16 @@ import com.algorand.algosdk.kmd.client.ApiException;
 public class ExampleUtils {
 
     private static String kmd_host = "http://localhost:4002";
-    private static String kmd_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private static String kmd_token = "a".repeat(64);
     private static KmdApi kmd = null;
 
     private static String algod_host = "http://localhost";
     private static int algod_port = 4001;
-    private static String algod_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private static String algod_token = "a".repeat(64);
 
     private static String indexer_host = "http://localhost";
     private static int indexer_port = 8980;
-    private static String indexer_token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    private static String indexer_token = "a".repeat(64);
 
     public static AlgodClient getAlgodClient() {
         return new AlgodClient(algod_host, algod_port, algod_token);

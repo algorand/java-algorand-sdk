@@ -12,7 +12,7 @@ public class IndexerExamples {
         // example: CREATE_INDEXER_CLIENT
         String indexerHost = "http://localhost";
         int indexerPort = 8980;
-        String indexerToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String indexerToken = "a".repeat(64);
         IndexerClient indexerClient = new IndexerClient(indexerHost, indexerPort, indexerToken);
         // example: CREATE_INDEXER_CLIENT
 

@@ -25,7 +25,7 @@ public class KMDExamples {
     public static void main(String[] args) throws ApiException {
         // example: KMD_CREATE_CLIENT 
         String kmdHost = "http://localhost:4002";
-        String kmdToken =  "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String kmdToken =  "a".repeat(64);
 
         KmdClient kmdClient = new KmdClient();
         kmdClient.setBasePath(kmdHost);

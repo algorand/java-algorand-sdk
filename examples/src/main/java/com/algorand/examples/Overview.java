@@ -1,9 +1,9 @@
 package com.algorand.examples;
 
+import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import com.algorand.algosdk.v2.client.Utils;
-import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
@@ -54,13 +54,16 @@ public class Overview {
         // example: SP_MIN_FEE
 
         // example: TRANSACTION_FEE_OVERRIDE
+        BigInteger nullFee = null;
         Transaction feeOverrideTxn = Transaction.PaymentTransactionBuilder()
                 .sender(acct.getAddress())
                 .receiver(acct2.getAddress())
                 .suggestedParams(suggestedParams.body())
-                // override the fee given by suggested params
-                // to set a flat fee of 2x minfee to cover another transaction
-                // in the same group
+                // since suggestedParams sets a fee, we have to `null` it out
+                // or trying to set flatFee will fail with both set
+                .fee(nullFee)
+                // override the fee given by suggested params to set a flat 
+                // fee of 2x minfee to cover another transaction in the same group
                 .flatFee(2 * suggestedParams.body().minFee).build();
         // example: TRANSACTION_FEE_OVERRIDE
 
@@ -91,7 +94,7 @@ public class Overview {
         // example: ALGOD_CREATE_CLIENT
         String algodHost = "http://localhost";
         int algodPort = 4001;
-        String algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+        String algodToken = "a".repeat(64);
         AlgodClient algodClient = new AlgodClient(algodHost, algodPort, algodToken);
 
         // OR if the API provider requires a specific header key for the token
