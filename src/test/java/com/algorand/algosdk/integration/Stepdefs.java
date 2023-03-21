@@ -1184,4 +1184,11 @@ public class Stepdefs {
         }
     }
 
+    @Then("disassembly of {string} matches {string}")
+    public void disassemblyMatches(String bytecodeFilename, String sourceFilename) throws Exception {
+        String disassembledSource = aclv2.TealDisassemble().source(loadResource(bytecodeFilename)).execute().body().result;
+        String expectedSource = new String(ResourceUtils.readResource(sourceFilename), StandardCharsets.UTF_8);
+
+        assertThat(disassembledSource).isEqualTo(expectedSource);
+    }
 }
