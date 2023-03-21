@@ -51,7 +51,7 @@ public class AtomicTransfers {
         // sign transactions
         SignedTransaction signedPtxn1 = acct1.signTransaction(ptxn1);
         SignedTransaction signedPtxn2 = acct2.signTransaction(ptxn2);
-        // # example: ATOMIC_GROUP_SIGN
+        // example: ATOMIC_GROUP_SIGN
 
         // example: ATOMIC_GROUP_ASSEMBLE
         // combine the signed transactions into a single list
