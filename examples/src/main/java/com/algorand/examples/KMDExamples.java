@@ -52,13 +52,11 @@ public class KMDExamples {
 
         String handleToken = getHandle(kmd, wallet, password);
 
-        // example: KMD_BACKUP_WALLET
         ExportMasterKeyRequest mker = new ExportMasterKeyRequest();
         mker.setWalletHandleToken(handleToken);
         mker.setWalletPassword(password);
         APIV1POSTMasterKeyExportResponse masterKeyResp = kmd.exportMasterKey(mker);
         byte[] backupKey = masterKeyResp.getMasterDerivationKey();
-        // example: KMD_BACKUP_WALLET
 
         // example: KMD_RECOVER_WALLET
         // create a new CreateWalletRequest and set parameters 
@@ -106,14 +104,12 @@ public class KMDExamples {
     }
 
     public static String getHandle(KmdApi kmd, APIV1Wallet wallet, String password) throws ApiException {
-        // example: KMD_CREATE_HANDLE_TOKEN
         // grab a handle that we can re-use
         InitWalletHandleTokenRequest tokenReq = new InitWalletHandleTokenRequest();
         tokenReq.setWalletId(wallet.getId());
         tokenReq.setWalletPassword(password);
         APIV1POSTWalletInitResponse handleTokenResp = kmd.initWalletHandleToken(tokenReq);
         String handleToken = handleTokenResp.getWalletHandleToken();
-        // example: KMD_CREATE_HANDLE_TOKEN
         return handleToken;
     }
 

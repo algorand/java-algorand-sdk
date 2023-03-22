@@ -1,6 +1,7 @@
 package com.algorand.examples;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Hex;
@@ -67,16 +68,24 @@ public class CodecExamples {
         assert decodedSignedTransaction.equals(signedTxn);
         // example: CODEC_TRANSACTION_SIGNED
 
-        // example: CODEC_ABI_TYPES
-        ABIType tupleCodec = ABIType.valueOf("(uint64,bool,string)");
-        Object[] data = new Object[]{123, false, "hi"};
-        byte[] encoded = tupleCodec.encode(data);
-        System.out.printf("Encoded: '%s'\n", Hex.encodeHexString(encoded));
+        // example: CODEC_ABI
+        ABIType tupleCodec = ABIType.valueOf("(string,string)");
+        Object[] tupleData = new Object[] { "hello", "world" };
+        byte[] tupleEncoded = tupleCodec.encode(tupleData);
+        System.out.printf("Encoded: '%s'\n", Hex.encodeHexString(tupleEncoded));
+        Object tupleDecoded = tupleCodec.decode(tupleEncoded);
+        // prints [hello, world]
+        System.out.printf("Decoded: %s\n", Arrays.toString((Object[]) tupleDecoded));
 
-        ABIType boolCodec = ABIType.valueOf("bool");
-        byte[] singleEncoded = boolCodec.encode(true);
-        System.out.printf("Single Encoded: '%s'\n", Hex.encodeHexString(singleEncoded));
-        // example: CODEC_ABI_TYPES
+        ABIType arrCodec = ABIType.valueOf("uint64[]");
+        Object[] arrData = new Object[] { 1, 2, 3, 4, 5 };
+        byte[] arrEncoded = arrCodec.encode(arrData);
+        System.out.printf("Encoded: '%s'\n", Hex.encodeHexString(arrEncoded));
+
+        Object arrDecoded = arrCodec.decode(arrEncoded);
+        // prints [1, 2, 3, 4, 5]
+        System.out.printf("Decoded: %s\n", Arrays.toString((Object[]) arrDecoded));
+        // example: CODEC_ABI
 
     }
 }

@@ -32,6 +32,7 @@ public class ASAExamples {
         xferAsset(algodClient, acct1, acct2, asaId);
         freezeAsset(algodClient, acct1, acct2, asaId);
         clawbackAsset(algodClient, acct1, acct2, asaId);
+        optOutOfAsset(algodClient, acct2, acct1, asaId);
         deleteAsset(algodClient, acct1, asaId);
     }
 
@@ -153,6 +154,24 @@ public class ASAExamples {
         // example: ASSET_FREEZE
         SignedTransaction signedFreeze = sender.signTransaction(freezeTxn);
         ExampleUtils.sendPrint(algodClient, signedFreeze, "freeze asset");
+    }
+
+    public static void optOutOfAsset(AlgodClient algodClient, Account sender, Account creator, Long asaId)
+            throws Exception {
+        // example: ASSET_OPT_OUT
+        Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
+        TransactionParametersResponse sp = rsp.body();
+        // Opt out of the asset by setting the assetCloseTo parameter
+        Transaction optOutTxn = Transaction.AssetTransferTransactionBuilder().suggestedParams(sp)
+                .sender(sender.getAddress())
+                .assetReceiver(creator.getAddress())
+                .assetCloseTo(creator.getAddress())
+                .assetIndex(asaId)
+                .assetAmount(0)
+                .build();
+        // example: ASSET_OPT_OUT
+        SignedTransaction signedOptOut = sender.signTransaction(optOutTxn);
+        ExampleUtils.sendPrint(algodClient, signedOptOut, "opt out asset");
     }
 
     public static void clawbackAsset(AlgodClient algodClient, Account sender, Account receiver, Long asaId)
