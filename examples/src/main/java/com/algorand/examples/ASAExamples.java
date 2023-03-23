@@ -2,8 +2,6 @@ package com.algorand.examples;
 
 import java.util.List;
 
-import org.bouncycastle.pqc.crypto.ExchangePair;
-
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;

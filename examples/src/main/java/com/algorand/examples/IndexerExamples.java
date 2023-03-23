@@ -9,12 +9,12 @@ import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 public class IndexerExamples {
 
     public static void main(String[] args) throws Exception {
-        // example: CREATE_INDEXER_CLIENT
+        // example: INDEXER_CREATE_CLIENT
         String indexerHost = "http://localhost";
         int indexerPort = 8980;
         String indexerToken = "a".repeat(64);
         IndexerClient indexerClient = new IndexerClient(indexerHost, indexerPort, indexerToken);
-        // example: CREATE_INDEXER_CLIENT
+        // example: INDEXER_CREATE_CLIENT
 
         // example: INDEXER_LOOKUP_ASSET
         Long asaId = 25l;
@@ -34,22 +34,23 @@ public class IndexerExamples {
         String nextToken = "";
         boolean hasResults = true;
         // Start with empty nextToken and while there are
-        // results in the transaction results, query again with the next page 
-        while(hasResults){
+        // results in the transaction results, query again with the next page
+        while (hasResults) {
             Response<TransactionsResponse> searchResults = indexerClient.searchForTransactions().minRound(1000l)
                     .maxRound(1500l).currencyGreaterThan(10l).next(nextToken).execute();
             TransactionsResponse txnRes = searchResults.body();
             //
             // ... do something with transaction results
             //
-            hasResults = txnRes.transactions.size()>0;
+            hasResults = txnRes.transactions.size() > 0;
             nextToken = txnRes.nextToken;
         }
         // example: INDEXER_PAGINATE_RESULTS
 
         // example: INDEXER_PREFIX_SEARCH
         byte[] prefix = new String("showing prefix").getBytes();
-        Response<TransactionsResponse> prefixResults = indexerClient.searchForTransactions().notePrefix(prefix).execute();
+        Response<TransactionsResponse> prefixResults = indexerClient.searchForTransactions().notePrefix(prefix)
+                .execute();
         // ...
         // example: INDEXER_PREFIX_SEARCH
     }

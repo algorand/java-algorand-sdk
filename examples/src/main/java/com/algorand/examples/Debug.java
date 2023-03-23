@@ -22,7 +22,6 @@ import com.algorand.algosdk.v2.client.model.DryrunTxnResult;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 
 public class Debug {
-    
 
     public static void main(String[] args) throws Exception {
         AlgodClient algodClient = ExampleUtils.getAlgodClient();
@@ -46,12 +45,12 @@ public class Debug {
 
         MethodCallTransactionBuilder<?> mctb = MethodCallTransactionBuilder.Builder();
         MethodCallParams mcp = mctb.applicationId(appId).signer(acct.getTransactionSigner())
-                        .suggestedParams(sp)
-                        .sender(acct.getAddress())
-                        .method(contract.getMethodByName("add"))
-                        .methodArguments(methodArgs)
-                        .onComplete(Transaction.OnCompletion.NoOpOC)
-                        .build();
+                .suggestedParams(sp)
+                .sender(acct.getAddress())
+                .method(contract.getMethodByName("add"))
+                .methodArguments(methodArgs)
+                .onComplete(Transaction.OnCompletion.NoOpOC)
+                .build();
         atc.addMethodCall(mcp);
 
         DryrunRequest drr = Utils.createDryrun(algodClient, atc.gatherSignatures(), "", 0L, 0L);

@@ -59,15 +59,16 @@ public class AccountExamples {
                 rekeyAcct(algodClient, acct1, acct2);
 
         }
+
         public static Account recoverFromMnemonic() throws GeneralSecurityException {
-                // example: ACCOUNT_RECOVER_MNEMONIC 
+                // example: ACCOUNT_RECOVER_MNEMONIC
                 // Space delimited 25 word mnemonic
                 String mn = "cost piano sample enough south bar diet garden nasty mystery mesh sadness convince bacon best patch surround protect drum actress entire vacuum begin abandon hair";
                 // We can get the private key
                 byte[] key = Mnemonic.toKey(mn);
                 // Or just init the account directly from the mnemonic
                 Account acct = new Account(mn);
-                // example: ACCOUNT_RECOVER_MNEMONIC 
+                // example: ACCOUNT_RECOVER_MNEMONIC
                 return acct;
         }
 

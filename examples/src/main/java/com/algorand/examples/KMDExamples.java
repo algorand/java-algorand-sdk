@@ -23,23 +23,22 @@ import com.algorand.algosdk.mnemonic.Mnemonic;
 public class KMDExamples {
 
     public static void main(String[] args) throws ApiException {
-        // example: KMD_CREATE_CLIENT 
+        // example: KMD_CREATE_CLIENT
         String kmdHost = "http://localhost:4002";
-        String kmdToken =  "a".repeat(64);
+        String kmdToken = "a".repeat(64);
 
         KmdClient kmdClient = new KmdClient();
         kmdClient.setBasePath(kmdHost);
         kmdClient.setApiKey(kmdToken);
 
         KmdApi kmd = new KmdApi(kmdClient);
-        // example: KMD_CREATE_CLIENT 
+        // example: KMD_CREATE_CLIENT
 
-
-        String walletName =  "MyNewWallet";
+        String walletName = "MyNewWallet";
         String password = "supersecretpassword";
 
-        // example: KMD_CREATE_WALLET 
-        // create a new CreateWalletRequest and set parameters 
+        // example: KMD_CREATE_WALLET
+        // create a new CreateWalletRequest and set parameters
         CreateWalletRequest cwr = new CreateWalletRequest();
         cwr.setWalletName(walletName);
         cwr.setWalletPassword(password);
@@ -48,7 +47,7 @@ public class KMDExamples {
         APIV1POSTWalletResponse result = kmd.createWallet(cwr);
         APIV1Wallet wallet = result.getWallet();
         System.out.printf("Wallet name: %s\n", wallet.getName());
-        // example: KMD_CREATE_WALLET 
+        // example: KMD_CREATE_WALLET
 
         String handleToken = getHandle(kmd, wallet, password);
 
@@ -59,9 +58,9 @@ public class KMDExamples {
         byte[] backupKey = masterKeyResp.getMasterDerivationKey();
 
         // example: KMD_RECOVER_WALLET
-        // create a new CreateWalletRequest and set parameters 
+        // create a new CreateWalletRequest and set parameters
         CreateWalletRequest recoverRequest = new CreateWalletRequest();
-        recoverRequest.setWalletName("Recovered:"+walletName);
+        recoverRequest.setWalletName("Recovered:" + walletName);
         recoverRequest.setWalletPassword(password);
         recoverRequest.setWalletDriverName("sqlite");
         // Pass the specific derivation key we want to use
