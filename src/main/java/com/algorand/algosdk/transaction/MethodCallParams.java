@@ -170,7 +170,7 @@ public class MethodCallParams {
                 methodABIts.add(argT.parsedType);
             } else
                 throw new IllegalArgumentException(
-                        "error: the type of method argument is a transaction-type, but no transaction-with-signer provided"
+                        "error: the type of method (" + this.method.name +") argument " + (i+1) + " is a " + methodArg.getClass().getName() + ", but " + argT.type + " not provided"
                 );
         }
 
