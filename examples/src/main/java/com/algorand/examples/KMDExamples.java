@@ -34,7 +34,9 @@ public class KMDExamples {
         KmdApi kmd = new KmdApi(kmdClient);
         // example: KMD_CREATE_CLIENT
 
-        String walletName = "MyNewWallet";
+        kmd = ExampleUtils.getKMDClient();
+
+        String walletName =  "MyNewWallet";
         String password = "supersecretpassword";
 
         // example: KMD_CREATE_WALLET

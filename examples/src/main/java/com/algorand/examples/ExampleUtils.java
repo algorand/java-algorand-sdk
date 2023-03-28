@@ -67,7 +67,7 @@ public class ExampleUtils {
         return new IndexerClient(indexer_host, indexer_port, indexer_token);
     }
 
-    public static List<Account> getSandboxAccounts() throws Exception {
+    public static KmdApi getKMDClient() {
         // KMD Environment variables
         if (System.getenv("KMD_HOST") != null) {
             kmd_host = System.getenv("KMD_HOST");
@@ -86,6 +86,11 @@ public class ExampleUtils {
         kmdClient.setBasePath(kmd_host + ":" + kmd_port);
         kmdClient.setApiKey(kmd_token);
         kmd = new KmdApi(kmdClient);
+        return kmd;
+    }
+
+    public static List<Account> getSandboxAccounts() throws Exception {
+        getKMDClient();
 
         // Get accounts from sandbox.
         String walletHandle = getDefaultWalletHandle();

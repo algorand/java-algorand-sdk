@@ -1,9 +1,14 @@
 package com.algorand.examples;
 
+import java.util.List;
+
+import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.Asset;
 import com.algorand.algosdk.v2.client.model.AssetResponse;
+import com.algorand.algosdk.v2.client.model.AssetsResponse;
 import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 public class IndexerExamples {
@@ -16,8 +21,16 @@ public class IndexerExamples {
         IndexerClient indexerClient = new IndexerClient(indexerHost, indexerPort, indexerToken);
         // example: INDEXER_CREATE_CLIENT
 
+        // Create asset for use with Indexer
+        indexerClient = ExampleUtils.getIndexerClient();
+        AlgodClient algodClient = ExampleUtils.getAlgodClient();
+        List<Account> accts = ExampleUtils.getSandboxAccounts();
+        Account acct = accts.get(0);
+        System.out.println("Creating Asset");
+        Long existingAssetId = ASAExamples.createAsset(algodClient, acct);
+
         // example: INDEXER_LOOKUP_ASSET
-        Long asaId = 25l;
+        Long asaId = existingAssetId;
         Response<AssetResponse> assetResponse = indexerClient.lookupAssetByID(asaId).execute();
         Asset assetInfo = assetResponse.body().asset;
         System.out.printf("Name for %d: %s\n", asaId, assetInfo.params.name);
@@ -53,6 +66,9 @@ public class IndexerExamples {
                 .execute();
         // ...
         // example: INDEXER_PREFIX_SEARCH
+
+        System.out.println("Deleting Asset: " + existingAssetId);
+        ASAExamples.deleteAsset(algodClient, acct, existingAssetId);
     }
 
 }
