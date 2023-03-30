@@ -18,5 +18,10 @@ for file in $(find . -name "*.java" -type f | sort -n); do
         file="${file//.java/}"
         # Run the example
         java -cp target/sdk-extras-1.0-SNAPSHOT-jar-with-dependencies.jar $file
+        # Check if the test failed
+        if [ $? -ne 0 ]; then
+            echo "Test failed, stopping script"
+            exit 1
+        fi
     fi
 done
