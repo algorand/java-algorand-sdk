@@ -38,7 +38,13 @@ public class IndexerExamples {
 
         // example: INDEXER_SEARCH_MIN_AMOUNT
         Response<TransactionsResponse> transactionSearchResult = indexerClient.searchForTransactions()
-                .minRound(1l).maxRound(1000l).currencyGreaterThan(10l).execute();
+                .minRound(0l).maxRound(1000l).execute();
+
+        if (!transactionSearchResult.isSuccessful()) {
+          System.out.println(transactionSearchResult.message());
+          System.exit(1);
+        }
+
         TransactionsResponse txResp = transactionSearchResult.body();
         System.out.printf("Found %d transactions that match criteria\n", txResp.transactions.size());
         // example: INDEXER_SEARCH_MIN_AMOUNT
