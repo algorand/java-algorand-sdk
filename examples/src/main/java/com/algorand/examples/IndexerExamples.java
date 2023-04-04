@@ -38,7 +38,7 @@ public class IndexerExamples {
 
         // example: INDEXER_SEARCH_MIN_AMOUNT
         Response<TransactionsResponse> transactionSearchResult = indexerClient.searchForTransactions()
-                .minRound(0l).maxRound(1000l).execute();
+                .minRound(0l).maxRound(1000l).currencyGreaterThan(1l).execute();
 
         if (!transactionSearchResult.isSuccessful()) {
           System.out.println(transactionSearchResult.message());
@@ -61,8 +61,12 @@ public class IndexerExamples {
             //
             // ... do something with transaction results
             //
-            hasResults = txnRes.transactions.size() > 0;
-            nextToken = txnRes.nextToken;
+            if (txnRes != null && txnRes.transactions != null) {
+                hasResults = txnRes.transactions.size() > 0;
+                nextToken = txnRes.nextToken;
+            } else {
+                hasResults = false;
+            }
         }
         // example: INDEXER_PAGINATE_RESULTS
 
