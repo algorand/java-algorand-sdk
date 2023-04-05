@@ -1,5 +1,5 @@
 # Configs for testing repo download:
-SDK_TESTING_URL="https://github.com/algorand/algorand-sdk-testing"
+SDK_TESTING_URL="https://github.com/nullun/algorand-sdk-testing"
 SDK_TESTING_BRANCH="master"
 SDK_TESTING_HARNESS="test-harness"
 
