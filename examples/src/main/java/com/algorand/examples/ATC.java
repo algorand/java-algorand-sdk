@@ -13,6 +13,7 @@ import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.ApplicationCreateTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.logic.StateSchema;
 import com.algorand.algosdk.transaction.AppBoxReference;
@@ -37,6 +38,7 @@ public class ATC {
                 AlgodClient algodClient = ExampleUtils.getAlgodClient();
                 List<Account> accts = ExampleUtils.getSandboxAccounts();
                 Account acct = accts.get(0);
+                Account otherAccount = accts.get(1);
 
                 Long appId = deployApp(algodClient, acct);
 
@@ -94,11 +96,11 @@ public class ATC {
                 // example: ATC_RESULTS
 
                 // example: ATC_BOX_REF
-                MethodCallTransactionBuilder<?> mct_builder = MethodCallTransactionBuilder.Builder();
+                MethodCallTransactionBuilder<?> mctBuilder = MethodCallTransactionBuilder.Builder();
 
                 List<AppBoxReference> boxRefs = new ArrayList<>();
                 boxRefs.add(new AppBoxReference(appId.intValue(), "cool-box".getBytes()));
-                MethodCallParams box_ref_mcp = mct_builder
+                MethodCallParams boxRefMcp = mctBuilder
                                 .suggestedParams(sp)
                                 .applicationId(appId)
                                 .sender(acct.getAddress())
@@ -111,6 +113,36 @@ public class ATC {
                                 .boxReferences(boxRefs)
                                 .build();
                 // example: ATC_BOX_REF
+
+                // example: ATC_FOREIGN_REFS
+                MethodCallTransactionBuilder<?> refBuilder = MethodCallTransactionBuilder.Builder();
+
+                List<AppBoxReference> boxReferences = new ArrayList<>();
+                boxRefs.add(new AppBoxReference(appId.intValue(), "cool-box".getBytes()));
+
+                List<Address> acctReferences = new ArrayList<>();
+                acctReferences.add(otherAccount.getAddress());
+
+                List<Long> appReferences = new ArrayList<>();
+                appReferences.add(1337l);
+
+                List<Long> assetReferences = new ArrayList<>();
+                appReferences.add(42l);
+
+                MethodCallParams foreignRefMCP = refBuilder
+                                .suggestedParams(sp)
+                                .applicationId(appId)
+                                .sender(acct.getAddress())
+                                .method(contract.getMethodByName("add"))
+                                .methodArguments(methodArgs)
+                                .signer(acct.getTransactionSigner())
+                                .onComplete(Transaction.OnCompletion.NoOpOC)
+                                .accounts(acctReferences)
+                                .foreignApps(appReferences)
+                                .foreignAssets(assetReferences)
+                                .boxReferences(boxReferences)
+                                .build();
+                // example: ATC_FOREIGN_REFS
         }
 
         public static void atcWithTws(AlgodClient algodClient, Account account) throws Exception {

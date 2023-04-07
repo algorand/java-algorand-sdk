@@ -49,7 +49,6 @@ public class CodecExamples {
         // example: CODEC_TRANSACTION_UNSIGNED
         Response<TransactionParametersResponse> rsp = algodClient.TransactionParams().execute();
         TransactionParametersResponse sp = rsp.body();
-        // Wipe the `reserve` address through an AssetConfigTransaction
         Transaction ptxn = Transaction.PaymentTransactionBuilder().suggestedParams(sp)
                 .sender(acct.getAddress()).receiver(acct.getAddress()).amount(100).build();
 
