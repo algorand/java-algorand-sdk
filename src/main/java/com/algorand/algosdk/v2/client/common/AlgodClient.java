@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.common;
 
 import com.algorand.algosdk.v2.client.algod.HealthCheck;
+import com.algorand.algosdk.v2.client.algod.GetReady;
 import com.algorand.algosdk.v2.client.algod.Metrics;
 import com.algorand.algosdk.v2.client.algod.GetGenesis;
 import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
@@ -16,6 +17,7 @@ import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
 import com.algorand.algosdk.v2.client.algod.RawTransaction;
+import com.algorand.algosdk.v2.client.algod.SimulateTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
@@ -25,6 +27,9 @@ import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
+import com.algorand.algosdk.v2.client.algod.UnsetSyncRound;
+import com.algorand.algosdk.v2.client.algod.GetSyncRound;
+import com.algorand.algosdk.v2.client.algod.SetSyncRound;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.algod.TealDisassemble;
 import com.algorand.algosdk.v2.client.algod.TealDryrun;
@@ -59,6 +64,14 @@ public class AlgodClient extends Client {
      */
     public HealthCheck HealthCheck() {
         return new HealthCheck((Client) this);
+    }
+
+    /**
+     * Returns OK if healthy and fully caught up.
+     * /ready
+     */
+    public GetReady GetReady() {
+        return new GetReady((Client) this);
     }
 
     /**
@@ -187,11 +200,21 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Broadcasts a raw transaction to the network.
+     * Broadcasts a raw transaction or transaction group to the network.
      * /v2/transactions
      */
     public RawTransaction RawTransaction() {
         return new RawTransaction((Client) this);
+    }
+
+    /**
+     * Simulates a raw transaction or transaction group as it would be evaluated on the
+     * network. The simulation will use blockchain state from the latest committed
+     * round.
+     * /v2/transactions/simulate
+     */
+    public SimulateTransaction SimulateTransaction() {
+        return new SimulateTransaction((Client) this);
     }
 
     /**
@@ -280,6 +303,30 @@ public class AlgodClient extends Client {
      */
     public GetAssetByID GetAssetByID(Long assetId) {
         return new GetAssetByID((Client) this, assetId);
+    }
+
+    /**
+     * Unset the ledger sync round.
+     * /v2/ledger/sync
+     */
+    public UnsetSyncRound UnsetSyncRound() {
+        return new UnsetSyncRound((Client) this);
+    }
+
+    /**
+     * Gets the minimum sync round for the ledger.
+     * /v2/ledger/sync
+     */
+    public GetSyncRound GetSyncRound() {
+        return new GetSyncRound((Client) this);
+    }
+
+    /**
+     * Sets the minimum sync round on the ledger.
+     * /v2/ledger/sync/{round}
+     */
+    public SetSyncRound SetSyncRound(Long round) {
+        return new SetSyncRound((Client) this, round);
     }
 
     /**
