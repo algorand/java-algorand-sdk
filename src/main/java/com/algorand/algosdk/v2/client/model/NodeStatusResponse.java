@@ -123,6 +123,54 @@ public class NodeStatusResponse extends PathResponse {
     @JsonProperty("time-since-last-round")
     public Long timeSinceLastRound;
 
+    /**
+     * Upgrade delay
+     */
+    @JsonProperty("upgrade-delay")
+    public Long upgradeDelay;
+
+    /**
+     * Next protocol round
+     */
+    @JsonProperty("upgrade-next-protocol-vote-before")
+    public Long upgradeNextProtocolVoteBefore;
+
+    /**
+     * No votes cast for consensus upgrade
+     */
+    @JsonProperty("upgrade-no-votes")
+    public Long upgradeNoVotes;
+
+    /**
+     * This node's upgrade vote
+     */
+    @JsonProperty("upgrade-node-vote")
+    public Boolean upgradeNodeVote;
+
+    /**
+     * Total voting rounds for current upgrade
+     */
+    @JsonProperty("upgrade-vote-rounds")
+    public Long upgradeVoteRounds;
+
+    /**
+     * Total votes cast for consensus upgrade
+     */
+    @JsonProperty("upgrade-votes")
+    public Long upgradeVotes;
+
+    /**
+     * Yes votes required for consensus upgrade
+     */
+    @JsonProperty("upgrade-votes-required")
+    public Long upgradeVotesRequired;
+
+    /**
+     * Yes votes cast for consensus upgrade
+     */
+    @JsonProperty("upgrade-yes-votes")
+    public Long upgradeYesVotes;
+
     @Override
     public boolean equals(Object o) {
 
@@ -148,6 +196,14 @@ public class NodeStatusResponse extends PathResponse {
         if (!Objects.deepEquals(this.nextVersionSupported, other.nextVersionSupported)) return false;
         if (!Objects.deepEquals(this.stoppedAtUnsupportedRound, other.stoppedAtUnsupportedRound)) return false;
         if (!Objects.deepEquals(this.timeSinceLastRound, other.timeSinceLastRound)) return false;
+        if (!Objects.deepEquals(this.upgradeDelay, other.upgradeDelay)) return false;
+        if (!Objects.deepEquals(this.upgradeNextProtocolVoteBefore, other.upgradeNextProtocolVoteBefore)) return false;
+        if (!Objects.deepEquals(this.upgradeNoVotes, other.upgradeNoVotes)) return false;
+        if (!Objects.deepEquals(this.upgradeNodeVote, other.upgradeNodeVote)) return false;
+        if (!Objects.deepEquals(this.upgradeVoteRounds, other.upgradeVoteRounds)) return false;
+        if (!Objects.deepEquals(this.upgradeVotes, other.upgradeVotes)) return false;
+        if (!Objects.deepEquals(this.upgradeVotesRequired, other.upgradeVotesRequired)) return false;
+        if (!Objects.deepEquals(this.upgradeYesVotes, other.upgradeYesVotes)) return false;
 
         return true;
     }
