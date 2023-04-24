@@ -1,6 +1,7 @@
 package com.algorand.algosdk.v2.client.common;
 
 import com.algorand.algosdk.v2.client.algod.HealthCheck;
+import com.algorand.algosdk.v2.client.algod.GetReady;
 import com.algorand.algosdk.v2.client.algod.Metrics;
 import com.algorand.algosdk.v2.client.algod.GetGenesis;
 import com.algorand.algosdk.v2.client.algod.SwaggerJSON;
@@ -16,6 +17,7 @@ import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
 import com.algorand.algosdk.v2.client.algod.RawTransaction;
+import com.algorand.algosdk.v2.client.algod.SimulateTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
@@ -25,9 +27,14 @@ import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
 import com.algorand.algosdk.v2.client.algod.GetApplicationBoxByName;
 import com.algorand.algosdk.v2.client.algod.GetAssetByID;
+import com.algorand.algosdk.v2.client.algod.UnsetSyncRound;
+import com.algorand.algosdk.v2.client.algod.GetSyncRound;
+import com.algorand.algosdk.v2.client.algod.SetSyncRound;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.algod.TealDisassemble;
 import com.algorand.algosdk.v2.client.algod.TealDryrun;
+import com.algorand.algosdk.v2.client.algod.GetBlockTimeStampOffset;
+import com.algorand.algosdk.v2.client.algod.SetBlockTimeStampOffset;
 import com.algorand.algosdk.crypto.Address;
 
 public class AlgodClient extends Client {
@@ -59,6 +66,14 @@ public class AlgodClient extends Client {
      */
     public HealthCheck HealthCheck() {
         return new HealthCheck((Client) this);
+    }
+
+    /**
+     * Returns OK if healthy and fully caught up.
+     * /ready
+     */
+    public GetReady GetReady() {
+        return new GetReady((Client) this);
     }
 
     /**
@@ -187,11 +202,21 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Broadcasts a raw transaction to the network.
+     * Broadcasts a raw transaction or transaction group to the network.
      * /v2/transactions
      */
     public RawTransaction RawTransaction() {
         return new RawTransaction((Client) this);
+    }
+
+    /**
+     * Simulates a raw transaction or transaction group as it would be evaluated on the
+     * network. The simulation will use blockchain state from the latest committed
+     * round.
+     * /v2/transactions/simulate
+     */
+    public SimulateTransaction SimulateTransaction() {
+        return new SimulateTransaction((Client) this);
     }
 
     /**
@@ -283,6 +308,30 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Unset the ledger sync round.
+     * /v2/ledger/sync
+     */
+    public UnsetSyncRound UnsetSyncRound() {
+        return new UnsetSyncRound((Client) this);
+    }
+
+    /**
+     * Gets the minimum sync round for the ledger.
+     * /v2/ledger/sync
+     */
+    public GetSyncRound GetSyncRound() {
+        return new GetSyncRound((Client) this);
+    }
+
+    /**
+     * Sets the minimum sync round on the ledger.
+     * /v2/ledger/sync/{round}
+     */
+    public SetSyncRound SetSyncRound(Long round) {
+        return new SetSyncRound((Client) this, round);
+    }
+
+    /**
      * Given TEAL source code in plain text, return base64 encoded program bytes and
      * base32 SHA512_256 hash of program bytes (Address style). This endpoint is only
      * enabled when a node's configuration file sets EnableDeveloperAPI to true.
@@ -310,6 +359,23 @@ public class AlgodClient extends Client {
      */
     public TealDryrun TealDryrun() {
         return new TealDryrun((Client) this);
+    }
+
+    /**
+     * Gets the current timestamp offset.
+     * /v2/devmode/blocks/offset
+     */
+    public GetBlockTimeStampOffset GetBlockTimeStampOffset() {
+        return new GetBlockTimeStampOffset((Client) this);
+    }
+
+    /**
+     * Sets the timestamp offset (seconds) for blocks in dev mode. Providing an offset
+     * of 0 will unset this value and try to use the real clock for the timestamp.
+     * /v2/devmode/blocks/offset/{offset}
+     */
+    public SetBlockTimeStampOffset SetBlockTimeStampOffset(Long offset) {
+        return new SetBlockTimeStampOffset((Client) this, offset);
     }
 
 }
