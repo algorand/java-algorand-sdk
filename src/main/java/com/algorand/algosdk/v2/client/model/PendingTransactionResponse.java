@@ -54,7 +54,7 @@ public class PendingTransactionResponse extends PathResponse {
     public Long confirmedRound;
 
     /**
-     * (gd) Global state key/value changes for the application being executed by this
+     * Global state key/value changes for the application being executed by this
      * transaction.
      */
     @JsonProperty("global-state-delta")
@@ -67,14 +67,14 @@ public class PendingTransactionResponse extends PathResponse {
     public List<PendingTransactionResponse> innerTxns = new ArrayList<PendingTransactionResponse>();
 
     /**
-     * (ld) Local state key/value changes for the application being executed by this
+     * Local state key/value changes for the application being executed by this
      * transaction.
      */
     @JsonProperty("local-state-delta")
     public List<AccountStateDelta> localStateDelta = new ArrayList<AccountStateDelta>();
 
     /**
-     * (lg) Logs for the application being executed by this transaction.
+     * Logs for the application being executed by this transaction.
      */
     @JsonProperty("logs")
     public List<byte[]> logs = new ArrayList<byte[]>();
