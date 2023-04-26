@@ -15,6 +15,7 @@
 @unit.indexer.rekey
 @unit.offline
 @unit.program_sanity_check
+@unit.ready
 @unit.rekey
 @unit.responses
 @unit.responses.231
@@ -22,11 +23,13 @@
 @unit.responses.messagepack.231
 @unit.responses.unlimited_assets
 @unit.responses.blocksummary
+@unit.responses.timestamp
 @unit.sourcemap
 @unit.stateproof.paths
 @unit.stateproof.responses
 @unit.stateproof.responses.msgp
 @unit.tealsign
+@unit.timestamp
 @unit.transactions
 @unit.transactions.keyreg
 @unit.transactions.payment
