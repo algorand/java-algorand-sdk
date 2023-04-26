@@ -23,6 +23,7 @@
 @unit.responses.messagepack
 @unit.responses.messagepack.231
 @unit.responses.timestamp
+@unit.responses.sync
 @unit.responses.unlimited_assets
 @unit.sourcemap
 @unit.stateproof.paths

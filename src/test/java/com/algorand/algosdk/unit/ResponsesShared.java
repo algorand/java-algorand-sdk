@@ -197,6 +197,9 @@ public class ResponsesShared {
                     case "GetBlockTimeStampOffset":
                         response = algod.GetBlockTimeStampOffset().execute();
                         break;
+                    case "GetSyncRound":
+                        response = algod.GetSyncRound().execute();
+                        break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
                 }
