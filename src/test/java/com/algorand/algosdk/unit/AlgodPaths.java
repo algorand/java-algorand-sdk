@@ -121,4 +121,12 @@ public class AlgodPaths {
     public void getBlockHash(Long round) {
         ps.q = algodClient.GetBlockHash(round);
     }
+
+    @When("we make a GetBlockTimeStampOffset call")
+    public void getBlockTimestampOffset() {
+        ps.q = algodClient.;
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
 }
