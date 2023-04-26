@@ -122,11 +122,33 @@ public class AlgodPaths {
         ps.q = algodClient.GetBlockHash(round);
     }
 
-    @When("we make a GetBlockTimeStampOffset call")
-    public void getBlockTimestampOffset() {
-        ps.q = algodClient.;
-        // Write code here that turns the phrase above into concrete actions
-        throw new io.cucumber.java.PendingException();
+    @When("we make a GetSyncRound call")
+    public void getSyncRound() {
+        ps.q = algodClient.GetSyncRound();
     }
 
+    @When("we make a SetSyncRound call against round {long}")
+    public void setSyncRound(Long round) {
+        ps.q = algodClient.SetSyncRound(round);
+    }
+
+    @When("we make a UnsetSyncRound call")
+    public void unetSyncRound() {
+        ps.q = algodClient.UnsetSyncRound();
+    }
+
+    @When("we make a Ready call")
+    public void getReady() {
+        ps.q = algodClient.GetReady();
+    }
+
+    @When("we make a GetBlockTimeStampOffset call")
+    public void getBlockTimestampOffset() {
+        ps.q = algodClient.GetBlockTimeStampOffset();
+    }
+
+    @When("we make a SetBlockTimeStampOffset call against offset {long}")
+    public void setBlockTimestampOffset(Long round) {
+        ps.q = algodClient.SetBlockTimeStampOffset(round);
+    }
 }

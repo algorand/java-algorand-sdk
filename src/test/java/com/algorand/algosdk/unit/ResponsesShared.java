@@ -194,6 +194,9 @@ public class ResponsesShared {
                     case "GetBlockHash":
                         response = algod.GetBlockHash(1234L).execute();
                         break;
+                    case "GetBlockTimeStampOffset":
+                        response = algod.GetBlockTimeStampOffset().execute();
+                        break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
                 }

@@ -1,3 +1,5 @@
 @unit.ready
 @unit.responses.timestamp
 @unit.timestamp
+@unit.responses.blocksummary
+@unit.sync
