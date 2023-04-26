@@ -13,6 +13,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SimulationEvalOverrides extends PathResponse {
 
     /**
+     * If true, transactions without signatures are allowed and simulated as if they
+     * were properly signed.
+     */
+    @JsonProperty("allow-empty-signatures")
+    public Boolean allowEmptySignatures;
+
+    /**
      * The maximum log calls one can make during simulation
      */
     @JsonProperty("max-log-calls")
@@ -31,6 +38,7 @@ public class SimulationEvalOverrides extends PathResponse {
         if (o == null) return false;
 
         SimulationEvalOverrides other = (SimulationEvalOverrides) o;
+        if (!Objects.deepEquals(this.allowEmptySignatures, other.allowEmptySignatures)) return false;
         if (!Objects.deepEquals(this.maxLogCalls, other.maxLogCalls)) return false;
         if (!Objects.deepEquals(this.maxLogSize, other.maxLogSize)) return false;
 

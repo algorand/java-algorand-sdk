@@ -39,14 +39,6 @@ public class SimulateResponse extends PathResponse {
     @JsonProperty("version")
     public Long version;
 
-    /**
-     * Indicates whether the simulated transactions would have succeeded during an
-     * actual submission. If any transaction fails or is missing a signature, this will
-     * be false.
-     */
-    @JsonProperty("would-succeed")
-    public Boolean wouldSucceed;
-
     @Override
     public boolean equals(Object o) {
 
@@ -58,7 +50,6 @@ public class SimulateResponse extends PathResponse {
         if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
         if (!Objects.deepEquals(this.version, other.version)) return false;
-        if (!Objects.deepEquals(this.wouldSucceed, other.wouldSucceed)) return false;
 
         return true;
     }

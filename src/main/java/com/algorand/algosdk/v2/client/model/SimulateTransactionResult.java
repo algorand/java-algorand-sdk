@@ -24,12 +24,6 @@ public class SimulateTransactionResult extends PathResponse {
     public Long logicSigBudgetConsumed;
 
     /**
-     * A boolean indicating whether this transaction is missing signatures
-     */
-    @JsonProperty("missing-signature")
-    public Boolean missingSignature;
-
-    /**
      * Details about a pending transaction. If the transaction was recently confirmed,
      * includes confirmation details like the round and reward details.
      */
@@ -45,7 +39,6 @@ public class SimulateTransactionResult extends PathResponse {
         SimulateTransactionResult other = (SimulateTransactionResult) o;
         if (!Objects.deepEquals(this.appBudgetConsumed, other.appBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.logicSigBudgetConsumed, other.logicSigBudgetConsumed)) return false;
-        if (!Objects.deepEquals(this.missingSignature, other.missingSignature)) return false;
         if (!Objects.deepEquals(this.txnResult, other.txnResult)) return false;
 
         return true;

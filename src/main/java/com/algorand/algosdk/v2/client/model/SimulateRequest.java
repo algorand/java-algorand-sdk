@@ -13,10 +13,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SimulateRequest extends PathResponse {
 
     /**
-     * The boolean flag that lifts the limit on log opcode during simulation.
+     * Allow transactions without signatures to be simulated as if they had correct
+     * signatures.
      */
-    @JsonProperty("lift-log-limits")
-    public Boolean liftLogLimits;
+    @JsonProperty("allow-empty-signatures")
+    public Boolean allowEmptySignatures;
+
+    /**
+     * Lifts limits on log opcode usage during simulation.
+     */
+    @JsonProperty("allow-more-logging")
+    public Boolean allowMoreLogging;
 
     /**
      * The transaction groups to simulate.
@@ -31,7 +38,8 @@ public class SimulateRequest extends PathResponse {
         if (o == null) return false;
 
         SimulateRequest other = (SimulateRequest) o;
-        if (!Objects.deepEquals(this.liftLogLimits, other.liftLogLimits)) return false;
+        if (!Objects.deepEquals(this.allowEmptySignatures, other.allowEmptySignatures)) return false;
+        if (!Objects.deepEquals(this.allowMoreLogging, other.allowMoreLogging)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
 
         return true;
