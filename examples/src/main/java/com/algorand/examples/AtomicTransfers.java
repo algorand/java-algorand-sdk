@@ -1,5 +1,7 @@
 package com.algorand.examples;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.algorand.algosdk.account.Account;
@@ -39,6 +41,8 @@ public class AtomicTransfers {
                 // example: ATOMIC_GROUP_TXNS
                 // Assign group id to the transactions (order matters!)
                 Transaction[] txs = TxGroup.assignGroupID(ptxn1, ptxn2);
+                // Save the original group id
+                Digest orig_gid = txs[0].group;
 
                 // Or, equivalently
                 // compute group id and assign it to transactions
@@ -46,6 +50,10 @@ public class AtomicTransfers {
                 ptxn1.group = gid;
                 ptxn2.group = gid;
                 // example: ATOMIC_GROUP_TXNS
+
+                // Reassign the original group id to the transactions
+                ptxn1.group = orig_gid;
+                ptxn2.group = orig_gid;
 
                 // example: ATOMIC_GROUP_SIGN
                 // sign transactions
@@ -56,12 +64,25 @@ public class AtomicTransfers {
                 // example: ATOMIC_GROUP_ASSEMBLE
                 // combine the signed transactions into a single list
                 SignedTransaction[] stxns = new SignedTransaction[] { signedPtxn1, signedPtxn2 };
+
+                // Encode the transactions into a byte array
+                List<byte[]> encodings = new ArrayList<>();
+                int lengthEncoded = 0;
+                for (SignedTransaction stx : stxns) {
+                    byte[] temp = Encoder.encodeToMsgPack(stx);
+                    encodings.add(temp);
+                    lengthEncoded += temp.length;
+                }
+                ByteBuffer bf = ByteBuffer.allocate(lengthEncoded);
+                for (byte[] subEncode : encodings) {
+                    bf.put(subEncode);
+                }
+                byte[] encoded = bf.array();
                 // example: ATOMIC_GROUP_ASSEMBLE
 
                 // example: ATOMIC_GROUP_SEND
                 // Only the first transaction id is returned
-                Response<PostTransactionsResponse> txResponse = algodClient.RawTransaction()
-                                .rawtxn(Encoder.encodeToMsgPack(stxns)).execute();
+                Response<PostTransactionsResponse> txResponse = algodClient.RawTransaction().rawtxn(encoded).execute();
                 String txid = txResponse.body().txId;
 
                 // Wait for the transaction id to be confirmed

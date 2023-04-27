@@ -24,9 +24,10 @@ import com.algorand.algosdk.kmd.client.ApiException;
 
 public class ExampleUtils {
 
-    private static String kmd_host = "http://localhost:4002";
+    private static String kmd_host = "http://localhost";
+    private static int kmd_port = 4002;
     private static String kmd_token = "a".repeat(64);
-    private static KmdApi kmd = null;
+    private static KmdApi kmd;
 
     private static String algod_host = "http://localhost";
     private static int algod_port = 4001;
@@ -37,19 +38,59 @@ public class ExampleUtils {
     private static String indexer_token = "a".repeat(64);
 
     public static AlgodClient getAlgodClient() {
+        // Algod Environment variables
+        if (System.getenv("ALGOD_HOST") != null) {
+            algod_host = System.getenv("ALGOD_HOST");
+        }
+
+        if (System.getenv("ALGOD_PORT") != null) {
+            algod_port = Integer.parseInt(System.getenv("ALGOD_PORT"));
+        }
+
         return new AlgodClient(algod_host, algod_port, algod_token);
     }
 
     public static IndexerClient getIndexerClient() {
+        // Indexer Environment variables
+        if (System.getenv("INDEXER_HOST") != null) {
+            indexer_host = System.getenv("INDEXER_HOST");
+        }
+
+        if (System.getenv("INDEXER_PORT") != null) {
+            indexer_port = Integer.parseInt(System.getenv("INDEXER_PORT"));
+        }
+
+        if (System.getenv("INDEXER_TOKEN") != null) {
+            indexer_token = System.getenv("INDEXER_TOKEN");
+        }
+
         return new IndexerClient(indexer_host, indexer_port, indexer_token);
     }
 
-    public static List<Account> getSandboxAccounts() throws Exception {
+    public static KmdApi getKMDClient() {
+        // KMD Environment variables
+        if (System.getenv("KMD_HOST") != null) {
+            kmd_host = System.getenv("KMD_HOST");
+        }
+
+        if (System.getenv("KMD_PORT") != null) {
+            kmd_port = Integer.parseInt(System.getenv("KMD_PORT"));
+        }
+
+        if (System.getenv("KMD_TOKEN") != null) {
+            kmd_token = System.getenv("KMD_TOKEN");
+        }
+
         // Initialize KMD v1 client
         KmdClient kmdClient = new KmdClient();
-        kmdClient.setBasePath(kmd_host);
+        kmdClient.setBasePath(kmd_host + ":" + kmd_port);
         kmdClient.setApiKey(kmd_token);
         kmd = new KmdApi(kmdClient);
+        return kmd;
+    }
+
+    public static List<Account> getSandboxAccounts() throws Exception {
+        getKMDClient();
 
         // Get accounts from sandbox.
         String walletHandle = getDefaultWalletHandle();
