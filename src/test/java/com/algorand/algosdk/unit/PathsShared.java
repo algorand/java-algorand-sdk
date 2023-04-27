@@ -6,14 +6,22 @@ import com.algorand.algosdk.v2.client.common.Query;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class PathsShared {
     public Query q;
 
     @Given("mock server recording request paths")
-    public void mock_server_recording_request_paths() { }
+    public void mockServerNoop() { }
 
     @Then("expect the path used to be {string}")
-    public void expect_the_path_used_to_be(String string) {
-        TestingUtils.verifyPathUrls(q.getRequestUrl(), string);
+    public void expectPathToBe(String path) {
+        TestingUtils.verifyPathUrls(q.getRequestUrl(), path);
+    }
+
+    @Then("expect the request to be {string} {string}")
+    public void expectMethodAndPathToBe(String method, String path) {
+        assertThat(q.getRequestMethod()).isEqualTo(method);
+        TestingUtils.verifyPathUrls(q.getRequestUrl(), path);
     }
 }
