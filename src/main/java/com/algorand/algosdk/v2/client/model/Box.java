@@ -24,6 +24,12 @@ public class Box extends PathResponse {
     public byte[] name;
 
     /**
+     * The round for which this information is relevant
+     */
+    @JsonProperty("round")
+    public Long round;
+
+    /**
      * (value) box value, base64 encoded.
      */
     @JsonProperty("value")
@@ -43,6 +49,7 @@ public class Box extends PathResponse {
 
         Box other = (Box) o;
         if (!Objects.deepEquals(this.name, other.name)) return false;
+        if (!Objects.deepEquals(this.round, other.round)) return false;
         if (!Objects.deepEquals(this.value, other.value)) return false;
 
         return true;
