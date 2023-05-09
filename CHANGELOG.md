@@ -1,3 +1,22 @@
+# 2.1.0
+
+## What's Changed
+Supports new devmode block timestamp offset endpoints.
+
+### Bugfixes
+* Bug-Fix: update label github action to v3 by @michaeltchuang in https://github.com/algorand/java-algorand-sdk/pull/531
+### Enhancements
+* algod REST API: Add test for /v2/teal/disassemble by @michaeldiamant in https://github.com/algorand/java-algorand-sdk/pull/433
+* Documentation: Adds examples to be pulled into docs by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/506
+* Fix: improve error message for mismatched args by @barnjamin in https://github.com/algorand/java-algorand-sdk/pull/511
+* api: Regenerate Client Interfaces and implement cucumber tests. by @winder in https://github.com/algorand/java-algorand-sdk/pull/555
+* DevOps: Add CODEOWNERS to restrict workflow editing by @onetechnical in https://github.com/algorand/java-algorand-sdk/pull/559
+
+## New Contributors
+* @michaeltchuang made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/531
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.0.0...2.1.0
+
 # 2.0.0
 
 ## What's Changed
