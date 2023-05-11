@@ -26,6 +26,12 @@ public class SimulateRequest extends PathResponse {
     public Boolean allowMoreLogging;
 
     /**
+     * Applies extra opcode budget during simulation for each transaction group.
+     */
+    @JsonProperty("extra-opcode-budget")
+    public Long extraOpcodeBudget;
+
+    /**
      * The transaction groups to simulate.
      */
     @JsonProperty("txn-groups")
@@ -40,6 +46,7 @@ public class SimulateRequest extends PathResponse {
         SimulateRequest other = (SimulateRequest) o;
         if (!Objects.deepEquals(this.allowEmptySignatures, other.allowEmptySignatures)) return false;
         if (!Objects.deepEquals(this.allowMoreLogging, other.allowMoreLogging)) return false;
+        if (!Objects.deepEquals(this.extraOpcodeBudget, other.extraOpcodeBudget)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
 
         return true;
