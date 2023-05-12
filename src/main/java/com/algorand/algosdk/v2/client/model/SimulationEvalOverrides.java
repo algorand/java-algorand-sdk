@@ -20,16 +20,22 @@ public class SimulationEvalOverrides extends PathResponse {
     public Boolean allowEmptySignatures;
 
     /**
+     * The extra opcode budget added to each transaction group during simulation
+     */
+    @JsonProperty("extra-opcode-budget")
+    public Long extraOpcodeBudget;
+
+    /**
      * The maximum log calls one can make during simulation
      */
     @JsonProperty("max-log-calls")
-    public java.math.BigInteger maxLogCalls;
+    public Long maxLogCalls;
 
     /**
      * The maximum byte number to log during simulation
      */
     @JsonProperty("max-log-size")
-    public java.math.BigInteger maxLogSize;
+    public Long maxLogSize;
 
     @Override
     public boolean equals(Object o) {
@@ -39,6 +45,7 @@ public class SimulationEvalOverrides extends PathResponse {
 
         SimulationEvalOverrides other = (SimulationEvalOverrides) o;
         if (!Objects.deepEquals(this.allowEmptySignatures, other.allowEmptySignatures)) return false;
+        if (!Objects.deepEquals(this.extraOpcodeBudget, other.extraOpcodeBudget)) return false;
         if (!Objects.deepEquals(this.maxLogCalls, other.maxLogCalls)) return false;
         if (!Objects.deepEquals(this.maxLogSize, other.maxLogSize)) return false;
 
