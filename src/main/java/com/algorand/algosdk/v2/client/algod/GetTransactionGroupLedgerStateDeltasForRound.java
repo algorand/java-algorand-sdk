@@ -5,7 +5,7 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.TransactionGroupLedgerStateDeltaForRoundResponse;
+import com.algorand.algosdk.v2.client.model.TransactionGroupLedgerStateDeltasForRoundResponse;
 
 
 /**
@@ -21,7 +21,6 @@ public class GetTransactionGroupLedgerStateDeltasForRound extends Query {
      */
     public GetTransactionGroupLedgerStateDeltasForRound(Client client, Long round) {
         super(client, new HttpMethod("get"));
-        addQuery("format", "msgpack");
         this.round = round;
     }
 
@@ -31,9 +30,9 @@ public class GetTransactionGroupLedgerStateDeltasForRound extends Query {
     * @throws Exception
     */
     @Override
-    public Response<TransactionGroupLedgerStateDeltaForRoundResponse> execute() throws Exception {
-        Response<TransactionGroupLedgerStateDeltaForRoundResponse> resp = baseExecute();
-        resp.setValueType(TransactionGroupLedgerStateDeltaForRoundResponse.class);
+    public Response<TransactionGroupLedgerStateDeltasForRoundResponse> execute() throws Exception {
+        Response<TransactionGroupLedgerStateDeltasForRoundResponse> resp = baseExecute();
+        resp.setValueType(TransactionGroupLedgerStateDeltasForRoundResponse.class);
         return resp;
     }
 
@@ -46,9 +45,9 @@ public class GetTransactionGroupLedgerStateDeltasForRound extends Query {
     * @throws Exception
     */
     @Override
-    public Response<TransactionGroupLedgerStateDeltaForRoundResponse> execute(String[] headers, String[] values) throws Exception {
-        Response<TransactionGroupLedgerStateDeltaForRoundResponse> resp = baseExecute(headers, values);
-        resp.setValueType(TransactionGroupLedgerStateDeltaForRoundResponse.class);
+    public Response<TransactionGroupLedgerStateDeltasForRoundResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<TransactionGroupLedgerStateDeltasForRoundResponse> resp = baseExecute(headers, values);
+        resp.setValueType(TransactionGroupLedgerStateDeltasForRoundResponse.class);
         return resp;
     }
 

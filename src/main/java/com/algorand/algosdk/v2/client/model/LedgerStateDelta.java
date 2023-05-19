@@ -1,9 +1,8 @@
 package com.algorand.algosdk.v2.client.model;
 
-import com.algorand.algosdk.v2.client.common.PathResponse;
+import java.util.HashMap;
 
 /**
  * Contains a ledger delta
  */
-public class LedgerStateDelta extends PathResponse {
-}
+public class LedgerStateDelta extends HashMap<String,Object> {}

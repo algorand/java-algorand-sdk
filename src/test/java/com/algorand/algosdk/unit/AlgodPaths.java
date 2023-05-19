@@ -151,4 +151,19 @@ public class AlgodPaths {
     public void setBlockTimestampOffset(Long round) {
         ps.q = algodClient.SetBlockTimeStampOffset(round);
     }
+
+    @When("we make a GetLedgerStateDelta call against round {int}")
+    public void we_make_a_get_ledger_state_delta_call_against_round(Integer round) {
+        ps.q = algodClient.GetLedgerStateDelta(Long.valueOf(round.longValue()));
+    }
+
+    @When("we make a LedgerStateDeltaForTransactionGroupResponse call for ID {string}")
+    public void we_make_a_ledger_state_delta_for_transaction_group_response_call_for_id(String id) {
+        ps.q = algodClient.GetLedgerStateDeltaForTransactionGroup(id);
+    }
+
+    @When("we make a TransactionGroupLedgerStateDeltaForRoundResponse call for round {int}")
+    public void we_make_a_transaction_group_ledger_state_delta_for_round_response_call_for_round(Integer round) {
+        ps.q = algodClient.GetTransactionGroupLedgerStateDeltasForRound(Long.valueOf(round.longValue()));
+    }
 }

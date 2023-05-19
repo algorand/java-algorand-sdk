@@ -21,7 +21,6 @@ public class GetLedgerStateDeltaForTransactionGroup extends Query {
      */
     public GetLedgerStateDeltaForTransactionGroup(Client client, String id) {
         super(client, new HttpMethod("get"));
-        addQuery("format", "msgpack");
         this.id = id;
     }
 
