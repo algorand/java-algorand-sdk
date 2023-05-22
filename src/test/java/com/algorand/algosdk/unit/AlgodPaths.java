@@ -152,7 +152,8 @@ public class AlgodPaths {
         ps.q = algodClient.SetBlockTimeStampOffset(round);
     }
 
-    @When("we make a GetLedgerStateDelta call against round {int}")
+    @When("we make a GetLedgerStateDelta call against round {long}")
+        public void we_make_a_get_ledger_state_delta_call_against_round(Long round) {
     public void we_make_a_get_ledger_state_delta_call_against_round(Integer round) {
         ps.q = algodClient.GetLedgerStateDelta(Long.valueOf(round.longValue()));
     }
