@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class TransactionGroupLedgerStateDeltasForRoundResponse extends PathResponse {
 
-    @JsonProperty("Deltas")
+    @JsonProperty("deltas")
     public List<LedgerStateDeltaForTransactionGroup> deltas = new ArrayList<LedgerStateDeltaForTransactionGroup>();
 
     @Override

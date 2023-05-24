@@ -16,10 +16,10 @@ public class LedgerStateDeltaForTransactionGroup extends PathResponse {
     /**
      * Ledger StateDelta object
      */
-    @JsonProperty("Delta")
+    @JsonProperty("delta")
     public HashMap<String,Object> delta;
 
-    @JsonProperty("Ids")
+    @JsonProperty("ids")
     public List<String> ids = new ArrayList<String>();
 
     @Override
