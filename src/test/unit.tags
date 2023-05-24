@@ -22,10 +22,13 @@
 @unit.responses.blocksummary
 @unit.responses.messagepack
 @unit.responses.messagepack.231
+@unit.responses.statedelta
 @unit.responses.timestamp
+@unit.responses.txngroupdeltas
 @unit.responses.sync
 @unit.responses.unlimited_assets
 @unit.sourcemap
+@unit.statedelta
 @unit.stateproof.paths
 @unit.stateproof.responses
 @unit.stateproof.responses.msgp
@@ -35,3 +38,4 @@
 @unit.transactions
 @unit.transactions.keyreg
 @unit.transactions.payment
+@unit.txngroupdeltas

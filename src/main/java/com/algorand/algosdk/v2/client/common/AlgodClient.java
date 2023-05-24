@@ -21,6 +21,9 @@ import com.algorand.algosdk.v2.client.algod.SimulateTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
+import com.algorand.algosdk.v2.client.algod.GetLedgerStateDelta;
+import com.algorand.algosdk.v2.client.algod.GetTransactionGroupLedgerStateDeltasForRound;
+import com.algorand.algosdk.v2.client.algod.GetLedgerStateDeltaForTransactionGroup;
 import com.algorand.algosdk.v2.client.algod.GetStateProof;
 import com.algorand.algosdk.v2.client.algod.GetLightBlockHeaderProof;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
@@ -249,6 +252,30 @@ public class AlgodClient extends Client {
      */
     public PendingTransactionInformation PendingTransactionInformation(String txid) {
         return new PendingTransactionInformation((Client) this, txid);
+    }
+
+    /**
+     * Get ledger deltas for a round.
+     * /v2/deltas/{round}
+     */
+    public GetLedgerStateDelta GetLedgerStateDelta(Long round) {
+        return new GetLedgerStateDelta((Client) this, round);
+    }
+
+    /**
+     * Get ledger deltas for transaction groups in a given round.
+     * /v2/deltas/{round}/txn/group
+     */
+    public GetTransactionGroupLedgerStateDeltasForRound GetTransactionGroupLedgerStateDeltasForRound(Long round) {
+        return new GetTransactionGroupLedgerStateDeltasForRound((Client) this, round);
+    }
+
+    /**
+     * Get a ledger delta for a given transaction group.
+     * /v2/deltas/txn/group/{id}
+     */
+    public GetLedgerStateDeltaForTransactionGroup GetLedgerStateDeltaForTransactionGroup(String id) {
+        return new GetLedgerStateDeltaForTransactionGroup((Client) this, id);
     }
 
     /**
