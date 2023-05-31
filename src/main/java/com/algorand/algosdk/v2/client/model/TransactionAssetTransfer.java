@@ -26,7 +26,7 @@ public class TransactionAssetTransfer extends PathResponse {
     public Long assetId;
 
     /**
-     * Number of assets transfered to the close-to account as part of the transaction.
+     * Number of assets transferred to the close-to account as part of the transaction.
      */
     @JsonProperty("close-amount")
     public java.math.BigInteger closeAmount;
