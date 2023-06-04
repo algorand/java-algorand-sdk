@@ -21,6 +21,7 @@ public class GetLedgerStateDelta extends Query {
      */
     public GetLedgerStateDelta(Client client, Long round) {
         super(client, new HttpMethod("get"));
+        addQuery("format", "msgpack");
         this.round = round;
     }
 
