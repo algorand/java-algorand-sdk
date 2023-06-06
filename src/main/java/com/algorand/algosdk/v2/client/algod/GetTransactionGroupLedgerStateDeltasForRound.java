@@ -21,6 +21,7 @@ public class GetTransactionGroupLedgerStateDeltasForRound extends Query {
      */
     public GetTransactionGroupLedgerStateDeltasForRound(Client client, Long round) {
         super(client, new HttpMethod("get"));
+        addQuery("format", "msgpack");
         this.round = round;
     }
 
