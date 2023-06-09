@@ -21,6 +21,12 @@ public class SimulateResponse extends PathResponse {
     public SimulationEvalOverrides evalOverrides;
 
     /**
+     * An object that configures simulation execution trace.
+     */
+    @JsonProperty("exec-trace-config")
+    public SimulateTraceConfig execTraceConfig;
+
+    /**
      * The round immediately preceding this simulation. State changes through this
      * round were used to run this simulation.
      */
@@ -47,6 +53,7 @@ public class SimulateResponse extends PathResponse {
 
         SimulateResponse other = (SimulateResponse) o;
         if (!Objects.deepEquals(this.evalOverrides, other.evalOverrides)) return false;
+        if (!Objects.deepEquals(this.execTraceConfig, other.execTraceConfig)) return false;
         if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
         if (!Objects.deepEquals(this.version, other.version)) return false;
