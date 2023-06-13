@@ -1,10 +1,8 @@
 # This script bumps up the version in setup.py for new releases.
-# Usage: python bump_version.py {new_version} (--file_path <path-to setup.py>)
+# Usage: python bump_version.py {new_version} (--read_me <path-to-README.md> --pom_xml <path-to-pom-xml>)
 
 import argparse
 import re
-import xml.etree.ElementTree as ET
-
 
 def bump_version(new_version, file_path):
     with open(file_path, "r") as file:
