@@ -6,17 +6,17 @@ import re
 
 def bump_version(new_version, file_path):
     with open(file_path, "r") as file:
-        read_me = file.read()
+        content = file.read()
 
     # Replace first instance of <version></version>
-    new_read_me = re.sub(
+    new_content = re.sub(
         '<version>[0-9]+\.[0-9]+\.[-a-z0-9]+</version>',
         f'<version>{new_version}</version>',
-        read_me, 1
+        content, 1
     )
 
     with open(file_path, "w") as file:
-        file.write(new_read_me)
+        file.write(new_content)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
