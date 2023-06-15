@@ -1,4 +1,4 @@
-# This script bumps up the version in setup.py for new releases.
+# This script bumps up the version in `pom.xml` and `README.md` for new releases.
 # Usage: python bump_version.py {new_version} (--read_me <path-to-README.md> --pom_xml <path-to-pom-xml>)
 
 import argparse
