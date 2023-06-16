@@ -1,3 +1,17 @@
+# 2.2.0
+
+## Enhancements
+
+- DevOps: Update CODEOWNERS to only refer to the devops group by @onetechnical in #571
+- deltas: Deltas apis by @Eric-Warehime in #575
+- algod: Regen changes for Deltas endpoints by @Eric-Warehime in #590
+
+## Bug Fixes
+
+- docs: remove old example from README by @winder in #561
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.1.0...2.2.0
+
 # 2.1.0
 
 ## What's Changed
