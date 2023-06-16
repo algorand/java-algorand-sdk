@@ -21,6 +21,9 @@ import com.algorand.algosdk.v2.client.algod.SimulateTransaction;
 import com.algorand.algosdk.v2.client.algod.TransactionParams;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
 import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
+import com.algorand.algosdk.v2.client.algod.GetLedgerStateDelta;
+import com.algorand.algosdk.v2.client.algod.GetTransactionGroupLedgerStateDeltasForRound;
+import com.algorand.algosdk.v2.client.algod.GetLedgerStateDeltaForTransactionGroup;
 import com.algorand.algosdk.v2.client.algod.GetStateProof;
 import com.algorand.algosdk.v2.client.algod.GetLightBlockHeaderProof;
 import com.algorand.algosdk.v2.client.algod.GetApplicationByID;
@@ -252,6 +255,30 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get ledger deltas for a round.
+     * /v2/deltas/{round}
+     */
+    public GetLedgerStateDelta GetLedgerStateDelta(Long round) {
+        return new GetLedgerStateDelta((Client) this, round);
+    }
+
+    /**
+     * Get ledger deltas for transaction groups in a given round.
+     * /v2/deltas/{round}/txn/group
+     */
+    public GetTransactionGroupLedgerStateDeltasForRound GetTransactionGroupLedgerStateDeltasForRound(Long round) {
+        return new GetTransactionGroupLedgerStateDeltasForRound((Client) this, round);
+    }
+
+    /**
+     * Get a ledger delta for a given transaction group.
+     * /v2/deltas/txn/group/{id}
+     */
+    public GetLedgerStateDeltaForTransactionGroup GetLedgerStateDeltaForTransactionGroup(String id) {
+        return new GetLedgerStateDeltaForTransactionGroup((Client) this, id);
+    }
+
+    /**
      * Get a state proof that covers a given round
      * /v2/stateproofs/{round}
      */
@@ -287,8 +314,8 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given an application ID and box name, it returns the box name and value (each
-     * base64 encoded). Box names must be in the goal app call arg encoding form
+     * Given an application ID and box name, it returns the round, box name, and value
+     * (each base64 encoded). Box names must be in the goal app call arg encoding form
      * 'encoding:value'. For ints, use the form 'int:1234'. For raw bytes, use the form
      * 'b64:A=='. For printable strings, use the form 'str:hello'. For addresses, use
      * the form 'addr:XYZ...'.

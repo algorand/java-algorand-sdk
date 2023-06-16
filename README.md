@@ -19,7 +19,7 @@ Maven:
 <dependency>
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </dependency>
 ```
 
@@ -196,13 +196,6 @@ This project uses Maven.
 ### **To build**
 ```
 ~$ mvn package
-```
-
-**To run the example project**
-Use the following command in the examples directory, be sure to update your algod network address and the API token
-parameters (see examples/README for more information):
-```
-~$ mvn exec:java -Dexec.mainClass="com.algorand.algosdk.example.Main" -Dexec.args="127.0.0.1:8080 ***X-Algo-API-Token***"
 ```
 
 ### **To test**

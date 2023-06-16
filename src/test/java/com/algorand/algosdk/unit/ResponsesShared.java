@@ -200,6 +200,15 @@ public class ResponsesShared {
                     case "GetSyncRound":
                         response = algod.GetSyncRound().execute();
                         break;
+                    case "GetTransactionGroupLedgerStateDeltaForRound":
+                        response = algod.GetTransactionGroupLedgerStateDeltasForRound(1234L).execute();
+                        break;
+                    case "GetLedgerStateDeltaForTransactionGroup":
+                        response = algod.GetLedgerStateDeltaForTransactionGroup("abc123").execute();
+                        break;
+                    case "GetLedgerStateDelta":
+                        response = algod.GetLedgerStateDelta(1234L).execute();
+                        break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
                 }
