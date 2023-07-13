@@ -24,6 +24,18 @@ public class SimulationOpcodeTraceUnit extends PathResponse {
     @JsonProperty("spawned-inners")
     public List<Long> spawnedInners = new ArrayList<Long>();
 
+    /**
+     * The values added by this opcode to the stack.
+     */
+    @JsonProperty("stack-additions")
+    public List<AvmValue> stackAdditions = new ArrayList<AvmValue>();
+
+    /**
+     * The number of deleted stack values by this opcode.
+     */
+    @JsonProperty("stack-pop-count")
+    public Long stackPopCount;
+
     @Override
     public boolean equals(Object o) {
 
@@ -33,6 +45,8 @@ public class SimulationOpcodeTraceUnit extends PathResponse {
         SimulationOpcodeTraceUnit other = (SimulationOpcodeTraceUnit) o;
         if (!Objects.deepEquals(this.pc, other.pc)) return false;
         if (!Objects.deepEquals(this.spawnedInners, other.spawnedInners)) return false;
+        if (!Objects.deepEquals(this.stackAdditions, other.stackAdditions)) return false;
+        if (!Objects.deepEquals(this.stackPopCount, other.stackPopCount)) return false;
 
         return true;
     }
