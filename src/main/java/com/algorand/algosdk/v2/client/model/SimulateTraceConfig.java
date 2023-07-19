@@ -16,6 +16,13 @@ public class SimulateTraceConfig extends PathResponse {
     @JsonProperty("enable")
     public Boolean enable;
 
+    /**
+     * A boolean option enabling returning stack changes together with execution trace
+     * during simulation.
+     */
+    @JsonProperty("stack-change")
+    public Boolean stackChange;
+
     @Override
     public boolean equals(Object o) {
 
@@ -24,6 +31,7 @@ public class SimulateTraceConfig extends PathResponse {
 
         SimulateTraceConfig other = (SimulateTraceConfig) o;
         if (!Objects.deepEquals(this.enable, other.enable)) return false;
+        if (!Objects.deepEquals(this.stackChange, other.stackChange)) return false;
 
         return true;
     }
