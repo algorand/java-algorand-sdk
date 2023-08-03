@@ -197,7 +197,8 @@ public class AlgodClient extends Client {
 
     /**
      * Waits for a block to appear after round {round} and returns the node's status at
-     * the time.
+     * the time. There is a 1 minute timeout, when reached the current status is
+     * returned regardless of whether or not it is the round after the given round.
      * /v2/status/wait-for-block-after/{round}
      */
     public WaitForBlock WaitForBlock(Long round) {
