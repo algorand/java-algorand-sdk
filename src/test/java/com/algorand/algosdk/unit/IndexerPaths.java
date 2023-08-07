@@ -32,7 +32,6 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(String.valueOf(currenGT))) q.currencyGreaterThan(currenGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         ps.q = q;
-        System.out.printf("query: %s\n",q);
     }
 
     @When("we make a Lookup Asset Transactions call against asset index {long} "
