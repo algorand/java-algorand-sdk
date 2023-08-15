@@ -11,6 +11,7 @@ import com.algorand.algosdk.v2.client.algod.AccountAssetInformation;
 import com.algorand.algosdk.v2.client.algod.AccountApplicationInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
+import com.algorand.algosdk.v2.client.algod.GetBlockTxids;
 import com.algorand.algosdk.v2.client.algod.GetBlockHash;
 import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
@@ -163,6 +164,14 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get the top level transaction IDs for the block on the given round.
+     * /v2/blocks/{round}/txids
+     */
+    public GetBlockTxids GetBlockTxids(Long round) {
+        return new GetBlockTxids((Client) this, round);
+    }
+
+    /**
      * Get the block hash for the block on the given round.
      * /v2/blocks/{round}/hash
      */
@@ -197,7 +206,8 @@ public class AlgodClient extends Client {
 
     /**
      * Waits for a block to appear after round {round} and returns the node's status at
-     * the time.
+     * the time. There is a 1 minute timeout, when reached the current status is
+     * returned regardless of whether or not it is the round after the given round.
      * /v2/status/wait-for-block-after/{round}
      */
     public WaitForBlock WaitForBlock(Long round) {
