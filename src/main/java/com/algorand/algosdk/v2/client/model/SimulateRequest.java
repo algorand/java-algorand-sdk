@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class SimulateRequest extends PathResponse {
 
     /**
-     * Allow transactions without signatures to be simulated as if they had correct
+     * Allows transactions without signatures to be simulated as if they had correct
      * signatures.
      */
     @JsonProperty("allow-empty-signatures")
@@ -24,6 +24,12 @@ public class SimulateRequest extends PathResponse {
      */
     @JsonProperty("allow-more-logging")
     public Boolean allowMoreLogging;
+
+    /**
+     * Allows access to unnamed resources during simulation.
+     */
+    @JsonProperty("allow-unnamed-resources")
+    public Boolean allowUnnamedResources;
 
     /**
      * An object that configures simulation execution trace.
@@ -52,6 +58,7 @@ public class SimulateRequest extends PathResponse {
         SimulateRequest other = (SimulateRequest) o;
         if (!Objects.deepEquals(this.allowEmptySignatures, other.allowEmptySignatures)) return false;
         if (!Objects.deepEquals(this.allowMoreLogging, other.allowMoreLogging)) return false;
+        if (!Objects.deepEquals(this.allowUnnamedResources, other.allowUnnamedResources)) return false;
         if (!Objects.deepEquals(this.execTraceConfig, other.execTraceConfig)) return false;
         if (!Objects.deepEquals(this.extraOpcodeBudget, other.extraOpcodeBudget)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
