@@ -5,23 +5,21 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.NodeStatusResponse;
+import com.algorand.algosdk.v2.client.model.BlockTxidsResponse;
 
 
 /**
- * Waits for a block to appear after round {round} and returns the node's status at
- * the time. There is a 1 minute timeout, when reached the current status is
- * returned regardless of whether or not it is the round after the given round.
- * /v2/status/wait-for-block-after/{round}
+ * Get the top level transaction IDs for the block on the given round.
+ * /v2/blocks/{round}/txids
  */
-public class WaitForBlock extends Query {
+public class GetBlockTxids extends Query {
 
     private Long round;
 
     /**
-     * @param round The round to wait until returning status
+     * @param round The round from which to fetch block transaction IDs.
      */
-    public WaitForBlock(Client client, Long round) {
+    public GetBlockTxids(Client client, Long round) {
         super(client, new HttpMethod("get"));
         this.round = round;
     }
@@ -32,9 +30,9 @@ public class WaitForBlock extends Query {
     * @throws Exception
     */
     @Override
-    public Response<NodeStatusResponse> execute() throws Exception {
-        Response<NodeStatusResponse> resp = baseExecute();
-        resp.setValueType(NodeStatusResponse.class);
+    public Response<BlockTxidsResponse> execute() throws Exception {
+        Response<BlockTxidsResponse> resp = baseExecute();
+        resp.setValueType(BlockTxidsResponse.class);
         return resp;
     }
 
@@ -47,9 +45,9 @@ public class WaitForBlock extends Query {
     * @throws Exception
     */
     @Override
-    public Response<NodeStatusResponse> execute(String[] headers, String[] values) throws Exception {
-        Response<NodeStatusResponse> resp = baseExecute(headers, values);
-        resp.setValueType(NodeStatusResponse.class);
+    public Response<BlockTxidsResponse> execute(String[] headers, String[] values) throws Exception {
+        Response<BlockTxidsResponse> resp = baseExecute(headers, values);
+        resp.setValueType(BlockTxidsResponse.class);
         return resp;
     }
 
@@ -58,9 +56,9 @@ public class WaitForBlock extends Query {
             throw new RuntimeException("round is not set. It is a required parameter.");
         }
         addPathSegment(String.valueOf("v2"));
-        addPathSegment(String.valueOf("status"));
-        addPathSegment(String.valueOf("wait-for-block-after"));
+        addPathSegment(String.valueOf("blocks"));
         addPathSegment(String.valueOf(round));
+        addPathSegment(String.valueOf("txids"));
 
         return qd;
     }
