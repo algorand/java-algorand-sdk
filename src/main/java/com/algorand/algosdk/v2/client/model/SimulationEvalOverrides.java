@@ -20,6 +20,12 @@ public class SimulationEvalOverrides extends PathResponse {
     public Boolean allowEmptySignatures;
 
     /**
+     * If true, allows access to unnamed resources during simulation.
+     */
+    @JsonProperty("allow-unnamed-resources")
+    public Boolean allowUnnamedResources;
+
+    /**
      * The extra opcode budget added to each transaction group during simulation
      */
     @JsonProperty("extra-opcode-budget")
@@ -45,6 +51,7 @@ public class SimulationEvalOverrides extends PathResponse {
 
         SimulationEvalOverrides other = (SimulationEvalOverrides) o;
         if (!Objects.deepEquals(this.allowEmptySignatures, other.allowEmptySignatures)) return false;
+        if (!Objects.deepEquals(this.allowUnnamedResources, other.allowUnnamedResources)) return false;
         if (!Objects.deepEquals(this.extraOpcodeBudget, other.extraOpcodeBudget)) return false;
         if (!Objects.deepEquals(this.maxLogCalls, other.maxLogCalls)) return false;
         if (!Objects.deepEquals(this.maxLogSize, other.maxLogSize)) return false;
