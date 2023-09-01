@@ -37,6 +37,20 @@ public class SimulateTransactionResult extends PathResponse {
     @JsonProperty("txn-result")
     public PendingTransactionResponse txnResult;
 
+    /**
+     * These are resources that were accessed by this group that would normally have
+     * caused failure, but were allowed in simulation. Depending on where this object
+     * is in the response, the unnamed resources it contains may or may not qualify for
+     * group resource sharing. If this is a field in SimulateTransactionGroupResult,
+     * the resources do qualify, but if this is a field in SimulateTransactionResult,
+     * they do not qualify. In order to make this group valid for actual submission,
+     * resources that qualify for group sharing can be made available by any
+     * transaction of the group; otherwise, resources must be placed in the same
+     * transaction which accessed them.
+     */
+    @JsonProperty("unnamed-resources-accessed")
+    public SimulateUnnamedResourcesAccessed unnamedResourcesAccessed;
+
     @Override
     public boolean equals(Object o) {
 
@@ -48,6 +62,7 @@ public class SimulateTransactionResult extends PathResponse {
         if (!Objects.deepEquals(this.execTrace, other.execTrace)) return false;
         if (!Objects.deepEquals(this.logicSigBudgetConsumed, other.logicSigBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.txnResult, other.txnResult)) return false;
+        if (!Objects.deepEquals(this.unnamedResourcesAccessed, other.unnamedResourcesAccessed)) return false;
 
         return true;
     }
