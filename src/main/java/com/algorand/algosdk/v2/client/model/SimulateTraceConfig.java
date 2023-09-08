@@ -16,6 +16,27 @@ public class SimulateTraceConfig extends PathResponse {
     @JsonProperty("enable")
     public Boolean enable;
 
+    /**
+     * A boolean option enabling returning scratch slot changes together with execution
+     * trace during simulation.
+     */
+    @JsonProperty("scratch-change")
+    public Boolean scratchChange;
+
+    /**
+     * A boolean option enabling returning stack changes together with execution trace
+     * during simulation.
+     */
+    @JsonProperty("stack-change")
+    public Boolean stackChange;
+
+    /**
+     * A boolean option enabling returning application state changes (global, local,
+     * and box changes) with the execution trace during simulation.
+     */
+    @JsonProperty("state-change")
+    public Boolean stateChange;
+
     @Override
     public boolean equals(Object o) {
 
@@ -24,6 +45,9 @@ public class SimulateTraceConfig extends PathResponse {
 
         SimulateTraceConfig other = (SimulateTraceConfig) o;
         if (!Objects.deepEquals(this.enable, other.enable)) return false;
+        if (!Objects.deepEquals(this.scratchChange, other.scratchChange)) return false;
+        if (!Objects.deepEquals(this.stackChange, other.stackChange)) return false;
+        if (!Objects.deepEquals(this.stateChange, other.stateChange)) return false;
 
         return true;
     }
