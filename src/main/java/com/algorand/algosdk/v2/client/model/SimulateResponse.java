@@ -27,6 +27,12 @@ public class SimulateResponse extends PathResponse {
     public SimulateTraceConfig execTraceConfig;
 
     /**
+     * Initial states of resources that were accessed during simulation.
+     */
+    @JsonProperty("initial-states")
+    public SimulateInitialStates initialStates;
+
+    /**
      * The round immediately preceding this simulation. State changes through this
      * round were used to run this simulation.
      */
@@ -54,6 +60,7 @@ public class SimulateResponse extends PathResponse {
         SimulateResponse other = (SimulateResponse) o;
         if (!Objects.deepEquals(this.evalOverrides, other.evalOverrides)) return false;
         if (!Objects.deepEquals(this.execTraceConfig, other.execTraceConfig)) return false;
+        if (!Objects.deepEquals(this.initialStates, other.initialStates)) return false;
         if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
         if (!Objects.deepEquals(this.version, other.version)) return false;
