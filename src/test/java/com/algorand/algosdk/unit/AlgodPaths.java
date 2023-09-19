@@ -166,4 +166,9 @@ public class AlgodPaths {
     public void we_make_a_transaction_group_ledger_state_delta_for_round_response_call_for_round(Long round) {
         ps.q = algodClient.GetTransactionGroupLedgerStateDeltasForRound(round);
     }
+
+    @When("we make a GetBlockTxids call against block number {long}")
+    public void we_make_a_get_block_txids_call_against_block_number(Long round) {
+        ps.q = algodClient.GetBlockTxids(round);
+    }
 }
