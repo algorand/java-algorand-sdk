@@ -29,7 +29,7 @@ public class IndexerPaths {
     public void lookupAssetBalances(Long assetId, Long limit, String afterAddress, Long currenGT, Long currencyLT) {
         LookupAssetBalances q = indexerClient.lookupAssetBalances(assetId);
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
-        if (TestingUtils.notEmpty(currenGT)) q.currencyGreaterThan(currenGT);
+        if (TestingUtils.notEmpty(String.valueOf(currenGT))) q.currencyGreaterThan(currenGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         ps.q = q;
     }
@@ -163,7 +163,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
         if (TestingUtils.notEmpty(beforeTime)) q.beforeTime(Utils.parseDate(beforeTime));
         if (TestingUtils.notEmpty(afterTime)) q.afterTime(Utils.parseDate(afterTime));
-        if (TestingUtils.notEmpty(currencyGT)) q.currencyGreaterThan(currencyGT);
+        if (TestingUtils.notEmpty(String.valueOf(currencyGT))) q.currencyGreaterThan(currencyGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         if (TestingUtils.notEmpty(addressRole)) q.addressRole(Enums.AddressRole.forValue(addressRole));
         if (TestingUtils.notEmpty(excludeCloseTo)) q.excludeCloseTo(excludeCloseTo.equals("true"));
@@ -184,7 +184,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
         if (TestingUtils.notEmpty(beforeTime)) q.beforeTime(Utils.parseDate(beforeTime));
         if (TestingUtils.notEmpty(afterTime)) q.afterTime(Utils.parseDate(afterTime));
-        if (TestingUtils.notEmpty(currencyGT)) q.currencyGreaterThan(currencyGT);
+        if (TestingUtils.notEmpty(String.valueOf(currencyGT))) q.currencyGreaterThan(currencyGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         if (TestingUtils.notEmpty(assetId)) q.assetId(assetId);
         if (TestingUtils.notEmpty(rekeyTo)) q.rekeyTo(rekeyTo.equals("true"));
@@ -196,7 +196,7 @@ public class IndexerPaths {
         SearchForAccounts q = this.indexerClient.searchForAccounts();
         if (TestingUtils.notEmpty(assetId)) q.assetId(assetId);
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
-        if (TestingUtils.notEmpty(currencyGT)) q.currencyGreaterThan(currencyGT);
+        if (TestingUtils.notEmpty(String.valueOf(currencyGT))) q.currencyGreaterThan(currencyGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         if (TestingUtils.notEmpty(round)) q.round(round);
         if (TestingUtils.notEmpty(authAddr)) q.authAddr(new Address(authAddr));
@@ -221,7 +221,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(limit)) q.limit(limit);
         if (TestingUtils.notEmpty(beforeTime)) q.beforeTime(Utils.parseDate(beforeTime));
         if (TestingUtils.notEmpty(afterTime)) q.afterTime(Utils.parseDate(afterTime));
-        if (TestingUtils.notEmpty(currencyGT)) q.currencyGreaterThan(currencyGT);
+        if (TestingUtils.notEmpty(String.valueOf(currencyGT))) q.currencyGreaterThan(currencyGT);
         if (TestingUtils.notEmpty(currencyLT)) q.currencyLessThan(currencyLT);
         if (TestingUtils.notEmpty(assetID)) q.assetId(assetID);
         if (TestingUtils.notEmpty(addressRole)) q.addressRole(Enums.AddressRole.forValue(addressRole));
