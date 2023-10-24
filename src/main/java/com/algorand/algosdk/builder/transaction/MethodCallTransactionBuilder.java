@@ -12,7 +12,6 @@ import com.algorand.algosdk.transaction.TxnSigner;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 @SuppressWarnings("unchecked")
@@ -105,7 +104,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     @Override
     public T accounts(List<Address> accounts) {
         if (accounts != null)
-            this.foreignAccounts = new ArrayList<>(new HashSet<>(accounts));
+            this.foreignAccounts = new ArrayList<>(accounts);
         else
             this.foreignAccounts.clear();
         return (T) this;
@@ -114,7 +113,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     @Override
     public T foreignApps(List<Long> foreignApps) {
         if (foreignApps != null)
-            this.foreignApps = new ArrayList<>(new HashSet<>(foreignApps));
+            this.foreignApps = new ArrayList<>(foreignApps);
         else
             this.foreignApps.clear();
         return (T) this;
@@ -123,7 +122,7 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
     @Override
     public T foreignAssets(List<Long> foreignAssets) {
         if (foreignAssets != null)
-            this.foreignAssets = new ArrayList<>(new HashSet<>(foreignAssets));
+            this.foreignAssets = new ArrayList<>(foreignAssets);
         else
             this.foreignAssets.clear();
         return (T) this;
