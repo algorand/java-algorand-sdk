@@ -1,3 +1,16 @@
+# 2.4.0
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.4.0 -->
+
+## What's Changed
+### Enhancements
+* Patch: Remove de-duping via HashSet from accounts,foriegn apps, and foreign … by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/652
+
+## New Contributors
+* @gmalouf made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/652
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.3.0...2.4.0
+
 # 2.3.0
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.3.0 -->
