@@ -51,6 +51,21 @@ public class SimulationTransactionExecTrace extends PathResponse {
     public List<SimulationOpcodeTraceUnit> clearStateProgramTrace = new ArrayList<SimulationOpcodeTraceUnit>();
 
     /**
+     * If true, indicates that the clear state program failed and any persistent state
+     * changes it produced should be reverted once the program exits.
+     */
+    @JsonProperty("clear-state-rollback")
+    public Boolean clearStateRollback;
+
+    /**
+     * The error message explaining why the clear state program failed. This field will
+     * only be populated if clear-state-rollback is true and the failure was due to an
+     * execution error.
+     */
+    @JsonProperty("clear-state-rollback-error")
+    public String clearStateRollbackError;
+
+    /**
      * An array of SimulationTransactionExecTrace representing the execution trace of
      * any inner transactions executed.
      */
@@ -86,6 +101,8 @@ public class SimulationTransactionExecTrace extends PathResponse {
         if (!Objects.deepEquals(this.approvalProgramTrace, other.approvalProgramTrace)) return false;
         if (!Objects.deepEquals(this.clearStateProgramHash, other.clearStateProgramHash)) return false;
         if (!Objects.deepEquals(this.clearStateProgramTrace, other.clearStateProgramTrace)) return false;
+        if (!Objects.deepEquals(this.clearStateRollback, other.clearStateRollback)) return false;
+        if (!Objects.deepEquals(this.clearStateRollbackError, other.clearStateRollbackError)) return false;
         if (!Objects.deepEquals(this.innerTrace, other.innerTrace)) return false;
         if (!Objects.deepEquals(this.logicSigHash, other.logicSigHash)) return false;
         if (!Objects.deepEquals(this.logicSigTrace, other.logicSigTrace)) return false;
