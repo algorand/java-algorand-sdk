@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestTransaction {
@@ -279,6 +280,264 @@ public class TestTransaction {
         assertThat(txUTF8).isEqualTo(txB64);
         assertThat(txUTF8).isNotEqualTo(txUTF8Different);
     }
+
+    @Test
+    public void testFeeBuilderMethodWithNullValue() throws Exception {
+        // Test that the fee builder method accepts null for Long, Integer.
+        // The result should same as the output of BigInteger method.
+
+        String metadataHashUTF8 = "Hello! This is the metadata hash";
+        // The value below is the base64 of metadataHashUTF8
+        String metadataHashB64 = "SGVsbG8hIFRoaXMgaXMgdGhlIG1ldGFkYXRhIGhhc2g=";
+
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address manager = addr;
+        Address reserve = addr;
+        Address freeze = addr;
+        Address clawback = addr;
+
+        Transaction txWhereFeeIsBigIntegerNull = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee((BigInteger) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+        Transaction txWhereFeeIsIntegerNull = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee((Integer) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+        Transaction txWhereFeeIsLongNull = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee((Long) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+
+        assertThat(txWhereFeeIsIntegerNull).isEqualTo(txWhereFeeIsBigIntegerNull);
+        assertThat(txWhereFeeIsLongNull).isEqualTo(txWhereFeeIsBigIntegerNull);
+    }
+
+    @Test
+    public void testFlatFeeBuilderMethodWithNullValue() throws Exception {
+        // Test that the fee builder method accepts null for Long, Integer.
+        // The result should same as the output of BigInteger method.
+
+        String metadataHashUTF8 = "Hello! This is the metadata hash";
+        // The value below is the base64 of metadataHashUTF8
+        String metadataHashB64 = "SGVsbG8hIFRoaXMgaXMgdGhlIG1ldGFkYXRhIGhhc2g=";
+
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address manager = addr;
+        Address reserve = addr;
+        Address freeze = addr;
+        Address clawback = addr;
+
+        Transaction txWhereFlatFeeIsBigIntegerNull = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .flatFee((BigInteger) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+        Transaction txWhereFlatFeeIsIntegerNull = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .flatFee((Integer) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+        Transaction txWhereFlatFeeIsLongNull = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .flatFee((Long) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+
+
+        assertThat(txWhereFlatFeeIsIntegerNull).isEqualTo(txWhereFlatFeeIsBigIntegerNull);
+        assertThat(txWhereFlatFeeIsLongNull).isEqualTo(txWhereFlatFeeIsBigIntegerNull);
+    }
+
+    @Test
+    public void testNullValuesOfFeeAndFlatFee() throws Exception {
+        // This test checks status of transaction for different fee and flatFee combination.
+
+        String metadataHashUTF8 = "Hello! This is the metadata hash";
+        // The value below is the base64 of metadataHashUTF8
+        String metadataHashB64 = "SGVsbG8hIFRoaXMgaXMgdGhlIG1ldGFkYXRhIGhhc2g=";
+
+        Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+        Address sender = addr;
+        Address manager = addr;
+        Address reserve = addr;
+        Address freeze = addr;
+        Address clawback = addr;
+
+        // If flatFee is not present, but fee is present, set value of fee to supplied fee. If there is
+        // some problem, value is set to Account.MIN_TX_FEE_UALGOS.
+        Transaction txWhereFlatFeeIsNullFeeIsPresent = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .flatFee((BigInteger) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+        assertThat(txWhereFlatFeeIsNullFeeIsPresent.fee).isEqualTo(4180);
+
+        // If flatFee is present, but fee is not present, set value of fee to supplied flatfee.
+        Transaction txWhereFeeIsNullFlatFeeIsPresent = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee((BigInteger) null)
+                .flatFee(100)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+        assertThat(txWhereFeeIsNullFlatFeeIsPresent.fee).isEqualTo(100);
+
+        // If flatFee is not present, but fee is null, set value of
+        // fee to Account.MIN_TX_FEE_UALGOS.
+        Transaction txWhereFeeIsNullFlatFeeIsNotPresent = Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee((BigInteger) null)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build();
+        assertThat(txWhereFeeIsNullFlatFeeIsNotPresent.fee).isEqualTo(Account.MIN_TX_FEE_UALGOS);
+
+        // If both fee and flatFee is preset, that is an
+        // illegal state and exception is thrown.
+        IllegalArgumentException exceptionWhenFeeAndFlatFeeIsNotNull =
+                assertThrows(IllegalArgumentException.class, () -> Transaction.AssetCreateTransactionBuilder()
+                .sender(sender)
+                .fee(10)
+                .flatFee(10)
+                .firstValid(322575)
+                .lastValid(323575)
+                .genesisHash(gh)
+                .assetTotal(100)
+                .assetDecimals(5)
+                .assetUnitName("tst")
+                .assetName("testcoin")
+                .url("https://example.com")
+                .metadataHashB64(metadataHashB64)
+                .manager(manager)
+                .reserve(reserve)
+                .freeze(freeze)
+                .clawback(clawback)
+                .build());
+        assertNotNull(exceptionWhenFeeAndFlatFeeIsNotNull);
+    }
+
 
     private void createAssetTest(int numDecimal, String goldenString) throws Exception {
         Address addr = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
