@@ -6,6 +6,7 @@
 @unit.applications.boxes
 @unit.atomic_transaction_composer
 @unit.blocksummary
+@unit.blocktxids
 @unit.dryrun
 @unit.dryrun.trace.application
 @unit.feetest
@@ -24,6 +25,7 @@
 @unit.responses.messagepack.231
 @unit.responses.statedelta
 @unit.responses.timestamp
+@unit.responses.txid.json
 @unit.responses.txngroupdeltas
 @unit.responses.sync
 @unit.responses.unlimited_assets

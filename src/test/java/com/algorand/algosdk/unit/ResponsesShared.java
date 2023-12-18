@@ -209,6 +209,9 @@ public class ResponsesShared {
                     case "GetLedgerStateDelta":
                         response = algod.GetLedgerStateDelta(1234L).execute();
                         break;
+                    case "GetBlockTxids":
+                        response = algod.GetBlockTxids(1234L).execute();
+                        break;
                     default:
                         Assertions.fail("Unsupported algod endpoint: " + endpoint);
                 }
