@@ -36,6 +36,7 @@ public class Applications {
 
     public Transaction transaction;
     public String txId = null;
+    public Long lastTxConfirmedRound = 0L;
     public Long appId = 0L;
     public List<Long> rememberedAppIds = new ArrayList<>();
 
@@ -141,7 +142,8 @@ public class Applications {
 
     @Given("I wait for the transaction to be confirmed.")
     public void waitForTransactionToBeConfirmed() throws Exception {
-        Utils.waitForConfirmation(base.aclv2, base.txid, 1);
+        PendingTransactionResponse response = Utils.waitForConfirmation(base.aclv2, base.txid, 1);
+        this.lastTxConfirmedRound = response.confirmedRound;
     }
 
     @Given("I remember the new application ID.")
@@ -346,8 +348,30 @@ public class Applications {
         assertSetOfByteArraysEqual(expectedNames, actualNames);
     }
 
-    @Then("I sleep for {int} milliseconds for indexer to digest things down.")
-    public void sleepForNSecondsForIndexer(int milliseconds) throws Exception {
-        Thread.sleep(milliseconds);
+    @Then("I wait for indexer to catch up to the round where my most recent transaction was confirmed.")
+    public void sleepForNSecondsForIndexer() throws Exception {
+        final int maxAttempts = 30;
+
+        final long roundToWaitFor = this.lastTxConfirmedRound;
+        long indexerRound = 0;
+        int attempts = 0;
+
+        while(true) {
+            Response<HealthCheck> response = base.v2IndexerClient.makeHealthCheck().execute();
+            Assert.assertTrue(response.isSuccessful());
+            indexerRound = response.body().round;
+            if (indexerRound >= roundToWaitFor) {
+                // Success
+                break;
+            }
+
+            // Sleep for 1 second and try again
+            Thread.sleep(1000);
+            attempts++;
+
+            if (attempts > maxAttempts) {
+                throw new Exception("Timeout waiting for indexer to catch up to round " + roundToWaitFor + ". It is currently on " + indexerRound);
+            }
+        }
     }
 }
