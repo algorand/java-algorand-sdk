@@ -11,19 +11,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TealValue extends PathResponse {
 
     /**
-     * (tb) bytes value.
+     * bytes value.
      */
     @JsonProperty("bytes")
     public String bytes;
 
     /**
-     * (tt) value type. Value `1` refers to   bytes  , value `2` refers to   uint  
+     * type of the value. Value `1` refers to   bytes  , value `2` refers to   uint  
      */
     @JsonProperty("type")
     public Long type;
 
     /**
-     * (ui) uint value.
+     * uint value.
      */
     @JsonProperty("uint")
     public java.math.BigInteger uint;
