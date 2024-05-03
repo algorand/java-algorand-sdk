@@ -13,6 +13,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ParticipationUpdates extends PathResponse {
 
     /**
+     * (partupabs) a list of online accounts that need to be suspended.
+     */
+    @JsonProperty("absent-participation-accounts")
+    public List<String> absentParticipationAccounts = new ArrayList<String>();
+
+    /**
      * (partupdrmv) a list of online accounts that needs to be converted to offline
      * since their participation key expired.
      */
@@ -26,6 +32,7 @@ public class ParticipationUpdates extends PathResponse {
         if (o == null) return false;
 
         ParticipationUpdates other = (ParticipationUpdates) o;
+        if (!Objects.deepEquals(this.absentParticipationAccounts, other.absentParticipationAccounts)) return false;
         if (!Objects.deepEquals(this.expiredParticipationAccounts, other.expiredParticipationAccounts)) return false;
 
         return true;

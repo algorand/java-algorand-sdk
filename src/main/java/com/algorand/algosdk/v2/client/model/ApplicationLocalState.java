@@ -32,7 +32,7 @@ public class ApplicationLocalState extends PathResponse {
     public Long id;
 
     /**
-     * (tkv) storage.
+     * storage.
      */
     @JsonProperty("key-value")
     public List<TealKeyValue> keyValue = new ArrayList<TealKeyValue>();
@@ -44,7 +44,7 @@ public class ApplicationLocalState extends PathResponse {
     public java.math.BigInteger optedInAtRound;
 
     /**
-     * (hsch) schema.
+     * schema.
      */
     @JsonProperty("schema")
     public ApplicationStateSchema schema;
