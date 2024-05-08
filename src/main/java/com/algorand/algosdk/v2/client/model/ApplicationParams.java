@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ApplicationParams extends PathResponse {
 
     /**
-     * (approv) approval program.
+     * approval program.
      */
     @JsonProperty("approval-program")
     public void approvalProgram(String base64Encoded) {
@@ -28,7 +28,7 @@ public class ApplicationParams extends PathResponse {
     public byte[] approvalProgram;
 
     /**
-     * (clearp) approval program.
+     * clear state program.
      */
     @JsonProperty("clear-state-program")
     public void clearStateProgram(String base64Encoded) {
@@ -58,25 +58,25 @@ public class ApplicationParams extends PathResponse {
     public Address creator;
 
     /**
-     * (epp) the amount of extra program pages available to this app.
+     * the number of extra program pages available to this app.
      */
     @JsonProperty("extra-program-pages")
     public Long extraProgramPages;
 
     /**
-     * [\gs) global schema
+     * global state
      */
     @JsonProperty("global-state")
     public List<TealKeyValue> globalState = new ArrayList<TealKeyValue>();
 
     /**
-     * [\gsch) global schema
+     * global schema
      */
     @JsonProperty("global-state-schema")
     public ApplicationStateSchema globalStateSchema;
 
     /**
-     * [\lsch) local schema
+     * local schema
      */
     @JsonProperty("local-state-schema")
     public ApplicationStateSchema localStateSchema;
