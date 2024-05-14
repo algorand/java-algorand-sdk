@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AssetHolding extends PathResponse {
 
     /**
-     * (a) number of units held.
+     * number of units held.
      */
     @JsonProperty("amount")
     public java.math.BigInteger amount;
@@ -31,7 +31,7 @@ public class AssetHolding extends PathResponse {
     public Boolean deleted;
 
     /**
-     * (f) whether or not the holding is frozen.
+     * whether or not the holding is frozen.
      */
     @JsonProperty("is-frozen")
     public Boolean isFrozen;

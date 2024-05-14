@@ -1,9 +1,11 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +16,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * data/bookkeeping/block.go : Block
  */
 public class Block extends PathResponse {
+
+    /**
+     * the potential bonus payout for this block.
+     */
+    @JsonProperty("bonus")
+    public Long bonus;
+
+    /**
+     * the sum of all fees paid by transactions in this block.
+     */
+    @JsonProperty("fees-collected")
+    public Long feesCollected;
 
     /**
      * (gh) hash to which this block belongs.
@@ -50,6 +64,29 @@ public class Block extends PathResponse {
         return Encoder.encodeToBase64(this.previousBlockHash);
     }
     public byte[] previousBlockHash;
+
+    /**
+     * the proposer of this block.
+     */
+    @JsonProperty("proposer")
+    public void proposer(String proposer) throws NoSuchAlgorithmException {
+        this.proposer = new Address(proposer);
+    }
+    @JsonProperty("proposer")
+    public String proposer() throws NoSuchAlgorithmException {
+        if (this.proposer != null) {
+            return this.proposer.encodeAsString();
+        } else {
+            return null;
+        }
+    }
+    public Address proposer;
+
+    /**
+     * the actual amount transferred to the proposer from the fee sink.
+     */
+    @JsonProperty("proposer-payout")
+    public Long proposerPayout;
 
     /**
      * Fields relating to rewards,
@@ -154,10 +191,14 @@ public class Block extends PathResponse {
         if (o == null) return false;
 
         Block other = (Block) o;
+        if (!Objects.deepEquals(this.bonus, other.bonus)) return false;
+        if (!Objects.deepEquals(this.feesCollected, other.feesCollected)) return false;
         if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
         if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
         if (!Objects.deepEquals(this.participationUpdates, other.participationUpdates)) return false;
         if (!Objects.deepEquals(this.previousBlockHash, other.previousBlockHash)) return false;
+        if (!Objects.deepEquals(this.proposer, other.proposer)) return false;
+        if (!Objects.deepEquals(this.proposerPayout, other.proposerPayout)) return false;
         if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
         if (!Objects.deepEquals(this.round, other.round)) return false;
         if (!Objects.deepEquals(this.seed, other.seed)) return false;
