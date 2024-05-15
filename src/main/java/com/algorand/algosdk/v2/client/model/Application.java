@@ -29,13 +29,13 @@ public class Application extends PathResponse {
     public java.math.BigInteger deletedAtRound;
 
     /**
-     * (appidx) application index.
+     * application index.
      */
     @JsonProperty("id")
     public Long id;
 
     /**
-     * (appparams) application parameters.
+     * application parameters.
      */
     @JsonProperty("params")
     public ApplicationParams params;
