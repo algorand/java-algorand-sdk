@@ -11,13 +11,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class ApplicationStateSchema extends PathResponse {
 
     /**
-     * (nbs) num of byte slices.
+     * number of byte slices.
      */
     @JsonProperty("num-byte-slice")
     public Long numByteSlice;
 
     /**
-     * (nui) num of uints.
+     * number of uints.
      */
     @JsonProperty("num-uint")
     public Long numUint;

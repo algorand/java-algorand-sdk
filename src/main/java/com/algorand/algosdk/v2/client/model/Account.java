@@ -35,7 +35,7 @@ public class Account extends PathResponse {
     public Address address;
 
     /**
-     * (algo) total number of MicroAlgos in the account
+     * total number of MicroAlgos in the account
      */
     @JsonProperty("amount")
     public Long amount;
@@ -47,37 +47,36 @@ public class Account extends PathResponse {
     public Long amountWithoutPendingRewards;
 
     /**
-     * (appl) applications local data stored in this account.
+     * application local data stored in this account.
      * Note the raw object uses `map[int] -> AppLocalState` for this type.
      */
     @JsonProperty("apps-local-state")
     public List<ApplicationLocalState> appsLocalState = new ArrayList<ApplicationLocalState>();
 
     /**
-     * (teap) the sum of all extra application program pages for this account.
+     * the sum of all extra application program pages for this account.
      */
     @JsonProperty("apps-total-extra-pages")
     public Long appsTotalExtraPages;
 
     /**
-     * (tsch) stores the sum of all of the local schemas and global schemas in this
-     * account.
+     * the sum of all of the local schemas and global schemas in this account.
      * Note: the raw account uses `StateSchema` for this type.
      */
     @JsonProperty("apps-total-schema")
     public ApplicationStateSchema appsTotalSchema;
 
     /**
-     * (asset) assets held by this account.
+     * assets held by this account.
      * Note the raw object uses `map[int] -> AssetHolding` for this type.
      */
     @JsonProperty("assets")
     public List<AssetHolding> assets = new ArrayList<AssetHolding>();
 
     /**
-     * (spend) the address against which signing should be checked. If empty, the
-     * address of the current account is used. This field can be updated in any
-     * transaction by setting the RekeyTo field.
+     * The address against which signing should be checked. If empty, the address of
+     * the current account is used. This field can be updated in any transaction by
+     * setting the RekeyTo field.
      */
     @JsonProperty("auth-addr")
     public void authAddr(String authAddr) throws NoSuchAlgorithmException {
@@ -100,15 +99,14 @@ public class Account extends PathResponse {
     public java.math.BigInteger closedAtRound;
 
     /**
-     * (appp) parameters of applications created by this account including app global
-     * data.
+     * parameters of applications created by this account including app global data.
      * Note: the raw account uses `map[int] -> AppParams` for this type.
      */
     @JsonProperty("created-apps")
     public List<Application> createdApps = new ArrayList<Application>();
 
     /**
-     * (apar) parameters of assets created by this account.
+     * parameters of assets created by this account.
      * Note: the raw account uses `map[int] -> Asset` for this type.
      */
     @JsonProperty("created-assets")
@@ -127,6 +125,26 @@ public class Account extends PathResponse {
     public Boolean deleted;
 
     /**
+     * can the account receive block incentives if its balance is in range at proposal
+     * time.
+     */
+    @JsonProperty("incentive-eligible")
+    public Boolean incentiveEligible;
+
+    /**
+     * The round in which this account last went online, or explicitly renewed their
+     * online status.
+     */
+    @JsonProperty("last-heartbeat")
+    public Long lastHeartbeat;
+
+    /**
+     * The round in which this account last proposed the block.
+     */
+    @JsonProperty("last-proposed")
+    public Long lastProposed;
+
+    /**
      * AccountParticipation describes the parameters used by this account in consensus
      * protocol.
      */
@@ -140,15 +158,14 @@ public class Account extends PathResponse {
     public Long pendingRewards;
 
     /**
-     * (ebase) used as part of the rewards computation. Only applicable to accounts
-     * which are participating.
+     * used as part of the rewards computation. Only applicable to accounts which are
+     * participating.
      */
     @JsonProperty("reward-base")
     public Long rewardBase;
 
     /**
-     * (ern) total rewards of MicroAlgos the account has received, including pending
-     * rewards.
+     * total rewards of MicroAlgos the account has received, including pending rewards.
      */
     @JsonProperty("rewards")
     public Long rewards;
@@ -160,7 +177,7 @@ public class Account extends PathResponse {
     public Long round;
 
     /**
-     * Indicates what type of signature is used by this account, must be one of:
+     * the type of signature used by this account, must be one of:
      *   sig
      *   msig
      *   lsig
@@ -170,7 +187,7 @@ public class Account extends PathResponse {
     public Enums.SigType sigType;
 
     /**
-     * (onl) delegation status of the account's MicroAlgos
+     * voting status of the account's MicroAlgos
      *   Offline - indicates that the associated account is delegated.
      *   Online - indicates that the associated account used as part of the delegation
      * pool.
@@ -240,6 +257,9 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.createdAssets, other.createdAssets)) return false;
         if (!Objects.deepEquals(this.createdAtRound, other.createdAtRound)) return false;
         if (!Objects.deepEquals(this.deleted, other.deleted)) return false;
+        if (!Objects.deepEquals(this.incentiveEligible, other.incentiveEligible)) return false;
+        if (!Objects.deepEquals(this.lastHeartbeat, other.lastHeartbeat)) return false;
+        if (!Objects.deepEquals(this.lastProposed, other.lastProposed)) return false;
         if (!Objects.deepEquals(this.participation, other.participation)) return false;
         if (!Objects.deepEquals(this.pendingRewards, other.pendingRewards)) return false;
         if (!Objects.deepEquals(this.rewardBase, other.rewardBase)) return false;
