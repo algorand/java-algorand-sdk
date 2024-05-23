@@ -10,12 +10,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Stores the global information associated with an application.
+ * The logged messages from an app call along with the app ID and outer transaction
+ * ID. Logs appear in the same order that they were emitted.
  */
-public class ApplicationLogData extends PathResponse {
+public class AppCallLogs extends PathResponse {
 
     /**
-     * Logs for the application being executed by the transaction.
+     * The application from which the logs were generated
+     */
+    @JsonProperty("application-index")
+    public Long applicationIndex;
+
+    /**
+     * An array of logs
      */
     @JsonProperty("logs")
     public List<byte[]> logs = new ArrayList<byte[]>();
@@ -36,10 +43,10 @@ public class ApplicationLogData extends PathResponse {
     }
 
     /**
-     * Transaction ID
+     * The transaction ID of the outer app call that lead to these logs
      */
-    @JsonProperty("txid")
-    public String txid;
+    @JsonProperty("txId")
+    public String txId;
 
     @Override
     public boolean equals(Object o) {
@@ -47,9 +54,10 @@ public class ApplicationLogData extends PathResponse {
         if (this == o) return true;
         if (o == null) return false;
 
-        ApplicationLogData other = (ApplicationLogData) o;
+        AppCallLogs other = (AppCallLogs) o;
+        if (!Objects.deepEquals(this.applicationIndex, other.applicationIndex)) return false;
         if (!Objects.deepEquals(this.logs, other.logs)) return false;
-        if (!Objects.deepEquals(this.txid, other.txid)) return false;
+        if (!Objects.deepEquals(this.txId, other.txId)) return false;
 
         return true;
     }
