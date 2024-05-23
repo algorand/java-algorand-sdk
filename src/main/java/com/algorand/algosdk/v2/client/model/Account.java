@@ -220,6 +220,13 @@ public class Account extends PathResponse {
     @JsonProperty("total-created-assets")
     public Long totalCreatedAssets;
 
+    /**
+     * MicroAlgo balance required by the account.
+     * The requirement grows based on asset and application usage.
+     */
+    @JsonProperty("min-balance")
+    public Long minBalance;
+
     @Override
     public boolean equals(Object o) {
 
@@ -253,6 +260,7 @@ public class Account extends PathResponse {
         if (!Objects.deepEquals(this.totalBoxes, other.totalBoxes)) return false;
         if (!Objects.deepEquals(this.totalCreatedApps, other.totalCreatedApps)) return false;
         if (!Objects.deepEquals(this.totalCreatedAssets, other.totalCreatedAssets)) return false;
+        if (!Objects.deepEquals(this.minBalance, other.minBalance)) return false;
 
         return true;
     }
