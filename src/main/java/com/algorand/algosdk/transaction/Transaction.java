@@ -1,6 +1,5 @@
 package com.algorand.algosdk.transaction;
 
-import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.*;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.logic.StateSchema;
@@ -352,7 +351,7 @@ public class Transaction implements Serializable {
     ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
-        this.fee = (fee == null ? Account.MIN_TX_FEE_UALGOS : fee);
+        this.fee = (fee == null ? BigInteger.valueOf(0) : fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         setNote(note);

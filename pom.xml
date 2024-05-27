@@ -42,8 +42,8 @@
         <maven.surefire.version>3.0.0-M5</maven.surefire.version>
 
         <!-- Test sources at 1.8 to allow using JUnit5 -->
-        <java.version>1.7</java.version>
-        <java.release.version>7</java.release.version>
+        <java.version>1.8</java.version>
+        <java.release.version>8</java.release.version>
         <java.test.release.version>8</java.test.release.version>
 
         <!-- github server corresponds to entry in ~/.m2/settings.xml -->
