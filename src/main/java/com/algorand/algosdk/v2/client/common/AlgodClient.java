@@ -14,6 +14,7 @@ import com.algorand.algosdk.v2.client.algod.GetBlock;
 import com.algorand.algosdk.v2.client.algod.GetBlockTxids;
 import com.algorand.algosdk.v2.client.algod.GetBlockHash;
 import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
+import com.algorand.algosdk.v2.client.algod.GetBlockLogs;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
@@ -186,6 +187,14 @@ public class AlgodClient extends Client {
     public GetTransactionProof GetTransactionProof(Long round,
             String txid) {
         return new GetTransactionProof((Client) this, round, txid);
+    }
+
+    /**
+     * Get all of the logs from outer and inner app calls in the given round
+     * /v2/blocks/{round}/logs
+     */
+    public GetBlockLogs GetBlockLogs(Long round) {
+        return new GetBlockLogs((Client) this, round);
     }
 
     /**
