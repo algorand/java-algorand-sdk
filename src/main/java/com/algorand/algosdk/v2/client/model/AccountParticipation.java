@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AccountParticipation extends PathResponse {
 
     /**
-     * (sel) Selection public key (if any) currently registered for this round.
+     * Selection public key (if any) currently registered for this round.
      */
     @JsonProperty("selection-participation-key")
     public void selectionParticipationKey(String base64Encoded) {
@@ -25,7 +25,7 @@ public class AccountParticipation extends PathResponse {
     public byte[] selectionParticipationKey;
 
     /**
-     * (stprf) Root of the state proof key (if any)
+     * Root of the state proof key (if any)
      */
     @JsonProperty("state-proof-key")
     public void stateProofKey(String base64Encoded) {
@@ -37,26 +37,25 @@ public class AccountParticipation extends PathResponse {
     public byte[] stateProofKey;
 
     /**
-     * (voteFst) First round for which this participation is valid.
+     * First round for which this participation is valid.
      */
     @JsonProperty("vote-first-valid")
     public Long voteFirstValid;
 
     /**
-     * (voteKD) Number of subkeys in each batch of participation keys.
+     * Number of subkeys in each batch of participation keys.
      */
     @JsonProperty("vote-key-dilution")
     public Long voteKeyDilution;
 
     /**
-     * (voteLst) Last round for which this participation is valid.
+     * Last round for which this participation is valid.
      */
     @JsonProperty("vote-last-valid")
     public Long voteLastValid;
 
     /**
-     * (vote) root participation public key (if any) currently registered for this
-     * round.
+     * root participation public key (if any) currently registered for this round.
      */
     @JsonProperty("vote-participation-key")
     public void voteParticipationKey(String base64Encoded) {
