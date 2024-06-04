@@ -15,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class AssetParams extends PathResponse {
 
     /**
-     * (c) Address of account used to clawback holdings of this asset. If empty,
-     * clawback is not permitted.
+     * Address of account used to clawback holdings of this asset. If empty, clawback
+     * is not permitted.
      */
     @JsonProperty("clawback")
     public String clawback;
@@ -30,36 +30,36 @@ public class AssetParams extends PathResponse {
     public String creator;
 
     /**
-     * (dc) The number of digits to use after the decimal point when displaying this
-     * asset. If 0, the asset is not divisible. If 1, the base unit of the asset is in
-     * tenths. If 2, the base unit of the asset is in hundredths, and so on. This value
-     * must be between 0 and 19 (inclusive).
+     * The number of digits to use after the decimal point when displaying this asset.
+     * If 0, the asset is not divisible. If 1, the base unit of the asset is in tenths.
+     * If 2, the base unit of the asset is in hundredths, and so on. This value must be
+     * between 0 and 19 (inclusive).
      */
     @JsonProperty("decimals")
     public Long decimals;
 
     /**
-     * (df) Whether holdings of this asset are frozen by default.
+     * Whether holdings of this asset are frozen by default.
      */
     @JsonProperty("default-frozen")
     public Boolean defaultFrozen;
 
     /**
-     * (f) Address of account used to freeze holdings of this asset. If empty, freezing
-     * is not permitted.
+     * Address of account used to freeze holdings of this asset. If empty, freezing is
+     * not permitted.
      */
     @JsonProperty("freeze")
     public String freeze;
 
     /**
-     * (m) Address of account used to manage the keys of this asset and to destroy it.
+     * Address of account used to manage the keys of this asset and to destroy it.
      */
     @JsonProperty("manager")
     public String manager;
 
     /**
-     * (am) A commitment to some unspecified asset metadata. The format of this
-     * metadata is up to the application.
+     * A commitment to some unspecified asset metadata. The format of this metadata is
+     * up to the application.
      */
     @JsonProperty("metadata-hash")
     public void metadataHash(String base64Encoded) {
@@ -71,8 +71,8 @@ public class AssetParams extends PathResponse {
     public byte[] metadataHash;
 
     /**
-     * (an) Name of this asset, as supplied by the creator. Included only when the
-     * asset name is composed of printable utf-8 characters.
+     * Name of this asset, as supplied by the creator. Included only when the asset
+     * name is composed of printable utf-8 characters.
      */
     @JsonProperty("name")
     public String name;
@@ -90,20 +90,20 @@ public class AssetParams extends PathResponse {
     public byte[] nameB64;
 
     /**
-     * (r) Address of account holding reserve (non-minted) units of this asset.
+     * Address of account holding reserve (non-minted) units of this asset.
      */
     @JsonProperty("reserve")
     public String reserve;
 
     /**
-     * (t) The total number of units of this asset.
+     * The total number of units of this asset.
      */
     @JsonProperty("total")
     public java.math.BigInteger total;
 
     /**
-     * (un) Name of a unit of this asset, as supplied by the creator. Included only
-     * when the name of a unit of this asset is composed of printable utf-8 characters.
+     * Name of a unit of this asset, as supplied by the creator. Included only when the
+     * name of a unit of this asset is composed of printable utf-8 characters.
      */
     @JsonProperty("unit-name")
     public String unitName;
@@ -121,8 +121,8 @@ public class AssetParams extends PathResponse {
     public byte[] unitNameB64;
 
     /**
-     * (au) URL where more information about the asset can be retrieved. Included only
-     * when the URL is composed of printable utf-8 characters.
+     * URL where more information about the asset can be retrieved. Included only when
+     * the URL is composed of printable utf-8 characters.
      */
     @JsonProperty("url")
     public String url;

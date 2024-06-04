@@ -1,3 +1,19 @@
+# 2.5.0
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.5.0 -->
+
+## What's Changed
+### Bugfixes
+* Fix: Fix indexer sync issue in cucumber tests by @jasonpaulos in https://github.com/algorand/java-algorand-sdk/pull/686
+### Enhancements
+* API Update: Regenerate code with the latest specification file (8f8a9ef2) by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/661
+* Codegen: Regenerate code with the latest specification file (2335b019) by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/715
+* Test: Add minbalance tests for Java SDK. by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/717
+* ci: upgrade checkout action to v4 by @michaeltchuang in https://github.com/algorand/java-algorand-sdk/pull/716
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.4.0...2.5.0
+
 # 2.4.0
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.4.0 -->

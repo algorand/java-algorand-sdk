@@ -23,6 +23,7 @@
 @unit.responses.blocksummary
 @unit.responses.messagepack
 @unit.responses.messagepack.231
+@unit.responses.minbalance
 @unit.responses.statedelta
 @unit.responses.timestamp
 @unit.responses.txid.json
