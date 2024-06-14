@@ -32,6 +32,13 @@ public class SimulationEvalOverrides extends PathResponse {
     public Long extraOpcodeBudget;
 
     /**
+     * If true, signers for transactions that are missing signatures will be fixed
+     * during evaluation.
+     */
+    @JsonProperty("fix-signers")
+    public Boolean fixSigners;
+
+    /**
      * The maximum log calls one can make during simulation
      */
     @JsonProperty("max-log-calls")
@@ -53,6 +60,7 @@ public class SimulationEvalOverrides extends PathResponse {
         if (!Objects.deepEquals(this.allowEmptySignatures, other.allowEmptySignatures)) return false;
         if (!Objects.deepEquals(this.allowUnnamedResources, other.allowUnnamedResources)) return false;
         if (!Objects.deepEquals(this.extraOpcodeBudget, other.extraOpcodeBudget)) return false;
+        if (!Objects.deepEquals(this.fixSigners, other.fixSigners)) return false;
         if (!Objects.deepEquals(this.maxLogCalls, other.maxLogCalls)) return false;
         if (!Objects.deepEquals(this.maxLogSize, other.maxLogSize)) return false;
 
