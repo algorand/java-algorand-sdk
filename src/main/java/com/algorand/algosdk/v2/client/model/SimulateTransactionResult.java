@@ -1,7 +1,9 @@
 package com.algorand.algosdk.v2.client.model;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -23,6 +25,24 @@ public class SimulateTransactionResult extends PathResponse {
      */
     @JsonProperty("exec-trace")
     public SimulationTransactionExecTrace execTrace;
+
+    /**
+     * The account that needed to sign this transaction when no signature was provided
+     * and the provided signer was incorrect.
+     */
+    @JsonProperty("fixed-signer")
+    public void fixedSigner(String fixedSigner) throws NoSuchAlgorithmException {
+        this.fixedSigner = new Address(fixedSigner);
+    }
+    @JsonProperty("fixed-signer")
+    public String fixedSigner() throws NoSuchAlgorithmException {
+        if (this.fixedSigner != null) {
+            return this.fixedSigner.encodeAsString();
+        } else {
+            return null;
+        }
+    }
+    public Address fixedSigner;
 
     /**
      * Budget used during execution of a logic sig transaction.
@@ -60,6 +80,7 @@ public class SimulateTransactionResult extends PathResponse {
         SimulateTransactionResult other = (SimulateTransactionResult) o;
         if (!Objects.deepEquals(this.appBudgetConsumed, other.appBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.execTrace, other.execTrace)) return false;
+        if (!Objects.deepEquals(this.fixedSigner, other.fixedSigner)) return false;
         if (!Objects.deepEquals(this.logicSigBudgetConsumed, other.logicSigBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.txnResult, other.txnResult)) return false;
         if (!Objects.deepEquals(this.unnamedResourcesAccessed, other.unnamedResourcesAccessed)) return false;
