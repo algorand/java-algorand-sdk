@@ -5,20 +5,18 @@ import com.algorand.algosdk.abi.ABIType;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
+import com.algorand.algosdk.v2.client.algod.PendingTransactionInformation;
+import com.algorand.algosdk.v2.client.algod.SimulateTransaction;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
+import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
-import com.algorand.algosdk.v2.client.model.PostTransactionsResponse;
+import com.algorand.algosdk.v2.client.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 public class AtomicTransactionComposer {
     public enum Status {
@@ -228,6 +226,58 @@ public class AtomicTransactionComposer {
         return this.getTxIDs();
     }
 
+    // Simulate simulates the transaction group against the network.
+    //
+    // The composer's status must be SUBMITTED or lower before calling this method. Simulation will not
+    // advance the status of the composer beyond SIGNED.
+    //
+    // The `request` argument can be used to customize the characteristics of the simulation.
+    //
+    // Returns a models.SimulateResponse and an ABIResult for each method call in this group.
+    public SimulateResult simulate(Client client, SimulateRequest request) throws Exception {
+        if (this.status.ordinal() > Status.SUBMITTED.ordinal()) {
+            throw new Exception("Status must be SUBMITTED or lower in order to call Simulate()");
+        }
+
+        List<SignedTransaction> stxs = gatherSignatures();
+        if (stxs == null) {
+            throw new Exception("Error gathering signatures");
+        }
+
+        SimulateRequestTransactionGroup txnGroups = new SimulateRequestTransactionGroup();
+        txnGroups.txns = stxs;
+        request.txnGroups = new ArrayList<>();
+        request.txnGroups.add(txnGroups);
+
+        SimulateTransaction st = new SimulateTransaction(client);
+        SimulateResponse simulateResponse = st.request(request).execute().body();
+
+        if (simulateResponse == null) {
+            throw new Exception("Error in simulation response");
+        }
+
+        List<ABIMethodResult> methodResults = new ArrayList<>();
+        for (int i = 0; i < stxs.size(); i++) {
+            SignedTransaction stx = stxs.get(i);
+            String txID = stx.transactionID;
+            PendingTransactionResponse pendingTransactionResponse = simulateResponse.txnGroups.get(0).txnResults.get(i).txnResult;
+
+            ABIMethodResult methodResult = new ABIMethodResult();
+            methodResult.setTxID(txID);
+            methodResult.setRawReturnValue(new byte[0]);
+            methodResult.setMethod(this.methodMap.get(i));
+
+            methodResult = parseMethodResponse(methodResult.getMethod(), methodResult, pendingTransactionResponse);
+            methodResults.add(methodResult);
+        }
+
+        SimulateResult result = new SimulateResult();
+        result.setMethodResults(methodResults);
+        result.setSimulateResponse(simulateResponse);
+
+        return result;
+    }
+
     /**
      * Send the transaction group to the network and wait until it's committed to a block. An error
      * will be thrown if submission or execution fails.
@@ -324,6 +374,77 @@ public class AtomicTransactionComposer {
         }
 
         return new ExecuteResult(txInfo.confirmedRound, this.getTxIDs(), retList);
+    }
+
+    public static class SimulateResult {
+        // The result of the transaction group simulation
+        private SimulateResponse simulateResponse;
+        // For each ABI method call in the executed group (created by the AddMethodCall method), this
+        // list contains information about the method call's return value
+        private List<ABIMethodResult> methodResults;
+
+        // Getter and setter for simulateResponse
+        public SimulateResponse getSimulateResponse() {
+            return simulateResponse;
+        }
+
+        public void setSimulateResponse(SimulateResponse simulateResponse) {
+            this.simulateResponse = simulateResponse;
+        }
+
+        // Getter and setter for methodResults
+        public List<ABIMethodResult> getMethodResults() {
+            return methodResults;
+        }
+
+        public void setMethodResults(List<ABIMethodResult> methodResults) {
+            this.methodResults = methodResults;
+        }
+    }
+
+    /**
+     * Parses a single ABI Method transaction log into a ABI result object.
+     *
+     * @param method
+     * @param methodResult
+     * @param pendingTransactionResponse
+     * @return An ABIMethodResult object
+     */
+    public ABIMethodResult parseMethodResponse(Method method, ABIMethodResult methodResult, PendingTransactionResponse pendingTransactionResponse) {
+        ABIMethodResult returnedResult = methodResult;
+        try {
+            returnedResult.setTransactionInfo(pendingTransactionResponse);
+            if (!method.returns.type.equals("void")) {
+                List<byte[]> logs = pendingTransactionResponse.logs;
+                if (logs == null || logs.isEmpty()) {
+                    throw new Exception("App call transaction did not log a return value");
+                }
+
+                byte[] lastLog = logs.get(logs.size() - 1);
+                if (lastLog.length < 4 || !hasPrefix(lastLog, ABI_RET_HASH)) {
+                    throw new Exception("App call transaction did not log a return value");
+                }
+
+                returnedResult.setRawReturnValue(Arrays.copyOfRange(lastLog, 4, lastLog.length));
+                returnedResult.setReturnValue(method.returns.parsedType.decode(returnedResult.getRawReturnValue()));
+            }
+        } catch (Exception e) {
+            returnedResult.setDecodeError(e);
+        }
+
+        return returnedResult;
+    }
+
+    private static boolean hasPrefix(byte[] array, byte[] prefix) {
+        if (array.length < prefix.length) {
+            return false;
+        }
+        for (int i = 0; i < prefix.length; i++) {
+            if (array[i] != prefix[i]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean checkLogRet(byte[] logLine) {
