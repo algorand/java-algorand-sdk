@@ -352,7 +352,7 @@ public class Transaction implements Serializable {
     ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
-        this.fee = (fee == null ? Account.MIN_TX_FEE_UALGOS : fee);
+        this.fee = (fee == null ? BigInteger.ZERO : fee);
         if (firstValid != null) this.firstValid = firstValid;
         if (lastValid != null) this.lastValid = lastValid;
         setNote(note);
