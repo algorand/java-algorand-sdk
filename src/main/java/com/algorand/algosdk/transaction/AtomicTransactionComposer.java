@@ -226,15 +226,17 @@ public class AtomicTransactionComposer {
         return this.getTxIDs();
     }
 
-    // Simulate simulates the transaction group against the network.
-    //
-    // The composer's status must be SUBMITTED or lower before calling this method. Simulation will not
-    // advance the status of the composer beyond SIGNED.
-    //
-    // The `request` argument can be used to customize the characteristics of the simulation.
-    //
-    // Returns a models.SimulateResponse and an ABIResult for each method call in this group.
-    public SimulateResult simulate(Client client, SimulateRequest request) throws Exception {
+    /**
+     * Simulate simulates the transaction group against the network.
+     * <p>
+     * The composer's status must be SUBMITTED or lower before calling this method. Simulation will not
+     * advance the status of the composer beyond SIGNED.
+     * <p>
+     * The `request` argument can be used to customize the characteristics of the simulation.
+     * <p>
+     * Returns a models.SimulateResponse and an ABIResult for each method call in this group.
+     */
+    public SimulateResult simulate(AlgodClient client, SimulateRequest request) throws Exception {
         if (this.status.ordinal() > Status.SUBMITTED.ordinal()) {
             throw new Exception("Status must be SUBMITTED or lower in order to call Simulate()");
         }
@@ -414,7 +416,7 @@ public class AtomicTransactionComposer {
         ABIMethodResult returnedResult = methodResult;
         try {
             returnedResult.setTransactionInfo(pendingTransactionResponse);
-            if (!method.returns.type.equals("void")) {
+            if (!method.returns.type.equals(Method.Returns.VoidRetType)) {
                 List<byte[]> logs = pendingTransactionResponse.logs;
                 if (logs == null || logs.isEmpty()) {
                     throw new Exception("App call transaction did not log a return value");
@@ -425,7 +427,7 @@ public class AtomicTransactionComposer {
                     throw new Exception("App call transaction did not log a return value");
                 }
 
-                returnedResult.setRawReturnValue(Arrays.copyOfRange(lastLog, 4, lastLog.length));
+                returnedResult.setRawReturnValue(Arrays.copyOfRange(lastLog, ABI_RET_HASH.length, lastLog.length));
                 returnedResult.setReturnValue(method.returns.parsedType.decode(returnedResult.getRawReturnValue()));
             }
         } catch (Exception e) {
