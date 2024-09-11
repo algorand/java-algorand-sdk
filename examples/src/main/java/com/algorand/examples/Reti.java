@@ -18,7 +18,6 @@ import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.transaction.AtomicTransactionComposer.ExecuteResult;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.v2.client.algod.SimulateTransaction;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.*;
@@ -128,7 +127,7 @@ public class Reti {
             request.allowUnnamedResources = true;
 
             AtomicTransactionComposer.SimulateResult simulateResult = atc.simulate(algodClient, request);
-            Object resultsObj = simulateResult.getMethodResults().get(0).getReturnValue();
+            Object resultsObj = simulateResult.getMethodResults().get(0).value;
             List<Object> results = Arrays.stream(((Object[]) resultsObj)).toList();
 
             for (Object o : results) {
@@ -175,7 +174,7 @@ public class Reti {
             request.allowUnnamedResources = true;
 
              AtomicTransactionComposer.SimulateResult simulateResult = atc.simulate(algodClient, request);
-             Object resultsObj = simulateResult.getMethodResults().get(0).getReturnValue();
+             Object resultsObj = simulateResult.getMethodResults().get(0).value;
              List<Object> results = Arrays.stream(((Object[]) resultsObj)).toList();
             System.out.println("balance = " + results.get(1) + " microALGOS, poolAppID = " + poolAppID);
         } catch (Exception e) {

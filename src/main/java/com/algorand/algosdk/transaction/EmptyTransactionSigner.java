@@ -27,12 +27,11 @@ public class EmptyTransactionSigner implements TxnSigner {
      * @return A list of signed transaction bytes.
      */
     @Override
-    public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign) throws JsonProcessingException, NoSuchAlgorithmException {
+    public SignedTransaction[] signTxnGroup(Transaction[] txnGroup, int[] indicesToSign) throws NoSuchAlgorithmException {
         SignedTransaction[] stxs = new SignedTransaction[indicesToSign.length];
 
         for (int pos : indicesToSign) {
-            SignedTransaction stx = new SignedTransaction();
-            stx.tx = txnGroup[pos];
+            SignedTransaction stx = new SignedTransaction(txnGroup[pos]);
 
             if (authAddr != null) {
                 Address address = new Address(authAddr);

@@ -258,19 +258,13 @@ public class AtomicTransactionComposer {
             throw new Exception("Error in simulation response");
         }
 
-        List<ABIMethodResult> methodResults = new ArrayList<>();
+        List<ReturnValue> methodResults = new ArrayList<>();
         for (int i = 0; i < stxs.size(); i++) {
             SignedTransaction stx = stxs.get(i);
-            String txID = stx.transactionID;
             PendingTransactionResponse pendingTransactionResponse = simulateResponse.txnGroups.get(0).txnResults.get(i).txnResult;
 
-            ABIMethodResult methodResult = new ABIMethodResult();
-            methodResult.setTxID(txID);
-            methodResult.setRawReturnValue(new byte[0]);
-            methodResult.setMethod(this.methodMap.get(i));
-
-            methodResult = parseMethodResponse(methodResult.getMethod(), methodResult, pendingTransactionResponse);
-            methodResults.add(methodResult);
+            ReturnValue returnValue = parseMethodResponse(this.methodMap.get(i), stx, pendingTransactionResponse);
+            methodResults.add(returnValue);
         }
 
         SimulateResult result = new SimulateResult();
@@ -379,13 +373,9 @@ public class AtomicTransactionComposer {
     }
 
     public static class SimulateResult {
-        // The result of the transaction group simulation
         private SimulateResponse simulateResponse;
-        // For each ABI method call in the executed group (created by the AddMethodCall method), this
-        // list contains information about the method call's return value
-        private List<ABIMethodResult> methodResults;
+        private List<ReturnValue> methodResults;
 
-        // Getter and setter for simulateResponse
         public SimulateResponse getSimulateResponse() {
             return simulateResponse;
         }
@@ -394,12 +384,11 @@ public class AtomicTransactionComposer {
             this.simulateResponse = simulateResponse;
         }
 
-        // Getter and setter for methodResults
-        public List<ABIMethodResult> getMethodResults() {
+        public List<ReturnValue> getMethodResults() {
             return methodResults;
         }
 
-        public void setMethodResults(List<ABIMethodResult> methodResults) {
+        public void setMethodResults(List<ReturnValue> methodResults) {
             this.methodResults = methodResults;
         }
     }
@@ -408,14 +397,20 @@ public class AtomicTransactionComposer {
      * Parses a single ABI Method transaction log into a ABI result object.
      *
      * @param method
-     * @param methodResult
+     * @param stx
      * @param pendingTransactionResponse
-     * @return An ABIMethodResult object
+     * @return An ReturnValue object
      */
-    public ABIMethodResult parseMethodResponse(Method method, ABIMethodResult methodResult, PendingTransactionResponse pendingTransactionResponse) {
-        ABIMethodResult returnedResult = methodResult;
+    public ReturnValue parseMethodResponse(Method method, SignedTransaction stx, PendingTransactionResponse pendingTransactionResponse) {
+        ReturnValue returnValue = new ReturnValue(
+                stx.transactionID,
+                new byte[0],
+                null,
+                method,
+                null,
+                pendingTransactionResponse
+        );
         try {
-            returnedResult.setTransactionInfo(pendingTransactionResponse);
             if (!method.returns.type.equals(Method.Returns.VoidRetType)) {
                 List<byte[]> logs = pendingTransactionResponse.logs;
                 if (logs == null || logs.isEmpty()) {
@@ -427,14 +422,14 @@ public class AtomicTransactionComposer {
                     throw new Exception("App call transaction did not log a return value");
                 }
 
-                returnedResult.setRawReturnValue(Arrays.copyOfRange(lastLog, ABI_RET_HASH.length, lastLog.length));
-                returnedResult.setReturnValue(method.returns.parsedType.decode(returnedResult.getRawReturnValue()));
+                returnValue.rawValue = Arrays.copyOfRange(lastLog, ABI_RET_HASH.length, lastLog.length);
+                returnValue.value = method.returns.parsedType.decode(returnValue.rawValue);
             }
         } catch (Exception e) {
-            returnedResult.setDecodeError(e);
+            returnValue.parseError = e;
         }
 
-        return returnedResult;
+        return returnValue;
     }
 
     private static boolean hasPrefix(byte[] array, byte[] prefix) {
