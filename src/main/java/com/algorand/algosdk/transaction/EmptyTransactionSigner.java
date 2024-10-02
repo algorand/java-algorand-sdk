@@ -30,10 +30,12 @@ public class EmptyTransactionSigner implements TxnSigner {
         for (int pos : indicesToSign) {
             SignedTransaction stx = new SignedTransaction(txnGroup[pos]);
 
-            if (authAddr != null) {
-                Address address = new Address(authAddr);
-                stx.authAddr(address.getBytes());
-            }
+            try {
+                if (authAddr != null) {
+                    Address address = new Address(authAddr);
+                    stx.authAddr(address.getBytes());
+                }
+            } catch (IllegalArgumentException ignored) { }
 
             stxs[pos] = stx;
         }
