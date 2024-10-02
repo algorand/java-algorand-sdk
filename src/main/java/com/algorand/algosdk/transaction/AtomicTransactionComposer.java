@@ -124,7 +124,7 @@ public class AtomicTransactionComposer {
         if (this.status.compareTo(Status.BUILT) >= 0)
             return this.transactionList;
 
-        if (this.transactionList.size() == 0)
+        if (this.transactionList.isEmpty())
             throw new IllegalArgumentException("should not build transaction group with 0 transaction in composer");
         else if (this.transactionList.size() > 1) {
             List<Transaction> groupTxns = new ArrayList<>();
@@ -262,6 +262,9 @@ public class AtomicTransactionComposer {
         for (int i = 0; i < stxs.size(); i++) {
             SignedTransaction stx = stxs.get(i);
             PendingTransactionResponse pendingTransactionResponse = simulateResponse.txnGroups.get(0).txnResults.get(i).txnResult;
+
+            if (!this.methodMap.containsKey(i))
+                continue;
 
             ReturnValue returnValue = parseMethodResponse(this.methodMap.get(i), stx, pendingTransactionResponse);
             methodResults.add(returnValue);

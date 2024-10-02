@@ -4,35 +4,71 @@ import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.auction.Bid;
 import com.algorand.algosdk.auction.SignedBid;
 import com.algorand.algosdk.builder.transaction.TransactionBuilder;
-import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.Digest;
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.LogicsigSignature;
+import com.algorand.algosdk.crypto.MultisigAddress;
+import com.algorand.algosdk.crypto.ParticipationPublicKey;
+import com.algorand.algosdk.crypto.Signature;
+import com.algorand.algosdk.crypto.VRFPublicKey;
 import com.algorand.algosdk.kmd.client.KmdClient;
 import com.algorand.algosdk.kmd.client.api.KmdApi;
-import com.algorand.algosdk.kmd.client.model.*;
+import com.algorand.algosdk.kmd.client.model.APIV1GETWalletsResponse;
+import com.algorand.algosdk.kmd.client.model.APIV1Wallet;
+import com.algorand.algosdk.kmd.client.model.CreateWalletRequest;
+import com.algorand.algosdk.kmd.client.model.DeleteKeyRequest;
+import com.algorand.algosdk.kmd.client.model.DeleteMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.ExportKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ExportMasterKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ExportMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.GenerateKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ImportKeyRequest;
+import com.algorand.algosdk.kmd.client.model.ImportMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.InitWalletHandleTokenRequest;
+import com.algorand.algosdk.kmd.client.model.ListKeysRequest;
+import com.algorand.algosdk.kmd.client.model.ListMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.ReleaseWalletHandleTokenRequest;
+import com.algorand.algosdk.kmd.client.model.RenameWalletRequest;
+import com.algorand.algosdk.kmd.client.model.RenewWalletHandleTokenRequest;
+import com.algorand.algosdk.kmd.client.model.SignMultisigRequest;
+import com.algorand.algosdk.kmd.client.model.SignTransactionRequest;
+import com.algorand.algosdk.kmd.client.model.WalletInfoRequest;
 import com.algorand.algosdk.mnemonic.Mnemonic;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TransactionWithSigner;
 import com.algorand.algosdk.util.AlgoConverter;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
+import com.algorand.algosdk.v2.client.algod.SimulateTransaction;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.*;
-
+import com.algorand.algosdk.v2.client.model.AccountAssetResponse;
+import com.algorand.algosdk.v2.client.model.Asset;
+import com.algorand.algosdk.v2.client.model.CompileResponse;
+import com.algorand.algosdk.v2.client.model.DryrunRequest;
+import com.algorand.algosdk.v2.client.model.DryrunResponse;
+import com.algorand.algosdk.v2.client.model.DryrunSource;
+import com.algorand.algosdk.v2.client.model.SimulateRequest;
+import com.algorand.algosdk.v2.client.model.SimulateRequestTransactionGroup;
+import com.algorand.algosdk.v2.client.model.SimulateResponse;
+import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
-import java.io.*;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +79,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 
 public class Stepdefs {
-    public static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    public static String algodHost = "http://localhost";
+    public static String algodToken = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     public static Integer algodPort = 60000;
     public static Integer kmdPort = 60001;
 
@@ -95,6 +132,11 @@ public class Stepdefs {
     BigInteger votelst;
     BigInteger votekd;
 
+    TransactionWithSigner accountTxAndSigner;
+    SimulateRequest simulateRequest;
+    Response<SimulateResponse> simulateResponse;
+    SimulateTransaction simulateTransaction;
+
     /* Assets */
     String creator = "";
     BigInteger assetID = BigInteger.valueOf(1);
@@ -111,7 +153,7 @@ public class Stepdefs {
         if (addresses == null) {
             throw new RuntimeException("Addresses not initialized, must use given 'wallet information'");
         }
-        if (addresses.size() < i || addresses.size() == 0) {
+        if (addresses.size() < i || addresses.isEmpty()) {
             throw new RuntimeException("Not enough addresses, you may need to update the network template.");
         }
         try {
@@ -558,7 +600,7 @@ public class Stepdefs {
         kmdClient.setConnectTimeout(30000);
         kmdClient.setReadTimeout(30000);
         kmdClient.setWriteTimeout(30000);
-        kmdClient.setApiKey(token);
+        kmdClient.setApiKey(algodToken);
         kmdClient.setBasePath("http://localhost:" + kmdPort);
         kcl = new KmdApi(kmdClient);
     }
@@ -566,7 +608,7 @@ public class Stepdefs {
     @Given("an algod v2 client")
     public void aClientv2() {
         aclv2 = new com.algorand.algosdk.v2.client.common.AlgodClient(
-            "http://localhost", algodPort, token
+            algodHost, algodPort, algodToken
         );
     }
 
@@ -1190,5 +1232,86 @@ public class Stepdefs {
         String expectedSource = new String(ResourceUtils.readResource(sourceFilename), StandardCharsets.UTF_8);
 
         assertThat(disassembledSource).isEqualTo(expectedSource);
+    }
+
+    @And("I simulate the transaction")
+    public void iSimulateTheTransaction() throws Exception {
+        SimulateRequestTransactionGroup group = new SimulateRequestTransactionGroup();
+        group.txns = Collections.singletonList(stx);
+
+        if (simulateRequest == null) {
+            simulateRequest = new SimulateRequest();
+        }
+
+        simulateRequest.txnGroups = Collections.singletonList(group);
+        simulateResponse = aclv2.SimulateTransaction().request(simulateRequest).execute();
+    }
+
+    @When("I make a new simulate request.")
+    public void iMakeANewSimulateRequest() {
+
+    }
+
+    @Then("I allow {int} more budget on that simulate request.")
+    public void iAllowMoreBudgetOnThatSimulateRequest(int arg0) {
+
+    }
+
+    @Then("I simulate the transaction group with the simulate request.")
+    public void iSimulateTheTransactionGroupWithTheSimulateRequest() {
+
+    }
+
+    @Then("I check the simulation result has power packs extra-opcode-budget with extra budget {int}.")
+    public void iCheckTheSimulationResultHasPowerPacksExtraOpcodeBudgetWithExtraBudget(int arg0) {
+
+    }
+
+    @Then("I check the simulation result has power packs allow-more-logging.")
+    public void iCheckTheSimulationResultHasPowerPacksAllowMoreLogging() {
+
+    }
+
+    @Then("I allow more logs on that simulate request.")
+    public void iAllowMoreLogsOnThatSimulateRequest() {
+        if (simulateRequest == null) {
+            simulateRequest = new SimulateRequest();
+        }
+        simulateRequest.allowMoreLogging = true;
+    }
+
+    @Then("I allow exec trace options {string} on that simulate request.")
+    public void iAllowExecTraceOptionsOnThatSimulateRequest(String arg0) {
+
+    }
+
+    @Then("{int}th unit in the {string} trace at txn-groups path {string} should add value {string} to stack, pop {int} values from stack, write value {string} to scratch slot {string}.")
+    public void thUnitInTheTraceAtTxnGroupsPathShouldAddValueToStackPopValuesFromStackWriteValueToScratchSlot(int arg0, String arg1, String arg2, String arg3, int arg4, String arg5, String arg6) {
+
+    }
+
+    @And("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments, boxes {string}.")
+    public void iAddAMethodCallWithTheTransientAccountTheCurrentApplicationSuggestedParamsOnCompleteCurrentTransactionSignerCurrentMethodArgumentsBoxes(String arg0, String arg1) {
+
+    }
+
+    @Then("the current application initial {string} state should be empty.")
+    public void theCurrentApplicationInitialStateShouldBeEmpty(String arg0) {
+
+    }
+
+    @Then("{string} hash at txn-groups path {string} should be {string}.")
+    public void hashAtTxnGroupsPathShouldBe(String arg0, String arg1, String arg2) {
+
+    }
+
+    @And("<index{int}>th unit in the {string} trace at txn-groups path {string} should write to {string} state {string} with new value {string}.")
+    public void indexThUnitInTheTraceAtTxnGroupsPathShouldWriteToStateWithNewValue(int arg0, String arg1, String arg2, String arg3, String arg4, String arg5) {
+
+    }
+
+    @When("I prepare the transaction without signatures for simulation")
+    public void iPrepareTheTransactionWithoutSignaturesForSimulation() {
+        stx = new SignedTransaction(txn);
     }
 }

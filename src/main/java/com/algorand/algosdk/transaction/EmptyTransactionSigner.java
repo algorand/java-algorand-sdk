@@ -1,15 +1,12 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.util.Encoder;
-import com.fasterxml.jackson.core.JsonProcessingException;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 public class EmptyTransactionSigner implements TxnSigner {
 
-    private String authAddr = "";
+    private String authAddr;
     /**
      * EmptyTransactionSigner is a TransactionSigner that produces signed transaction objects without
      * signatures. This is useful for simulating transactions, but it won't work for actual submission.
