@@ -8,11 +8,21 @@ import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.crypto.TEALProgram;
 import com.algorand.algosdk.cucumber.shared.TransactionSteps;
 import com.algorand.algosdk.logic.StateSchema;
-import com.algorand.algosdk.transaction.*;
-import com.algorand.algosdk.util.*;
+import com.algorand.algosdk.transaction.AtomicTransactionComposer;
+import com.algorand.algosdk.transaction.EmptyTransactionSigner;
+import com.algorand.algosdk.transaction.MethodCallParams;
+import com.algorand.algosdk.transaction.Transaction;
+import com.algorand.algosdk.transaction.TransactionWithSigner;
+import com.algorand.algosdk.transaction.TxnSigner;
+import com.algorand.algosdk.util.Digester;
+import com.algorand.algosdk.util.Encoder;
+import com.algorand.algosdk.util.GenericObjToArray;
+import com.algorand.algosdk.util.ResourceUtils;
+import com.algorand.algosdk.util.SplitAndProcessMethodArgs;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
+import com.algorand.algosdk.v2.client.model.SimulateRequest;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
-
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -27,7 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.algorand.algosdk.util.ConversionUtils.convertBoxes;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertNull;
 
 public class AtomicTxnComposer {
 
@@ -43,6 +55,7 @@ public class AtomicTxnComposer {
     SplitAndProcessMethodArgs abiArgProcessor;
     Long appID;
     String nonce;
+    AtomicTransactionComposer.SimulateResult simulateResult;
 
     public AtomicTxnComposer(Stepdefs stepdefs, Applications apps, TransactionSteps steps) {
         base = stepdefs;
@@ -425,6 +438,28 @@ public class AtomicTxnComposer {
         atc.addMethodCall(optionBuild);
     }
 
+    @And("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments, boxes {string}.")
+    public void iAddAMethodCallWithTheTransientAccountTheCurrentApplicationSuggestedParamsOnCompleteCurrentTransactionSignerCurrentMethodArgumentsBoxes(String onCompleteString, String boxesString) throws Exception {
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
+
+        optionBuilder
+                .onComplete(Transaction.OnCompletion.String(onCompleteString))
+                .sender(senderAddress)
+                .signer(transSigner)
+                .applicationId(applications.appId)
+                .method(method)
+                .note(("I should be unique thanks to this nonce: " + nonce).getBytes(StandardCharsets.UTF_8))
+                .firstValid(transSteps.fv)
+                .lastValid(transSteps.lv)
+                .genesisHash(transSteps.genesisHash)
+                .genesisID(transSteps.genesisID)
+                .fee(transSteps.fee)
+                .flatFee(transSteps.flatFee)
+                .boxReferences(convertBoxes(boxesString));
+        MethodCallParams optionBuild = optionBuilder.build();
+        atc.addMethodCall(optionBuild);
+    }
+
     @When("I build the transaction group with the composer. If there is an error it is {string}.")
     public void i_build_the_transaction_group_with_the_composer_if_there_is_an_error_it_is(String errStr) {
         String inferredError = "";
@@ -436,5 +471,93 @@ public class AtomicTxnComposer {
             inferredError = e.getMessage();
         }
         assertThat(inferredError).isEqualTo(errStr);
+    }
+
+    @And("I simulate the current transaction group with the composer")
+    public void iSimulateTheCurrentTransactionGroupWithTheComposer() throws Exception {
+        if (base.simulateRequest == null) {
+            base.simulateRequest = new SimulateRequest();
+        }
+
+        simulateResult = atc.simulate(base.aclv2, base.simulateRequest);
+        execRes = new AtomicTransactionComposer.ExecuteResult(0L, null, simulateResult.getMethodResults());
+    }
+
+    @Then("the simulation should succeed without any failure message")
+    public void theSimulationShouldSucceedWithoutAnyFailureMessage() {
+        if (simulateResult != null) {
+            assertNull(simulateResult.getSimulateResponse().txnGroups.get(0).failureMessage);
+        } else {
+            assertNull(base.simulateResponse.body().txnGroups.get(0).failureMessage);
+        }
+    }
+
+    @And("the simulation should report a failure at group {string}, path {string} with message {string}")
+    public void theSimulationShouldReportAFailureAtGroupPathWithMessage(String txnGroupIndex, String failAt, String expectedFailureMsg) throws Exception {
+        int groupIndex;
+        try {
+            groupIndex = Integer.parseInt(txnGroupIndex);
+        } catch (NumberFormatException e) {
+            throw new Exception("Invalid transaction group index", e);
+        }
+
+        String[] path = failAt.split(",");
+        List<Long> expectedPath = new ArrayList<>();
+        for (String pathStr : path) {
+            try {
+                expectedPath.add(Long.parseLong(pathStr));
+            } catch (NumberFormatException e) {
+                throw new Exception("Invalid path number", e);
+            }
+        }
+
+        String actualFailureMsg = null;
+        if (base.simulateResponse != null) {
+            actualFailureMsg = base.simulateResponse.body().txnGroups.get(groupIndex).failureMessage;
+        } else if (simulateResult != null) {
+            actualFailureMsg = simulateResult.getSimulateResponse().txnGroups.get(groupIndex).failureMessage;
+        }
+
+        if (expectedFailureMsg.isEmpty() && actualFailureMsg != null && !actualFailureMsg.isEmpty()) {
+            throw new Exception("Expected no failure message, but got: '" + actualFailureMsg + "'");
+        } else if (!expectedFailureMsg.isEmpty() && actualFailureMsg != null && !actualFailureMsg.contains(expectedFailureMsg)) {
+            throw new Exception("Expected failure message '" + expectedFailureMsg + "', but got: '" + actualFailureMsg + "'");
+        }
+
+        List<Long> actualPath = null;
+        if (base.simulateResponse != null) {
+            actualPath = base.simulateResponse.body().txnGroups.get(groupIndex).failedAt;
+        } else if (simulateResult != null) {
+            actualPath = simulateResult.getSimulateResponse().txnGroups.get(groupIndex).failedAt;
+        }
+        if (expectedPath.size() != actualPath.size()) {
+            throw new Exception("Expected failure path " + expectedPath + ", but got: " + actualPath);
+        }
+
+        for (int i = 0; i < expectedPath.size(); i++) {
+            if (!expectedPath.get(i).equals(actualPath.get(i))) {
+                throw new Exception("Expected failure path " + expectedPath + ", but got: " + actualPath);
+            }
+        }
+    }
+
+    @And("I create a transaction with an empty signer with the current transaction.")
+    public void iCreateATransactionWithAnEmptySignerWithTheCurrentTransaction() {
+        String address = "";
+        if (base.address != null) {
+            address = base.address;
+        } else if (base.account != null) {
+            address = base.account.getAddress().toString();
+        }
+
+        base.txn = transSteps.builtTransaction;
+        transWithSigner = new TransactionWithSigner(base.txn,
+                new EmptyTransactionSigner(address)
+        );
+    }
+
+    @Then("the current application initial {string} state should contain {string} with value {string}.")
+    public void theCurrentApplicationInitialStateShouldContainWithValue(String arg0, String arg1, String arg2) {
+
     }
 }

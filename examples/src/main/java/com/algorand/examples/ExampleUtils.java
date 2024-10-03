@@ -36,8 +36,16 @@ public class ExampleUtils {
     private static int indexer_port = 8980;
     private static String indexer_token = "a".repeat(64);
 
+    private static String testnet_algod_host = "https://testnet-api.algonode.cloud";
+    private static int testnet_algod_port = 443;
+    private static String testnet_algod_token = "";
+
     public static AlgodClient getAlgodClient() {
         return new AlgodClient(algod_host, algod_port, algod_token);
+    }
+
+    public static AlgodClient getAlgodTestnetClient() {
+        return new AlgodClient(testnet_algod_host, testnet_algod_port, testnet_algod_token);
     }
 
     public static IndexerClient getIndexerClient() {

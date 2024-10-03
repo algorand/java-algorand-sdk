@@ -71,6 +71,10 @@ public class SignedTransaction implements Serializable {
     private SignedTransaction() {
     }
 
+    public SignedTransaction(Transaction transaction) {
+        this.tx = transaction;
+    }
+
     public SignedTransaction authAddr(Address authAddr) {
         this.authAddr = authAddr;
         return this;
