@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.algorand.algosdk.util.ConversionUtils.convertBoxes;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertNull;
 
@@ -437,6 +438,28 @@ public class AtomicTxnComposer {
         atc.addMethodCall(optionBuild);
     }
 
+    @And("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments, boxes {string}.")
+    public void iAddAMethodCallWithTheTransientAccountTheCurrentApplicationSuggestedParamsOnCompleteCurrentTransactionSignerCurrentMethodArgumentsBoxes(String onCompleteString, String boxesString) throws Exception {
+        Address senderAddress = applications.transientAccount.transientAccount.getAddress();
+
+        optionBuilder
+                .onComplete(Transaction.OnCompletion.String(onCompleteString))
+                .sender(senderAddress)
+                .signer(transSigner)
+                .applicationId(applications.appId)
+                .method(method)
+                .note(("I should be unique thanks to this nonce: " + nonce).getBytes(StandardCharsets.UTF_8))
+                .firstValid(transSteps.fv)
+                .lastValid(transSteps.lv)
+                .genesisHash(transSteps.genesisHash)
+                .genesisID(transSteps.genesisID)
+                .fee(transSteps.fee)
+                .flatFee(transSteps.flatFee)
+                .boxReferences(convertBoxes(boxesString));
+        MethodCallParams optionBuild = optionBuilder.build();
+        atc.addMethodCall(optionBuild);
+    }
+
     @When("I build the transaction group with the composer. If there is an error it is {string}.")
     public void i_build_the_transaction_group_with_the_composer_if_there_is_an_error_it_is(String errStr) {
         String inferredError = "";
@@ -478,7 +501,6 @@ public class AtomicTxnComposer {
             throw new Exception("Invalid transaction group index", e);
         }
 
-        // Parse the path ("0,0") into a list of numbers ([0, 0])
         String[] path = failAt.split(",");
         List<Long> expectedPath = new ArrayList<>();
         for (String pathStr : path) {
@@ -489,7 +511,6 @@ public class AtomicTxnComposer {
             }
         }
 
-        // Retrieve the actual failure message
         String actualFailureMsg = null;
         if (base.simulateResponse != null) {
             actualFailureMsg = base.simulateResponse.body().txnGroups.get(groupIndex).failureMessage;
@@ -503,7 +524,6 @@ public class AtomicTxnComposer {
             throw new Exception("Expected failure message '" + expectedFailureMsg + "', but got: '" + actualFailureMsg + "'");
         }
 
-        // Retrieve the actual failure path
         List<Long> actualPath = null;
         if (base.simulateResponse != null) {
             actualPath = base.simulateResponse.body().txnGroups.get(groupIndex).failedAt;

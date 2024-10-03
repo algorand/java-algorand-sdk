@@ -54,6 +54,7 @@ import com.algorand.algosdk.v2.client.model.DryrunSource;
 import com.algorand.algosdk.v2.client.model.SimulateRequest;
 import com.algorand.algosdk.v2.client.model.SimulateRequestTransactionGroup;
 import com.algorand.algosdk.v2.client.model.SimulateResponse;
+import com.algorand.algosdk.v2.client.model.SimulateTraceConfig;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.cucumber.java.en.And;
@@ -1249,12 +1250,14 @@ public class Stepdefs {
 
     @When("I make a new simulate request.")
     public void iMakeANewSimulateRequest() {
-
+        if (simulateRequest == null) {
+            simulateRequest = new SimulateRequest();
+        }
     }
 
     @Then("I allow {int} more budget on that simulate request.")
-    public void iAllowMoreBudgetOnThatSimulateRequest(int arg0) {
-
+    public void iAllowMoreBudgetOnThatSimulateRequest(int extraOpcodeBudget) {
+        simulateRequest.extraOpcodeBudget = Long.parseLong(extraOpcodeBudget + "");
     }
 
     @Then("I simulate the transaction group with the simulate request.")
@@ -1263,7 +1266,7 @@ public class Stepdefs {
     }
 
     @Then("I check the simulation result has power packs extra-opcode-budget with extra budget {int}.")
-    public void iCheckTheSimulationResultHasPowerPacksExtraOpcodeBudgetWithExtraBudget(int arg0) {
+    public void iCheckTheSimulationResultHasPowerPacksExtraOpcodeBudgetWithExtraBudget(int budget) {
 
     }
 
@@ -1274,24 +1277,31 @@ public class Stepdefs {
 
     @Then("I allow more logs on that simulate request.")
     public void iAllowMoreLogsOnThatSimulateRequest() {
-        if (simulateRequest == null) {
-            simulateRequest = new SimulateRequest();
-        }
         simulateRequest.allowMoreLogging = true;
     }
 
     @Then("I allow exec trace options {string} on that simulate request.")
-    public void iAllowExecTraceOptionsOnThatSimulateRequest(String arg0) {
-
+    public void iAllowExecTraceOptionsOnThatSimulateRequest(String stcString) {
+        SimulateTraceConfig stc = new SimulateTraceConfig();
+        String[] stcArray = stcString.split(",");
+        for (String stcValue : stcArray) {
+            switch (stcValue) {
+                case "stack":  stc.stackChange = true;
+                    break;
+                case "scratch":  stc.scratchChange = true;
+                    break;
+                case "state":  stc.stateChange = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        stc.enable = true;
+        simulateRequest.execTraceConfig = stc;
     }
 
     @Then("{int}th unit in the {string} trace at txn-groups path {string} should add value {string} to stack, pop {int} values from stack, write value {string} to scratch slot {string}.")
     public void thUnitInTheTraceAtTxnGroupsPathShouldAddValueToStackPopValuesFromStackWriteValueToScratchSlot(int arg0, String arg1, String arg2, String arg3, int arg4, String arg5, String arg6) {
-
-    }
-
-    @And("I add a method call with the transient account, the current application, suggested params, on complete {string}, current transaction signer, current method arguments, boxes {string}.")
-    public void iAddAMethodCallWithTheTransientAccountTheCurrentApplicationSuggestedParamsOnCompleteCurrentTransactionSignerCurrentMethodArgumentsBoxes(String arg0, String arg1) {
 
     }
 
