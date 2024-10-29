@@ -50,7 +50,8 @@ public class LookupAccountByID extends Query {
     }
 
     /**
-     * Include results for the specified round.
+     * Deprecated and disallowed. This parameter used to include results for a
+     * specified round. Requests with this parameter set are now rejected.
      */
     public LookupAccountByID round(Long round) {
         addQuery("round", String.valueOf(round));
