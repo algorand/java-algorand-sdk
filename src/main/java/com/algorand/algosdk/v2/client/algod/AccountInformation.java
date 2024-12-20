@@ -11,7 +11,7 @@ import com.algorand.algosdk.v2.client.model.Enums;
 
 
 /**
- * Given a specific account public key, this call returns the accounts status,
+ * Given a specific account public key, this call returns the account's status,
  * balance and spendable amounts
  * /v2/accounts/{address}
  */
