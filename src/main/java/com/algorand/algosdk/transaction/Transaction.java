@@ -175,6 +175,9 @@ public class Transaction implements Serializable {
     @JsonProperty("spmsg")
     public Map<String,Object> stateProofMessage = null;
 
+    @JsonProperty("hb")
+    public HeartbeatTxnFields heartbeatFields = new HeartbeatTxnFields();
+
     /**
      * Helper for Jackson conversion.
      */
@@ -238,7 +241,9 @@ public class Transaction implements Serializable {
                         @JsonProperty("apid") Long applicationId,
                         @JsonProperty("apls") StateSchema localStateSchema,
                         @JsonProperty("apsu") byte[] clearStateProgram,
-                        @JsonProperty("apep") Long extraPages
+                        @JsonProperty("apep") Long extraPages,
+                        // heartbeat fields
+                        @JsonProperty("hb") HeartbeatTxnFields heartbeatFields
     ) throws IOException {
         this(
                 type,
@@ -289,7 +294,8 @@ public class Transaction implements Serializable {
                 applicationId,
                 localStateSchema,
                 clearStateProgram == null ? null : new TEALProgram(clearStateProgram),
-                extraPages
+                extraPages,
+                heartbeatFields
         );
     }
 
@@ -348,7 +354,8 @@ public class Transaction implements Serializable {
             Long applicationId,
             StateSchema localStateSchema,
             TEALProgram clearStateProgram,
-            Long extraPages
+            Long extraPages,
+            HeartbeatTxnFields heartbeatFields
     ) {
         if (type != null) this.type = type;
         if (sender != null) this.sender = sender;
@@ -393,6 +400,7 @@ public class Transaction implements Serializable {
         if (localStateSchema != null) this.localStateSchema = localStateSchema;
         if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
         if (extraPages != null) this.extraPages = extraPages;
+        if (heartbeatFields != null) this.heartbeatFields = heartbeatFields;
     }
 
     // Used by Jackson to determine "default" values.
@@ -604,7 +612,8 @@ public class Transaction implements Serializable {
                 freezeState == that.freezeState &&
                 rekeyTo.equals(that.rekeyTo) &&
                 extraPages.equals(that.extraPages) &&
-                boxReferences.equals(that.boxReferences);
+                boxReferences.equals(that.boxReferences) &&
+                heartbeatFields.equals(that.heartbeatFields);
     }
 
     /**
