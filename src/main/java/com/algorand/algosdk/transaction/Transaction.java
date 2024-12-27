@@ -441,7 +441,8 @@ public class Transaction implements Serializable {
         AssetTransfer("axfer"),
         AssetFreeze("afrz"),
         ApplicationCall("appl"),
-        StateProof("stpf");
+        StateProof("stpf"),
+        Heartbeat("hb");
 
         private static Map<String, Type> namesMap = new HashMap<String, Type>(6);
 
