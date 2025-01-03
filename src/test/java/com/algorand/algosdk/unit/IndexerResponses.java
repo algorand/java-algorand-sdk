@@ -1,6 +1,7 @@
 package com.algorand.algosdk.unit;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -187,5 +188,14 @@ public class IndexerResponses {
     @When("the parsed SearchForTransactions response should be valid on round {int} and the array should be of len {int} and the element at index {int} should have rekey-to {string}")
     public void the_parsed_SearchForTransactions_response_should_be_valid_on_round_and_the_array_should_be_of_len_and_the_element_at_index_should_have_rekey_to(Integer int1, Integer int2, Integer int3, String string) throws IOException {
         verifyResponse(transactionsResponse, shared.bodyFile);
+    }
+
+    @When("the parsed SearchForTransactions response should be valid on round {int} and the array should be of len {int} and the element at index {int} should have hbaddress {string}")
+    public void the_parsed_SearchForTransactions_response_should_be_valid_on_round_and_the_array_should_be_of_len_and_the_element_at_index_should_have_hbaddress(Integer round, Integer length, Integer index, String hbaddress) throws IOException {
+        verifyResponse(transactionsResponse, shared.bodyFile);
+
+        assertThat(transactionsResponse.body().currentRound).isEqualTo(round.longValue());
+        assertThat(transactionsResponse.body().transactions.size()).isEqualTo(length.intValue());
+        assertThat(transactionsResponse.body().transactions.get(index).heartbeatTransaction.hbAddress).isEqualTo(hbaddress);
     }
 }

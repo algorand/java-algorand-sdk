@@ -14,6 +14,7 @@
 @unit.indexer.ledger_refactoring
 @unit.indexer.logs
 @unit.indexer.rekey
+@unit.indexer.heartbeat
 @unit.offline
 @unit.program_sanity_check
 @unit.ready
@@ -35,6 +36,8 @@
 @unit.stateproof.paths
 @unit.stateproof.responses
 @unit.stateproof.responses.msgp
+@unit.heartbeat.responses
+@unit.heartbeat.responses.msgp
 @unit.sync
 @unit.tealsign
 @unit.timestamp
