@@ -17,6 +17,7 @@ import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
 import com.algorand.algosdk.v2.client.indexer.LookupAssetTransactions;
+import com.algorand.algosdk.v2.client.indexer.SearchForBlockHeaders;
 import com.algorand.algosdk.v2.client.indexer.LookupBlock;
 import com.algorand.algosdk.v2.client.indexer.LookupTransaction;
 import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
@@ -194,6 +195,15 @@ public class IndexerClient extends Client {
      */
     public LookupAssetTransactions lookupAssetTransactions(Long assetId) {
         return new LookupAssetTransactions((Client) this, assetId);
+    }
+
+    /**
+     * Search for block headers. Block headers are returned in ascending round order.
+     * Transactions are not included in the output.
+     * /v2/block-headers
+     */
+    public SearchForBlockHeaders searchForBlockHeaders() {
+        return new SearchForBlockHeaders((Client) this);
     }
 
     /**
