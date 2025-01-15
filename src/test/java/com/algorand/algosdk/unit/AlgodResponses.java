@@ -139,6 +139,11 @@ public class AlgodResponses {
         verifyResponse(blockResponse, shared.bodyFile);
     }
 
+    @Then("the parsed Get Block response should have heartbeat address {string}")
+    public void the_parsed_Get_Block_response_should_have_heartbeat_address(String string) throws IOException {
+        verifyResponse(blockResponse, shared.bodyFile);
+    }
+
     @Then("the parsed Suggested Transaction Parameters response should have first round valid of {int}")
     public void the_parsed_Suggested_Transaction_Parameters_response_should_have_first_round_valid_of(Integer int1) throws IOException {
         verifyResponse(transactionParametersResponse, shared.bodyFile);

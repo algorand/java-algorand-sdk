@@ -917,6 +917,20 @@ public class TestTransaction {
         assertThat(tx.lease).isNull();
     }
 
+    @Test
+    public void testDeserializationHeartbeats() throws Exception {
+
+        Address hbAddress = new Address("NRJ2UKUNLR3FHLTIYG5RP576RXX7MAU25F7DW6LCM5D45WF67H6EFQMWNM");
+        Address snd = new Address("GAU5WA6DT2EPFS6LKOA333BQP67NXIHZ7JPOOHMZWJDPZRL4XMHDDDUCKA");
+        String goldenString = "gqRsc2lngaFsxAYLMSAyAxKjdHhuhqJmdmqiZ2jEIP9SQzAGyec/v8omzEOW3/GIM+a7bvPaU5D/ohX7qjFtomhihaFhxCBsU6oqjVx2U65owbsX9/6N7/YCmul+O3liZ0fO2L75/KJrZGSjcHJmhaFwxCAM1TyIrIbgm+yPLT9so6VDI3rKl33t4c4RSGJv6G12eaNwMXPEQBETln14zJzQ1Mb/SNjmDNl0fyQ4DPBQZML8iTEbhqBj+YDAgpNSEduWj7OuVkCSQMq4N/Er/+2HfKUHu//spgOicDLEIB9c5n7WgG+5aOdjfBmuxH3z4TYiQzDVYKjBLhv4IkNfo3Ayc8RAeKpQ+o/GJyGCH0I4f9luN0i7BPXlMlaJAuXLX5Ng8DTN0vtZtztjqYfkwp1cVOYPu+Fce3aIdJHVoUDaJaMIDqFzxEBQN41y5zAZhYHQWf2wWF6CGboqQk6MxDcQ76zXHvVtzrAPUWXZDt4IB8Ha1z+54Hc6LmEoG090pk0IYs+jLN8HonNkxCCPVPjiD5O7V0c3P/SVsHmED7slwllta7c92WiKwnvgoqN2aWTEIHBy8sOi/V0YKXJw8VtW40MbqhtUyO9HC9m/haf84xiGomx2dKNzbmTEIDAp2wPDnojyy8tTgb3sMH++26D5+l7nHZmyRvzFfLsOpHR5cGWiaGI=";
+
+        SignedTransaction o = Encoder.decodeFromMsgPack(goldenString, SignedTransaction.class);
+        assertThat(o.tx.type).isEqualTo(Transaction.Type.Heartbeat);
+        assertThat(o.tx.heartbeatFields.hbKeyDilution).isEqualTo(100);
+        assertThat(o.tx.heartbeatFields.hbAddress).isEqualTo(hbAddress);
+        TestUtil.serializeDeserializeCheck(o);
+    }
+
     @Nested
     class TestFees {
         @Test
