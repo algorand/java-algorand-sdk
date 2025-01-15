@@ -1,3 +1,15 @@
+# 2.6.0
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.6.0 -->
+
+## What's Changed
+### Enhancements
+* Simulate: Support `fixSigners` option by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/721
+* Incentives: Support heartbeat txn, Java 8 Min Version by @algorandskiy in https://github.com/algorand/java-algorand-sdk/pull/758
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.5.0...2.6.0
+
 # 2.5.0
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.5.0 -->
