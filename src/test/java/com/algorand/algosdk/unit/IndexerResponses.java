@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.math.BigInteger;
 
+import com.algorand.algosdk.v2.client.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 
@@ -13,13 +14,6 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.ClientMocker;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.AccountResponse;
-import com.algorand.algosdk.v2.client.model.AccountsResponse;
-import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
-import com.algorand.algosdk.v2.client.model.AssetResponse;
-import com.algorand.algosdk.v2.client.model.AssetsResponse;
-import com.algorand.algosdk.v2.client.model.Block;
-import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -40,6 +34,7 @@ public class IndexerResponses {
     Response<AssetResponse> assetResponse;
     Response<AssetBalancesResponse> assetBalancesResponse;
     Response<TransactionsResponse> transactionsResponse;
+    Response<BlockHeadersResponse> blockheadersResponse;
     Response<AssetsResponse> assetsResponse;
 
     @When("we make any LookupAssetBalances call")
@@ -90,6 +85,12 @@ public class IndexerResponses {
         transactionsResponse = client.searchForTransactions().execute();
     }
 
+    @When("we make any SearchForBlockHeaders call")
+    public void we_make_any_search_for_block_headers_call() throws Exception {
+        ClientMocker.infect(client);
+        blockheadersResponse = client.searchForBlockHeaders().execute();
+    }
+
     @When("we make any SearchForAssets call")
     public void we_make_any_SearchForAssets_call() throws Exception {
         ClientMocker.infect(client);
@@ -137,6 +138,13 @@ public class IndexerResponses {
     @Then("the parsed LookupBlock response should have previous block hash {string}")
     public void the_parsed_LookupBlock_response_should_have_previous_block_hash(String string) throws IOException {
         verifyResponse(blockResponse, shared.bodyFile);
+    }
+
+    @Then("the parsed SearchForBlockHeaders response should have a block array of len {int} "
+           + "and the element at index {int} should have round {string}")
+    public void the_parsed_search_for_block_headers_response_should_have_a_block_array_of_len_and_the_element_at_index_should_have_round(
+            Integer int1, Integer int2, String string) throws IOException {
+        verifyResponse(blockheadersResponse, shared.bodyFile);
     }
 
 
