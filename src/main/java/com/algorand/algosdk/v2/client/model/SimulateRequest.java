@@ -44,6 +44,13 @@ public class SimulateRequest extends PathResponse {
     public Long extraOpcodeBudget;
 
     /**
+     * If true, signers for transactions that are missing signatures will be fixed
+     * during evaluation.
+     */
+    @JsonProperty("fix-signers")
+    public Boolean fixSigners;
+
+    /**
      * If provided, specifies the round preceding the simulation. State changes through
      * this round will be used to run this simulation. Usually only the 4 most recent
      * rounds will be available (controlled by the node config value MaxAcctLookback).
@@ -70,6 +77,7 @@ public class SimulateRequest extends PathResponse {
         if (!Objects.deepEquals(this.allowUnnamedResources, other.allowUnnamedResources)) return false;
         if (!Objects.deepEquals(this.execTraceConfig, other.execTraceConfig)) return false;
         if (!Objects.deepEquals(this.extraOpcodeBudget, other.extraOpcodeBudget)) return false;
+        if (!Objects.deepEquals(this.fixSigners, other.fixSigners)) return false;
         if (!Objects.deepEquals(this.round, other.round)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
 

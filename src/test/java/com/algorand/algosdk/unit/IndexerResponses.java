@@ -1,10 +1,12 @@
 package com.algorand.algosdk.unit;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.math.BigInteger;
 
+import com.algorand.algosdk.v2.client.model.*;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 
@@ -12,13 +14,6 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.ClientMocker;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.AccountResponse;
-import com.algorand.algosdk.v2.client.model.AccountsResponse;
-import com.algorand.algosdk.v2.client.model.AssetBalancesResponse;
-import com.algorand.algosdk.v2.client.model.AssetResponse;
-import com.algorand.algosdk.v2.client.model.AssetsResponse;
-import com.algorand.algosdk.v2.client.model.Block;
-import com.algorand.algosdk.v2.client.model.TransactionsResponse;
 
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -39,6 +34,7 @@ public class IndexerResponses {
     Response<AssetResponse> assetResponse;
     Response<AssetBalancesResponse> assetBalancesResponse;
     Response<TransactionsResponse> transactionsResponse;
+    Response<BlockHeadersResponse> blockheadersResponse;
     Response<AssetsResponse> assetsResponse;
 
     @When("we make any LookupAssetBalances call")
@@ -87,6 +83,12 @@ public class IndexerResponses {
     public void we_make_any_SearchForTransactions_call() throws Exception {
         ClientMocker.infect(client);
         transactionsResponse = client.searchForTransactions().execute();
+    }
+
+    @When("we make any SearchForBlockHeaders call")
+    public void we_make_any_search_for_block_headers_call() throws Exception {
+        ClientMocker.infect(client);
+        blockheadersResponse = client.searchForBlockHeaders().execute();
     }
 
     @When("we make any SearchForAssets call")
@@ -138,6 +140,13 @@ public class IndexerResponses {
         verifyResponse(blockResponse, shared.bodyFile);
     }
 
+    @Then("the parsed SearchForBlockHeaders response should have a block array of len {int} "
+           + "and the element at index {int} should have round {string}")
+    public void the_parsed_search_for_block_headers_response_should_have_a_block_array_of_len_and_the_element_at_index_should_have_round(
+            Integer int1, Integer int2, String string) throws IOException {
+        verifyResponse(blockheadersResponse, shared.bodyFile);
+    }
+
 
     @Then("the parsed LookupAccountByID response should have address {string}")
     public void the_parsed_LookupAccountByID_response_should_have_address(String string) throws IOException {
@@ -187,5 +196,14 @@ public class IndexerResponses {
     @When("the parsed SearchForTransactions response should be valid on round {int} and the array should be of len {int} and the element at index {int} should have rekey-to {string}")
     public void the_parsed_SearchForTransactions_response_should_be_valid_on_round_and_the_array_should_be_of_len_and_the_element_at_index_should_have_rekey_to(Integer int1, Integer int2, Integer int3, String string) throws IOException {
         verifyResponse(transactionsResponse, shared.bodyFile);
+    }
+
+    @When("the parsed SearchForTransactions response should be valid on round {int} and the array should be of len {int} and the element at index {int} should have hbaddress {string}")
+    public void the_parsed_SearchForTransactions_response_should_be_valid_on_round_and_the_array_should_be_of_len_and_the_element_at_index_should_have_hbaddress(Integer round, Integer length, Integer index, String hbaddress) throws IOException {
+        verifyResponse(transactionsResponse, shared.bodyFile);
+
+        assertThat(transactionsResponse.body().currentRound).isEqualTo(round.longValue());
+        assertThat(transactionsResponse.body().transactions.size()).isEqualTo(length.intValue());
+        assertThat(transactionsResponse.body().transactions.get(index).heartbeatTransaction.hbAddress).isEqualTo(hbaddress);
     }
 }

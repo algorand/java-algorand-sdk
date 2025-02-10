@@ -13,7 +13,9 @@ import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
 import com.algorand.algosdk.v2.client.algod.GetBlockTxids;
 import com.algorand.algosdk.v2.client.algod.GetBlockHash;
+import com.algorand.algosdk.v2.client.algod.GetBlockHeader;
 import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
+import com.algorand.algosdk.v2.client.algod.GetBlockLogs;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
 import com.algorand.algosdk.v2.client.algod.GetStatus;
 import com.algorand.algosdk.v2.client.algod.WaitForBlock;
@@ -114,7 +116,7 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given a specific account public key, this call returns the accounts status,
+     * Given a specific account public key, this call returns the account's status,
      * balance and spendable amounts
      * /v2/accounts/{address}
      */
@@ -180,12 +182,28 @@ public class AlgodClient extends Client {
     }
 
     /**
+     * Get the block header for the block on the given round.
+     * /v2/blocks/{round}/header
+     */
+    public GetBlockHeader GetBlockHeader(Long round) {
+        return new GetBlockHeader((Client) this, round);
+    }
+
+    /**
      * Get a proof for a transaction in a block.
      * /v2/blocks/{round}/transactions/{txid}/proof
      */
     public GetTransactionProof GetTransactionProof(Long round,
             String txid) {
         return new GetTransactionProof((Client) this, round, txid);
+    }
+
+    /**
+     * Get all of the logs from outer and inner app calls in the given round
+     * /v2/blocks/{round}/logs
+     */
+    public GetBlockLogs GetBlockLogs(Long round) {
+        return new GetBlockLogs((Client) this, round);
     }
 
     /**

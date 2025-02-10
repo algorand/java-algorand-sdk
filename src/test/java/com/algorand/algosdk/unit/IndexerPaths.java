@@ -12,6 +12,8 @@ import io.cucumber.java.en.When;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class IndexerPaths {
     IndexerClient indexerClient = new IndexerClient("localhost", 1234, "");;
@@ -132,6 +134,63 @@ public class IndexerPaths {
         searchForTransactions(address, notePrefix, txType, sigType, txid, round, minRound,
                 maxRound, limit, beforeTime, afterTime, currencyGT, currencyLT, assetID,
                 addressRole, excludeCloseTo, "");
+    }
+
+    @When("we make a Search For BlockHeaders call with minRound {long} " +
+            "maxRound {long} " +
+            "limit {long} " +
+            "nextToken {string} " +
+            "beforeTime {string} " +
+            "afterTime {string} " +
+            "proposers {string} " +
+            "expired {string} " +
+            "absent {string}")
+    public void SearchForBlockHeaders(Long minRound, Long maxRound, Long limit,
+                                      String next, String beforeTime, String afterTime,
+                                      String proposers, String expired, String absent)
+            throws ParseException {
+
+        SearchForBlockHeaders q = this.indexerClient.searchForBlockHeaders();
+        if (TestingUtils.notEmpty(minRound)) q.minRound(minRound);
+        if (TestingUtils.notEmpty(maxRound)) q.maxRound(maxRound);
+        if (TestingUtils.notEmpty(limit)) q.limit(limit);
+        if (TestingUtils.notEmpty(next)) q.next(next);
+        if (TestingUtils.notEmpty(beforeTime)) q.beforeTime(Utils.parseDate(beforeTime));
+        if (TestingUtils.notEmpty(afterTime)) q.afterTime(Utils.parseDate(afterTime));
+        if (TestingUtils.notEmpty(proposers)) {
+            q.proposers(
+                    Arrays.stream(proposers.split(",")).map(ea -> {
+                        try {
+                            return new Address(ea);
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).collect(Collectors.toList())
+            );
+        }
+        if (TestingUtils.notEmpty(expired)) {
+            q.expired(
+                    Arrays.stream(expired.split(",")).map(ea -> {
+                        try {
+                            return new Address(ea);
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).collect(Collectors.toList())
+            );
+        }
+        if (TestingUtils.notEmpty(absent)) {
+            q.absent(
+                    Arrays.stream(absent.split(",")).map(ea -> {
+                        try {
+                            return new Address(ea);
+                        } catch (NoSuchAlgorithmException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).collect(Collectors.toList())
+            );
+        }
+        ps.q = q;
     }
 
     @When("we make a SearchForAssets call with limit {long} "

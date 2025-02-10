@@ -4,6 +4,7 @@ src/test/resources/generated_responses/
 *.feature
 src/test/resources/**/*.json
 src/test/resources/**/*.base64
+src/test/resources/**/*.tok.map
 src/test/resources/**/*.teal
 src/test/resources/**/*.tok
 src/test/resources/**/*.txt
