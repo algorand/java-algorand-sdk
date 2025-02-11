@@ -147,11 +147,10 @@ public class Enums {
     }
 
     /**
-     * Indicates what type of signature is used by this account, must be one of:
-     *   sig
-     *   msig
-     *   lsig
-     *   or null if unknown
+     * SigType filters just results using the specified type of signature:
+     *   sig - Standard
+     *   msig - MultiSig
+     *   lsig - LogicSig
      */
     public enum SigType {
         @JsonProperty("sig") SIG("sig"),
@@ -192,6 +191,7 @@ public class Enums {
      *   (afrz) asset-freeze-transaction
      *   (appl) application-transaction
      *   (stpf) state-proof-transaction
+     *   (hb) heartbeat-transaction
      */
     public enum TxType {
         @JsonProperty("pay") PAY("pay"),
@@ -201,6 +201,7 @@ public class Enums {
         @JsonProperty("afrz") AFRZ("afrz"),
         @JsonProperty("appl") APPL("appl"),
         @JsonProperty("stpf") STPF("stpf"),
+        @JsonProperty("hb") HB("hb"),
         @JsonProperty("") UNKNOWN("");
 
         final String serializedName;

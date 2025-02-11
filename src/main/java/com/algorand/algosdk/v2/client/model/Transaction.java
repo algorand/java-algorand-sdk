@@ -157,6 +157,14 @@ public class Transaction extends PathResponse {
     public byte[] group;
 
     /**
+     * Fields for a heartbeat transaction.
+     * Definition:
+     * data/transactions/heartbeat.go : HeartbeatTxnFields
+     */
+    @JsonProperty("heartbeat-transaction")
+    public TransactionHeartbeat heartbeatTransaction;
+
+    /**
      * Transaction ID
      */
     @JsonProperty("id")
@@ -321,6 +329,7 @@ public class Transaction extends PathResponse {
      *   (afrz) asset-freeze-transaction
      *   (appl) application-transaction
      *   (stpf) state-proof-transaction
+     *   (hb) heartbeat-transaction
      */
     @JsonProperty("tx-type")
     public Enums.TxType txType;
@@ -348,6 +357,7 @@ public class Transaction extends PathResponse {
         if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
         if (!Objects.deepEquals(this.globalStateDelta, other.globalStateDelta)) return false;
         if (!Objects.deepEquals(this.group, other.group)) return false;
+        if (!Objects.deepEquals(this.heartbeatTransaction, other.heartbeatTransaction)) return false;
         if (!Objects.deepEquals(this.id, other.id)) return false;
         if (!Objects.deepEquals(this.innerTxns, other.innerTxns)) return false;
         if (!Objects.deepEquals(this.intraRoundOffset, other.intraRoundOffset)) return false;

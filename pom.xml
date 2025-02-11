@@ -4,7 +4,7 @@
 
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>2.4.0</version>
+    <version>2.6.0</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -42,8 +42,8 @@
         <maven.surefire.version>3.0.0-M5</maven.surefire.version>
 
         <!-- Test sources at 1.8 to allow using JUnit5 -->
-        <java.version>1.7</java.version>
-        <java.release.version>7</java.release.version>
+        <java.version>1.8</java.version>
+        <java.release.version>8</java.release.version>
         <java.test.release.version>8</java.test.release.version>
 
         <!-- github server corresponds to entry in ~/.m2/settings.xml -->
@@ -85,7 +85,7 @@
         <dependency>
           <groupId>com.squareup.okio</groupId>
           <artifactId>okio</artifactId>
-          <version>1.6.0</version>
+          <version>1.17.6</version>
         </dependency>
         <dependency>
           <groupId>commons-codec</groupId>
