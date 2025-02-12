@@ -25,6 +25,15 @@ public class GetBlock extends Query {
         this.round = round;
     }
 
+    /**
+     * If true, only the block header (exclusive of payset or certificate) may be
+     * included in response.
+     */
+    public GetBlock headerOnly(Boolean headerOnly) {
+        addQuery("header-only", String.valueOf(headerOnly));
+        return this;
+    }
+
    /**
     * Execute the query.
     * @return the query response object.

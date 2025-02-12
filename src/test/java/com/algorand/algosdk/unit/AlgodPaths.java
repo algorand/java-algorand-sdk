@@ -2,11 +2,7 @@ package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.TestingUtils;
-import com.algorand.algosdk.v2.client.algod.AccountInformation;
-import com.algorand.algosdk.v2.client.algod.GetApplicationBoxes;
-import com.algorand.algosdk.v2.client.algod.GetPendingTransactions;
-import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
-import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
+import com.algorand.algosdk.v2.client.algod.*;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.model.Enums;
 import io.cucumber.java.en.When;
@@ -57,6 +53,19 @@ public class AlgodPaths {
     @When("we make a Get Block call against block number {long} with format {string}")
     public void getBlock(Long round, String format) {
         ps.q = algodClient.GetBlock(round);
+    }
+
+    @When("we make a Get Block call for round {int} with format {string} and header-only {string}")
+    public void getBlockHeaderOnly(Integer round, String format, String headerOnly) {
+        GetBlock gb = algodClient.GetBlock(Long.valueOf(round));
+
+        boolean headerOnlyBool = Boolean.parseBoolean(headerOnly);
+
+        if (headerOnlyBool) {
+            gb.headerOnly(true);
+        }
+
+        ps.q = gb;
     }
 
     @When("we make a GetAssetByID call for assetID {long}")
