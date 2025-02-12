@@ -139,6 +139,12 @@ public class AlgodResponses {
         verifyResponse(blockResponse, shared.bodyFile);
     }
 
+    @Then("the parsed Get Block response should have rewards pool {string} and no certificate or payset")
+    public void the_parsed_get_block_response_should_have_rewards_pool_and_no_certificate_or_payset(String string) throws IOException {
+        verifyResponse(blockResponse, shared.bodyFile);
+    }
+
+
     @Then("the parsed Get Block response should have heartbeat address {string}")
     public void the_parsed_Get_Block_response_should_have_heartbeat_address(String string) throws IOException {
         verifyResponse(blockResponse, shared.bodyFile);
