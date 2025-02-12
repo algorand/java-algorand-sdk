@@ -11,23 +11,25 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <jackson.version>2.18.2</jackson.version>
+        <jacksonmsgp.version>0.9.9</jacksonmsgp.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.10.0</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.10.0</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.10.5.1</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp</groupId>
@@ -69,12 +71,12 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15to18</artifactId>
-            <version>1.66</version>
+            <version>1.78</version>
         </dependency>
         <dependency>
             <groupId>org.msgpack</groupId>
             <artifactId>jackson-dataformat-msgpack</artifactId>
-            <version>0.9.0</version>
+            <version>${jacksonmsgp.version}</version>
         </dependency>
         <dependency>
             <groupId>org.threeten</groupId>
