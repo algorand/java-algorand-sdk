@@ -188,6 +188,8 @@ public class LogicsigSignature {
                 sig.update(this.bytesToSign());
                 return sig.verify(this.sig.getBytes());
             } catch (Exception ex) {
+                System.out.println("Exception thrown verifying signature: "+ex.toString());
+                ex.printStackTrace();
                 return false;
             }
         }

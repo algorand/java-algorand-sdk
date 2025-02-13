@@ -534,7 +534,6 @@ public class Account {
             if (!lsig.verify(lsigAddr))
                 throw new IllegalArgumentException("verification failed on logic sig");
         } catch (NoSuchAlgorithmException ex) {
-            ex.printStackTrace();
             throw new IllegalArgumentException("verification failed on logic sig", ex);
         }
 
