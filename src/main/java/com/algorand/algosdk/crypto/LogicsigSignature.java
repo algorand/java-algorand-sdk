@@ -178,32 +178,22 @@ public class LogicsigSignature {
         try {
             pk = singleSigner.toVerifyKey();
         } catch (Exception ex) {
-            System.out.println("Exception on toVerifyKey: "+ ex);
-            ex.printStackTrace();
             return false;
         }
 
         if (this.sig != null) {
-            System.out.println("Made it into sig ! null");
             try {
                 java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGO);
-                System.out.println("Lookedup up sig");
                 sig.initVerify(pk);
-                System.out.println("Init verify");
                 sig.update(this.bytesToSign());
-                System.out.println("updated bytes to sign");
                 return sig.verify(this.sig.getBytes());
             } catch (Exception ex) {
-                System.out.println("Exception thrown verifying signature: "+ex.toString());
-                ex.printStackTrace();
                 return false;
             }
         }
 
-        if (this.msig != null) {
-            System.out.println("Made it into msig!=null");
+        if (this.msig != null)
             return this.msig.verify(this.bytesToSign());
-        }
 
         return true;
     }

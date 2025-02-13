@@ -18,9 +18,8 @@ import java.util.Objects;
 import java.security.*;
 import java.nio.charset.StandardCharsets;
 import java.security.spec.X509EncodedKeySpec;
-
-import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 
 import java.io.ByteArrayOutputStream;

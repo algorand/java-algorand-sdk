@@ -21,7 +21,7 @@ jobs:
       - image: maven:3.9-eclipse-temurin-11
     steps:
       - checkout
-      - run: mvn -e test
+      - run: mvn test
   integration-test:
     machine:
       image: "ubuntu-2204:2022.10.2"
