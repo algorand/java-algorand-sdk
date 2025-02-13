@@ -13,7 +13,6 @@ import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
 import com.algorand.algosdk.v2.client.algod.GetBlockTxids;
 import com.algorand.algosdk.v2.client.algod.GetBlockHash;
-import com.algorand.algosdk.v2.client.algod.GetBlockHeader;
 import com.algorand.algosdk.v2.client.algod.GetTransactionProof;
 import com.algorand.algosdk.v2.client.algod.GetBlockLogs;
 import com.algorand.algosdk.v2.client.algod.GetSupply;
@@ -179,14 +178,6 @@ public class AlgodClient extends Client {
      */
     public GetBlockHash GetBlockHash(Long round) {
         return new GetBlockHash((Client) this, round);
-    }
-
-    /**
-     * Get the block header for the block on the given round.
-     * /v2/blocks/{round}/header
-     */
-    public GetBlockHeader GetBlockHeader(Long round) {
-        return new GetBlockHeader((Client) this, round);
     }
 
     /**

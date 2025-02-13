@@ -1,3 +1,18 @@
+# 2.7.0
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.7.0 -->
+
+## What's Changed
+### Enhancements
+* Comments: Regenerate code with the latest specification file (88320845) by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/770
+* BlockHeaders: Implement blockheaders endpoint cross-SDK test. by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/771
+* API: Support for header-only flag on /v2/block algod endpoint. by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/774
+
+## New Contributors
+* @dependabot made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/655
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.6.0...2.7.0
+
 # 2.6.0
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.6.0 -->
