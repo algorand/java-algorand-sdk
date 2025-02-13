@@ -175,7 +175,7 @@ Additional resources and code samples are located at [https://developer.algorand
 
 # Cryptography
 
-AlgoSDK depends on `org.bouncycastle:bcprov-jdk15on:1.61` for `Ed25519` signatures, `sha512/256` digests, and deserializing `X.509`-encoded `Ed25519` private keys.
+AlgoSDK depends on `org.bouncycastle:bcprov-jdk15to18:1.66` for `Ed25519` signatures, `sha512/256` digests, and deserializing `X.509`-encoded `Ed25519` private keys.
 The latter is the only explicit dependency on an external crypto library - all other references are abstracted through the JCA.
 
 # Java 9+
@@ -239,7 +239,7 @@ It is occasionally useful to run locally, or against alternate integration branc
 
 # Android Support
 
-Significant work has been taken to ensure Android compatibility (in particular for `minSdkVersion` 16). Note that the
+Significant work has been taken to ensure Android compatibility (in particular for `minSdkVersion` 26). Note that the
 default crypto provider on Android does not provide `ed25519` signatures, so you will need to provide your own (e.g. `BouncyCastle`).
 
 # Algod V2 and Indexer Code Generation
