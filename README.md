@@ -9,7 +9,7 @@ and also exposes functionality for generating keypairs, mnemonics, creating tran
 
 # Prerequisites
 
-Java 7+ and Android `minSdkVersion` 16+
+Java 8+ and Android `minSdkVersion` 26+
 
 # Installation
 

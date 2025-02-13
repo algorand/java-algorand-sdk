@@ -18,7 +18,7 @@ workflows:
 jobs:
   unit-test:
     docker:
-      - image: adoptopenjdk/maven-openjdk11
+      - image: maven/3.9-eclipse-temurin-11
     steps:
       - checkout
       - run: mvn -e test
