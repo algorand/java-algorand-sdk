@@ -103,8 +103,12 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
      * @return This builder.
      */
     public T fee(Integer fee) {
-        if (fee < 0) throw new IllegalArgumentException("fee cannot be a negative value");
-        this.fee = BigInteger.valueOf(fee);
+        if (fee != null) {
+            if (fee < 0) throw new IllegalArgumentException("fee cannot be a negative value");
+            this.fee = BigInteger.valueOf(fee);
+        } else {
+            this.fee = null;
+        }
         return (T) this;
     }
 
@@ -115,8 +119,12 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
      * @return This builder.
      */
     public T fee(Long fee) {
-        if (fee < 0) throw new IllegalArgumentException("fee cannot be a negative value");
-        this.fee = BigInteger.valueOf(fee);
+        if (fee != null) {
+            if (fee < 0) throw new IllegalArgumentException("fee cannot be a negative value");
+            this.fee = BigInteger.valueOf(fee);
+        } else {
+            this.fee = null;
+        }
         return (T) this;
     }
 
@@ -142,8 +150,12 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
      * @return This builder.
      */
     public T flatFee(Integer flatFee) {
-        if (flatFee < 0) throw new IllegalArgumentException("flatFee cannot be a negative value");
-        this.flatFee = BigInteger.valueOf(flatFee);
+        if (flatFee != null) {
+            if (flatFee < 0) throw new IllegalArgumentException("flatFee cannot be a negative value");
+            this.flatFee = BigInteger.valueOf(flatFee);
+        } else {
+            this.flatFee = null;
+        }
         return (T) this;
     }
 
@@ -156,8 +168,12 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
      * @return This builder.
      */
     public T flatFee(Long flatFee) {
-        if (flatFee < 0) throw new IllegalArgumentException("flatFee cannot be a negative value");
-        this.flatFee = BigInteger.valueOf(flatFee);
+        if (flatFee != null) {
+            if (flatFee < 0) throw new IllegalArgumentException("flatFee cannot be a negative value");
+            this.flatFee = BigInteger.valueOf(flatFee);
+        } else {
+            this.flatFee = null;
+        }
         return (T) this;
     }
 
