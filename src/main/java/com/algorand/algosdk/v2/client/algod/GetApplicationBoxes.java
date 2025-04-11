@@ -9,9 +9,8 @@ import com.algorand.algosdk.v2.client.model.BoxesResponse;
 
 
 /**
- * Given an application ID, return all Box names. No particular ordering is
- * guaranteed. Request fails when client or server-side configured limits prevent
- * returning all Box names.
+ * Given an application ID, return boxes in lexographical order by name. If the
+ * results must be truncated, a next-token is supplied to continue the request.
  * /v2/applications/{application-id}/boxes
  */
 public class GetApplicationBoxes extends Query {
@@ -27,11 +26,39 @@ public class GetApplicationBoxes extends Query {
     }
 
     /**
-     * Max number of box names to return. If max is not set, or max == 0, returns all
-     * box-names.
+     * Maximum number of boxes to return. Server may impose a lower limit.
      */
     public GetApplicationBoxes max(Long max) {
         addQuery("max", String.valueOf(max));
+        return this;
+    }
+
+    /**
+     * A box name, in the goal app call arg form 'encoding:value'. When provided, the
+     * returned boxes begin (lexographically) with the supplied name. Callers may
+     * implement pagination by reinvoking the endpoint with the token from a previous
+     * call's next-token.
+     */
+    public GetApplicationBoxes next(String next) {
+        addQuery("next", String.valueOf(next));
+        return this;
+    }
+
+    /**
+     * A box name prefix, in the goal app call arg form 'encoding:value'. For ints, use
+     * the form 'int:1234'. For raw bytes, use the form 'b64:A=='. For printable
+     * strings, use the form 'str:hello'. For addresses, use the form 'addr:XYZ...'.
+     */
+    public GetApplicationBoxes prefix(String prefix) {
+        addQuery("prefix", String.valueOf(prefix));
+        return this;
+    }
+
+    /**
+     * If true, box values will be returned.
+     */
+    public GetApplicationBoxes values(Boolean values) {
+        addQuery("values", String.valueOf(values));
         return this;
     }
 
