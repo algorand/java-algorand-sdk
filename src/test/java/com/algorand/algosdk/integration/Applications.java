@@ -9,6 +9,7 @@ import com.algorand.algosdk.util.ComparableBytes;
 import com.algorand.algosdk.util.Digester;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
+import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.*;
 import io.cucumber.java.en.Given;
@@ -290,16 +291,6 @@ public class Applications {
 
     @Then("according to {string}, the current application should have the following boxes {string}.")
     public void checkAppBoxes(String fromClient, String encodedBoxesRaw) throws Exception {
-        Response<BoxesResponse> r;
-        if (fromClient.equals("algod"))
-            r = base.aclv2.GetApplicationBoxes(this.appId).execute();
-        else if (fromClient.equals("indexer"))
-            r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
-        else
-            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
-
-        Assert.assertTrue(r.isSuccessful());
-
         final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
             for (String s : encodedBoxesRaw.split(":")) {
@@ -307,12 +298,87 @@ public class Applications {
             }
         }
 
+        Response<BoxesResponse> r;
+        if (fromClient.equals("algod")) {
+            advanceChainAndWaitForBoxes(base.aclv2, this.appId, this.transientAccount,
+                    expectedNames.size());
+            r = base.aclv2.GetApplicationBoxes(this.appId).execute();
+        } else if (fromClient.equals("indexer"))
+            r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
+        else
+            throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
+
+        Assert.assertTrue(r.isSuccessful());
+
         final Set<byte[]> actualNames = new HashSet<>();
         for (BoxDescriptor b : r.body().boxes) {
             actualNames.add(b.name);
         }
 
         assertSetOfByteArraysEqual(expectedNames, actualNames);
+    }
+
+    /**
+     * Advance the blockchain and wait for the expected number of application boxes to persist.
+     *
+     * @param algodClient        Algod client for interacting with the blockchain.
+     * @param appId              Application ID to check for boxes.
+     * @param sender             Account sending dummy transactions.
+     * @param expectedNumBoxes   The expected number of boxes.
+     * @throws Exception if the boxes do not persist within the specified attempts.
+     */
+    public static void advanceChainAndWaitForBoxes(
+            AlgodClient algodClient,
+            long appId,
+            TransientAccount sender,
+            int expectedNumBoxes) throws Exception {
+
+        int waitRounds = 5;
+        int maxAttempts = 50;
+        // Get the current round
+        long currentRound = algodClient.GetStatus().execute().body().lastRound;
+        long targetRound = currentRound + waitRounds;
+
+        System.out.println("Current round: " + currentRound + ", waiting for round: " + targetRound);
+
+        int attempts = 0;
+        while (attempts < maxAttempts) {
+            // Send a dummy 0-Algo payment transaction to advance the blockchain
+            TransactionParametersResponse params = algodClient.TransactionParams().execute().body();
+
+            Transaction txn = Transaction.PaymentTransactionBuilder()
+                    .sender(sender.transientAccount.getAddress())
+                    .amount(0)
+                    .receiver(sender.transientAccount.getAddress())
+                    .suggestedParams(params)
+                    .noteUTF8("Advance round for box persistence")
+                    .build();
+
+            SignedTransaction stxn = sender.transientAccount.signTransaction(txn);
+            String txId = algodClient.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stxn)).execute().body().txId;
+
+            // Use Utils.waitForConfirmation to wait for the transaction to be confirmed
+            Utils.waitForConfirmation(algodClient, txId, waitRounds);
+            System.out.println("Dummy transaction confirmed. TxID: " + txId);
+
+            // Check the number of boxes
+            Response<BoxesResponse> boxResponse = algodClient.GetApplicationBoxes(appId).execute();
+            List<BoxDescriptor> boxes = boxResponse.body().boxes;
+
+            int actualNumBoxes = boxes != null ? boxes.size() : 0;
+            System.out.println("Actual number of boxes: " + actualNumBoxes + ", Expected: " + expectedNumBoxes);
+
+            if (actualNumBoxes == expectedNumBoxes) {
+                System.out.println("The expected number of boxes is now available.");
+                return; // Exit once the condition is met
+            }
+
+            // Wait for a second before the next attempt
+            Thread.sleep(1000);
+            attempts++;
+        }
+
+        throw new Exception("Timeout waiting for " + expectedNumBoxes + " boxes to persist for application " + appId);
     }
 
     @Then("according to {string}, with {long} being the parameter that limits results, the current application should have {int} boxes.")
