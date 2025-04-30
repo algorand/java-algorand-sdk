@@ -104,6 +104,15 @@ public class SearchForAccounts extends Query {
     }
 
     /**
+     * When this is set to true, return only accounts whose participation status is
+     * currently online.
+     */
+    public SearchForAccounts onlineOnly(Boolean onlineOnly) {
+        addQuery("online-only", String.valueOf(onlineOnly));
+        return this;
+    }
+
+    /**
      * Include results for the specified round. For performance reasons, this parameter
      * may be disabled on some configurations. Using application-id or asset-id filters
      * will return both creator and opt-in accounts. Filtering by include-all will
