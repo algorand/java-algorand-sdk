@@ -5,6 +5,7 @@ import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
+import com.algorand.algosdk.v2.client.model.Genesis;
 
 
 /**
@@ -23,9 +24,9 @@ public class GetGenesis extends Query {
     * @throws Exception
     */
     @Override
-    public Response<String> execute() throws Exception {
-        Response<String> resp = baseExecute();
-        resp.setValueType(String.class);
+    public Response<Genesis> execute() throws Exception {
+        Response<Genesis> resp = baseExecute();
+        resp.setValueType(Genesis.class);
         return resp;
     }
 
@@ -38,9 +39,9 @@ public class GetGenesis extends Query {
     * @throws Exception
     */
     @Override
-    public Response<String> execute(String[] headers, String[] values) throws Exception {
-        Response<String> resp = baseExecute(headers, values);
-        resp.setValueType(String.class);
+    public Response<Genesis> execute(String[] headers, String[] values) throws Exception {
+        Response<Genesis> resp = baseExecute(headers, values);
+        resp.setValueType(Genesis.class);
         return resp;
     }
 
