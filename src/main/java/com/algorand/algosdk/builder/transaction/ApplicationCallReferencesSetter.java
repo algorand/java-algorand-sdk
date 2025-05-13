@@ -1,9 +1,9 @@
 package com.algorand.algosdk.builder.transaction;
 
-import java.util.List;
-
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.AppBoxReference;
+
+import java.util.List;
 
 public interface ApplicationCallReferencesSetter<T extends ApplicationCallReferencesSetter<T>> {
 

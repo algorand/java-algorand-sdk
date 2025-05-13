@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
 import static com.algorand.algosdk.util.ConversionUtils.*;
+import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class Applications {

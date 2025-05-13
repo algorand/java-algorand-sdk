@@ -1,20 +1,15 @@
 package com.algorand.algosdk.crypto;
 
 import com.algorand.algosdk.util.Digester;
+import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.codec.binary.Base64;
 
 import java.nio.charset.StandardCharsets;
-import java.security.PublicKey;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * Serializable logicsig class.

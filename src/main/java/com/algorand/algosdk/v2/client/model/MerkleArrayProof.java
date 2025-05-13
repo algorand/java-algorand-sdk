@@ -1,13 +1,13 @@
 package com.algorand.algosdk.v2.client.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class MerkleArrayProof extends PathResponse {
 

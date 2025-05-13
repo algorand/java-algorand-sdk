@@ -2,6 +2,7 @@ package com.algorand.algosdk.abi;
 
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.GenericObjToArray;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -9,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
 
 public class TypeTuple extends ABIType {
     public final List<ABIType> childTypes;

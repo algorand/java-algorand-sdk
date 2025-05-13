@@ -1,13 +1,13 @@
 package com.algorand.algosdk.v2.client.model;
 
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.v2.client.common.PathResponse;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.v2.client.common.PathResponse;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Account information at a given round.

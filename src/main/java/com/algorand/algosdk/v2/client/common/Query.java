@@ -1,7 +1,6 @@
 package com.algorand.algosdk.v2.client.common;
 
 import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.v2.client.model.Account;
 import com.fasterxml.jackson.core.JsonProcessingException;
 
 public abstract class Query {

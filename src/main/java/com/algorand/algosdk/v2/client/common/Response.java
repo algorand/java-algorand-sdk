@@ -1,9 +1,9 @@
 package com.algorand.algosdk.v2.client.common;
 
-import java.io.IOException;
-
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
+
+import java.io.IOException;
 
 public class Response<T> {
     private int code;

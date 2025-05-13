@@ -1,27 +1,7 @@
 package com.algorand.algosdk.v2.client.common;
 
-import com.algorand.algosdk.v2.client.indexer.MakeHealthCheck;
-import com.algorand.algosdk.v2.client.indexer.SearchForAccounts;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountByID;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountAssets;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountCreatedAssets;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountAppLocalStates;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountCreatedApplications;
-import com.algorand.algosdk.v2.client.indexer.LookupAccountTransactions;
-import com.algorand.algosdk.v2.client.indexer.SearchForApplications;
-import com.algorand.algosdk.v2.client.indexer.LookupApplicationByID;
-import com.algorand.algosdk.v2.client.indexer.SearchForApplicationBoxes;
-import com.algorand.algosdk.v2.client.indexer.LookupApplicationBoxByIDAndName;
-import com.algorand.algosdk.v2.client.indexer.LookupApplicationLogsByID;
-import com.algorand.algosdk.v2.client.indexer.SearchForAssets;
-import com.algorand.algosdk.v2.client.indexer.LookupAssetByID;
-import com.algorand.algosdk.v2.client.indexer.LookupAssetBalances;
-import com.algorand.algosdk.v2.client.indexer.LookupAssetTransactions;
-import com.algorand.algosdk.v2.client.indexer.SearchForBlockHeaders;
-import com.algorand.algosdk.v2.client.indexer.LookupBlock;
-import com.algorand.algosdk.v2.client.indexer.LookupTransaction;
-import com.algorand.algosdk.v2.client.indexer.SearchForTransactions;
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.v2.client.indexer.*;
 
 public class IndexerClient extends Client {
 

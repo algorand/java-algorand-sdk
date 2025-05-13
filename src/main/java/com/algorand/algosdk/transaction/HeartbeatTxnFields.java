@@ -1,15 +1,16 @@
 package com.algorand.algosdk.transaction;
 
-import java.io.Serializable;
-import java.math.BigInteger;
-import java.util.Arrays;
-import java.util.Objects;
-
-import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.crypto.ParticipationPublicKey;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import java.io.Serializable;
+import java.math.BigInteger;
+import java.util.Arrays;
+import java.util.Objects;
 
 @JsonPropertyOrder(alphabetic = true)
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)

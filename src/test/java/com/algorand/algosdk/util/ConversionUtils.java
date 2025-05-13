@@ -2,7 +2,6 @@ package com.algorand.algosdk.util;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.AppBoxReference;
-
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.util.Strings;
 

@@ -1,14 +1,14 @@
 package com.algorand.algosdk.v2.client.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Details about a pending transaction. If the transaction was recently confirmed,

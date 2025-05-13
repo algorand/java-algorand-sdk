@@ -1,6 +1,5 @@
 package com.algorand.algosdk.logic;
 
-import java.lang.Integer;
 import java.util.ArrayList;
 import java.util.HashMap;
 

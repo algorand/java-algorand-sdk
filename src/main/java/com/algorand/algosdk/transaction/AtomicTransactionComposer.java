@@ -1,7 +1,7 @@
 package com.algorand.algosdk.transaction;
 
-import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.abi.ABIType;
+import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.crypto.Digest;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.Utils;
@@ -14,11 +14,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 
 public class AtomicTransactionComposer {
     public enum Status {

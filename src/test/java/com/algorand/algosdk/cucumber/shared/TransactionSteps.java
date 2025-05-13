@@ -1,16 +1,5 @@
 package com.algorand.algosdk.cucumber.shared;
 
-import static com.algorand.algosdk.util.ConversionUtils.convertAccounts;
-import static com.algorand.algosdk.util.ConversionUtils.convertArgs;
-import static com.algorand.algosdk.util.ConversionUtils.convertForeignApps;
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Map;
-
 import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.KeyRegistrationTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.PaymentTransactionBuilder;
@@ -21,17 +10,21 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.unit.Base;
 import com.algorand.algosdk.util.Encoder;
 import com.fasterxml.jackson.core.JsonProcessingException;
-
-import org.apache.commons.lang3.StringUtils;
-import org.assertj.core.api.Assertions;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.apache.commons.lang3.StringUtils;
+import org.assertj.core.api.Assertions;
 
+import java.io.IOException;
+import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.Map;
 
 import static com.algorand.algosdk.util.ConversionUtils.*;
 import static com.algorand.algosdk.util.ResourceUtils.loadTEALProgramFromFile;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionSteps {
     public Base base;

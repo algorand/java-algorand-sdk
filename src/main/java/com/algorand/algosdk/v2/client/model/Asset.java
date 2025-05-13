@@ -1,9 +1,9 @@
 package com.algorand.algosdk.v2.client.model;
 
-import java.util.Objects;
-
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 /**
  * Specifies both the unique identifier and the parameters for an asset

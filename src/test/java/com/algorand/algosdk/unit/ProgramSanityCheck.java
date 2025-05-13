@@ -2,7 +2,6 @@ package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.util.Encoder;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

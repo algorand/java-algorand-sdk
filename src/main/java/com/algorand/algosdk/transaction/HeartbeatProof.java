@@ -1,13 +1,14 @@
 package com.algorand.algosdk.transaction;
 
-import java.io.Serializable;
-import java.util.Objects;
-
-import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
+import com.algorand.algosdk.crypto.Signature;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+
+import java.io.Serializable;
+import java.util.Objects;
 
 
 @JsonPropertyOrder(alphabetic = true)

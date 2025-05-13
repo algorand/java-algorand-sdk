@@ -1,10 +1,10 @@
 package com.algorand.algosdk.v2.client.model;
 
-import java.util.Objects;
-
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 /**
  * A single Delta containing the key, the previous value and the current value for
