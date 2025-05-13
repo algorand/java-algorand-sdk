@@ -12,7 +12,6 @@ import com.algorand.algosdk.transaction.*;
 import com.algorand.algosdk.util.*;
 import com.algorand.algosdk.v2.client.model.PendingTransactionResponse;
 import com.algorand.algosdk.v2.client.model.TransactionParametersResponse;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

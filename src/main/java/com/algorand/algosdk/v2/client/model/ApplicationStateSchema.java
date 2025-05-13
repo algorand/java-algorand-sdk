@@ -1,9 +1,9 @@
 package com.algorand.algosdk.v2.client.model;
 
-import java.util.Objects;
-
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 /**
  * Specifies maximums on the number of each type that may be stored.

@@ -13,11 +13,11 @@
 
 package com.algorand.algosdk.kmd.client.model;
 
+import com.algorand.algosdk.crypto.Ed25519PublicKey;
 import com.google.gson.annotations.SerializedName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.ObjectUtils;
-import com.algorand.algosdk.crypto.Ed25519PublicKey;
 
 import java.util.ArrayList;
 import java.util.List;

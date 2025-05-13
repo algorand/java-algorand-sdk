@@ -7,8 +7,8 @@ import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Utils;
 import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.model.Enums;
-
 import io.cucumber.java.en.When;
+
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;

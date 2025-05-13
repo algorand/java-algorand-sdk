@@ -1,9 +1,9 @@
 package com.algorand.algosdk.v2.client.model;
 
-import java.util.Objects;
-
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.Objects;
 
 /**
  * The set of parameters and limits override during simulation. If this set of

@@ -1,8 +1,8 @@
 package com.algorand.algosdk.util;
 
-import java.util.Arrays;
-
 import org.apache.commons.codec.binary.Hex;
+
+import java.util.Arrays;
 
 public class ComparableBytes {
     private final byte[] data;

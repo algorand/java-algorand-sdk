@@ -1,7 +1,6 @@
 package com.algorand.algosdk.auction;
 
 import com.algorand.algosdk.crypto.Address;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

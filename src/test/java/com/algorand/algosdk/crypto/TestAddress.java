@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.util.Random;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestAddress {
     @Test

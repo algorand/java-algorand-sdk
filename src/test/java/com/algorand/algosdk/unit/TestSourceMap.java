@@ -3,6 +3,9 @@ package com.algorand.algosdk.unit;
 import com.algorand.algosdk.logic.SourceMap;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
+import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -10,10 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 
-import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
 import static org.assertj.core.api.Assertions.assertThat;
 
 

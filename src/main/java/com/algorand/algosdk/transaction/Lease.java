@@ -1,7 +1,8 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.util.Encoder;
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Arrays;
 import java.util.Random;

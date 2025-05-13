@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestTypes {
     Random rand;

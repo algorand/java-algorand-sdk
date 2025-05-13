@@ -1,7 +1,5 @@
 package com.algorand.algosdk.unit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.crypto.TEALProgram;
@@ -19,6 +17,8 @@ import io.cucumber.java.en.When;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AtomicTxnComposer {
     public static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";

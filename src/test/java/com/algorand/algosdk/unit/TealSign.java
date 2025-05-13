@@ -1,20 +1,19 @@
 package com.algorand.algosdk.unit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
-
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.LogicsigSignature;
 import com.algorand.algosdk.crypto.Signature;
 import com.algorand.algosdk.util.Encoder;
-
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.NoSuchAlgorithmException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TealSign {
     private Rekeying shared;

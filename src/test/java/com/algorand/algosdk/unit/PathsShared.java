@@ -1,7 +1,6 @@
 package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.unit.utils.TestingUtils;
-
 import com.algorand.algosdk.v2.client.common.Query;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;

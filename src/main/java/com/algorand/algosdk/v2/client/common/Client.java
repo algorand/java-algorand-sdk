@@ -1,17 +1,13 @@
 package com.algorand.algosdk.v2.client.common;
 
+import com.squareup.okhttp.*;
+import com.squareup.okhttp.Request.Builder;
+import com.squareup.okhttp.Response;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Map.Entry;
-
-import com.squareup.okhttp.HttpUrl;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Request.Builder;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
 
 public class Client {
 

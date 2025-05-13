@@ -1,11 +1,11 @@
 package com.algorand.algosdk.v2.client.model;
 
-import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
-
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.Objects;
 
 /**
  * Simulation result for an individual transaction

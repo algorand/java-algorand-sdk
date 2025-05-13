@@ -1,7 +1,5 @@
 package com.algorand.algosdk.unit;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.algorand.algosdk.abi.Contract;
 import com.algorand.algosdk.abi.Interface;
 import com.algorand.algosdk.abi.Method;
@@ -15,11 +13,9 @@ import org.apache.commons.codec.binary.Hex;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ABIJson {
     private enum CHECK_FIELD {
