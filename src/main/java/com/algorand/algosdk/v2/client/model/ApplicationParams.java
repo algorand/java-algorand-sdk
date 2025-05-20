@@ -81,6 +81,12 @@ public class ApplicationParams extends PathResponse {
     @JsonProperty("local-state-schema")
     public ApplicationStateSchema localStateSchema;
 
+    /**
+     * the number of updates to the application programs
+     */
+    @JsonProperty("version")
+    public Long version;
+
     @Override
     public boolean equals(Object o) {
 
@@ -95,6 +101,7 @@ public class ApplicationParams extends PathResponse {
         if (!Objects.deepEquals(this.globalState, other.globalState)) return false;
         if (!Objects.deepEquals(this.globalStateSchema, other.globalStateSchema)) return false;
         if (!Objects.deepEquals(this.localStateSchema, other.localStateSchema)) return false;
+        if (!Objects.deepEquals(this.version, other.version)) return false;
 
         return true;
     }
