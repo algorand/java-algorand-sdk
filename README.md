@@ -175,7 +175,7 @@ Additional resources and code samples are located at [https://developer.algorand
 
 # Cryptography
 
-AlgoSDK depends on `org.bouncycastle:bcprov-jdk15to18:1.66` for `Ed25519` signatures, `sha512/256` digests, and deserializing `X.509`-encoded `Ed25519` private keys.
+AlgoSDK depends on `org.bouncycastle:bcprov-jdk15to18:1.78` for `Ed25519` signatures, `sha512/256` digests, and deserializing `X.509`-encoded `Ed25519` private keys.
 The latter is the only explicit dependency on an external crypto library - all other references are abstracted through the JCA.
 
 # Java 9+
