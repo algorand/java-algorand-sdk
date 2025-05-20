@@ -262,6 +262,13 @@ public class IndexerPaths {
         ps.q = q;
     }
 
+    @When("we make a Search Accounts call with onlineOnly {string}")
+    public void searchAccountsOnlineOnly(String string) {
+        SearchForAccounts q = this.indexerClient.searchForAccounts();
+        if (string.contentEquals("true")) q.onlineOnly(true);
+        ps.q = q;
+    }
+
     @When("we make a Search For Transactions call with account {string} NotePrefix {string} TxType {string} SigType {string} txid {string} round {long} minRound {long} maxRound {long} limit {long} beforeTime {string} afterTime {string} currencyGreaterThan {long} currencyLessThan {long} assetIndex {long} addressRole {string} ExcluseCloseTo {string} rekeyTo {string}")
     public void searchForTransactions(String address, String notePrefix, String txType, String sigType,
             String txid, Long round, Long minRound, Long maxRound, Long limit,
