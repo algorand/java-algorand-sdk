@@ -174,16 +174,15 @@ public class LogicsigSignature {
 
         sanityCheckProgram(this.logic);
 
-        PublicKey pk;
-        try {
-            pk = singleSigner.toVerifyKey();
-        } catch (Exception ex) {
-            return false;
-        }
-
         if (this.sig != null) {
             try {
                 java.security.Signature sig = java.security.Signature.getInstance(SIGN_ALGO);
+                PublicKey pk;
+                try {
+                  pk = singleSigner.toVerifyKey();
+                } catch (Exception ex) {
+                  return false;
+                }
                 sig.initVerify(pk);
                 sig.update(this.bytesToSign());
                 return sig.verify(this.sig.getBytes());
