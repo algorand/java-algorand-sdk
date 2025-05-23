@@ -4,7 +4,7 @@
 
     <groupId>com.algorand</groupId>
     <artifactId>algosdk</artifactId>
-    <version>2.7.0</version>
+    <version>2.8.0</version>
     <packaging>jar</packaging>
 
     <name>${project.groupId}:${project.artifactId}</name>
@@ -37,6 +37,8 @@
         <assertj.version>3.17.1</assertj.version>
         <cucumber.version>6.6.0</cucumber.version>
         <mockito.version>3.5.7</mockito.version>
+        <jackson.version>2.18.2</jackson.version>
+        <jacksonmsgp.version>0.9.9</jacksonmsgp.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
         <maven.surefire.version>3.0.0-M5</maven.surefire.version>
@@ -55,22 +57,22 @@
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-annotations</artifactId>
-          <version>2.10.0</version>
+          <version>${jackson.version}</version>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-core</artifactId>
-          <version>2.10.0</version>
+          <version>${jackson.version}</version>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-databind</artifactId>
-          <version>2.10.5.1</version>
+          <version>${jackson.version}</version>
         </dependency>
         <dependency>
           <groupId>com.google.code.gson</groupId>
           <artifactId>gson</artifactId>
-          <version>2.8.1</version>
+          <version>2.8.9</version>
         </dependency>
         <dependency>
           <groupId>com.squareup.okhttp</groupId>
@@ -112,12 +114,12 @@
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcprov-jdk15to18</artifactId>
-          <version>1.66</version>
+          <version>1.78</version>
         </dependency>
         <dependency>
           <groupId>org.msgpack</groupId>
           <artifactId>jackson-dataformat-msgpack</artifactId>
-          <version>0.9.0</version>
+          <version>${jacksonmsgp.version}</version>
         </dependency>
         <dependency>
           <groupId>org.threeten</groupId>
@@ -127,7 +129,7 @@
         <dependency>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
-          <version>28.2-android</version>
+          <version>32.0.1-android</version>
         </dependency>
 
         <!-- test dependencies -->
