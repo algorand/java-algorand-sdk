@@ -20,7 +20,7 @@ public class AccountInformation extends Query {
     private Address address;
 
     /**
-     * @param address An account public key
+     * @param address An account public key.
      */
     public AccountInformation(Client client, Address address) {
         super(client, new HttpMethod("get"));
