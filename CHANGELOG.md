@@ -1,3 +1,17 @@
+# 2.8.1
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.8.1 -->
+
+## What's Changed
+### Enhancements
+* Build: Update Box API Pagination-dependent integration tests by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/802
+* API: Regenerate code with the latest specification file (ad67b6e3) by @github-actions in https://github.com/algorand/java-algorand-sdk/pull/815
+* Deps: Bump org.bouncycastle:bcprov-jdk15to18 from 1.66 to 1.78 by @dependabot in https://github.com/algorand/java-algorand-sdk/pull/778
+* Dependencies: Resolve multiple dependabot dependency alerts. by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/775
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.7.0...2.8.1
+
 # 2.8.0
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.8.0 -->
