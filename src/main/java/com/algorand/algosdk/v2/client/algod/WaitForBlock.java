@@ -19,7 +19,7 @@ public class WaitForBlock extends Query {
     private Long round;
 
     /**
-     * @param round The round to wait until returning status
+     * @param round A round number.
      */
     public WaitForBlock(Client client, Long round) {
         super(client, new HttpMethod("get"));
