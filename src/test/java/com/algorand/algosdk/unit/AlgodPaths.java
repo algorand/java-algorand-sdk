@@ -100,14 +100,11 @@ public class AlgodPaths {
         ps.q = algodClient.GetApplicationBoxByName(appID).name(encodedBoxName);
     }
 
-    @When("we make a GetApplicationBoxes call for applicationID {long} with max {long} prefix {string} next {string} values {string}")
-    public void getApplicationBoxes(Long appId, Long max, String prefix, String next, String values) {
+    @When("we make a GetApplicationBoxes call for applicationID {long} with max {long}")
+    public void getApplicationBoxes(Long appId, Long max) {
         GetApplicationBoxes q = algodClient.GetApplicationBoxes(appId);
 
         if (TestingUtils.notEmpty(max)) q.max(max);
-        if (TestingUtils.notEmpty(prefix)) q.prefix(prefix);
-        if (TestingUtils.notEmpty(next)) q.next(next);
-        if (TestingUtils.notEmpty(values)) q.values(values.equals("true"));
 
         ps.q = q;
     }
