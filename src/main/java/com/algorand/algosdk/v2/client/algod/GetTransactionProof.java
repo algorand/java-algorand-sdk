@@ -6,7 +6,7 @@ import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.Enums;
-import com.algorand.algosdk.v2.client.model.TransactionProofResponse;
+import com.algorand.algosdk.v2.client.model.TransactionProof;
 
 
 /**
@@ -19,7 +19,7 @@ public class GetTransactionProof extends Query {
     private String txid;
 
     /**
-     * @param round The round in which the transaction appears.
+     * @param round A round number.
      * @param txid The transaction ID for which to generate a proof.
      */
     public GetTransactionProof(Client client, Long round, String txid) {
@@ -45,9 +45,9 @@ public class GetTransactionProof extends Query {
     * @throws Exception
     */
     @Override
-    public Response<TransactionProofResponse> execute() throws Exception {
-        Response<TransactionProofResponse> resp = baseExecute();
-        resp.setValueType(TransactionProofResponse.class);
+    public Response<TransactionProof> execute() throws Exception {
+        Response<TransactionProof> resp = baseExecute();
+        resp.setValueType(TransactionProof.class);
         return resp;
     }
 
@@ -60,9 +60,9 @@ public class GetTransactionProof extends Query {
     * @throws Exception
     */
     @Override
-    public Response<TransactionProofResponse> execute(String[] headers, String[] values) throws Exception {
-        Response<TransactionProofResponse> resp = baseExecute(headers, values);
-        resp.setValueType(TransactionProofResponse.class);
+    public Response<TransactionProof> execute(String[] headers, String[] values) throws Exception {
+        Response<TransactionProof> resp = baseExecute(headers, values);
+        resp.setValueType(TransactionProof.class);
         return resp;
     }
 
