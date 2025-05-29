@@ -323,8 +323,9 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given an application ID, return boxes in lexographical order by name. If the
-     * results must be truncated, a next-token is supplied to continue the request.
+     * Given an application ID, return all Box names. No particular ordering is
+     * guaranteed. Request fails when client or server-side configured limits prevent
+     * returning all Box names.
      * /v2/applications/{application-id}/boxes
      */
     public GetApplicationBoxes GetApplicationBoxes(Long applicationId) {
