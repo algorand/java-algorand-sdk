@@ -1,6 +1,7 @@
 # java-algorand-sdk
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/algorand/java-algorand-sdk/tree/develop.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/algorand/java-algorand-sdk/tree/develop)
+<!-- Commented out until https://github.com/softwaremill/maven-badges/issues/1009 resolved -->
 <!-- [![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.algorand/algosdk/badge.svg?style=plastic)](https://maven-badges.sml.io/sonatype-central/com.algorand/algosdk/) -->
 
 AlgoSDK is a Java library for communicating and interacting with the Algorand network. It contains a REST client for accessing `algod` instances over the web,
