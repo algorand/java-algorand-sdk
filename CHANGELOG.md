@@ -1,3 +1,14 @@
+# 2.8.2
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.8.2 -->
+
+## What's Changed
+### Bugfixes
+* API: Revert application boxes pagination by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/827
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.8.1...2.8.2
+
 # 2.8.1
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.8.1 -->
