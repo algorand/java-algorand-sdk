@@ -22,6 +22,10 @@ docker-javasdk-build:
 
 docker-javasdk-run:
 	# Launch SDK testing
-	docker run -it --network host java-sdk-testing:latest
+	docker run -t --network host java-sdk-testing:latest
 
 docker-test: harness docker-javasdk-build docker-javasdk-run
+
+ci-test: harness unit integration
+
+.PHONY: ci-test
