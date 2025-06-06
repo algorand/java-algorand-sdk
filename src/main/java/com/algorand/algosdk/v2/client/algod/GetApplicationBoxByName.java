@@ -21,7 +21,7 @@ public class GetApplicationBoxByName extends Query {
     private Long applicationId;
 
     /**
-     * @param applicationId An application identifier
+     * @param applicationId An application identifier.
      */
     public GetApplicationBoxByName(Client client, Long applicationId) {
         super(client, new HttpMethod("get"));
