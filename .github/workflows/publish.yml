@@ -1,0 +1,81 @@
+name: Publish to Maven Repositories
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_version:
+        description: 'The tag_version, e.g. x.x.x'
+        default: 'x.x.x'
+        required: true
+        type: 'string'
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # For building and potentially deploying packages
+      id-token: write # For OIDC authentication, if used
+      pages: write    # Specifically for deploying to GitHub Pages
+      packages: write
+      pull-requests: write # Often needed by plugins for status checks, etc.
+      statuses: write      # For updating commit statuses
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag_version }}
+
+      - name: Set up JDK 11 for x64
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Build with Maven
+        run: mvn package
+
+      - name: Publish to Local Maven Repo
+        run: mvn deploy -P github,default
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to mvn-repo branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/mvn-repo    # Directory containing the artifacts
+          publish_branch: mvn-repo        # The target branch
+          force_orphan: false              # Overwrite branch history (consider 'false' for appending)
+          user_name: 'github-actions[bot]' # Recommended bot user for commits
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Build Javadocs/Site
+        run: mvn site -P github,default
+
+      - name: Publish Javadocs to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/site/apidocs
+          publish_branch: gh-pages      # The target branch for GitHub Pages
+          force_orphan: false
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Set up Apache Maven Central
+        uses: actions/setup-java@v4
+        with: # running setup-java again overwrites the settings.xml
+          distribution: 'temurin'
+          java-version: '11'
+          server-id: central
+          server-username: MAVEN_USERNAME # env variable for username in deploy
+          server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+
+      - name: Publish to Apache Maven Central
+        run: mvn deploy -P release,default
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
