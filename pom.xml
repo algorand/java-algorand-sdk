@@ -42,6 +42,9 @@
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
         <maven.surefire.version>3.0.0-M5</maven.surefire.version>
+        <maven.site.plugin.version>3.7.1</maven.site.plugin.version>
+        <maven.project.info.reports.plugin.version>3.0.0</maven.project.info.reports.plugin.version>
+
 
         <!-- Test sources at 1.8 to allow using JUnit5 -->
         <java.version>1.8</java.version>
@@ -349,7 +352,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.5</version>
+                        <version>1.6</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -371,25 +374,11 @@
             </build>
         </profile>
         <profile>
-            <!--
-                Maven github release profile.
-                'mvn clean deploy -P github'
-
-                Update settings.xml with the following server configuration:
-                  <settings>
-                   <servers>
-                     <server>
-                       <id>github</id>
-                       <password>your-github-oauth-token</password>
-                     </server>
-                   </servers>
-                 </settings>
-            -->
             <id>github</id>
             <distributionManagement>
                 <repository>
-                    <id>internal.repo</id>
-                    <name>Temporary Staging Repository</name>
+                    <id>local-mvn-repo</id> <!-- Distinct ID to avoid conflict with global 'github' ID -->
+                    <name>Temporary Staging Repository for mvn-repo branch</name>
                     <url>file://${project.build.directory}/mvn-repo</url>
                 </repository>
             </distributionManagement>
@@ -399,81 +388,61 @@
                         <artifactId>maven-deploy-plugin</artifactId>
                         <version>2.8.1</version>
                         <configuration>
-                            <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>com.github.github</groupId>
-                        <artifactId>site-maven-plugin</artifactId>
-                        <version>0.11</version>
-                        <configuration>
-                            <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
-                            <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
-                            <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
-                            <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
-                            <includes><include>**/*</include></includes>
-                            <repositoryName>java-algorand-sdk</repositoryName>      <!-- github repo name -->
-                            <repositoryOwner>algorand</repositoryOwner>
+                            <!-- Deploy to the local file system as defined in this profile's distributionManagement -->
+                            <altDeploymentRepository>local-mvn-repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
                         </configuration>
                         <executions>
-                            <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
                             <execution>
-                                <goals>
-                                    <goal>site</goal>
-                                </goals>
+                                <id>deploy-to-local-repo</id>
                                 <phase>deploy</phase>
+                                <goals>
+                                    <goal>deploy</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>
-                    <!-- publish javadoc to github in site phase -->
+
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <version>${maven.javadoc.plugin.version}</version>
                         <configuration>
-                          <source>${java.version}</source>
-                          <doclint>none</doclint>
+                            <source>${java.version}</source>
+                            <doclint>none</doclint>
                         </configuration>
                         <executions>
                             <execution>
-                                <id>gen-javadocs</id>
+                                <id>attach-javadocs-to-site</id>
                                 <goals>
                                     <goal>javadoc</goal>
                                 </goals>
-                                <phase>site</phase>
+                                <phase>site</phase> <!-- Bind to the site phase to generate Javadocs as part of mvn site -->
                             </execution>
                         </executions>
                     </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-project-info-reports-plugin</artifactId>
-                        <version>3.0.0</version>
-                    </plugin>
+
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-site-plugin</artifactId>
-                        <version>3.7.1</version>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-scm-publish-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <configuration>
-                            <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
-                            <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
-                            <content>${project.reporting.outputDirectory}/apidocs</content>
-                            <skipDeletedFiles>true</skipDeletedFiles>
-                            <pubScmUrl>scm:git:git@github.com:algorand/java-algorand-sdk.git</pubScmUrl>
-                            <scmBranch>gh-pages</scmBranch> <!-- branch with static site -->
-                        </configuration>
+                        <version>${maven.site.plugin.version}</version>
                         <executions>
                             <execution>
-                                <goals>
-                                    <goal>publish-scm</goal>
-                                </goals>
+                                <id>default-site</id>
                                 <phase>site</phase>
+                                <goals>
+                                    <goal>site</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>${project.build.directory}/site</outputDirectory>
+                                </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-project-info-reports-plugin</artifactId>
+                        <version>${maven.project.info.reports.plugin.version}</version>
                     </plugin>
                 </plugins>
             </build>

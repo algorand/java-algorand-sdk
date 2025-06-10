@@ -1,0 +1,199 @@
+name: "Create and Publish Release"
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_pr_number:
+        description: "The pull request number to merge that contains the package version bumps and changelog updates."
+        required: true
+        type: number
+      release_version:
+        description: "The tag name for the release (e.g., v1.2.3)"
+        required: true
+        type: string
+      skip_publish:
+        description: "Set to true to 'dry-run'/not publish Artifacts or Javadocs."
+        default: false
+        required: true
+        type: boolean
+
+jobs:
+  release_and_publish:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # Needed for creating releases and tags, and deleting branches
+      pull-requests: write # Needed for merging the PR
+      id-token: write # For OIDC authentication, if used
+      pages: write    # Specifically for deploying to GitHub Pages
+      packages: write
+      statuses: write      # For updating commit statuses
+    steps:
+      - name: Get Pull Request Info (Base Branch, Release Notes)
+        id: get_pr_info
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt(process.env.RELEASE_PR_NUMBER, 10);
+            const result = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            core.setOutput('RELEASE_NOTES', result.data.body);
+            core.setOutput('RELEASE_TAG', process.env.RELEASE_VERSION);
+            core.setOutput('BASE_BRANCH', result.data.base.ref);  // Capture base branch
+        env:
+          RELEASE_PR_NUMBER: ${{ github.event.inputs.release_pr_number }}
+          RELEASE_VERSION: ${{ github.event.inputs.release_version }}
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.get_pr_info.outputs.BASE_BRANCH }}
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+
+      - name: Merge Pull Request
+        uses: actions/github-script@v7
+        id: merge_pr
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt('${{ github.event.inputs.release_pr_number }}', 10);
+            const result = await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            core.setOutput('merged', result.data.merged);
+
+      - name: Ensure latest changes from merged PR
+        run: |
+          git fetch origin ${{ steps.get_pr_info.outputs.BASE_BRANCH }}
+          git reset --hard origin/${{ steps.get_pr_info.outputs.BASE_BRANCH }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.event.inputs.release_version }}
+          name: ${{ github.event.inputs.release_version }}
+          body: ${{ steps.get_pr_info.outputs.RELEASE_NOTES }}
+          generate_release_notes: false
+
+      # Start publishing artifacts and javadocs only if skip_publish is false - should match publish.yml save for if checks
+
+      - name: Set up JDK 11 for x64
+        if: ${{ inputs.skip_publish == false }}
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+          architecture: x64
+
+      - name: Build with Maven
+        if: ${{ inputs.skip_publish == false }}
+        run: mvn package
+
+      - name: Publish to Local Maven Repo
+        if: ${{ inputs.skip_publish == false }}
+        run: mvn deploy -P github,default
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish to mvn-repo branch
+        if: ${{ inputs.skip_publish == false }}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/mvn-repo    # Directory containing the artifacts
+          publish_branch: mvn-repo        # The target branch
+          force_orphan: false              # Overwrite branch history (consider 'false' for appending)
+          user_name: 'github-actions[bot]' # Recommended bot user for commits
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Build Javadocs/Site
+        if: ${{ inputs.skip_publish == false }}
+        run: mvn site -P github,default
+
+      - name: Publish Javadocs to gh-pages branch
+        if: ${{ inputs.skip_publish == false }}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: target/site/apidocs
+          publish_branch: gh-pages      # The target branch for GitHub Pages
+          force_orphan: false
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Set up Apache Maven Central
+        if: ${{ inputs.skip_publish == false }}
+        uses: actions/setup-java@v4
+        with: # running setup-java again overwrites the settings.xml
+          distribution: 'temurin'
+          java-version: '11'
+          server-id: central
+          server-username: MAVEN_USERNAME # env variable for username in deploy
+          server-password: MAVEN_CENTRAL_TOKEN # env variable for token in deploy
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE # env variable for GPG private key passphrase
+
+      - name: Publish to Apache Maven Central
+        if: ${{ inputs.skip_publish == false }}
+        run: mvn deploy -P release,default
+        env:
+          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+          MAVEN_CENTRAL_TOKEN: ${{ secrets.MAVEN_CENTRAL_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+
+      # End publishing artifacts and javadocs
+
+      - name: Delete branch after merge
+        if: steps.merge_pr.outputs.merged == 'true' # Only delete if merge was successful
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const branchName = `release/${{ github.event.inputs.release_version }}`;
+            
+            try {
+              await github.rest.git.deleteRef({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: `heads/${branchName}`,
+              });
+              console.log(`Successfully deleted branch: ${branchName}`);
+            } catch (error) {
+              console.error(`Failed to delete branch ${branchName}:`, error);
+            }
+
+      - name: Notify Slack - Release Completed
+        id: slack-release
+        uses: slackapi/slack-github-action@v1.27.1
+        env:
+          SDK: ${{ github.event.repository.name }}
+          RELEASE_TAG: ${{ steps.get_pr_info.outputs.RELEASE_TAG }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_RELEASE_NOTIFICATIONS_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*${{ env.SDK }} ${{ env.RELEASE_TAG }}* was released today. https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}"
+                  }
+                }
+              ]
+            }

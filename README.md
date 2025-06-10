@@ -222,13 +222,7 @@ You can then run specific cucumber-based unit and integration tests directly.
 
 ## deploying artifacts
 
-The generated pom file provides maven compatibility and deploy capabilities.
-```
-mvn clean install
-mvn clean deploy -P github,default
-mvn clean site -P github,default  # for javadoc
-mvn clean deploy -P release,default
-```
+You can deploy artifacts to Maven Central and Github Pages using the Publish and Release Workflows with appropriate permissioning.
 
 # Testing
 
