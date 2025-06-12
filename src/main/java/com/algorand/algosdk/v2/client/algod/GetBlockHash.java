@@ -17,7 +17,7 @@ public class GetBlockHash extends Query {
     private Long round;
 
     /**
-     * @param round The round from which to fetch block hash information.
+     * @param round A round number.
      */
     public GetBlockHash(Client client, Long round) {
         super(client, new HttpMethod("get"));
