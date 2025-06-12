@@ -21,8 +21,8 @@ public class AccountAssetInformation extends Query {
     private Long assetId;
 
     /**
-     * @param address An account public key
-     * @param assetId An asset identifier
+     * @param address An account public key.
+     * @param assetId An asset identifier.
      */
     public AccountAssetInformation(Client client, Address address, Long assetId) {
         super(client, new HttpMethod("get"));
