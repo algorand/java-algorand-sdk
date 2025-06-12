@@ -17,7 +17,7 @@ public class GetBlockLogs extends Query {
     private Long round;
 
     /**
-     * @param round The round from which to fetch block log information.
+     * @param round A round number.
      */
     public GetBlockLogs(Client client, Long round) {
         super(client, new HttpMethod("get"));

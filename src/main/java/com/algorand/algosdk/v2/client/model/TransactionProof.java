@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * Proof of transaction in a block.
  */
-public class TransactionProofResponse extends PathResponse {
+public class TransactionProof extends PathResponse {
 
     /**
      * The type of hash function used to create the proof, must be one of:
@@ -23,7 +23,7 @@ public class TransactionProofResponse extends PathResponse {
      * Index of the transaction in the block's payset.
      */
     @JsonProperty("idx")
-    public Long idx;
+    public java.math.BigInteger idx;
 
     /**
      * Proof of transaction membership.
@@ -54,7 +54,7 @@ public class TransactionProofResponse extends PathResponse {
      * from a leaf to the root.
      */
     @JsonProperty("treedepth")
-    public Long treedepth;
+    public java.math.BigInteger treedepth;
 
     @Override
     public boolean equals(Object o) {
@@ -62,7 +62,7 @@ public class TransactionProofResponse extends PathResponse {
         if (this == o) return true;
         if (o == null) return false;
 
-        TransactionProofResponse other = (TransactionProofResponse) o;
+        TransactionProof other = (TransactionProof) o;
         if (!Objects.deepEquals(this.hashtype, other.hashtype)) return false;
         if (!Objects.deepEquals(this.idx, other.idx)) return false;
         if (!Objects.deepEquals(this.proof, other.proof)) return false;
