@@ -17,7 +17,7 @@ public class GetBlockTxids extends Query {
     private Long round;
 
     /**
-     * @param round The round from which to fetch block transaction IDs.
+     * @param round A round number.
      */
     public GetBlockTxids(Client client, Long round) {
         super(client, new HttpMethod("get"));
