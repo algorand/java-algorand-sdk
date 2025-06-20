@@ -18,7 +18,7 @@ public class GetAssetByID extends Query {
     private Long assetId;
 
     /**
-     * @param assetId An asset identifier
+     * @param assetId An asset identifier.
      */
     public GetAssetByID(Client client, Long assetId) {
         super(client, new HttpMethod("get"));
