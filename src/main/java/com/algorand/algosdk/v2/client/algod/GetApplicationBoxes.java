@@ -19,7 +19,7 @@ public class GetApplicationBoxes extends Query {
     private Long applicationId;
 
     /**
-     * @param applicationId An application identifier
+     * @param applicationId An application identifier.
      */
     public GetApplicationBoxes(Client client, Long applicationId) {
         super(client, new HttpMethod("get"));
@@ -30,7 +30,7 @@ public class GetApplicationBoxes extends Query {
      * Max number of box names to return. If max is not set, or max == 0, returns all
      * box-names.
      */
-    public GetApplicationBoxes max(Long max) {
+    public GetApplicationBoxes max(java.math.BigInteger max) {
         addQuery("max", String.valueOf(max));
         return this;
     }
