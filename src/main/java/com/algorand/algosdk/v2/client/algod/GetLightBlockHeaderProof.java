@@ -17,7 +17,7 @@ public class GetLightBlockHeaderProof extends Query {
     private Long round;
 
     /**
-     * @param round The round to which the light block header belongs.
+     * @param round A round number.
      */
     public GetLightBlockHeaderProof(Client client, Long round) {
         super(client, new HttpMethod("get"));
