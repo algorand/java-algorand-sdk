@@ -7,15 +7,16 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * References a box of an application.
+ * BoxReference names a box by its name and the application ID it belongs to.
  */
 public class BoxReference extends PathResponse {
 
     /**
-     * Application ID which this box belongs to
+     * Application ID to which the box belongs, or zero if referring to the called
+     * application.
      */
-    @JsonProperty("app")
-    public Long app;
+    @JsonProperty("application-id")
+    public Long applicationId;
 
     /**
      * Base64 encoded box name
@@ -36,7 +37,7 @@ public class BoxReference extends PathResponse {
         if (o == null) return false;
 
         BoxReference other = (BoxReference) o;
-        if (!Objects.deepEquals(this.app, other.app)) return false;
+        if (!Objects.deepEquals(this.applicationId, other.applicationId)) return false;
         if (!Objects.deepEquals(this.name, other.name)) return false;
 
         return true;
