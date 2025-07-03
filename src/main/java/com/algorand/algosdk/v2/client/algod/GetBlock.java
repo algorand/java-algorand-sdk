@@ -17,7 +17,7 @@ public class GetBlock extends Query {
     private Long round;
 
     /**
-     * @param round The round from which to fetch block information.
+     * @param round A round number.
      */
     public GetBlock(Client client, Long round) {
         super(client, new HttpMethod("get"));

@@ -83,6 +83,13 @@ public class TransactionApplication extends PathResponse {
     public byte[] approvalProgram;
 
     /**
+     * (apbx) the boxes that can be accessed by this transaction (and others in the
+     * same group).
+     */
+    @JsonProperty("box-references")
+    public List<BoxReference> boxReferences = new ArrayList<BoxReference>();
+
+    /**
      * (apsu) Logic executed for application transactions with on-completion set to
      * "clear". It can read and write global state for the application, as well as
      * account-specific local state. Clear state programs cannot reject the
@@ -150,6 +157,13 @@ public class TransactionApplication extends PathResponse {
     @JsonProperty("on-completion")
     public Enums.OnCompletion onCompletion;
 
+    /**
+     * (aprv) the lowest application version for which this transaction should
+     * immediately fail. 0 indicates that no version check should be performed.
+     */
+    @JsonProperty("reject-version")
+    public Long rejectVersion;
+
     @Override
     public boolean equals(Object o) {
 
@@ -161,6 +175,7 @@ public class TransactionApplication extends PathResponse {
         if (!Objects.deepEquals(this.applicationArgs, other.applicationArgs)) return false;
         if (!Objects.deepEquals(this.applicationId, other.applicationId)) return false;
         if (!Objects.deepEquals(this.approvalProgram, other.approvalProgram)) return false;
+        if (!Objects.deepEquals(this.boxReferences, other.boxReferences)) return false;
         if (!Objects.deepEquals(this.clearStateProgram, other.clearStateProgram)) return false;
         if (!Objects.deepEquals(this.extraProgramPages, other.extraProgramPages)) return false;
         if (!Objects.deepEquals(this.foreignApps, other.foreignApps)) return false;
@@ -168,6 +183,7 @@ public class TransactionApplication extends PathResponse {
         if (!Objects.deepEquals(this.globalStateSchema, other.globalStateSchema)) return false;
         if (!Objects.deepEquals(this.localStateSchema, other.localStateSchema)) return false;
         if (!Objects.deepEquals(this.onCompletion, other.onCompletion)) return false;
+        if (!Objects.deepEquals(this.rejectVersion, other.rejectVersion)) return false;
 
         return true;
     }
