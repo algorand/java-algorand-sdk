@@ -22,8 +22,8 @@ public class AccountApplicationInformation extends Query {
     private Long applicationId;
 
     /**
-     * @param address An account public key
-     * @param applicationId An application identifier
+     * @param address An account public key.
+     * @param applicationId An application identifier.
      */
     public AccountApplicationInformation(Client client, Address address, Long applicationId) {
         super(client, new HttpMethod("get"));
