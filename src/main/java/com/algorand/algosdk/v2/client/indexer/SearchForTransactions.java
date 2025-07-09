@@ -103,6 +103,16 @@ public class SearchForTransactions extends Query {
     }
 
     /**
+     * Lookup transactions by group ID. This field must be base64-encoded, and
+     * afterwards, base64 characters that are URL-unsafe (i.e. =, /, +) must be
+     * URL-encoded
+     */
+    public SearchForTransactions groupId(byte[] groupId) {
+        addQuery("group-id", Encoder.encodeToBase64(groupId));
+        return this;
+    }
+
+    /**
      * Maximum number of results to return. There could be additional pages even if the
      * limit is not reached.
      */
