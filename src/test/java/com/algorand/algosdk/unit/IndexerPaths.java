@@ -9,6 +9,8 @@ import com.algorand.algosdk.v2.client.indexer.*;
 import com.algorand.algosdk.v2.client.model.Enums;
 
 import io.cucumber.java.en.When;
+import org.junit.jupiter.api.Test;
+
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -125,15 +127,16 @@ public class IndexerPaths {
             + "currencyLessThan {long} "
             + "assetIndex {long} "
             + "addressRole {string} "
-            + "ExcluseCloseTo {string}")
+            + "ExcluseCloseTo {string} "
+            + "groupid {string}")
     public void oldSearchForTransactions(
             String address, String notePrefix, String txType, String sigType,
             String txid, Long round, Long minRound, Long maxRound, Long limit,
             String beforeTime, String afterTime, Long currencyGT, Long currencyLT, Long assetID,
-            String addressRole, String excludeCloseTo) throws ParseException, NoSuchAlgorithmException {
+            String addressRole, String excludeCloseTo, String groupid) throws ParseException, NoSuchAlgorithmException {
         searchForTransactions(address, notePrefix, txType, sigType, txid, round, minRound,
                 maxRound, limit, beforeTime, afterTime, currencyGT, currencyLT, assetID,
-                addressRole, excludeCloseTo, "");
+                addressRole, excludeCloseTo, groupid,"");
     }
 
     @When("we make a Search For BlockHeaders call with minRound {long} " +
@@ -269,11 +272,11 @@ public class IndexerPaths {
         ps.q = q;
     }
 
-    @When("we make a Search For Transactions call with account {string} NotePrefix {string} TxType {string} SigType {string} txid {string} round {long} minRound {long} maxRound {long} limit {long} beforeTime {string} afterTime {string} currencyGreaterThan {long} currencyLessThan {long} assetIndex {long} addressRole {string} ExcluseCloseTo {string} rekeyTo {string}")
+    @When("we make a Search For Transactions call with account {string} NotePrefix {string} TxType {string} SigType {string} txid {string} round {long} minRound {long} maxRound {long} limit {long} beforeTime {string} afterTime {string} currencyGreaterThan {long} currencyLessThan {long} assetIndex {long} addressRole {string} ExcluseCloseTo {string} groupid {string} rekeyTo {string}")
     public void searchForTransactions(String address, String notePrefix, String txType, String sigType,
             String txid, Long round, Long minRound, Long maxRound, Long limit,
             String beforeTime, String afterTime, Long currencyGT, Long currencyLT, Long assetID,
-            String addressRole, String excludeCloseTo, String rekeyTo) throws ParseException, NoSuchAlgorithmException {
+            String addressRole, String excludeCloseTo, String groupid, String rekeyTo) throws ParseException, NoSuchAlgorithmException {
 
         SearchForTransactions q = this.indexerClient.searchForTransactions();
         if (TestingUtils.notEmpty(address)) q.address(new Address(address));
@@ -292,6 +295,7 @@ public class IndexerPaths {
         if (TestingUtils.notEmpty(assetID)) q.assetId(assetID);
         if (TestingUtils.notEmpty(addressRole)) q.addressRole(Enums.AddressRole.forValue(addressRole));
         if (TestingUtils.notEmpty(excludeCloseTo)) q.excludeCloseTo(excludeCloseTo.equals("true"));
+        if (TestingUtils.notEmpty(groupid)) q.groupId(Encoder.decodeFromBase64(groupid));
         if (TestingUtils.notEmpty(rekeyTo)) q.rekeyTo(rekeyTo.equals("true"));
         ps.q = q;
     }
