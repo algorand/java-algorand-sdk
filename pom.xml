@@ -60,17 +60,17 @@
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-annotations</artifactId>
-          <version>${jackson.version}</version>
+          <version>2.18.2</version>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-core</artifactId>
-          <version>${jackson.version}</version>
+          <version>2.18.2</version>
         </dependency>
         <dependency>
           <groupId>com.fasterxml.jackson.core</groupId>
           <artifactId>jackson-databind</artifactId>
-          <version>${jackson.version}</version>
+          <version>2.18.2</version>
         </dependency>
         <dependency>
           <groupId>com.google.code.gson</groupId>
@@ -101,7 +101,7 @@
         <dependency>
           <groupId>io.gsonfire</groupId>
           <artifactId>gson-fire</artifactId>
-          <version>1.8.0</version>
+          <version>1.9.0</version>
         </dependency>
         <dependency>
           <groupId>io.swagger</groupId>
@@ -112,17 +112,17 @@
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
           <!-- this is the last version with java 1.7 support -->
-          <version>3.8</version>
+          <version>3.8.1</version>
         </dependency>
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcprov-jdk15to18</artifactId>
-          <version>1.78</version>
+          <version>1.78.1</version>
         </dependency>
         <dependency>
           <groupId>org.msgpack</groupId>
           <artifactId>jackson-dataformat-msgpack</artifactId>
-          <version>${jacksonmsgp.version}</version>
+          <version>0.9.9</version>
         </dependency>
         <dependency>
           <groupId>org.threeten</groupId>
@@ -132,7 +132,7 @@
         <dependency>
           <groupId>com.google.guava</groupId>
           <artifactId>guava</artifactId>
-          <version>32.0.1-android</version>
+          <version>32.0.1-jre</version>
         </dependency>
 
         <!-- test dependencies -->
@@ -141,7 +141,7 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
+            <version>3.17.1</version>
             <scope>test</scope>
         </dependency>
 
@@ -149,35 +149,35 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <version>${junit5.version}</version>
+            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit5.version}</version>
+            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.vintage</groupId>
             <artifactId>junit-vintage-engine</artifactId>
-            <version>${junit5.version}</version>
+            <version>5.8.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
-            <version>${junit5.version}</version>
+            <version>5.6.2</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>${mockito.version}</version>
+            <version>3.5.7</version>
             <scope>test</scope>
         </dependency>
 
@@ -185,14 +185,14 @@
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-java</artifactId>
-            <version>${cucumber.version}</version>
+            <version>6.6.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-junit</artifactId>
-            <version>${cucumber.version}</version>
+            <version>6.8.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -200,7 +200,7 @@
         <dependency>
             <groupId>io.cucumber</groupId>
             <artifactId>cucumber-picocontainer</artifactId>
-            <version>${cucumber.version}</version>
+            <version>6.6.0</version>
             <scope>test</scope>
         </dependency>
 
