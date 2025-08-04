@@ -1,3 +1,18 @@
+# 2.9.0
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.9.0 -->
+
+## What's Changed
+### New Features
+* CICD: run tests in GitHub Actions by @onetechnical in https://github.com/algorand/java-algorand-sdk/pull/836
+### Enhancements
+* Devops: Release process update by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/839
+* CICD: disable CircleCI testing by @onetechnical in https://github.com/algorand/java-algorand-sdk/pull/837
+* API: Regenerate code with the latest specification file (da1078cd) by @github-actions[bot] in https://github.com/algorand/java-algorand-sdk/pull/851
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.8.2...2.9.0
+
 # 2.8.2
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.8.2 -->
