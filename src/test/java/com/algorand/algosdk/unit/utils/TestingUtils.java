@@ -311,6 +311,6 @@ public class TestingUtils {
     }
 
     public static boolean notEmpty(Long val) {
-        return val != 0;
+        return val != null && val != 0;
     }
 }
