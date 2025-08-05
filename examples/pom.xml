@@ -66,7 +66,7 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <!-- this is the last version with java 1.7 support -->
-            <version>3.8</version>
+            <version>3.18.0</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
