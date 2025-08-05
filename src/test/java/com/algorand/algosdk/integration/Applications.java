@@ -386,9 +386,14 @@ public class Applications {
         Response<BoxesResponse> r;
         if (fromClient.equals("algod"))
             r = base.aclv2.GetApplicationBoxes(this.appId).max(limit).execute();
-        else if (fromClient.equals("indexer"))
-            r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
-        else
+        else if (fromClient.equals("indexer")) {
+            // Handle limit=0 case for indexer: omit the limit parameter to use server default
+            if (limit == 0) {
+                r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).execute();
+            } else {
+                r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).execute();
+            }
+        } else
             throw new IllegalArgumentException("expecting algod or indexer, got " + fromClient);
 
         Assert.assertTrue(r.isSuccessful());
@@ -398,7 +403,13 @@ public class Applications {
 
     @Then("according to indexer, with {long} being the parameter that limits results, and {string} being the parameter that sets the next result, the current application should have the following boxes {string}.")
     public void indexerCheckAppBoxesWithParams(Long limit, String next, String encodedBoxesRaw) throws Exception {
-        Response<BoxesResponse> r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
+        // Handle limit=0 case for indexer: omit the limit parameter to use server default
+        Response<BoxesResponse> r;
+        if (limit == 0) {
+            r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).next(next).execute();
+        } else {
+            r = base.v2IndexerClient.searchForApplicationBoxes(this.appId).limit(limit).next(next).execute();
+        }
         final Set<byte[]> expectedNames = new HashSet<>();
         if (!encodedBoxesRaw.isEmpty()) {
             for (String s : encodedBoxesRaw.split(":")) {

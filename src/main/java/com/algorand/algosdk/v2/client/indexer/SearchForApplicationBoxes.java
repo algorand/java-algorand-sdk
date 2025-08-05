@@ -30,11 +30,7 @@ public class SearchForApplicationBoxes extends Query {
      * limit is not reached.
      */
     public SearchForApplicationBoxes limit(Long limit) {
-        // Only add limit parameter if limit is not null and not 0
-        // This matches behavior of other SDKs (Python/Go) which omit the parameter when limit=0
-        if (limit != null && limit != 0) {
-            addQuery("limit", String.valueOf(limit));
-        }
+        addQuery("limit", String.valueOf(limit));
         return this;
     }
 
