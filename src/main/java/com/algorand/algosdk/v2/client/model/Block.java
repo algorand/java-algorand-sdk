@@ -66,6 +66,18 @@ public class Block extends PathResponse {
     public byte[] previousBlockHash;
 
     /**
+     * (prev512) Previous block hash, using SHA-512.
+     */
+    @JsonProperty("previous-block-hash-512")
+    public void previousBlockHash512(String base64Encoded) {
+        this.previousBlockHash512 = Encoder.decodeFromBase64(base64Encoded);
+    }
+    public String previousBlockHash512() {
+        return Encoder.encodeToBase64(this.previousBlockHash512);
+    }
+    public byte[] previousBlockHash512;
+
+    /**
      * the proposer of this block.
      */
     @JsonProperty("proposer")
@@ -163,6 +175,20 @@ public class Block extends PathResponse {
     public byte[] transactionsRootSha256;
 
     /**
+     * (txn512) TransactionsRootSHA512 is an auxiliary TransactionRoot, built using a
+     * vector commitment instead of a merkle tree, and SHA512 hash function instead of
+     * the default SHA512_256.
+     */
+    @JsonProperty("transactions-root-sha512")
+    public void transactionsRootSha512(String base64Encoded) {
+        this.transactionsRootSha512 = Encoder.decodeFromBase64(base64Encoded);
+    }
+    public String transactionsRootSha512() {
+        return Encoder.encodeToBase64(this.transactionsRootSha512);
+    }
+    public byte[] transactionsRootSha512;
+
+    /**
      * (tc) TxnCounter counts the number of transactions committed in the ledger, from
      * the time at which support for this feature was introduced.
      * Specifically, TxnCounter is the number of the next transaction that will be
@@ -197,6 +223,7 @@ public class Block extends PathResponse {
         if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
         if (!Objects.deepEquals(this.participationUpdates, other.participationUpdates)) return false;
         if (!Objects.deepEquals(this.previousBlockHash, other.previousBlockHash)) return false;
+        if (!Objects.deepEquals(this.previousBlockHash512, other.previousBlockHash512)) return false;
         if (!Objects.deepEquals(this.proposer, other.proposer)) return false;
         if (!Objects.deepEquals(this.proposerPayout, other.proposerPayout)) return false;
         if (!Objects.deepEquals(this.rewards, other.rewards)) return false;
@@ -207,6 +234,7 @@ public class Block extends PathResponse {
         if (!Objects.deepEquals(this.transactions, other.transactions)) return false;
         if (!Objects.deepEquals(this.transactionsRoot, other.transactionsRoot)) return false;
         if (!Objects.deepEquals(this.transactionsRootSha256, other.transactionsRootSha256)) return false;
+        if (!Objects.deepEquals(this.transactionsRootSha512, other.transactionsRootSha512)) return false;
         if (!Objects.deepEquals(this.txnCounter, other.txnCounter)) return false;
         if (!Objects.deepEquals(this.upgradeState, other.upgradeState)) return false;
         if (!Objects.deepEquals(this.upgradeVote, other.upgradeVote)) return false;
