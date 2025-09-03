@@ -19,6 +19,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class TransactionApplication extends PathResponse {
 
     /**
+     * (al) Access unifies `accounts`, `foreign-apps`, `foreign-assets`, and
+     * `box-references` under a single list. If access is non-empty, these lists must
+     * be empty. If access is empty, those lists may be non-empty.
+     */
+    @JsonProperty("access")
+    public List<ResourceRef> access = new ArrayList<ResourceRef>();
+
+    /**
      * (apat) List of accounts in addition to the sender that may be accessed from the
      * application's approval-program and clear-state-program.
      */
@@ -171,6 +179,7 @@ public class TransactionApplication extends PathResponse {
         if (o == null) return false;
 
         TransactionApplication other = (TransactionApplication) o;
+        if (!Objects.deepEquals(this.access, other.access)) return false;
         if (!Objects.deepEquals(this.accounts, other.accounts)) return false;
         if (!Objects.deepEquals(this.applicationArgs, other.applicationArgs)) return false;
         if (!Objects.deepEquals(this.applicationId, other.applicationId)) return false;
