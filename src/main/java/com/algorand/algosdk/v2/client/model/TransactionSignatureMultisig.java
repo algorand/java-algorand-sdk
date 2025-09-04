@@ -8,7 +8,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * (msig) structure holding multiple subsignatures.
+ * structure holding multiple subsignatures.
  * Definition:
  * crypto/multisig.go : MultisigSig
  */

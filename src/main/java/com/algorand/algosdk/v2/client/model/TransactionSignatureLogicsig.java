@@ -51,7 +51,15 @@ public class TransactionSignatureLogicsig extends PathResponse {
     public byte[] logic;
 
     /**
-     * (msig) structure holding multiple subsignatures.
+     * structure holding multiple subsignatures.
+     * Definition:
+     * crypto/multisig.go : MultisigSig
+     */
+    @JsonProperty("logic-multisig-signature")
+    public TransactionSignatureMultisig logicMultisigSignature;
+
+    /**
+     * structure holding multiple subsignatures.
      * Definition:
      * crypto/multisig.go : MultisigSig
      */
@@ -79,6 +87,7 @@ public class TransactionSignatureLogicsig extends PathResponse {
         TransactionSignatureLogicsig other = (TransactionSignatureLogicsig) o;
         if (!Objects.deepEquals(this.args, other.args)) return false;
         if (!Objects.deepEquals(this.logic, other.logic)) return false;
+        if (!Objects.deepEquals(this.logicMultisigSignature, other.logicMultisigSignature)) return false;
         if (!Objects.deepEquals(this.multisigSignature, other.multisigSignature)) return false;
         if (!Objects.deepEquals(this.signature, other.signature)) return false;
 

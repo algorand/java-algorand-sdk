@@ -21,7 +21,7 @@ public class TransactionSignature extends PathResponse {
     public TransactionSignatureLogicsig logicsig;
 
     /**
-     * (msig) structure holding multiple subsignatures.
+     * structure holding multiple subsignatures.
      * Definition:
      * crypto/multisig.go : MultisigSig
      */
