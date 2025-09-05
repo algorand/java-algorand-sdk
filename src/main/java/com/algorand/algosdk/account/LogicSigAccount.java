@@ -95,9 +95,11 @@ public class LogicSigAccount {
     public LogicSigAccount(LogicsigSignature lsig, Ed25519PublicKey signerPublicKey)
             throws IllegalArgumentException, NoSuchAlgorithmException {
         boolean hasSig = lsig.sig != null;
+        boolean hasLmsig = lsig.lmsig != null;
         boolean hasMsig = lsig.msig != null;
-        if (hasSig && hasMsig)
-            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig or Msig may be defined");
+
+        if (lsig.sigCount() > 1)
+            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig, Msig, or LMsig may be defined");
         if (hasSig) {
             if (signerPublicKey == null)
                 throw new IllegalArgumentException("Cannot generate LogicSigAccount from single-signed LogicSig and a null public key");
@@ -119,8 +121,9 @@ public class LogicSigAccount {
      */
     public boolean isDelegated() {
         boolean hasSig = this.lsig.sig != null;
+        boolean hasLmsig = this.lsig.lmsig != null;
         boolean hasMsig = this.lsig.msig != null;
-        return hasSig || hasMsig;
+        return hasSig || hasLmsig || hasMsig;
     }
 
     /**
@@ -131,12 +134,21 @@ public class LogicSigAccount {
      */
     public Address getAddress() throws NoSuchAlgorithmException, IllegalArgumentException {
         boolean hasSig = this.lsig.sig != null;
+        boolean hasLmsig = this.lsig.lmsig != null;
         boolean hasMsig = this.lsig.msig != null;
-        if (hasSig && hasMsig)
-            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig or Msig may be defined");
+
+        if (this.lsig.sigCount() > 1)
+            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig, Msig, or LMsig may be defined");
         if (hasSig) {
             byte[] sigKeyRaw = this.sigKey.getBytes();
             return new Address(sigKeyRaw);
+        }
+        if (hasLmsig) {
+            List<Ed25519PublicKey> pkFromSubSig = new ArrayList<>();
+            for (MultisigSignature.MultisigSubsig subSig : this.lsig.lmsig.subsigs)
+                pkFromSubSig.add(subSig.key);
+            MultisigAddress ma = new MultisigAddress(this.lsig.lmsig.version, this.lsig.lmsig.threshold, pkFromSubSig);
+            return ma.toAddress();
         }
         if (hasMsig) {
             List<Ed25519PublicKey> pkFromSubSig = new ArrayList<>();

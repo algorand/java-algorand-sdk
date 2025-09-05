@@ -29,6 +29,8 @@ public class LogicsigSignature {
     @JsonIgnore
     private static final byte[] LOGIC_PREFIX = ("Program").getBytes(StandardCharsets.UTF_8);
     @JsonIgnore
+    private static final byte[] MULTISIG_PROGRAM_PREFIX = ("MsigProgram").getBytes(StandardCharsets.UTF_8);
+    @JsonIgnore
     private static final String SIGN_ALGO = "EdDSA";
 
     @JsonProperty("l")
@@ -39,6 +41,8 @@ public class LogicsigSignature {
     public Signature sig;
     @JsonProperty("msig")
     public MultisigSignature msig;
+    @JsonProperty("lmsig")
+    public MultisigSignature lmsig;
 
 
     private static boolean isAsciiPrintable(final byte symbol) {
@@ -98,7 +102,8 @@ public class LogicsigSignature {
         @JsonProperty("l") byte[] logic,
         @JsonProperty("arg") List<byte[]> args,
         @JsonProperty("sig") byte[] sig,
-        @JsonProperty("msig") MultisigSignature msig
+        @JsonProperty("msig") MultisigSignature msig,
+        @JsonProperty("lmsig") MultisigSignature lmsig
     ) {
         this.logic = Objects.requireNonNull(logic, "program must not be null");
         this.args = args;
@@ -107,6 +112,7 @@ public class LogicsigSignature {
 
         if (sig != null) this.sig = new Signature(sig);
         this.msig = msig;
+        this.lmsig = lmsig;
     }
 
     /**
@@ -123,7 +129,7 @@ public class LogicsigSignature {
      * @param args
      */
     public LogicsigSignature(byte[] logicsig, List<byte[]> args) {
-        this(logicsig, args, null, null);
+        this(logicsig, args, null, null, null);
     }
 
     /**
@@ -132,6 +138,19 @@ public class LogicsigSignature {
     public LogicsigSignature() {
         this.logic = null;
         this.args = null;
+    }
+
+    /**
+     * Returns the number of signatures (sig, msig, lmsig) on this LogicSig.
+     * At most one of these should be present.
+     * @return the number of signature types present
+     */
+    public int sigCount() {
+        int count = 0;
+        if (this.sig != null) count++;
+        if (this.msig != null) count++;
+        if (this.lmsig != null) count++;
+        return count;
     }
 
     /**
@@ -158,6 +177,21 @@ public class LogicsigSignature {
     }
 
     /**
+     * Return prefixed program with multisig address as byte array that is ready to use with multisig
+     * signatures on delegated logicsig programs
+     * @param multisigAddress the multisig address to include in signed data
+     * @return byte[]
+     */
+    public byte[] bytesToSignMultisig(Address multisigAddress) {
+        byte[] addressBytes = multisigAddress.getBytes();
+        byte[] prefixedEncoded = new byte[this.logic.length + MULTISIG_PROGRAM_PREFIX.length + addressBytes.length];
+        System.arraycopy(MULTISIG_PROGRAM_PREFIX, 0, prefixedEncoded, 0, MULTISIG_PROGRAM_PREFIX.length);
+        System.arraycopy(addressBytes, 0, prefixedEncoded, MULTISIG_PROGRAM_PREFIX.length, addressBytes.length);
+        System.arraycopy(this.logic, 0, prefixedEncoded, MULTISIG_PROGRAM_PREFIX.length + addressBytes.length, this.logic.length);
+        return prefixedEncoded;
+    }
+
+    /**
      * Perform signature verification against the sender address
      * @param singleSigner only used in the case of a delegated LogicSig whose delegating account
      *                     is backed by a single private key
@@ -168,7 +202,8 @@ public class LogicsigSignature {
             return false;
         }
 
-        if (this.sig != null && this.msig != null) {
+        // At most one signature type should be present
+        if (sigCount() > 1) {
             return false;
         }
 
@@ -189,6 +224,11 @@ public class LogicsigSignature {
             } catch (Exception ex) {
                 return false;
             }
+        }
+
+        if (this.lmsig != null) {
+            Address multisigAddr = this.lmsig.convertToMultisigAddress().toAddress();
+            return this.lmsig.verify(this.bytesToSignMultisig(multisigAddr));
         }
 
         if (this.msig != null)
@@ -220,6 +260,9 @@ public class LogicsigSignature {
 
             if (!LogicsigSignature.nullCheck(this.sig, actual.sig)) return false;
             if (this.sig != null && !this.sig.equals(actual.sig)) return false;
+
+            if (!LogicsigSignature.nullCheck(this.lmsig, actual.lmsig)) return false;
+            if (this.lmsig != null && !this.lmsig.equals(actual.lmsig)) return false;
 
             if (!LogicsigSignature.nullCheck(this.msig, actual.msig)) return false;
             return this.msig == null || this.msig.equals(actual.msig);
