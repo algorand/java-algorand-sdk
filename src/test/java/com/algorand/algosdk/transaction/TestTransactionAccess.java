@@ -545,4 +545,30 @@ public class TestTransactionAccess {
         assertTrue(txn.foreignApps.isEmpty());
         assertTrue(txn.foreignAssets.isEmpty());
     }
+
+    @Test
+    public void testAppResourceRefsRejectsNullEntries() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        
+        List<AppResourceRef> appResourceRefs = Arrays.asList(
+            AppResourceRef.forAsset(123L),
+            null, // This should be rejected
+            AppResourceRef.forApp(456L)
+        );
+
+        // Should throw when appResourceRefs contains null entries
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            ApplicationCallTransactionBuilder.Builder()
+                    .sender(sender)
+                    .applicationId(1018L)
+                    .useAccess(true)
+                    .appResourceRefs(appResourceRefs)
+                    .firstValid(BigInteger.valueOf(1000))
+                    .lastValid(BigInteger.valueOf(2000))
+                    .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                    .build();
+        });
+        
+        assertEquals("AppResourceRef cannot be null", exception.getMessage());
+    }
 }

@@ -63,6 +63,15 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                 access = AccessConverter.convertToResourceRefs(appResourceRefs, sender, applicationId);
             }
             
+            // Validate AppResourceRef entries for null references
+            if (appResourceRefs != null && !appResourceRefs.isEmpty()) {
+                for (AppResourceRef ref : appResourceRefs) {
+                    if (ref == null) {
+                        throw new IllegalArgumentException("AppResourceRef cannot be null");
+                    }
+                }
+            }
+            
             // Validate ResourceRef entries
             if (access != null && !access.isEmpty()) {
                 for (ResourceRef ref : access) {

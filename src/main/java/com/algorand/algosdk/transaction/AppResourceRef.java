@@ -220,9 +220,7 @@ public abstract class AppResourceRef {
         
         @Override
         public int hashCode() {
-            int result = Objects.hash(appId);
-            result = 31 * result + Arrays.hashCode(name);
-            return result;
+            return Objects.hash(appId, Arrays.hashCode(name));
         }
         
         @Override
