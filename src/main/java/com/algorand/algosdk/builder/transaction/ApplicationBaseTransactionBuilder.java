@@ -1,7 +1,10 @@
 package com.algorand.algosdk.builder.transaction;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.transaction.AccessConverter;
 import com.algorand.algosdk.transaction.AppBoxReference;
+import com.algorand.algosdk.transaction.AppResourceRef;
+import com.algorand.algosdk.transaction.ResourceRef;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
@@ -17,6 +20,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<Long> foreignApps;
     private List<Long> foreignAssets;
     private List<AppBoxReference> appBoxReferences;
+    private List<ResourceRef> access;
+    private List<AppResourceRef> appResourceRefs;
     private Long applicationId;
 
     /**
@@ -32,6 +37,38 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         Objects.requireNonNull(onCompletion, "OnCompletion is required, please file a bug report.");
         Objects.requireNonNull(applicationId);
 
+        // Handle access field conversion and validation
+        boolean hasLegacyFields = (accounts != null && !accounts.isEmpty()) ||
+                                 (foreignApps != null && !foreignApps.isEmpty()) ||
+                                 (foreignAssets != null && !foreignAssets.isEmpty()) ||
+                                 (appBoxReferences != null && !appBoxReferences.isEmpty());
+        
+        boolean hasAccessFields = (access != null && !access.isEmpty()) ||
+                                 (appResourceRefs != null && !appResourceRefs.isEmpty());
+        
+        if (hasLegacyFields && hasAccessFields) {
+            throw new IllegalArgumentException(
+                "Cannot use access fields together with legacy accounts, foreignApps, foreignAssets, or boxReferences");
+        }
+        
+        // Convert AppResourceRef to ResourceRef if provided
+        if (appResourceRefs != null && !appResourceRefs.isEmpty()) {
+            if (access != null && !access.isEmpty()) {
+                throw new IllegalArgumentException(
+                    "Cannot use both AppResourceRef and ResourceRef access methods simultaneously");
+            }
+            access = AccessConverter.convertToResourceRefs(appResourceRefs, sender, applicationId);
+        }
+        
+        // Validate ResourceRef entries
+        if (access != null && !access.isEmpty()) {
+            for (ResourceRef ref : access) {
+                if (ref != null) {
+                    ref.validate();
+                }
+            }
+        }
+
         if (applicationId != null) txn.applicationId = applicationId;
         if (onCompletion != null) txn.onCompletion = onCompletion;
         if (applicationArgs != null) txn.applicationArgs = applicationArgs;
@@ -39,6 +76,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         if (foreignApps != null) txn.foreignApps = foreignApps;
         if (foreignAssets != null) txn.foreignAssets = foreignAssets;
         if (appBoxReferences != null) txn.boxReferences = convertBoxes(appBoxReferences, foreignApps, applicationId);
+        if (access != null) txn.access = access;
     }
 
     @Override
@@ -105,6 +143,31 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
 
     public T boxReferences(List<AppBoxReference> boxReferences) {
         this.appBoxReferences = boxReferences;
+        return (T) this;
+    }
+
+    /**
+     * Set the access list for this transaction using low-level ResourceRef objects.
+     * The access list unifies accounts, foreignApps, foreignAssets, and boxReferences 
+     * under a single list with explicit resource tracking.
+     * 
+     * Note: Using the access field is mutually exclusive with using the separate accounts,
+     * foreignApps, foreignAssets, and boxReferences fields.
+     */
+    public T access(List<ResourceRef> access) {
+        this.access = access;
+        return (T) this;
+    }
+
+    /**
+     * Set the access list for this transaction using high-level AppResourceRef objects.
+     * This provides a user-friendly API that automatically handles index conversion.
+     * 
+     * Note: Using the access field is mutually exclusive with using the separate accounts,
+     * foreignApps, foreignAssets, and boxReferences fields.
+     */
+    public T appResourceRefs(List<AppResourceRef> appResourceRefs) {
+        this.appResourceRefs = appResourceRefs;
         return (T) this;
     }
 }
