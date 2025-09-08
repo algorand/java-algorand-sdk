@@ -504,6 +504,9 @@ public class Account {
      * @throws NoSuchAlgorithmException
      */
     public LogicsigSignature appendToLogicsig(LogicsigSignature lsig) throws IllegalArgumentException, IOException {
+        if (lsig.lmsig == null) {
+            throw new IllegalArgumentException("LogicsigSignature.lmsig is null; cannot append to multisig logic signature.");
+        }
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myIndex = -1;
         for (int i = 0; i < lsig.lmsig.subsigs.size(); i++ ) {
