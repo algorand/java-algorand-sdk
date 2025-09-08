@@ -34,6 +34,7 @@ public class TestTransactionAccess {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1001L)
+                .useAccess(true)
                 .appResourceRefs(appResourceRefs)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -71,6 +72,7 @@ public class TestTransactionAccess {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1002L)
+                .useAccess(true)
                 .appResourceRefs(appResourceRefs)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -113,11 +115,12 @@ public class TestTransactionAccess {
             AppResourceRef.forAddress(account)
         );
 
-        // Should throw when trying to use appResourceRefs with accounts
+        // Should throw when trying to use appResourceRefs with accounts and useAccess=true
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             ApplicationCallTransactionBuilder.Builder()
                     .sender(sender)
                     .applicationId(1003L)
+                    .useAccess(true)
                     .appResourceRefs(appResourceRefs)
                     .accounts(Arrays.asList(account)) // This should conflict
                     .firstValid(BigInteger.valueOf(1000))
@@ -126,7 +129,7 @@ public class TestTransactionAccess {
                     .build();
         });
         
-        assertTrue(exception.getMessage().contains("Cannot use access fields together with legacy"));
+        assertTrue(exception.getMessage().contains("Cannot use legacy accounts, foreignApps, foreignAssets, or boxReferences when useAccess=true"));
     }
 
     @Test
@@ -137,11 +140,12 @@ public class TestTransactionAccess {
             AppResourceRef.forApp(777L)
         );
 
-        // Should throw when trying to use appResourceRefs with foreignApps
+        // Should throw when trying to use appResourceRefs with foreignApps and useAccess=true
         IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
             ApplicationCallTransactionBuilder.Builder()
                     .sender(sender)
                     .applicationId(1004L)
+                    .useAccess(true)
                     .appResourceRefs(appResourceRefs)
                     .foreignApps(Arrays.asList(777L)) // This should conflict
                     .firstValid(BigInteger.valueOf(1000))
@@ -150,7 +154,7 @@ public class TestTransactionAccess {
                     .build();
         });
         
-        assertTrue(exception.getMessage().contains("Cannot use access fields together with legacy"));
+        assertTrue(exception.getMessage().contains("Cannot use legacy accounts, foreignApps, foreignAssets, or boxReferences when useAccess=true"));
     }
 
     @Test
@@ -169,6 +173,7 @@ public class TestTransactionAccess {
             ApplicationCallTransactionBuilder.Builder()
                     .sender(sender)
                     .applicationId(1005L)
+                    .useAccess(true)
                     .access(accessList)
                     .firstValid(BigInteger.valueOf(1000))
                     .lastValid(BigInteger.valueOf(2000))
@@ -192,6 +197,7 @@ public class TestTransactionAccess {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1006L)
+                .useAccess(true)
                 .appResourceRefs(appResourceRefs)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -226,6 +232,7 @@ public class TestTransactionAccess {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1007L)
+                .useAccess(true)
                 .appResourceRefs(Arrays.asList()) // Empty list
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -283,6 +290,7 @@ public class TestTransactionAccess {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1009L)
+                .useAccess(true)
                 .access(accessList)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -325,6 +333,7 @@ public class TestTransactionAccess {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1010L) // This is the current app
+                .useAccess(true)
                 .appResourceRefs(appResourceRefs)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -367,6 +376,7 @@ public class TestTransactionAccess {
             ApplicationCallTransactionBuilder.Builder()
                     .sender(sender)
                     .applicationId(1011L)
+                    .useAccess(true)
                     .access(accessList)
                     .appResourceRefs(appResourceRefs) // This should conflict
                     .firstValid(BigInteger.valueOf(1000))
@@ -376,5 +386,163 @@ public class TestTransactionAccess {
         });
         
         assertTrue(exception.getMessage().contains("Cannot use both AppResourceRef and ResourceRef access methods"));
+    }
+
+    @Test
+    public void testUseAccessTrueWithAppResourceRefs() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+        
+        List<AppResourceRef> appResourceRefs = Arrays.asList(
+            AppResourceRef.forAddress(account),
+            AppResourceRef.forAsset(999L)
+        );
+
+        // Should work when useAccess=true
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1012L)
+                .useAccess(true)
+                .appResourceRefs(appResourceRefs)
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertNotNull(txn.access);
+        assertEquals(2, txn.access.size());
+        
+        // Verify legacy fields are empty
+        assertTrue(txn.accounts.isEmpty());
+        assertTrue(txn.foreignApps.isEmpty());
+        assertTrue(txn.foreignAssets.isEmpty());
+        assertTrue(txn.boxReferences.isEmpty());
+    }
+
+    @Test
+    public void testUseAccessFalseWithLegacyFields() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+
+        // Should work when useAccess=false (default)
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1013L)
+                .useAccess(false)
+                .accounts(Arrays.asList(account))
+                .foreignApps(Arrays.asList(999L))
+                .foreignAssets(Arrays.asList(777L))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        // Verify legacy fields are set
+        assertEquals(1, txn.accounts.size());
+        assertEquals(account, txn.accounts.get(0));
+        assertEquals(1, txn.foreignApps.size());
+        assertEquals(Long.valueOf(999L), txn.foreignApps.get(0));
+        assertEquals(1, txn.foreignAssets.size());
+        assertEquals(Long.valueOf(777L), txn.foreignAssets.get(0));
+        
+        // Verify access field is empty
+        assertTrue(txn.access.isEmpty());
+    }
+
+    @Test
+    public void testUseAccessDefaultIsFalse() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+
+        // Default behavior (no useAccess call) should be useAccess=false
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1014L)
+                .accounts(Arrays.asList(account))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        // Should work like useAccess=false
+        assertEquals(1, txn.accounts.size());
+        assertTrue(txn.access.isEmpty());
+    }
+
+    @Test
+    public void testUseAccessTrueRejectsLegacyFields() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+
+        // Should throw when trying to use legacy fields with useAccess=true
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            ApplicationCallTransactionBuilder.Builder()
+                    .sender(sender)
+                    .applicationId(1015L)
+                    .useAccess(true)
+                    .accounts(Arrays.asList(account)) // This should conflict
+                    .firstValid(BigInteger.valueOf(1000))
+                    .lastValid(BigInteger.valueOf(2000))
+                    .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                    .build();
+        });
+        
+        assertTrue(exception.getMessage().contains("Cannot use legacy accounts, foreignApps, foreignAssets, or boxReferences when useAccess=true"));
+    }
+
+    @Test
+    public void testUseAccessFalseRejectsAccessFields() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        
+        List<AppResourceRef> appResourceRefs = Arrays.asList(
+            AppResourceRef.forAsset(123L)
+        );
+
+        // Should throw when trying to use access fields with useAccess=false
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> {
+            ApplicationCallTransactionBuilder.Builder()
+                    .sender(sender)
+                    .applicationId(1016L)
+                    .useAccess(false)
+                    .appResourceRefs(appResourceRefs) // This should conflict
+                    .firstValid(BigInteger.valueOf(1000))
+                    .lastValid(BigInteger.valueOf(2000))
+                    .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                    .build();
+        });
+        
+        assertTrue(exception.getMessage().contains("Cannot use access fields or appResourceRefs when useAccess=false"));
+    }
+
+    @Test
+    public void testUseAccessTrueWithDirectResourceRefs() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+        
+        List<ResourceRef> accessList = Arrays.asList(
+            ResourceRef.forAddress(account),
+            ResourceRef.forAsset(555L)
+        );
+
+        // Should work when useAccess=true with direct ResourceRef
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1017L)
+                .useAccess(true)
+                .access(accessList)
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertNotNull(txn.access);
+        assertEquals(2, txn.access.size());
+        assertEquals(account, txn.access.get(0).address);
+        assertEquals(Long.valueOf(555L), txn.access.get(1).asset);
+        
+        // Verify legacy fields are empty
+        assertTrue(txn.accounts.isEmpty());
+        assertTrue(txn.foreignApps.isEmpty());
+        assertTrue(txn.foreignAssets.isEmpty());
     }
 }

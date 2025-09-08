@@ -23,6 +23,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<ResourceRef> access;
     private List<AppResourceRef> appResourceRefs;
     private Long applicationId;
+    private boolean useAccess = false;
 
     /**
      * All application calls use this type, so no need to make this private. This constructor should always be called.
@@ -37,7 +38,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         Objects.requireNonNull(onCompletion, "OnCompletion is required, please file a bug report.");
         Objects.requireNonNull(applicationId);
 
-        // Handle access field conversion and validation
+        // Handle access field conversion and validation based on useAccess flag
         boolean hasLegacyFields = (accounts != null && !accounts.isEmpty()) ||
                                  (foreignApps != null && !foreignApps.isEmpty()) ||
                                  (foreignAssets != null && !foreignAssets.isEmpty()) ||
@@ -46,37 +47,51 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         boolean hasAccessFields = (access != null && !access.isEmpty()) ||
                                  (appResourceRefs != null && !appResourceRefs.isEmpty());
         
-        if (hasLegacyFields && hasAccessFields) {
-            throw new IllegalArgumentException(
-                "Cannot use access fields together with legacy accounts, foreignApps, foreignAssets, or boxReferences");
-        }
-        
-        // Convert AppResourceRef to ResourceRef if provided
-        if (appResourceRefs != null && !appResourceRefs.isEmpty()) {
-            if (access != null && !access.isEmpty()) {
+        if (useAccess) {
+            // Using access field mode - validate no legacy fields are set
+            if (hasLegacyFields) {
                 throw new IllegalArgumentException(
-                    "Cannot use both AppResourceRef and ResourceRef access methods simultaneously");
+                    "Cannot use legacy accounts, foreignApps, foreignAssets, or boxReferences when useAccess=true");
             }
-            access = AccessConverter.convertToResourceRefs(appResourceRefs, sender, applicationId);
-        }
-        
-        // Validate ResourceRef entries
-        if (access != null && !access.isEmpty()) {
-            for (ResourceRef ref : access) {
-                if (ref != null) {
-                    ref.validate();
+            
+            // Convert AppResourceRef to ResourceRef if provided
+            if (appResourceRefs != null && !appResourceRefs.isEmpty()) {
+                if (access != null && !access.isEmpty()) {
+                    throw new IllegalArgumentException(
+                        "Cannot use both AppResourceRef and ResourceRef access methods simultaneously");
+                }
+                access = AccessConverter.convertToResourceRefs(appResourceRefs, sender, applicationId);
+            }
+            
+            // Validate ResourceRef entries
+            if (access != null && !access.isEmpty()) {
+                for (ResourceRef ref : access) {
+                    if (ref != null) {
+                        ref.validate();
+                    }
                 }
             }
+            
+            // Set access field and clear legacy fields
+            if (access != null) txn.access = access;
+        } else {
+            // Using legacy fields mode - validate no access fields are set
+            if (hasAccessFields) {
+                throw new IllegalArgumentException(
+                    "Cannot use access fields or appResourceRefs when useAccess=false. Set useAccess=true to use access field.");
+            }
+            
+            // Use legacy fields (existing behavior)
+            if (accounts != null) txn.accounts = accounts;
+            if (foreignApps != null) txn.foreignApps = foreignApps;
+            if (foreignAssets != null) txn.foreignAssets = foreignAssets;
+            if (appBoxReferences != null) txn.boxReferences = convertBoxes(appBoxReferences, foreignApps, applicationId);
         }
 
+        // Set common fields
         if (applicationId != null) txn.applicationId = applicationId;
         if (onCompletion != null) txn.onCompletion = onCompletion;
         if (applicationArgs != null) txn.applicationArgs = applicationArgs;
-        if (accounts != null) txn.accounts = accounts;
-        if (foreignApps != null) txn.foreignApps = foreignApps;
-        if (foreignAssets != null) txn.foreignAssets = foreignAssets;
-        if (appBoxReferences != null) txn.boxReferences = convertBoxes(appBoxReferences, foreignApps, applicationId);
-        if (access != null) txn.access = access;
     }
 
     @Override
@@ -168,6 +183,27 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      */
     public T appResourceRefs(List<AppResourceRef> appResourceRefs) {
         this.appResourceRefs = appResourceRefs;
+        return (T) this;
+    }
+    
+    /**
+     * Enable or disable the use of the access field in this transaction.
+     * 
+     * When useAccess=true:
+     * - The transaction will use the new access field for resource references
+     * - Legacy accounts, foreignApps, foreignAssets, and boxReferences fields are not allowed
+     * - appResourceRefs() and access() methods are available for setting resources
+     * 
+     * When useAccess=false (default):
+     * - The transaction will use legacy accounts, foreignApps, foreignAssets, and boxReferences fields
+     * - The access field and appResourceRefs are not allowed
+     * - This maintains backward compatibility with pre-consensus upgrade networks
+     * 
+     * @param useAccess true to use the access field, false to use legacy fields
+     * @return this builder instance
+     */
+    public T useAccess(boolean useAccess) {
+        this.useAccess = useAccess;
         return (T) this;
     }
 }

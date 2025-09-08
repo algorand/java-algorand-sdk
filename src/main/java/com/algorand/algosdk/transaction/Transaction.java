@@ -166,7 +166,7 @@ public class Transaction implements Serializable {
     public Long extraPages = 0L;
 
     /* access field - unifies accounts, foreignApps, foreignAssets, and boxReferences */
-    @JsonProperty("apac")
+    @JsonProperty("al")
     public List<ResourceRef> access = new ArrayList<>();
 
     /* state proof fields */
@@ -247,7 +247,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("apsu") byte[] clearStateProgram,
                         @JsonProperty("apep") Long extraPages,
                         // access fields
-                        @JsonProperty("apac") List<ResourceRef> access,
+                        @JsonProperty("al") List<ResourceRef> access,
                         // heartbeat fields
                         @JsonProperty("hb") HeartbeatTxnFields heartbeatFields
     ) throws IOException {

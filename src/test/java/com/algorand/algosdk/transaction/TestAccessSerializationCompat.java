@@ -38,6 +38,7 @@ public class TestAccessSerializationCompat {
         Transaction original = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(2001L)
+                .useAccess(true)
                 .appResourceRefs(appResourceRefs)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -110,6 +111,7 @@ public class TestAccessSerializationCompat {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(2002L)
+                .useAccess(true)
                 .appResourceRefs(appResourceRefs)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -124,8 +126,14 @@ public class TestAccessSerializationCompat {
         String hexEncoded = bytesToHex(encoded);
         assertNotNull(hexEncoded);
         
-        // The presence of access field should be indicated by the "apac" tag in MessagePack
-        // This is indirectly verified by successful round-trip serialization
+        // The presence of access field should be indicated by the "al" tag in MessagePack
+        // Directly verify that the "al" field is present in the MessagePack bytes
+        assertTrue(containsMessagePackField(encoded, "al"));
+        
+        // Verify that the old "apac" tag is NOT present (regression test)
+        assertFalse(containsMessagePackField(encoded, "apac"));
+        
+        // Also verify by successful round-trip serialization
         Transaction decoded = Encoder.decodeFromMsgPack(encoded, Transaction.class);
         assertNotNull(decoded.access);
         assertFalse(decoded.access.isEmpty());
@@ -145,6 +153,7 @@ public class TestAccessSerializationCompat {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(3003L)
+                .useAccess(true)
                 .appResourceRefs(appResourceRefs)
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
@@ -183,5 +192,27 @@ public class TestAccessSerializationCompat {
             result.append(String.format("%02x", b));
         }
         return result.toString();
+    }
+
+    /**
+     * Check if a MessagePack field name is present in the encoded bytes.
+     * MessagePack uses compact string encoding where short strings are encoded inline.
+     * This is a simple byte search that looks for the field name as bytes.
+     */
+    private static boolean containsMessagePackField(byte[] messagePackBytes, String fieldName) {
+        byte[] fieldBytes = fieldName.getBytes();
+        for (int i = 0; i <= messagePackBytes.length - fieldBytes.length; i++) {
+            boolean found = true;
+            for (int j = 0; j < fieldBytes.length; j++) {
+                if (messagePackBytes[i + j] != fieldBytes[j]) {
+                    found = false;
+                    break;
+                }
+            }
+            if (found) {
+                return true;
+            }
+        }
+        return false;
     }
 }
