@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.security.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -25,6 +26,7 @@ public class TestLogicSigAccount {
     ArrayList<byte[]> args;
     String otherAddrStr, programHash;
     byte[] note;
+    byte[] testVectorGenesisHash;
     final String SK_MNEMONIC = "olympic cricket tower model share zone grid twist sponsor avoid eight apology patient party success claim famous rapid donor pledge bomb mystery security ability often";
     Account singleDelegateAccount;
     KeyPair kp;
@@ -50,6 +52,7 @@ public class TestLogicSigAccount {
         note = new byte[]{(byte) 180, 81, 121, 57, (byte) 252, (byte) 250, (byte) 210, 113};
         otherAddrStr = "WTDCE2FEYM2VB5MKNXKLRSRDTSPR2EFTIGVH4GRW4PHGD6747GFJTBGT2A";
         programHash = "6Z3C3LDVWGMX23BMSYMANACQOSINPFIRF77H7N3AWJZYV6OH6GWTJKVMXY";
+        testVectorGenesisHash = Base64.getDecoder().decode("JgsgCaCTqIaLeVhyL6XlRu3n7Rfk2FxMeK+wRSaQ7dI=");
 
         byte[] seed = Mnemonic.toKey(SK_MNEMONIC);
         singleDelegateAccount = new Account(seed);
@@ -74,6 +77,9 @@ public class TestLogicSigAccount {
         LogicSigAccount lsaEscrow = new LogicSigAccount(program, args);
         assertThat(lsaEscrow.lsig).isEqualTo(new LogicsigSignature(program, args));
         assertThat(lsaEscrow.sigKey).isNull();
+        assertThat(lsaEscrow.lsig.sig).isNull();
+        assertThat(lsaEscrow.lsig.msig).isNull();
+        assertThat(lsaEscrow.lsig.lmsig).isNull();
 
         // delegated single logic-sig account
         LogicSigAccount lsaDelegated = new LogicSigAccount(program, args, kp.getPrivate());
@@ -89,6 +95,7 @@ public class TestLogicSigAccount {
         };
         assertThat(lsaDelegated.sigKey).isEqualTo(singleDelegateAccount.getEd25519PublicKey());
         assertThat(lsaDelegated.lsig.msig).isNull();
+        assertThat(lsaDelegated.lsig.lmsig).isNull();
         assertThat(singleDelegateAccount.getEd25519PublicKey()).isEqualTo(lsaDelegated.sigKey);
         assertThat(lsaDelegated.lsig.sig).isEqualTo(new Signature(expectedSigBytes));
 
@@ -99,28 +106,18 @@ public class TestLogicSigAccount {
         assertThat(lsaMultiDelegated.lsig.args).isEqualTo(args);
         lsaMultiDelegated.appendMultiSig(maKp1.getPrivate());
 
-        byte[] sig0bytes = new byte[]{
-                0x49, 0x13, (byte) 0xb8, 0x5, (byte) 0xd1, (byte) 0x9e, 0x7f, 0x2c, 0x10, (byte) 0x80, (byte) 0xf6,
-                0x33, 0x7e, 0x18, 0x54, (byte) 0xa7, (byte) 0xce, (byte) 0xea, (byte) 0xee, 0x10, (byte) 0xdd, (byte) 0xbd,
-                0x13, 0x65, (byte) 0x84, (byte) 0xbf, (byte) 0x93, (byte) 0xb7, 0x5f, 0x30, 0x63, 0x15, (byte) 0x91,
-                (byte) 0xca, 0x23, 0xc, (byte) 0xed, (byte) 0xef, 0x23, (byte) 0xd1, 0x74, 0x1b, 0x52, (byte) 0x9d,
-                (byte) 0xb0, (byte) 0xff, (byte) 0xef, 0x37, 0x54, (byte) 0xd6, 0x46, (byte) 0xf4, (byte) 0xb5, 0x61,
-                (byte) 0xfc, (byte) 0x8b, (byte) 0xbc, 0x2d, 0x7b, 0x4e, 0x63, 0x5c, (byte) 0xbd, 0x2
-        };
-        Signature sig0Expected = new Signature(sig0bytes);
-        assertThat(lsaMultiDelegated.lsig.msig.subsigs.get(0).sig).isEqualTo(sig0Expected);
+        assertThat(lsaMultiDelegated.lsig.msig).isNull(); // Legacy
+        assertThat(lsaMultiDelegated.lsig.lmsig).isNotNull();
+        assertThat(lsaMultiDelegated.lsig.lmsig.subsigs).hasSize(3);
+        assertThat(lsaMultiDelegated.lsig.lmsig.subsigs.get(0).sig).isNotNull();
+        assertThat(lsaMultiDelegated.lsig.lmsig.subsigs.get(1).sig).isNotNull();
+        assertThat(lsaMultiDelegated.lsig.lmsig.subsigs.get(2).sig).isEqualTo(new Signature());
 
-        byte[] sig1bytes = new byte[]{
-                0x64, (byte) 0xbc, 0x55, (byte) 0xdb, (byte) 0xed, (byte) 0x91, (byte) 0xa2, 0x41, (byte) 0xd4, 0x2a,
-                (byte) 0xb6, 0x60, (byte) 0xf7, (byte) 0xe1, 0x4a, (byte) 0xb9, (byte) 0x99, (byte) 0x9a, 0x52,
-                (byte) 0xb3, (byte) 0xb1, 0x71, 0x58, (byte) 0xce, (byte) 0xfc, 0x3f, 0x4f, (byte) 0xe7,
-                (byte) 0xcb, 0x22, 0x41, 0x14, (byte) 0xad, (byte) 0xa9, 0x3d, 0x5e, (byte) 0x84, 0x5, 0x2, 0xa, 0x17,
-                (byte) 0xa6, 0x69, (byte) 0x83, 0x3, 0x22, 0x4e, (byte) 0x86, (byte) 0xa3, (byte) 0x8b, 0x6a, 0x36,
-                (byte) 0xc5, 0x54, (byte) 0xbe, 0x20, 0x50, (byte) 0xff, (byte) 0xd3, (byte) 0xee, (byte) 0xa8,
-                (byte) 0xb3, 0x4, 0x9
-        };
-        Signature sig1Expected = new Signature(sig1bytes);
-        assertThat(lsaMultiDelegated.lsig.msig.subsigs.get(1).sig).isEqualTo(sig1Expected);
+        // from: jq '.lsig' tests/resources/msig_delegated.txn | msgpacktool -e | base64
+        String expectedBase64 = "g6NhcmeSxAEBxAICA6FsxAUBIAEBIqVsbXNpZ4Omc3Vic2lnk4KicGvEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4oXPEQIwzZcSx0RNw8j9w13dGn+HZR3m/TY1kgXZJNe94TMx2V2zA4O/pwUb6YHba+s5V7przG3aOvDK07BosjD3AZwaConBrxCAJYzIJU3OJ8HVnEXc5kcfQPhtzyMT1K/av8BqiXPnCcaFzxEBPVtR92cCxahX1iGTp50PVMQkf969ssoHfNA0VOiNupdkXc9n/l2WO9+pj8Ddozf4ovorGgnrzca3ZhKc46uUNgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AQ==";
+        byte[] encoded = Encoder.encodeToMsgPack(lsaMultiDelegated.lsig);
+        String actualBase64 = Base64.getEncoder().encodeToString(encoded);
+        assertThat(actualBase64).isEqualTo(expectedBase64);
     }
 
     @Test
@@ -176,6 +173,12 @@ public class TestLogicSigAccount {
 
     private void testSign(LogicSigAccount lsa, Address sender, String expectedTxid, Address expectedAuthAddr, byte[] expectedBytes)
             throws GeneralSecurityException, IOException {
+        // older tests use empty genesis hash
+        testSign(lsa, sender, expectedTxid, expectedAuthAddr, expectedBytes, null);
+    }
+
+    private void testSign(LogicSigAccount lsa, Address sender, String expectedTxid, Address expectedAuthAddr, byte[] expectedBytes, byte[] genesisHashBytes)
+            throws GeneralSecurityException, IOException {
         Address to = new Address(otherAddrStr);
 
         BigInteger firstRound = BigInteger.valueOf(972508);
@@ -187,7 +190,7 @@ public class TestLogicSigAccount {
                 .lastValid(firstRound.longValue() + 1000)
                 .note(note)
                 .genesisID("testnet-v31.0")
-                .genesisHash(new Digest())
+                .genesisHash(new Digest(genesisHashBytes))
                 .amount(BigInteger.valueOf(5000))
                 .receiver(to)
                 .build();
@@ -248,19 +251,46 @@ public class TestLogicSigAccount {
     public void testMultiSigContractAddr() throws GeneralSecurityException, IOException {
         LogicSigAccount lsa = new LogicSigAccount(program, args, maKp0.getPrivate(), ma);
         lsa.appendMultiSig(maKp1.getPrivate());
-        String expectedTxID = "2I2QT3MGXNMB5IOTNWEQZWUJCHLJ5QFBYI264X5NWMUDKZXPZ5RA";
-        String expectedByteEncoded = "QKSGY43JM6B2GYLSM6JMIAIBYQBAEA5BNTCAKAJAAEASFJDNONUWPA5GON2WE43JM6JYFITQNPCCAG36YCYEX2TBW6LJBF7GZP2APYIIU4CTKHILZGFL5MJCBGUKXALYUFZ4IQCJCO4ALUM6P4WBBAHWGN7BQVFHZ3VO4EG5XUJWLBF7SO3V6MDDCWI4UIYM5XXSHULUDNJJ3MH7543VJVSG6S2WD7ELXQWXWTTDLS6QFAVCOBV4IIAJMMZASU3TRHYHKZYRO44ZDR6QHYNXHSGE6UV7NL7QDKRFZ6OCOGQXHRCAMS6FLW7NSGREDVBKWZQPPYKKXGMZUUVTWFYVRTX4H5H6PSZCIEKK3KJ5L2CAKAQKC6TGTAYDEJHINI4LNI3MKVF6EBIP7U7OVCZQICMBUJYGXRBA47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ2G5DIOIBKC5QBUN2HQ3UJUNQW25GNCOEKGZTFMXHAAA2PVCRGM5WOAAHNNXFDM5SW5LLUMVZXI3TFOQWXMMZRFYYKE3DWZYAA5WWEURXG65DFYQELIULZHH6PVUTRUNZGG5WEEC2MMITIUTBTKUHVRJW5JOGKEOOJ6HIQWNA2U7Q2G3R44YP37T4YVI3TNZSMIIENSK2ITEABOOQE36SDLGRWM2TK7TVCYQVALXM4D5Z65OSUPABX5GSHI6LQMWRXAYLZ";
-        byte[] expectedBytes = Encoder.decodeFromBase32StripPad(expectedByteEncoded);
-        testSign(lsa, ma.toAddress(), expectedTxID, new Address(), expectedBytes);
+        String expectedTxID = "UGGT5EZXG2OBPGWTEINC65UXIQ6UVAAOTNKRRCRAUCZH4FWJTVQQ";
+        // from: msgpacktool -e < tests/resources/msig_delegated.txn | base64
+        String expectedBase64 = "gqRsc2lng6NhcmeSxAEBxAICA6FsxAUBIAEBIqVsbXNpZ4Omc3Vic2lnk4KicGvEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4oXPEQIwzZcSx0RNw8j9w13dGn+HZR3m/TY1kgXZJNe94TMx2V2zA4O/pwUb6YHba+s5V7przG3aOvDK07BosjD3AZwaConBrxCAJYzIJU3OJ8HVnEXc5kcfQPhtzyMT1K/av8BqiXPnCcaFzxEBPVtR92cCxahX1iGTp50PVMQkf969ssoHfNA0VOiNupdkXc9n/l2WO9+pj8Ddozf4ovorGgnrzca3ZhKc46uUNgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaN0eG6Ko2FtdM0TiKNmZWXOAANPqKJmds4ADtbco2dlbq10ZXN0bmV0LXYzMS4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds4ADtrEpG5vdGXECLRReTn8+tJxo3JjdsQgtMYiaKTDNVD1im3UuMojnJ8dELNBqn4aNuPOYfv8+Yqjc25kxCCNkrSJkAFzoE36Q1mjZmpq/OosQqBd2cH3PuulR4A36aR0eXBlo3BheQ==";
+        byte[] expectedBytes = Base64.getDecoder().decode(expectedBase64);
+        testSign(lsa, ma.toAddress(), expectedTxID, new Address(), expectedBytes, testVectorGenesisHash);
+
+        SignedTransaction stx = Encoder.decodeFromMsgPack(expectedBytes, SignedTransaction.class);
+        assertThat(stx.lSig).isNotNull();
+        assertThat(stx.lSig.logic).isEqualTo(program);
+        assertThat(stx.lSig.args).hasSize(2);
+        assertThat(stx.lSig.args.get(0)).isEqualTo(new byte[] {0x01});
+        assertThat(stx.lSig.args.get(1)).isEqualTo(new byte[] {0x02, 0x03});
+        assertThat(stx.lSig.lmsig).isNotNull();
+        assertThat(stx.lSig.lmsig.subsigs).hasSize(3);
+        assertThat(stx.tx.sender).isEqualTo(ma.toAddress());
+
+        assertThat(stx.lSig.verify(ma.toAddress())).isTrue();
     }
 
     @Test
     public void testMultiSigNotContractAddr() throws GeneralSecurityException, IOException {
         LogicSigAccount lsa = new LogicSigAccount(program, args, maKp0.getPrivate(), ma);
         lsa.appendMultiSig(maKp1.getPrivate());
-        String expectedTxID = "U4X24Q45MCZ6JSL343QNR3RC6AJO2NUDQXFCTNONIW3SU2AYQJOA";
-        String expectedByteEncoded = "QOSGY43JM6B2GYLSM6JMIAIBYQBAEA5BNTCAKAJAAEASFJDNONUWPA5GON2WE43JM6JYFITQNPCCAG36YCYEX2TBW6LJBF7GZP2APYIIU4CTKHILZGFL5MJCBGUKXALYUFZ4IQCJCO4ALUM6P4WBBAHWGN7BQVFHZ3VO4EG5XUJWLBF7SO3V6MDDCWI4UIYM5XXSHULUDNJJ3MH7543VJVSG6S2WD7ELXQWXWTTDLS6QFAVCOBV4IIAJMMZASU3TRHYHKZYRO44ZDR6QHYNXHSGE6UV7NL7QDKRFZ6OCOGQXHRCAMS6FLW7NSGREDVBKWZQPPYKKXGMZUUVTWFYVRTX4H5H6PSZCIEKK3KJ5L2CAKAQKC6TGTAYDEJHINI4LNI3MKVF6EBIP7U7OVCZQICMBUJYGXRBA47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ2G5DIOIBKC5QBURZWO3TSYQQI3EVURGIAC45AJX5EGWNDMZVGV7HKFRBKAXOZYH3T525FI6ADP2NDOR4G5CNDMFWXJTITRCRWMZLFZYAAGT5IUJTHNTQAB3LNZI3HMVXK25DFON2G4ZLUFV3DGMJOGCRGY5WOAAHNVRFENZXXIZOEBC2FC6JZ7T5NE4NDOJRXNRBAWTDCE2FEYM2VB5MKNXKLRSRDTSPR2EFTIGVH4GRW4PHGD6747GFKG43OMTCCBNGGEJUKJQZVKD2YU3OUXDFCHHE7DUILGQNKPYNDNY6OMH57Z6MKUR2HS4DFUNYGC6I";
-        byte[] expectedBytes = Encoder.decodeFromBase32StripPad(expectedByteEncoded);
-        testSign(lsa, new Address(otherAddrStr), expectedTxID, ma.toAddress(), expectedBytes);
+        String expectedTxid = "DRBC5KBOYEUCL6L6H45GQSRKCCUTPNELUHUSQO4ZWCEODJEXQBBQ";
+        // from: msgpacktool -e < tests/resources/msig_delegated_other.txn | base64
+        String expectedBase64 = "g6Rsc2lng6NhcmeSxAEBxAICA6FsxAUBIAEBIqVsbXNpZ4Omc3Vic2lnk4KicGvEIBt+wLBL6mG3lpCX5sv0B+EIpwU1HQvJir6xIgmoq4F4oXPEQIwzZcSx0RNw8j9w13dGn+HZR3m/TY1kgXZJNe94TMx2V2zA4O/pwUb6YHba+s5V7przG3aOvDK07BosjD3AZwaConBrxCAJYzIJU3OJ8HVnEXc5kcfQPhtzyMT1K/av8BqiXPnCcaFzxEBPVtR92cCxahX1iGTp50PVMQkf969ssoHfNA0VOiNupdkXc9n/l2WO9+pj8Ddozf4ovorGgnrzca3ZhKc46uUNgaJwa8Qg5/D4TQaBHfnzHI2HixFV9GcdUaGFwgCQhmf0SVhwaKGjdGhyAqF2AaRzZ25yxCCNkrSJkAFzoE36Q1mjZmpq/OosQqBd2cH3PuulR4A36aN0eG6Ko2FtdM0TiKNmZWXOAANPqKJmds4ADtbco2dlbq10ZXN0bmV0LXYzMS4womdoxCAmCyAJoJOohot5WHIvpeVG7eftF+TYXEx4r7BFJpDt0qJsds4ADtrEpG5vdGXECLRReTn8+tJxo3JjdsQgtMYiaKTDNVD1im3UuMojnJ8dELNBqn4aNuPOYfv8+Yqjc25kxCC0xiJopMM1UPWKbdS4yiOcnx0Qs0Gqfho2485h+/z5iqR0eXBlo3BheQ==";
+        byte[] expectedBytes = Base64.getDecoder().decode(expectedBase64);
+        testSign(lsa, new Address(otherAddrStr), expectedTxid, ma.toAddress(), expectedBytes, testVectorGenesisHash);
+
+        SignedTransaction stx = Encoder.decodeFromMsgPack(expectedBytes, SignedTransaction.class);
+        assertThat(stx.lSig).isNotNull();
+        assertThat(stx.lSig.logic).isEqualTo(program);
+        assertThat(stx.lSig.args).hasSize(2);
+        assertThat(stx.lSig.args.get(0)).isEqualTo(new byte[] {0x01});
+        assertThat(stx.lSig.args.get(1)).isEqualTo(new byte[] {0x02, 0x03});
+        assertThat(stx.lSig.lmsig).isNotNull();
+        assertThat(stx.lSig.lmsig.subsigs).hasSize(3);
+        assertThat(stx.authAddr).isEqualTo(ma.toAddress());
+        assertThat(stx.tx.sender).isNotEqualTo(ma.toAddress());
+
+        assertThat(stx.lSig.verify(ma.toAddress())).isTrue();
     }
 }

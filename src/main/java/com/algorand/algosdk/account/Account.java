@@ -478,7 +478,7 @@ public class Account {
         // now, create the multisignature
         Signature sig;
         try {
-            byte[] bytesToSign = lsig.bytesToSign();
+            byte[] bytesToSign = lsig.bytesToSignMultisig(ma.toAddress());
             sig = this.rawSignBytes(bytesToSign);
         } catch (NoSuchAlgorithmException ex) {
             throw new IOException("could not sign transaction", ex);
@@ -492,7 +492,7 @@ public class Account {
                 mSig.subsigs.add(new MultisigSubsig(ma.publicKeys.get(i)));
             }
         }
-        lsig.msig = mSig;
+        lsig.lmsig = mSig;
         return lsig;
     }
 
@@ -504,10 +504,13 @@ public class Account {
      * @throws NoSuchAlgorithmException
      */
     public LogicsigSignature appendToLogicsig(LogicsigSignature lsig) throws IllegalArgumentException, IOException {
+        if (lsig.lmsig == null) {
+            throw new IllegalArgumentException("LogicsigSignature.lmsig is null; cannot append to multisig logic signature.");
+        }
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myIndex = -1;
-        for (int i = 0; i < lsig.msig.subsigs.size(); i++ ) {
-            MultisigSubsig subsig = lsig.msig.subsigs.get(i);
+        for (int i = 0; i < lsig.lmsig.subsigs.size(); i++ ) {
+            MultisigSubsig subsig = lsig.lmsig.subsigs.get(i);
             if (subsig.key.equals(myPK)) {
                 myIndex = i;
             }
@@ -518,9 +521,10 @@ public class Account {
 
         try {
             // now, create the multisignature
-            byte[] bytesToSign = lsig.bytesToSign();
+            Address multisigAddr = lsig.lmsig.convertToMultisigAddress().toAddress();
+            byte[] bytesToSign = lsig.bytesToSignMultisig(multisigAddr);
             Signature sig = this.rawSignBytes(bytesToSign);
-            lsig.msig.subsigs.set(myIndex, new MultisigSubsig(myPK, sig));
+            lsig.lmsig.subsigs.set(myIndex, new MultisigSubsig(myPK, sig));
             return lsig;
         } catch (NoSuchAlgorithmException ex) {
             throw new IOException("could not sign transaction", ex);
@@ -556,11 +560,14 @@ public class Account {
      */
     public static SignedTransaction signLogicsigTransaction(LogicsigSignature lsig, Transaction tx) throws IllegalArgumentException, IOException {
         boolean hasSig = lsig.sig != null;
+        boolean hasLmsig = lsig.lmsig != null;
         boolean hasMsig = lsig.msig != null;
         Address lsigAddr;
         try {
             if (hasSig) {
                 lsigAddr = tx.sender;
+            } else if (hasLmsig) {
+                lsigAddr = lsig.lmsig.convertToMultisigAddress().toAddress();
             } else if (hasMsig) {
                 lsigAddr = lsig.msig.convertToMultisigAddress().toAddress();
             } else {

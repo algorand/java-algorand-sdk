@@ -115,7 +115,8 @@ public class TestLogicsigSignature {
         assertThat(lsig.logic).isEqualTo(program);
         assertThat(lsig.args).isNull();
         assertThat(lsig.sig).isNull();
-        assertThat(lsig.msig)
+        assertThat(lsig.msig).isNull();
+        assertThat(lsig.lmsig)
                 .isNotEqualTo(new MultisigSignature())
                 .isNotNull();
         boolean verified = lsig.verify(ma.toAddress());
