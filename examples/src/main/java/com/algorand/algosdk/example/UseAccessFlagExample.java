@@ -2,8 +2,9 @@ package com.algorand.algosdk.example;
 
 import com.algorand.algosdk.account.Account;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
+import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
-import com.algorand.algosdk.transaction.AppResourceRef;
+import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.ResourceRef;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
@@ -15,9 +16,12 @@ import java.util.List;
 /**
  * Demonstrates the useAccess flag for handling consensus upgrade compatibility.
  * 
- * The useAccess flag allows applications to choose between:
- * - useAccess=false: Legacy fields (accounts, foreignApps, foreignAssets, boxReferences) 
- * - useAccess=true: New access field with unified resource references
+ * The useAccess flag controls how foreign references are handled:
+ * - useAccess=false: Uses legacy fields (accounts, foreignApps, foreignAssets, boxReferences) 
+ * - useAccess=true: Translates the same references into a unified access field
+ * 
+ * Key insight: You use the SAME builder methods in both modes - just add .useAccess(true)!
+ * No API changes needed for migration, making upgrades simple and safe.
  */
 public class UseAccessFlagExample {
     
@@ -26,33 +30,33 @@ public class UseAccessFlagExample {
         Account otherAccount = new Account();
         
         System.out.println("=== useAccess Flag Examples ===\n");
+        System.out.println("Shows how easy it is to migrate to access field mode:");
+        System.out.println("Just add .useAccess(true) - no other code changes needed!\n");
         
         // Example 1: Legacy mode (useAccess=false, default)
         demonstrateLegacyMode(sender, otherAccount);
         
         System.out.println("\n" + "=".repeat(50) + "\n");
         
-        // Example 2: Access field mode (useAccess=true)
-        demonstrateAccessFieldMode(sender, otherAccount);
+        // Example 2: Same code with useAccess=true - easy migration!
+        demonstrateEasyMigration(sender, otherAccount);
         
         System.out.println("\n" + "=".repeat(50) + "\n");
         
-        // Example 3: Error cases
-        demonstrateValidationErrors(sender, otherAccount);
+        System.out.println("\n🎉 That's it! Migration to access field mode is just one line.");
+        System.out.println("Advanced features like holdings() and locals() are also available with useAccess=true.");
     }
     
     private static void demonstrateLegacyMode(Account sender, Account otherAccount) throws Exception {
         System.out.println("Example 1: Legacy Mode (useAccess=false)");
         System.out.println("-----------------------------------------");
-        System.out.println("✓ Compatible with pre-consensus upgrade networks");
-        System.out.println("✓ Uses separate accounts, foreignApps, foreignAssets fields");
-        System.out.println("✗ Cannot use access field or appResourceRefs");
+        System.out.println("Using standard foreign reference methods with legacy field output");
         
-        // Build transaction using legacy fields (default behavior)
+        // Build transaction using foreign reference methods (default behavior)
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender.getAddress())
                 .applicationId(12345L)
-                .useAccess(false)  // Explicitly set to false (though it's the default)
+                .useAccess(false)  // Default mode - puts references in separate fields
                 .accounts(Arrays.asList(otherAccount.getAddress()))
                 .foreignApps(Arrays.asList(67890L))
                 .foreignAssets(Arrays.asList(999L))
@@ -61,106 +65,48 @@ public class UseAccessFlagExample {
                 .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
                 .build();
         
-        // Verify legacy fields are used
-        System.out.printf("Legacy fields populated:%n");
+        // Show how references are stored in separate legacy fields
+        System.out.printf("Result: References stored in separate fields%n");
         System.out.printf("  - accounts: %d entries%n", txn.accounts.size());
         System.out.printf("  - foreignApps: %d entries%n", txn.foreignApps.size()); 
         System.out.printf("  - foreignAssets: %d entries%n", txn.foreignAssets.size());
         System.out.printf("  - access field: %d entries (empty)%n", txn.access.size());
-        
-        // Serialize to verify compatibility
-        byte[] encoded = Encoder.encodeToMsgPack(txn);
-        System.out.printf("MessagePack size: %d bytes%n", encoded.length);
-        System.out.println("✓ Ready for pre-consensus upgrade networks");
+        System.out.println("✓ Compatible with pre-consensus upgrade networks");
     }
     
-    private static void demonstrateAccessFieldMode(Account sender, Account otherAccount) throws Exception {
-        System.out.println("Example 2: Access Field Mode (useAccess=true)");
-        System.out.println("----------------------------------------------");
-        System.out.println("✓ Compatible with post-consensus upgrade networks");
-        System.out.println("✓ Uses unified access field for all resources");
-        System.out.println("✓ Supports advanced features like holding/locals references");
-        System.out.println("✗ Cannot use legacy separate fields");
+    private static void demonstrateEasyMigration(Account sender, Account otherAccount) throws Exception {
+        System.out.println("Example 2: Easy Migration (useAccess=true)");
+        System.out.println("-------------------------------------------");
+        System.out.println("SAME CODE as Example 1 - just add .useAccess(true)!");
         
-        // Build transaction using access field with AppResourceRef API
-        List<AppResourceRef> appResourceRefs = Arrays.asList(
-            AppResourceRef.forAddress(otherAccount.getAddress()),
-            AppResourceRef.forAsset(999L),
-            AppResourceRef.forApp(67890L),
-            AppResourceRef.forHolding(sender.getAddress(), 999L),      // Advanced: asset holding
-            AppResourceRef.forLocals(sender.getAddress(), 12345L),     // Advanced: local state
-            AppResourceRef.forBox(12345L, "shared-box".getBytes())     // Advanced: box reference
-        );
-        
+        // Build transaction using the EXACT SAME builder method calls as Example 1
+        // The only difference is useAccess=true, which translates these into access field
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender.getAddress())
                 .applicationId(12345L)
-                .useAccess(true)  // Enable access field mode
-                .appResourceRefs(appResourceRefs)
+                .useAccess(true)  // 🔥 ONLY CHANGE: Add this one line!
+                .accounts(Arrays.asList(otherAccount.getAddress()))  // Same as Example 1
+                .foreignApps(Arrays.asList(67890L))                  // Same as Example 1
+                .foreignAssets(Arrays.asList(999L))                  // Same as Example 1
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
                 .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
                 .build();
         
-        // Verify access field is used
-        System.out.printf("Access field populated:%n");
-        System.out.printf("  - access entries: %d%n", txn.access.size());
-        System.out.printf("  - accounts: %d entries (empty)%n", txn.accounts.size());
-        System.out.printf("  - foreignApps: %d entries (empty)%n", txn.foreignApps.size());
-        System.out.printf("  - foreignAssets: %d entries (empty)%n", txn.foreignAssets.size());
+        // Show how the same references are now translated to access field
+        System.out.printf("Result: Same references, different internal format%n");
+        System.out.printf("  - accounts: %d entries (empty - translated to access)%n", txn.accounts.size());
+        System.out.printf("  - foreignApps: %d entries (empty - translated to access)%n", txn.foreignApps.size());
+        System.out.printf("  - foreignAssets: %d entries (empty - translated to access)%n", txn.foreignAssets.size());
+        System.out.printf("  - access field: %d entries (contains all references)%n", txn.access.size());
         
-        // Show access field details
-        System.out.println("Access field contents:");
-        for (int i = 0; i < txn.access.size(); i++) {
-            System.out.printf("  [%d] %s%n", i, formatAccessEntry(txn.access.get(i)));
-        }
-        
-        // Serialize to verify compatibility
-        byte[] encoded = Encoder.encodeToMsgPack(txn);
-        System.out.printf("MessagePack size: %d bytes%n", encoded.length);
+        System.out.println("\n🚀 Migration is just one line: .useAccess(true)");
+        System.out.println("✓ No API changes required");
+        System.out.println("✓ Same builder methods work in both modes");  
         System.out.println("✓ Ready for post-consensus upgrade networks");
     }
     
-    private static void demonstrateValidationErrors(Account sender, Account otherAccount) throws Exception {
-        System.out.println("Example 3: Validation Error Cases");
-        System.out.println("----------------------------------");
-        
-        // Error case 1: useAccess=true with legacy fields
-        System.out.println("Error case 1: useAccess=true with legacy fields");
-        try {
-            ApplicationCallTransactionBuilder.Builder()
-                    .sender(sender.getAddress())
-                    .applicationId(12345L)
-                    .useAccess(true)
-                    .accounts(Arrays.asList(otherAccount.getAddress()))  // ❌ Not allowed
-                    .firstValid(BigInteger.valueOf(1000))
-                    .lastValid(BigInteger.valueOf(2000))
-                    .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
-                    .build();
-            System.out.println("❌ Should have thrown exception!");
-        } catch (IllegalArgumentException e) {
-            System.out.printf("✓ Correctly rejected: %s%n", e.getMessage());
-        }
-        
-        // Error case 2: useAccess=false with appResourceRefs
-        System.out.println("Error case 2: useAccess=false with appResourceRefs");
-        try {
-            ApplicationCallTransactionBuilder.Builder()
-                    .sender(sender.getAddress())
-                    .applicationId(12345L)
-                    .useAccess(false)
-                    .appResourceRefs(Arrays.asList(AppResourceRef.forAsset(999L)))  // ❌ Not allowed
-                    .firstValid(BigInteger.valueOf(1000))
-                    .lastValid(BigInteger.valueOf(2000))
-                    .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
-                    .build();
-            System.out.println("❌ Should have thrown exception!");
-        } catch (IllegalArgumentException e) {
-            System.out.printf("✓ Correctly rejected: %s%n", e.getMessage());
-        }
-        
-        System.out.println("\n✓ All validation rules working correctly");
-    }
+    
     
     private static String formatAccessEntry(ResourceRef ref) {
         if (ref.address != null) {

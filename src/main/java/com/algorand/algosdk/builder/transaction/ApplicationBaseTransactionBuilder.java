@@ -14,14 +14,40 @@ import java.util.Objects;
 
 @SuppressWarnings("unchecked")
 public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransactionBuilder<T>> extends TransactionBuilder<T> implements ApplicationCallReferencesSetter<T> {
+    
+    /**
+     * Represents a holding reference for asset holdings of an account.
+     */
+    public static class HoldingReference {
+        public final Address address;
+        public final long assetId;
+        
+        public HoldingReference(Address address, long assetId) {
+            this.address = address;
+            this.assetId = assetId;
+        }
+    }
+    
+    /**
+     * Represents a locals reference for local state of an account in an app.
+     */
+    public static class LocalsReference {
+        public final Address address;
+        public final long appId;
+        
+        public LocalsReference(Address address, long appId) {
+            this.address = address;
+            this.appId = appId;
+        }
+    }
     private Transaction.OnCompletion onCompletion;
     private List<byte[]> applicationArgs;
     private List<Address> accounts;
     private List<Long> foreignApps;
     private List<Long> foreignAssets;
     private List<AppBoxReference> appBoxReferences;
-    private List<ResourceRef> access;
-    private List<AppResourceRef> appResourceRefs;
+    private List<HoldingReference> holdings;
+    private List<LocalsReference> locals;
     private Long applicationId;
     private boolean useAccess = false;
 
@@ -38,59 +64,63 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         Objects.requireNonNull(onCompletion, "OnCompletion is required, please file a bug report.");
         Objects.requireNonNull(applicationId);
 
-        // Handle access field conversion and validation based on useAccess flag
-        boolean hasLegacyFields = (accounts != null && !accounts.isEmpty()) ||
-                                 (foreignApps != null && !foreignApps.isEmpty()) ||
-                                 (foreignAssets != null && !foreignAssets.isEmpty()) ||
-                                 (appBoxReferences != null && !appBoxReferences.isEmpty());
-        
-        boolean hasAccessFields = (access != null && !access.isEmpty()) ||
-                                 (appResourceRefs != null && !appResourceRefs.isEmpty());
+        // Check if advanced features are being used
+        boolean hasAdvancedFeatures = (holdings != null && !holdings.isEmpty()) ||
+                                     (locals != null && !locals.isEmpty());
         
         if (useAccess) {
-            // Using access field mode - validate no legacy fields are set
-            if (hasLegacyFields) {
-                throw new IllegalArgumentException(
-                    "Cannot use legacy accounts, foreignApps, foreignAssets, or boxReferences when useAccess=true");
-            }
+            // Using access field mode - translate all references into access list
+            List<AppResourceRef> allRefs = new ArrayList<>();
             
-            // Convert AppResourceRef to ResourceRef if provided
-            if (appResourceRefs != null && !appResourceRefs.isEmpty()) {
-                if (access != null && !access.isEmpty()) {
-                    throw new IllegalArgumentException(
-                        "Cannot use both AppResourceRef and ResourceRef access methods simultaneously");
-                }
-                access = AccessConverter.convertToResourceRefs(appResourceRefs, sender, applicationId);
-            }
-            
-            // Validate AppResourceRef entries for null references
-            if (appResourceRefs != null && !appResourceRefs.isEmpty()) {
-                for (AppResourceRef ref : appResourceRefs) {
-                    if (ref == null) {
-                        throw new IllegalArgumentException("AppResourceRef cannot be null");
-                    }
+            // Convert basic foreign references
+            if (accounts != null && !accounts.isEmpty()) {
+                for (Address account : accounts) {
+                    allRefs.add(AppResourceRef.forAddress(account));
                 }
             }
             
-            // Validate ResourceRef entries
-            if (access != null && !access.isEmpty()) {
-                for (ResourceRef ref : access) {
-                    if (ref != null) {
-                        ref.validate();
-                    }
+            if (foreignApps != null && !foreignApps.isEmpty()) {
+                for (Long appId : foreignApps) {
+                    allRefs.add(AppResourceRef.forApp(appId));
                 }
             }
             
-            // Set access field and clear legacy fields
-            if (access != null) txn.access = access;
+            if (foreignAssets != null && !foreignAssets.isEmpty()) {
+                for (Long assetId : foreignAssets) {
+                    allRefs.add(AppResourceRef.forAsset(assetId));
+                }
+            }
+            
+            if (appBoxReferences != null && !appBoxReferences.isEmpty()) {
+                for (AppBoxReference boxRef : appBoxReferences) {
+                    allRefs.add(AppResourceRef.forBox(boxRef.getAppId(), boxRef.getName()));
+                }
+            }
+            
+            // Convert advanced features
+            if (holdings != null && !holdings.isEmpty()) {
+                for (HoldingReference holdingRef : holdings) {
+                    allRefs.add(AppResourceRef.forHolding(holdingRef.address, holdingRef.assetId));
+                }
+            }
+            
+            if (locals != null && !locals.isEmpty()) {
+                for (LocalsReference localsRef : locals) {
+                    allRefs.add(AppResourceRef.forLocals(localsRef.address, localsRef.appId));
+                }
+            }
+
+            txn.access = AccessConverter.convertToResourceRefs(allRefs, sender, applicationId);
+            
         } else {
-            // Using legacy fields mode - validate no access fields are set
-            if (hasAccessFields) {
+            // Using legacy fields mode
+            if (hasAdvancedFeatures) {
                 throw new IllegalArgumentException(
-                    "Cannot use access fields or appResourceRefs when useAccess=false. Set useAccess=true to use access field.");
+                    "Holdings and locals references require useAccess=true as they cannot be represented in legacy transaction format"
+                );
             }
             
-            // Use legacy fields (existing behavior)
+            // Use legacy fields directly
             if (accounts != null) txn.accounts = accounts;
             if (foreignApps != null) txn.foreignApps = foreignApps;
             if (foreignAssets != null) txn.foreignAssets = foreignAssets;
@@ -171,44 +201,49 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     }
 
     /**
-     * Set the access list for this transaction using low-level ResourceRef objects.
-     * The access list unifies accounts, foreignApps, foreignAssets, and boxReferences 
-     * under a single list with explicit resource tracking.
+     * Set asset holding references that need to be accessible in this transaction.
+     * Holdings references allow the transaction to access asset balances of specific accounts.
      * 
-     * Note: Using the access field is mutually exclusive with using the separate accounts,
-     * foreignApps, foreignAssets, and boxReferences fields.
+     * Note: Holdings references are only available when useAccess=true as they cannot be 
+     * represented in legacy transaction format.
      */
-    public T access(List<ResourceRef> access) {
-        this.access = access;
+    public T holdings(List<HoldingReference> holdings) {
+        this.holdings = holdings;
         return (T) this;
     }
 
     /**
-     * Set the access list for this transaction using high-level AppResourceRef objects.
-     * This provides a user-friendly API that automatically handles index conversion.
+     * Set local state references that need to be accessible in this transaction.
+     * Locals references allow the transaction to access local state of specific accounts in specific apps.
      * 
-     * Note: Using the access field is mutually exclusive with using the separate accounts,
-     * foreignApps, foreignAssets, and boxReferences fields.
+     * Note: Locals references are only available when useAccess=true as they cannot be 
+     * represented in legacy transaction format.
      */
-    public T appResourceRefs(List<AppResourceRef> appResourceRefs) {
-        this.appResourceRefs = appResourceRefs;
+    public T locals(List<LocalsReference> locals) {
+        this.locals = locals;
         return (T) this;
     }
-    
+
     /**
-     * Enable or disable the use of the access field in this transaction.
+     * Enable or disable translation of foreign references into the access field.
      * 
      * When useAccess=true:
-     * - The transaction will use the new access field for resource references
-     * - Legacy accounts, foreignApps, foreignAssets, and boxReferences fields are not allowed
-     * - appResourceRefs() and access() methods are available for setting resources
+     * - All foreign references (accounts, foreignApps, foreignAssets, boxReferences) are translated
+     *   into a unified access field instead of using separate legacy fields
+     * - You can still use the same methods (accounts(), foreignApps(), etc.) - they will be translated
+     * - Advanced features (holdings(), locals()) are also available
+     * - Compatible with networks that support the access field consensus upgrade
      * 
      * When useAccess=false (default):
-     * - The transaction will use legacy accounts, foreignApps, foreignAssets, and boxReferences fields
-     * - The access field and appResourceRefs are not allowed
-     * - This maintains backward compatibility with pre-consensus upgrade networks
+     * - Uses legacy separate fields (accounts, foreignApps, foreignAssets, boxReferences)
+     * - No translation occurs - references are placed directly in their respective fields
+     * - Maintains backward compatibility with pre-consensus upgrade networks
+     * - Advanced features (holdings(), locals()) are not allowed
      * 
-     * @param useAccess true to use the access field, false to use legacy fields
+     * This design allows easy migration - just add .useAccess(true) to enable access field mode
+     * while keeping your existing foreign reference method calls.
+     * 
+     * @param useAccess true to translate references to access field, false to use legacy fields
      * @return this builder instance
      */
     public T useAccess(boolean useAccess) {
