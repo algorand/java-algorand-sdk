@@ -71,8 +71,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         if (useAccess) {
             // Using access field mode - translate all references into access list
             List<AppResourceRef> allRefs = new ArrayList<>();
-            
-            // Convert basic foreign references
+
             if (accounts != null && !accounts.isEmpty()) {
                 for (Address account : accounts) {
                     allRefs.add(AppResourceRef.forAddress(account));
@@ -96,8 +95,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                     allRefs.add(AppResourceRef.forBox(boxRef.getAppId(), boxRef.getName()));
                 }
             }
-            
-            // Convert advanced features
+
             if (holdings != null && !holdings.isEmpty()) {
                 for (HoldingReference holdingRef : holdings) {
                     allRefs.add(AppResourceRef.forHolding(holdingRef.address, holdingRef.assetId));

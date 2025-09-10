@@ -84,13 +84,13 @@ public class UseAccessFlagExample {
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender.getAddress())
                 .applicationId(12345L)
-                .useAccess(true)  // 🔥 ONLY CHANGE: Add this one line!
                 .accounts(Arrays.asList(otherAccount.getAddress()))  // Same as Example 1
                 .foreignApps(Arrays.asList(67890L))                  // Same as Example 1
                 .foreignAssets(Arrays.asList(999L))                  // Same as Example 1
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
                 .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .useAccess(true)  // 🔥 ONLY CHANGE: Add this one line!
                 .build();
         
         // Show how the same references are now translated to access field
