@@ -1,3 +1,18 @@
+# 2.10.0
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.10.0 -->
+
+## What's Changed
+### Enhancements
+* API: Regenerate code with the latest specification file (e4539acc) by @github-actions[bot] in https://github.com/algorand/java-algorand-sdk/pull/864
+* Signatures: support lmsig logicsig signatures by @cce in https://github.com/algorand/java-algorand-sdk/pull/865
+* Types: add txn.Access constructor by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/866
+
+## New Contributors
+* @cce made their first contribution in https://github.com/algorand/java-algorand-sdk/pull/865
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.9.0...2.10.0
+
 # 2.9.0
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.9.0 -->
