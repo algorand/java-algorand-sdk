@@ -95,8 +95,7 @@
         <dependency>
           <groupId>commons-codec</groupId>
           <artifactId>commons-codec</artifactId>
-          <!-- version 1.14 adds some stronger constraints to base64 encoding which breaks a test. -->
-          <version>1.12</version>
+          <version>1.19.0</version>
         </dependency>
         <dependency>
           <groupId>io.gsonfire</groupId>
