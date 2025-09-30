@@ -49,6 +49,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<HoldingReference> holdings;
     private List<LocalsReference> locals;
     private Long applicationId;
+    private Long rejectVersion;
     private boolean useAccess = false;
 
     /**
@@ -129,6 +130,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         if (applicationId != null) txn.applicationId = applicationId;
         if (onCompletion != null) txn.onCompletion = onCompletion;
         if (applicationArgs != null) txn.applicationArgs = applicationArgs;
+        if (rejectVersion != null) txn.rejectVersion = rejectVersion;
     }
 
     @Override
@@ -224,28 +226,41 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
 
     /**
      * Enable or disable translation of foreign references into the access field.
-     * 
+     *
      * When useAccess=true:
      * - All foreign references (accounts, foreignApps, foreignAssets, boxReferences) are translated
      *   into a unified access field instead of using separate legacy fields
      * - You can still use the same methods (accounts(), foreignApps(), etc.) - they will be translated
      * - Advanced features (holdings(), locals()) are also available
      * - Compatible with networks that support the access field consensus upgrade
-     * 
+     *
      * When useAccess=false (default):
      * - Uses legacy separate fields (accounts, foreignApps, foreignAssets, boxReferences)
      * - No translation occurs - references are placed directly in their respective fields
      * - Maintains backward compatibility with pre-consensus upgrade networks
      * - Advanced features (holdings(), locals()) are not allowed
-     * 
+     *
      * This design allows easy migration - just add .useAccess(true) to enable access field mode
      * while keeping your existing foreign reference method calls.
-     * 
+     *
      * @param useAccess true to translate references to access field, false to use legacy fields
      * @return this builder instance
      */
     public T useAccess(boolean useAccess) {
         this.useAccess = useAccess;
+        return (T) this;
+    }
+
+    /**
+     * Set the reject version for the application call.
+     * The lowest application version for which this transaction should immediately fail.
+     * 0 indicates that no version check should be performed.
+     *
+     * @param rejectVersion the minimum application version to reject
+     * @return this builder instance
+     */
+    public T rejectVersion(Long rejectVersion) {
+        this.rejectVersion = rejectVersion;
         return (T) this;
     }
 }
