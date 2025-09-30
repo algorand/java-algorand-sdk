@@ -1053,4 +1053,72 @@ public class TestTransaction {
         }
     }
 
+    @Test
+    public void testApplicationCallRejectVersion() throws Exception {
+        Address from = new Address("VKM6KSCTDHEM6KGEAMSYCNEGIPFJMHDSEMIRAQLK76CJDIRMMDHKAIRMFQ");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+
+        // Test with specific rejectVersion
+        Transaction txWithReject = Transaction.ApplicationCallTransactionBuilder()
+                .sender(from)
+                .applicationId(123L)
+                .firstValid(1000)
+                .lastValid(2000)
+                .genesisHash(gh)
+                .rejectVersion(5L)
+                .build();
+
+        // Verify rejectVersion is set
+        assertThat(txWithReject.rejectVersion).isEqualTo(5L);
+
+        // Test serialization/deserialization with msgpack
+        byte[] encodedTxn = Encoder.encodeToMsgPack(txWithReject);
+        Transaction decodedTxn = Encoder.decodeFromMsgPack(encodedTxn, Transaction.class);
+        assertThat(decodedTxn.rejectVersion).isEqualTo(5L);
+        assertEqual(txWithReject, decodedTxn);
+
+        // Test serialization/deserialization with JSON
+        ObjectMapper objectMapper = new ObjectMapper();
+        String transactionJson = objectMapper.writeValueAsString(txWithReject);
+        Transaction jsonDecodedTxn = objectMapper.readValue(transactionJson, Transaction.class);
+        assertThat(jsonDecodedTxn.rejectVersion).isEqualTo(5L);
+        assertEqual(txWithReject, jsonDecodedTxn);
+
+        // Verify aprv field is present in JSON when rejectVersion is non-zero
+        assertThat(transactionJson).contains("\"aprv\":5");
+
+        // Test with default rejectVersion (should be 0)
+        Transaction txDefault = Transaction.ApplicationCallTransactionBuilder()
+                .sender(from)
+                .applicationId(456L)
+                .firstValid(1000)
+                .lastValid(2000)
+                .genesisHash(gh)
+                .build();
+
+        // Verify default rejectVersion is 0
+        assertThat(txDefault.rejectVersion).isEqualTo(0L);
+
+        // Verify aprv field is NOT present in JSON when rejectVersion is 0 (default omission)
+        String txDefaultJson = objectMapper.writeValueAsString(txDefault);
+        assertThat(txDefaultJson).doesNotContain("aprv");
+
+        // Test explicit 0 rejectVersion
+        Transaction txExplicitZero = Transaction.ApplicationCallTransactionBuilder()
+                .sender(from)
+                .applicationId(456L)
+                .firstValid(1000)
+                .lastValid(2000)
+                .genesisHash(gh)
+                .rejectVersion(0L)
+                .build();
+
+        assertThat(txExplicitZero.rejectVersion).isEqualTo(0L);
+        assertEqual(txDefault, txExplicitZero);
+
+        // Verify aprv field is NOT present in JSON when rejectVersion is explicitly 0
+        String txExplicitZeroJson = objectMapper.writeValueAsString(txExplicitZero);
+        assertThat(txExplicitZeroJson).doesNotContain("aprv");
+    }
+
 }

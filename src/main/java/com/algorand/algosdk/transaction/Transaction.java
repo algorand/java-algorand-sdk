@@ -165,6 +165,9 @@ public class Transaction implements Serializable {
     @JsonProperty("apep")
     public Long extraPages = 0L;
 
+    @JsonProperty("aprv")
+    public Long rejectVersion = 0L;
+
     /* access field - unifies accounts, foreignApps, foreignAssets, and boxReferences */
     @JsonProperty("al")
     public List<ResourceRef> access = new ArrayList<>();
@@ -246,6 +249,7 @@ public class Transaction implements Serializable {
                         @JsonProperty("apls") StateSchema localStateSchema,
                         @JsonProperty("apsu") byte[] clearStateProgram,
                         @JsonProperty("apep") Long extraPages,
+                        @JsonProperty("aprv") Long rejectVersion,
                         // access fields
                         @JsonProperty("al") List<ResourceRef> access,
                         // heartbeat fields
@@ -301,6 +305,7 @@ public class Transaction implements Serializable {
                 localStateSchema,
                 clearStateProgram == null ? null : new TEALProgram(clearStateProgram),
                 extraPages,
+                rejectVersion,
                 access == null ? new ArrayList<>() : access,
                 heartbeatFields
         );
@@ -362,6 +367,7 @@ public class Transaction implements Serializable {
             StateSchema localStateSchema,
             TEALProgram clearStateProgram,
             Long extraPages,
+            Long rejectVersion,
             List<ResourceRef> access,
             HeartbeatTxnFields heartbeatFields
     ) {
@@ -408,6 +414,7 @@ public class Transaction implements Serializable {
         if (localStateSchema != null) this.localStateSchema = localStateSchema;
         if (clearStateProgram != null) this.clearStateProgram = clearStateProgram;
         if (extraPages != null) this.extraPages = extraPages;
+        if (rejectVersion != null) this.rejectVersion = rejectVersion;
         if (access != null) this.access = access;
         if (heartbeatFields != null) this.heartbeatFields = heartbeatFields;
     }
@@ -622,6 +629,7 @@ public class Transaction implements Serializable {
                 freezeState == that.freezeState &&
                 rekeyTo.equals(that.rekeyTo) &&
                 extraPages.equals(that.extraPages) &&
+                rejectVersion.equals(that.rejectVersion) &&
                 boxReferences.equals(that.boxReferences) &&
                 heartbeatFields.equals(that.heartbeatFields);
     }
