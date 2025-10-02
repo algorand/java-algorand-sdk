@@ -1,3 +1,15 @@
+# 2.10.1
+
+<!-- Release notes generated using configuration in .github/release.yml at release/2.10.1 -->
+
+## What's Changed
+### Enhancements
+* Deps: Update commons-codec to 1.19.0, addressing CVE reports for 1.12. by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/868
+* Apps: Support for reject-version on application call transactions by @gmalouf in https://github.com/algorand/java-algorand-sdk/pull/869
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.10.0...2.10.1
+
 # 2.10.0
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.10.0 -->
