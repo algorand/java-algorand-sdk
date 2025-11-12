@@ -4,7 +4,6 @@ import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.transaction.AccessConverter;
 import com.algorand.algosdk.transaction.AppBoxReference;
 import com.algorand.algosdk.transaction.AppResourceRef;
-import com.algorand.algosdk.transaction.ResourceRef;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.Encoder;
 
@@ -14,27 +13,27 @@ import java.util.Objects;
 
 @SuppressWarnings("unchecked")
 public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBaseTransactionBuilder<T>> extends TransactionBuilder<T> implements ApplicationCallReferencesSetter<T> {
-    
+
     /**
      * Represents a holding reference for asset holdings of an account.
      */
     public static class HoldingReference {
         public final Address address;
         public final long assetId;
-        
+
         public HoldingReference(Address address, long assetId) {
             this.address = address;
             this.assetId = assetId;
         }
     }
-    
+
     /**
      * Represents a locals reference for local state of an account in an app.
      */
     public static class LocalsReference {
         public final Address address;
         public final long appId;
-        
+
         public LocalsReference(Address address, long appId) {
             this.address = address;
             this.appId = appId;
@@ -68,7 +67,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
         // Check if advanced features are being used
         boolean hasAdvancedFeatures = (holdings != null && !holdings.isEmpty()) ||
                                      (locals != null && !locals.isEmpty());
-        
+
         if (useAccess) {
             // Using access field mode - translate all references into access list
             List<AppResourceRef> allRefs = new ArrayList<>();
@@ -78,19 +77,19 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                     allRefs.add(AppResourceRef.forAddress(account));
                 }
             }
-            
+
             if (foreignApps != null && !foreignApps.isEmpty()) {
                 for (Long appId : foreignApps) {
                     allRefs.add(AppResourceRef.forApp(appId));
                 }
             }
-            
+
             if (foreignAssets != null && !foreignAssets.isEmpty()) {
                 for (Long assetId : foreignAssets) {
                     allRefs.add(AppResourceRef.forAsset(assetId));
                 }
             }
-            
+
             if (appBoxReferences != null && !appBoxReferences.isEmpty()) {
                 for (AppBoxReference boxRef : appBoxReferences) {
                     allRefs.add(AppResourceRef.forBox(boxRef.getAppId(), boxRef.getName()));
@@ -102,7 +101,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                     allRefs.add(AppResourceRef.forHolding(holdingRef.address, holdingRef.assetId));
                 }
             }
-            
+
             if (locals != null && !locals.isEmpty()) {
                 for (LocalsReference localsRef : locals) {
                     allRefs.add(AppResourceRef.forLocals(localsRef.address, localsRef.appId));
@@ -110,7 +109,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
             }
 
             txn.access = AccessConverter.convertToResourceRefs(allRefs, sender, applicationId);
-            
+
         } else {
             // Using legacy fields mode
             if (hasAdvancedFeatures) {
@@ -118,7 +117,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                     "Holdings and locals references require useAccess=true as they cannot be represented in legacy transaction format"
                 );
             }
-            
+
             // Use legacy fields directly
             if (accounts != null) txn.accounts = accounts;
             if (foreignApps != null) txn.foreignApps = foreignApps;
@@ -203,8 +202,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     /**
      * Set asset holding references that need to be accessible in this transaction.
      * Holdings references allow the transaction to access asset balances of specific accounts.
-     * 
-     * Note: Holdings references are only available when useAccess=true as they cannot be 
+     *
+     * Note: Holdings references are only available when useAccess=true as they cannot be
      * represented in legacy transaction format.
      */
     public T holdings(List<HoldingReference> holdings) {
@@ -215,8 +214,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     /**
      * Set local state references that need to be accessible in this transaction.
      * Locals references allow the transaction to access local state of specific accounts in specific apps.
-     * 
-     * Note: Locals references are only available when useAccess=true as they cannot be 
+     *
+     * Note: Locals references are only available when useAccess=true as they cannot be
      * represented in legacy transaction format.
      */
     public T locals(List<LocalsReference> locals) {

@@ -1,8 +1,10 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder.HoldingReference;
 import com.algorand.algosdk.crypto.*;
 import com.algorand.algosdk.mnemonic.Mnemonic;
+import com.algorand.algosdk.unit.utils.TestingUtils;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.TestUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +16,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -1121,4 +1124,44 @@ public class TestTransaction {
         assertThat(txExplicitZeroJson).doesNotContain("aprv");
     }
 
+    @Test
+    public void testApplicationCallAccessOrdering() throws Exception {
+        Address from = new Address("BH55E5RMBD4GYWXGX5W5PJ5JAHPGM5OXKDQH5DC4O2MGI7NW4H6VOE4CP4");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+
+        Address addr1 = new Address("FDMKB5D72THLYSJEBHBDHUE7XFRDOM5IHO44SOJ7AWPD6EZMWOQ2WKN7HQ");
+        HoldingReference holding = new HoldingReference(addr1, 123L);
+
+        Transaction tx = Transaction.ApplicationCallTransactionBuilder()
+                .sender(from)
+                .applicationId(111L)
+                .firstValid(322575)
+                .lastValid(322575)
+                .genesisHash(gh)
+                .holdings(Arrays.asList(holding))
+                .useAccess(true)
+                .build();
+
+        // Verify access field ordering
+        assertThat(tx.access.size()).isEqualTo(3);
+        assertThat(tx.access.get(2).holding.addressIndex).isEqualTo(1);  // index=1
+
+        // Make a deep copy
+        String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(tx));
+        Transaction tx2 = Encoder.decodeFromMsgPack(encoded, tx.getClass());
+        assertEqual(tx, tx2);
+
+        // Reorder holdings
+        ArrayList<ResourceRef> reorderedAccess = new ArrayList<>();
+        reorderedAccess.add(tx.access.get(2)); // index=1
+        reorderedAccess.add(tx.access.get(0)); // index=0
+        reorderedAccess.add(tx.access.get(1)); // index=2
+        tx.access = reorderedAccess;
+
+        TestUtil.serializeDeserializeCheck(tx);
+
+        encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(tx));
+        Transaction decoded = Encoder.decodeFromMsgPack(encoded, tx.getClass());
+        assertEqual(tx2, decoded);
+    }
 }
