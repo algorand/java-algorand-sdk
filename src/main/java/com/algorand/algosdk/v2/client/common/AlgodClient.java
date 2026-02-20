@@ -9,6 +9,7 @@ import com.algorand.algosdk.v2.client.algod.GetVersion;
 import com.algorand.algosdk.v2.client.algod.AccountInformation;
 import com.algorand.algosdk.v2.client.algod.AccountAssetInformation;
 import com.algorand.algosdk.v2.client.algod.AccountApplicationInformation;
+import com.algorand.algosdk.v2.client.algod.AccountApplicationsInformation;
 import com.algorand.algosdk.v2.client.algod.GetPendingTransactionsByAddress;
 import com.algorand.algosdk.v2.client.algod.GetBlock;
 import com.algorand.algosdk.v2.client.algod.GetBlockTxids;
@@ -144,6 +145,15 @@ public class AlgodClient extends Client {
     public AccountApplicationInformation AccountApplicationInformation(Address address,
             Long applicationId) {
         return new AccountApplicationInformation((Client) this, address, applicationId);
+    }
+
+    /**
+     * Lookup an account's application holdings (local state and params if the account
+     * is the creator).
+     * /v2/accounts/{address}/applications
+     */
+    public AccountApplicationsInformation AccountApplicationsInformation(Address address) {
+        return new AccountApplicationsInformation((Client) this, address);
     }
 
     /**

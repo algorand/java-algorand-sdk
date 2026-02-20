@@ -91,7 +91,7 @@ public class AlgodPaths {
     @When("we make an Account Information call against account {string} with exclude {string}")
     public void accountInformation(String string, String string2) throws NoSuchAlgorithmException {
         AccountInformation aiq = algodClient.AccountInformation(new Address(string));
-        if (TestingUtils.notEmpty(string2)) aiq.exclude(Enums.Exclude.forValue(string2));
+        if (TestingUtils.notEmpty(string2)) aiq.exclude(java.util.Arrays.asList(Enums.Exclude.forValue(string2)));
         ps.q = aiq;
     }
 
