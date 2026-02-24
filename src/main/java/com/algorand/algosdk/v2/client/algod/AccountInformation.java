@@ -1,5 +1,9 @@
 package com.algorand.algosdk.v2.client.algod;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
@@ -28,11 +32,17 @@ public class AccountInformation extends Query {
     }
 
     /**
-     * When set to `all` will exclude asset holdings, application local state, created
-     * asset parameters, any created application parameters. Defaults to `none`.
+     * Exclude additional items from the account. Use `all` to exclude asset holdings,
+     * application local state, created asset parameters, and created application
+     * parameters. Use `created-apps-params` to exclude only the parameters of created
+     * applications (returns only application IDs). Use `created-assets-params` to
+     * exclude only the parameters of created assets (returns only asset IDs). Multiple
+     * values can be comma-separated (e.g.,
+     * `created-apps-params,created-assets-params`). Note: `all` and `none` cannot be
+     * combined with other values. Defaults to `none`.
      */
-    public AccountInformation exclude(Enums.Exclude exclude) {
-        addQuery("exclude", String.valueOf(exclude));
+    public AccountInformation exclude(List<Enums.Exclude> exclude) {
+        addQuery("exclude", StringUtils.join(exclude, ","));
         return this;
     }
 
