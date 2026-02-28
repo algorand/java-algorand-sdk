@@ -289,3 +289,9 @@ following manual pass on generated code:
 - Run an `Optimize Imports` operation on generated code, to minimize dependencies.
 
 Note that msgpack-java is good at using the minimal representation.
+<br>## Welcome to Java ASA Management<br>Algorand SDK manages ASA in Java—new contributors, start with the Transaction tutorial for your first asset transfer. Tip: Use Atomic for groups! <br>
+
+<br>## Welcome to Java ASA Management<br>Algorand SDK manages ASA in Java—new contributors, start with the Transaction tutorial for your first asset transfer. Tip: Use Atomic for groups! <br>
+
+<br>## Welcome to Java ASA Management<br>Algorand SDK manages ASA in Java—new contributors, start with the Transaction tutorial for your first asset transfer. Tip: Use Atomic for groups! <br>
+
