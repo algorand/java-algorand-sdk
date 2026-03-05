@@ -17,10 +17,19 @@ public class SupplyResponse extends PathResponse {
     public Long current_round;
 
     /**
-     * OnlineMoney
+     * Total stake held by accounts with status Online at current_round, including
+     * those whose participation keys have expired but have not yet been marked
+     * offline.
      */
     @JsonProperty("online-money")
     public Long onlineMoney;
+
+    /**
+     * Online stake used by agreement to vote for current_round, excluding accounts
+     * whose participation keys have expired.
+     */
+    @JsonProperty("online-stake")
+    public Long onlineStake;
 
     /**
      * TotalMoney
@@ -37,6 +46,7 @@ public class SupplyResponse extends PathResponse {
         SupplyResponse other = (SupplyResponse) o;
         if (!Objects.deepEquals(this.current_round, other.current_round)) return false;
         if (!Objects.deepEquals(this.onlineMoney, other.onlineMoney)) return false;
+        if (!Objects.deepEquals(this.onlineStake, other.onlineStake)) return false;
         if (!Objects.deepEquals(this.totalMoney, other.totalMoney)) return false;
 
         return true;
