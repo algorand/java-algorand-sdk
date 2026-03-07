@@ -43,11 +43,13 @@ public class Enums {
      */
     public enum Exclude {
         @JsonProperty("all") ALL("all"),
+        @JsonProperty("none") NONE("none"),
+        @JsonProperty("created-apps-params") CREATEDAPPSPARAMS("created-apps-params"),
+        @JsonProperty("created-assets-params") CREATEDASSETSPARAMS("created-assets-params"),
         @JsonProperty("assets") ASSETS("assets"),
         @JsonProperty("created-assets") CREATEDASSETS("created-assets"),
         @JsonProperty("apps-local-state") APPSLOCALSTATE("apps-local-state"),
         @JsonProperty("created-apps") CREATEDAPPS("created-apps"),
-        @JsonProperty("none") NONE("none"),
         @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
@@ -95,6 +97,32 @@ public class Enums {
         @JsonCreator
         public static Hashtype forValue(String value) {
             for (Hashtype t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
+    }
+
+    public enum Include {
+        @JsonProperty("params") PARAMS("params"),
+        @JsonProperty("") UNKNOWN("");
+
+        final String serializedName;
+        Include(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+
+        @JsonCreator
+        public static Include forValue(String value) {
+            for (Include t : values()) {
                 if (t.serializedName.equalsIgnoreCase(value)) {
                     return t;
                 }
@@ -180,19 +208,6 @@ public class Enums {
 
     }
 
-    /**
-     * (type) Indicates what type of transaction this is. Different types have
-     * different fields.
-     * Valid types, and where their fields are stored:
-     *   (pay) payment-transaction
-     *   (keyreg) keyreg-transaction
-     *   (acfg) asset-config-transaction
-     *   (axfer) asset-transfer-transaction
-     *   (afrz) asset-freeze-transaction
-     *   (appl) application-transaction
-     *   (stpf) state-proof-transaction
-     *   (hb) heartbeat-transaction
-     */
     public enum TxType {
         @JsonProperty("pay") PAY("pay"),
         @JsonProperty("keyreg") KEYREG("keyreg"),
