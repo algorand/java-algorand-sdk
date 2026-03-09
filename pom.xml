@@ -37,7 +37,7 @@
         <assertj.version>3.27.7</assertj.version>
         <cucumber.version>6.6.0</cucumber.version>
         <mockito.version>3.5.7</mockito.version>
-        <jackson.version>2.18.2</jackson.version>
+        <jackson.version>2.18.6</jackson.version>
         <jacksonmsgp.version>0.9.9</jacksonmsgp.version>
         <maven.compiler.plugin.version>3.8.1</maven.compiler.plugin.version>
         <maven.javadoc.plugin.version>3.2.0</maven.javadoc.plugin.version>
