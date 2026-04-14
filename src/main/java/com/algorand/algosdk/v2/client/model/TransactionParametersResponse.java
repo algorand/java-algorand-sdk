@@ -53,8 +53,8 @@ public class TransactionParametersResponse extends PathResponse {
     public Long lastRound;
 
     /**
-     * The minimum transaction fee (not per byte) required for the
-     * txn to validate for the current network protocol.
+     * The minimum transaction fee (not per byte) required for the txn to validate for
+     * the current network protocol.
      */
     @JsonProperty("min-fee")
     public Long minFee;
