@@ -108,6 +108,7 @@ public class Enums {
 
     public enum Include {
         @JsonProperty("params") PARAMS("params"),
+        @JsonProperty("values") VALUES("values"),
         @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
