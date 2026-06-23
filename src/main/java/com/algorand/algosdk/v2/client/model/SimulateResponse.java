@@ -40,6 +40,19 @@ public class SimulateResponse extends PathResponse {
     public Long lastRound;
 
     /**
+     * Total fees paid across all top-level transaction groups and their descendants.
+     */
+    @JsonProperty("total-fees-paid")
+    public Long totalFeesPaid;
+
+    /**
+     * Total fee usage across all top-level transaction groups and their descendants,
+     * in millionths of a basic transaction fee unit.
+     */
+    @JsonProperty("total-usage")
+    public Long totalUsage;
+
+    /**
      * A result object for each transaction group that was simulated.
      */
     @JsonProperty("txn-groups")
@@ -62,6 +75,8 @@ public class SimulateResponse extends PathResponse {
         if (!Objects.deepEquals(this.execTraceConfig, other.execTraceConfig)) return false;
         if (!Objects.deepEquals(this.initialStates, other.initialStates)) return false;
         if (!Objects.deepEquals(this.lastRound, other.lastRound)) return false;
+        if (!Objects.deepEquals(this.totalFeesPaid, other.totalFeesPaid)) return false;
+        if (!Objects.deepEquals(this.totalUsage, other.totalUsage)) return false;
         if (!Objects.deepEquals(this.txnGroups, other.txnGroups)) return false;
         if (!Objects.deepEquals(this.version, other.version)) return false;
 
