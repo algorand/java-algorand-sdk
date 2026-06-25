@@ -28,6 +28,12 @@ public class BoxesResponse extends PathResponse {
     @JsonProperty("next-token")
     public String nextToken;
 
+    /**
+     * The round for which this information is relevant.
+     */
+    @JsonProperty("round")
+    public Long round;
+
     @Override
     public boolean equals(Object o) {
 
@@ -38,6 +44,7 @@ public class BoxesResponse extends PathResponse {
         if (!Objects.deepEquals(this.applicationId, other.applicationId)) return false;
         if (!Objects.deepEquals(this.boxes, other.boxes)) return false;
         if (!Objects.deepEquals(this.nextToken, other.nextToken)) return false;
+        if (!Objects.deepEquals(this.round, other.round)) return false;
 
         return true;
     }
