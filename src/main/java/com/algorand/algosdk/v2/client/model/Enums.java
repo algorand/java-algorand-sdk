@@ -106,8 +106,13 @@ public class Enums {
 
     }
 
+    /**
+     * Include additional items in the response. Use `values` to include box values.
+     * Multiple values can be comma-separated.
+     */
     public enum Include {
         @JsonProperty("params") PARAMS("params"),
+        @JsonProperty("values") VALUES("values"),
         @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
