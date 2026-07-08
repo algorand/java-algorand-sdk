@@ -39,7 +39,6 @@ import com.algorand.algosdk.v2.client.algod.GetSyncRound;
 import com.algorand.algosdk.v2.client.algod.SetSyncRound;
 import com.algorand.algosdk.v2.client.algod.TealCompile;
 import com.algorand.algosdk.v2.client.algod.TealDisassemble;
-import com.algorand.algosdk.v2.client.algod.TealDryrun;
 import com.algorand.algosdk.v2.client.algod.GetBlockTimeStampOffset;
 import com.algorand.algosdk.v2.client.algod.SetBlockTimeStampOffset;
 import com.algorand.algosdk.crypto.Address;
@@ -342,9 +341,18 @@ public class AlgodClient extends Client {
     }
 
     /**
-     * Given an application ID, return all Box names. No particular ordering is
+     * Given an application ID, return all box names. No particular ordering is
      * guaranteed. Request fails when client or server-side configured limits prevent
-     * returning all Box names.
+     * returning all box names.
+     * Pagination mode is enabled when any of the following parameters are provided:
+     * limit, next, prefix, include, or round. In pagination mode box values can be
+     * requested and results are returned in sorted order.
+     * To paginate: use the next-token from a previous response as the next parameter
+     * in the following request. Pin the round parameter to the round value from the
+     * first page's response to ensure consistent results across pages. The server
+     * enforces a per-response byte limit, so fewer results than limit may be returned
+     * even when more exist; the presence of next-token is the only reliable signal
+     * that more data is available.
      * /v2/applications/{application-id}/boxes
      */
     public GetApplicationBoxes GetApplicationBoxes(Long applicationId) {
@@ -414,16 +422,6 @@ public class AlgodClient extends Client {
      */
     public TealDisassemble TealDisassemble() {
         return new TealDisassemble((Client) this);
-    }
-
-    /**
-     * Executes TEAL program(s) in context and returns debugging information about the
-     * execution. This endpoint is only enabled when a node's configuration file sets
-     * EnableDeveloperAPI to true.
-     * /v2/teal/dryrun
-     */
-    public TealDryrun TealDryrun() {
-        return new TealDryrun((Client) this);
     }
 
     /**
