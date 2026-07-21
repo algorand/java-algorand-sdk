@@ -7,7 +7,7 @@ import com.algorand.algosdk.v2.client.common.PathResponse;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Box descriptor describes an app box without a value.
+ * Box descriptor describes an app box.
  */
 public class BoxDescriptor extends PathResponse {
 
@@ -23,6 +23,19 @@ public class BoxDescriptor extends PathResponse {
     }
     public byte[] name;
 
+    /**
+     * Base64 encoded box value. Present only when the `values` query parameter is set
+     * to true.
+     */
+    @JsonProperty("value")
+    public void value(String base64Encoded) {
+        this.value = Encoder.decodeFromBase64(base64Encoded);
+    }
+    public String value() {
+        return Encoder.encodeToBase64(this.value);
+    }
+    public byte[] value;
+
     @Override
     public boolean equals(Object o) {
 
@@ -31,6 +44,7 @@ public class BoxDescriptor extends PathResponse {
 
         BoxDescriptor other = (BoxDescriptor) o;
         if (!Objects.deepEquals(this.name, other.name)) return false;
+        if (!Objects.deepEquals(this.value, other.value)) return false;
 
         return true;
     }
