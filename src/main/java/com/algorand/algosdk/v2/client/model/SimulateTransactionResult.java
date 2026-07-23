@@ -27,6 +27,13 @@ public class SimulateTransactionResult extends PathResponse {
     public SimulationTransactionExecTrace execTrace;
 
     /**
+     * Total fees paid by this transaction and all of its descendant inner
+     * transactions.
+     */
+    @JsonProperty("fees-paid")
+    public Long feesPaid;
+
+    /**
      * The account that needed to sign this transaction when no signature was provided
      * and the provided signer was incorrect.
      */
@@ -80,6 +87,7 @@ public class SimulateTransactionResult extends PathResponse {
         SimulateTransactionResult other = (SimulateTransactionResult) o;
         if (!Objects.deepEquals(this.appBudgetConsumed, other.appBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.execTrace, other.execTrace)) return false;
+        if (!Objects.deepEquals(this.feesPaid, other.feesPaid)) return false;
         if (!Objects.deepEquals(this.fixedSigner, other.fixedSigner)) return false;
         if (!Objects.deepEquals(this.logicSigBudgetConsumed, other.logicSigBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.txnResult, other.txnResult)) return false;
