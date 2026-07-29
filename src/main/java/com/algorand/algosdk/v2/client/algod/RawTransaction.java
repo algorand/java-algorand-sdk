@@ -26,6 +26,17 @@ public class RawTransaction extends Query {
         return this;
     }
 
+    /**
+     * Skip post-quantum address checks, including the check that rejects PQ authorizer
+     * and LogicSig escrow (TEAL v13 or later) whose address is an Edwards25519 curve
+     * point. This should only be used if you understand the risks and know what you
+     * are doing.
+     */
+    public RawTransaction skipPqAddressCheck(Boolean skipPqAddressCheck) {
+        addQuery("skip-pq-address-check", String.valueOf(skipPqAddressCheck));
+        return this;
+    }
+
    /**
     * Execute the query.
     * @return the query response object.
