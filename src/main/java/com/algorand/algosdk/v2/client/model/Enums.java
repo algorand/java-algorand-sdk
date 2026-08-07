@@ -36,6 +36,33 @@ public class Enums {
 
     }
 
+    public enum ConnectionType {
+        @JsonProperty("inbound") INBOUND("inbound"),
+        @JsonProperty("outbound") OUTBOUND("outbound"),
+        @JsonProperty("") UNKNOWN("");
+
+        final String serializedName;
+        ConnectionType(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+
+        @JsonCreator
+        public static ConnectionType forValue(String value) {
+            for (ConnectionType t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
+    }
+
     /**
      * Exclude additional items such as asset holdings, application local data stored
      * for this account, asset parameters created by this account, and application
@@ -106,8 +133,13 @@ public class Enums {
 
     }
 
+    /**
+     * Include additional items in the response. Use `values` to include box values.
+     * Multiple values can be comma-separated.
+     */
     public enum Include {
         @JsonProperty("params") PARAMS("params"),
+        @JsonProperty("values") VALUES("values"),
         @JsonProperty("") UNKNOWN("");
 
         final String serializedName;
@@ -123,6 +155,33 @@ public class Enums {
         @JsonCreator
         public static Include forValue(String value) {
             for (Include t : values()) {
+                if (t.serializedName.equalsIgnoreCase(value)) {
+                    return t;
+                }
+            }
+            return UNKNOWN;
+        }
+
+    }
+
+    public enum NetworkType {
+        @JsonProperty("p2p") P2P("p2p"),
+        @JsonProperty("ws") WS("ws"),
+        @JsonProperty("") UNKNOWN("");
+
+        final String serializedName;
+        NetworkType(String name) {
+            this.serializedName = name;
+        }
+
+        @Override
+        public String toString() {
+            return this.serializedName;
+        }
+
+        @JsonCreator
+        public static NetworkType forValue(String value) {
+            for (NetworkType t : values()) {
                 if (t.serializedName.equalsIgnoreCase(value)) {
                     return t;
                 }
@@ -179,11 +238,13 @@ public class Enums {
      *   sig - Standard
      *   msig - MultiSig
      *   lsig - LogicSig
+     *   pqsig - Post-Quantum
      */
     public enum SigType {
         @JsonProperty("sig") SIG("sig"),
         @JsonProperty("msig") MSIG("msig"),
         @JsonProperty("lsig") LSIG("lsig"),
+        @JsonProperty("pqsig") PQSIG("pqsig"),
         @JsonProperty("") UNKNOWN("");
 
         final String serializedName;

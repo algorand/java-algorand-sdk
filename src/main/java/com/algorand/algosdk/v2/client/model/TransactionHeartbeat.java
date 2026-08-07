@@ -20,6 +20,14 @@ public class TransactionHeartbeat extends PathResponse {
     public String hbAddress;
 
     /**
+     * (hbc) HbChallengeDiscount requests the challenge fee discount, reducing the
+     * required fee by one min fee. It is a request, not an assertion: it is granted
+     * only if HbAddress is actually under challenge.
+     */
+    @JsonProperty("hb-challenge-discount")
+    public Boolean hbChallengeDiscount;
+
+    /**
      * (hbkd) HbKeyDilution must match HbAddress account's current KeyDilution.
      */
     @JsonProperty("hb-key-dilution")
@@ -65,6 +73,7 @@ public class TransactionHeartbeat extends PathResponse {
 
         TransactionHeartbeat other = (TransactionHeartbeat) o;
         if (!Objects.deepEquals(this.hbAddress, other.hbAddress)) return false;
+        if (!Objects.deepEquals(this.hbChallengeDiscount, other.hbChallengeDiscount)) return false;
         if (!Objects.deepEquals(this.hbKeyDilution, other.hbKeyDilution)) return false;
         if (!Objects.deepEquals(this.hbProof, other.hbProof)) return false;
         if (!Objects.deepEquals(this.hbSeed, other.hbSeed)) return false;

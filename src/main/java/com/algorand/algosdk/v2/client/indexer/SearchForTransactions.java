@@ -174,6 +174,7 @@ public class SearchForTransactions extends Query {
      *   sig - Standard
      *   msig - MultiSig
      *   lsig - LogicSig
+     *   pqsig - Post-Quantum
      */
     public SearchForTransactions sigType(Enums.SigType sigType) {
         addQuery("sig-type", String.valueOf(sigType));
