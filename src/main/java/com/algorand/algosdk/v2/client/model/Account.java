@@ -188,6 +188,7 @@ public class Account extends PathResponse {
      *   sig
      *   msig
      *   lsig
+     *   pqsig
      *   or null if unknown
      */
     @JsonProperty("sig-type")

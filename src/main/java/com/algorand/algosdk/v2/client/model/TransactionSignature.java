@@ -29,6 +29,14 @@ public class TransactionSignature extends PathResponse {
     public TransactionSignatureMultisig multisig;
 
     /**
+     * structure holding a post-quantum signature.
+     * Definition:
+     * data/transactions/pqsig.go : PQSig
+     */
+    @JsonProperty("pqsig")
+    public TransactionSignaturePQsig pqsig;
+
+    /**
      * (sig) Standard ed25519 signature.
      */
     @JsonProperty("sig")
@@ -49,6 +57,7 @@ public class TransactionSignature extends PathResponse {
         TransactionSignature other = (TransactionSignature) o;
         if (!Objects.deepEquals(this.logicsig, other.logicsig)) return false;
         if (!Objects.deepEquals(this.multisig, other.multisig)) return false;
+        if (!Objects.deepEquals(this.pqsig, other.pqsig)) return false;
         if (!Objects.deepEquals(this.sig, other.sig)) return false;
 
         return true;
