@@ -1,11 +1,16 @@
 package com.algorand.algosdk.v2.client.indexer;
 
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.algorand.algosdk.v2.client.common.Client;
 import com.algorand.algosdk.v2.client.common.HttpMethod;
 import com.algorand.algosdk.v2.client.common.Query;
 import com.algorand.algosdk.v2.client.common.QueryData;
 import com.algorand.algosdk.v2.client.common.Response;
 import com.algorand.algosdk.v2.client.model.BoxesResponse;
+import com.algorand.algosdk.v2.client.model.Enums;
 
 
 /**
@@ -23,6 +28,15 @@ public class SearchForApplicationBoxes extends Query {
     public SearchForApplicationBoxes(Client client, Long applicationId) {
         super(client, new HttpMethod("get"));
         this.applicationId = applicationId;
+    }
+
+    /**
+     * Include additional items in the response. Use `values` to include box values.
+     * Multiple values can be comma-separated.
+     */
+    public SearchForApplicationBoxes include(List<Enums.Include> include) {
+        addQuery("include", StringUtils.join(include, ","));
+        return this;
     }
 
     /**
