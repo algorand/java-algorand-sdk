@@ -41,6 +41,20 @@ public class SimulateTransactionGroupResult extends PathResponse {
     public String failureMessage;
 
     /**
+     * Total fees paid by the transaction group and all of its descendant inner
+     * transaction groups.
+     */
+    @JsonProperty("group-fees-paid")
+    public Long groupFeesPaid;
+
+    /**
+     * Fee usage for the transaction group, including all descendant inner
+     * transactions, in millionths of a basic transaction fee unit.
+     */
+    @JsonProperty("group-usage")
+    public Long groupUsage;
+
+    /**
      * Simulation result for individual transactions
      */
     @JsonProperty("txn-results")
@@ -71,6 +85,8 @@ public class SimulateTransactionGroupResult extends PathResponse {
         if (!Objects.deepEquals(this.appBudgetConsumed, other.appBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.failedAt, other.failedAt)) return false;
         if (!Objects.deepEquals(this.failureMessage, other.failureMessage)) return false;
+        if (!Objects.deepEquals(this.groupFeesPaid, other.groupFeesPaid)) return false;
+        if (!Objects.deepEquals(this.groupUsage, other.groupUsage)) return false;
         if (!Objects.deepEquals(this.txnResults, other.txnResults)) return false;
         if (!Objects.deepEquals(this.unnamedResourcesAccessed, other.unnamedResourcesAccessed)) return false;
 
