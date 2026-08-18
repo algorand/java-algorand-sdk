@@ -226,7 +226,7 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
     }
 
     /**
-     * Set the note field. It may containe 1024 bytes of free form data.
+     * Set the note field. It may contain 4096 bytes of free form data.
      * @param note The note field.
      * @return This builder.
      */
@@ -235,7 +235,7 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
         return (T) this;
     }
     /**
-     * Set the note field using a UTF-8 encoded string. It may containe 1024 bytes of free form data.
+     * Set the note field using a UTF-8 encoded string. It may contain 4096 bytes of free form data.
      * @param note The note field.
      * @return This builder.
      */
@@ -245,7 +245,7 @@ public abstract class TransactionParametersBuilder<T extends TransactionParamete
     }
 
     /**
-     * Set the note field using a Base64 encoded string. It may containe 1024 bytes of free form data.
+     * Set the note field using a Base64 encoded string. It may contain 4096 bytes of free form data.
      * @param note The note field.
      * @return This builder.
      */
