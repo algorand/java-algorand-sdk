@@ -20,7 +20,8 @@ public interface StateSchemaSetter<T extends StateSchemaSetter<T>> {
 
     /**
      * extraPages allows you to rent extra pages of memory for the application. Each page is 2048 bytes of shared
-     * memory between approval and clear state programs. extraPages parameter must be an integer between 0 and 3 inclusive.
+     * memory between approval and clear state programs. extraPages must be a non-negative integer; the maximum
+     * (currently 7) is enforced by the network.
      */
     public T extraPages(Long extraPages);
 }
