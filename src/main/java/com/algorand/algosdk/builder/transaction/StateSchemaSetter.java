@@ -14,14 +14,14 @@ public interface StateSchemaSetter<T extends StateSchemaSetter<T>> {
     /**
      * GlobalStateSchema sets limits on the number of strings and integers that may be stored in the GlobalState. The
      * larger these limits are, the larger minimum balance must be maintained inside the creator's account (in order to
-     * 'pay' for the state that can be used). The GlobalStateSchema is immutable.
+     * 'pay' for the state that can be used). The GlobalStateSchema may also be changed during an application update.
      */
     public T globalStateSchema(StateSchema globalStateSchema);
 
     /**
      * extraPages allows you to rent extra pages of memory for the application. Each page is 2048 bytes of shared
-     * memory between approval and clear state programs. extraPages must be a non-negative integer; the maximum
-     * (currently 7) is enforced by the network.
+     * memory between approval and clear state programs. extraPages may also be changed during an application update.
+     * It must be a non-negative integer; the maximum (currently 7) is enforced by the network.
      */
     public T extraPages(Long extraPages);
 }

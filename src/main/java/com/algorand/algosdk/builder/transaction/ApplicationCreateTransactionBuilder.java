@@ -6,8 +6,6 @@ import com.algorand.algosdk.transaction.Transaction;
 @SuppressWarnings("unchecked")
 public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTransactionBuilder<T>> extends ApplicationUpdateTransactionBuilder<T> implements StateSchemaSetter<T> {
     private StateSchema localStateSchema;
-    private StateSchema globalStateSchema;
-    private Long extraPages = 0L;
 
     /**
      * Initialize a {@link ApplicationCreateTransactionBuilder}.
@@ -24,8 +22,6 @@ public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTra
     @Override
     protected void applyTo(Transaction txn) {
         txn.localStateSchema = localStateSchema;
-        txn.globalStateSchema = globalStateSchema;
-        txn.extraPages = extraPages;
 
         super.applyTo(txn);
     }
@@ -60,18 +56,24 @@ public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTra
         return (T) this;
     }
 
+    /**
+     * GlobalStateSchema sets limits on the number of strings and integers that may be stored in the GlobalState. The
+     * larger these limits are, the larger minimum balance must be maintained inside the creator's account (in order to
+     * 'pay' for the state that can be used). The global state schema set at creation may later be changed by an
+     * application update.
+     */
     @Override
     public T globalStateSchema(StateSchema globalStateSchema) {
-        this.globalStateSchema = globalStateSchema;
-        return (T) this;
+        return super.globalStateSchema(globalStateSchema);
     }
 
+    /**
+     * extraPages allows you to rent extra pages of memory for the application. Each page is 2048 bytes of shared
+     * memory between approval and clear state programs. The value set at creation may later be changed by an
+     * application update. It must be a non-negative integer; the maximum (currently 7) is enforced by the network.
+     */
     @Override
     public T extraPages(Long extraPages) {
-        if (extraPages == null || extraPages < 0) {
-            throw new IllegalArgumentException("extraPages must be a non-negative integer");
-        }
-        this.extraPages = extraPages;
-        return (T) this;
+        return super.extraPages(extraPages);
     }
 }
