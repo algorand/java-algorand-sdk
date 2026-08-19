@@ -24,6 +24,13 @@ public class Block extends PathResponse {
     public Long bonus;
 
     /**
+     * the fee required, beyond the minimum fee, for "normal" transactions in this
+     * block.
+     */
+    @JsonProperty("congestion-tax")
+    public Long congestionTax;
+
+    /**
      * the sum of all fees paid by transactions in this block.
      */
     @JsonProperty("fees-collected")
@@ -46,6 +53,14 @@ public class Block extends PathResponse {
      */
     @JsonProperty("genesis-id")
     public String genesisId;
+
+    /**
+     * the degree to which this block is full, based on the number of bytes in the
+     * final block compared to the maximum allowed. Expressed as a fixed-point integer
+     * with 6 digits of precision, so 1,000,000 is a completely full block.
+     */
+    @JsonProperty("load")
+    public Long load;
 
     /**
      * Participation account data that needs to be checked/acted on by the network.
@@ -218,9 +233,11 @@ public class Block extends PathResponse {
 
         Block other = (Block) o;
         if (!Objects.deepEquals(this.bonus, other.bonus)) return false;
+        if (!Objects.deepEquals(this.congestionTax, other.congestionTax)) return false;
         if (!Objects.deepEquals(this.feesCollected, other.feesCollected)) return false;
         if (!Objects.deepEquals(this.genesisHash, other.genesisHash)) return false;
         if (!Objects.deepEquals(this.genesisId, other.genesisId)) return false;
+        if (!Objects.deepEquals(this.load, other.load)) return false;
         if (!Objects.deepEquals(this.participationUpdates, other.participationUpdates)) return false;
         if (!Objects.deepEquals(this.previousBlockHash, other.previousBlockHash)) return false;
         if (!Objects.deepEquals(this.previousBlockHash512, other.previousBlockHash512)) return false;
