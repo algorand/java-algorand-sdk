@@ -322,6 +322,34 @@ public class TestUseAccess {
     }
 
     @Test
+    public void testDuplicateReferencesAreDeduplicated() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+
+        // Each resource is listed at most once, matching the python SDK's ensure()
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .accounts(Arrays.asList(account, account))
+                .foreignAssets(Arrays.asList(55L, 55L))
+                .foreignApps(Arrays.asList(77L, 77L))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(3, txn.access.size());
+        boolean foundAccount = false, foundAsset = false, foundApp = false;
+        for (ResourceRef ref : txn.access) {
+            if (account.equals(ref.address)) foundAccount = true;
+            if (Long.valueOf(55L).equals(ref.asset)) foundAsset = true;
+            if (Long.valueOf(77L).equals(ref.app)) foundApp = true;
+        }
+        assertTrue(foundAccount && foundAsset && foundApp);
+    }
+
+    @Test
     public void testEmptyRefsAddedToAccessList() throws NoSuchAlgorithmException {
         Address sender = new Address(SENDER_ADDR);
         Address account = new Address(ACCOUNT_ADDR);
