@@ -339,14 +339,11 @@ public class TestUseAccess {
                 .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
                 .build();
 
+        // Exact order should match the other SDKs (py, go, ts): accounts, assets, apps
         assertEquals(3, txn.access.size());
-        boolean foundAccount = false, foundAsset = false, foundApp = false;
-        for (ResourceRef ref : txn.access) {
-            if (account.equals(ref.address)) foundAccount = true;
-            if (Long.valueOf(55L).equals(ref.asset)) foundAsset = true;
-            if (Long.valueOf(77L).equals(ref.app)) foundApp = true;
-        }
-        assertTrue(foundAccount && foundAsset && foundApp);
+        assertEquals(account, txn.access.get(0).address);
+        assertEquals(Long.valueOf(55L), txn.access.get(1).asset);
+        assertEquals(Long.valueOf(77L), txn.access.get(2).app);
     }
 
     @Test
