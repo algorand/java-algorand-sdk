@@ -36,7 +36,9 @@ public class AccessConverter {
         
         List<ResourceRef> result = new ArrayList<>();
         
-        // First pass: Create basic ResourceRef entries for addresses, assets, and apps
+        // First pass: Create basic ResourceRef entries for addresses, assets, and
+        // apps. Each resource is listed at most once (find-or-add, like the
+        // compound passes below), so duplicates never waste access list slots.
         for (AppResourceRef appRef : appRefs) {
             if (appRef instanceof AppResourceRef.AddressRef) {
                 AppResourceRef.AddressRef addrRef = (AppResourceRef.AddressRef) appRef;
@@ -44,13 +46,19 @@ public class AccessConverter {
                 if (addrRef.getAddress() == null || addrRef.getAddress().equals(new Address())) {
                     continue;
                 }
-                result.add(ResourceRef.forAddress(addrRef.getAddress()));
+                if (!containsAddress(result, addrRef.getAddress())) {
+                    result.add(ResourceRef.forAddress(addrRef.getAddress()));
+                }
             } else if (appRef instanceof AppResourceRef.AssetRef) {
                 AppResourceRef.AssetRef assetRef = (AppResourceRef.AssetRef) appRef;
-                result.add(ResourceRef.forAsset(assetRef.getAssetId()));
+                if (!containsAsset(result, assetRef.getAssetId())) {
+                    result.add(ResourceRef.forAsset(assetRef.getAssetId()));
+                }
             } else if (appRef instanceof AppResourceRef.AppRef) {
                 AppResourceRef.AppRef appRefInner = (AppResourceRef.AppRef) appRef;
-                result.add(ResourceRef.forApp(appRefInner.getAppId()));
+                if (!containsApp(result, appRefInner.getAppId())) {
+                    result.add(ResourceRef.forApp(appRefInner.getAppId()));
+                }
             }
         }
         
@@ -90,6 +98,33 @@ public class AccessConverter {
         return result;
     }
     
+    private static boolean containsAddress(List<ResourceRef> resources, Address address) {
+        for (ResourceRef ref : resources) {
+            if (ref.address != null && ref.address.equals(address)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean containsAsset(List<ResourceRef> resources, long assetId) {
+        for (ResourceRef ref : resources) {
+            if (ref.asset != null && ref.asset.equals(assetId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean containsApp(List<ResourceRef> resources, long appId) {
+        for (ResourceRef ref : resources) {
+            if (ref.app != null && ref.app.equals(appId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     /**
      * Find or add an address to the resource list and return its index.
      * Only a null or zero (empty) address means the sender (index 0); an
