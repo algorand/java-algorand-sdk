@@ -81,21 +81,18 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                 }
             }
 
-            if (foreignApps != null && !foreignApps.isEmpty()) {
-                for (Long appId : foreignApps) {
-                    allRefs.add(AppResourceRef.forApp(appId));
-                }
-            }
-
+            // Collection order is a cross-SDK contract (py/js): accounts,
+            // assets, apps, holdings, locals, boxes. Reordering changes the
+            // encoded bytes and therefore TxIDs and group IDs.
             if (foreignAssets != null && !foreignAssets.isEmpty()) {
                 for (Long assetId : foreignAssets) {
                     allRefs.add(AppResourceRef.forAsset(assetId));
                 }
             }
 
-            if (appBoxReferences != null && !appBoxReferences.isEmpty()) {
-                for (AppBoxReference boxRef : appBoxReferences) {
-                    allRefs.add(AppResourceRef.forBox(boxRef.getAppId(), boxRef.getName()));
+            if (foreignApps != null && !foreignApps.isEmpty()) {
+                for (Long appId : foreignApps) {
+                    allRefs.add(AppResourceRef.forApp(appId));
                 }
             }
 
@@ -108,6 +105,12 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
             if (locals != null && !locals.isEmpty()) {
                 for (LocalsReference localsRef : locals) {
                     allRefs.add(AppResourceRef.forLocals(localsRef.address, localsRef.appId));
+                }
+            }
+
+            if (appBoxReferences != null && !appBoxReferences.isEmpty()) {
+                for (AppBoxReference boxRef : appBoxReferences) {
+                    allRefs.add(AppResourceRef.forBox(boxRef.getAppId(), boxRef.getName()));
                 }
             }
 
