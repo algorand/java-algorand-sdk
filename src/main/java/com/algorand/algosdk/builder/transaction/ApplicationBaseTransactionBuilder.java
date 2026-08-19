@@ -48,6 +48,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<AppBoxReference> appBoxReferences;
     private List<HoldingReference> holdings;
     private List<LocalsReference> locals;
+    private int emptyRefs = 0;
     private Long applicationId;
     private Long rejectVersion;
     private boolean useAccess = false;
@@ -67,7 +68,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
 
         // Check if advanced features are being used
         boolean hasAdvancedFeatures = (holdings != null && !holdings.isEmpty()) ||
-                                     (locals != null && !locals.isEmpty());
+                                     (locals != null && !locals.isEmpty()) ||
+                                     emptyRefs > 0;
 
         if (useAccess) {
             // Using access field mode - translate all references into access list
@@ -109,13 +111,17 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                 }
             }
 
+            for (int i = 0; i < emptyRefs; i++) {
+                allRefs.add(AppResourceRef.forEmpty());
+            }
+
             txn.access = AccessConverter.convertToResourceRefs(allRefs, sender, applicationId);
 
         } else {
             // Using legacy fields mode
             if (hasAdvancedFeatures) {
                 throw new IllegalArgumentException(
-                    "Holdings and locals references require useAccess=true as they cannot be represented in legacy transaction format"
+                    "Holdings, locals, and empty references require useAccess=true as they cannot be represented in legacy transaction format"
                 );
             }
 
@@ -221,6 +227,21 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      */
     public T locals(List<LocalsReference> locals) {
         this.locals = locals;
+        return (T) this;
+    }
+
+    /**
+     * Add empty references to the access list. Each empty reference requests a
+     * box I/O quota bump without naming a resource.
+     *
+     * Note: Empty references are only available when useAccess=true as they cannot be
+     * represented in legacy transaction format.
+     */
+    public T emptyRefs(int emptyRefs) {
+        if (emptyRefs < 0) {
+            throw new IllegalArgumentException("emptyRefs must be a non-negative integer");
+        }
+        this.emptyRefs = emptyRefs;
         return (T) this;
     }
 
