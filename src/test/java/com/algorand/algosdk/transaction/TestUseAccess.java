@@ -252,16 +252,41 @@ public class TestUseAccess {
     }
 
     @Test
-    public void testZeroLocalAppRefWithSenderAddress() throws NoSuchAlgorithmException {
+    public void testExplicitSenderAddressIsListedAndReferenced() throws NoSuchAlgorithmException {
         Address sender = new Address(SENDER_ADDR);
 
-        // Sender address + appId 0 collapses to indices (0, 0)
+        // An explicit address, even the sender's own, is listed and referenced
+        // by index — only null/zero addresses collapse to index 0 (py/js contract)
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1001L)
                 .useAccess(true)
                 .locals(Collections.singletonList(
                         new ApplicationBaseTransactionBuilder.LocalsReference(sender, 0L)))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(2, txn.access.size());
+        assertEquals(sender, txn.access.get(0).address);
+        assertNotNull(txn.access.get(1).locals);
+        assertEquals(1L, txn.access.get(1).locals.addressIndex);
+        assertEquals(0L, txn.access.get(1).locals.appIndex);
+    }
+
+    @Test
+    public void testNullAddressLocalsCollapsesToSender() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+
+        // null address + appId 0 collapses to indices (0, 0), canonically the
+        // fully-empty reference, matching go-algorand's omitempty encoding
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .locals(Collections.singletonList(
+                        new ApplicationBaseTransactionBuilder.LocalsReference(null, 0L)))
                 .firstValid(BigInteger.valueOf(1000))
                 .lastValid(BigInteger.valueOf(2000))
                 .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
@@ -296,6 +321,49 @@ public class TestUseAccess {
         assertNotNull(txn.access.get(0).locals);
         assertEquals(Long.valueOf(0L), txn.access.get(0).locals.addressIndex);
         assertEquals(Long.valueOf(0L), txn.access.get(0).locals.appIndex);
+    }
+
+    @Test
+    public void testEmptyRefsAddedToAccessList() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+
+        // Empty references request box I/O quota bumps without naming a resource
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .accounts(Collections.singletonList(account))
+                .emptyRefs(2)
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(3, txn.access.size());
+        assertEquals(account, txn.access.get(0).address);
+        assertTrue(txn.access.get(1).isEmpty());
+        assertTrue(txn.access.get(2).isEmpty());
+    }
+
+    @Test
+    public void testEmptyRefsRequireUseAccess() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () ->
+                ApplicationCallTransactionBuilder.Builder()
+                        .sender(sender)
+                        .applicationId(1001L)
+                        .useAccess(false)
+                        .emptyRefs(1)
+                        .firstValid(BigInteger.valueOf(1000))
+                        .lastValid(BigInteger.valueOf(2000))
+                        .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                        .build());
+        assertTrue(e.getMessage().contains("require useAccess=true"));
+
+        assertThrows(IllegalArgumentException.class, () ->
+                ApplicationCallTransactionBuilder.Builder().emptyRefs(-1));
     }
 
     @Test
