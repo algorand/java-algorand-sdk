@@ -1,5 +1,6 @@
 package com.algorand.algosdk.transaction;
 
+import com.algorand.algosdk.builder.transaction.ApplicationBaseTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.ApplicationCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.util.Encoder;
@@ -220,5 +221,101 @@ public class TestUseAccess {
 
         assertTrue(accessTxn.accounts.isEmpty());
         assertTrue(accessTxn.access.isEmpty());
+    }
+
+    @Test
+    public void testZeroLocalAppRefMeansCurrentApp() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+        Address account = new Address(ACCOUNT_ADDR);
+
+        // appId 0 in a locals reference refers to the currently executing app
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .locals(Collections.singletonList(
+                        new ApplicationBaseTransactionBuilder.LocalsReference(account, 0L)))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        // Access list: the account plus the locals ref - no app entry should be added for app 0
+        assertEquals(2, txn.access.size());
+        assertEquals(account, txn.access.get(0).address);
+        assertNotNull(txn.access.get(1).locals);
+        assertEquals(Long.valueOf(1L), txn.access.get(1).locals.addressIndex);
+        assertEquals(Long.valueOf(0L), txn.access.get(1).locals.appIndex);
+        for (ResourceRef ref : txn.access) {
+            assertNull(ref.app, "App 0 must not be added as a standalone app reference");
+        }
+    }
+
+    @Test
+    public void testZeroLocalAppRefWithSenderAddress() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+
+        // Sender address + appId 0 collapses to indices (0, 0)
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .locals(Collections.singletonList(
+                        new ApplicationBaseTransactionBuilder.LocalsReference(sender, 0L)))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(1, txn.access.size());
+        assertNotNull(txn.access.get(0).locals);
+        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.addressIndex);
+        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.appIndex);
+    }
+
+    @Test
+    public void testZeroAddressMeansSender() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+
+        // The zero (empty) address means the sender: it collapses to index 0 in
+        // compound references and is never listed as a standalone entry
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .accounts(Collections.singletonList(new Address()))
+                .locals(Collections.singletonList(
+                        new ApplicationBaseTransactionBuilder.LocalsReference(new Address(), 0L)))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(1, txn.access.size());
+        assertNull(txn.access.get(0).address, "The zero address must not be listed");
+        assertNotNull(txn.access.get(0).locals);
+        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.addressIndex);
+        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.appIndex);
+    }
+
+    @Test
+    public void testZeroBoxAppRefMeansCurrentApp() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+
+        // appId 0 in a box reference also refers to the currently executing app in access mode
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .boxReferences(Collections.singletonList(new AppBoxReference(0L, "box1".getBytes())))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(1, txn.access.size());
+        assertNotNull(txn.access.get(0).box);
+        assertEquals(Long.valueOf(0L), txn.access.get(0).box.index);
+        assertNull(txn.access.get(0).app);
     }
 }
