@@ -17,9 +17,12 @@ public class AccessConverter {
      * Convert a list of high-level AppResourceRef to index-based ResourceRef.
      * This handles index 0 special cases and ensures proper referencing.
      * 
+     * Only a null or zero (empty) address means the sender (index 0); an explicit
+     * address, including the sender's own, is listed and referenced by index.
+     *
      * @param appRefs High-level resource references
-     * @param sender Transaction sender (used for index 0 address references)
-     * @param currentAppId Current application ID (used for index 0 app references) 
+     * @param sender Transaction sender (unused; kept for API stability)
+     * @param currentAppId Current application ID (used for index 0 app references)
      * @return List of index-based ResourceRef for serialization
      */
     public static List<ResourceRef> convertToResourceRefs(
@@ -37,6 +40,10 @@ public class AccessConverter {
         for (AppResourceRef appRef : appRefs) {
             if (appRef instanceof AppResourceRef.AddressRef) {
                 AppResourceRef.AddressRef addrRef = (AppResourceRef.AddressRef) appRef;
+                // The zero (empty) address means the sender and is never listed
+                if (addrRef.getAddress() == null || addrRef.getAddress().equals(new Address())) {
+                    continue;
+                }
                 result.add(ResourceRef.forAddress(addrRef.getAddress()));
             } else if (appRef instanceof AppResourceRef.AssetRef) {
                 AppResourceRef.AssetRef assetRef = (AppResourceRef.AssetRef) appRef;
@@ -52,7 +59,7 @@ public class AccessConverter {
             if (appRef instanceof AppResourceRef.HoldingRef) {
                 AppResourceRef.HoldingRef holdingRef = (AppResourceRef.HoldingRef) appRef;
                 long addressIndex = findOrAddAddressIndex(
-                    holdingRef.getAddress(), sender, result);
+                    holdingRef.getAddress(), result);
                 long assetIndex = findOrAddAssetIndex(
                     holdingRef.getAssetId(), result);
                 result.add(ResourceRef.forHolding(
@@ -61,7 +68,7 @@ public class AccessConverter {
             } else if (appRef instanceof AppResourceRef.LocalsRef) {
                 AppResourceRef.LocalsRef localsRef = (AppResourceRef.LocalsRef) appRef;
                 long addressIndex = findOrAddAddressIndex(
-                    localsRef.getAddress(), sender, result);
+                    localsRef.getAddress(), result);
                 long appIndex = findOrAddAppIndex(
                     localsRef.getAppId(), currentAppId, result);
                 result.add(ResourceRef.forLocals(
@@ -81,11 +88,13 @@ public class AccessConverter {
     
     /**
      * Find or add an address to the resource list and return its index.
-     * Handles index 0 special case (sender).
+     * Only a null or zero (empty) address means the sender (index 0); an
+     * explicit address, including the sender's own, is listed and referenced
+     * by index, matching the py and js SDKs.
      */
-    private static long findOrAddAddressIndex(Address address, Address sender, List<ResourceRef> resources) {
-        // Special case: index 0 = sender
-        if (address == null || address.equals(sender)) {
+    private static long findOrAddAddressIndex(Address address, List<ResourceRef> resources) {
+        // Special case: index 0 = sender (null and the zero address are sender shorthands)
+        if (address == null || address.equals(new Address())) {
             return 0;
         }
         
@@ -121,11 +130,12 @@ public class AccessConverter {
     
     /**
      * Find or add an app to the resource list and return its index.
-     * Handles index 0 special case (current app).
+     * Handles index 0 special case (current app). An appId of 0 always refers
+     * to the currently executing app.
      */
     private static long findOrAddAppIndex(long appId, Long currentAppId, List<ResourceRef> resources) {
-        // Special case: index 0 = current app
-        if (currentAppId != null && appId == currentAppId) {
+        // Special case: index 0 = current app (appId 0 is shorthand for the executing app)
+        if (appId == 0 || (currentAppId != null && appId == currentAppId)) {
             return 0;
         }
         

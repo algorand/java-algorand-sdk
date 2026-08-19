@@ -153,6 +153,7 @@ public abstract class AppResourceRef {
     
     /**
      * Locals reference (account + app).
+     * An appId of 0 refers to the currently executing app.
      */
     public static class LocalsRef extends AppResourceRef {
         private final Address address;
