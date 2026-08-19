@@ -244,8 +244,8 @@ public class TestUseAccess {
         assertEquals(2, txn.access.size());
         assertEquals(account, txn.access.get(0).address);
         assertNotNull(txn.access.get(1).locals);
-        assertEquals(Long.valueOf(1L), txn.access.get(1).locals.addressIndex);
-        assertEquals(Long.valueOf(0L), txn.access.get(1).locals.appIndex);
+        assertEquals(1L, txn.access.get(1).locals.addressIndex);
+        assertEquals(0L, txn.access.get(1).locals.appIndex);
         for (ResourceRef ref : txn.access) {
             assertNull(ref.app, "App 0 must not be added as a standalone app reference");
         }
@@ -293,9 +293,7 @@ public class TestUseAccess {
                 .build();
 
         assertEquals(1, txn.access.size());
-        assertNotNull(txn.access.get(0).locals);
-        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.addressIndex);
-        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.appIndex);
+        assertTrue(txn.access.get(0).isEmpty());
     }
 
     @Test
@@ -316,11 +314,11 @@ public class TestUseAccess {
                 .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
                 .build();
 
+        // The zero address collapses to sender (index 0), and locals(sender,
+        // current app) is all-zero, canonically the fully-empty reference
         assertEquals(1, txn.access.size());
         assertNull(txn.access.get(0).address, "The zero address must not be listed");
-        assertNotNull(txn.access.get(0).locals);
-        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.addressIndex);
-        assertEquals(Long.valueOf(0L), txn.access.get(0).locals.appIndex);
+        assertTrue(txn.access.get(0).isEmpty());
     }
 
     @Test
@@ -383,7 +381,7 @@ public class TestUseAccess {
 
         assertEquals(1, txn.access.size());
         assertNotNull(txn.access.get(0).box);
-        assertEquals(Long.valueOf(0L), txn.access.get(0).box.index);
+        assertEquals(0L, txn.access.get(0).box.index);
         assertNull(txn.access.get(0).app);
     }
 }

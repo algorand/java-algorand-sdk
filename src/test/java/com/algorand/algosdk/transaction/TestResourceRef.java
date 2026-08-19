@@ -1,6 +1,7 @@
 package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.crypto.Address;
+import com.algorand.algosdk.util.Encoder;
 import org.junit.jupiter.api.Test;
 
 import java.security.NoSuchAlgorithmException;
@@ -64,8 +65,8 @@ public class TestResourceRef {
         assertNull(ref.asset);
         assertNull(ref.app);
         assertNotNull(ref.holding);
-        assertEquals(Long.valueOf(0L), ref.holding.addressIndex);
-        assertEquals(Long.valueOf(1L), ref.holding.assetIndex);
+        assertEquals(0L, ref.holding.addressIndex);
+        assertEquals(1L, ref.holding.assetIndex);
         assertNull(ref.locals);
         assertNull(ref.box);
         assertFalse(ref.isEmpty());
@@ -74,20 +75,36 @@ public class TestResourceRef {
 
     @Test
     public void testResourceRefForLocals() {
-        // Index-based approach: addressIndex=0 (sender), appIndex=0 (current app)
-        ResourceRef.LocalsRef locals = new ResourceRef.LocalsRef(0L, 0L);
+        // Index-based approach: addressIndex=1, appIndex=0 (current app)
+        ResourceRef.LocalsRef locals = new ResourceRef.LocalsRef(1L, 0L);
         ResourceRef ref = ResourceRef.forLocals(locals);
-        
+
         assertNull(ref.address);
         assertNull(ref.asset);
         assertNull(ref.app);
         assertNull(ref.holding);
         assertNotNull(ref.locals);
-        assertEquals(Long.valueOf(0L), ref.locals.addressIndex);
-        assertEquals(Long.valueOf(0L), ref.locals.appIndex);
+        assertEquals(1L, ref.locals.addressIndex);
+        assertEquals(0L, ref.locals.appIndex);
         assertNull(ref.box);
         assertFalse(ref.isEmpty());
         assertDoesNotThrow(ref::validate);
+    }
+
+    @Test
+    public void testAllZeroCompoundRefsCollapseToEmpty() {
+        // An all-zero holding/locals or a zero-index empty-name box is
+        // canonically the fully-empty reference
+        assertTrue(ResourceRef.forLocals(new ResourceRef.LocalsRef(0L, 0L)).isEmpty());
+        assertTrue(ResourceRef.forHolding(new ResourceRef.HoldingRef(0L, 0L)).isEmpty());
+        assertTrue(ResourceRef.forBox(new ResourceRef.BoxRef(0L, new byte[0])).isEmpty());
+        assertTrue(ResourceRef.forBox(new ResourceRef.BoxRef(0L, null)).isEmpty());
+
+        // Any non-zero component keeps the compound reference
+        assertFalse(ResourceRef.forLocals(new ResourceRef.LocalsRef(1L, 0L)).isEmpty());
+        assertFalse(ResourceRef.forHolding(new ResourceRef.HoldingRef(0L, 1L)).isEmpty());
+        assertFalse(ResourceRef.forBox(new ResourceRef.BoxRef(0L, "n".getBytes())).isEmpty());
+        assertFalse(ResourceRef.forBox(new ResourceRef.BoxRef(3L, new byte[0])).isEmpty());
     }
 
     @Test
@@ -102,7 +119,7 @@ public class TestResourceRef {
         assertNull(ref.holding);
         assertNull(ref.locals);
         assertNotNull(ref.box);
-        assertEquals(Long.valueOf(0L), ref.box.index);
+        assertEquals(0L, ref.box.index);
         assertArrayEquals(boxName, ref.box.name);
         assertFalse(ref.isEmpty());
         assertDoesNotThrow(ref::validate);
@@ -162,8 +179,8 @@ public class TestResourceRef {
         // Index-based approach: addressIndex=2, assetIndex=3 (arbitrary indices)
         ResourceRef.HoldingRef holding = new ResourceRef.HoldingRef(2L, 3L);
         
-        assertEquals(Long.valueOf(2L), holding.addressIndex);
-        assertEquals(Long.valueOf(3L), holding.assetIndex);
+        assertEquals(2L, holding.addressIndex);
+        assertEquals(3L, holding.assetIndex);
         
         // Test equality
         ResourceRef.HoldingRef holding2 = new ResourceRef.HoldingRef(2L, 3L);
@@ -179,8 +196,8 @@ public class TestResourceRef {
         // Index-based approach: addressIndex=1, appIndex=2 (arbitrary indices)
         ResourceRef.LocalsRef locals = new ResourceRef.LocalsRef(1L, 2L);
         
-        assertEquals(Long.valueOf(1L), locals.addressIndex);
-        assertEquals(Long.valueOf(2L), locals.appIndex);
+        assertEquals(1L, locals.addressIndex);
+        assertEquals(2L, locals.appIndex);
         
         // Test equality
         ResourceRef.LocalsRef locals2 = new ResourceRef.LocalsRef(1L, 2L);
@@ -196,7 +213,7 @@ public class TestResourceRef {
         byte[] boxName = "my-box".getBytes();
         ResourceRef.BoxRef box = new ResourceRef.BoxRef(101L, boxName);
         
-        assertEquals(Long.valueOf(101L), box.index);
+        assertEquals(101L, box.index);
         assertArrayEquals(boxName, box.name);
         assertArrayEquals(boxName, box.getName()); // Test getter makes defensive copy
         
@@ -212,9 +229,10 @@ public class TestResourceRef {
     @Test
     public void testBoxRefWithNullName() {
         ResourceRef.BoxRef box = new ResourceRef.BoxRef(102L, null);
-        
-        assertEquals(Long.valueOf(102L), box.index);
-        assertArrayEquals(new byte[0], box.name);
+
+        assertEquals(102L, box.index);
+        // Empty names are stored as null so the canonical encoding omits them
+        assertNull(box.name);
         assertArrayEquals(new byte[0], box.getName());
     }
 
@@ -242,6 +260,65 @@ public class TestResourceRef {
         assertNotEquals(ref, null);
         assertNotEquals(ref, "not a ResourceRef");
         assertEquals(ref, ref); // self equality
+    }
+
+    private static String hex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) sb.append(String.format("%02x", b));
+        return sb.toString();
+    }
+
+    @Test
+    public void testGoldenAccessRefEncodings() throws Exception {
+        // Canonical msgpack encodings, matching go-algorand's omitempty structs
+        // and the python SDK's golden vectors: zero indices and empty names are
+        // never emitted.
+
+        // empty reference -> empty map
+        assertEquals("80", hex(Encoder.encodeToMsgPack(ResourceRef.forEmpty())));
+
+        // holding(sender, asset at index 1) -> {"h":{"s":1}}
+        assertEquals("81a16881a17301", hex(Encoder.encodeToMsgPack(
+                ResourceRef.forHolding(new ResourceRef.HoldingRef(0L, 1L)))));
+
+        // locals(address at index 1, current app) -> {"l":{"d":1}}
+        assertEquals("81a16c81a16401", hex(Encoder.encodeToMsgPack(
+                ResourceRef.forLocals(new ResourceRef.LocalsRef(1L, 0L)))));
+
+        // locals(address at index 1, app at index 2) -> {"l":{"d":1,"p":2}}
+        assertEquals("81a16c82a16401a17002", hex(Encoder.encodeToMsgPack(
+                ResourceRef.forLocals(new ResourceRef.LocalsRef(1L, 2L)))));
+
+        // box(current app, "name") -> {"b":{"n":"name"}}
+        assertEquals("81a16281a16ec4046e616d65", hex(Encoder.encodeToMsgPack(
+                ResourceRef.forBox(new ResourceRef.BoxRef(0L, "name".getBytes())))));
+
+        // box(app at index 3, empty name) -> {"b":{"i":3}}
+        assertEquals("81a16281a16903", hex(Encoder.encodeToMsgPack(
+                ResourceRef.forBox(new ResourceRef.BoxRef(3L, new byte[0])))));
+
+        // box(current app, empty name) collapses to the empty reference
+        assertEquals("80", hex(Encoder.encodeToMsgPack(
+                ResourceRef.forBox(new ResourceRef.BoxRef(0L, new byte[0])))));
+    }
+
+    @Test
+    public void testAccessRefDecodeReEncodeIdentity() throws Exception {
+        // Decoded references must re-encode to identical bytes
+        for (String golden : new String[]{
+                "80",                     // {}
+                "81a16281a16903",         // {"b":{"i":3}}
+                "81a16c81a16401",         // {"l":{"d":1}}
+                "81a16881a17301",         // {"h":{"s":1}}
+        }) {
+            byte[] bytes = new byte[golden.length() / 2];
+            for (int i = 0; i < bytes.length; i++) {
+                bytes[i] = (byte) Integer.parseInt(golden.substring(2 * i, 2 * i + 2), 16);
+            }
+            ResourceRef decoded = Encoder.decodeFromMsgPack(
+                    com.algorand.algosdk.util.Encoder.encodeToBase64(bytes), ResourceRef.class);
+            assertEquals(golden, hex(Encoder.encodeToMsgPack(decoded)));
+        }
     }
 
     @Test
