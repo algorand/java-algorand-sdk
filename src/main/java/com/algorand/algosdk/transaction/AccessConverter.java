@@ -80,6 +80,10 @@ public class AccessConverter {
                     boxRef.getAppId(), currentAppId, result);
                 result.add(ResourceRef.forBox(
                     new ResourceRef.BoxRef(appIndex, boxRef.getName())));
+
+            } else if (appRef instanceof AppResourceRef.EmptyRef) {
+                // An empty reference requests a box I/O quota bump without naming a resource
+                result.add(ResourceRef.forEmpty());
             }
         }
         

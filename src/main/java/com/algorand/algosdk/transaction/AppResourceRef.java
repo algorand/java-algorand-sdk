@@ -192,6 +192,28 @@ public abstract class AppResourceRef {
     }
     
     /**
+     * Empty reference. Requests a box I/O quota bump without naming a resource.
+     */
+    public static class EmptyRef extends AppResourceRef {
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            return o != null && getClass() == o.getClass();
+        }
+
+        @Override
+        public int hashCode() {
+            return EmptyRef.class.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "EmptyRef{}";
+        }
+    }
+
+    /**
      * Box reference.
      */
     public static class BoxRef extends AppResourceRef {
@@ -253,5 +275,9 @@ public abstract class AppResourceRef {
     
     public static BoxRef forBox(long appId, byte[] name) {
         return new BoxRef(appId, name);
+    }
+
+    public static EmptyRef forEmpty() {
+        return new EmptyRef();
     }
 }

@@ -12,7 +12,9 @@ import java.util.Objects;
 /**
  * ResourceRef is a reference to a resource in an application call transaction.
  * It can reference different types of resources like accounts, assets, applications, holdings, locals, or boxes.
- * Only one resource type should be set per ResourceRef instance.
+ * At most one resource type should be set per ResourceRef instance. An empty
+ * ResourceRef is meaningful: it requests a box I/O quota bump without naming a
+ * resource, and encodes canonically as an empty map.
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ResourceRef {
@@ -41,7 +43,8 @@ public class ResourceRef {
 
     /**
      * JsonCreator constructor for ResourceRef deserialization.
-     * Empty ResourceRef objects (all fields null) are converted to empty box references.
+     * Empty ResourceRef objects (all fields null) stay empty so they re-encode
+     * canonically as an empty map.
      */
     @JsonCreator
     public ResourceRef(
@@ -59,12 +62,6 @@ public class ResourceRef {
         this.holding = holding;
         this.locals = locals;
         this.box = box;
-
-        // Handle empty ResourceRef objects by converting to empty box references
-        if (address == null && asset == null && app == null &&
-            holding == null && locals == null && box == null) {
-            this.box = new BoxRef(0L, new byte[0]);
-        }
     }
 
     /**
@@ -122,6 +119,14 @@ public class ResourceRef {
     }
 
     /**
+     * Create an empty ResourceRef. An empty reference requests a box I/O quota
+     * bump without naming a resource.
+     */
+    public static ResourceRef forEmpty() {
+        return new ResourceRef();
+    }
+
+    /**
      * Check if this ResourceRef is empty (no resource type is set).
      */
     @JsonIgnore
@@ -131,7 +136,8 @@ public class ResourceRef {
     }
 
     /**
-     * Validate that only one resource type is set.
+     * Validate that at most one resource type is set. An empty ResourceRef is
+     * valid: it requests a box I/O quota bump without naming a resource.
      * @throws IllegalStateException if multiple resource types are set
      */
     @JsonIgnore
@@ -146,9 +152,6 @@ public class ResourceRef {
 
         if (setCount > 1) {
             throw new IllegalStateException("ResourceRef can only have one resource type set");
-        }
-        if (setCount == 0) {
-            throw new IllegalStateException("ResourceRef must have one resource type set");
         }
     }
 
