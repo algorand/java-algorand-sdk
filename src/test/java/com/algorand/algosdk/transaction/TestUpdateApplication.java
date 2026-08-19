@@ -2,6 +2,7 @@ package com.algorand.algosdk.transaction;
 
 import com.algorand.algosdk.abi.Method;
 import com.algorand.algosdk.account.Account;
+import com.algorand.algosdk.builder.transaction.ApplicationCreateTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.ApplicationUpdateTransactionBuilder;
 import com.algorand.algosdk.builder.transaction.MethodCallTransactionBuilder;
 import com.algorand.algosdk.crypto.Address;
@@ -76,6 +77,44 @@ public class TestUpdateApplication {
 
         assertEquals(Long.valueOf(0L), txn.extraPages);
         assertEquals(new StateSchema(), txn.globalStateSchema);
+    }
+
+    @Test
+    public void testSchemalessCreateOmitsSchemaKeys() throws Exception {
+        // A create without schemas/extraPages must omit apls/apgs/apep entirely;
+        // encoding them as msgpack nil breaks signature verification on the node
+        Transaction unset = ApplicationCreateTransactionBuilder.Builder()
+                .sender(new Address(SENDER_ADDR))
+                .approvalProgram(program())
+                .clearStateProgram(program())
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64(GENESIS_HASH))
+                .build();
+
+        byte[] enc = Encoder.encodeToMsgPack(unset);
+        @SuppressWarnings("unchecked")
+        java.util.Map<String, Object> fields = Encoder.decodeFromMsgPack(
+                Encoder.encodeToBase64(enc), java.util.Map.class);
+        assertFalse(fields.containsKey("apls"), "apls must be omitted, not nil");
+        assertFalse(fields.containsKey("apgs"), "apgs must be omitted, not nil");
+        assertFalse(fields.containsKey("apep"), "apep must be omitted, not nil");
+
+        // Explicit zero schemas and extraPages(0) encode byte-identically to unset
+        Transaction explicitZero = ApplicationCreateTransactionBuilder.Builder()
+                .sender(new Address(SENDER_ADDR))
+                .approvalProgram(program())
+                .clearStateProgram(program())
+                .localStateSchema(new StateSchema(0, 0))
+                .globalStateSchema(new StateSchema(0, 0))
+                .extraPages(0L)
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64(GENESIS_HASH))
+                .build();
+
+        assertEquals(Encoder.encodeToBase64(enc),
+                Encoder.encodeToBase64(Encoder.encodeToMsgPack(explicitZero)));
     }
 
     @Test

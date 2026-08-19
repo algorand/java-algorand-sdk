@@ -21,7 +21,9 @@ public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTra
 
     @Override
     protected void applyTo(Transaction txn) {
-        txn.localStateSchema = localStateSchema;
+        // Only assign when set: overwriting the field default with null would
+        // serialize "apls" as msgpack nil instead of omitting it
+        if (localStateSchema != null) txn.localStateSchema = localStateSchema;
 
         super.applyTo(txn);
     }
