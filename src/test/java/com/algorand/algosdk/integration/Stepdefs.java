@@ -103,9 +103,8 @@ public class Stepdefs {
     com.algorand.algosdk.transaction.AssetParams expectedParams = null;
     Asset queriedParams = new Asset();
 
-    /* Compile / Dryrun */
+    /* Compile */
     Response<CompileResponse> compileResponse;
-    Response<DryrunResponse> dryrunResponse;
 
     protected Address getAddress(int i) {
         if (addresses == null) {
@@ -1105,62 +1104,6 @@ public class Stepdefs {
         } else {
             assertThat(compileResponse.isSuccessful()).isFalse();
         }
-    }
-
-    @When("I dryrun a {string} program {string}")
-    public void i_dryrun_a_program(String kind, String path) throws Exception {
-        byte[] data = loadResource(path);
-        List<DryrunSource> sources = new ArrayList<DryrunSource>();
-        List<SignedTransaction> stxns = new ArrayList<SignedTransaction>();
-        Account account = new Account();
-        Address pk = account.getAddress();
-        Digest gh = new Digest(Encoder.decodeFromBase64("ZIkPs8pTDxbRJsFB1yJ7gvnpDu0Q85FRkl2NCkEAQLU="));
-        Transaction txn = Transaction.PaymentTransactionBuilder()
-            .sender(pk)
-            .fee(1000)
-            .firstValid(1)
-            .lastValid(100)
-            .amount(1000)
-            .genesisHash(gh)
-            .receiver(pk)
-            .build();
-
-        if (kind.equals("compiled")) {
-            LogicsigSignature lsig = new LogicsigSignature(data);
-            SignedTransaction stxn = new SignedTransaction(txn, lsig);
-            stxns.add(stxn);
-        } else if (kind.equals("source")) {
-            DryrunSource drs = new DryrunSource();
-            drs.fieldName = "lsig";
-            drs.source = new String(data);
-            drs.txnIndex = 0L;
-            sources.add(drs);
-            SignedTransaction stxn = new SignedTransaction(txn, new Signature());
-            stxns.add(stxn);
-        } else {
-            fail("kind " + kind + " not in (compiled, source)");
-        }
-
-        DryrunRequest dr = new DryrunRequest();
-        dr.txns = stxns;
-        dr.sources = sources;
-        dryrunResponse = aclv2.TealDryrun().request(dr).execute();
-    }
-
-    @When("I get execution result {string}")
-    public void i_get_execution_result(String result) {
-        DryrunResponse ddr = dryrunResponse.body();
-        assertThat(ddr).isNotNull();
-        assertThat(ddr.txns).isNotNull();
-        assertThat(ddr.txns.size()).isGreaterThan(0);
-        List<String> msgs = new ArrayList<String>();
-        if (ddr.txns.get(0).appCallMessages.size() > 0) {
-            msgs = ddr.txns.get(0).appCallMessages;
-        } else if (ddr.txns.get(0).logicSigMessages.size() > 0) {
-            msgs = ddr.txns.get(0).logicSigMessages;
-        }
-        assertThat(msgs.size()).isGreaterThan(0);
-        assertThat(msgs.get(msgs.size() - 1)).isEqualTo(result);
     }
 
     @When("I compile a teal program {string} with mapping enabled")
