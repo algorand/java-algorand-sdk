@@ -122,8 +122,9 @@ public class TestResourceRef {
     }
 
     @Test
-    public void testEmptyResourceRefViaJsonCreatorBecomesEmptyBoxRef() {
-        // Empty ResourceRef via JsonCreator (deserialization) converts to empty box reference
+    public void testEmptyResourceRefViaJsonCreatorStaysEmpty() {
+        // Empty ResourceRef via JsonCreator (deserialization) stays empty so it
+        // re-encodes canonically as an empty map
         ResourceRef ref = new ResourceRef(null, null, null, null, null, null);
 
         assertNull(ref.address);
@@ -131,20 +132,19 @@ public class TestResourceRef {
         assertNull(ref.app);
         assertNull(ref.holding);
         assertNull(ref.locals);
-        assertNotNull(ref.box);
-        assertEquals(Long.valueOf(0L), ref.box.index);
-        assertArrayEquals(new byte[0], ref.box.name);
-        assertFalse(ref.isEmpty());
+        assertNull(ref.box);
+        assertTrue(ref.isEmpty());
         assertDoesNotThrow(ref::validate);
     }
 
     @Test
-    public void testResourceRefValidationFailsWhenEmpty() {
-        // Only the default constructor creates truly empty ResourceRef
-        ResourceRef ref = new ResourceRef();
+    public void testEmptyResourceRefIsValid() {
+        // An empty ResourceRef is meaningful: it requests a box I/O quota bump
+        // without naming a resource
+        ResourceRef ref = ResourceRef.forEmpty();
 
-        IllegalStateException exception = assertThrows(IllegalStateException.class, ref::validate);
-        assertEquals("ResourceRef must have one resource type set", exception.getMessage());
+        assertTrue(ref.isEmpty());
+        assertDoesNotThrow(ref::validate);
     }
 
     @Test
@@ -258,29 +258,28 @@ public class TestResourceRef {
                 .genesisHash(gh)
                 .build();
 
-        // Add empty ResourceRef objects via JsonCreator
+        // Add an empty ResourceRef to the access list
         java.util.List<ResourceRef> accessList = new java.util.ArrayList<>();
         accessList.add(ResourceRef.forAddress(from));
-        accessList.add(new ResourceRef(null, null, null, null, null, null)); // Empty ResourceRef
+        accessList.add(ResourceRef.forEmpty());
         accessList.add(ResourceRef.forAsset(123L));
         tx.access = accessList;
 
-        // Verify empty ResourceRef was converted to empty box reference
-        assertNotNull(tx.access.get(1).box);
-        assertEquals(Long.valueOf(0L), tx.access.get(1).box.index);
-        assertArrayEquals(new byte[0], tx.access.get(1).box.name);
+        assertTrue(tx.access.get(1).isEmpty());
 
-        // Encode and decode to verify serialization/deserialization works
+        // Encode and decode: the empty reference must survive the round trip and
+        // re-encode to identical bytes (empty refs encode as an empty map)
         String encoded = com.algorand.algosdk.util.Encoder.encodeToBase64(
             com.algorand.algosdk.util.Encoder.encodeToMsgPack(tx));
         Transaction decoded = com.algorand.algosdk.util.Encoder.decodeFromMsgPack(
             encoded, Transaction.class);
 
-        // Verify decoded transaction has the empty box reference
         assertNotNull(decoded.access);
         assertEquals(3, decoded.access.size());
-        assertNotNull(decoded.access.get(1).box);
-        assertEquals(Long.valueOf(0L), decoded.access.get(1).box.index);
-        assertArrayEquals(new byte[0], decoded.access.get(1).box.name);
+        assertTrue(decoded.access.get(1).isEmpty());
+
+        String reEncoded = com.algorand.algosdk.util.Encoder.encodeToBase64(
+            com.algorand.algosdk.util.Encoder.encodeToMsgPack(decoded));
+        assertEquals(encoded, reEncoded);
     }
 }
