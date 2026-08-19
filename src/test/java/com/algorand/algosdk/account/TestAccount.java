@@ -623,4 +623,38 @@ public class TestAccount {
             testSign(lsig, new Address(otherAddrStr), expectedTxID, ma.toAddress(), expectedBytes);
         }
     }
+
+    @Test
+    public void testAuthAddrEqualToSenderNormalizedToEmpty() throws Exception {
+        Account account = new Account();
+        Account other = new Account();
+
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(account.getAddress())
+                .receiver(other.getAddress())
+                .flatFee(1000)
+                .amount(100)
+                .firstValid(1)
+                .lastValid(100)
+                .genesisHash(new Digest())
+                .build();
+
+        SignedTransaction stx = account.signTransaction(tx);
+        assertThat(stx.authAddr).isEqualTo(new Address());
+
+        // Explicitly setting authAddr == sender is a redundant no-op that nodes
+        // now reject; the setter normalizes it back to empty ("not rekeyed").
+        stx.authAddr(account.getAddress());
+        assertThat(stx.authAddr).isEqualTo(new Address());
+
+        // The encoded transaction must not contain an sgnr field at all
+        byte[] enc = Encoder.encodeToMsgPack(stx);
+        assertThat(new String(enc, StandardCharsets.ISO_8859_1)).doesNotContain("sgnr");
+
+        // A genuinely different auth address is preserved
+        stx.authAddr(other.getAddress());
+        assertThat(stx.authAddr).isEqualTo(other.getAddress());
+        byte[] encRekeyed = Encoder.encodeToMsgPack(stx);
+        assertThat(new String(encRekeyed, StandardCharsets.ISO_8859_1)).contains("sgnr");
+    }
 }
