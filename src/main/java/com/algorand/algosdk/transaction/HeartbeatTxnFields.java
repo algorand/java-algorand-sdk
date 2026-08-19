@@ -29,6 +29,10 @@ public class HeartbeatTxnFields implements Serializable {
     @JsonProperty("kd")
     public BigInteger hbKeyDilution = BigInteger.valueOf(0);
 
+    // If true, the heartbeat qualifies for the challenge fee discount
+    @JsonProperty("c")
+    public boolean hbChallengeDiscount = false;
+
     public HeartbeatTxnFields() {}
 
     public HeartbeatTxnFields(
@@ -38,6 +42,17 @@ public class HeartbeatTxnFields implements Serializable {
             ParticipationPublicKey hbVoteID,
             BigInteger hbKeyDilution
     ) {
+        this(hbAddress, hbProof, hbSeed, hbVoteID, hbKeyDilution, false);
+    }
+
+    public HeartbeatTxnFields(
+            Address hbAddress,
+            HeartbeatProof hbProof,
+            byte[] hbSeed,
+            ParticipationPublicKey hbVoteID,
+            BigInteger hbKeyDilution,
+            boolean hbChallengeDiscount
+    ) {
         this.hbAddress = Objects.requireNonNull(hbAddress, "hbAddress must not be null");
         this.hbProof = Objects.requireNonNull(hbProof, "hbProof must not be null");
         this.hbVoteID = Objects.requireNonNull(hbVoteID, "hbVoteID must not be null");
@@ -46,6 +61,7 @@ public class HeartbeatTxnFields implements Serializable {
             throw new NullPointerException("hbSeed must not be null");
         }
         System.arraycopy(hbSeed, 0, this.hbSeed, 0, this.hbSeed.length);
+        this.hbChallengeDiscount = hbChallengeDiscount;
     }
 
     @JsonCreator
@@ -54,7 +70,8 @@ public class HeartbeatTxnFields implements Serializable {
             @JsonProperty("prf") HeartbeatProof hbProof,
             @JsonProperty("sd") byte[] hbSeed,
             @JsonProperty("vid") byte[] hbVoteID,
-            @JsonProperty("kd") BigInteger hbKeyDilution
+            @JsonProperty("kd") BigInteger hbKeyDilution,
+            @JsonProperty("c") Boolean hbChallengeDiscount
     ) {
         if (hbAddress != null) {
             this.hbAddress = new Address(hbAddress);
@@ -71,6 +88,9 @@ public class HeartbeatTxnFields implements Serializable {
         if (hbKeyDilution != null) {
             this.hbKeyDilution = hbKeyDilution;
         }
+        if (hbChallengeDiscount != null) {
+            this.hbChallengeDiscount = hbChallengeDiscount;
+        }
     }
 
     @Override
@@ -82,6 +102,7 @@ public class HeartbeatTxnFields implements Serializable {
                 hbProof.equals(that.hbProof) &&
                 Arrays.equals(hbSeed, that.hbSeed) &&
                 hbVoteID.equals(that.hbVoteID) &&
-                hbKeyDilution.equals(that.hbKeyDilution);
+                hbKeyDilution.equals(that.hbKeyDilution) &&
+                hbChallengeDiscount == that.hbChallengeDiscount;
     }
 }
