@@ -29,6 +29,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
 
     /**
      * Represents a locals reference for local state of an account in an app.
+     * An appId of 0 refers to the currently executing app.
      */
     public static class LocalsReference {
         public final Address address;
