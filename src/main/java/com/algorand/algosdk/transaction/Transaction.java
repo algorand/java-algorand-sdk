@@ -631,7 +631,31 @@ public class Transaction implements Serializable {
                 extraPages.equals(that.extraPages) &&
                 rejectVersion.equals(that.rejectVersion) &&
                 boxReferences.equals(that.boxReferences) &&
-                heartbeatFields.equals(that.heartbeatFields);
+                heartbeatFields.equals(that.heartbeatFields) &&
+                Objects.equals(applicationId, that.applicationId) &&
+                Objects.equals(onCompletion, that.onCompletion) &&
+                byteArrayListEquals(applicationArgs, that.applicationArgs) &&
+                Objects.equals(accounts, that.accounts) &&
+                Objects.equals(foreignApps, that.foreignApps) &&
+                Objects.equals(foreignAssets, that.foreignAssets) &&
+                Objects.equals(approvalProgram, that.approvalProgram) &&
+                Objects.equals(clearStateProgram, that.clearStateProgram) &&
+                Objects.equals(globalStateSchema, that.globalStateSchema) &&
+                Objects.equals(localStateSchema, that.localStateSchema) &&
+                Objects.equals(access, that.access) &&
+                Objects.equals(stateProofType, that.stateProofType) &&
+                Objects.equals(stateProof, that.stateProof) &&
+                Objects.equals(stateProofMessage, that.stateProofMessage);
+    }
+
+    // List<byte[]>.equals compares elements by reference; compare contents instead
+    private static boolean byteArrayListEquals(List<byte[]> a, List<byte[]> b) {
+        if (a == b) return true;
+        if (a == null || b == null || a.size() != b.size()) return false;
+        for (int i = 0; i < a.size(); i++) {
+            if (!Arrays.equals(a.get(i), b.get(i))) return false;
+        }
+        return true;
     }
 
     /**
