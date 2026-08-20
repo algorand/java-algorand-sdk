@@ -347,6 +347,51 @@ public class TestUseAccess {
     }
 
     @Test
+    public void testHoldingWithZeroAddressReferencesSender() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+
+        // A zero-address holding collapses the address to index 0 (sender) and
+        // never lists the zero address as a standalone entry
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .holdings(Collections.singletonList(
+                        new ApplicationBaseTransactionBuilder.HoldingReference(new Address(), 55L)))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(2, txn.access.size());
+        assertEquals(Long.valueOf(55L), txn.access.get(0).asset);
+        assertNotNull(txn.access.get(1).holding);
+        assertEquals(0L, txn.access.get(1).holding.addressIndex);
+        assertEquals(1L, txn.access.get(1).holding.assetIndex);
+    }
+
+    @Test
+    public void testStandaloneForeignAppZeroIsListed() throws NoSuchAlgorithmException {
+        Address sender = new Address(SENDER_ADDR);
+
+        // A standalone foreignApps entry of 0 is listed as-is (only compound
+        // references treat appId 0 as the currently executing app); the node is
+        // the arbiter of its validity
+        Transaction txn = ApplicationCallTransactionBuilder.Builder()
+                .sender(sender)
+                .applicationId(1001L)
+                .useAccess(true)
+                .foreignApps(Collections.singletonList(0L))
+                .firstValid(BigInteger.valueOf(1000))
+                .lastValid(BigInteger.valueOf(2000))
+                .genesisHash(Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI="))
+                .build();
+
+        assertEquals(1, txn.access.size());
+        assertEquals(Long.valueOf(0L), txn.access.get(0).app);
+    }
+
+    @Test
     public void testEmptyRefsAddedToAccessList() throws NoSuchAlgorithmException {
         Address sender = new Address(SENDER_ADDR);
         Address account = new Address(ACCOUNT_ADDR);

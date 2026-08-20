@@ -676,12 +676,16 @@ public class TestAccount {
 
         // The encoded transaction must not contain an sgnr field at all
         byte[] enc = Encoder.encodeToMsgPack(stx);
-        assertThat(new String(enc, StandardCharsets.ISO_8859_1)).doesNotContain("sgnr");
+        java.util.Map<String, Object> fields = Encoder.decodeFromMsgPack(
+                Encoder.encodeToBase64(enc), java.util.Map.class);
+        assertThat(fields).doesNotContainKey("sgnr");
 
         // A genuinely different auth address is preserved
         stx.authAddr(other.getAddress());
         assertThat(stx.authAddr).isEqualTo(other.getAddress());
         byte[] encRekeyed = Encoder.encodeToMsgPack(stx);
-        assertThat(new String(encRekeyed, StandardCharsets.ISO_8859_1)).contains("sgnr");
+        java.util.Map<String, Object> fieldsRekeyed = Encoder.decodeFromMsgPack(
+                Encoder.encodeToBase64(encRekeyed), java.util.Map.class);
+        assertThat(fieldsRekeyed).containsKey("sgnr");
     }
 }
