@@ -18,6 +18,9 @@ import java.util.Objects;
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ResourceRef {
+
+    private static final Address ZERO_ADDRESS = new Address();
+
     @JsonProperty("d")
     public Address address;
     
@@ -65,29 +68,38 @@ public class ResourceRef {
     }
 
     /**
-     * Create a ResourceRef for an account address.
+     * Create a ResourceRef for an account address. The zero (empty) address is
+     * canonically the fully-empty reference.
      */
     public static ResourceRef forAddress(Address address) {
         ResourceRef ref = new ResourceRef();
-        ref.address = address;
+        if (address != null && !address.equals(ZERO_ADDRESS)) {
+            ref.address = address;
+        }
         return ref;
     }
 
     /**
-     * Create a ResourceRef for an asset.
+     * Create a ResourceRef for an asset. An asset id of 0 is canonically the
+     * fully-empty reference.
      */
     public static ResourceRef forAsset(long assetId) {
         ResourceRef ref = new ResourceRef();
-        ref.asset = assetId;
+        if (assetId != 0) {
+            ref.asset = assetId;
+        }
         return ref;
     }
 
     /**
-     * Create a ResourceRef for an application.
+     * Create a ResourceRef for an application. An app id of 0 is canonically the
+     * fully-empty reference.
      */
     public static ResourceRef forApp(long appId) {
         ResourceRef ref = new ResourceRef();
-        ref.app = appId;
+        if (appId != 0) {
+            ref.app = appId;
+        }
         return ref;
     }
 
