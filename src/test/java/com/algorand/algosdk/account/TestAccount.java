@@ -625,6 +625,33 @@ public class TestAccount {
     }
 
     @Test
+    public void testDecodePreservesLegacyAuthAddrEqualToSender() throws Exception {
+        Account account = new Account();
+        Account other = new Account();
+
+        Transaction tx = Transaction.PaymentTransactionBuilder()
+                .sender(account.getAddress())
+                .receiver(other.getAddress())
+                .flatFee(1000)
+                .amount(100)
+                .firstValid(1)
+                .lastValid(100)
+                .genesisHash(new Digest())
+                .build();
+
+        // Simulate historical chain data with sgnr == sender by writing the
+        // field directly, bypassing the normalizing setter
+        SignedTransaction stx = account.signTransaction(tx);
+        stx.authAddr = account.getAddress();
+        String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(stx));
+
+        // Decoding must preserve it (never normalize) and re-encode byte-identically
+        SignedTransaction decoded = Encoder.decodeFromMsgPack(encoded, SignedTransaction.class);
+        assertThat(decoded.authAddr).isEqualTo(account.getAddress());
+        assertThat(Encoder.encodeToBase64(Encoder.encodeToMsgPack(decoded))).isEqualTo(encoded);
+    }
+
+    @Test
     public void testAuthAddrEqualToSenderNormalizedToEmpty() throws Exception {
         Account account = new Account();
         Account other = new Account();
