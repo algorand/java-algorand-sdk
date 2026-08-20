@@ -12,6 +12,9 @@ import java.util.List;
  * This follows the same pattern as BoxReference.fromAppBoxReference() method.
  */
 public class AccessConverter {
+
+    private static final Address ZERO_ADDRESS = new Address();
+
     
     /**
      * Convert a list of high-level AppResourceRef to index-based ResourceRef.
@@ -43,7 +46,7 @@ public class AccessConverter {
             if (appRef instanceof AppResourceRef.AddressRef) {
                 AppResourceRef.AddressRef addrRef = (AppResourceRef.AddressRef) appRef;
                 // The zero (empty) address means the sender and is never listed
-                if (addrRef.getAddress() == null || addrRef.getAddress().equals(new Address())) {
+                if (addrRef.getAddress() == null || addrRef.getAddress().equals(ZERO_ADDRESS)) {
                     continue;
                 }
                 if (!containsAddress(result, addrRef.getAddress())) {
@@ -133,7 +136,7 @@ public class AccessConverter {
      */
     private static long findOrAddAddressIndex(Address address, List<ResourceRef> resources) {
         // Special case: index 0 = sender (null and the zero address are sender shorthands)
-        if (address == null || address.equals(new Address())) {
+        if (address == null || address.equals(ZERO_ADDRESS)) {
             return 0;
         }
         

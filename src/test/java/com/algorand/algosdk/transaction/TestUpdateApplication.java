@@ -33,7 +33,7 @@ public class TestUpdateApplication {
     }
 
     @Test
-    public void testUpdateAllowsGlobalSchemaAndExtraPages() throws NoSuchAlgorithmException {
+    public void testUpdateAllowsGlobalSchemaAndExtraPages() throws Exception {
         Transaction txn = ApplicationUpdateTransactionBuilder.Builder()
                 .sender(new Address(SENDER_ADDR))
                 .applicationId(1001L)
@@ -51,13 +51,8 @@ public class TestUpdateApplication {
         assertEquals(BigInteger.valueOf(3), txn.globalStateSchema.numByteSlice);
         assertEquals(Long.valueOf(2L), txn.extraPages);
 
-        Transaction decoded;
-        try {
-            String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(txn));
-            decoded = Encoder.decodeFromMsgPack(encoded, Transaction.class);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        String encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(txn));
+        Transaction decoded = Encoder.decodeFromMsgPack(encoded, Transaction.class);
         assertEquals(BigInteger.valueOf(2), decoded.globalStateSchema.numUint);
         assertEquals(BigInteger.valueOf(3), decoded.globalStateSchema.numByteSlice);
         assertEquals(Long.valueOf(2L), decoded.extraPages);
