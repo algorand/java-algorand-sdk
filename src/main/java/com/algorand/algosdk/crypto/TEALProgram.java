@@ -43,4 +43,17 @@ public class TEALProgram {
     public TEALProgram(String base64String) {
         this(Encoder.decodeFromBase64(base64String));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TEALProgram that = (TEALProgram) o;
+        return Arrays.equals(program, that.program);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(program);
+    }
 }
