@@ -371,12 +371,12 @@ public class TestUseAccess {
     }
 
     @Test
-    public void testStandaloneForeignAppZeroIsListed() throws NoSuchAlgorithmException {
+    public void testStandaloneForeignAppZeroCollapsesToEmpty() throws NoSuchAlgorithmException {
         Address sender = new Address(SENDER_ADDR);
 
-        // A standalone foreignApps entry of 0 is listed as-is (only compound
-        // references treat appId 0 as the currently executing app); the node is
-        // the arbiter of its validity
+        // A standalone entry with a zero app id is canonically the fully-empty
+        // reference (a box I/O quota bump): go-algorand's ResourceRef omits zero
+        // fields, so emitting {"p":0} would break signature verification
         Transaction txn = ApplicationCallTransactionBuilder.Builder()
                 .sender(sender)
                 .applicationId(1001L)
@@ -388,7 +388,7 @@ public class TestUseAccess {
                 .build();
 
         assertEquals(1, txn.access.size());
-        assertEquals(Long.valueOf(0L), txn.access.get(0).app);
+        assertTrue(txn.access.get(0).isEmpty());
     }
 
     @Test

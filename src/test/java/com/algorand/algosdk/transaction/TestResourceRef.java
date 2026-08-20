@@ -300,6 +300,17 @@ public class TestResourceRef {
         // box(current app, empty name) collapses to the empty reference
         assertEquals("80", hex(Encoder.encodeToMsgPack(
                 ResourceRef.forBox(new ResourceRef.BoxRef(0L, new byte[0])))));
+
+        // Standalone zero values are omitted too: go-algorand's ResourceRef is
+        // tagged omitempty, so a zero app/asset/address is the empty reference
+        assertEquals("80", hex(Encoder.encodeToMsgPack(ResourceRef.forApp(0L))));
+        assertEquals("80", hex(Encoder.encodeToMsgPack(ResourceRef.forAsset(0L))));
+        assertEquals("80", hex(Encoder.encodeToMsgPack(ResourceRef.forAddress(new Address()))));
+        assertEquals("80", hex(Encoder.encodeToMsgPack(ResourceRef.forAddress(null))));
+
+        // Non-zero standalone values still encode
+        assertEquals("81a17007", hex(Encoder.encodeToMsgPack(ResourceRef.forApp(7L))));
+        assertEquals("81a17307", hex(Encoder.encodeToMsgPack(ResourceRef.forAsset(7L))));
     }
 
     @Test
