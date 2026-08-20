@@ -70,8 +70,8 @@ public class ApplicationCreateTransactionBuilder<T extends  ApplicationCreateTra
     }
 
     /**
-     * extraPages allows you to rent extra pages of memory for the application. Each page is 2048 bytes of shared
-     * memory between approval and clear state programs. The value set at creation may later be changed by an
+     * extraPages allows you to rent extra program pages for the application. Each extra page grants 2048 extra
+     * bytes of program size available to the approval and clear state programs. The value set at creation may later be changed by an
      * application update. It must be a non-negative integer; the maximum (currently 7) is enforced by the network.
      */
     @Override

@@ -52,6 +52,8 @@ public class ApplicationUpdateTransactionBuilder<T extends ApplicationUpdateTran
      *
      * Note: on an update, a non-zero global state schema or extraPages installs both sizes and zeroes the one left
      * out, so pass the current value of a size that should not change. Leaving both out keeps the current sizes.
+     *
+     * Passing null means unset: the transaction carries no schema (extraPages(null), by contrast, is rejected).
      */
     public T globalStateSchema(StateSchema globalStateSchema) {
         this.globalStateSchema = globalStateSchema;
@@ -59,8 +61,8 @@ public class ApplicationUpdateTransactionBuilder<T extends ApplicationUpdateTran
     }
 
     /**
-     * extraPages allows you to rent extra pages of memory for the application. Each page is 2048 bytes of shared
-     * memory between approval and clear state programs. extraPages may also be changed during an application update.
+     * extraPages allows you to rent extra program pages for the application. Each extra page grants 2048 extra
+     * bytes of program size available to the approval and clear state programs. extraPages may also be changed during an application update.
      * It must be a non-negative integer; the maximum (currently 7) is enforced by the network.
      *
      * Note: on an update, a non-zero global state schema or extraPages installs both sizes and zeroes the one left

@@ -213,6 +213,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      * Set asset holding references that need to be accessible in this transaction.
      * Holdings references allow the transaction to access asset balances of specific accounts.
      *
+     * A null or zero (empty) address means the sender.
+     *
      * Note: Holdings references are only available when useAccess=true as they cannot be
      * represented in legacy transaction format.
      */
@@ -224,6 +226,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     /**
      * Set local state references that need to be accessible in this transaction.
      * Locals references allow the transaction to access local state of specific accounts in specific apps.
+     *
+     * A null or zero (empty) address means the sender; an appId of 0 refers to the currently executing app.
      *
      * Note: Locals references are only available when useAccess=true as they cannot be
      * represented in legacy transaction format.

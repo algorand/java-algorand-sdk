@@ -14,7 +14,7 @@ import java.util.Objects;
 public abstract class AppResourceRef {
     
     /**
-     * Address reference.
+     * Address reference. The zero (empty) address means the sender and is never listed.
      */
     public static class AddressRef extends AppResourceRef {
         private final Address address;
@@ -114,6 +114,7 @@ public abstract class AppResourceRef {
     
     /**
      * Holding reference (account + asset).
+     * A null or zero (empty) address means the sender.
      */
     public static class HoldingRef extends AppResourceRef {
         private final Address address;
@@ -154,6 +155,7 @@ public abstract class AppResourceRef {
     /**
      * Locals reference (account + app).
      * An appId of 0 refers to the currently executing app.
+     * A null or zero (empty) address means the sender.
      */
     public static class LocalsRef extends AppResourceRef {
         private final Address address;
@@ -214,7 +216,7 @@ public abstract class AppResourceRef {
     }
 
     /**
-     * Box reference.
+     * Box reference. An appId of 0 refers to the currently executing app.
      */
     public static class BoxRef extends AppResourceRef {
         private final long appId;

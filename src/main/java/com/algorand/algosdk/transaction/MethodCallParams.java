@@ -81,7 +81,7 @@ public class MethodCallParams {
             // state schema and extraPages may be changed during an update.
             if (localStateSchema != null)
                 throw new IllegalArgumentException(
-                        "The local state schema cannot be changed on an update call: localStateSchema"
+                        "The local state schema cannot be changed on an update call"
                 );
         } else {
             if (approvalProgram != null || clearProgram != null || globalStateSchema != null || localStateSchema != null || extraPages != null) {
