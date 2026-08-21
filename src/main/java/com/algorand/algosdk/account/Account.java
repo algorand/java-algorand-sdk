@@ -449,6 +449,9 @@ public class Account {
      * @throws IOException
      */
     public LogicsigSignature signLogicsig(LogicsigSignature lsig) throws IOException {
+        if (lsig.pqsig != null) {
+            throw new IllegalStateException("LogicsigSignature already has a post-quantum signature");
+        }
         Signature sig;
         try {
             byte[] bytesToSign = lsig.bytesToSign();
@@ -468,6 +471,9 @@ public class Account {
      * @throws IOException
      */
     public LogicsigSignature signLogicsig(LogicsigSignature lsig, MultisigAddress ma) throws IOException {
+        if (lsig.pqsig != null) {
+            throw new IllegalStateException("LogicsigSignature already has a post-quantum signature");
+        }
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myIndex = ma.publicKeys.indexOf(myPK);
         if (myIndex == -1) {
@@ -560,6 +566,7 @@ public class Account {
         boolean hasSig = lsig.sig != null;
         boolean hasLmsig = lsig.lmsig != null;
         boolean hasMsig = lsig.msig != null;
+        boolean hasPQsig = lsig.pqsig != null;
         Address lsigAddr;
         try {
             if (hasSig) {
@@ -568,6 +575,8 @@ public class Account {
                 lsigAddr = lsig.lmsig.convertToMultisigAddress().toAddress();
             } else if (hasMsig) {
                 lsigAddr = lsig.msig.convertToMultisigAddress().toAddress();
+            } else if (hasPQsig) {
+                lsigAddr = PQAddress.fromSignature(lsig.pqsig);
             } else {
                 lsigAddr = lsig.toAddress();
             }

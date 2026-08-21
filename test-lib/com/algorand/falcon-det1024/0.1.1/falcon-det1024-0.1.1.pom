@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.algorand</groupId>
+    <artifactId>falcon-det1024</artifactId>
+    <version>0.1.1</version>
+    <packaging>jar</packaging>
+
+    <name>falcon-det1024</name>
+    <description>
+        Java bindings for the Algorand deterministic Falcon (det1024) post-quantum
+        signature scheme, wrapping the vendored reference C implementation.
+    </description>
+    <url>https://github.com/Argimirodelpozo/falcon-det1024-java</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.14.0</version>
+        </dependency>
+    </dependencies>
+</project>

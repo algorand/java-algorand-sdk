@@ -1,7 +1,10 @@
 package com.algorand.algosdk.mnemonic;
 
+import com.algorand.algosdk.crypto.PQSignature;
 import com.algorand.algosdk.util.CryptoProvider;
+import com.algorand.algosdk.util.Digester;
 
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -20,6 +23,7 @@ public class Mnemonic {
     private static final int PADDING_ZEROS = BITS_PER_WORD - ((KEY_LEN_BYTES*8)%BITS_PER_WORD);
     private static final String CHECKSUM_ALG = "SHA-512/256";
     private static final String MNEMONIC_DELIM = " ";
+    private static final byte[] PQ_SEED_PREFIX = ("PQK").getBytes(StandardCharsets.UTF_8);
 
     // on set up, verify expected relationship between constants
     static {
@@ -93,6 +97,28 @@ public class Mnemonic {
             throw new GeneralSecurityException("checksum failed to validate");
         }
         return Arrays.copyOf(b, KEY_LEN_BYTES);
+    }
+
+    /**
+     * Derive a post-quantum key seed from a 25 word mnemonic. The seed is
+     * SHA-512/256("PQK" + scheme + key), where key is the 32-byte value the
+     * mnemonic decodes to.
+     * @param mnemonicStr words delimited by MNEMONIC_DELIM
+     * @param scheme 2-byte scheme identifier (e.g. {@link PQSignature#falcon1024Scheme()})
+     * @return 32 byte post-quantum key seed
+     * @throws IllegalArgumentException if the scheme is not exactly 2 bytes
+     */
+    public static byte[] toPQSeed(String mnemonicStr, byte[] scheme) throws GeneralSecurityException {
+        if (scheme == null || scheme.length != PQSignature.SCHEME_LEN_BYTES) {
+            throw new IllegalArgumentException("post-quantum scheme must be " + PQSignature.SCHEME_LEN_BYTES +
+                    " bytes, got " + (scheme == null ? "null" : scheme.length));
+        }
+        byte[] key = toKey(mnemonicStr);
+        byte[] toBeHashed = new byte[PQ_SEED_PREFIX.length + scheme.length + key.length];
+        System.arraycopy(PQ_SEED_PREFIX, 0, toBeHashed, 0, PQ_SEED_PREFIX.length);
+        System.arraycopy(scheme, 0, toBeHashed, PQ_SEED_PREFIX.length, scheme.length);
+        System.arraycopy(key, 0, toBeHashed, PQ_SEED_PREFIX.length + scheme.length, key.length);
+        return Digester.digest(toBeHashed);
     }
 
     // returns a word corresponding to the 11 bit checksum of the data

@@ -3,6 +3,8 @@ test-harness/
 src/test/resources/generated_responses/
 *.feature
 src/test/resources/**/*.json
+# vendored post-quantum test vectors
+!src/test/resources/pq_test_data/*.json
 src/test/resources/**/*.base64
 src/test/resources/**/*.tok.map
 src/test/resources/**/*.teal
@@ -29,6 +31,8 @@ target/
 
 # Package Files #
 *.jar
+# vendored, not-yet-published falcon-det1024 test dependency (see test-lib/README.md)
+!test-lib/**/*.jar
 *.war
 *.nar
 *.ear

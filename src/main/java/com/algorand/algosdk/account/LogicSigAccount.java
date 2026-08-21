@@ -1,6 +1,8 @@
 package com.algorand.algosdk.account;
 
 import com.algorand.algosdk.crypto.*;
+import com.algorand.algosdk.signer.Falcon1024AlgorandSigner;
+import com.algorand.algosdk.signer.PQAlgorandSigner;
 import com.algorand.algosdk.transaction.SignedTransaction;
 import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.transaction.TxnSigner;
@@ -83,6 +85,39 @@ public class LogicSigAccount {
     }
 
     /**
+     * Creates a new delegated LogicSigAccount whose delegating account is a
+     * post-quantum account, signing the program in one call with the supplied
+     * callback-based signer.
+     * <p>
+     * This is the callback-based counterpart of the
+     * {@code (logic, args, privateKey)} constructor. Post-quantum delegation
+     * does not support multisig; there is no multisig variant of this factory.
+     * @param logic the bytes of the program
+     * @param args the arguments of the program (may be null)
+     * @param signer the post-quantum signer of the delegating account
+     * @return a delegated LogicSigAccount carrying the post-quantum signature
+     */
+    public static LogicSigAccount delegatedPQ(byte[] logic, List<byte[]> args, PQAlgorandSigner signer)
+            throws Exception {
+        Objects.requireNonNull(signer, "signer must not be null");
+        LogicsigSignature lsig = new LogicsigSignature(logic, args);
+        signer.signLogicsig(lsig);
+        return new LogicSigAccount(lsig, null);
+    }
+
+    /**
+     * {@link #delegatedPQ} fixed to a Falcon-1024 signer.
+     * @param logic the bytes of the program
+     * @param args the arguments of the program (may be null)
+     * @param signer the Falcon-1024 signer of the delegating account
+     * @return a delegated LogicSigAccount carrying the post-quantum signature
+     */
+    public static LogicSigAccount delegatedFalcon1024(byte[] logic, List<byte[]> args, Falcon1024AlgorandSigner signer)
+            throws Exception {
+        return delegatedPQ(logic, args, signer);
+    }
+
+    /**
      * Creates a new delegated LogicSigAccount from existing LogicSig
      * @param lsig is an existing LogicSig.
      * @param signerPublicKey must be present if the LogicSig is delegated and the delegating account
@@ -99,7 +134,7 @@ public class LogicSigAccount {
         boolean hasMsig = lsig.msig != null;
 
         if (lsig.sigCount() > 1)
-            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig, Msig, or LMsig may be defined");
+            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig, Msig, LMsig, or PQsig may be defined");
         if (hasSig) {
             if (signerPublicKey == null)
                 throw new IllegalArgumentException("Cannot generate LogicSigAccount from single-signed LogicSig and a null public key");
@@ -110,7 +145,7 @@ public class LogicSigAccount {
             return;
         }
         if (signerPublicKey != null)
-            throw new IllegalArgumentException("Cannot generate LogicSigAccount from multi-sig LogicSig and a public key");
+            throw new IllegalArgumentException("Cannot generate LogicSigAccount from multi-sig or post-quantum LogicSig and a public key");
         this.lsig = lsig;
         this.sigKey = null;
     }
@@ -123,7 +158,8 @@ public class LogicSigAccount {
         boolean hasSig = this.lsig.sig != null;
         boolean hasLmsig = this.lsig.lmsig != null;
         boolean hasMsig = this.lsig.msig != null;
-        return hasSig || hasLmsig || hasMsig;
+        boolean hasPQsig = this.lsig.pqsig != null;
+        return hasSig || hasLmsig || hasMsig || hasPQsig;
     }
 
     /**
@@ -136,12 +172,18 @@ public class LogicSigAccount {
         boolean hasSig = this.lsig.sig != null;
         boolean hasLmsig = this.lsig.lmsig != null;
         boolean hasMsig = this.lsig.msig != null;
+        boolean hasPQsig = this.lsig.pqsig != null;
 
         if (this.lsig.sigCount() > 1)
-            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig, Msig, or LMsig may be defined");
+            throw new IllegalArgumentException("Logicsig has too many signatures, at most one of Sig, Msig, LMsig, or PQsig may be defined");
         if (hasSig) {
             byte[] sigKeyRaw = this.sigKey.getBytes();
             return new Address(sigKeyRaw);
+        }
+        if (hasPQsig) {
+            // The signature carries the scheme, salt and public key of the
+            // delegating account, so it fully determines the address.
+            return PQAddress.fromSignature(this.lsig.pqsig);
         }
         if (hasLmsig) {
             List<Ed25519PublicKey> pkFromSubSig = new ArrayList<>();

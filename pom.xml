@@ -203,8 +203,35 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Real Falcon-1024 (det1024) implementation, used only to back the
+             signing callback in the post-quantum cucumber steps. The SDK itself
+             bundles no Falcon code.
+
+             TEMPORARY: falcon-det1024-java is not published yet, so a build of
+             it is vendored under test-lib/ (see test-lib/README.md) and
+             resolved from the file-based repository declared below. When the
+             artifact reaches Maven Central, delete test-lib/ and the
+             <repositories> block and bump this to the released version. -->
+        <dependency>
+            <groupId>com.algorand</groupId>
+            <artifactId>falcon-det1024</artifactId>
+            <version>0.1.1</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- end test dependencies -->
     </dependencies>
+
+    <!-- TEMPORARY: resolves the vendored, not-yet-published falcon-det1024
+         test dependency. Remove once it is available from Maven Central. -->
+    <repositories>
+        <repository>
+            <id>vendored-test-lib</id>
+            <url>file://${project.basedir}/test-lib</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
+        </repository>
+    </repositories>
 
     <build>
       <plugins>
