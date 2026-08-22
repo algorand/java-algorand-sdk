@@ -1,5 +1,6 @@
 package com.algorand.algosdk.signer;
 
+import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.crypto.MultisigAddress;
 import com.algorand.algosdk.crypto.MultisigSignature;
 import com.algorand.algosdk.crypto.MultisigSignature.MultisigSubsig;
@@ -76,9 +77,8 @@ public class Ed25519MultisigAlgorandSigner implements TxnSigner {
             SignedTransaction stx = new SignedTransaction(tx, mSig, tx.txID());
             // if the transaction sender address is not the multisig address, set
             // the auth address to the multisig address
-            if (!tx.sender.equals(msig.toAddress())) {
-                stx.authAddr = msig.toAddress();
-            }
+        Address msigAddr = msig.toAddress();
+        stx.authAddr(msigAddr);
             sTxn[i] = stx;
         }
         return sTxn;
