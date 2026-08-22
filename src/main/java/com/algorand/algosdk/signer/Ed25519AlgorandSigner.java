@@ -180,9 +180,8 @@ public class Ed25519AlgorandSigner implements TxnSigner {
         SignedTransaction stx = new SignedTransaction(tx, mSig, tx.txID());
         // if the transaction sender address is not the multisig address, set the
         // auth address to the multisig address
-        if (!tx.sender.equals(ma.toAddress())) {
-            stx.authAddr = ma.toAddress();
-        }
+        Address msigAddr = ma.toAddress();
+        stx.authAddr(msigAddr);
         return stx;
     }
 
