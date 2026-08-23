@@ -314,8 +314,12 @@ public class TestPQ {
     @Test
     public void testDelegatedPayment() throws Exception {
         DelegatedResult r = runDelegatedFixture("pqDelegatedPayment.json");
-        // Falcon signs the raw preimage "PQProgram" + address + program
-        assertThat(r.capturedPreimage).isEqualTo(r.lsig.bytesToSignPQ(r.pqAddress));
+        // Falcon signs the raw preimage "PQProgram" + address + program, built
+        // here independently of bytesToSignPQ so a regression in it cannot hide
+        assertThat(r.capturedPreimage).isEqualTo(concat(
+                "PQProgram".getBytes(StandardCharsets.UTF_8),
+                r.pqAddress.getBytes(),
+                b64(r.fx.get("signer").get("lsig"))));
         assertThat(r.blob).isEqualTo(b64(r.fx.get("stxnBlob")));
         assertThat(r.stxn.authAddr).isEqualTo(new Address());
         assertThat(Encoder.decodeFromMsgPack(r.blob, SignedTransaction.class)).isEqualTo(r.stxn);
@@ -652,8 +656,13 @@ public class TestPQ {
         }, 99);
         LogicsigSignature lsig = salted.signLogicsig(new LogicsigSignature(program));
 
-        // the delegation is bound to the salted address, not the canonical one
-        assertThat(captured.get()).isEqualTo(lsig.bytesToSignPQ(salted.getAddress()));
+        // the delegation is bound to the salted address, not the canonical one;
+        // the preimage is built independently of bytesToSignPQ so a regression
+        // in it cannot hide
+        assertThat(captured.get()).isEqualTo(concat(
+                "PQProgram".getBytes(StandardCharsets.UTF_8),
+                salted.getAddress().getBytes(),
+                program));
         assertThat(new LogicSigAccount(lsig, null).getAddress()).isEqualTo(salted.getAddress());
         assertThat(lsig.verify(salted.getAddress())).isTrue();
     }
