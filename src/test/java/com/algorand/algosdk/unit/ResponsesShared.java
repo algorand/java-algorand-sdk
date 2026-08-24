@@ -2,14 +2,9 @@ package com.algorand.algosdk.unit;
 
 import com.algorand.algosdk.crypto.Address;
 import com.algorand.algosdk.unit.utils.ClientMocker;
-import com.algorand.algosdk.util.Encoder;
-import com.algorand.algosdk.util.ResourceUtils;
-import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
-import com.algorand.algosdk.v2.client.model.DryrunResponse;
-import com.algorand.algosdk.v2.client.model.DryrunTxnResult;
 import com.algorand.algosdk.v2.client.model.StateProof;
 import com.google.common.io.Files;
 import io.cucumber.java.en.Given;
@@ -19,7 +14,6 @@ import org.assertj.core.api.Assertions;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +22,6 @@ public class ResponsesShared {
     public File bodyFile;
     @SuppressWarnings("rawtypes")
     public Response response;
-    public DryrunTxnResult dryrunTxnResult;
 
     public AlgodClient algod = new AlgodClient("localhost", 123, "");
     public IndexerClient indexer = new IndexerClient("localhost", 123);
@@ -165,9 +158,6 @@ public class ResponsesShared {
                     case "GetPendingTransactionsByAddress":
                         response = algod.GetPendingTransactionsByAddress(new Address()).execute();
                         break;
-                    case "DryRun":
-                        response = algod.TealDryrun().execute();
-                        break;
                     case "Proof":
                     case "GetTransactionProof":
                         response = algod.GetTransactionProof(0L, "").execute();
@@ -229,30 +219,5 @@ public class ResponsesShared {
     @Then("the parsed response should equal the mock response.")
     public void the_parsed_response_should_equal() throws IOException {
         verifyResponse(response, bodyFile);
-    }
-
-    @Given("a dryrun response file {string} and a transaction at index {string}")
-    public void a_dryrun_response_file_and_a_transaction_at_index(String path, String strIdx) {
-        byte[] b = ResourceUtils.loadResource(path);
-        String str_resource = new String(b, StandardCharsets.UTF_8);
-        try{
-            DryrunResponse drr = Encoder.decodeFromJson(str_resource, DryrunResponse.class);
-            int idx = Integer.parseInt(strIdx);
-            this.dryrunTxnResult = drr.txns.get(idx);
-        }catch(Exception e){
-            assertThat(e).isNull();
-        }
-    }
-
-    @Then("calling app trace produces {string}")
-    public void calling_app_trace_produces(String path) {
-        byte[] b = ResourceUtils.loadResource(path);
-        String str_resource = new String(b, StandardCharsets.UTF_8);
-        Utils.StackPrinterConfig spc = new Utils.StackPrinterConfig();
-        spc.maxValueWidth = 30;
-        spc.topOfStackFirst = false;
-
-        String trace = Utils.appTrace(this.dryrunTxnResult, spc);
-        assertThat(str_resource).isEqualTo(trace);
     }
 }
