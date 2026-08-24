@@ -1,3 +1,14 @@
+# 2.11.1
+
+<!-- Release notes written manually due to bug in release note generator returning null -->
+
+## What's Changed
+### New Features
+* v42 models and dry run removal
+
+
+**Full Changelog**: https://github.com/algorand/java-algorand-sdk/compare/2.10.1...2.11.0
+
 # 2.10.1
 
 <!-- Release notes generated using configuration in .github/release.yml at release/2.10.1 -->
