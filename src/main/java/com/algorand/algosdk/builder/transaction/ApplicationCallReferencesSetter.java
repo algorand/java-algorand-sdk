@@ -14,6 +14,7 @@ public interface ApplicationCallReferencesSetter<T extends ApplicationCallRefere
 
     /**
      * Accounts lists the accounts (in addition to the sender) that may be accessed from the application logic.
+     * In access list mode (useAccess=true) the zero (empty) address means the sender and is never listed.
      */
     public T accounts(List<Address> accounts);
 

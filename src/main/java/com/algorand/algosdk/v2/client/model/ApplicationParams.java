@@ -64,6 +64,18 @@ public class ApplicationParams extends PathResponse {
     public Long extraProgramPages;
 
     /**
+     * (fba) if true, apps with the same creator may read and write this app's boxes
+     */
+    @JsonProperty("family-box-access")
+    public Boolean familyBoxAccess;
+
+    /**
+     * (fbr) if true, any app may read this app's boxes
+     */
+    @JsonProperty("foreign-box-reads")
+    public Boolean foreignBoxReads;
+
+    /**
      * global state
      */
     @JsonProperty("global-state")
@@ -82,6 +94,23 @@ public class ApplicationParams extends PathResponse {
     public ApplicationStateSchema localStateSchema;
 
     /**
+     * (ss) the account responsible for extra pages and global state MBR
+     */
+    @JsonProperty("size-sponsor")
+    public void sizeSponsor(String sizeSponsor) throws NoSuchAlgorithmException {
+        this.sizeSponsor = new Address(sizeSponsor);
+    }
+    @JsonProperty("size-sponsor")
+    public String sizeSponsor() throws NoSuchAlgorithmException {
+        if (this.sizeSponsor != null) {
+            return this.sizeSponsor.encodeAsString();
+        } else {
+            return null;
+        }
+    }
+    public Address sizeSponsor;
+
+    /**
      * the number of updates to the application programs
      */
     @JsonProperty("version")
@@ -98,9 +127,12 @@ public class ApplicationParams extends PathResponse {
         if (!Objects.deepEquals(this.clearStateProgram, other.clearStateProgram)) return false;
         if (!Objects.deepEquals(this.creator, other.creator)) return false;
         if (!Objects.deepEquals(this.extraProgramPages, other.extraProgramPages)) return false;
+        if (!Objects.deepEquals(this.familyBoxAccess, other.familyBoxAccess)) return false;
+        if (!Objects.deepEquals(this.foreignBoxReads, other.foreignBoxReads)) return false;
         if (!Objects.deepEquals(this.globalState, other.globalState)) return false;
         if (!Objects.deepEquals(this.globalStateSchema, other.globalStateSchema)) return false;
         if (!Objects.deepEquals(this.localStateSchema, other.localStateSchema)) return false;
+        if (!Objects.deepEquals(this.sizeSponsor, other.sizeSponsor)) return false;
         if (!Objects.deepEquals(this.version, other.version)) return false;
 
         return true;

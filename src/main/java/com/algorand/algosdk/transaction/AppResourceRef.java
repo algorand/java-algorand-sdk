@@ -14,7 +14,7 @@ import java.util.Objects;
 public abstract class AppResourceRef {
     
     /**
-     * Address reference.
+     * Address reference. The zero (empty) address means the sender and is never listed.
      */
     public static class AddressRef extends AppResourceRef {
         private final Address address;
@@ -114,6 +114,7 @@ public abstract class AppResourceRef {
     
     /**
      * Holding reference (account + asset).
+     * A null or zero (empty) address means the sender.
      */
     public static class HoldingRef extends AppResourceRef {
         private final Address address;
@@ -153,6 +154,8 @@ public abstract class AppResourceRef {
     
     /**
      * Locals reference (account + app).
+     * An appId of 0 refers to the currently executing app.
+     * A null or zero (empty) address means the sender.
      */
     public static class LocalsRef extends AppResourceRef {
         private final Address address;
@@ -191,7 +194,29 @@ public abstract class AppResourceRef {
     }
     
     /**
-     * Box reference.
+     * Empty reference. Requests a box I/O quota bump without naming a resource.
+     */
+    public static class EmptyRef extends AppResourceRef {
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            return o != null && getClass() == o.getClass();
+        }
+
+        @Override
+        public int hashCode() {
+            return EmptyRef.class.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            return "EmptyRef{}";
+        }
+    }
+
+    /**
+     * Box reference. An appId of 0 refers to the currently executing app.
      */
     public static class BoxRef extends AppResourceRef {
         private final long appId;
@@ -252,5 +277,9 @@ public abstract class AppResourceRef {
     
     public static BoxRef forBox(long appId, byte[] name) {
         return new BoxRef(appId, name);
+    }
+
+    public static EmptyRef forEmpty() {
+        return new EmptyRef();
     }
 }

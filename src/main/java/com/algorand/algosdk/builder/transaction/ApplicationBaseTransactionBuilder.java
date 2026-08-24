@@ -29,6 +29,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
 
     /**
      * Represents a locals reference for local state of an account in an app.
+     * An appId of 0 refers to the currently executing app.
      */
     public static class LocalsReference {
         public final Address address;
@@ -47,6 +48,7 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
     private List<AppBoxReference> appBoxReferences;
     private List<HoldingReference> holdings;
     private List<LocalsReference> locals;
+    private int emptyRefs = 0;
     private Long applicationId;
     private Long rejectVersion;
     private boolean useAccess = false;
@@ -66,7 +68,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
 
         // Check if advanced features are being used
         boolean hasAdvancedFeatures = (holdings != null && !holdings.isEmpty()) ||
-                                     (locals != null && !locals.isEmpty());
+                                     (locals != null && !locals.isEmpty()) ||
+                                     emptyRefs > 0;
 
         if (useAccess) {
             // Using access field mode - translate all references into access list
@@ -78,21 +81,18 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                 }
             }
 
-            if (foreignApps != null && !foreignApps.isEmpty()) {
-                for (Long appId : foreignApps) {
-                    allRefs.add(AppResourceRef.forApp(appId));
-                }
-            }
-
+            // Collection order is a cross-SDK contract (py/js): accounts,
+            // assets, apps, holdings, locals, boxes. Reordering changes the
+            // encoded bytes and therefore TxIDs and group IDs.
             if (foreignAssets != null && !foreignAssets.isEmpty()) {
                 for (Long assetId : foreignAssets) {
                     allRefs.add(AppResourceRef.forAsset(assetId));
                 }
             }
 
-            if (appBoxReferences != null && !appBoxReferences.isEmpty()) {
-                for (AppBoxReference boxRef : appBoxReferences) {
-                    allRefs.add(AppResourceRef.forBox(boxRef.getAppId(), boxRef.getName()));
+            if (foreignApps != null && !foreignApps.isEmpty()) {
+                for (Long appId : foreignApps) {
+                    allRefs.add(AppResourceRef.forApp(appId));
                 }
             }
 
@@ -108,13 +108,23 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
                 }
             }
 
+            if (appBoxReferences != null && !appBoxReferences.isEmpty()) {
+                for (AppBoxReference boxRef : appBoxReferences) {
+                    allRefs.add(AppResourceRef.forBox(boxRef.getAppId(), boxRef.getName()));
+                }
+            }
+
+            for (int i = 0; i < emptyRefs; i++) {
+                allRefs.add(AppResourceRef.forEmpty());
+            }
+
             txn.access = AccessConverter.convertToResourceRefs(allRefs, sender, applicationId);
 
         } else {
             // Using legacy fields mode
             if (hasAdvancedFeatures) {
                 throw new IllegalArgumentException(
-                    "Holdings and locals references require useAccess=true as they cannot be represented in legacy transaction format"
+                    "Holdings, locals, and empty references require useAccess=true as they cannot be represented in legacy transaction format"
                 );
             }
 
@@ -203,6 +213,8 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      * Set asset holding references that need to be accessible in this transaction.
      * Holdings references allow the transaction to access asset balances of specific accounts.
      *
+     * A null or zero (empty) address means the sender.
+     *
      * Note: Holdings references are only available when useAccess=true as they cannot be
      * represented in legacy transaction format.
      */
@@ -215,11 +227,28 @@ public abstract class ApplicationBaseTransactionBuilder<T extends ApplicationBas
      * Set local state references that need to be accessible in this transaction.
      * Locals references allow the transaction to access local state of specific accounts in specific apps.
      *
+     * A null or zero (empty) address means the sender; an appId of 0 refers to the currently executing app.
+     *
      * Note: Locals references are only available when useAccess=true as they cannot be
      * represented in legacy transaction format.
      */
     public T locals(List<LocalsReference> locals) {
         this.locals = locals;
+        return (T) this;
+    }
+
+    /**
+     * Add empty references to the access list. Each empty reference requests a
+     * box I/O quota bump without naming a resource.
+     *
+     * Note: Empty references are only available when useAccess=true as they cannot be
+     * represented in legacy transaction format.
+     */
+    public T emptyRefs(int emptyRefs) {
+        if (emptyRefs < 0) {
+            throw new IllegalArgumentException("emptyRefs must be a non-negative integer");
+        }
+        this.emptyRefs = emptyRefs;
         return (T) this;
     }
 

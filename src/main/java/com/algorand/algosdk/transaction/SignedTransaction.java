@@ -71,8 +71,18 @@ public class SignedTransaction implements Serializable {
     private SignedTransaction() {
     }
 
+    /**
+     * Set the auth address (rekeyed signer) for this transaction. "Not rekeyed" is
+     * represented as an empty auth address: setting an auth address equal to the
+     * transaction sender is a redundant no-op that nodes reject, so it is
+     * normalized to empty here. Passing null also clears the auth address.
+     */
     public SignedTransaction authAddr(Address authAddr) {
-        this.authAddr = authAddr;
+        if (authAddr == null || authAddr.equals(this.tx.sender)) {
+            this.authAddr = new Address();
+        } else {
+            this.authAddr = authAddr;
+        }
         return this;
     }
 
