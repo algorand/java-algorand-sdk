@@ -78,6 +78,13 @@ public class SimulateTransactionResult extends PathResponse {
     @JsonProperty("unnamed-resources-accessed")
     public SimulateUnnamedResourcesAccessed unnamedResourcesAccessed;
 
+    /**
+     * Fee usage for this transaction and all of its descendant inner transactions, in
+     * millionths of a basic transaction fee unit.
+     */
+    @JsonProperty("usage")
+    public Long usage;
+
     @Override
     public boolean equals(Object o) {
 
@@ -92,6 +99,7 @@ public class SimulateTransactionResult extends PathResponse {
         if (!Objects.deepEquals(this.logicSigBudgetConsumed, other.logicSigBudgetConsumed)) return false;
         if (!Objects.deepEquals(this.txnResult, other.txnResult)) return false;
         if (!Objects.deepEquals(this.unnamedResourcesAccessed, other.unnamedResourcesAccessed)) return false;
+        if (!Objects.deepEquals(this.usage, other.usage)) return false;
 
         return true;
     }
