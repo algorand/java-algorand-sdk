@@ -14,6 +14,7 @@ import com.algorand.algosdk.transaction.Transaction;
 import com.algorand.algosdk.util.AlgoConverter;
 import com.algorand.algosdk.util.Encoder;
 import com.algorand.algosdk.util.ResourceUtils;
+import com.algorand.algosdk.v2.client.Utils;
 import com.algorand.algosdk.v2.client.common.AlgodClient;
 import com.algorand.algosdk.v2.client.common.IndexerClient;
 import com.algorand.algosdk.v2.client.common.Response;
@@ -40,7 +41,6 @@ import java.util.Map;
 
 import static com.algorand.algosdk.util.ResourceUtils.loadResource;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
 
 public class Stepdefs {
     public static String token = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
@@ -456,7 +456,7 @@ public class Stepdefs {
         // Fund rekey address
         try {
             getParams();
-            Address sender = getAddress(0);
+            Address sender = richestWalletAccount();
             Transaction tx =
                     Transaction.PaymentTransactionBuilder()
                             .sender(sender)
@@ -465,10 +465,38 @@ public class Stepdefs {
                             .receiver(rekey)
                             .build();
             SignedTransaction st = signWithAddress(tx, sender);
-            aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(st)).execute();
+            Response<PostTransactionsResponse> resp =
+                    aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(st)).execute();
+            if (!resp.isSuccessful()) {
+                throw new IllegalStateException("funding the rekey account failed: " + resp.message());
+            }
+            Utils.waitForConfirmation(aclv2, resp.body().txId, 1);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * The wallet accumulates the zero-balance throwaway keys scenarios
+     * generate, and kmd does not list keys in a stable order, so funding from
+     * a fixed index can select an unfunded key. Fund from the richest account
+     * instead.
+     */
+    protected Address richestWalletAccount() throws Exception {
+        Address richest = null;
+        long best = -1;
+        for (String addr : addresses) {
+            Address candidate = new Address(addr);
+            long amount = aclv2.AccountInformation(candidate).execute().body().amount;
+            if (amount > best) {
+                best = amount;
+                richest = candidate;
+            }
+        }
+        if (richest == null) {
+            throw new IllegalStateException("no wallet accounts available; must use 'wallet information' first");
+        }
+        return richest;
     }
 
     Address rekey;
@@ -651,7 +679,11 @@ public class Stepdefs {
 
     @When("I send the transaction")
     public void sendTxn() throws Exception {
-        txid = aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute().body().txId;
+        Response<PostTransactionsResponse> resp = aclv2.RawTransaction().rawtxn(Encoder.encodeToMsgPack(stx)).execute();
+        if (!resp.isSuccessful()) {
+            throw new IllegalStateException("sending transaction failed: " + resp.message());
+        }
+        txid = resp.body().txId;
     }
 
     @When("I send the multisig transaction")

@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -931,7 +932,89 @@ public class TestTransaction {
         assertThat(o.tx.type).isEqualTo(Transaction.Type.Heartbeat);
         assertThat(o.tx.heartbeatFields.hbKeyDilution).isEqualTo(100);
         assertThat(o.tx.heartbeatFields.hbAddress).isEqualTo(hbAddress);
+        // a heartbeat without the challenge discount decodes to false
+        assertThat(o.tx.heartbeatFields.hbChallengeDiscount).isFalse();
         TestUtil.serializeDeserializeCheck(o);
+    }
+
+    @Test
+    public void testEqualsCoversAppCallAndAccessFields() throws Exception {
+        Address sender = new Address("47YPQTIGQEO7T4Y4RWDYWEKV6RTR2UNBQXBABEEGM72ESWDQNCQ52OPASU");
+        byte[] gh = Encoder.decodeFromBase64("SGO1GKSzyE7IEPItTxCByw9x8FmnrCDexi9/cOUJOiI=");
+
+        // Build twice with separately-allocated argument arrays: equality must be
+        // by content, not reference
+        java.util.function.Supplier<Transaction> build = () -> {
+            try {
+                return Transaction.ApplicationCallTransactionBuilder()
+                        .sender(sender)
+                        .applicationId(1001L)
+                        .args(Collections.singletonList("arg".getBytes()))
+                        .accounts(Collections.singletonList(sender))
+                        .foreignApps(Collections.singletonList(55L))
+                        .firstValid(1000)
+                        .lastValid(2000)
+                        .genesisHash(new Digest(gh))
+                        .build();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Transaction a = build.get();
+        Transaction b = build.get();
+        assertThat(a).isEqualTo(b);
+
+        // Decode-vs-built equality now covers the app-call fields
+        Transaction decoded = Encoder.decodeFromMsgPack(
+                Encoder.encodeToBase64(Encoder.encodeToMsgPack(a)), Transaction.class);
+        assertThat(decoded).isEqualTo(a);
+
+        // Each previously-ignored field now participates in equality
+        Transaction c = build.get();
+        c.applicationArgs = Collections.singletonList("other".getBytes());
+        assertThat(c).isNotEqualTo(a);
+
+        Transaction d = build.get();
+        d.access = Collections.singletonList(ResourceRef.forAsset(9L));
+        assertThat(d).isNotEqualTo(a);
+
+        Transaction e = build.get();
+        e.applicationId = 2002L;
+        assertThat(e).isNotEqualTo(a);
+
+        Transaction f = build.get();
+        f.approvalProgram = new TEALProgram(new byte[]{0x06});
+        assertThat(f).isNotEqualTo(a);
+    }
+
+    @Test
+    public void testHeartbeatChallengeDiscountRoundTrip() throws Exception {
+        Address hbAddress = new Address("NRJ2UKUNLR3FHLTIYG5RP576RXX7MAU25F7DW6LCM5D45WF67H6EFQMWNM");
+
+        HeartbeatTxnFields discounted = new HeartbeatTxnFields(
+                hbAddress, new HeartbeatProof(), new byte[32],
+                new ParticipationPublicKey(), BigInteger.valueOf(100), true);
+        HeartbeatTxnFields plain = new HeartbeatTxnFields(
+                hbAddress, new HeartbeatProof(), new byte[32],
+                new ParticipationPublicKey(), BigInteger.valueOf(100));
+
+        byte[] encDiscounted = Encoder.encodeToMsgPack(discounted);
+        byte[] encPlain = Encoder.encodeToMsgPack(plain);
+
+        // the "c" boolean (key + true value = 3 bytes) is only present when set
+        assertThat(encDiscounted.length).isEqualTo(encPlain.length + 3);
+
+        HeartbeatTxnFields decoded = Encoder.decodeFromMsgPack(
+                Encoder.encodeToBase64(encDiscounted), HeartbeatTxnFields.class);
+        assertThat(decoded.hbChallengeDiscount).isTrue();
+        assertThat(decoded).isEqualTo(discounted);
+
+        HeartbeatTxnFields decodedPlain = Encoder.decodeFromMsgPack(
+                Encoder.encodeToBase64(encPlain), HeartbeatTxnFields.class);
+        assertThat(decodedPlain.hbChallengeDiscount).isFalse();
+        assertThat(decodedPlain).isEqualTo(plain);
+        assertThat(decodedPlain).isNotEqualTo(discounted);
     }
 
     @Nested
@@ -1162,6 +1245,9 @@ public class TestTransaction {
 
         encoded = Encoder.encodeToBase64(Encoder.encodeToMsgPack(tx));
         Transaction decoded = Encoder.decodeFromMsgPack(encoded, tx.getClass());
-        assertEqual(tx2, decoded);
+        // The reordered access list round-trips faithfully, and is a genuinely
+        // different transaction than the original ordering (indices shift meaning)
+        assertEqual(tx, decoded);
+        assertThat(decoded).isNotEqualTo(tx2);
     }
 }

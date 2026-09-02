@@ -39,11 +39,16 @@ public class Ed25519PublicKey implements Serializable {
 
     @JsonValue
     public byte[] getBytes() {
-        return this.bytes;
+        return Arrays.copyOf(this.bytes, this.bytes.length);
     }
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Ed25519PublicKey && Arrays.equals(this.bytes, ((Ed25519PublicKey) obj).bytes);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(this.bytes);
     }
 }

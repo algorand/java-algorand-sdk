@@ -77,10 +77,11 @@ public class MethodCallParams {
                 throw new IllegalArgumentException(
                         "One of the following required parameters for OnApplicationComplete.UpdateApplicationOC is missing: approvalProgram, clearProgram"
                 );
-            if (globalStateSchema != null || localStateSchema != null || extraPages != null)
+            // The local state schema cannot be changed after application creation. The global
+            // state schema and extraPages may be changed during an update.
+            if (localStateSchema != null)
                 throw new IllegalArgumentException(
-                        "One of the following application creation parameters were set on a non-creation call: " +
-                                "globalStateSchema, localStateSchema, extraPages"
+                        "The local state schema cannot be changed on an update call"
                 );
         } else {
             if (approvalProgram != null || clearProgram != null || globalStateSchema != null || localStateSchema != null || extraPages != null) {

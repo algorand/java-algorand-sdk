@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 
 import static com.algorand.algosdk.unit.utils.TestingUtils.verifyResponse;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AlgodResponses {
     AlgodClient client;

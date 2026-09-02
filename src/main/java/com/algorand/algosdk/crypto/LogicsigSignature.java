@@ -31,6 +31,8 @@ public class LogicsigSignature {
     @JsonIgnore
     private static final byte[] MULTISIG_PROGRAM_PREFIX = ("MsigProgram").getBytes(StandardCharsets.UTF_8);
     @JsonIgnore
+    private static final byte[] PQ_PROGRAM_PREFIX = ("PQProgram").getBytes(StandardCharsets.UTF_8);
+    @JsonIgnore
     private static final String SIGN_ALGO = "EdDSA";
 
     @JsonProperty("l")
@@ -43,6 +45,8 @@ public class LogicsigSignature {
     public MultisigSignature msig;
     @JsonProperty("lmsig")
     public MultisigSignature lmsig;
+    @JsonProperty("pqsig")
+    public PQSignature pqsig;
 
 
     private static boolean isAsciiPrintable(final byte symbol) {
@@ -103,7 +107,8 @@ public class LogicsigSignature {
         @JsonProperty("arg") List<byte[]> args,
         @JsonProperty("sig") byte[] sig,
         @JsonProperty("msig") MultisigSignature msig,
-        @JsonProperty("lmsig") MultisigSignature lmsig
+        @JsonProperty("lmsig") MultisigSignature lmsig,
+        @JsonProperty("pqsig") PQSignature pqsig
     ) {
         this.logic = Objects.requireNonNull(logic, "program must not be null");
         this.args = args;
@@ -113,6 +118,17 @@ public class LogicsigSignature {
         if (sig != null) this.sig = new Signature(sig);
         this.msig = msig;
         this.lmsig = lmsig;
+        this.pqsig = pqsig;
+    }
+
+    public LogicsigSignature(
+        byte[] logic,
+        List<byte[]> args,
+        byte[] sig,
+        MultisigSignature msig,
+        MultisigSignature lmsig
+    ) {
+        this(logic, args, sig, msig, lmsig, null);
     }
 
     /**
@@ -141,7 +157,7 @@ public class LogicsigSignature {
     }
 
     /**
-     * Returns the number of signatures (sig, msig, lmsig) on this LogicSig.
+     * Returns the number of signatures (sig, msig, lmsig, pqsig) on this LogicSig.
      * At most one of these should be present.
      * @return the number of signature types present
      */
@@ -150,6 +166,7 @@ public class LogicsigSignature {
         if (this.sig != null) count++;
         if (this.msig != null) count++;
         if (this.lmsig != null) count++;
+        if (this.pqsig != null) count++;
         return count;
     }
 
@@ -188,6 +205,22 @@ public class LogicsigSignature {
         System.arraycopy(MULTISIG_PROGRAM_PREFIX, 0, prefixedEncoded, 0, MULTISIG_PROGRAM_PREFIX.length);
         System.arraycopy(addressBytes, 0, prefixedEncoded, MULTISIG_PROGRAM_PREFIX.length, addressBytes.length);
         System.arraycopy(this.logic, 0, prefixedEncoded, MULTISIG_PROGRAM_PREFIX.length + addressBytes.length, this.logic.length);
+        return prefixedEncoded;
+    }
+
+    /**
+     * Return the post-quantum delegation preimage: the "PQProgram" prefix, the
+     * delegating post-quantum address, and the program. Post-quantum schemes
+     * sign these bytes directly.
+     * @param pqAddress the delegating post-quantum address to include in signed data
+     * @return byte[]
+     */
+    public byte[] bytesToSignPQ(Address pqAddress) {
+        byte[] addressBytes = pqAddress.getBytes();
+        byte[] prefixedEncoded = new byte[this.logic.length + PQ_PROGRAM_PREFIX.length + addressBytes.length];
+        System.arraycopy(PQ_PROGRAM_PREFIX, 0, prefixedEncoded, 0, PQ_PROGRAM_PREFIX.length);
+        System.arraycopy(addressBytes, 0, prefixedEncoded, PQ_PROGRAM_PREFIX.length, addressBytes.length);
+        System.arraycopy(this.logic, 0, prefixedEncoded, PQ_PROGRAM_PREFIX.length + addressBytes.length, this.logic.length);
         return prefixedEncoded;
     }
 
@@ -234,6 +267,19 @@ public class LogicsigSignature {
         if (this.msig != null)
             return this.msig.verify(this.bytesToSign());
 
+        if (this.pqsig != null) {
+            // There is no local post-quantum signature verification; consensus
+            // verifies the signature bytes. Here we only confirm that the address
+            // the signature authorizes -- derived from the scheme, salt and public
+            // key it carries, exactly as consensus resolves it -- is the
+            // delegating account.
+            try {
+                return PQAddress.fromSignature(this.pqsig).equals(singleSigner);
+            } catch (Exception ex) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -263,6 +309,9 @@ public class LogicsigSignature {
 
             if (!LogicsigSignature.nullCheck(this.lmsig, actual.lmsig)) return false;
             if (this.lmsig != null && !this.lmsig.equals(actual.lmsig)) return false;
+
+            if (!LogicsigSignature.nullCheck(this.pqsig, actual.pqsig)) return false;
+            if (this.pqsig != null && !this.pqsig.equals(actual.pqsig)) return false;
 
             if (!LogicsigSignature.nullCheck(this.msig, actual.msig)) return false;
             return this.msig == null || this.msig.equals(actual.msig);

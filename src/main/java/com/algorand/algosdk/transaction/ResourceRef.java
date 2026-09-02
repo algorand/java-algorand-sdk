@@ -12,10 +12,15 @@ import java.util.Objects;
 /**
  * ResourceRef is a reference to a resource in an application call transaction.
  * It can reference different types of resources like accounts, assets, applications, holdings, locals, or boxes.
- * Only one resource type should be set per ResourceRef instance.
+ * At most one resource type should be set per ResourceRef instance. An empty
+ * ResourceRef is meaningful: it requests a box I/O quota bump without naming a
+ * resource, and encodes canonically as an empty map.
  */
 @JsonInclude(JsonInclude.Include.NON_DEFAULT)
 public class ResourceRef {
+
+    private static final Address ZERO_ADDRESS = new Address();
+
     @JsonProperty("d")
     public Address address;
     
@@ -41,7 +46,8 @@ public class ResourceRef {
 
     /**
      * JsonCreator constructor for ResourceRef deserialization.
-     * Empty ResourceRef objects (all fields null) are converted to empty box references.
+     * Empty ResourceRef objects (all fields null) stay empty so they re-encode
+     * canonically as an empty map.
      */
     @JsonCreator
     public ResourceRef(
@@ -59,38 +65,41 @@ public class ResourceRef {
         this.holding = holding;
         this.locals = locals;
         this.box = box;
-
-        // Handle empty ResourceRef objects by converting to empty box references
-        if (address == null && asset == null && app == null &&
-            holding == null && locals == null && box == null) {
-            this.box = new BoxRef(0L, new byte[0]);
-        }
     }
 
     /**
-     * Create a ResourceRef for an account address.
+     * Create a ResourceRef for an account address. The zero (empty) address is
+     * canonically the fully-empty reference.
      */
     public static ResourceRef forAddress(Address address) {
         ResourceRef ref = new ResourceRef();
-        ref.address = address;
+        if (address != null && !address.equals(ZERO_ADDRESS)) {
+            ref.address = address;
+        }
         return ref;
     }
 
     /**
-     * Create a ResourceRef for an asset.
+     * Create a ResourceRef for an asset. An asset id of 0 is canonically the
+     * fully-empty reference.
      */
     public static ResourceRef forAsset(long assetId) {
         ResourceRef ref = new ResourceRef();
-        ref.asset = assetId;
+        if (assetId != 0) {
+            ref.asset = assetId;
+        }
         return ref;
     }
 
     /**
-     * Create a ResourceRef for an application.
+     * Create a ResourceRef for an application. An app id of 0 is canonically the
+     * fully-empty reference.
      */
     public static ResourceRef forApp(long appId) {
         ResourceRef ref = new ResourceRef();
-        ref.app = appId;
+        if (appId != 0) {
+            ref.app = appId;
+        }
         return ref;
     }
 
@@ -99,7 +108,10 @@ public class ResourceRef {
      */
     public static ResourceRef forHolding(HoldingRef holdingRef) {
         ResourceRef ref = new ResourceRef();
-        ref.holding = holdingRef;
+        // An all-zero holding is canonically the fully-empty reference
+        if (holdingRef != null && !(holdingRef.addressIndex == 0 && holdingRef.assetIndex == 0)) {
+            ref.holding = holdingRef;
+        }
         return ref;
     }
 
@@ -108,7 +120,10 @@ public class ResourceRef {
      */
     public static ResourceRef forLocals(LocalsRef localsRef) {
         ResourceRef ref = new ResourceRef();
-        ref.locals = localsRef;
+        // An all-zero locals reference is canonically the fully-empty reference
+        if (localsRef != null && !(localsRef.addressIndex == 0 && localsRef.appIndex == 0)) {
+            ref.locals = localsRef;
+        }
         return ref;
     }
 
@@ -117,8 +132,19 @@ public class ResourceRef {
      */
     public static ResourceRef forBox(BoxRef boxRef) {
         ResourceRef ref = new ResourceRef();
-        ref.box = boxRef;
+        // A zero-index box with an empty name is canonically the fully-empty reference
+        if (boxRef != null && !(boxRef.index == 0 && boxRef.name == null)) {
+            ref.box = boxRef;
+        }
         return ref;
+    }
+
+    /**
+     * Create an empty ResourceRef. An empty reference requests a box I/O quota
+     * bump without naming a resource.
+     */
+    public static ResourceRef forEmpty() {
+        return new ResourceRef();
     }
 
     /**
@@ -131,7 +157,8 @@ public class ResourceRef {
     }
 
     /**
-     * Validate that only one resource type is set.
+     * Validate that at most one resource type is set. An empty ResourceRef is
+     * valid: it requests a box I/O quota bump without naming a resource.
      * @throws IllegalStateException if multiple resource types are set
      */
     @JsonIgnore
@@ -146,9 +173,6 @@ public class ResourceRef {
 
         if (setCount > 1) {
             throw new IllegalStateException("ResourceRef can only have one resource type set");
-        }
-        if (setCount == 0) {
-            throw new IllegalStateException("ResourceRef must have one resource type set");
         }
     }
 
@@ -189,10 +213,10 @@ public class ResourceRef {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class HoldingRef {
         @JsonProperty("d")
-        public Long addressIndex;  // Index into Access array (0 = sender)
-        
+        public long addressIndex;  // Index into Access array (0 = sender)
+
         @JsonProperty("s")
-        public Long assetIndex;    // Index into Access array
+        public long assetIndex;    // Index into Access array
 
         public HoldingRef() {}
 
@@ -200,8 +224,8 @@ public class ResourceRef {
         public HoldingRef(
                 @JsonProperty("d") Long addressIndex,
                 @JsonProperty("s") Long assetIndex) {
-            this.addressIndex = addressIndex;
-            this.assetIndex = assetIndex;
+            this.addressIndex = addressIndex == null ? 0 : addressIndex;
+            this.assetIndex = assetIndex == null ? 0 : assetIndex;
         }
 
         public HoldingRef(long addressIndex, long assetIndex) {
@@ -214,7 +238,7 @@ public class ResourceRef {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             HoldingRef that = (HoldingRef) o;
-            return Objects.equals(addressIndex, that.addressIndex) && Objects.equals(assetIndex, that.assetIndex);
+            return addressIndex == that.addressIndex && assetIndex == that.assetIndex;
         }
 
         @Override
@@ -238,10 +262,10 @@ public class ResourceRef {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class LocalsRef {
         @JsonProperty("d")
-        public Long addressIndex;  // Index into Access array (0 = sender)
-        
+        public long addressIndex;  // Index into Access array (0 = sender)
+
         @JsonProperty("p")
-        public Long appIndex;      // Index into Access array (0 = current app)
+        public long appIndex;      // Index into Access array (0 = current app)
 
         public LocalsRef() {}
 
@@ -249,8 +273,8 @@ public class ResourceRef {
         public LocalsRef(
                 @JsonProperty("d") Long addressIndex,
                 @JsonProperty("p") Long appIndex) {
-            this.addressIndex = addressIndex;
-            this.appIndex = appIndex;
+            this.addressIndex = addressIndex == null ? 0 : addressIndex;
+            this.appIndex = appIndex == null ? 0 : appIndex;
         }
 
         public LocalsRef(long addressIndex, long appIndex) {
@@ -263,7 +287,7 @@ public class ResourceRef {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             LocalsRef that = (LocalsRef) o;
-            return Objects.equals(addressIndex, that.addressIndex) && Objects.equals(appIndex, that.appIndex);
+            return addressIndex == that.addressIndex && appIndex == that.appIndex;
         }
 
         @Override
@@ -287,8 +311,9 @@ public class ResourceRef {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     public static class BoxRef {
         @JsonProperty("i")
-        public Long index;        // Index into Access array (0 = current app)
-        
+        public long index;        // Index into Access array (0 = current app)
+
+        // Stored as null when empty so the canonical encoding omits it
         @JsonProperty("n")
         public byte[] name;
 
@@ -298,13 +323,13 @@ public class ResourceRef {
         public BoxRef(
                 @JsonProperty("i") Long index,
                 @JsonProperty("n") byte[] name) {
-            this.index = index;
-            this.name = name == null ? new byte[0] : Arrays.copyOf(name, name.length);
+            this.index = index == null ? 0 : index;
+            this.name = name == null || name.length == 0 ? null : Arrays.copyOf(name, name.length);
         }
 
         public BoxRef(long index, byte[] name) {
             this.index = index;
-            this.name = name == null ? new byte[0] : Arrays.copyOf(name, name.length);
+            this.name = name == null || name.length == 0 ? null : Arrays.copyOf(name, name.length);
         }
 
         @JsonIgnore
@@ -317,7 +342,7 @@ public class ResourceRef {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             BoxRef boxRef = (BoxRef) o;
-            return Objects.equals(index, boxRef.index) && Arrays.equals(name, boxRef.name);
+            return index == boxRef.index && Arrays.equals(name, boxRef.name);
         }
 
         @Override

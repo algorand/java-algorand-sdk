@@ -10,7 +10,7 @@ public class Utils {
     /**
      * Wait until a transaction has been confirmed or rejected by the network
      * or wait until waitRound fully elapsed
-     * 
+     *
      * @param client     an Algod v2 client
      * @param txID       the transaction ID that we are waiting
      * @param waitRounds The maximum number of rounds to wait for.

@@ -164,8 +164,8 @@ public class MethodCallTransactionBuilder<T extends MethodCallTransactionBuilder
 
     @Override
     public T extraPages(Long extraPages) {
-        if (extraPages == null || extraPages < 0 || extraPages > 3) {
-            throw new IllegalArgumentException("extraPages must be an integer between 0 and 3 inclusive");
+        if (extraPages == null || extraPages < 0) {
+            throw new IllegalArgumentException("extraPages must be a non-negative integer");
         }
         this.extraPages = extraPages;
         return (T) this;

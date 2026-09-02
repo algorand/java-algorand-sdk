@@ -163,9 +163,8 @@ public class Account {
             byte[] prefixEncodedTx = tx.bytesToSign();
             Signature txSig = rawSignBytes(Arrays.copyOf(prefixEncodedTx, prefixEncodedTx.length));
             SignedTransaction stx = new SignedTransaction(tx, txSig, tx.txID());
-            if (!tx.sender.equals(this.address)) {
-                stx.authAddr(this.address);
-            }
+            // the setter normalizes authAddr == sender to empty ("not rekeyed")
+            stx.authAddr(this.address);
             return stx;
         } catch (IOException e) {
             throw new RuntimeException("unexpected behavior", e);
@@ -331,10 +330,9 @@ public class Account {
         }
         // generate signed transaction
         SignedTransaction stx = new SignedTransaction(tx, mSig, txSig.transactionID);
-        // if the transaction sender address is not multi-sig address
-        // set the auth address as the multi-sig address
-        if (!tx.sender.equals(from.toAddress()))
-            stx.authAddr = from.toAddress();
+        // if the transaction sender is not the multi-sig address, the multi-sig
+        // address becomes the auth address (the setter normalizes sender to empty)
+        stx.authAddr(from.toAddress());
         return stx;
     }
 
@@ -451,6 +449,9 @@ public class Account {
      * @throws IOException
      */
     public LogicsigSignature signLogicsig(LogicsigSignature lsig) throws IOException {
+        if (lsig.pqsig != null) {
+            throw new IllegalStateException("LogicsigSignature already has a post-quantum signature");
+        }
         Signature sig;
         try {
             byte[] bytesToSign = lsig.bytesToSign();
@@ -470,6 +471,9 @@ public class Account {
      * @throws IOException
      */
     public LogicsigSignature signLogicsig(LogicsigSignature lsig, MultisigAddress ma) throws IOException {
+        if (lsig.pqsig != null) {
+            throw new IllegalStateException("LogicsigSignature already has a post-quantum signature");
+        }
         Ed25519PublicKey myPK = this.getEd25519PublicKey();
         int myIndex = ma.publicKeys.indexOf(myPK);
         if (myIndex == -1) {
@@ -543,8 +547,8 @@ public class Account {
 
         try {
             SignedTransaction stx = new SignedTransaction(tx, lsig, tx.txID());
-            if (!stx.tx.sender.equals(lsigAddr))
-                stx.authAddr = lsigAddr;
+            // the setter normalizes authAddr == sender to empty ("not rekeyed")
+            stx.authAddr(lsigAddr);
             return stx;
         } catch (Exception ex) {
             throw new IOException("could not encode transactions", ex);
@@ -562,6 +566,7 @@ public class Account {
         boolean hasSig = lsig.sig != null;
         boolean hasLmsig = lsig.lmsig != null;
         boolean hasMsig = lsig.msig != null;
+        boolean hasPQsig = lsig.pqsig != null;
         Address lsigAddr;
         try {
             if (hasSig) {
@@ -570,6 +575,8 @@ public class Account {
                 lsigAddr = lsig.lmsig.convertToMultisigAddress().toAddress();
             } else if (hasMsig) {
                 lsigAddr = lsig.msig.convertToMultisigAddress().toAddress();
+            } else if (hasPQsig) {
+                lsigAddr = PQAddress.fromSignature(lsig.pqsig);
             } else {
                 lsigAddr = lsig.toAddress();
             }
