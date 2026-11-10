@@ -57,6 +57,7 @@ public class Lease {
         if (o == null || getClass() != o.getClass()) return false;
         return Arrays.equals(((Lease)o).data, data);
     }
+
      @Override
      public int hashCode() {
         return Arrays.hashCode(data);
