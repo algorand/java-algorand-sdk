@@ -58,6 +58,10 @@ public class Lease {
         return Arrays.equals(((Lease)o).data, data);
     }
 
+     @Override
+     public int hashCode() {
+        return Arrays.hashCode(data);
+     }
     /**
      * Validates a lease byte array. The lease should be an empty array or a 32 byte array.
      * @param value a lease byte array.
